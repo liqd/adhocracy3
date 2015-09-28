@@ -121,7 +121,7 @@ def root_view(request):
 
 def _build_ws_url(request: Request) -> str:
     ws_domain = request.domain
-    ws_port = 8080
+    ws_port = 6561
     ws_scheme = 'wss' if request.scheme == 'https' else 'ws'
     return '{}://{}:{}'.format(ws_scheme, ws_domain, ws_port)
 

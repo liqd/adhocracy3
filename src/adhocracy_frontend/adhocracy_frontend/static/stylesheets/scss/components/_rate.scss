@@ -10,7 +10,7 @@ A like-button with counter.
 The button has the is-rate-button-active state.
 
 ```html_example
-<div class="like">
+<div class="like" style="margin-bottom: 10px">
     <span class="like-difference">+4</span>
     <a class="like-button">Like</a>
 </div>
@@ -36,14 +36,15 @@ The button has the is-rate-button-active state.
 }
 
 $line-height: (24/12);
-$arrow-width: 1em;
+$arrow-width: 1rem;
 
 .like-button {
     @include inline-block;
-    font-size: $font-size-small;
+    @include rem(font-size, $font-size-small);
+    @include rem(min-width, 100px);
+    @include rem(padding, 0 10px);
     position: relative;
     margin-left: $arrow-width;
-    padding: 0 0.83333333em;
     text-transform: uppercase;
     line-height: $line-height;
     background-color: $color-brand-one-normal;
@@ -51,17 +52,16 @@ $arrow-width: 1em;
     cursor: pointer;
     text-align: center;
     text-decoration: none;
-    min-width: 100px / $font-size-small * 1em;
 
     &:before {
+        @include rem(border-right, $arrow-width solid $color-brand-one-normal);
+        border-top: $line-height/2 * 1em solid $color-structure-transparent;
+        border-bottom: $line-height/2 * 1em solid $color-structure-transparent;
         content: "";
         position: absolute;
         left: -$arrow-width;
         width: 0;
         height: 0;
-        border-top: $line-height/2 * 1em solid $color-structure-transparent;
-        border-bottom: $line-height/2 * 1em solid $color-structure-transparent;
-        border-right: $arrow-width solid $color-brand-one-normal;
         border-left: 0;
     }
 
@@ -202,9 +202,9 @@ Click show results
     }
 
     .rate-results {
+        @include rem(font-size, $font-size-small);
+        @include rem(padding-top, 3px);
         display: block;
-        padding-top: 3px / $font-size-small * 1em;
-        font-size: $font-size-small;
         position: absolute;
         text-align: center;
         visibility: hidden;

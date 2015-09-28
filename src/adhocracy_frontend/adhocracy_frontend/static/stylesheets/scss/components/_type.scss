@@ -6,9 +6,12 @@ category: Type
 ---
 */
 
+html {
+    @include rem-baseline;
+}
+
 body {
     color: $color-text-normal;
-    font-size: $font-size-normal;
     line-height: $line-height-normal;
 
     @media print {
@@ -62,11 +65,11 @@ category: Type
 ```
 */
 p {
+    @include rem(margin, 0 0 1rem);
     // break very long words
     word-wrap: break-word;
     hyphens: auto;
     line-height: $line-height-normal;
-    margin: 0 0 1em;
 
     @media print {
         text-align: justify;
@@ -133,16 +136,16 @@ blockquote,
 article,
 section {
     h1, h2, h3, h4, h5, h6 {
-        font-size: 1em;
-        margin: 10px 0;
+        @include rem(font-size, 1rem);
+        @include rem(margin, 10px 0);
     }
 
     h1 {
-        font-size: 1.2em;
+        @include rem(font-size, 1.2rem);
     }
 
     h2 {
-        font-size: 1.1em;
+        @include rem(font-size, 1.1rem);
     }
 }
 
@@ -167,10 +170,10 @@ category: Type
 .inline-box {
     @media screen {
         @include inline-block;
+        @include rem(font-size, $font-size-small);
+        @include rem(padding, 0 1rem);
         color: $color-text-highlight-introvert;
         border: 1px solid $color-text-highlight-introvert;
-        font-size: $font-size-small;
-        padding: 0 1em;
     }
 }
 
@@ -226,8 +229,8 @@ category: Type
 */
 table {
     td, th {
+        @include rem(padding, 0.5rem);
         @include text-align(start);
-        padding: 0.5em;
         border-top: 1px solid $color-structure-border;
         vertical-align: top;
     }
@@ -296,7 +299,7 @@ parent: lists
 ```
 */
 ul, ol {
-    padding-left: 1.5em;
+    @include rem(padding-left, 1.5rem);
 }
 
 li {
@@ -355,11 +358,11 @@ category: Type
 ```
 */
 blockquote {
+    @include rem(margin, 1.5rem);
+    @include rem(padding-left, 0.5rem);
+    @include rem(border-left, 0.4rem solid $color-text-highlight-normal);
     position: relative;
     font-style: italic;
-    border-left: 0.4em solid $color-text-highlight-normal;
-    padding-left: 0.5em;
-    margin: 1.5em;
 
     cite {
         float: right;
@@ -368,7 +371,7 @@ blockquote {
 
 // figure
 figure {
-    margin: 1em 0;
+    @include rem(margin, 1rem 0);
 }
 
 figcaption {
@@ -387,7 +390,7 @@ parent: inline
 ```
 */
 code {
-    font-size: 0.9em;
+    @include rem(font-size, 0.9rem);
     background-color: $color-structure-introvert;
 }
 
@@ -405,13 +408,13 @@ category: Type
 ```
 */
 pre {
-    margin: 1em 0;
+    @include rem(font-size, 0.9rem);
+    @include rem(margin, 1rem 0);
+    @include rem(max-height, 18rem);
+    @include rem(padding, 0.7rem);
     display: block;
-    padding: 0.7em;
-    font-size: 0.9em;
     background-color: $color-structure-introvert;
     border: 1px solid $color-structure-border;
-    max-height: 18em;
     overflow: auto;
 
     code {

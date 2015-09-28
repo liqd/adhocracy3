@@ -16,14 +16,39 @@ from adhocracy_core.workflows import transition_to_states
 
 
 def set_workflow_state():  # pragma: no cover
-    """Set a workflow state for a given resource.
+    """Set a workflow state for a given resource."""
+    epilog = """
+Below are some usages examples. We assume there is a process
+associated to the ``/organisation/workshop`` resource with a standard
+workflow.
 
-    usage::
+To set a particular state, a relative path leading to the wanted state
+is entered::
 
-        bin/set_workflow_state etc/development.ini <resource-path> <state>
-    """
+    ./bin/set_workflow_state etc/development.ini
+    /organisation/workshop evaluate result closed
+
+An absolute path can be given instead of a relative one with the
+`absolute` option. The following command will put the workflow in the
+'closed' state, whatever the current state is::
+
+    ./bin/set_workflow_state --absolute etc/development.ini /organisation/workshop announce participate evaluate result closed
+
+The current state and information about the workflow can be obtained
+with the `info` option::
+
+    ./bin/set_workflow_state --info etc/development.ini /organisation/workshop
+
+The `reset` option is used to reset the workflow before setting the state::
+
+    ./bin/set_workflow_state --reset etc/development.ini /organisation/workshop draft announce
+
+    """  # noqa
     docstring = inspect.getdoc(set_workflow_state)
-    parser = argparse.ArgumentParser(description=docstring)
+    parser = argparse.ArgumentParser(description=docstring,
+                                     epilog=epilog,
+                                     formatter_class=argparse
+                                     .RawDescriptionHelpFormatter)
     parser.add_argument('ini_file',
                         help='path to the adhocracy backend ini file')
     parser.add_argument('resource_path',
@@ -39,7 +64,8 @@ def set_workflow_state():  # pragma: no cover
                         action='store_true')
     parser.add_argument('-r',
                         '--reset',
-                        help='reset workflow to initial state',
+                        help='reset workflow before '
+                        'transitioning to the states',
                         action='store_true')
     parser.add_argument('states',
                         type=str,

@@ -5,7 +5,7 @@
 }
 
 .error-page-title {
+    @include rem(font-size, $font-size-large);
+    @include rem(margin, 40px 0 0);
     color: $color-text-normal;
-    font-size: $font-size-large;
-    margin: (40px / $font-size-large * 1em) 0 0;
 }

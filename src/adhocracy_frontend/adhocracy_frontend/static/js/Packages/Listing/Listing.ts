@@ -62,8 +62,7 @@ export interface IFacet {
     items : IFacetItem[];
 }
 
-export type IPredicateItem = string | ((string) => string);
-export type IPredicate = IPredicateItem | IPredicateItem[];
+export type IPredicate = string | {[key : string]: string}
 
 export interface ListingScope<Container> extends angular.IScope {
     path : string;

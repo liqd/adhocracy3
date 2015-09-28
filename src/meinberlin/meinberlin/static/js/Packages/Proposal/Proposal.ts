@@ -40,6 +40,7 @@ export interface IScope extends angular.IScope {
     data : {
         title : string;
         detail : string;
+        rateCount : number;
         creator : string;
         creationDate : string;
         commentCount : number;
@@ -122,7 +123,7 @@ var bindPath = (
                     adhRate.fetchAggregatedRates(rateableSheet.post_pool, resource.path),
                     getPolygon(),
                     adhGetBadges(resource)
-                ]).then((args) => {
+                ]).then((args : any[]) => {
                     var commentCount = args[0];
                     var rates = args[1];
                     var polygon = args[2];
@@ -170,7 +171,6 @@ var fill = (
     if (isKiezkasse) {
         proposalVersion.data[SIKiezkassenProposal.nick] = new SIKiezkassenProposal.Sheet({
             budget: scope.data.budget,
-            detail: scope.data.detail,
             creator_participate: scope.data.creatorParticipate,
             location_text: scope.data.locationText,
             address: scope.data.address

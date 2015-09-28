@@ -6,6 +6,8 @@ import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 
+import * as ResourcesBase from "../ResourcesBase";
+
 import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RIDocument from "../../Resources_/adhocracy_core/resources/document/IDocument";
 import RIDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
@@ -207,7 +209,6 @@ export var postCreate = (
         follows: [doc.first_version_path]
     });
     documentVersion.data[SIDocument.nick] = new SIDocument.Sheet({
-        description: "",
         elements: <string[]>_.map(paragraphVersions, "path")
     });
     documentVersion.data[SITitle.nick] = new SITitle.Sheet({
@@ -306,7 +307,6 @@ export var postEdit = (
         follows: [oldVersion.path]
     });
     documentVersion.data[SIDocument.nick] = new SIDocument.Sheet({
-        description: "",
         elements: paragraphRefs
     });
     documentVersion.data[SITitle.nick] = new SITitle.Sheet({
@@ -324,7 +324,7 @@ export var postEdit = (
     }
 
     var commit = () => {
-        return adhHttp.deepPost(<any[]>_.flatten([documentVersion, paragraphItems, paragraphVersions]))
+        return adhHttp.deepPost(_.flatten<ResourcesBase.Resource>([documentVersion, paragraphItems, paragraphVersions]))
             .then((result) => result[0]);
     };
 

@@ -1,6 +1,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
+import * as _ from "lodash";
+
 import * as AdhHttp from "../Http/Http";
 
 
@@ -44,6 +46,11 @@ export var recursionHelper = ($compile) => {
             };
         }
     };
+};
+
+
+export var numberOrDashFilter = (n) : string => {
+    return _.isFinite(n) ? n : "—";
 };
 
 
@@ -273,4 +280,3 @@ export var submitIfValid = (
         return $q.reject([]);
     }
 };
-

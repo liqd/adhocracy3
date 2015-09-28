@@ -15,6 +15,7 @@ export var register = (angular) => {
         ])
         .filter("join", () => (list : any[], separator : string = ", ") : string => list.join(separator))
         .filter("signum", () => (n : number) : string => (typeof n === "number") ? (n > 0 ? "+" + n.toString() : n.toString()) : "0")
+        .filter("numberOrDash", () => AdhAngularHelpers.numberOrDashFilter)
         .factory("adhRecursionHelper", ["$compile", AdhAngularHelpers.recursionHelper])
         .factory("adhShowError", () => AdhAngularHelpers.showError)
         .factory("adhSingleClickWrapper", ["$timeout", AdhAngularHelpers.singleClickWrapperFactory])

@@ -54,4 +54,4 @@ class TestCommentableSheet:
     def test_set_with_comments(self, meta, context, sheet_catalogs):
         inst = meta.sheet_class(meta, context)
         inst.set({'comments': []})
-        assert not 'comments' in inst._data
+        assert not 'comments' in getattr(context, inst._annotation_key)

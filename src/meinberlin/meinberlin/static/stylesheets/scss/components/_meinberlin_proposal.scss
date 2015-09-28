@@ -17,8 +17,8 @@
 }
 
 .mein-berlin-proposal-form-upper {
+    @include rem(padding, 1rem);
     background: $color-background-base;
-    padding: 1em;
 }
 
 .mein-berlin-proposal-detail {
@@ -31,68 +31,68 @@
 .mein-berlin-proposal-badge-descriptions,
 .mein-berlin-proposal-detail-body {
     @include clearfix;
+    @include rem(padding, 0 10px);
     background: $color-background-base;
-    padding: 0 (10px / $font-size-normal * 1em);
 }
 
 .mein-berlin-proposal-detail-body-comments {
+    @include rem(padding-left, 40px);
     float: right;
-    padding-left: 40px / $font-size-small * 1em;
     text-align: center;
 
     &, a {
+        @include rem(font-size, $font-size-small);
         color: $color-text-highlight-introvert;
-        font-size: $font-size-small;
     }
 
     [class*=icon-] {
+        @include rem(font-size, 17px);
+        @include rem(line-height, 17px);
         display: block;
-        line-height: 17px;
-        font-size: 17px;
     }
 }
 
 .mein-berlin-proposal-detail-body-comments-icon {
+    @include rem(font-size, 20px);
     display: block;
-    font-size: 20px;
 }
 
 .mein-berlin-proposal-detail-header {
-    padding-top: 30px / $font-size-normal * 1em;
+    @include rem(padding-top, 30px);
 
     .mein-berlin-proposal-detail-header-title {
+        @include rem(font-size, $font-size-normal);
+        @include rem(margin, 0 0 30px);
         color: $color-text-normal;
-        font-size: $font-size-normal;
         font-weight: $font-weight-extrovert;
-        margin: 0 0 (30px / $font-size-normal * 1em);
     }
 
     .badge {
+        @include rem(top, -20px);
         position: relative;
-        top: -20px / $font-size-small * 1em;
     }
 }
 
 .mein-berlin-proposal-detail-detail {
-    margin-bottom: 30px / $font-size-normal * 1em;
+    @include rem(margin-bottom, 30px);
     padding-right: 15%;
     white-space: pre-line;
 }
 
 .mein-berlin-proposal-detail-meta-item,
 .mein-berlin-proposal-detail-author {
+    @include rem(font-size, $font-size-small);
     color: $color-text-introvert;
-    font-size: $font-size-small;
 }
 
 .mein-berlin-proposal-detail-author {
-    margin-bottom: 30px / $font-size-small * 1em;
+    @include rem(margin-bottom, 30px);
 }
 
 .mein-berlin-proposal-detail-meta {
     @include clearfix;
+    @include rem(margin, 0 0 40px);
     list-style-type: none;
-    margin: 0 0 (40px / $font-size-normal * 1em);
     padding: 0;
 
     .mein-berlin-proposal-detail-meta-item {
@@ -108,7 +108,7 @@
     }
 
     .mein-berlin-proposal-detail-meta-item-icon {
-        margin-right: 8px;
+        @include rem(margin-right, 8px);
         vertical-align: middle;
     }
 
@@ -139,41 +139,31 @@ as metadata.  It serves as an entry to a detail view.
 
 
 ```html_example
-<div class="meinberlin-proposal-map-list-item">
-    <a class="meinberlin-proposal-map-list-item-detail-link" href="">
-        <div class="map-list-item-col-left">
-            <h3 class="map-list-item-title">The title of my proposal</h3>
-            By God on 12/10/15
-        </div>
-        <div class="map-list-item-col-right">
-            <p class="map-list-item-comments map-list-meta-item"><i class="map-list-meta-item-icon icon-speechbubble-unfilled"></i> 12 Comments</p>
-            <p class="map-list-item-votes map-list-meta-item"><i class="map-list-meta-item-icon icon-voting"></i> +12 votes</p>
-            <p class="map-list-item-location map-list-meta-item"><i class="map-list-meta-item-icon icon-pin-detail"></i> Berlin</p>
-        </div>
-    </a>
-</div>
+<a class="proposal-list-item is-selected" href="" style="overflow:hidden">
+    <div class="proposal-list-item-col-left">
+        <h3 class="meinberlin-proposal-list-item-title">A title here</h3>
+        by Cliff on 12.10.15
+        <span class="badge is-realized">is realized</span>
+        <span class="badge is-not-realized">is not realized</span>
+    </div>
+    <div class="proposal-list-item-col-right">
+        <p class="meinberlin-proposal-list-meta-item m-comments">
+            <i class="meinberlin-proposal-list-meta-item-icon icon-speechbubble-unfilled"></i> 12 comments</p>
+        <p class="meinberlin-proposal-list-meta-item m-votes">
+            <i class="meinberlin-proposal-list-meta-item-icon icon-voting"></i> +12</p>
+        <p class="meinberlin-proposal-list-meta-item m-location">
+            <i class="meinberlin-proposal-list-meta-item-icon icon-pin-detail"></i> Berlin</p>
+    </div>
+</a>
 
-<div class="meinberlin-proposal-map-list-item is-selected">
-    <a class="meinberlin-proposal-map-list-item-detail-link" href="">
-        <div class="map-list-item-col-left">
-            <h3 class="map-list-item-title">The title of my proposal</h3>
-            By God on 12/10/15
-        </div>
-        <div class="map-list-item-col-right">
-            <p class="map-list-item-comments map-list-meta-item"><i class="map-list-meta-item-icon icon-speechbubble-unfilled"></i> 12 Comments</p>
-            <p class="map-list-item-votes map-list-meta-item"><i class="map-list-meta-item-icon icon-voting"></i> +12 votes</p>
-            <p class="map-list-item-location map-list-meta-item"><i class="map-list-meta-item-icon icon-pin-detail"></i> Berlin</p>
-        </div>
-    </a>
-</div>
 ```
 */
 
 .meinberlin-proposal-list-item {
     @include clearfix;
+    @include rem(padding, 10px);
     color: $color-text-normal;
     display: block;
-    padding: 10px / $font-size-normal * 1em;
     text-decoration: none;
 
     &:hover, &:focus {
@@ -189,24 +179,14 @@ as metadata.  It serves as an entry to a detail view.
     }
 
     .badge {
-        margin-left: 20px / $font-size-small * 1em;
+        @include rem(margin-left, 20px);
     }
-}
-
-.meinberlin-proposal-list-item-col-left,
-.meinberlin-alexanderplatz-proposal-list-item-col-left {
-    @include span(8 of 12 first);
-}
-
-.meinberlin-proposal-list-item-col-right,
-.meinberlin-alexanderplatz-proposal-list-item-col-right {
-    @include span(4 of 12 last);
 }
 
 .meinberlin-alexanderplatz-proposal-list-item,
 .section-jump-cover {
     .badge {
-        margin-bottom: 20px / $font-size-small * 1em;
+        @include rem(margin-bottom, 20px);
     }
 }
 
@@ -217,22 +197,22 @@ as metadata.  It serves as an entry to a detail view.
 }
 
 .meinberlin-proposal-list-item-title {
-    font-size: $font-size-normal;
-    margin: 0 0 (15px / $font-size-normal * 1em);
+    @include rem(font-size, $font-size-normal);
+    @include rem(margin, 0 0 15px);
 }
 
 .meinberlin-proposal-list-meta-item {
-    margin-bottom: 15px / $font-size-small * 1em;
-    font-size: $font-size-small;
+    @include rem(font-size, $font-size-small);
+    @include rem(margin-bottom, 15px);
 }
 
 .meinberlin-proposal-list-meta-item-icon {
-    font-size: $font-size-normal;
-    margin-right: 8px / $font-size-normal * 1em;
+    @include rem(font-size, $font-size-small);
+    @include rem(margin-right, 8px);
 }
 
 .mein-berlin-proposal-form-footer {
     .form-footer-button {
-        padding-left: 10px / $font-size-normal * 1em;
+        @include rem(padding-left, 10px);
     }
 }
