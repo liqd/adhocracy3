@@ -9,7 +9,7 @@ import * as AdhMeinberlinPhaseModule from "../../Phase/Module";
 import * as Process from "./Process";
 
 
-export var moduleName = "adhMeinberlinKiezkassenProcess";
+export var moduleName = "adhMeinberlinKiezkasseProcess";
 
 export var register = (angular) => {
     angular
@@ -21,8 +21,8 @@ export var register = (angular) => {
             AdhTabsModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .directive("adhMeinberlinKiezkassenPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", Process.phaseHeaderDirective])
-        .directive("adhMeinberlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", Process.detailDirective])
-        .directive("adhMeinberlinKiezkassenEdit", [
+        .directive("adhMeinberlinKiezkassePhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", Process.phaseHeaderDirective])
+        .directive("adhMeinberlinKiezkasseDetail", ["adhConfig", "adhHttp", "adhPermissions", Process.detailDirective])
+        .directive("adhMeinberlinKiezkasseEdit", [
             "adhConfig", "adhHttp", "adhShowError", "adhSubmitIfValid", "moment", Process.editDirective]);
 };

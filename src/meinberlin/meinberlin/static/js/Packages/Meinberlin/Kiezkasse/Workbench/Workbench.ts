@@ -10,16 +10,16 @@ import * as AdhUtil from "../../../Util/Util";
 
 import RIComment from "../../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
-import RIKiezkassenProcess from "../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
+import RIKiezkasseProcess from "../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
 import RIProposal from "../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
 import RIProposalVersion from "../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
 import * as SIComment from "../../../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/Meinberlin/Kiezkassen/Workbench";
+var pkgLocation = "/Meinberlin/Kiezkasse/Workbench";
 
 
-export var kiezkassenWorkbenchDirective = (
+export var kiezkasseWorkbenchDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>
@@ -42,7 +42,7 @@ export var kiezkassenWorkbenchDirective = (
                 var contentType = values[0];
                 var view = values[1];
 
-                if (contentType === RIKiezkassenProcess.content_type) {
+                if (contentType === RIKiezkasseProcess.content_type) {
                     scope.views.process = view;
                 } else {
                     scope.views.process = "default";
@@ -67,13 +67,13 @@ export var kiezkassenWorkbenchDirective = (
     };
 };
 
-export var kiezkassenProposalDetailColumnDirective = (
+export var kiezkasseProposalDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkassenProposalDetailColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkasseProposalDetailColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
@@ -82,12 +82,12 @@ export var kiezkassenProposalDetailColumnDirective = (
     };
 };
 
-export var kiezkassenProposalCreateColumnDirective = (
+export var kiezkasseProposalCreateColumnDirective = (
     adhConfig : AdhConfig.IService
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkassenProposalCreateColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkasseProposalCreateColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl"]);
@@ -95,12 +95,12 @@ export var kiezkassenProposalCreateColumnDirective = (
     };
 };
 
-export var kiezkassenProposalEditColumnDirective = (
+export var kiezkasseProposalEditColumnDirective = (
     adhConfig : AdhConfig.IService
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkassenProposalEditColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkasseProposalEditColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
@@ -108,12 +108,12 @@ export var kiezkassenProposalEditColumnDirective = (
     };
 };
 
-export var kiezkassenDetailColumnDirective = (
+export var kiezkasseDetailColumnDirective = (
     adhConfig : AdhConfig.IService
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkassenDetailColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkasseDetailColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl"]);
@@ -125,12 +125,12 @@ export var kiezkassenDetailColumnDirective = (
     };
 };
 
-export var kiezkassenEditColumnDirective = (
+export var kiezkasseEditColumnDirective = (
     adhConfig : AdhConfig.IService
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkassenEditColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkasseEditColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl"]);
@@ -143,16 +143,16 @@ export var registerRoutes = (
     context : string = ""
 ) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
     adhResourceAreaProvider
-        .default(RIKiezkassenProcess, "", processType, context, {
+        .default(RIKiezkasseProcess, "", processType, context, {
             space: "content",
             movingColumns: "is-show-hide-hide"
         })
-        .default(RIKiezkassenProcess, "edit", processType, context, {
+        .default(RIKiezkasseProcess, "edit", processType, context, {
             space: "content",
             movingColumns: "is-show-hide-hide"
         })
-        .specific(RIKiezkassenProcess, "edit", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIKiezkassenProcess) => {
+        .specific(RIKiezkasseProcess, "edit", processType, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIKiezkasseProcess) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.PUT) {
                         throw 401;
@@ -161,12 +161,12 @@ export var registerRoutes = (
                     }
                 });
             }])
-        .default(RIKiezkassenProcess, "create_proposal", processType, context, {
+        .default(RIKiezkasseProcess, "create_proposal", processType, context, {
             space: "content",
             movingColumns: "is-show-show-hide"
         })
-        .specific(RIKiezkassenProcess, "create_proposal", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIKiezkassenProcess) => {
+        .specific(RIKiezkasseProcess, "create_proposal", processType, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIKiezkasseProcess) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;

@@ -15,12 +15,12 @@ import RIBurgerhaushaltProposalVersion from "../../Resources_/adhocracy_meinberl
 import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RIGeoProposal from "../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
 import RIGeoProposalVersion from "../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
-import RIKiezkassenProposal from "../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
-import RIKiezkassenProposalVersion from "../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
+import RIKiezkasseProposal from "../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
+import RIKiezkasseProposalVersion from "../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
 import * as SIBurgerhaushaltProposal from "../../Resources_/adhocracy_meinberlin/sheets/burgerhaushalt/IProposal";
 import * as SICommentable from "../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
-import * as SIKiezkassenProposal from "../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal";
+import * as SIKiezkasseProposal from "../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal";
 import * as SILocationReference from "../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
 import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 import * as SIMultiPolygon from "../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
@@ -113,7 +113,7 @@ var bindPath = (
                 var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
 
                 if (isKiezkasse) {
-                    var kiezkassenSheet : SIKiezkassenProposal.Sheet = resource.data[SIKiezkassenProposal.nick];
+                    var kiezkasseSheet : SIKiezkasseProposal.Sheet = resource.data[SIKiezkasseProposal.nick];
                 } else if (isBurgerhaushalt) {
                     var burgerhaushaltSheet : SIBurgerhaushaltProposal.Sheet = resource.data[SIBurgerhaushaltProposal.nick];
                 }
@@ -146,10 +146,10 @@ var bindPath = (
                         assignments: assignments
                     };
                     if (isKiezkasse) {
-                        scope.data.budget = kiezkassenSheet.budget;
-                        scope.data.address = kiezkassenSheet.address;
-                        scope.data.creatorParticipate = kiezkassenSheet.creator_participate;
-                        scope.data.locationText = kiezkassenSheet.location_text;
+                        scope.data.budget = kiezkasseSheet.budget;
+                        scope.data.address = kiezkasseSheet.address;
+                        scope.data.creatorParticipate = kiezkasseSheet.creator_participate;
+                        scope.data.locationText = kiezkasseSheet.location_text;
                     } else if (isBurgerhaushalt) {
                         scope.data.budget = burgerhaushaltSheet.budget;
                         scope.data.locationText = burgerhaushaltSheet.location_text;
@@ -169,7 +169,7 @@ var fill = (
 ) : void => {
 
     if (isKiezkasse) {
-        proposalVersion.data[SIKiezkassenProposal.nick] = new SIKiezkassenProposal.Sheet({
+        proposalVersion.data[SIKiezkasseProposal.nick] = new SIKiezkasseProposal.Sheet({
             budget: scope.data.budget,
             creator_participate: scope.data.creatorParticipate,
             location_text: scope.data.locationText,
@@ -207,8 +207,8 @@ var postCreate = (
     var proposalVersionClass = RIGeoProposalVersion;
 
     if (isKiezkasse) {
-        proposalClass = RIKiezkassenProposal;
-        proposalVersionClass = RIKiezkassenProposalVersion;
+        proposalClass = RIKiezkasseProposal;
+        proposalVersionClass = RIKiezkasseProposalVersion;
     } else if (isBurgerhaushalt) {
         proposalClass = RIBurgerhaushaltProposal;
         proposalVersionClass = RIBurgerhaushaltProposalVersion;
@@ -239,7 +239,7 @@ var postEdit = (
     var proposalVersionClass = RIGeoProposalVersion;
 
     if (isKiezkasse) {
-        proposalVersionClass = RIKiezkassenProposalVersion;
+        proposalVersionClass = RIKiezkasseProposalVersion;
     } else if (isBurgerhaushalt) {
         proposalVersionClass = RIBurgerhaushaltProposalVersion;
     }

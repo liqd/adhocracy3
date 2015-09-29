@@ -20,7 +20,7 @@ import * as SIName from "../../../../Resources_/adhocracy_core/sheets/name/IName
 import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/Meinberlin/Kiezkassen/Process";
+var pkgLocation = "/Meinberlin/Kiezkasse/Process";
 
 
 export var detailDirective = (
@@ -167,7 +167,7 @@ export var editDirective = (
                     "data", "PUT", "request_body", "data", SIWorkflow.nick, "workflow_state"]);
             });
             scope.submit = () => {
-                return adhSubmitIfValid(scope, element, scope.kiezkassenProcessForm, () => {
+                return adhSubmitIfValid(scope, element, scope.kiezkasseProcessForm, () => {
                     process.data[SITitle.nick].title = scope.data.title;
                     process.data[SIName.nick] = undefined;
                     process.data[SIImageReference.nick] = undefined;
