@@ -17,16 +17,14 @@
             }">{{ assignment.title }}</span>
     </div>
     <div class="proposal-list-item-col-right">
-        <p class="meinberlin-proposal-list-meta-item m-comments"
-            ><i class="meinberlin-proposal-list-meta-item-icon icon-speechbubble-unfilled"></i
-            > {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}</p>
-        <p class="meinberlin-proposal-list-meta-item m-votes"
-            ><i class="meinberlin-proposal-list-meta-item-icon icon-voting"></i
-            > {{ data.rateCount | signum }} {{ "TR__RATES" | translate }}</p>
-        <p
-            class="meinberlin-proposal-list-meta-item m-location"
-            data-ng-if="isKiezkasse || isBurgerhaushalt"
-            ><i class="meinberlin-proposal-list-meta-item-icon icon-pin-detail"></i
-            > {{data.locationText}}</p>
+        <ul class="meta-list m-vertical">
+            <li class="meta-list-item"><i class="meta-list-meta-item-icon icon-speechbubble-unfilled"></i
+            > {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}</li>
+            <li class="meta-list-item"><i class="meta-list-meta-item-icon icon-voting"></i
+            > {{ data.rateCount | signum }} {{ "TR__RATES" | translate }}</li>
+            <li class="meta-list-item"
+            data-ng-if="isKiezkasse || isBurgerhaushalt"><i class="meta-list-meta-item-icon icon-pin-detail"></i
+            > {{data.locationText}}</li>
+        </ul>
     </div>
 </a>
