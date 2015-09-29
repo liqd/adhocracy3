@@ -52,6 +52,7 @@ polarization_meta = item_meta._replace(
     use_autonaming=True,
     autonaming_prefix='polarization_',
     permission_create='create_comment',
+    is_implicit_addable=True
 )
 
 

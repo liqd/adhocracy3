@@ -14,6 +14,7 @@ def test_polarization_meta():
     assert meta.element_types == (IPolarizationVersion,)
     assert meta.use_autonaming
     assert meta.permission_create == 'create_comment'
+    assert meta.is_implicit_addable is True
 
 
 def test_polarizationversion_meta():
