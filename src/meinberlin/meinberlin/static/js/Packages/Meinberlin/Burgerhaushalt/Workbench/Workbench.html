@@ -1,0 +1,13 @@
+<div data-adh-moving-columns="" class="moving-columns">
+    <adh-moving-column>
+        <adh-meinberlin-burgerhaushalt-detail-column></adh-meinberlin-burgerhaushalt-detail-column>
+    </adh-moving-column>
+    <adh-moving-column>
+        <adh-meinberlin-burgerhaushalt-proposal-create-column data-ng-if="views.process === 'create_proposal'"></adh-meinberlin-burgerhaushalt-proposal-create-column>
+        <adh-meinberlin-burgerhaushalt-proposal-edit-column data-ng-if="views.proposal === 'edit'"></adh-meinberlin-burgerhaushalt-proposal-edit-column>
+        <adh-meinberlin-burgerhaushalt-proposal-detail-column data-ng-if="views.process !== 'create_proposal' && views.proposal !== 'edit'"></adh-meinberlin-burgerhaushalt-proposal-detail-column>
+    </adh-moving-column>
+    <adh-moving-column>
+        <adh-comment-column></adh-comment-column>
+    </adh-moving-column>
+</div>

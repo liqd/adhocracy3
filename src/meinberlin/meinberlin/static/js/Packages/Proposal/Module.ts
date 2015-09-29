@@ -14,7 +14,7 @@ import * as AdhEmbed from "../Embed/Embed";
 import * as Proposal from "./Proposal";
 
 
-export var moduleName = "adhMeinBerlinProposal";
+export var moduleName = "adhMeinberlinProposal";
 
 export var register = (angular) => {
     angular
@@ -31,19 +31,19 @@ export var register = (angular) => {
             AdhTopLevelStateModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-detail");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-list-item");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-create");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-edit");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-list");
+            adhEmbedProvider.embeddableDirectives.push("meinberlin-proposal-detail");
+            adhEmbedProvider.embeddableDirectives.push("meinberlin-proposal-list-item");
+            adhEmbedProvider.embeddableDirectives.push("meinberlin-proposal-create");
+            adhEmbedProvider.embeddableDirectives.push("meinberlin-proposal-edit");
+            adhEmbedProvider.embeddableDirectives.push("meinberlin-proposal-list");
         }])
-        .directive("adhMeinBerlinProposalDetail", [
+        .directive("adhMeinberlinProposalDetail", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.detailDirective])
-        .directive("adhMeinBerlinProposalListItem", [
+        .directive("adhMeinberlinProposalListItem", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.listItemDirective])
-        .directive("adhMeinBerlinProposalMapListItem", [
+        .directive("adhMeinberlinProposalMapListItem", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.mapListItemDirective])
-        .directive("adhMeinBerlinProposalCreate", [
+        .directive("adhMeinberlinProposalCreate", [
             "adhConfig",
             "adhHttp",
             "adhPreliminaryNames",
@@ -54,7 +54,7 @@ export var register = (angular) => {
             "$location",
             Proposal.createDirective
         ])
-        .directive("adhMeinBerlinProposalEdit", [
+        .directive("adhMeinberlinProposalEdit", [
             "adhConfig",
             "adhHttp",
             "adhPermissions",

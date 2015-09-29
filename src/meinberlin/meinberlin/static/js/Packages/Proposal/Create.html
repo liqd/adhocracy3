@@ -1,10 +1,10 @@
 <form
     novalidate="novalidate"
     data-ng-submit="submit()"
-    class="mein-berlin-proposal-form"
-    name="meinBerlinProposalForm">
+    class="meinberlin-proposal-form"
+    name="meinberlinProposalForm">
 
-    <div class="mein-berlin-proposal-form-upper">
+    <div class="meinberlin-proposal-form-upper">
         <div class="form-error" data-ng-repeat="error in errors track by $index">
             <p>{{ error | adhFormatError | translate }}</p>
         </div>
@@ -21,7 +21,7 @@
                 minlength="3"
                 maxlength="100"
                 required="required" />
-            <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.title, 'required')">
+            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.title, 'required')">
                 {{ "TR__MEINBERLIN_ERROR_REQUIRED_TITLE" | translate }}
             </span>
         </label>
@@ -37,7 +37,7 @@
                 maxlength="500"
                 required="required"></textarea>
 
-            <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.detail, 'required')">
+            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.detail, 'required')">
                 {{ "TR__MEINBERLIN_ERROR_REQUIRED_DETAIL" | translate }}
             </span>
         </label>
@@ -59,10 +59,10 @@
                 data-ng-model="data.budget"
                 name="budget"
                 min="0" />
-            <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.budget, 'required')">
+            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.budget, 'required')">
                 {{ "TR__MEINBERLIN_ERROR_REQUIRED_BUDGET" | translate }}
             </span>
-            <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.budget, 'number')">
+            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.budget, 'number')">
                 {{ "TR__ERROR_MUST_BE_A_NUMBER" | translate }}
             </span>
         </label>
@@ -75,7 +75,7 @@
                 name="creatorParticipate"
                 />
                 {{ "TR__MEINBERLIN_I_WANT_TO_BE_PART" | translate }}
-            <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.creatorParticipate, 'required')">
+            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.creatorParticipate, 'required')">
                 {{ "TR__MEINBERLIN_ERROR_REQUIRED_I_WANT_TO_BE_PART" | translate }}
             </span>
         </label>
@@ -90,7 +90,7 @@
                 name="locationText"
                 maxlength="100"
                 required="required" />
-            <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.locationText, 'required')">
+            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.locationText, 'required')">
                 {{ "TR__MEINBERLIN_ERROR_REQUIRED_LOCATION_TEXT" | translate }}
             </span>
         </label>
@@ -102,7 +102,7 @@
     </label>
 
     <!-- DATA SUBMIT -->
-    <footer class="form-footer mein-berlin-proposal-form-footer">
+    <footer class="form-footer meinberlin-proposal-form-footer">
         <input
             type="submit"
             name="submit"
