@@ -181,7 +181,8 @@ The menu should always have the same state as its columns.
 .moving-column-body {
     @include rem(border-width, 0 $moving-column-border-width $moving-column-border-width);
     @include rem(font-size, $font-size-normal);
-    border: 0 solid $color-structure-normal;
+    border-color: $color-structure-normal;
+    border-style: solid;
 
     @media print {
         border: 0;
