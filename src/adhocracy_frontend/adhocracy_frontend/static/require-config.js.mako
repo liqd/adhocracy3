@@ -20,7 +20,6 @@ require.config({
         adhTemplates: "./templates",
 % endif
         text: "../lib/text/text",
-        jquery: "../lib/jquery/dist/jquery",
 % if minify:
         angular: "../lib/angular/angular.min",
 % else:
