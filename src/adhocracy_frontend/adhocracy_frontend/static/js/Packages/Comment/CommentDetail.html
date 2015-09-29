@@ -61,9 +61,7 @@
                 <a href="" class="button form-footer-button" data-ng-click="cancel()" data-ng-if="!hideCancel">{{ "TR__CANCEL" | translate }}</a>
             </footer>
         </form>
-        <div class="comment-content" data-ng-switch-default="">
-            {{data.content}}
-        </div>
+        <div class="comment-content" data-ng-switch-default="">{{data.content}}</div>
     </div>
 
     <div class="comment-children-create-form" data-ng-if="show.createForm">
