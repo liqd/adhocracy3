@@ -147,12 +147,14 @@ as metadata.  It serves as an entry to a detail view.
         <span class="badge is-not-realized">is not realized</span>
     </div>
     <div class="proposal-list-item-col-right">
-        <p class="meinberlin-proposal-list-meta-item m-comments">
-            <i class="meinberlin-proposal-list-meta-item-icon icon-speechbubble-unfilled"></i> 12 comments</p>
-        <p class="meinberlin-proposal-list-meta-item m-votes">
-            <i class="meinberlin-proposal-list-meta-item-icon icon-voting"></i> +12</p>
-        <p class="meinberlin-proposal-list-meta-item m-location">
-            <i class="meinberlin-proposal-list-meta-item-icon icon-pin-detail"></i> Berlin</p>
+        <ul class="meta-list m-vertical">
+            <li class="meta-list-item"><i class="meta-list-meta-item-icon icon-speechbubble-unfilled"></i
+            > 12 comments</li>
+            <li class="meta-list-item"><i class="meta-list-meta-item-icon icon-voting"></i
+            > +12</li>
+            <li class="meta-list-item"><i class="meta-list-meta-item-icon icon-pin-detail"></i
+            > Berlin</li>
+        </ul>
     </div>
 </a>
 
@@ -199,16 +201,6 @@ as metadata.  It serves as an entry to a detail view.
 .meinberlin-proposal-list-item-title {
     @include rem(font-size, $font-size-normal);
     @include rem(margin, 0 0 15px);
-}
-
-.meinberlin-proposal-list-meta-item {
-    @include rem(font-size, $font-size-small);
-    @include rem(margin-bottom, 15px);
-}
-
-.meinberlin-proposal-list-meta-item-icon {
-    @include rem(font-size, $font-size-small);
-    @include rem(margin-right, 8px);
 }
 
 .meinberlin-proposal-form-footer {

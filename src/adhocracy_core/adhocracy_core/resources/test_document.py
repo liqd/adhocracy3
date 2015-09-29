@@ -74,6 +74,7 @@ class TestGeoDocument:
                                       resources.paragraph.IParagraph,
                                       IGeoDocumentVersion
                                       )
+        assert meta.item_type == resources.document.IGeoDocumentVersion
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

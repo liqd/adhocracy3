@@ -65,6 +65,7 @@ src/meinberlin/meinberlin/build/
 src/pcompass/pcompass/build/
 src/s1/s1/build/
 src/spd/spd/build/
+src/euth/euth/build/
 /tmp
 /wheelhouse
 /share

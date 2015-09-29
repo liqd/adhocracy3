@@ -48,11 +48,17 @@ Vertical
 
     &.m-vertical {
         .meta-list-item {
-            @include rem(padding-bottom, 10px);
+            @include rem(margin-bottom, 15px);
             float: none;
 
+            i {
+                @include inline-block;
+                @include rem(margin-right, 8px);
+                @include rem(min-width, 12px);
+            }
+
             &:last-child {
-                padding-bottom: 0;
+                margin-bottom: 0;
             }
         }
     }
@@ -65,7 +71,6 @@ Vertical
     float: left;
 
     i {
-        font-size: 140%;
         line-height: 1;
         margin-right: 1px;
         vertical-align: middle;
