@@ -21,7 +21,7 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("meinberlin-bplan-proposal-embed");
+            adhEmbedProvider.registerDirective("meinberlin-bplan-proposal-embed");
         }])
         .directive("adhMeinberlinBplanProposalCreate", [
             "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", Proposal.createDirective])

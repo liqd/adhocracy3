@@ -31,11 +31,12 @@ export var register = (angular) => {
             AdhTopLevelStateModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("meinberlin-proposal-detail");
-            adhEmbedProvider.embeddableDirectives.push("meinberlin-proposal-list-item");
-            adhEmbedProvider.embeddableDirectives.push("meinberlin-proposal-create");
-            adhEmbedProvider.embeddableDirectives.push("meinberlin-proposal-edit");
-            adhEmbedProvider.embeddableDirectives.push("meinberlin-proposal-list");
+            adhEmbedProvider
+                .registerDirective("meinberlin-proposal-detail")
+                .registerDirective("meinberlin-proposal-list-item")
+                .registerDirective("meinberlin-proposal-create")
+                .registerDirective("meinberlin-proposal-edit")
+                .registerDirective("meinberlin-proposal-list");
         }])
         .directive("adhMeinberlinProposalDetail", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.detailDirective])

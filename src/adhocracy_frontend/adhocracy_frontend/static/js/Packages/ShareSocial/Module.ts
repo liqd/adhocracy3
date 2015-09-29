@@ -13,7 +13,7 @@ export var register = (angular) => {
         .config(["$injector", ($injector) => {
             if ($injector.has("adhEmbedProvider")) {
                 var adhEmbedProvider : AdhEmbed.Provider = $injector.get("adhEmbedProvider");
-                adhEmbedProvider.registerEmbeddableDirectives(["social-share"]);
+                adhEmbedProvider.registerDirective("social-share");
             }
         }])
         .directive("adhSocialShare", ["adhConfig", "$location", "$document", AdhShareSocial.socialShare]);
