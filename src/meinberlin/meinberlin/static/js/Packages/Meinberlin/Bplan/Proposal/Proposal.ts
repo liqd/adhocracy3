@@ -11,7 +11,7 @@ import * as SIProposal from "../../../../Resources_/adhocracy_meinberlin/sheets/
 import * as SIVersionable from "../../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/Meinberlin/Bplaene/Proposal";
+var pkgLocation = "/Meinberlin/Bplan/Proposal";
 
 
 export interface IScope extends angular.IScope {

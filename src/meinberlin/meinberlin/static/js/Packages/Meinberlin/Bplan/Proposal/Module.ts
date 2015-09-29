@@ -9,7 +9,7 @@ import * as AdhEmbed from "../../../Embed/Embed";
 import * as Proposal from "./Proposal";
 
 
-export var moduleName = "adhMeinBplaeneProposal";
+export var moduleName = "adhMeinBplanProposal";
 
 export var register = (angular) => {
     angular
@@ -21,9 +21,9 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("meinberlin-bplaene-proposal-embed");
+            adhEmbedProvider.embeddableDirectives.push("meinberlin-bplan-proposal-embed");
         }])
-        .directive("adhMeinberlinBplaeneProposalCreate", [
+        .directive("adhMeinberlinBplanProposalCreate", [
             "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", Proposal.createDirective])
-        .directive("adhMeinberlinBplaeneProposalEmbed", ["adhConfig", "adhHttp", Proposal.embedDirective]);
+        .directive("adhMeinberlinBplanProposalEmbed", ["adhConfig", "adhHttp", Proposal.embedDirective]);
 };
