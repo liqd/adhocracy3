@@ -43,7 +43,7 @@
         </label>
 
         <!-- Requested Budget -->
-        <label data-ng-if="isKiezkasse || isBurgerhaushalt">
+        <label data-ng-if="isKiezkasse || isBuergerhaushalt">
             <span class="label-text">{{ "TR__MEINBERLIN_BUDGET" | translate }}</span>
             <input
                 data-ng-if="isKiezkasse"
@@ -54,7 +54,7 @@
                 max="50000"
                 required="required" />
             <input
-                data-ng-if="isBurgerhaushalt"
+                data-ng-if="isBuergerhaushalt"
                 type="number"
                 data-ng-model="data.budget"
                 name="budget"
@@ -82,7 +82,7 @@
 
         <!-- LOCATION RELATED INFORMATION -->
         <!-- Related Place -->
-        <label data-ng-if="isKiezkasse || isBurgerhaushalt">
+        <label data-ng-if="isKiezkasse || isBuergerhaushalt">
             <span class="label-text">{{ "TR__MEINBERLIN_LOCATION_TEXT" | translate }}</span>
             <input
                 type="text"

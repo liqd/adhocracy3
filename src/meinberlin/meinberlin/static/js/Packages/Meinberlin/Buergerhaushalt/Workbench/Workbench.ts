@@ -10,16 +10,16 @@ import * as AdhUtil from "../../../Util/Util";
 
 import RIComment from "../../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
-import RIBurgerhaushaltProcess from "../../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
+import RIBuergerhaushaltProcess from "../../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
 import RIProposal from "../../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal";
 import RIProposalVersion from "../../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
 import * as SIComment from "../../../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/Meinberlin/Burgerhaushalt/Workbench";
+var pkgLocation = "/Meinberlin/Buergerhaushalt/Workbench";
 
 
-export var burgerhaushaltWorkbenchDirective = (
+export var buergerhaushaltWorkbenchDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>
@@ -42,7 +42,7 @@ export var burgerhaushaltWorkbenchDirective = (
                 var contentType = values[0];
                 var view = values[1];
 
-                if (contentType === RIBurgerhaushaltProcess.content_type) {
+                if (contentType === RIBuergerhaushaltProcess.content_type) {
                     scope.views.process = view;
                 } else {
                     scope.views.process = "default";
@@ -67,13 +67,13 @@ export var burgerhaushaltWorkbenchDirective = (
     };
 };
 
-export var burgerhaushaltProposalDetailColumnDirective = (
+export var buergerhaushaltProposalDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/BurgerhaushaltProposalDetailColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/BuergerhaushaltProposalDetailColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
@@ -82,12 +82,12 @@ export var burgerhaushaltProposalDetailColumnDirective = (
     };
 };
 
-export var burgerhaushaltProposalCreateColumnDirective = (
+export var buergerhaushaltProposalCreateColumnDirective = (
     adhConfig : AdhConfig.IService
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/BurgerhaushaltProposalCreateColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/BuergerhaushaltProposalCreateColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl"]);
@@ -95,12 +95,12 @@ export var burgerhaushaltProposalCreateColumnDirective = (
     };
 };
 
-export var burgerhaushaltProposalEditColumnDirective = (
+export var buergerhaushaltProposalEditColumnDirective = (
     adhConfig : AdhConfig.IService
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/BurgerhaushaltProposalEditColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/BuergerhaushaltProposalEditColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
@@ -108,12 +108,12 @@ export var burgerhaushaltProposalEditColumnDirective = (
     };
 };
 
-export var burgerhaushaltDetailColumnDirective = (
+export var buergerhaushaltDetailColumnDirective = (
     adhConfig : AdhConfig.IService
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/BurgerhaushaltDetailColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/BuergerhaushaltDetailColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl"]);
@@ -130,16 +130,16 @@ export var registerRoutes = (
     context : string = ""
 ) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
     adhResourceAreaProvider
-        .default(RIBurgerhaushaltProcess, "", processType, context, {
+        .default(RIBuergerhaushaltProcess, "", processType, context, {
             space: "content",
             movingColumns: "is-show-hide-hide"
         })
-        .default(RIBurgerhaushaltProcess, "create_proposal", processType, context, {
+        .default(RIBuergerhaushaltProcess, "create_proposal", processType, context, {
             space: "content",
             movingColumns: "is-show-show-hide"
         })
-        .specific(RIBurgerhaushaltProcess, "create_proposal", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIBurgerhaushaltProcess) => {
+        .specific(RIBuergerhaushaltProcess, "create_proposal", processType, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIBuergerhaushaltProcess) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;

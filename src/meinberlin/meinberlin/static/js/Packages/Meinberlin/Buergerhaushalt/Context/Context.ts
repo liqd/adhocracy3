@@ -2,7 +2,7 @@ import * as AdhConfig from "../../../Config/Config";
 import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 
-var pkgLocation = "/Meinberlin/Burgerhaushalt/Context";
+var pkgLocation = "/Meinberlin/Buergerhaushalt/Context";
 
 
 export var headerDirective = (

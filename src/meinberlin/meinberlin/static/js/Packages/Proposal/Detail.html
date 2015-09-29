@@ -8,11 +8,11 @@
                 'm-is-realized': assignment.name === 'going_to_be_realized',
                 'm-is-not-realized': assignment.name === 'not_realizeable',
                 'm-on-test': assignment.name === 'on_test',
-                'm-color': isBurgerhaushalt && (assignment.name === 'going_to_be_realized' || assignment.name === 'not_realizeable' || assignment.name === 'on_test')
+                'm-color': isBuergerhaushalt && (assignment.name === 'going_to_be_realized' || assignment.name === 'not_realizeable' || assignment.name === 'on_test')
             }">{{ assignment.title }}</span>
 
         <ul class="meinberlin-proposal-detail-meta">
-            <li data-ng-if="isKiezkasse || isBurgerhaushalt" class="meinberlin-proposal-detail-meta-item meinberlin-proposal-detail-meta-item-location">
+            <li data-ng-if="isKiezkasse || isBuergerhaushalt" class="meinberlin-proposal-detail-meta-item meinberlin-proposal-detail-meta-item-location">
                 <i class="icon-pin-detail"></i> {{data.locationText}}
             </li>
             <li class="meinberlin-proposal-detail-meta-item meinberlin-proposal-detail-meta-item-comments">
@@ -20,9 +20,9 @@
                     <i class="icon-speechbubble"></i> {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}
                 </a>
             </li>
-            <li data-ng-if="!(isKiezkasse || isBurgerhaushalt)"></li>
+            <li data-ng-if="!(isKiezkasse || isBuergerhaushalt)"></li>
             <li class="meinberlin-proposal-detail-meta-item meinberlin-proposal-detail-meta-budget">
-                <div data-ng-if="isKiezkasse || isBurgerhaushalt"><i class="meinberlin-proposal-detail-meta-item-icon icon-budget"></i> {{data.budget | numberOrDash}} &euro;</div>
+                <div data-ng-if="isKiezkasse || isBuergerhaushalt"><i class="meinberlin-proposal-detail-meta-item-icon icon-budget"></i> {{data.budget | numberOrDash}} &euro;</div>
             </li>
             <li class="meinberlin-proposal-detail-meta-item meinberlin-proposal-detail-meta-participation">
                 <adh-rate data-refers-to="{{path}}"></adh-rate>
@@ -54,7 +54,7 @@
                 'm-is-realized': assignment.name === 'going_to_be_realized',
                 'm-is-not-realized': assignment.name === 'not_realizeable',
                 'm-on-test': assignment.name === 'on_test',
-                'm-color': isBurgerhaushalt && (assignment.name === 'going_to_be_realized' || assignment.name === 'not_realizeable' || assignment.name === 'on_test')
+                'm-color': isBuergerhaushalt && (assignment.name === 'going_to_be_realized' || assignment.name === 'not_realizeable' || assignment.name === 'on_test')
             }">
             <adh-parse-markdown data-parsetext="assignment.description"></adh-parse-markdown>
         </div>

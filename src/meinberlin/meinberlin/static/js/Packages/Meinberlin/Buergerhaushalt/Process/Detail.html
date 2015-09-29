@@ -1,9 +1,9 @@
-<div class="meinberlin-burgerhaushalt-detail">
+<div class="meinberlin-buergerhaushalt-detail">
     <div data-ng-switch="currentPhase.name">
-        <div data-ng-switch-when="announce" class="meinberlin-burgerhaushalt-detail-announce">
+        <div data-ng-switch-when="announce" class="meinberlin-buergerhaushalt-detail-announce">
             {{ currentPhase.description }}
         </div>
-        <div data-ng-switch-default="" class="meinberlin-burgerhaushalt-detail-listing">
+        <div data-ng-switch-default="" class="meinberlin-buergerhaushalt-detail-listing">
             <adh-listing
                 data-path="{{path}}"
                 data-ng-show="!shared.isShowMap"
@@ -11,7 +11,7 @@
                 data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
                 data-params="{tag: 'LAST'}"
                 data-content-type="adhocracy_meinberlin.resources.burgerhaushalt.IProposalVersion">
-                <adh-meinberlin-proposal-list-item data-path="{{element}}" data-is-burgerhaushalt="true">
+                <adh-meinberlin-proposal-list-item data-path="{{element}}" data-is-buergerhaushalt="true">
                 </adh-meinberlin-proposal-list-item>
             </adh-listing>
 
@@ -33,7 +33,7 @@
                     data-content-type="adhocracy_meinberlin.resources.burgerhaushalt.IProposalVersion">
                     <adh-meinberlin-proposal-map-list-item
                         data-path="{{item}}"
-                        data-is-burgerhaushalt="true">
+                        data-is-buergerhaushalt="true">
                     </adh-meinberlin-proposal-map-list-item>
                 </adh-map-listing>
             </adh-wait>

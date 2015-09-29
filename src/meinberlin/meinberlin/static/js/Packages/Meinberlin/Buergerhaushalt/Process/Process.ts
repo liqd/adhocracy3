@@ -11,7 +11,7 @@ import * as SILocationReference from "../../../../Resources_/adhocracy_core/shee
 import * as SIMultiPolygon from "../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
 import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/Meinberlin/Burgerhaushalt/Process";
+var pkgLocation = "/Meinberlin/Buergerhaushalt/Process";
 
 
 export var detailDirective = (

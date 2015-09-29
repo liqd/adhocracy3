@@ -13,7 +13,7 @@
                 'm-is-realized': assignment.name === 'going_to_be_realized',
                 'm-is-not-realized': assignment.name === 'not_realizeable',
                 'm-on-test': assignment.name === 'on_test',
-                'm-color': isBurgerhaushalt && (assignment.name === 'going_to_be_realized' || assignment.name === 'not_realizeable' || assignment.name === 'on_test')
+                'm-color': isBuergerhaushalt && (assignment.name === 'going_to_be_realized' || assignment.name === 'not_realizeable' || assignment.name === 'on_test')
             }">{{ assignment.title }}</span>
     </div>
     <div class="proposal-list-item-col-right">
@@ -25,7 +25,7 @@
             > {{ data.rateCount | signum }} {{ "TR__RATES" | translate }}</p>
         <p
             class="meinberlin-proposal-list-meta-item m-location"
-            data-ng-if="isKiezkasse || isBurgerhaushalt"
+            data-ng-if="isKiezkasse || isBuergerhaushalt"
             ><i class="meinberlin-proposal-list-meta-item-icon icon-pin-detail"></i
             > {{data.locationText}}</p>
     </div>

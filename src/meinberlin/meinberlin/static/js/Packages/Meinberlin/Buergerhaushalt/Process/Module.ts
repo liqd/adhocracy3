@@ -8,7 +8,7 @@ import * as AdhMeinberlinPhaseModule from "../../Phase/Module";
 import * as Process from "./Process";
 
 
-export var moduleName = "adhMeinberlinBurgerhaushaltProcess";
+export var moduleName = "adhMeinberlinBuergerhaushaltProcess";
 
 export var register = (angular) => {
     angular
@@ -19,6 +19,6 @@ export var register = (angular) => {
             AdhPermissionsModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .directive("adhMeinberlinBurgerhaushaltPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", Process.phaseHeaderDirective])
-        .directive("adhMeinberlinBurgerhaushaltDetail", ["adhConfig", "adhHttp", "adhPermissions", Process.detailDirective]);
+        .directive("adhMeinberlinBuergerhaushaltPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", Process.phaseHeaderDirective])
+        .directive("adhMeinberlinBuergerhaushaltDetail", ["adhConfig", "adhHttp", "adhPermissions", Process.detailDirective]);
 };
