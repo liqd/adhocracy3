@@ -28,7 +28,7 @@ export var register = (angular) => {
         ])
         .directive("adhBuergerhaushaltContextHeader", ["adhConfig", "adhPermissions", "adhTopLevelState", Context.headerDirective])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider.registerContext("buergerhaushalt");
+            adhEmbedProvider.registerContext("buergerhaushalt", ["burgerhaushalt"]);
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider.template("buergerhaushalt", ["adhConfig", "$templateRequest", Context.areaTemplate]);

@@ -28,7 +28,7 @@ export var register = (angular) => {
         ])
         .directive("adhKiezkasseContextHeader", ["adhConfig", "adhPermissions", "adhTopLevelState", Context.headerDirective])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider.registerContext("kiezkasse");
+            adhEmbedProvider.registerContext("kiezkasse", ["kiezkassen"]);
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider.template("kiezkasse", ["adhConfig", "$templateRequest", Context.areaTemplate]);
