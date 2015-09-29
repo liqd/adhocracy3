@@ -54,7 +54,7 @@ Vertical
             i {
                 @include inline-block;
                 @include rem(margin-right, 8px);
-                min-width: 12px;
+                @include rem(min-width, 12px);
             }
 
             &:last-child {
