@@ -1,8 +1,8 @@
 include RELEASE-VERSION version.py
 recursive-include spd/build *.js *.css *.woff *.eot *.ttf *.svg *.xml *.json *.jpg *.ico *.gif *.png *.html *.md *.mako *.pt
 global-exclude *Spec.js
-prune src/spd/build/styleguide
-prune src/spd/build/lib/DefinitelyTyped
-prune src/spd/build/lib/q
-prune src/spd/build/lib/jasmine
-prune src/spd/build/lib/blanket
+prune spd/build/styleguide
+prune spd/build/lib/DefinitelyTyped
+prune spd/build/lib/q
+prune spd/build/lib/jasmine
+prune spd/build/lib/blanket
