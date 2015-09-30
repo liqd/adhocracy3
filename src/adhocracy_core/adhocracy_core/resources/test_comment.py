@@ -22,7 +22,9 @@ def test_commentversion_meta():
     assert meta.iresource is ICommentVersion
     assert meta.extended_sheets == (adhocracy_core.sheets.comment.IComment,
                                     adhocracy_core.sheets.comment.ICommentable,
-                                    adhocracy_core.sheets.rate.IRateable)
+                                    adhocracy_core.sheets.rate.IRateable,
+                                    adhocracy_core.sheets.relation.ICanPolarize,
+                                    )
     assert meta.permission_create == 'edit_comment'
 
 
