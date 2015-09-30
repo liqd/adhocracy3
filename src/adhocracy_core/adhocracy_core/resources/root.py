@@ -98,7 +98,8 @@ def _add_graph(context, registry):
 
 
 def _add_catalog_service(context, registry):
-    registry.content.create(ICatalogsService.__identifier__, parent=context)
+    registry.content.create(ICatalogsService.__identifier__, parent=context,
+                            registry=registry)
 
 
 def _add_principals_service(context, registry):
@@ -119,7 +120,8 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
                   {'name': 'adhocracy'}}
     registry.content.create(IProcess.__identifier__,
                             parent=context,
-                            appstructs=appstructs)
+                            appstructs=appstructs,
+                            registry=registry)
 
 
 def _add_default_group(context, registry):

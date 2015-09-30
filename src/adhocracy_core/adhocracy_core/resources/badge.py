@@ -64,7 +64,8 @@ badges_service_meta = service_meta._replace(
 
 def add_badges_service(context: IPool, registry: Registry, options: dict):
     """Add `badge` service to context."""
-    registry.content.create(IBadgesService.__identifier__, parent=context)
+    registry.content.create(IBadgesService.__identifier__, parent=context,
+                            registry=registry)
 
 
 class IBadgeAssignment(ISimple):
@@ -101,7 +102,7 @@ def add_badge_assignments_service(context: IPool, registry: Registry,
                                   options: dict):
     """Add `badge_assignments` service to context."""
     registry.content.create(IBadgeAssignmentsService.__identifier__,
-                            parent=context)
+                            parent=context, registry=registry)
 
 
 def includeme(config):
