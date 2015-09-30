@@ -6,13 +6,23 @@ from pyramid.registry import Registry
 from substanced.workflow import ACLWorkflow
 from substanced.workflow import WorkflowError
 from substanced.workflow import IWorkflow
+from zope.deprecation import deprecated
 from zope.interface import implementer
+from zope.interface import Interface
 
 from adhocracy_core.authorization import acm_to_acl
 from adhocracy_core.authorization import create_fake_god_request
 from adhocracy_core.exceptions import ConfigurationError
 from adhocracy_core.interfaces import IAdhocracyWorkflow
 from adhocracy_core.workflows.schemas import create_workflow_meta_schema
+
+
+class ISample(Interface):
+
+    """Sample workflow."""
+
+
+deprecated('ISample', 'Backward compatible code, remove after migration')
 
 
 @implementer(IAdhocracyWorkflow)

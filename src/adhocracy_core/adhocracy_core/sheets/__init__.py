@@ -350,6 +350,7 @@ def includeme(config):  # pragma: no cover
     config.include('.versions')
     config.include('.tags')
     config.include('.principal')
+    config.include('.relation')
     config.include('.metadata')
     config.include('.comment')
     config.include('.rate')

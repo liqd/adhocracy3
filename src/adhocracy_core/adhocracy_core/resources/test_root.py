@@ -20,6 +20,7 @@ def integration(integration):
     integration.include('adhocracy_core.changelog')
     integration.include('adhocracy_core.rest')
     integration.include('adhocracy_core.messaging')
+    return integration
 
 
 @mark.usefixtures('integration')
