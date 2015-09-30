@@ -34,7 +34,7 @@ polarizationversion_meta = itemversion_meta._replace(
     iresource=IPolarizationVersion,
     extended_sheets=(adhocracy_core.sheets.relation.IPolarization,
                      ),
-    permission_create='edit_comment',
+    permission_create='edit_relation',
 )
 
 
@@ -51,7 +51,7 @@ polarization_meta = item_meta._replace(
     item_type=IPolarizationVersion,
     use_autonaming=True,
     autonaming_prefix='polarization_',
-    permission_create='create_comment',
+    permission_create='create_relation',
     is_implicit_addable=True
 )
 

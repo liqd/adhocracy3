@@ -13,7 +13,7 @@ def test_polarization_meta():
     assert meta.item_type == IPolarizationVersion
     assert meta.element_types == (IPolarizationVersion,)
     assert meta.use_autonaming
-    assert meta.permission_create == 'create_comment'
+    assert meta.permission_create == 'create_relation'
     assert meta.is_implicit_addable is True
 
 
@@ -28,7 +28,7 @@ def test_polarizationversion_meta():
     assert meta.iresource.isOrExtends(IRelationVersion)
     assert meta.extended_sheets == (adhocracy_core.sheets.relation.IPolarization,
                                     )
-    assert meta.permission_create == 'edit_comment'
+    assert meta.permission_create == 'edit_relation'
 
 
 def test_relationservice_meta():
