@@ -7,7 +7,7 @@ from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import PostPool
-from adhocracy_core.schema import Reference as ReferenceSchema
+from adhocracy_core.schema import Reference
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
@@ -63,9 +63,8 @@ class PolarizationSchema(colander.MappingSchema):
     `position`: the position in the debate, 'pro' or 'contra'.
     """
 
-    subject = ReferenceSchema(reftype=PolarizationSubjectReference,
-                              backref=True)
-    object = ReferenceSchema(reftype=PolarizationObjectReference)
+    subject = Reference(reftype=PolarizationSubjectReference)
+    object = Reference(reftype=PolarizationObjectReference)
     position = Position()
 
 polarization_meta = sheet_meta._replace(isheet=IPolarization,
@@ -77,6 +76,9 @@ class CanPolarizeSchema(colander.MappingSchema):
 
     """CanPolarize sheet data structure."""
 
+    polarization = Reference(reftype=PolarizationSubjectReference,
+                             backref=True,
+                             readonly=True,)
 
 can_polarize_meta = sheet_meta._replace(isheet=ICanPolarize,
                                         schema_class=CanPolarizeSchema)
