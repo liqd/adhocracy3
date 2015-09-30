@@ -430,8 +430,8 @@ def _has_follower(version: IItemVersion, registry: Registry) -> bool:
 
 
 @log_migration
-def update_asset_download_childs(root):  # pragma: no cover
-    """Readd asset downloads and update IAssetMetadata sheet."""
+def update_asset_download_children(root):  # pragma: no cover
+    """Add asset downloads and update IAssetMetadata sheet."""
     from adhocracy_core.sheets.asset import IAssetMetadata
     from adhocracy_core.sheets.image import IImageMetadata
     from adhocracy_core.resources.asset import add_metadata
@@ -472,4 +472,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(migrate_rate_sheet_to_attribute_storage)
     config.add_evolution_step(move_autoname_last_counters_to_attributes)
     config.add_evolution_step(remove_empty_first_versions)
-    config.add_evolution_step(update_asset_download_childs)
+    config.add_evolution_step(update_asset_download_children)
