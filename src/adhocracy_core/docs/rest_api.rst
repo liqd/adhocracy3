@@ -1584,6 +1584,9 @@ custom filters:
   sheet.
   Valid query comparable: 'eq', 'noteq', 'lt', 'le', 'gt', 'ge', 'any', 'notany'
 
+* *user_name* the login name of users.
+  Valid query comparable: 'eq', 'noteq', 'lt', 'le', 'gt', 'ge', 'any', 'notany'
+
 *<package.sheets.sheet.ISheet:FieldName>* filters: you can add arbitrary custom
 filters that refer to sheet fields with references. The key is the name of
 the isheet plus the field name separated by ':' The value is the wanted

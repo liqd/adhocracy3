@@ -21,6 +21,7 @@ from zope.interface.interfaces import IInterface
 from zope.interface import Interface
 
 from adhocracy_core.caching import set_cache_header
+from adhocracy_core.events import ResourceSheetModified
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -64,6 +65,7 @@ from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.sheets.pool import IPool as IPoolSheet
 from adhocracy_core.sheets.versions import IVersionable
+from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.utils import extract_events_from_changelog_metadata
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
@@ -1109,6 +1111,9 @@ def validate_activation_path(context, request: Request):
         user.activate()
         user.activation_path = None
         request.validated['user'] = user
+        event = ResourceSheetModified(user, IUserBasic, request.registry, {},
+                                      {}, request)
+        request.registry.notify(event)  # trigger reindex activation_path index
 
 
 @view_defaults(

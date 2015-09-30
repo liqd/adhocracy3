@@ -17,6 +17,8 @@ from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.badge import IBadgeable
+from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import list_resource_with_descendants
 from adhocracy_core.utils import get_sheet_field
@@ -32,6 +34,24 @@ def reindex_rates(event):
     """Reindex the rates index if a rate backreference is modified."""
     catalogs = find_service(event.object, 'catalogs')
     catalogs.reindex_index(event.object, 'rates')
+
+
+def reindex_user_name(event):
+    """Reindex indexes `user_name`."""
+    catalogs = find_service(event.object, 'catalogs')
+    catalogs.reindex_index(event.object, 'user_name')
+
+
+def reindex_user_email(event):
+    """Reindex indexes `private_user_email`."""
+    catalogs = find_service(event.object, 'catalogs')
+    catalogs.reindex_index(event.object, 'private_user_email')
+
+
+def reindex_user_activation_path(event):
+    """Reindex indexes `private_user_activation_path`."""
+    catalogs = find_service(event.object, 'catalogs')
+    catalogs.reindex_index(event.object, 'private_user_activation_path')
 
 
 def reindex_badge(event):
@@ -104,5 +124,14 @@ def includeme(config):
     config.add_subscriber(reindex_workflow_state,
                           IResourceSheetModified,
                           event_isheet=IWorkflowAssignment)
+    config.add_subscriber(reindex_user_name,
+                          IResourceSheetModified,
+                          event_isheet=IUserBasic)
+    config.add_subscriber(reindex_user_email,
+                          IResourceSheetModified,
+                          event_isheet=IUserExtended)
+    config.add_subscriber(reindex_user_activation_path,
+                          IResourceSheetModified,
+                          event_isheet=IUserBasic)
     # add subscriber to updated allowed index
     config.scan('substanced.objectmap.subscribers')

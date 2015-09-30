@@ -15,6 +15,7 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IRolesUserLocator
+from adhocracy_core.interfaces import search_query
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import resource_meta
 from adhocracy_core.resources.pool import Pool
@@ -273,11 +274,8 @@ class UserLocatorAdapter(object):
 
     def get_user_by_login(self, login: str) -> IUser:
         """Find user per `login` name or return None."""
-        # TODO use catalog for all get_user_by_ methods
-        users = self.get_users()
-        for user in users:
-            if user.name == login:
-                return user
+        user = self._search_user('user_name', login)
+        return user
 
     def get_users(self) -> [IUser]:
         """Return all users."""
@@ -299,59 +297,64 @@ class UserLocatorAdapter(object):
 
     def get_user_by_email(self, email: str) -> IUser:
         """Find user per email or return None."""
-        users = self.get_users()
-        for user in users:
-            if user.email == email:
-                return user
+        user = self._search_user('private_user_email', email)
+        return user
 
     def get_user_by_activation_path(self, activation_path: str) -> IUser:
         """Find user per activation path or return None."""
-        users = self.get_users()
-        for user in users:
-            if user.activation_path == activation_path:  # pragma: no branch
-                return user
+        user = self._search_user('private_user_activation_path',
+                                 activation_path)
+        return user
 
-    def get_groupids(self, userid: str) -> list:
+    def _search_user(self, index_name: str, value: str) -> IUser:
+        catalogs = find_service(self.context, 'catalogs')
+        query = search_query._replace(indexes={index_name: value},
+                                      resolve=True)
+        users = catalogs.search(query).elements
+        if len(users) == 1:
+            return users[0]
+
+    def get_groupids(self, userid: str) -> [str]:
         """Get :term:`groupid`s for term:`userid` or return None."""
         groups = self.get_groups(userid)
         if groups is None:
             return None
         return ['group:' + g.__name__ for g in groups]
 
-    def get_groups(self, userid: str) -> list:
+    def get_groups(self, userid: str) -> [IGroup]:
         """Get :term:`group`s for term:`userid` or return None."""
         user = self.get_user_by_userid(userid)
         if user is None:
-            return None
+            return
         user_sheet = get_sheet(user,
                                adhocracy_core.sheets.principal.IPermissions,
                                registry=self.request.registry)
         groups = user_sheet.get()['groups']
         return groups
 
-    def get_role_and_group_roleids(self, userid: str) -> list:
+    def get_role_and_group_roleids(self, userid: str) -> [str]:
         """Return the roles for :term:`userid` and all its groups or None."""
         user = self.get_user_by_userid(userid)
         if user is None:
-            return None
+            return
         roleids = self.get_roleids(userid)
         group_roleids = self.get_group_roleids(userid)
         role_and_group_roleids = set(roleids + group_roleids)
         return sorted(list(role_and_group_roleids))
 
-    def get_roleids(self, userid: str) -> list:
+    def get_roleids(self, userid: str) -> [str]:
         """Return the roles for :term:`userid` or None."""
         user = self.get_user_by_userid(userid)
         if user is None:
-            return None
+            return
         roleids = ['role:' + r for r in user.roles]
         return roleids
 
-    def get_group_roleids(self, userid: str) -> list:
+    def get_group_roleids(self, userid: str) -> [str]:
         """Return the group roleids for :term:`userid` or None."""
         user = self.get_user_by_userid(userid)
         if user is None:
-            return None
+            return
         groups = self.get_groups(userid)
         roleids = set()
         for group in groups:
