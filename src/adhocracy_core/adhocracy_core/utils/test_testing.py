@@ -11,16 +11,16 @@ class TestAddResource:
 
     @fixture
     def mock_import_resources(self, monkeypatch):
-        from adhocracy_core import scripts
-        mock = Mock(spec=scripts.import_resources)
-        monkeypatch.setattr(scripts, 'import_resources', mock)
+        from . import testing
+        mock = Mock(spec=testing.import_resources)
+        monkeypatch.setattr(testing, 'import_resources', mock)
         return mock
 
     @fixture
     def mock_get_root(self, monkeypatch):
-        from adhocracy_core import utils
-        mock = Mock(spec=utils.get_root)
-        monkeypatch.setattr(utils, 'get_root', mock)
+        from . import testing
+        mock = Mock(spec=testing.get_root)
+        monkeypatch.setattr(testing, 'get_root', mock)
         return mock
 
     @fixture
@@ -32,8 +32,8 @@ class TestAddResource:
 
     def test_add_resources(self,
                            app,
-                           mock_import_resources,
                            mock_get_root,
+                           mock_import_resources,
                            mock_transaction_commit):
         filename = "/tmp/dummy.json"
         dummy_root = testing.DummyResource()
