@@ -82,7 +82,6 @@ class TestStadtForum:
         resp = app_admin.get(process_url)
         assert resp.status_code == 200
 
-
     def test_set_participate_state(self, registry, app, process_url, app_admin):
         resp = app_admin.get(process_url)
         assert resp.status_code == 200

@@ -3,6 +3,8 @@
 This is registered as console script 'import_resources' in setup.py.
 
 """
+# pragma: no cover
+
 import argparse
 import inspect
 import logging
@@ -14,7 +16,7 @@ from pyramid.paster import bootstrap
 from adhocracy_core import scripts
 
 
-def import_resources():  # pragma: no cover
+def import_resources():
     """Import resources from a JSON file.
 
     usage::
