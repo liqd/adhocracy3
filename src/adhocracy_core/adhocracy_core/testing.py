@@ -1,6 +1,7 @@
 """Public py.test fixtures: http://pytest.org/latest/fixture.html. """
 from unittest.mock import Mock
 from configparser import ConfigParser
+from distutils import dir_util
 from shutil import rmtree
 from subprocess import CalledProcessError
 import json
@@ -893,3 +894,21 @@ def app_admin(app):
 def app_god(app):
     """Return backend test app wrapper with god authentication."""
     return AppUser(app, header=god_header)
+
+
+@fixture
+def datadir(tmpdir, request):
+    """Fixture to access tests data.
+
+    Responsible for searching a folder with the same name of test
+    module and, if available, moving all contents to a temporary directory so
+    tests can use them freely.
+
+    """
+    filename = request.module.__file__
+    test_dir, _ = os.path.splitext(filename)
+
+    if os.path.isdir(test_dir):
+        dir_util.copy_tree(test_dir, str(tmpdir))
+
+    return tmpdir
