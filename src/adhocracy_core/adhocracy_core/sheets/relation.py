@@ -35,7 +35,7 @@ class Position(AdhocracySchemaNode):
     schema_type = colander.String
     missing = colander.drop
     default = 'pro'
-    validator = colander.OneOf(['pro', 'contra']),
+    validator = colander.OneOf(['pro', 'contra'])
 
 
 class PolarizationSubjectReference(SheetToSheet):
