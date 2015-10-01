@@ -1,4 +1,4 @@
-"""Functionalities to ease the testing of the Adhocracy."""
+"""Functionalities to ease the testing of Adhocracy."""
 
 import transaction
 
