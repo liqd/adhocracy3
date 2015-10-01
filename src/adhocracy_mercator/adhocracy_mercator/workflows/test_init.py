@@ -8,7 +8,7 @@ from webtest import TestResponse
 from mercator.tests.fixtures.fixturesMercatorProposals1 import _create_proposal
 from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposal_batch
 from mercator.tests.fixtures.fixturesMercatorProposals1 import update_proposal_batch
-
+from adhocracy_core.utils.testing import do_transition_to
 
 @fixture
 def integration(config):
@@ -86,14 +86,6 @@ def _batch_post_full_sample_proposal(app_user) -> TestResponse:
     return resp
 
 
-def _do_transition_to(app_user, path, state) -> TestResponse:
-    from adhocracy_core.sheets.workflow import IWorkflowAssignment
-    data = {'data': {IWorkflowAssignment.__identifier__:\
-                         {'workflow_state': state}}}
-    resp = app_user.put(path, data)
-    return resp
-
-
 @mark.functional
 class TestMercatorWorkflow:
 
@@ -109,7 +101,7 @@ class TestMercatorWorkflow:
 
     @mark.xfail(reason='state is currently set to participate when creating the mercator process')
     def test_change_state_to_announce(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/', 'announce')
+        resp = do_transition_to(app_initiator, '/', 'announce')
         assert resp.status_code == 200
 
     @mark.xfail(reason='state is currently set to participate when creating the mercator process')
@@ -119,7 +111,7 @@ class TestMercatorWorkflow:
 
     @mark.xfail(reason='state is currently set to participate when creating the mercator process')
     def test_change_state_to_participate(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/', 'participate')
+        resp = do_transition_to(app_initiator, '/', 'participate')
         assert resp.status_code == 200
 
     def test_participate_participant_can_create_proposal(self, app_participant):
@@ -153,7 +145,7 @@ class TestMercatorWorkflow:
         assert postable_types == []
 
     def test_change_state_to_frozen(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/', 'evaluate')
+        resp = do_transition_to(app_initiator, '/', 'evaluate')
         assert resp.status_code == 200
 
     def test_frozen_participant_cannot_create_proposal_item(self, app_participant):
@@ -165,7 +157,7 @@ class TestMercatorWorkflow:
         assert postable_types == []
 
     def test_change_state_to_result(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/', 'result')
+        resp = do_transition_to(app_initiator, '/', 'result')
         assert resp.status_code == 200
 
     def test_result_participant_cannot_create_proposal_item(self, app_participant):

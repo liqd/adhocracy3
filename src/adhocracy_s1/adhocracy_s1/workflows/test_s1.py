@@ -4,6 +4,8 @@ from pytest import mark
 from unittest.mock import Mock
 from webtest import TestResponse
 
+from adhocracy_core.utils.testing import do_transition_to
+
 
 class TestDoTransitionToPropose:
 
@@ -184,14 +186,6 @@ def _post_proposal_item(app_user, path='') -> TestResponse:
     return resp
 
 
-def _do_transition_to(app_user, path, state) -> TestResponse:
-    from adhocracy_core.sheets.workflow import IWorkflowAssignment
-    data = {'data': {IWorkflowAssignment.__identifier__:\
-                         {'workflow_state': state}}}
-    resp = app_user.put(path, data)
-    return resp
-
-
 @mark.functional
 class TestS1Workflow:
 
@@ -218,7 +212,7 @@ class TestS1Workflow:
             '/s1/proposal_0000000/rates')
 
     def test_change_state_to_select(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/s1', 'select')
+        resp = do_transition_to(app_initiator, '/s1', 'select')
         assert resp.status_code == 200
 
     def test_select_proposal_has_state_votable(self, app_participant):
@@ -244,7 +238,7 @@ class TestS1Workflow:
               'http://localhost/s1/proposal_0000001/']
 
     def test_change_state_to_result(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/s1', 'result')
+        resp = do_transition_to(app_initiator, '/s1', 'result')
         assert resp.status_code == 200
 
     def test_result_old_proposal_most_rated_has_state_selected(self, app_participant):
@@ -302,7 +296,7 @@ class TestS1Workflow:
               'http://localhost/s1/proposal_0000001/']
 
     def test_change_state_to_propose_again(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/s1', 'propose')
+        resp = do_transition_to(app_initiator, '/s1', 'propose')
         assert resp.status_code == 200
 
     def test_propose_again_old_decision_date_is_removed(self, app_participant):
@@ -318,11 +312,11 @@ class TestS1Workflow:
         assert 'proposal_0000003' in resp.json['path']
 
     def test_change_state_to_select_again(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/s1', 'select')
+        resp = do_transition_to(app_initiator, '/s1', 'select')
         assert resp.status_code == 200
 
     def test_change_state_to_result_again(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/s1', 'result')
+        resp = do_transition_to(app_initiator, '/s1', 'result')
         assert resp.status_code == 200
 
     def test_result_everybody_can_list_proposals_used_for_this_meeting_again(

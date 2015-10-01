@@ -3,6 +3,8 @@ from pytest import fixture
 from pytest import mark
 from webtest import TestResponse
 
+from adhocracy_core.utils.testing import do_transition_to
+
 
 @fixture(scope='class')
 def app_anonymous(app_anonymous):
@@ -71,14 +73,6 @@ def _post_proposal_itemversion(app_user, path='') -> TestResponse:
     return resp
 
 
-def _do_transition_to(app_user, path, state) -> TestResponse:
-    from adhocracy_core.sheets.workflow import IWorkflowAssignment
-    data = {'data': {IWorkflowAssignment.__identifier__:\
-                         {'workflow_state': state}}}
-    resp = app_user.put(path, data)
-    return resp
-
-
 @mark.functional
 class TestBPlanWorkflow:
 
@@ -99,7 +93,7 @@ class TestBPlanWorkflow:
         assert IProposal not in app_anonymous.get_postable_types('/bplan')
 
     def test_change_state_to_announce(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/bplan', 'announce')
+        resp = do_transition_to(app_initiator, '/bplan', 'announce')
         assert resp.status_code == 200
 
     def test_announce_anonymous_can_view_process(self, app_anonymous):
@@ -111,7 +105,7 @@ class TestBPlanWorkflow:
         assert IProposal not in app_anonymous.get_postable_types('/bplan')
 
     def test_change_state_to_participate(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/bplan', 'participate')
+        resp = do_transition_to(app_initiator, '/bplan', 'participate')
         assert resp.status_code == 200
 
     def test_participate_anonymous_creates_proposal(self, app_anonymous):
@@ -136,7 +130,7 @@ class TestBPlanWorkflow:
         assert resp.status_code == 200
 
     def test_change_state_to_frozen(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/bplan', 'evaluate')
+        resp = do_transition_to(app_initiator, '/bplan', 'evaluate')
         assert resp.status_code == 200
 
     def test_evaluate_anonymous_cannot_create_proposal(self, app_anonymous):
