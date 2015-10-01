@@ -6,6 +6,7 @@ from pytest import fixture
 from pytest import mark
 
 from adhocracy_core.utils.testing import add_resources
+from adhocracy_core.utils.testing import do_transition_to
 
 class TestProcess:
 
@@ -27,11 +28,32 @@ class TestProcess:
 @mark.functional
 class TestStadtForum:
 
-    def test_create_resources(self, registry, datadir, app, app_admin):
+    @fixture
+    def process_url(self):
+        return '/organisation/stadtforum'
+
+    def test_create_resources(self,
+                              registry,
+                              datadir,
+                              process_url,
+                              app,
+                              app_admin):
         json_file = str(datadir.join('resources.json'))
         add_resources(app, json_file)
-        resp = app_admin.get('/organisation/stadtforum')
+        resp = app_admin.get(process_url)
         assert resp.status_code == 200
 
-    def test_set_participate_phase(self, app_admin):
-        pass
+
+    def test_set_participate_phase(self, registry, app, process_url, app_admin):
+        resp = app_admin.get(process_url)
+        assert resp.status_code == 200
+
+        resp = do_transition_to(app_admin,
+                                process_url,
+                                'announce')
+        assert resp.status_code == 200
+
+        resp = do_transition_to(app_admin,
+                                process_url,
+                                'participate')
+        assert resp.status_code == 200
