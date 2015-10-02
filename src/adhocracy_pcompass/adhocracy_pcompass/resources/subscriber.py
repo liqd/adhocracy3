@@ -47,9 +47,10 @@ def update_elasticsearch_policycompass(event):
                                'http://localhost:9000')
     es_index = settings.get('adhocracy_pcompass.elasticsearch_index',
                             'policycompass_search')
-    r = requests.patch(
-        '%s/%s/%s/%s' % (es_endpoint, es_index, resource_type, resource_id),
-        json={'comment_count': comment_count})
+    r = requests.post(
+        '%s/%s/%s/%s/_update' %
+        (es_endpoint, es_index, resource_type, resource_id),
+        json={'doc': {'comment_count': comment_count}})
 
     if r.status_code == 404:  # document not created (error in pcompass)
         log.warn('Document "%s/%s" is missing from elastic search "%s" index',

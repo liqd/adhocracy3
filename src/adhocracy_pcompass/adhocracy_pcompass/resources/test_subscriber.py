@@ -40,19 +40,19 @@ class TestUpdateElasticsearchPolicycompass:
                 }
             })
 
-    def requests_patch(self, status_code=200):
+    def requests_post(self, status_code=200):
         response = requests.Response
         response.status_code = status_code
-        patch = Mock(name="requests.patch", return_value=response)
-        return(patch)
+        post = Mock(name="requests.post", return_value=response)
+        return(post)
 
     def test_elastic_search_update(self, registry, context, monkeypatch):
         from .subscriber import update_elasticsearch_policycompass
 
-        requests_patch = self.requests_patch()
-        monkeypatch.setattr(requests, 'patch', requests_patch)
+        requests_post = self.requests_post()
+        monkeypatch.setattr(requests, 'post', requests_post)
         self.make_comment(registry, context)
 
-        requests_patch.assert_called_with(
-            'http://localhost:9000/policycompass_search/dataset/1',
-            json={'comment_count': 1})
+        requests_post.assert_called_with(
+            'http://localhost:9000/policycompass_search/dataset/1/_update',
+            json={'doc': {'comment_count': 1}})
