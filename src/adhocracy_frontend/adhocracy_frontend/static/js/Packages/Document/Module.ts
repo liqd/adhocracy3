@@ -38,10 +38,11 @@ export var register = (angular) => {
             AdhTopLevelStateModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("document-detail");
-            adhEmbedProvider.embeddableDirectives.push("document-create");
-            adhEmbedProvider.embeddableDirectives.push("document-edit");
-            adhEmbedProvider.embeddableDirectives.push("document-list-item");
+            adhEmbedProvider
+                .registerDirective("document-detail")
+                .registerDirective("document-create")
+                .registerDirective("document-edit")
+                .registerDirective("document-list-item");
         }])
         .directive("adhDocumentDetail", ["$q", "adhConfig", "adhHttp", "adhGetBadges", "adhTopLevelState", AdhDocument.detailDirective])
         .directive("adhDocumentCreate", [

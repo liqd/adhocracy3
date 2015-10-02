@@ -13,7 +13,7 @@ export var register = (angular) => {
             AdhEmbedModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.registerEmbeddableDirectives(["test-parse-markdown"]);
+            adhEmbedProvider.registerDirective("test-parse-markdown");
         }])
         .directive("adhParseMarkdown", ["adhConfig", "markdownit", AdhMarkdown.parseMarkdown])
         .directive("adhTestParseMarkdown", ["adhConfig", AdhMarkdown.testMarkdown]);

@@ -1,4 +1,4 @@
-.mein-berlin-proposal-form {
+.meinberlin-proposal-form {
     background-color: $color-background-base-introvert;
     bottom: 0;
     padding: 0;
@@ -16,26 +16,26 @@
     }
 }
 
-.mein-berlin-proposal-form-upper {
+.meinberlin-proposal-form-upper {
     @include rem(padding, 1rem);
     background: $color-background-base;
 }
 
-.mein-berlin-proposal-detail {
+.meinberlin-proposal-detail {
     .rate {
         float: right;
     }
 }
 
-.mein-berlin-proposal-detail-header,
-.mein-berlin-proposal-badge-descriptions,
-.mein-berlin-proposal-detail-body {
+.meinberlin-proposal-detail-header,
+.meinberlin-proposal-badge-descriptions,
+.meinberlin-proposal-detail-body {
     @include clearfix;
     @include rem(padding, 0 10px);
     background: $color-background-base;
 }
 
-.mein-berlin-proposal-detail-body-comments {
+.meinberlin-proposal-detail-body-comments {
     @include rem(padding-left, 40px);
     float: right;
     text-align: center;
@@ -52,15 +52,15 @@
     }
 }
 
-.mein-berlin-proposal-detail-body-comments-icon {
+.meinberlin-proposal-detail-body-comments-icon {
     @include rem(font-size, 20px);
     display: block;
 }
 
-.mein-berlin-proposal-detail-header {
+.meinberlin-proposal-detail-header {
     @include rem(padding-top, 30px);
 
-    .mein-berlin-proposal-detail-header-title {
+    .meinberlin-proposal-detail-header-title {
         @include rem(font-size, $font-size-normal);
         @include rem(margin, 0 0 30px);
         color: $color-text-normal;
@@ -73,29 +73,29 @@
     }
 }
 
-.mein-berlin-proposal-detail-detail {
+.meinberlin-proposal-detail-detail {
     @include rem(margin-bottom, 30px);
     padding-right: 15%;
     white-space: pre-line;
 }
 
-.mein-berlin-proposal-detail-meta-item,
-.mein-berlin-proposal-detail-author {
+.meinberlin-proposal-detail-meta-item,
+.meinberlin-proposal-detail-author {
     @include rem(font-size, $font-size-small);
     color: $color-text-introvert;
 }
 
-.mein-berlin-proposal-detail-author {
+.meinberlin-proposal-detail-author {
     @include rem(margin-bottom, 30px);
 }
 
-.mein-berlin-proposal-detail-meta {
+.meinberlin-proposal-detail-meta {
     @include clearfix;
     @include rem(margin, 0 0 40px);
     list-style-type: none;
     padding: 0;
 
-    .mein-berlin-proposal-detail-meta-item {
+    .meinberlin-proposal-detail-meta-item {
         @include gallery(3 of 12);
 
         &:nth-child(2) {
@@ -103,23 +103,23 @@
         }
     }
 
-    .mein-berlin-proposal-detail-meta-participation {
+    .meinberlin-proposal-detail-meta-participation {
         text-align: right;
     }
 
-    .mein-berlin-proposal-detail-meta-item-icon {
+    .meinberlin-proposal-detail-meta-item-icon {
         @include rem(margin-right, 8px);
         vertical-align: middle;
     }
 
-    .mein-berlin-proposal-detail-meta-item-text {
+    .meinberlin-proposal-detail-meta-item-text {
         @include inline-block;
         margin: 0;
         text-align: left;
     }
 
-    .mein-berlin-proposal-detail-meta-item-comments,
-    .mein-berlin-proposal-detail-meta-item-location {
+    .meinberlin-proposal-detail-meta-item-comments,
+    .meinberlin-proposal-detail-meta-item-location {
         a {
             color: $color-text-highlight-introvert;
         }
@@ -128,13 +128,13 @@
 
 /*doc
 ---
-title: Kiezkassen Proposal List Item
-name: mein-berlin-proposal-list-item
+title: Kiezkasse Proposal List Item
+name: meinberlin-proposal-list-item
 category: meinberlin
 ---
 
-Kiezkassen Proposal List Item contains all the key information about a
-kiezkassen proposal.  Key information may be content from the proposal as well
+Kiezkasse Proposal List Item contains all the key information about a
+kiezkasse proposal.  Key information may be content from the proposal as well
 as metadata.  It serves as an entry to a detail view.
 
 
@@ -203,7 +203,7 @@ as metadata.  It serves as an entry to a detail view.
     @include rem(margin, 0 0 15px);
 }
 
-.mein-berlin-proposal-form-footer {
+.meinberlin-proposal-form-footer {
     .form-footer-button {
         @include rem(padding-left, 10px);
     }

@@ -15,7 +15,7 @@ export var register = (angular) => {
             AdhHttpModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("upload-image");
+            adhEmbedProvider.registerDirective("upload-image");
         }])
         .factory("adhUploadImage", ["adhHttp", AdhImage.uploadImageFactory])
         .directive("adhUploadImage", ["adhConfig", "adhHttp", "adhUploadImage", "flowFactory", AdhImage.uploadImageDirective])
