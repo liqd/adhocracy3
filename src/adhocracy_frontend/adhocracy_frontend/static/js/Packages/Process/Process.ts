@@ -72,6 +72,7 @@ export var workflowSwitchDirective = (
         scope: {
             path: "@"
         },
+        transclude: true,
         link: (scope, element) => {
 
             adhHttp.options(scope.path, {importOptions: false}).then((raw) => {

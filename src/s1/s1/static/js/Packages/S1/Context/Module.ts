@@ -29,6 +29,7 @@ export var register = (angular) => {
             AdhUserViewsModule.moduleName
         ])
         .directive("adhS1ContextHeader", ["adhConfig", "adhPermissions", "adhTopLevelState", Context.headerDirective])
+        .directive("adhS1StateIndicator", ["adhConfig", "adhHttp", "adhTopLevelState", Context.stateIndicatorDirective])
         .directive("adhS1MeetingSelector", ["adhConfig", "adhHttp", "adhTopLevelState", Context.meetingSelectorDirective])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerContext("s1");

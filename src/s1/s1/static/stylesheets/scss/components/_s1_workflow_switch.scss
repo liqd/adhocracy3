@@ -69,7 +69,7 @@ $arrow-width: 5px;
     }
 }
 
-.s1-workflow-switch-states-container.has-switch {
+.s1-workflow-switch.has-switch .s1-workflow-switch-transcluded {
     @include span(9 of 12 first);
 }
 

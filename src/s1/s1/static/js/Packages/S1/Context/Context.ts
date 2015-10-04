@@ -26,6 +26,25 @@ export var headerDirective = (
 };
 
 
+export var stateIndicatorDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/StateIndicator.html",
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.on("processUrl", (processUrl) => {
+                adhHttp.get(processUrl).then((process : RIS1Process) => {
+                    scope.workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
+                });
+            }));
+        }
+    };
+};
+
+
 /* Dynamically displays links to the current meeting, to the next meeting (if
  * appropriate) and adds a proposal besides the meeting, in which proposals
  * can currently be added.

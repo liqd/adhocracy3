@@ -10,4 +10,6 @@
         <a data-ng-href="{{ '/principals/users' | adhResourceUrl }}" class="button-cta-secondary">{{ "TR__S1_USER_LIST" | translate }}</a>
     </div>
 </div>
-<adh-workflow-switch data-path="{{ processUrl }}"></adh-workflow-switch>
+<adh-workflow-switch data-path="{{ processUrl }}">
+    <adh-s1-state-indicator data-path="{{ processUrl }}"></adh-s1-state-indicator>
+</adh-workflow-switch>
