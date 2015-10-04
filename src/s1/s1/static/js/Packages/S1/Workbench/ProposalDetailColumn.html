@@ -14,4 +14,7 @@
         data-ng-switch-when="body"
         data-path="{{proposalUrl}}">
     </adh-s1-proposal-detail>
+    <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ proposalUrl | adhParentPath | adhResourceUrl }}">
+        <i class="icon-collapse moving-column-expand-icon"></i>
+    </a>
 </div>
