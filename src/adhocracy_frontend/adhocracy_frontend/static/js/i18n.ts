@@ -5,6 +5,7 @@
 
 translateMe = [
     "TR__BACK_TO_TOP",
+    "TR__BY",
     "TR__COMMENTS",
     "TR__COMMENTS_TOTAL",
     "TR__CREATE_DOCUMENT",
@@ -42,6 +43,7 @@ translateMe = [
     "TR__MAX_CHARS_800",
     "TR__NEWSLETTER",
     "TR__NO",
+    "TR__ON",
     "TR__ONLINE",
     "TR__OPTIONAL",
     "TR__OTHER",
