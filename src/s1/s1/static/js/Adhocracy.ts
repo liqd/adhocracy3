@@ -111,7 +111,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         adhTopLevelStateProvider
             .when("", ["$location", ($location) : AdhTopLevelState.IAreaInput => {
                 $location.replace();
-                $location.path("/r/adhocracy/");
+                $location.path("/r/s1/");
                 return {
                     skip: true
                 };
