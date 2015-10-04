@@ -193,11 +193,15 @@ export var s1ProposalEditColumnDirective = (
 };
 
 export var s1LandingDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Landing.html"
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Landing.html",
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+        }
     };
 };
 
