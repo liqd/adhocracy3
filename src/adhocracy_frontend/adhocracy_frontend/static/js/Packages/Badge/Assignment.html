@@ -1,4 +1,3 @@
-<h2>Badge Assignment</h2>
 <form
     name="form"
     data-ng-if="badges"
@@ -9,10 +8,10 @@
         name="badges"
         data-ng-options="badge.path as badge.title for badge in badges"
         required="required">
-        <option value="">Choose a badge</option>
+        <option value="">{{ "TR__CHOOSE_BADGE" | translate }}</option>
     </select>
     <span data-ng-show="form.$submitted || form.badges.$touched">
-        <span class="input-error" data-ng-show="form.badges.$error.required">Please choose a badge</span>
+        <span class="input-error" data-ng-show="form.badges.$error.required">{{ "TR__ERROR_REQUIRED_BADGE" | translate }}</span>
     </span>
     <span class="input-error" data-ng-show="serverError">{{serverError}}</span>
 
