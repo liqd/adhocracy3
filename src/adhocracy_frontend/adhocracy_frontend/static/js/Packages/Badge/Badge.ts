@@ -24,6 +24,7 @@ export interface IBadge {
     title : string;
     description : string;
     name : string;
+    path : string;
 }
 
 export interface IGetBadges {
@@ -50,7 +51,8 @@ export var getBadgesFactory = (
                 return {
                     title: badge.data[SITitle.nick].title,
                     name: badge.data[SIName.nick].name,
-                    description: assignment.data[SIDescription.nick].description
+                    description: assignment.data[SIDescription.nick].description,
+                    path: assignmentPath
                 };
             });
         });
@@ -230,8 +232,8 @@ export var badgeAssignmentDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     $q : angular.IQService,
-    adhCredentials : AdhCredentials.Service,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhGetBadges
 ) => {
     return {
         restrict: "E",
@@ -245,14 +247,17 @@ export var badgeAssignmentDirective = (
         },
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             scope.badgeablePath = scope.path;
+            scope.data = {};
 
             var processUrl = adhTopLevelState.get("processUrl");
             var promise1 = adhHttp.get(processUrl).then((resource) => {
                 scope.badgesPath = resource.data[SIHasBadgesPool.nick].badges_pool;
             });
 
-            var promise2 = adhHttp.get(scope.path).then((resource) => {
-                scope.options = resource.data[SIBadgeable.nick].assignments;
+            var promise2 = adhHttp.get(scope.path).then((proposal) => {
+                return adhGetBadges(proposal).then((assignments : IBadge[]) => {
+                    scope.assignments = assignments;
+                });
             });
 
             $q.all([promise1, promise2]).then(() => {
