@@ -141,6 +141,7 @@ export var badgeAssignmentCreateDirective = (
         scope: {
             badgesPath: "@",
             badgeablePath: "@",
+            showDescription: "=?",
             onSubmit: "=?",
             onCancel: "=?"
         },
@@ -184,6 +185,7 @@ export var badgeAssignmentEditDirective = (
         scope: {
             path: "@",
             badgesPath: "@",
+            showDescription: "=?",
             onSubmit: "=?",
             onCancel: "=?"
         },
@@ -237,6 +239,7 @@ export var badgeAssignmentDirective = (
         require: "^adhMovingColumn",
         scope: {
             path: "@",
+            showDescription: "=?",
             onSubmit: "=?",
             onCancel: "=?"
         },

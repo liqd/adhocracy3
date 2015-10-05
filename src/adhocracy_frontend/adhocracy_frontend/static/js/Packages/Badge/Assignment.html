@@ -17,6 +17,7 @@
     <span class="input-error" data-ng-show="serverError">{{serverError}}</span>
 
     <textarea
+        data-ng-if="showDescription"
         data-ng-model="data.description"
         name="description">
     </textarea>
