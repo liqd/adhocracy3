@@ -248,7 +248,7 @@ export var registerDirective = (
             };
 
             scope.cancel = scope.goBack = () => {
-                 adhTopLevelState.goToCameFrom("/");
+                adhTopLevelState.goToCameFrom("/");
             };
 
 
