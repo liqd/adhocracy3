@@ -8,6 +8,7 @@ from substanced.util import find_service
 from pyramid.traversal import find_interface
 
 from adhocracy_core.interfaces import IResourceCreatedAndAdded, search_query
+from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.resources.comment import IComment
 from adhocracy_core.resources.external_resource import IExternalResource
 from adhocracy_core.sheets.name import IName
@@ -39,7 +40,7 @@ def update_elasticsearch_policycompass(event):
 
     # count comments using catalog
     catalogs = find_service(external_resource, 'catalogs')
-    query = search_query._replace(interfaces=IComment)
+    query = search_query._replace(interfaces=IComment, only_visible=True)
     comment_count = catalogs.search(query).count
 
     settings = event.registry.settings
@@ -65,4 +66,7 @@ def includeme(config):
     """Register subscribers."""
     config.add_subscriber(update_elasticsearch_policycompass,
                           IResourceCreatedAndAdded,
+                          object_iface=IComment)
+    config.add_subscriber(update_elasticsearch_policycompass,
+                          IResourceSheetModified,
                           object_iface=IComment)
