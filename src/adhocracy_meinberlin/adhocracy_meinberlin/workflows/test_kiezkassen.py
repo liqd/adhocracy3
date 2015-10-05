@@ -3,6 +3,8 @@ from pytest import fixture
 from pytest import mark
 from webtest import TestResponse
 
+from adhocracy_core.utils.testing import do_transition_to
+
 
 @fixture(scope='class')
 def app_anonymous(app_anonymous):
@@ -76,14 +78,6 @@ def _post_proposal_item(app_user, path='') -> TestResponse:
     return resp
 
 
-def _do_transition_to(app_user, path, state) -> TestResponse:
-    from adhocracy_core.sheets.workflow import IWorkflowAssignment
-    data = {'data': {IWorkflowAssignment.__identifier__:\
-                         {'workflow_state': state}}}
-    resp = app_user.put(path, data)
-    return resp
-
-
 @mark.functional
 class TestKiezkassenWorkflow:
 
@@ -100,7 +94,7 @@ class TestKiezkassenWorkflow:
         assert IProposal not in app_participant.get_postable_types('/kiezkasse')
 
     def test_change_state_to_announce(self, app_initiator, app_god):
-        resp = _do_transition_to(app_initiator, '/kiezkasse', 'announce')
+        resp = do_transition_to(app_initiator, '/kiezkasse', 'announce')
         assert resp.status_code == 200
 
     def test_announce_participant_can_view_process(self, app_participant):
@@ -112,7 +106,7 @@ class TestKiezkassenWorkflow:
         assert IProposal not in app_participant.get_postable_types('/kiezkasse')
 
     def test_change_state_to_participate(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/kiezkasse', 'participate')
+        resp = do_transition_to(app_initiator, '/kiezkasse', 'participate')
         assert resp.status_code == 200
 
     def test_participate_participant_creates_proposal(self, app_participant):
@@ -131,11 +125,11 @@ class TestKiezkassenWorkflow:
             '/kiezkasse/proposal_0000000/rates')
 
     def test_change_state_to_evaluate(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/kiezkasse', 'evaluate')
+        resp = do_transition_to(app_initiator, '/kiezkasse', 'evaluate')
         assert resp.status_code == 200
 
     def test_change_state_to_result(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/kiezkasse', 'result')
+        resp = do_transition_to(app_initiator, '/kiezkasse', 'result')
         assert resp.status_code == 200
 
     def test_result_participant_can_view_process(self, app_participant):
@@ -155,6 +149,6 @@ class TestKiezkassenWorkflow:
             '/kiezkasse/proposal_0000000/rates')
 
     def test_change_state_to_closed(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/kiezkasse', 'closed')
+        resp = do_transition_to(app_initiator, '/kiezkasse', 'closed')
         assert resp.status_code == 200
 
