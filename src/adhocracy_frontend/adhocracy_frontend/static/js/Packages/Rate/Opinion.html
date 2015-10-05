@@ -3,12 +3,12 @@
     'm-show-results-persist': showResults==='persist',
     'm-show-results-click': showResults==='click',
     'm-show-results-hover': showResults==='hover',
-    'is-cast': isCast
+    'is-cast': hasCastInSession
 }" data-ng-if="ready">
-    <span class="opinion-button-container">
+    <span class="opinion-button-container" data-ng-if="!hasCast">
         <a
             href=""
-            class="opinion-yes"
+            class="opinion-yes opinion-button"
             data-ng-class="{
                 'is-opinion-button-active': myRate === 1,
                 'is-disabled': disabled || (!optionsPostPool.POST && optionsPostPool.loggedIn)
@@ -18,10 +18,10 @@
         </a>
 
     </span>
-    <span class="opinion-button-container">
+    <span class="opinion-button-container" data-ng-if="!hasCast">
         <a
             href=""
-            class="opinion-no"
+            class="opinion-no opinion-button"
             data-ng-class="{
                 'is-opinion-button-active': myRate === -1,
                 'is-disabled': disabled || (!optionsPostPool.POST && optionsPostPool.loggedIn)
@@ -30,8 +30,21 @@
             {{'TR__NO' | translate}}
         </a>
     </span>
-    <span class="rate-results">
-        <span class="rate-result-yes">{{rates(1)}}</span>
-        <span class="rate-result-no">{{rates(-1)}}</span>
+    <span class="opinion-results" data-ng-if="hasCast" data-ng-class="{
+        'is-opinion-yes': myRate === 1,
+        'is-opinion-no': myRate === -1
+    }">
+        <span class="opinion-bar-container">
+            <span class="opinion-bar" style="width: {{rates(1) | percentage:(rates(1) + rates(-1))}}"></span>
+        </span>
+        <span class="opinion-result-numerics">
+            <span class="opinion-result-yes">
+                {{'TR__YES' | translate | uppercase}} ({{rates(1)}} {{'TR__VOTES' | translate}}) {{rates(1) | percentage:(rates(1) + rates(-1))}}
+            </span>
+            <span class="opinion-result-total">{{'TR__TOTAL' | translate}} {{rates(1) + rates(-1)}}</span>
+            <span class="opinion-result-no">
+                ({{rates(-1)}} {{'TR__VOTES' | translate}}) {{rates(-1) | percentage:(rates(1) + rates(-1))}} {{'TR__NO' | translate | uppercase }}
+            </span>
+        </span>
     </span>
 </div>
