@@ -43,11 +43,12 @@ export interface IRateScope extends angular.IScope {
     refersTo : string;
     showResults : string;
     disabled : boolean;
-    isCast : boolean;
+    hasCastInSession : boolean;
     myRate : number;
     rates(rate : number) : number;
     optionsPostPool : AdhHttp.IOptions;
     ready : boolean;
+    hasCast : boolean;
 
     cast(value : number) : angular.IPromise<void>;
     uncast() : angular.IPromise<void>;
@@ -101,7 +102,6 @@ export class Service {
         };
         query[SIRate.nick + ":subject"] = subject;
         query[SIRate.nick + ":object"] = object;
-
         return this.adhHttp.get(poolPath, query).then((pool) => {
             if (pool.data[SIPool.nick].elements.length > 0) {
                 return this.adhHttp.get(pool.data[SIPool.nick].elements[0]);
@@ -217,6 +217,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                     return adhRate.fetchRate(postPoolPath, scope.refersTo, adhCredentials.userPath).then((resource) => {
                         storeMyRateResource(resource);
                         scope.myRate = adapter.rate(resource);
+                        scope.hasCast = true;
                     }, () => undefined);
                 } else {
                     return $q.when();
@@ -318,7 +319,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                             })
                             .then(() => undefined);
                     }).finally(() => {
-                        scope.isCast = true;
+                        scope.hasCastInSession = true;
                         lock = false;
                     });
                 }
