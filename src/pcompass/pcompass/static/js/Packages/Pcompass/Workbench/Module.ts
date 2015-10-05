@@ -37,7 +37,7 @@ export var register = (angular) => {
             }];
         }])
         .directive("adhPcompassWorkbench", ["adhTopLevelState", "adhConfig", "adhHttp", Workbench.workbenchDirective])
-        .directive("adhPcompassProposalDetailColumn", ["adhConfig", "adhPermissions", Workbench.proposalDetailColumnDirective])
+        .directive("adhPcompassProposalDetailColumn", ["adhConfig", "adhHttp", "adhPermissions", Workbench.proposalDetailColumnDirective])
         .directive("adhPcompassProposalCreateColumn", ["adhConfig", Workbench.proposalCreateColumnDirective])
         .directive("adhPcompassProposalEditColumn", ["adhConfig", Workbench.proposalEditColumnDirective])
         .directive("adhPcompassProcessDetailColumn", ["adhConfig", Workbench.processDetailColumnDirective]);
