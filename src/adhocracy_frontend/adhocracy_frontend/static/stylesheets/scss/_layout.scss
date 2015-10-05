@@ -173,7 +173,7 @@ depends on a lot of factors:
 
 .l-header,
 .l-header-center {
-    max-width: $moving-column-single-width-max;
+    @include rem(max-width, $moving-column-single-width-max);
 }
 
 .l-header-left {

@@ -100,9 +100,8 @@ class PolarizableSchema(colander.MappingSchema):
 polarizable_meta = sheet_meta._replace(
     isheet=IPolarizable,
     schema_class=PolarizableSchema,
-    editable=True,
-    creatable=True,
-    create_mandatory=True
+    editable=False,
+    creatable=False,
 )
 
 
