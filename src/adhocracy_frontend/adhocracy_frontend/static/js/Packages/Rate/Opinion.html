@@ -1,0 +1,37 @@
+<div class="opinion" data-ng-class="{
+    'is-disabled': disabled || (!optionsPostPool.POST && optionsPostPool.loggedIn),
+    'm-show-results-persist': showResults==='persist',
+    'm-show-results-click': showResults==='click',
+    'm-show-results-hover': showResults==='hover',
+    'is-cast': isCast
+}" data-ng-if="ready">
+    <span class="opinion-button-container">
+        <a
+            href=""
+            class="opinion-yes"
+            data-ng-class="{
+                'is-opinion-button-active': myRate === 1,
+                'is-disabled': disabled || (!optionsPostPool.POST && optionsPostPool.loggedIn)
+            }"
+            data-ng-click="toggle(1)">
+            {{'TR__YES' | translate}}
+        </a>
+
+    </span>
+    <span class="opinion-button-container">
+        <a
+            href=""
+            class="opinion-no"
+            data-ng-class="{
+                'is-opinion-button-active': myRate === -1,
+                'is-disabled': disabled || (!optionsPostPool.POST && optionsPostPool.loggedIn)
+            }"
+            data-ng-click="toggle(-1)">
+            {{'TR__NO' | translate}}
+        </a>
+    </span>
+    <span class="rate-results">
+        <span class="rate-result-yes">{{rates(1)}}</span>
+        <span class="rate-result-no">{{rates(-1)}}</span>
+    </span>
+</div>

@@ -52,5 +52,18 @@ export var register = (angular) => {
             "adhPreliminaryNames",
             "adhTopLevelState",
             "adhDone",
-            AdhRate.directiveFactory("/Like.html", new Adapter.LikeAdapter())]);
+            AdhRate.directiveFactory("/Like.html", new Adapter.LikeAdapter())])
+        .directive("adhOpinion", [
+            "$q",
+            "adhRate",
+            "adhRateEventManager",
+            "adhConfig",
+            "adhHttp",
+            "adhWebSocket",
+            "adhPermissions",
+            "adhCredentials",
+            "adhPreliminaryNames",
+            "adhTopLevelState",
+            "adhDone",
+            AdhRate.directiveFactory("/Opinion.html", new Adapter.OpinionAdapter())]);
 };
