@@ -29,7 +29,7 @@ def principals(pool_with_catalogs, registry):
 class TestImportResources:
 
     def test_import_resources(self, registry, log):
-        from adhocracy_core.scripts.import_resources import _import_resources
+        from adhocracy_core.scripts import import_resources
 
         (self._tempfd, filename) = mkstemp()
         with open(filename, 'w') as f:
@@ -41,13 +41,13 @@ class TestImportResources:
             ]))
 
         root = registry.content.create(IRootPool.__identifier__)
-        _import_resources(root, registry, filename)
+        import_resources(root, registry, filename)
         assert IOrganisation.providedBy(root['alt-treptow'])
         assert get_sheet_field(root['alt-treptow'], IName, 'name') == 'alt-treptow'
 
 
     def test_import_resources_invalid_data(self, registry, log):
-        from adhocracy_core.scripts.import_resources import _import_resources
+        from adhocracy_core.scripts import import_resources
         import colander
 
         (self._tempfd, filename) = mkstemp()
@@ -64,11 +64,11 @@ class TestImportResources:
 
         root = registry.content.create(IRootPool.__identifier__)
         with pytest.raises(colander.Invalid):
-            _import_resources(root, registry, filename)
+            import_resources(root, registry, filename)
 
 
     def test_import_resources_already_exists(self, registry, log):
-        from adhocracy_core.scripts.import_resources import _import_resources
+        from adhocracy_core.scripts import import_resources
 
         (self._tempfd, filename) = mkstemp()
         with open(filename, 'w') as f:
@@ -80,15 +80,15 @@ class TestImportResources:
             ]))
 
         root = registry.content.create(IRootPool.__identifier__)
-        _import_resources(root, registry, filename)
+        import_resources(root, registry, filename)
         # try readding
-        _import_resources(root, registry, filename)
+        import_resources(root, registry, filename)
         assert IOrganisation.providedBy(root['alt-treptow'])
         assert get_sheet_field(root['alt-treptow'], IName, 'name') == 'alt-treptow'
 
     def test_import_resources_already_oneleveldeep(self, registry, principals,
                                                    log):
-        from adhocracy_core.scripts.import_resources import _import_resources
+        from adhocracy_core.scripts import import_resources
 
         (self._tempfd, filename) = mkstemp()
         with open(filename, 'w') as f:
@@ -104,11 +104,11 @@ class TestImportResources:
         registry.content.create(IOrganisation.__identifier__, root,
                                 appstructs=appstructs, registry=registry)
 
-        _import_resources(root, registry, filename)
+        import_resources(root, registry, filename)
         assert IOrganisation.providedBy(root['orga']['alt-treptow'])
 
     def test_import_resources_set_creator(self, registry, log):
-        from adhocracy_core.scripts.import_resources import _import_resources
+        from adhocracy_core.scripts import import_resources
 
         (self._tempfd, filename) = mkstemp()
         with open(filename, 'w') as f:
@@ -121,13 +121,13 @@ class TestImportResources:
             ]))
 
         root = registry.content.create(IRootPool.__identifier__)
-        _import_resources(root, registry, filename)
+        import_resources(root, registry, filename)
         assert IOrganisation.providedBy(root['alt-treptow'])
         god = root['principals']['users'].values()[0]
         assert get_sheet_field(root['alt-treptow'], IMetadata, 'creator') == god
 
     def test_import_resource_create_group(self, registry, log):
-        from adhocracy_core.scripts.import_resources import _import_resources
+        from adhocracy_core.scripts import import_resources
 
         (self._tempfd, filename) = mkstemp()
         with open(filename, 'w') as f:
@@ -143,10 +143,10 @@ class TestImportResources:
 
             ]))
         root = registry.content.create(IRootPool.__identifier__)
-        _import_resources(root, registry, filename)
+        import_resources(root, registry, filename)
 
     def test_get_expected_path(self, log):
-        from adhocracy_core.scripts.import_resources import _get_expected_path
+        from adhocracy_core.scripts import _get_expected_path
 
         resource_info = {"path": "/",
                          "data": {"adhocracy_core.sheets.name.IName":
@@ -154,14 +154,14 @@ class TestImportResources:
         assert _get_expected_path(resource_info) == '/alt-treptow'
 
     def test_get_expected_path_no_name_noname(self, log):
-        from adhocracy_core.scripts.import_resources import _get_expected_path
+        from adhocracy_core.scripts import _get_expected_path
 
         resource_info = {"path": "/",
                          "data": {}}
         assert _get_expected_path(resource_info) == ''
 
     def test_username_is_resolved_to_his_path(self, registry):
-        from adhocracy_core.scripts.import_resources import _import_resources
+        from adhocracy_core.scripts import import_resources
         from .import_users import _get_user_locator
 
         (self._tempfd, filename) = mkstemp()
@@ -188,7 +188,7 @@ class TestImportResources:
                                 appstructs=badge_appstructs,
                                 registry=registry)
 
-        _import_resources(root, registry, filename)
+        import_resources(root, registry, filename)
         assignments = find_resource(root, '/principals/users/badge_assignments/')
         assignment = list(assignments.values())[0]
         subject = get_sheet_field(assignment, IBadgeAssignment, 'subject')
@@ -197,7 +197,7 @@ class TestImportResources:
         assert subject == god
 
     def test_raise_when_resolving_non_existing_user(self, registry):
-        from adhocracy_core.scripts.import_resources import _import_resources
+        from adhocracy_core.scripts import import_resources
         from .import_users import _get_user_locator
 
         (self._tempfd, filename) = mkstemp()
@@ -224,7 +224,7 @@ class TestImportResources:
                                 appstructs=badge_appstructs,
                                 registry=registry)
         with pytest.raises(ValueError):
-            _import_resources(root, registry, filename)
+            import_resources(root, registry, filename)
 
     def teardown_method(self, method):
         if hasattr(self, 'tempfd'):

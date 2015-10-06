@@ -148,8 +148,11 @@
     "TR__SUBMIT": "submit",
     "TR__SUPPORTERS": "supporters",
     "TR__TITLE_PLACEHOLDER": "Add a title here.",
+    "TR__TOTAL_VOTES": "total votes",
     "TR__USERNAME": "username",
     "TR__VIEW_PROFILE": "view profile",
+    "TR__VOTES": "votes",
     "TR__WEBSITE": "website",
-    "TR__YES": "yes"
+    "TR__YES": "yes",
+    "TR__YOU_VOTED": "You voted:"
 }

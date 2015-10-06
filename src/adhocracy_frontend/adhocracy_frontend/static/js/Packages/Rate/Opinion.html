@@ -1,0 +1,64 @@
+<div class="opinion" data-ng-class="{
+    'is-disabled': disabled || (!optionsPostPool.POST && optionsPostPool.loggedIn),
+    'm-show-results-persist': showResults==='persist',
+    'm-show-results-click': showResults==='click',
+    'm-show-results-hover': showResults==='hover',
+    'is-cast': hasCastInSession
+}" data-ng-if="ready">
+    <span class="opinion-button-container" data-ng-if="!hasCast">
+        <a
+            href=""
+            class="opinion-yes opinion-button"
+            data-ng-class="{
+                'is-opinion-button-active': myRate === 1,
+                'is-opinion-button-active': myRate === 1,
+                'is-disabled': disabled || (!optionsPostPool.POST && optionsPostPool.loggedIn)
+            }"
+            data-ng-click="toggle(1)">
+            {{'TR__YES' | translate}}
+        </a>
+
+    </span>
+    <span class="opinion-button-container" data-ng-if="!hasCast">
+        <a
+            href=""
+            class="opinion-no opinion-button"
+            data-ng-class="{
+                'is-opinion-button-active': myRate === -1,
+                'is-disabled': disabled || (!optionsPostPool.POST && optionsPostPool.loggedIn)
+            }"
+            data-ng-click="toggle(-1)">
+            {{'TR__NO' | translate}}
+        </a>
+    </span>
+    <span class="opinion-results" data-ng-if="hasCast" data-ng-class="{
+        'is-opinion-yes': myRate === 1,
+        'is-opinion-no': myRate === -1
+    }">
+        <span class="opinion-bar-container">
+            <span
+                class="opinion-bar opinion-bar-yes"
+                data-ng-if="myRate === 1"
+                title="{{'TR__YOU_VOTED' | translate}} {{'TR__YES' | translate}}"
+                style="width: {{rates(1) | percentage:(rates(1) + rates(-1))}}"></span>
+            <span
+                class="opinion-bar opinion-bar-no"
+                style="width: {{rates(-1) | percentage:(rates(1) + rates(-1))}}"
+                data-ng-if="myRate === -1"
+                title="{{'TR__YOU_VOTED' | translate}} {{'TR__NO' | translate}}"></span>
+        </span>
+        <span class="opinion-result-numerics">
+            <span class="opinion-result-yes">
+                <strong>{{'TR__YES' | translate | uppercase}}</strong>
+                {{rates(1) | percentage:(rates(1) + rates(-1))}}
+                <span class="opinion-result-absolute">({{rates(1)}} {{'TR__VOTES' | translate}})</span>
+            </span>
+            <span class="opinion-result-total">{{rates(1) + rates(-1)}} {{'TR__TOTAL_VOTES' | translate}}</span>
+            <span class="opinion-result-no">
+                <span class="opinion-result-absolute">({{rates(-1)}} {{'TR__VOTES' | translate}})</span>
+                {{rates(-1) | percentage:(rates(1) + rates(-1))}}
+                <strong>{{'TR__NO' | translate | uppercase }}</strong>
+            </span>
+        </span>
+    </span>
+</div>
