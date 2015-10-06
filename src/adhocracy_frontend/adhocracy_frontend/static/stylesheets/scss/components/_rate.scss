@@ -314,6 +314,10 @@ Click show results
         position: absolute;
         text-align: center;
         width: 100%;
+
+        @media only screen and (max-width : $breakpoint-small-device) {
+            display: none;
+        }
     }
 
     .opinion-result-no {
