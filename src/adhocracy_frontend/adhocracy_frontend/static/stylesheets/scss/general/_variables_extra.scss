@@ -1,6 +1,7 @@
 //Buttons
 $button-height: 24px !default;
 $button-line-height: $button-height / $font-size-normal !default;
+$button-line-height-secondary: ($button-height - 4px) / $font-size-normal !default;
 $color-button-text: $color-text-highlight-introvert !default;
 $color-button-text-hover: $color-text-highlight-normal !default;
 $color-button-cta-text: $color-text-inverted !default;

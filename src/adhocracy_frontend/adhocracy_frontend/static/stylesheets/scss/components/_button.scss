@@ -135,11 +135,10 @@ be used instead.
 }
 
 .button-cta-secondary {
-    @include rem(height, $button-height + 4px);
     background: transparent;
     border: 2px solid $color-button-cta-base;
     color: $color-button-cta-base;
-    line-height: $button-line-height;
+    line-height: $button-line-height-secondary;
 
     &:hover,
     &:focus {
