@@ -1,22 +1,19 @@
-<div>
+<div class="badge-assignments">
     <span class="help">{{ "TR__BADGE_MANAGEMENT_HELP" | translate }}</span>
 
-    <ul>
-        <li data-ng-repeat="assignment in assignments">
-            <a
-                href=""
-                data-ng-click="data.selected = assignment.path"
-                data-ng-class="{'is-selected': data.selected === assignment.path}"
-                class="badge">{{ assignment.title }}</a>
-        </li>
-        <li>
-            <a
-                href=""
-                data-ng-click="data.selected = 'new'"
-                data-ng-class="{'is-selected': data.selected === 'new'}"
-                class="badge m-new">{{ "TR__NEW_BADGE" | translate }}</a>
-        </li>
-    </ul>
+    <div class="badge-assignment-select">
+        <a
+            href=""
+            data-ng-click="data.selected = assignment.path"
+            data-ng-class="{'is-selected': data.selected === assignment.path}"
+            data-ng-repeat="assignment in assignments"
+            class="badge">{{ assignment.title }}</a>
+        <a
+            href=""
+            data-ng-click="data.selected = 'new'"
+            data-ng-class="{'is-selected': data.selected === 'new'}"
+            class="badge m-new">{{ "TR__NEW_BADGE" | translate }}</a>
+    </div>
 
     <div data-ng-if="ready">
         <adh-badge-assignment-edit
