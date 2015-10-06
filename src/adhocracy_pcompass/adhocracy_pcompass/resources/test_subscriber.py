@@ -1,4 +1,4 @@
-from pytest import fixture, mark
+from pytest import fixture, mark, raises
 from unittest.mock import Mock
 
 import requests
@@ -83,3 +83,14 @@ class TestUpdateElasticsearchPolicycompass:
         requests_post.assert_called_with(
             'http://localhost:9000/policycompass_search/dataset/2/_update',
             json={'doc': {'comment_count': 0}})
+
+    def test_elastic_search_update_not_found(self, registry, context_r1, monkeypatch):
+        requests_post = self.requests_post(404)
+        monkeypatch.setattr(requests, 'post', requests_post)
+        self.make_comment('dataset_1', registry, context_r1)
+
+    def test_elastic_search_update_error(self, registry, context_r1, monkeypatch):
+        requests_post = self.requests_post(400)
+        monkeypatch.setattr(requests, 'post', requests_post)
+        with raises(ValueError):
+            self.make_comment('dataset_1', registry, context_r1)
