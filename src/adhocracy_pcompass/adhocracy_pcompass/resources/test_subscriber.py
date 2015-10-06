@@ -11,44 +11,32 @@ class TestUpdateElasticsearchPolicycompass:
     def registry(self, config):
         return config.registry
 
-
-    def make_external_resource(self, name, registry, pool_with_catalogs):
+    @fixture
+    def context(self, registry, pool_with_catalogs):
         from adhocracy_core import resources, sheets
 
         context = pool_with_catalogs
         er_appstructs = {
-            sheets.name.IName.__identifier__: {'name': name}}
+            sheets.name.IName.__identifier__: {'name': 'dataset_478'}}
         external_resource = registry.content.create(
             resources.external_resource.IExternalResource.__identifier__,
             parent=context,
             appstructs=er_appstructs)
         return context
 
-    @fixture
-    def context_r1(self, registry, pool_with_catalogs):
-        return self.make_external_resource('dataset_1',
-                                           registry,
-                                           pool_with_catalogs)
-
-    @fixture
-    def context_r2(self, registry, pool_with_catalogs):
-        return self.make_external_resource('dataset_2',
-                                           registry,
-                                           pool_with_catalogs)
-
-    def make_comment(self, resource_name, registry, context):
+    def make_comment(self, registry, context):
         from adhocracy_core import resources, sheets
 
         comment = registry.content.create(
             resources.comment.IComment.__identifier__,
-            parent=context[resource_name])
+            parent=context['dataset_478'])
         registry.content.create(
             resources.comment.ICommentVersion.__identifier__,
             parent=comment,
             appstructs={
                 sheets.comment.IComment.__identifier__: {
                     'content': 'This is a comment',
-                    'refers_to': context[resource_name]
+                    'refers_to': context['dataset_478']
                 }
             })
         return comment
@@ -65,32 +53,32 @@ class TestUpdateElasticsearchPolicycompass:
         post = Mock(name='requests.post', return_value=response)
         return(post)
 
-    def test_elastic_search_update_on_create(self, registry, context_r1, monkeypatch):
+    def test_elastic_search_update_on_create(self, registry, context, monkeypatch):
         requests_post = self.requests_post()
         monkeypatch.setattr(requests, 'post', requests_post)
-        self.make_comment('dataset_1', registry, context_r1)
+        self.make_comment(registry, context)
 
         requests_post.assert_called_with(
-            'http://localhost:9000/policycompass_search/dataset/1/_update',
+            'http://localhost:9000/policycompass_search/dataset/478/_update',
             json={'doc': {'comment_count': 1}})
 
-    def test_elastic_search_update_on_delete(self, registry, context_r2, monkeypatch):
+    def test_elastic_search_update_on_delete(self, registry, context, monkeypatch):
         requests_post = self.requests_post()
         monkeypatch.setattr(requests, 'post', requests_post)
-        comment = self.make_comment('dataset_2', registry, context_r2)
+        comment = self.make_comment(registry, context)
 
-        self.delete_comment(comment, registry, context_r2)
+        self.delete_comment(comment, registry, context)
         requests_post.assert_called_with(
-            'http://localhost:9000/policycompass_search/dataset/2/_update',
+            'http://localhost:9000/policycompass_search/dataset/478/_update',
             json={'doc': {'comment_count': 0}})
 
-    def test_elastic_search_update_not_found(self, registry, context_r1, monkeypatch):
+    def test_elastic_search_update_not_found(self, registry, context, monkeypatch):
         requests_post = self.requests_post(404)
         monkeypatch.setattr(requests, 'post', requests_post)
-        self.make_comment('dataset_1', registry, context_r1)
+        self.make_comment(registry, context)
 
-    def test_elastic_search_update_error(self, registry, context_r1, monkeypatch):
+    def test_elastic_search_update_error(self, registry, context, monkeypatch):
         requests_post = self.requests_post(400)
         monkeypatch.setattr(requests, 'post', requests_post)
         with raises(ValueError):
-            self.make_comment('dataset_1', registry, context_r1)
+            self.make_comment(registry, context)
