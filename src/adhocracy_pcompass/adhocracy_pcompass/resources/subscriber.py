@@ -12,7 +12,7 @@ from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.resources.comment import IComment
 from adhocracy_core.resources.external_resource import IExternalResource
 from adhocracy_core.sheets.name import IName
-from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import get_sheet_field
 
 log = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ def update_elasticsearch_policycompass(event):
     if external_resource is None:
         return
 
-    ressource_name = get_sheet(external_resource, IName).get()['name']
+    ressource_name = get_sheet_field(external_resource, IName, 'name')
     match = re.match(
         '(?P<type>visualization|event|dataset|metric|model|indicator)'
         '_(?P<id>[0-9]+)',
