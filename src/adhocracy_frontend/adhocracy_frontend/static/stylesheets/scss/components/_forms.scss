@@ -332,6 +332,10 @@ A generic form footer containing one CTA and a regular button
 
     .form-footer-button-cta {
         float: right;
+
+        + [class^="button"] {
+            @include rem(margin-right, 10px);
+        }
     }
 
     .form-footer-button {
