@@ -46,7 +46,8 @@ locations_service_meta = service_meta._replace(
 
 def add_locations_service(context: IPool, registry: Registry, options: dict):
     """Add `locations` service to context."""
-    registry.content.create(ILocationsService.__identifier__, parent=context)
+    registry.content.create(ILocationsService.__identifier__, parent=context,
+                            registry=registry)
 
 
 def includeme(config):
