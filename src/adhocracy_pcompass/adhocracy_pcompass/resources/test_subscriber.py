@@ -36,19 +36,19 @@ class TestUpdateElasticsearchPolicycompass:
                                            registry,
                                            pool_with_catalogs)
 
-    def make_comment(self, resoruce_name, registry, context):
+    def make_comment(self, resource_name, registry, context):
         from adhocracy_core import resources, sheets
 
         comment = registry.content.create(
             resources.comment.IComment.__identifier__,
-            parent=context[resoruce_name])
+            parent=context[resource_name])
         registry.content.create(
             resources.comment.ICommentVersion.__identifier__,
             parent=comment,
             appstructs={
                 sheets.comment.IComment.__identifier__: {
                     'content': 'This is a comment',
-                    'refers_to': context[resoruce_name]
+                    'refers_to': context[resource_name]
                 }
             })
         return comment
@@ -57,12 +57,12 @@ class TestUpdateElasticsearchPolicycompass:
         from adhocracy_core import utils, resources, sheets
 
         metadata = utils.get_sheet(comment, sheets.metadata.IMetadata, registry)
-        metadata.set({ "hidden": True })
+        metadata.set({ 'hidden': True })
 
     def requests_post(self, status_code=200):
         response = requests.Response
         response.status_code = status_code
-        post = Mock(name="requests.post", return_value=response)
+        post = Mock(name='requests.post', return_value=response)
         return(post)
 
     def test_elastic_search_update_on_create(self, registry, context_r1, monkeypatch):

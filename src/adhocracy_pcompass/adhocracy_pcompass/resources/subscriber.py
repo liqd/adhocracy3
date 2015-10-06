@@ -25,14 +25,14 @@ def update_elasticsearch_policycompass(event):
     if external_resource is None:
         return
 
-    ressource_name = get_sheet_field(external_resource, IName, 'name')
+    resource_name = get_sheet_field(external_resource, IName, 'name')
     match = re.match(
         '(?P<type>visualization|event|dataset|metric|model|indicator)'
         '_(?P<id>[0-9]+)',
-        ressource_name)
+        resource_name)
 
     # this is not a known policycompass external resource
-    if (match is None):
+    if match is None:
         return
 
     resource_type = match.group('type')
