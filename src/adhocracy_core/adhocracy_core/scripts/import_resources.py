@@ -13,7 +13,7 @@ import transaction
 
 from pyramid.paster import bootstrap
 
-from adhocracy_core import scripts
+from . import import_resources as main_import_resources
 
 
 def import_resources():
@@ -40,6 +40,6 @@ def import_resources():
     args = parser.parse_args()
     env = bootstrap(args.ini_file)
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    scripts.import_resources(env['root'], env['registry'], args.filename)
+    main_import_resources(env['root'], env['registry'], args.filename)
     transaction.commit()
     env['closer']()
