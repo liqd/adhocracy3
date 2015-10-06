@@ -269,6 +269,11 @@ Click show results
     margin-right: 2px;
     text-align: center;
     text-decoration: none;
+
+    &:hover, &:focus {
+        background: $color-button-text-hover;
+        color: $color-text-inverted;
+    }
 }
 
 .opinion-no {
@@ -289,8 +294,13 @@ Click show results
     background-color: $color-button-text-hover;
 }
 
+.opinion-bar-no {
+    float: right;
+}
+
 .opinion-result-numerics {
     @include clearfix;
+    @include rem(font-size, $font-size-small);
     display: block;
     position: relative;
     width: 100%;
@@ -311,12 +321,12 @@ Click show results
     }
 }
 
-.is-opinion-no {
-    .opinion-bar {
-        background-color: $color-structure-normal;
-    }
+.opinion-result-absolute {
+    @include rem(margin-left, 20px);
+}
 
-    .opinion-bar-container {
-        background-color: $color-button-text-hover;
+.opinion-result-no {
+    .opinion-result-absolute {
+        @include rem(margin-right, 20px);
     }
 }
