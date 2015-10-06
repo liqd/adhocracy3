@@ -112,7 +112,3 @@ export class LikeAdapter extends RateAdapter {
         return resource.data[SILikeable.nick].post_pool;
     }
 }
-
-export class OpinionAdapter extends RateAdapter {
-
-}

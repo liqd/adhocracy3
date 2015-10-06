@@ -65,5 +65,5 @@ export var register = (angular) => {
             "adhPreliminaryNames",
             "adhTopLevelState",
             "adhDone",
-            AdhRate.directiveFactory("/Opinion.html", new Adapter.OpinionAdapter())]);
+            AdhRate.directiveFactory("/Opinion.html", new Adapter.RateAdapter())]);
 };
