@@ -21,6 +21,7 @@ import * as Adapter from "./Adapter";
 export var moduleName = "adhComment";
 
 export var register = (angular) => {
+    var adapter = new Adapter.CommentAdapter();
     angular
         .module(moduleName, [
             AdhAngularHelpersModule.moduleName,
@@ -44,20 +45,24 @@ export var register = (angular) => {
         .directive("adhCreateOrShowCommentListing", [
             "adhConfig", "adhDone", "adhHttp", "adhPreliminaryNames", "adhCredentials", AdhComment.adhCreateOrShowCommentListing])
         .directive("adhCommentResource", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhTopLevelState", "adhRecursionHelper", "$window", "$q",
-            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, adhRecursionHelper, $window, $q) => {
-                var adapter = new Adapter.CommentAdapter();
-                var widget = new AdhComment.CommentResource(
-                    adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $window, $q);
-                return widget.createRecursionDirective(adhRecursionHelper);
-            }])
+            "adhConfig",
+            "adhHttp",
+            "adhPermissions",
+            "adhPreliminaryNames",
+            "adhTopLevelState",
+            "adhRecursionHelper",
+            "$window",
+            "$q",
+            AdhComment.commentDetailDirective(adapter)])
         .directive("adhCommentCreate", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhTopLevelState", "adhRecursionHelper", "$window", "$q",
-            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, adhRecursionHelper, $window, $q) => {
-                var adapter = new Adapter.CommentAdapter();
-                var widget = new AdhComment.CommentCreate(
-                    adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $window, $q);
-                return widget.createRecursionDirective(adhRecursionHelper);
-            }])
+            "adhConfig",
+            "adhHttp",
+            "adhPermissions",
+            "adhPreliminaryNames",
+            "adhTopLevelState",
+            "adhRecursionHelper",
+            "$window",
+            "$q",
+            AdhComment.commentCreateDirective(adapter)])
         .directive("adhCommentColumn", ["adhConfig", AdhComment.commentColumnDirective]);
 };
