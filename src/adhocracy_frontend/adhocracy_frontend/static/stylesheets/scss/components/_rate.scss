@@ -271,7 +271,7 @@ Click show results
     text-decoration: none;
 
     &:hover, &:focus {
-        background: $color-button-text-hover;
+        background: $color-brand-one-normal;
         color: $color-text-inverted;
     }
 }
@@ -291,7 +291,7 @@ Click show results
 }
 
 .opinion-bar {
-    background-color: $color-button-text-hover;
+    background-color: $color-brand-one-normal;
 }
 
 .opinion-bar-no {
