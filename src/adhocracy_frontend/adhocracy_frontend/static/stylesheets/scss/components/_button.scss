@@ -138,7 +138,7 @@ be used instead.
     background: transparent;
     border: 2px solid $color-button-cta-base;
     color: $color-button-cta-base;
-    line-height: $button-line-height-secondary;
+    line-height: ($button-height - 4px) / $font-size-normal;
 
     &:hover,
     &:focus {
