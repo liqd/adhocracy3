@@ -4,12 +4,10 @@ import re
 import requests
 import logging
 
-from substanced.util import find_service
 from pyramid.traversal import find_interface
 
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import IResourceSheetModified
-from adhocracy_core.interfaces import search_query
 from adhocracy_core.resources.comment import IComment
 from adhocracy_core.resources.external_resource import IExternalResource
 from adhocracy_core.sheets.name import IName
@@ -18,7 +16,7 @@ from adhocracy_core.utils import get_sheet_field
 log = logging.getLogger(__name__)
 
 
-def update_elasticsearch_policycompass(event):
+def notify_policycompass(event):
     """Push comments of IExternalResource ressources to elastic search."""
     comment = event.object
     external_resource = find_interface(comment, IExternalResource)
@@ -39,37 +37,26 @@ def update_elasticsearch_policycompass(event):
     resource_type = match.group('type')
     resource_id = match.group('id')
 
-    # count comments using catalog
-    catalogs = find_service(external_resource, 'catalogs')
-    query = search_query._replace(interfaces=IComment, only_visible=True)
-    comment_count = catalogs.search(query).count
-
     settings = event.registry.settings
-    es_endpoint = settings.get('adhocracy_pcompass.elasticsearch_endpoint',
-                               'http://localhost:9000')
-    es_index = settings.get('adhocracy_pcompass.elasticsearch_index',
-                            'policycompass_search')
-    r = requests.post('{url}/{index}/{res_type}/{res_id}/_update'.format(
-        url=es_endpoint,
-        index=es_index,
-        res_type=resource_type,
-        res_id=resource_id),
-        json={'doc': {'comment_count': comment_count}})
+    pcompass_endpoint = settings.get('adhocracy_pcompass.pcompass_endpoint',
+                                     'http://localhost:8000')
+    url = '{base}/api/v1/searchmanager/updateindexitem/{res_type}/{res_id}' \
+        .format(base=pcompass_endpoint,
+                res_type=resource_type,
+                res_id=resource_id)
 
-    if r.status_code == 404:  # document not created (error in pcompass)
-        log.warn('Document "{}/{}" is missing from elastic search "{}" index'
-                 .format(resource_type, resource_id, es_index))
-    elif r.status_code >= 400:  # unexpected error occured
-        msg = 'Update elastic search index "{}" failed with "{}"'.format(
-            es_index, r.text)
+    r = requests.post(url)
+    if r.status_code != 200:  # indexing error on pcompass
+        msg = 'Notifying policy compass about "{}_{}" failed with "{}"'.format(
+            resource_type, resource_type, r.text)
         raise ValueError(msg)
 
 
 def includeme(config):
     """Register subscribers."""
-    config.add_subscriber(update_elasticsearch_policycompass,
+    config.add_subscriber(notify_policycompass,
                           IResourceCreatedAndAdded,
                           object_iface=IComment)
-    config.add_subscriber(update_elasticsearch_policycompass,
+    config.add_subscriber(notify_policycompass,
                           IResourceSheetModified,
                           object_iface=IComment)
