@@ -4,6 +4,7 @@ import * as AdhHttp from "../Http/Http";
 
 import * as AdhCredentials from "./Credentials";
 
+import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
 import * as SIPasswordAuthentication from "../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication";
 import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
 import * as SIUserExtended from "../../Resources_/adhocracy_core/sheets/principal/IUserExtended";
@@ -20,20 +21,30 @@ export interface IRegisterResponse {}
 
 export class Service {
     public data : IUserBasic;
+    public ready : angular.IPromise<RIUser>;
 
     constructor(
         private adhHttp : AdhHttp.Service<any>,
         private adhCredentials : AdhCredentials.Service,
+        private $q : angular.IQService,
         private $rootScope : angular.IScope
     ) {
         var _self : Service = this;
 
-        _self.$rootScope.$watch(() => adhCredentials.userPath, (userPath) => {
-            if (userPath) {
-                _self.loadUser(userPath);
-            } else {
-                _self.data = undefined;
-            }
+        var deferred = _self.$q.defer();
+        _self.ready = deferred.promise;
+
+        _self.adhCredentials.ready.then(() => {
+            _self.$rootScope.$watch(() => _self.adhCredentials.userPath, ((userPath) => {
+                if (userPath) {
+                    _self.loadUser(userPath).then(() => {
+                        deferred.resolve(_self.data);
+                    });
+                } else {
+                    _self.data = undefined;
+                    deferred.resolve(null);
+                }
+            }));
         });
     }
 
