@@ -7,8 +7,9 @@ import logging
 from substanced.util import find_service
 from pyramid.traversal import find_interface
 
-from adhocracy_core.interfaces import IResourceCreatedAndAdded, search_query
+from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import IResourceSheetModified
+from adhocracy_core.interfaces import search_query
 from adhocracy_core.resources.comment import IComment
 from adhocracy_core.resources.external_resource import IExternalResource
 from adhocracy_core.sheets.name import IName
