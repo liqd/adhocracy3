@@ -1,5 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
+import * as q from "q";
+
 import * as AdhConfig from "../Config/Config";
 import * as AdhCrossWindowMessaging from "./CrossWindowMessaging";
 
@@ -16,7 +18,8 @@ export var register = () => {
             locationMock = jasmine.createSpyObj("locationMock", ["absUrl"]);
             windowMock = jasmine.createSpyObj("windowMock", ["addEventListener"]);
             rootScopeMock = jasmine.createSpyObj("rootScopeMock", ["$watch"]);
-            adhCredentialsMock = jasmine.createSpyObj("adhCredentialsMock", ["loggedIn"]);
+            adhCredentialsMock = jasmine.createSpyObj("adhCredentialsMock", ["loggedIn", "ready"]);
+            adhCredentialsMock.ready.and.returnValue(q.when());
         });
 
         describe("Service", () => {
