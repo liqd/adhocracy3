@@ -6,6 +6,7 @@ import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
 import * as AdhUtil from "../../Util/Util";
 
+import * as SIBadgeable from "../../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
 import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
 import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
@@ -34,6 +35,7 @@ export var workbenchDirective = (
 
 export var proposalDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service
 ) => {
     return {
@@ -43,6 +45,16 @@ export var proposalDetailColumnDirective = (
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
+
+            var badgeAssignmentPoolPath;
+            scope.$watch("proposalUrl", (proposalUrl) => {
+                if (proposalUrl) {
+                    adhHttp.get(proposalUrl).then((proposal) => {
+                        badgeAssignmentPoolPath = proposal.data[SIBadgeable.nick].post_pool;
+                    });
+                }
+            });
+            adhPermissions.bindScope(scope, () => badgeAssignmentPoolPath, "badgeAssignmentPoolOptions");
         }
     };
 };

@@ -43,3 +43,12 @@ The description of a badge assignment. The same modifiers as for `badge` apply.
 </div>
 ```
 */
+
+.badge-assignment-select {
+    @include rem(margin, 10px 0 10px 1px);
+
+    .badge {
+        outline: 1px solid $color-text-inverted;
+        text-decoration: none;
+    }
+}

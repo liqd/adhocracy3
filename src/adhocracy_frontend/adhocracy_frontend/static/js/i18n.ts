@@ -35,6 +35,7 @@ translateMe = [
     "TR__IMAGE_UPLOAD",
     "TR__LASTNAME",
     "TR__LIST",
+    "TR__MANAGE_BADGE_ASSIGNMENTS",
     "TR__MAP",
     "TR__MAX_CHARS_100",
     "TR__MAX_CHARS_1000",
