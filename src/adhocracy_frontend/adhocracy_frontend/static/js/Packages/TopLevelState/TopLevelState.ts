@@ -427,8 +427,7 @@ export class Service {
             "/activate"
         ];
 
-        // FIXME: DefinitelyTyped
-        if (!(<any>_).includes(denylist, url)) {
+        if (!_.includes(denylist, url)) {
             this.cameFrom = url;
             return true;
         } else {
