@@ -417,6 +417,21 @@ export class Service {
     public setCameFrom(path? : string) : boolean {
         if (typeof path === "undefined") {
             path = this.$location.path();
+
+            var search = this.$location.search();
+            if (Object.keys(search).length > 0) {
+                path += "?";
+                for (var key in search) {
+                    if (me.hasOwnProperty(prop)) {
+                        path += "&" + key + "=" + search[key];
+                    }
+                }
+            }
+
+            var hash = this.$location.hash();
+            if (hash === "") {
+                path += "#" + hash;
+            }
         }
 
         var denylist = [
