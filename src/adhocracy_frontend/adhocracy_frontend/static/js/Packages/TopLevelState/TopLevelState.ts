@@ -422,14 +422,14 @@ export class Service {
             if (Object.keys(search).length > 0) {
                 path += "?";
                 for (var key in search) {
-                    if (me.hasOwnProperty(prop)) {
+                    if (me.hasOwnProperty(key)) {
                         path += "&" + key + "=" + search[key];
                     }
                 }
             }
 
             var hash = this.$location.hash();
-            if (hash === "") {
+            if (hash !== "") {
                 path += "#" + hash;
             }
         }
