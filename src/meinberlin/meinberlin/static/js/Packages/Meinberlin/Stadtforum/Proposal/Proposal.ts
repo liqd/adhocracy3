@@ -47,9 +47,9 @@ var bindPath = (
     adhGetBadges : AdhBadge.IGetBadges,
     $q : angular.IQService
 ) => (
-    scope : IScope
+    scope : IScope,
+    pathKey : string = "path"
 ) : void => {
-
     var getCommentCount = (resource) : angular.IPromise<number> => {
         var commentableSheet : SICommentable.Sheet = resource.data[SICommentable.nick];
 
@@ -63,7 +63,7 @@ var bindPath = (
         });
     };
 
-    scope.$watch("path", (value : string) => {
+    scope.$watch(pathKey, (value : string) => {
         if (value) {
             adhHttp.get(value).then((resource) => {
                 scope.resource = resource;
@@ -98,7 +98,7 @@ var bindPath = (
                 });
             });
         }
-        adhPermissions.bindScope(scope, () => scope.path);
+        adhPermissions.bindScope(scope, () => scope[pathKey]);
     });
 };
 
@@ -169,7 +169,7 @@ export var createDirective = (
     return {
         restrict: "E",
         scope: {
-            path: "@"
+            poolPath: "@"
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         link: (scope, element) => {
@@ -179,7 +179,7 @@ export var createDirective = (
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.proposalForm, () => {
-                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path);
+                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.poolPath);
                 });
             };
         }
