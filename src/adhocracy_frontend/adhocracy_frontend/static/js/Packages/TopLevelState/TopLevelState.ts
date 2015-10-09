@@ -414,24 +414,9 @@ export class Service {
 
     private cameFrom : string;
 
-    public setCameFrom(path? : string) : boolean {
-        if (typeof path === "undefined") {
-            path = this.$location.path();
-
-            var search = this.$location.search();
-            if (Object.keys(search).length > 0) {
-                path += "?";
-                for (var key in search) {
-                    if (me.hasOwnProperty(key)) {
-                        path += "&" + key + "=" + search[key];
-                    }
-                }
-            }
-
-            var hash = this.$location.hash();
-            if (hash !== "") {
-                path += "#" + hash;
-            }
+    public setCameFrom(url? : string) : boolean {
+        if (typeof url === "undefined") {
+            url = this.$location.url();
         }
 
         var denylist = [
@@ -443,8 +428,8 @@ export class Service {
         ];
 
         // FIXME: DefinitelyTyped
-        if (!(<any>_).includes(denylist, path)) {
-            this.cameFrom = path;
+        if (!(<any>_).includes(denylist, url)) {
+            this.cameFrom = url;
             return true;
         } else {
             return false;
