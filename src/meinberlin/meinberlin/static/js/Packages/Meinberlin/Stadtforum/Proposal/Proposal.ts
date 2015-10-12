@@ -37,6 +37,8 @@ export interface IScope extends angular.IScope {
     };
     selectedState? : string;
     resource : any;
+    frontendOrderPredicate : any;
+    frontendOrderReverse : boolean;
 }
 
 var bindPath = (
@@ -152,6 +154,8 @@ export var detailDirective = (
         },
         link: (scope : IScope) => {
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
+            scope.frontendOrderPredicate = (id) => id;
+            scope.frontendOrderReverse = true;
         }
     };
 };

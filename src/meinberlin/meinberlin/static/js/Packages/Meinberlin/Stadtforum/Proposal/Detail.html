@@ -8,5 +8,9 @@
         <i class="icon-speechbubble"></i> {{ data.commentCount }}
     </span>
 
-    <adh-comment-listing data-path="{{path}}"></adh-comment-listing>
+    <adh-comment-listing
+        data-path="{{path}}"
+        data-frontend-order-predicate="frontendOrderPredicate"
+        data-frontend-order-reverse="frontendOrderReverse">
+    </adh-comment-listing>
 </article>
