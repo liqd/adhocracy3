@@ -36,15 +36,6 @@ def test_add_changelog_created_with_parent(event, pool, changelog):
     assert changelog['parent'].modified is True
 
 
-def test_add_changelog_followed_with_item_parent(event, item, changelog):
-    from .subscriber import add_changelog_followed
-    new_version = testing.DummyResource()
-    item['version_0'] = new_version
-    event.new_version = new_version
-    add_changelog_followed(event)
-    assert changelog['/'].last_version == new_version
-
-
 def test_add_changelog_followed_with_has_no_follows(event, changelog):
     from .subscriber import add_changelog_followed
     event.new_version = None
@@ -57,7 +48,6 @@ def test_add_changelog_followed_with_has_follows(event, changelog):
     event.new_version = testing.DummyResource()
     add_changelog_followed(event)
     assert changelog['/'].followed_by is event.new_version
-
 
 
 class TestAddChangelogModified:

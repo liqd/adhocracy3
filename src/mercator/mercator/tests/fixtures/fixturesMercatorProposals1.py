@@ -268,7 +268,7 @@ update_proposal_batch = \
                         ".IOrganizationInfoVersion",
         "data": {"adhocracy_core.sheets.versions.IVersionable": {"follows": [
             "http://localhost/mercator/proposal_0000001/info_0000000"
-            "/VERSION_0000000/"]},
+            "/VERSION_0000001/"]},
             "adhocracy_core.sheets.metadata.IMetadata": {"deleted": false,
                                                          "preliminaryNames":
                                                              {"state": 77}},
