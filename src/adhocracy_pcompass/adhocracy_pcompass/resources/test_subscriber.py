@@ -53,31 +53,26 @@ class TestUpdateElasticsearchPolicycompass:
         post = Mock(name='requests.post', return_value=response)
         return(post)
 
-    def test_elastic_search_update_on_create(self, registry, context, monkeypatch):
+    def test_notify_policycompass_on_create(self, registry, context, monkeypatch):
         requests_post = self.requests_post()
         monkeypatch.setattr(requests, 'post', requests_post)
         self.make_comment(registry, context)
 
         requests_post.assert_called_with(
-            'http://localhost:9000/policycompass_search/dataset/478/_update',
-            json={'doc': {'comment_count': 1}})
+            'http://localhost:8000/api/v1/searchmanager/updateindexitem/' \
+            'dataset/478')
 
-    def test_elastic_search_update_on_delete(self, registry, context, monkeypatch):
+    def test_notify_policycompass_on_delete(self, registry, context, monkeypatch):
         requests_post = self.requests_post()
         monkeypatch.setattr(requests, 'post', requests_post)
         comment = self.make_comment(registry, context)
 
         self.delete_comment(comment, registry, context)
         requests_post.assert_called_with(
-            'http://localhost:9000/policycompass_search/dataset/478/_update',
-            json={'doc': {'comment_count': 0}})
+            'http://localhost:8000/api/v1/searchmanager/updateindexitem/' \
+            'dataset/478')
 
-    def test_elastic_search_update_not_found(self, registry, context, monkeypatch):
-        requests_post = self.requests_post(404)
-        monkeypatch.setattr(requests, 'post', requests_post)
-        self.make_comment(registry, context)
-
-    def test_elastic_search_update_error(self, registry, context, monkeypatch):
+    def test_notify_policycompass_error(self, registry, context, monkeypatch):
         requests_post = self.requests_post(400)
         monkeypatch.setattr(requests, 'post', requests_post)
         with raises(ValueError):
