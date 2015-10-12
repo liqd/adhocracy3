@@ -254,6 +254,7 @@ parent: comment
     }
 
     .comment-header-column1 {
+        @include text-align(left);
         float: left;
     }
 
