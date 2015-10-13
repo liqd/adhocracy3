@@ -27,15 +27,8 @@
                         data-ng-click="edit()"
                         class="comment-header-link"
                         title="{{ 'TR__EDIT' | translate }}">
-                            <i class="comment-header-icon icon-pencil"></i>
+                        <i class="comment-header-icon icon-pencil"></i>
 
-                    </a>
-                    <a href=""
-                        data-ng-click="report()"
-                        data-ng-if="report"
-                        class="comment-header-link"
-                        title="{{ 'TR__REPORT' | translate }}">
-                        <i class="comment-header-icon icon-ban-circle"></i>
                     </a>
                     <a href=""
                         data-ng-click="delete()"
@@ -43,6 +36,13 @@
                         class="comment-header-link"
                         title="{{ 'TR__DELETE' | translate }}">
                         <i class="comment-header-icon icon-x"></i>
+                    </a>
+                    <a href=""
+                        data-ng-click="report()"
+                        data-ng-if="report"
+                        class="comment-header-link comment-header-link-report"
+                        title="{{ 'TR__REPORT' | translate }}">
+                        <i class="comment-header-icon icon-flag"></i>
                     </a>
                 </span>
                 <adh-recompile-on-change data-value="{{data.path}}">
