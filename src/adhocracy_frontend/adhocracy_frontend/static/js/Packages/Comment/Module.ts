@@ -54,15 +54,6 @@ export var register = (angular) => {
             "$window",
             "$q",
             AdhComment.commentDetailDirective(adapter)])
-        .directive("adhCommentCreate", [
-            "adhConfig",
-            "adhHttp",
-            "adhPermissions",
-            "adhPreliminaryNames",
-            "adhTopLevelState",
-            "adhRecursionHelper",
-            "$window",
-            "$q",
-            AdhComment.commentCreateDirective(adapter)])
+        .directive("adhCommentCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", AdhComment.commentCreateDirective(adapter)])
         .directive("adhCommentColumn", ["adhConfig", AdhComment.commentColumnDirective]);
 };

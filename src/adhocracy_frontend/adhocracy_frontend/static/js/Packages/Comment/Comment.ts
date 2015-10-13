@@ -266,99 +266,35 @@ export var commentCreateDirective = (
 ) => (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    adhPermissions : AdhPermissions.Service,
-    adhPreliminaryNames : AdhPreliminaryNames.Service,
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhRecursionHelper,
-    $window : Window,
-    $q : angular.IQService
+    adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => {
-    var _update = update(adapter, adhHttp, $q);
-
-    var link = (scope : ICommentResourceScope, element, attrs, column? : AdhMovingColumns.MovingColumnController) => {
-        if (typeof column !== "undefined") {
-            scope.report = () => {
-                column.$scope.shared.abuseUrl = scope.data.path;
-                column.toggleOverlay("abuse");
-            };
-        }
-
-        scope.$on("$destroy", this.adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
-            if (!commentVersionUrl) {
-                scope.selectedState = "";
-            } else if (AdhUtil.parentPath(commentVersionUrl) === scope.path) {
-                scope.selectedState = "is-selected";
-            } else {
-                scope.selectedState = "is-not-selected";
-            }
-        }));
-
-        scope.show = {
-            createForm: false
-        };
-
-        scope.createComment = () => {
-            scope.show.createForm = true;
-            scope.createPath = this.adhPreliminaryNames.nextPreliminary();
-        };
-
-        scope.cancelCreateComment = () => {
-            scope.show.createForm = false;
-        };
-
-        scope.afterCreateComment = () => {
-            return scope.update().then(() => {
-                scope.show.createForm = false;
-            });
-        };
-
-        scope.update = () => {
-            return _update(scope, scope.path);
-        };
-
-        var originalSubmit = scope.submit;
-        scope.submit = () => {
-            return originalSubmit().then((x) => {
-                scope.update();
-                return x;
-            });
-        };
-
-        scope.delete = () : angular.IPromise<void> => {
-            // FIXME: translate
-            if ($window.confirm("Do you really want to delete this?")) {
-                return adhHttp.hide(scope.data.path, adapter.itemContentType).then(() => {
-                    scope.updateListing();
-                });
-            } else {
-                return this.$q.when();
-            }
-        };
-
-        adhPermissions.bindScope(scope, () => scope.data && scope.data.replyPoolPath, "poolOptions");
-        adhPermissions.bindScope(scope, () => {
-            if (scope.data && scope.data.path) {
-                return AdhUtil.parentPath(scope.data.path);
-            }
-        }, "commentItemOptions");
-        adhPermissions.bindScope(scope, () => scope.data && scope.data.path, "versionOptions");
-    };
+    var _postCreate = postCreate(adapter, adhHttp, adhPreliminaryNames);
 
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentCreate.html",
-        require: "?^adhMovingColumn",
         scope: {
-            path: "@",
             refersTo: "@",
             poolPath: "@",
-            frontendOrderPredicate: "=?",
-            frontendOrderReverse: "=?",
-            updateListing: "=",
+            onSubmit: "=?",
+            onCancel: "=?",
             hideCancel: "=?"
         },
-        compile: (element) => {
-            return adhRecursionHelper.compile(element, link);
+        link: (scope : ICommentResourceScope) => {
+            scope.submit = () => {
+                return _postCreate(scope, scope.poolPath).then(() => {
+                    scope.data = <any>{};
+                    if (scope.onSubmit) {
+                        scope.onSubmit();
+                    }
+                });
+            };
+
+            scope.cancel = () => {
+                if (scope.onCancel) {
+                    scope.onCancel();
+                }
+            };
         }
     };
 };
