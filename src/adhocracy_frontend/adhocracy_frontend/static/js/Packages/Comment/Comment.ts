@@ -261,7 +261,7 @@ export var commentDetailDirective = (
 
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentDetail.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
         require: "?^adhMovingColumn",
         scope: {
             path: "@",
@@ -286,7 +286,7 @@ export var commentCreateDirective = (
 
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentCreate.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
             refersTo: "@",
             poolPath: "@",
@@ -321,7 +321,7 @@ export var adhCommentListing = (
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentListing.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
         scope: {
             path: "@",
             frontendOrderReverse: "=?",
@@ -403,7 +403,7 @@ export var commentColumnDirective = (
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Column.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["commentCloseUrl", "commentableUrl"]);

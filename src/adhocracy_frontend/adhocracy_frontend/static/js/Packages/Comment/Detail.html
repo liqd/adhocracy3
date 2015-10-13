@@ -74,12 +74,12 @@
     </div>
 
     <div class="comment-children">
-        <adh-comment-resource
+        <adh-comment
             data-ng-repeat="comment in data.comments | orderBy:frontendOrderPredicate:frontendOrderReverse"
             data-path="{{comment}}"
             data-frontend-order-predicate="frontendOrderPredicate"
             data-frontend-order-reverse="frontendOrderReverse"
             data-on-submit="update">
-        </adh-comment-resource>
+        </adh-comment>
     </div>
 </div>
