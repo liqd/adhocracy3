@@ -9,7 +9,6 @@ import * as AdhMovingColumnsModule from "../MovingColumns/Module";
 import * as AdhPermissionsModule from "../Permissions/Module";
 import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
 import * as AdhRateModule from "../Rate/Module";
-import * as AdhResourceWidgetsModule from "../ResourceWidgets/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
 import * as AdhListing from "../Listing/Listing";
@@ -35,7 +34,6 @@ export var register = (angular) => {
             AdhPermissionsModule.moduleName,
             AdhPreliminaryNamesModule.moduleName,
             AdhRateModule.moduleName,
-            AdhResourceWidgetsModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
         .directive("adhCommentListingPartial",

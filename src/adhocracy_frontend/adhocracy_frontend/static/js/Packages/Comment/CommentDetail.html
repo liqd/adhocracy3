@@ -65,28 +65,21 @@
     </div>
 
     <div class="comment-children-create-form" data-ng-if="show.createForm">
-        <adh-resource-wrapper
-            data-on-submit="afterCreateComment()"
-            data-on-cancel="cancelCreateComment()">
-            <adh-comment-create
-                data-path="{{createPath}}"
-                data-mode="edit"
-                data-refers-to="{{data.path}}"
-                data-pool-path="{{data.replyPoolPath}}">
-            </adh-comment-create>
-        </adh-resource-wrapper>
+        <adh-comment-create
+            data-refers-to="{{data.path}}"
+            data-pool-path="{{data.replyPoolPath}}"
+            data-on-submit="afterCreateComment"
+            data-on-cancel="cancelCreateComment">
+        </adh-comment-create>
     </div>
 
     <div class="comment-children">
-        <adh-resource-wrapper
-            data-ng-repeat="comment in data.comments | orderBy:frontendOrderPredicate:frontendOrderReverse">
-            <adh-comment-resource
-                data-path="{{comment}}"
-                data-mode="display"
-                data-frontend-order-predicate="frontendOrderPredicate"
-                data-frontend-order-reverse="frontendOrderReverse"
-                data-update-listing="update">
-            </adh-comment-resource>
-        </adh-resource-wrapper>
+        <adh-comment-resource
+            data-ng-repeat="comment in data.comments | orderBy:frontendOrderPredicate:frontendOrderReverse"
+            data-path="{{comment}}"
+            data-frontend-order-predicate="frontendOrderPredicate"
+            data-frontend-order-reverse="frontendOrderReverse"
+            data-on-submit="update">
+        </adh-comment-resource>
     </div>
 </div>

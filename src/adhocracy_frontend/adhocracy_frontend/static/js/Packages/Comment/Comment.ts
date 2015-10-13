@@ -8,7 +8,6 @@ import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as AdhResourceUtil from "../Util/ResourceUtil";
-import * as AdhResourceWidgets from "../ResourceWidgets/ResourceWidgets";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 
@@ -38,12 +37,18 @@ export interface ICommentAdapter<T extends ResourcesBase.Resource> extends AdhLi
 }
 
 
-export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidgetScope {
+export interface ICommentResourceScope extends angular.IScope {
+    path : string;
+    submit : () => any;
+    delete : () => angular.IPromise<void>;
     refersTo : string;
     poolPath : string;
     hideCancel? : boolean;
     poolOptions : AdhHttp.IOptions;
     createPath : string;
+    edit : () => void;
+    cancel : () => void;
+    mode : number;
     selectedState : string;
     show : {
         createForm : boolean;
@@ -208,6 +213,14 @@ export var commentDetailDirective = (
             return scope.update().then(() => {
                 scope.show.createForm = false;
             });
+        };
+
+        scope.edit = () => {
+            scope.mode = 1;
+        };
+
+        scope.cancel = () => {
+            scope.mode = 0;
         };
 
         scope.update = () => {
