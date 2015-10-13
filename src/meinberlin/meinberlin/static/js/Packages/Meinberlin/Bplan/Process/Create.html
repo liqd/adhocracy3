@@ -1,0 +1,75 @@
+<form
+    name="processForm"
+    novalidate="novalidate"
+    data-ng-submit="submit()">
+
+    <div class="proposal-form-upper">
+        <div class="form-error" data-ng-repeat="error in errors track by $index">
+            <p>{{ error | adhFormatError | translate }}</p>
+        </div>
+
+        <label>
+            <span class="label-text">{{ "TR__TITLE" | translate }}</span>
+            <input
+                type="text"
+                data-ng-model="data.title"
+                name="title"
+                required="required" />
+            <span class="input-error" data-ng-show="showError(processForm, processForm.title, 'required')">
+                {{ "TR__ERROR_REQUIRED_TITLE" | translate }}
+            </span>
+        </label>
+
+        <label>
+            <span class="label-text">{{ "TR__MEINBERLIN_BPLAN_KIND" | translate }}</span>
+            <select data-ng-model="data.kind" name="kind">
+                <option>öffentliche Auslegung</option>
+                <option>frühzeitige Öffentlichkeitsbeteiligung</option>
+            </select>
+        </label>
+
+        <label>
+            <span class="label-text">{{ "TR__OFFICE_WORKER" | translate }}</span>
+            <input
+                type="url"
+                data-ng-model="data.officeWorker"
+                name="officeWorker"
+                required="required" />
+            <span class="input-error" data-ng-show="showError(processForm, processForm.officeWorker, 'required')">
+                {{ "TR__ERROR_REQUIRED_OFFICE_WORKER" | translate }}
+            </span>
+        </label>
+
+        <label>
+            <span class="label-text">{{ "TR__DATE_START" | translate }}</span>
+            <input
+                type="date"
+                data-ng-model="data.startDate"
+                name="startDate"
+                required="required" />
+            <span class="input-error" data-ng-show="showError(processForm, processForm.startDate, 'required')">
+                {{ "TR__ERROR_REQUIRED_DATE" | translate }}
+            </span>
+        </label>
+
+        <label>
+            <span class="label-text">{{ "TR__DATE_END" | translate }}</span>
+            <input
+                type="date"
+                data-ng-model="data.endDate"
+                name="endDate"
+                required="required" />
+            <span class="input-error" data-ng-show="showError(processForm, processForm.endDate, 'required')">
+                {{ "TR__ERROR_REQUIRED_DATE" | translate }}
+            </span>
+        </label>
+    </div>
+
+    <footer class="form-footer">
+        <input
+            type="submit"
+            name="submit"
+            value="{{ 'TR__PUBLISH' | translate }}"
+            class="button-cta form-footer-button-cta" />
+    </footer>
+</form>
