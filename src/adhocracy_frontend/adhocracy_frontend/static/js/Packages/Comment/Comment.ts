@@ -45,7 +45,6 @@ export interface ICommentResourceScope extends angular.IScope {
     poolPath : string;
     hideCancel? : boolean;
     poolOptions : AdhHttp.IOptions;
-    createPath : string;
     edit : () => void;
     cancel : () => void;
     mode : number;
@@ -56,11 +55,13 @@ export interface ICommentResourceScope extends angular.IScope {
     createComment() : void;
     cancelCreateComment() : void;
     afterCreateComment() : angular.IPromise<void>;
+    item : any;
     report? : () => void;
     // update resource
     update() : angular.IPromise<void>;
     // update outer listing
-    updateListing() : void;
+    onSubmit() : void;
+    onCancel() : void;
     data : {
         content : string;
         creator : string;
@@ -69,6 +70,7 @@ export interface ICommentResourceScope extends angular.IScope {
         commentCount : number;
         comments : string[];
         path : string;
+        itemPath : string;
         replyPoolPath : string;
         edited : boolean;
     };
@@ -90,8 +92,11 @@ export var update = (
         var item = args[0];
         var version = args[1];
 
+        scope.item = item;
+
         scope.data = {
             path: version.path,
+            itemPath: item.path,
             content: adapter.content(version),
             creator: adapter.creator(item),
             creationDate: adapter.creationDate(version),
@@ -177,6 +182,7 @@ export var commentDetailDirective = (
     $q : angular.IQService
 ) => {
     var _update = update(adapter, adhHttp, $q);
+    var _postEdit = postEdit(adapter, adhHttp, adhPreliminaryNames);
 
     var link = (scope : ICommentResourceScope, element, attrs, column? : AdhMovingColumns.MovingColumnController) => {
         if (typeof column !== "undefined") {
@@ -202,7 +208,6 @@ export var commentDetailDirective = (
 
         scope.createComment = () => {
             scope.show.createForm = true;
-            scope.createPath = this.adhPreliminaryNames.nextPreliminary();
         };
 
         scope.cancelCreateComment = () => {
@@ -227,32 +232,31 @@ export var commentDetailDirective = (
             return _update(scope, scope.path);
         };
 
-        var originalSubmit = scope.submit;
         scope.submit = () => {
-            return originalSubmit().then((x) => {
+            return _postEdit(scope, scope.item).then(() => {
                 scope.update();
-                return x;
+                scope.mode = 0;
             });
         };
 
         scope.delete = () : angular.IPromise<void> => {
             // FIXME: translate
             if ($window.confirm("Do you really want to delete this?")) {
-                return adhHttp.hide(scope.data.path, adapter.itemContentType).then(() => {
-                    scope.updateListing();
+                return adhHttp.hide(scope.data.itemPath, adapter.itemContentType).then(() => {
+                    if (scope.onSubmit) {
+                        scope.onSubmit();
+                    }
                 });
             } else {
-                return this.$q.when();
+                return $q.when();
             }
         };
 
         adhPermissions.bindScope(scope, () => scope.data && scope.data.replyPoolPath, "poolOptions");
-        adhPermissions.bindScope(scope, () => {
-            if (scope.data && scope.data.path) {
-                return AdhUtil.parentPath(scope.data.path);
-            }
-        }, "commentItemOptions");
+        adhPermissions.bindScope(scope, () => scope.data && scope.data.itemPath, "commentItemOptions");
         adhPermissions.bindScope(scope, () => scope.data && scope.data.path, "versionOptions");
+
+        scope.update();
     };
 
     return {
@@ -261,12 +265,9 @@ export var commentDetailDirective = (
         require: "?^adhMovingColumn",
         scope: {
             path: "@",
-            refersTo: "@",
-            poolPath: "@",
             frontendOrderPredicate: "=?",
             frontendOrderReverse: "=?",
-            updateListing: "=",
-            hideCancel: "=?"
+            onSubmit: "=?"
         },
         compile: (element) => {
             return adhRecursionHelper.compile(element, link);
