@@ -9,7 +9,7 @@ css_selector: .icon-{{glyph}}
 preprocessor_path: ""
 autowidth: true
 no_hash: true
-force: false 
+force: false
 debug: false
 quiet: false
 
