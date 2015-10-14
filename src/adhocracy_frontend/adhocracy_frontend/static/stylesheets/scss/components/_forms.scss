@@ -30,21 +30,6 @@ it is also dirty or the form has been submitted.
 
 /*doc
 ---
-title: textareas
-name: input.textarea
-category: Inputs
----
-
-Textareas behave exactly like text inputs however they are resizeable when enabled in modern browsers.
-
-```html_example
-<textarea></textarea>
-<textarea disabled="disabled" placeholder="disabled"></textarea>
-```
-*/
-
-/*doc
----
 title: textinput
 name: textinput
 parent: input
@@ -69,6 +54,21 @@ They should all look and behave similarily.
     <option>The other one</option>
 </select>
 <textarea placeholder="textarea"></textarea>
+```
+*/
+
+/*doc
+---
+title: Textareas
+name: textinput.textarea
+parent: textinput
+---
+
+Textareas behave exactly like text inputs however they are resizeable when enabled in modern browsers.
+
+```html_example
+<textarea></textarea>
+<textarea disabled="disabled" placeholder="disabled"></textarea>
 ```
 */
 
