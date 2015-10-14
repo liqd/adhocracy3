@@ -34,16 +34,36 @@ export var bindPath = (
     ) : Function => {
         scope.titles = [
             {
-                value: "challenge",
-                title: "Challenge"
+                value: "road to impact",
+                title: "Road to impact"
             },
             {
-                value: "highlight",
-                title: "Highlight"
+                value: "heroines and heroes",
+                title: "Heroines and heroes"
             },
             {
-                value: "team story",
-                title: "Team Story"
+                value: "impact Story",
+                title: "Impact Story"
+            },
+            {
+                value: "take this idea",
+                title: "Take this idea!"
+            },
+            {
+                value: "success",
+                title: "Success"
+            },
+            {
+                value: "failing forward",
+                title: "Failing forward"
+            },
+            {
+                value: "join forces",
+                title: "Join forces!"
+            },
+            {
+                value: "anything else",
+                title: "Anything else?"
             }
         ];
 
@@ -136,16 +156,36 @@ export var createDirective = (
             scope.errors = [];
             scope.titles = [
                 {
-                    value: "challenge",
-                    title: "Challenge"
+                    value: "road to impact",
+                    title: "Road to impact"
                 },
                 {
-                    value: "highlight",
-                    title: "Highlight"
+                    value: "heroines and heroes",
+                    title: "Heroines and heroes"
                 },
                 {
-                    value: "team story",
-                    title: "Team Story"
+                    value: "impact Story",
+                    title: "Impact Story"
+                },
+                {
+                    value: "take this idea",
+                    title: "Take this idea!"
+                },
+                {
+                    value: "success",
+                    title: "Success"
+                },
+                {
+                    value: "failing forward",
+                    title: "Failing forward"
+                },
+                {
+                    value: "join forces",
+                    title: "Join forces!"
+                },
+                {
+                    value: "anything else",
+                    title: "Anything else?"
                 }
             ];
             scope.data = {
