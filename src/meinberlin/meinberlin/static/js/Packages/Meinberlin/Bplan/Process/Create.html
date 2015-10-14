@@ -43,24 +43,32 @@
         <label>
             <span class="label-text">{{ "TR__DATE_START" | translate }}</span>
             <input
-                type="date"
+                type="text"
                 data-ng-model="data.startDate"
                 name="startDate"
+                data-ng-pattern="/([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|(1|2)[0-9]|0[1-9])$/"
                 required="required" />
             <span class="input-error" data-ng-show="showError(processForm, processForm.startDate, 'required')">
                 {{ "TR__ERROR_REQUIRED_DATE" | translate }}
+            </span>
+            <span class="input-error" data-ng-if="showError(processForm, processForm.startDate, 'pattern')">
+                {{ "TR__ERROR_INVALID_DATE" | translate }}
             </span>
         </label>
 
         <label>
             <span class="label-text">{{ "TR__DATE_END" | translate }}</span>
             <input
-                type="date"
+                type="text"
                 data-ng-model="data.endDate"
                 name="endDate"
+                data-ng-pattern="/([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|(1|2)[0-9]|0[1-9])$/"
                 required="required" />
             <span class="input-error" data-ng-show="showError(processForm, processForm.endDate, 'required')">
                 {{ "TR__ERROR_REQUIRED_DATE" | translate }}
+            </span>
+            <span class="input-error" data-ng-if="showError(processForm, processForm.endDate, 'pattern')">
+                {{ "TR__ERROR_INVALID_DATE" | translate }}
             </span>
         </label>
     </div>
