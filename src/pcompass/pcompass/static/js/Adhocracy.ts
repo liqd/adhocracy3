@@ -138,6 +138,9 @@ export var init = (config : AdhConfig.IService, metaApi) => {
             }, {
                 prefix: "/static/i18n/countries_",
                 suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
+            }, {
+                prefix: "/static/i18n/pcompass_",
+                suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
             }]
         });
         $translateProvider.useSanitizeValueStrategy("escape");
