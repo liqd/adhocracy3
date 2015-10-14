@@ -14,5 +14,5 @@ export var register = (angular) => {
             AdhCredentialsModule.moduleName,
             AdhHttpModule.moduleName
         ])
-        .service("adhUser", ["adhHttp", "adhCredentials", "$rootScope", AdhUser.Service]);
+        .service("adhUser", ["adhHttp", "adhCredentials", "$q", "$rootScope", AdhUser.Service]);
 };

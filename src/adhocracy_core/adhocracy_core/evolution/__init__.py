@@ -14,30 +14,31 @@ from substanced.evolution import add_evolution_step
 from substanced.util import find_service
 from substanced.interfaces import IFolder
 
-from adhocracy_core.utils import get_sheet
-from adhocracy_core.utils import get_sheet_field
-from adhocracy_core.interfaces import IResource
-from adhocracy_core.interfaces import search_query
-from adhocracy_core.interfaces import ResourceMetadata
-from adhocracy_core.interfaces import IItem
-from adhocracy_core.interfaces import IItemVersion
-from adhocracy_core.sheets.pool import IPool
-from adhocracy_core.interfaces import ISimple
-from adhocracy_core.sheets.title import ITitle
-from adhocracy_core.sheets.badge import IHasBadgesPool
-from adhocracy_core.sheets.badge import IBadgeable
-from adhocracy_core.sheets.principal import IUserExtended
-from adhocracy_core.sheets.workflow import IWorkflowAssignment
-from adhocracy_core.sheets.versions import IVersionable
-from adhocracy_core.resources.pool import IBasicPool
-from adhocracy_core.resources.asset import IPoolWithAssets
-from adhocracy_core.resources.badge import add_badges_service
-from adhocracy_core.resources.badge import add_badge_assignments_service
-from adhocracy_core.resources.badge import IBadgeAssignmentsService
-from adhocracy_core.resources.principal import IUser
-from adhocracy_core.resources.proposal import IProposal
-from adhocracy_core.resources.process import IProcess
 from adhocracy_core.catalog import ICatalogsService
+from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import ISimple
+from adhocracy_core.interfaces import ResourceMetadata
+from adhocracy_core.interfaces import search_query
+from adhocracy_core.resources.asset import IPoolWithAssets
+from adhocracy_core.resources.badge import IBadgeAssignmentsService
+from adhocracy_core.resources.badge import add_badge_assignments_service
+from adhocracy_core.resources.badge import add_badges_service
+from adhocracy_core.resources.comment import ICommentVersion
+from adhocracy_core.resources.pool import IBasicPool
+from adhocracy_core.resources.principal import IUser
+from adhocracy_core.resources.process import IProcess
+from adhocracy_core.resources.proposal import IProposal
+from adhocracy_core.resources.proposal import IProposalVersion
+from adhocracy_core.resources.relation import add_relationsservice
+from adhocracy_core.sheets.badge import IBadgeable
+from adhocracy_core.sheets.badge import IHasBadgesPool
+from adhocracy_core.sheets.pool import IPool
+from adhocracy_core.sheets.principal import IUserExtended
+from adhocracy_core.sheets.relation import ICanPolarize
+from adhocracy_core.sheets.relation import IPolarizable
+from adhocracy_core.sheets.title import ITitle
+from adhocracy_core.sheets.workflow import IWorkflowAssignment
+from adhocracy_core.utils import get_sheet
 
 
 logger = logging.getLogger(__name__)
@@ -332,6 +333,25 @@ def add_workflow_assignment_sheet_to_pools_simples(root):  # pragma: no cover
 
 
 @log_migration
+def make_proposalversions_polarizable(root):  # pragma: no cover
+    """Make proposals polarizable and add relations pool."""
+    catalogs = find_service(root, 'catalogs')
+    proposals = _search_for_interfaces(catalogs, IProposal)
+    registry = get_current_registry(root)
+    for proposal in proposals:
+        if 'relations' not in proposal:
+            logger.info('add relations pool to {0}'.format(proposal))
+            add_relationsservice(proposal, registry, {})
+    migrate_new_sheet(root, IProposalVersion, IPolarizable)
+
+
+@log_migration
+def add_icanpolarize_sheet_to_comments(root):  # pragma: no cover
+    """Make comments ICanPolarize."""
+    migrate_new_sheet(root, ICommentVersion, ICanPolarize)
+
+
+@log_migration
 def migrate_rate_sheet_to_attribute_storage(root):  # pragma: no cover
     """Migrate rate sheet to attribute storage."""
     import adhocracy_core.sheets.rate
@@ -393,41 +413,6 @@ def move_sheet_annotation_data_to_attributes(root):  # pragma: no cover
         delattr(resource, '_sheets')
 
 
-@log_migration
-def remove_empty_first_versions(root):  # pragma: no cover
-    """Remove empty first versions."""
-    registry = get_current_registry(root)
-    catalogs = find_service(root, 'catalogs')
-    items = _search_for_interfaces(catalogs, IItem)
-    count = len(items)
-    for index, item in enumerate(items):
-        logger.info('Migrating resource {0} of {1}'.format(index + 1, count))
-        if 'VERSION_0000000' not in item:
-            continue
-        first_version = item['VERSION_0000000']
-        is_empty = _is_version_without_data(first_version)
-        has_follower = _has_follower(first_version, registry)
-        if is_empty and has_follower:
-            logger.info('Delete empty version {0}.'.format(first_version))
-            del item['VERSION_0000000']
-
-
-def _is_version_without_data(version: IItemVersion) -> bool:
-    for attribute in version.__dict__:
-        if attribute.startswith('_sheet_'):
-            return False
-        if attribute == 'rate':
-            return False
-    else:
-        return True
-
-
-def _has_follower(version: IItemVersion, registry: Registry) -> bool:
-    followed_by = get_sheet_field(version, IVersionable, 'followed_by',
-                                  registry=registry)
-    return followed_by != []
-
-
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -445,4 +430,5 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(move_sheet_annotation_data_to_attributes)
     config.add_evolution_step(migrate_rate_sheet_to_attribute_storage)
     config.add_evolution_step(move_autoname_last_counters_to_attributes)
-    config.add_evolution_step(remove_empty_first_versions)
+    config.add_evolution_step(make_proposalversions_polarizable)
+    config.add_evolution_step(add_icanpolarize_sheet_to_comments)

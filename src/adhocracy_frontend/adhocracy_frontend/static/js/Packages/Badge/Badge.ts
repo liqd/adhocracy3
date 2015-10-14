@@ -5,12 +5,15 @@ import * as _ from "lodash";
 import * as AdhConfig from "../Config/Config";
 import * as AdhCredentials from "../User/Credentials";
 import * as AdhHttp from "../Http/Http";
+import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 
 import RIBadgeAssignment from "../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment";
 import * as SIBadgeable from "../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
 import * as SIBadgeAssignment from "../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment";
 import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIHasBadgesPool from "../../Resources_/adhocracy_core/sheets/badge/IHasBadgesPool";
 import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
 import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
@@ -21,6 +24,7 @@ export interface IBadge {
     title : string;
     description : string;
     name : string;
+    path : string;
 }
 
 export interface IGetBadges {
@@ -47,7 +51,8 @@ export var getBadgesFactory = (
                 return {
                     title: badge.data[SITitle.nick].title,
                     name: badge.data[SIName.nick].name,
-                    description: assignment.data[SIDescription.nick].description
+                    description: assignment.data[SIDescription.nick].description,
+                    path: assignmentPath
                 };
             });
         });
@@ -106,6 +111,10 @@ export var bindPath = (
                 });
             }
         });
+    } else {
+        adhHttp.get(scope.badgeablePath).then((badgeable) => {
+            scope.poolPath = badgeable.data[SIBadgeable.nick].post_pool;
+        });
     }
 };
 
@@ -133,8 +142,10 @@ export var badgeAssignmentCreateDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Assignment.html",
         scope: {
             badgesPath: "@",
-            poolPath: "@",
-            badgeablePath: "@"
+            badgeablePath: "@",
+            showDescription: "=?",
+            onSubmit: "=?",
+            onCancel: "=?"
         },
         link: (scope, element) => {
             bindPath(adhHttp, $q)(scope);
@@ -144,7 +155,21 @@ export var badgeAssignmentCreateDirective = (
                     content_type: RIBadgeAssignment.content_type,
                     data: {}
                 };
-                return adhHttp.post(scope.poolPath, fill(postdata, scope, adhCredentials.userPath));
+                return adhHttp.post(scope.poolPath, fill(postdata, scope, adhCredentials.userPath))
+                    .then((response) => {
+                        scope.serverError = null;
+                        if (scope.onSubmit) {
+                            scope.onSubmit();
+                        }
+                    }, (response) => {
+                        scope.serverError = response[0].description;
+                    });
+            };
+
+            scope.cancel = () => {
+                if (scope.onCancel) {
+                    scope.onCancel();
+                }
             };
         }
     };
@@ -161,14 +186,97 @@ export var badgeAssignmentEditDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Assignment.html",
         scope: {
             path: "@",
-            badgesPath: "@"
+            badgesPath: "@",
+            showDescription: "=?",
+            onSubmit: "=?",
+            onCancel: "=?"
         },
         link: (scope, element) => {
             bindPath(adhHttp, $q)(scope, "path");
 
+            scope.delete = () => {
+                return adhHttp.delete(scope.path, RIBadgeAssignment.content_type)
+                    .then(() => {
+                        scope.serverError = null;
+                        if (scope.onSubmit) {
+                            scope.onSubmit();
+                        }
+                    }, (response) => {
+                        scope.serverError = response[0].description;
+                    });
+            };
+
             scope.submit = () => {
                 var resource = scope.resource;
-                return adhHttp.put(resource.path, fill(resource, scope, adhCredentials.userPath));
+                return adhHttp.put(resource.path, fill(resource, scope, adhCredentials.userPath))
+                    .then((response) => {
+                        scope.serverError = null;
+                        if (scope.onSubmit) {
+                            scope.onSubmit();
+                        }
+                    }, (response) => {
+                        scope.serverError = response[0].description;
+                    });
+            };
+
+            scope.cancel = () => {
+                if (scope.onCancel) {
+                    scope.onCancel();
+                }
+            };
+        }
+    };
+};
+
+export var badgeAssignmentDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    $q : angular.IQService,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhGetBadges
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Wrapper.html",
+        require: "^adhMovingColumn",
+        scope: {
+            path: "@",
+            showDescription: "=?",
+            onSubmit: "=?",
+            onCancel: "=?"
+        },
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            scope.badgeablePath = scope.path;
+            scope.data = {};
+
+            var processUrl = adhTopLevelState.get("processUrl");
+            var promise1 = adhHttp.get(processUrl).then((resource) => {
+                scope.badgesPath = resource.data[SIHasBadgesPool.nick].badges_pool;
+            });
+
+            var promise2 = adhHttp.get(scope.path).then((proposal) => {
+                return adhGetBadges(proposal).then((assignments : IBadge[]) => {
+                    scope.assignments = assignments;
+                });
+            });
+
+            $q.all([promise1, promise2]).then(() => {
+                scope.ready = true;
+            });
+
+            scope.submit = () => {
+                column.hideOverlay("badges");
+                column.alert("TR__BADGE_ASSIGNMENT_UPDATED", "success");
+                if (scope.onSubmit) {
+                    scope.onSubmit();
+                }
+            };
+
+            scope.cancel = () => {
+                column.hideOverlay("badges");
+                if (scope.onCancel) {
+                    scope.onCancel();
+                }
             };
         }
     };

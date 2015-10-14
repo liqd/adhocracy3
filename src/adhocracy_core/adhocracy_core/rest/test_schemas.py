@@ -338,7 +338,7 @@ class TestBatchRequestPath:
     def test_deserialize_nonvalid_long_absolute_path(self):
         inst = self.make_one()
         with raises(colander.Invalid):
-            assert inst.deserialize('/a' * 200)
+            assert inst.deserialize('/a' * 8192)
 
     def test_deserialize_nonvalid_relativ_path_depth2(self):
         inst = self.make_one()

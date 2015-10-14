@@ -33,6 +33,9 @@ def test_create_adhocracy_catalog(pool_graph, registry):
     assert 'badge' in catalogs['adhocracy']
     assert 'title' in catalogs['adhocracy']
     assert 'workflow_state' in catalogs['adhocracy']
+    assert 'user_name' in catalogs['adhocracy']
+    assert 'private_user_email' in catalogs['adhocracy']
+    assert 'private_user_activation_path' in catalogs['adhocracy']
 
 
 class TestIndexMetadata:
@@ -392,3 +395,71 @@ class TestIndexWorkflowStateOfItem:
         assert registry.adapters.lookup((IVersionable,), IIndexView,
                                         name='adhocracy|workflow_state')
 
+
+class TestIndexUserName:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    def call_fut(self, *args):
+        from .adhocracy import index_user_name
+        return index_user_name(*args)
+
+    def test_return_user_name(self, registry, context, mock_sheet):
+        registry.content.get_sheet.return_value = mock_sheet
+        mock_sheet.get.return_value = {'name': 'user_name'}
+        assert self.call_fut(context, 'default') == 'user_name'
+
+    @mark.usefixtures('integration')
+    def test_register(self, registry):
+        from adhocracy_core.sheets.principal import IUserBasic
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IUserBasic,), IIndexView,
+                                        name='adhocracy|user_name')
+
+
+
+class TestIndexUserEmail:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    def call_fut(self, *args):
+        from .adhocracy import index_user_email
+        return index_user_email(*args)
+
+    def test_return_user_name(self, registry, context, mock_sheet):
+        registry.content.get_sheet.return_value = mock_sheet
+        mock_sheet.get.return_value = {'email': 'test@test.de'}
+        assert self.call_fut(context, 'default') == 'test@test.de'
+
+    @mark.usefixtures('integration')
+    def test_register(self, registry):
+        from adhocracy_core.sheets.principal import IUserExtended
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IUserExtended,), IIndexView,
+                                        name='adhocracy|private_user_email')
+
+
+class TestIndexUserActivationPath:
+
+    def call_fut(self, *args):
+        from .adhocracy import index_user_activation_path
+        return index_user_activation_path(*args)
+
+    def test_return_user_activation_path(self, context):
+        context.activation_path = '/path'
+        assert self.call_fut(context, 'default') == '/path'
+
+    def test_return_default_if_activation_path_is_none(self, context):
+        context.activation_path = None
+        assert self.call_fut(context, 'default') == 'default'
+
+    @mark.usefixtures('integration')
+    def test_register(self, registry):
+        from adhocracy_core.sheets.principal import IUserBasic
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IUserBasic,), IIndexView,
+                                        name='adhocracy|private_user_activation_path')

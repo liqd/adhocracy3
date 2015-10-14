@@ -321,7 +321,7 @@ class BatchRequestPath(AdhocracySchemaNode):
     validator = colander.All(colander.Regex('^(' + colander.URL_REGEX + '|'
                                             + absolutpath + '|@'
                                             + preliminarypath + ')$'),
-                             colander.Length(min=1, max=200))
+                             colander.Length(min=1, max=8192))
 
 
 class POSTBatchRequestItem(colander.Schema):

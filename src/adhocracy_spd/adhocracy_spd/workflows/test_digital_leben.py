@@ -3,6 +3,8 @@ from pytest import fixture
 from pytest import mark
 from webtest import TestResponse
 
+from adhocracy_core.utils.testing import do_transition_to
+
 
 @fixture
 def integration(config):
@@ -43,14 +45,6 @@ def _post_document_item(app_user, path='') -> TestResponse:
     return resp
 
 
-def _do_transition_to(app_user, path, state) -> TestResponse:
-    from adhocracy_core.sheets.workflow import IWorkflowAssignment
-    data = {'data': {IWorkflowAssignment.__identifier__:\
-                         {'workflow_state': state}}}
-    resp = app_user.put(path, data)
-    return resp
-
-
 @mark.functional
 class TestDigitalLebenWorkflow:
 
@@ -67,11 +61,11 @@ class TestDigitalLebenWorkflow:
         assert IDocument not in app_participant.get_postable_types('/digital_leben')
 
     def test_change_state_to_announce(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/digital_leben', 'announce')
+        resp = do_transition_to(app_initiator, '/digital_leben', 'announce')
         assert resp.status_code == 200
 
     def test_change_state_to_participate(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/digital_leben', 'participate')
+        resp = do_transition_to(app_initiator, '/digital_leben', 'participate')
         assert resp.status_code == 200
 
     def test_participate_initiator_creates_document(self, app_initiator):
@@ -95,11 +89,11 @@ class TestDigitalLebenWorkflow:
             '/digital_leben/document_0000000/rates')
 
     def test_change_state_to_evaluate(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/digital_leben', 'evaluate')
+        resp = do_transition_to(app_initiator, '/digital_leben', 'evaluate')
         assert resp.status_code == 200
 
     def test_change_state_to_result(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/digital_leben', 'result')
+        resp = do_transition_to(app_initiator, '/digital_leben', 'result')
         assert resp.status_code == 200
 
     def test_result_participant_can_view_process(self, app_participant):
@@ -117,5 +111,5 @@ class TestDigitalLebenWorkflow:
             '/digital_leben/document_0000000/rates')
 
     def test_change_state_to_closed(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/digital_leben', 'closed')
+        resp = do_transition_to(app_initiator, '/digital_leben', 'closed')
         assert resp.status_code == 200

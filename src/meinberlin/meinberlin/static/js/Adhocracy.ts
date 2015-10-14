@@ -42,8 +42,8 @@ import * as AdhLocaleModule from "./Packages/Locale/Module";
 import * as AdhLocalSocketModule from "./Packages/LocalSocket/Module";
 import * as AdhMappingModule from "./Packages/Mapping/Module";
 import * as AdhMarkdownModule from "./Packages/Markdown/Module";
-import * as AdhMeinBerlinProposalModule from "./Packages/Proposal/Module";
-import * as AdhMeinBerlinModule from "./Packages/MeinBerlin/Module";
+import * as AdhMeinberlinProposalModule from "./Packages/Proposal/Module";
+import * as AdhMeinberlinModule from "./Packages/Meinberlin/Module";
 import * as AdhMovingColumnsModule from "./Packages/MovingColumns/Module";
 import * as AdhPermissionsModule from "./Packages/Permissions/Module";
 import * as AdhPreliminaryNamesModule from "./Packages/PreliminaryNames/Module";
@@ -96,7 +96,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         AdhCommentModule.moduleName,
         AdhCrossWindowMessagingModule.moduleName,
         AdhEmbedModule.moduleName,
-        AdhMeinBerlinModule.moduleName,
+        AdhMeinberlinModule.moduleName,
         AdhResourceAreaModule.moduleName,
         AdhTrackingModule.moduleName,
         AdhUserViewsModule.moduleName
@@ -187,8 +187,8 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhListingModule.register(angular);
     AdhLocaleModule.register(angular);
     AdhLocalSocketModule.register(angular);
-    AdhMeinBerlinModule.register(angular);
-    AdhMeinBerlinProposalModule.register(angular);
+    AdhMeinberlinModule.register(angular);
+    AdhMeinberlinProposalModule.register(angular);
     AdhMappingModule.register(angular);
     AdhMarkdownModule.register(angular);
     AdhMovingColumnsModule.register(angular);

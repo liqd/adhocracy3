@@ -11,6 +11,7 @@ import copy
 import json
 import pprint
 
+
 from pyramid.compat import is_nonstr_iter
 from pyramid.location import lineage
 from pyramid.request import Request

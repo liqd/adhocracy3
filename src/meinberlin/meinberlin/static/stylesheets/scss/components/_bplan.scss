@@ -1,29 +1,29 @@
 // FIXME: This is very much like a moving column. Maybe we can share some code?
 
-.mein-berlin-bplaene-proposal-embed {
+.meinberlin-bplan-proposal-embed {
     @include rem(padding, 5px);
     background: $color-background-base-introvert;
 }
 
-.mein-berlin-bplaene-proposal-form {
+.meinberlin-bplan-proposal-form {
     padding: 0;
 }
 
-.mein-berlin-bplaene-proposal-form-inner {
+.meinberlin-bplan-proposal-form-inner {
     @include rem(padding, 15px);
     background: $color-background-base;
 }
 
-.mein-berlin-bplaene-proposal-success {
+.meinberlin-bplan-proposal-success {
     @extend .standalone-wrapper;
     @include rem(padding-left, 2.5rem);
     @include rem(padding-right, 2.5rem);
 }
 
-.mein-berlin-bplaene-proposal-success-title {
+.meinberlin-bplan-proposal-success-title {
     @extend .standalone-wrapper-title;
 }
 
-.mein-berlin-bplaene-proposal-success-show-form {
+.meinberlin-bplan-proposal-success-show-form {
     @include rem(margin, 2rem 0);
 }

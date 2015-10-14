@@ -1,8 +1,8 @@
 include RELEASE-VERSION version.py
-recursive-include src/{{project}}/build *.js *.css *.woff *.eot *.ttf *.svg *.xml *.json *.jpg *.ico *.gif *.png *.html *.md *.mako *.pt
+recursive-include {{project}}/build *.js *.css *.woff *.eot *.ttf *.svg *.xml *.json *.jpg *.ico *.gif *.png *.html *.md *.mako *.pt
 global-exclude *Spec.js
-prune src/{{project}}/build/styleguide
-prune src/{{project}}/build/lib/DefinitelyTyped
-prune src/{{project}}/build/lib/q
-prune src/{{project}}/build/lib/jasmine
-prune src/{{project}}/build/lib/blanket
+prune {{project}}/build/styleguide
+prune {{project}}/build/lib/DefinitelyTyped
+prune {{project}}/build/lib/q
+prune {{project}}/build/lib/jasmine
+prune {{project}}/build/lib/blanket

@@ -1,8 +1,8 @@
 http_path = "/"
-css_dir = "src/current/current/build/stylesheets"
+css_dir = "src/current/current/build/stylesheets/min"
 sass_dir = "src/current/current/build/stylesheets/scss"
 fonts_dir = "src/current/current/build/fonts"
-http_fonts_path = "../fonts"
+http_fonts_path = "../../fonts"
 images_dir = "src/current/current/build/images"
 javascripts_dir = "src/current/current/build/js"
 environment = :production

@@ -86,7 +86,7 @@ var MercatorProposalFormPage = function() {
         this.fillValid();
         this.submitButton.click();
         // FIXME: Return created comment
-        return this.listing.element(by.tagName("adh-comment-resource"));
+        return this.listing.element(by.tagName("adh-comment"));
 
         /*
         return all.reduce(function(acc, elem) {

@@ -7,12 +7,14 @@ from adhocracy_core.resources.comment import add_commentsservice
 from adhocracy_core.resources.item import item_meta
 from adhocracy_core.resources.itemversion import itemversion_meta
 from adhocracy_core.resources.rate import add_ratesservice
+from adhocracy_core.resources.relation import add_relationsservice
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.sheets.description import IDescription
 from adhocracy_core.sheets.geo import IPoint
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.title import ITitle
+from adhocracy_core.sheets.relation import IPolarizable
 
 
 class IProposalVersion(IItemVersion):
@@ -26,7 +28,9 @@ proposal_version_meta = itemversion_meta._replace(
                      ITitle,
                      IDescription,
                      ICommentable,
-                     IRateable),
+                     IRateable,
+                     IPolarizable,
+                     ),
     permission_create='edit_proposal',
 )
 
@@ -49,6 +53,7 @@ proposal_meta = item_meta._replace(
     add_commentsservice,
     add_ratesservice,
     add_badge_assignments_service,
+    add_relationsservice,
 ))
 
 

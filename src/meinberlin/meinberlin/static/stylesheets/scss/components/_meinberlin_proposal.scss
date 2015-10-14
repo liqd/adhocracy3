@@ -1,4 +1,4 @@
-.mein-berlin-proposal-form {
+.meinberlin-proposal-form {
     background-color: $color-background-base-introvert;
     bottom: 0;
     padding: 0;
@@ -16,26 +16,26 @@
     }
 }
 
-.mein-berlin-proposal-form-upper {
+.meinberlin-proposal-form-upper {
     @include rem(padding, 1rem);
     background: $color-background-base;
 }
 
-.mein-berlin-proposal-detail {
+.meinberlin-proposal-detail {
     .rate {
         float: right;
     }
 }
 
-.mein-berlin-proposal-detail-header,
-.mein-berlin-proposal-badge-descriptions,
-.mein-berlin-proposal-detail-body {
+.meinberlin-proposal-detail-header,
+.meinberlin-proposal-badge-descriptions,
+.meinberlin-proposal-detail-body {
     @include clearfix;
     @include rem(padding, 0 10px);
     background: $color-background-base;
 }
 
-.mein-berlin-proposal-detail-body-comments {
+.meinberlin-proposal-detail-body-comments {
     @include rem(padding-left, 40px);
     float: right;
     text-align: center;
@@ -52,15 +52,15 @@
     }
 }
 
-.mein-berlin-proposal-detail-body-comments-icon {
+.meinberlin-proposal-detail-body-comments-icon {
     @include rem(font-size, 20px);
     display: block;
 }
 
-.mein-berlin-proposal-detail-header {
+.meinberlin-proposal-detail-header {
     @include rem(padding-top, 30px);
 
-    .mein-berlin-proposal-detail-header-title {
+    .meinberlin-proposal-detail-header-title {
         @include rem(font-size, $font-size-normal);
         @include rem(margin, 0 0 30px);
         color: $color-text-normal;
@@ -73,29 +73,29 @@
     }
 }
 
-.mein-berlin-proposal-detail-detail {
+.meinberlin-proposal-detail-detail {
     @include rem(margin-bottom, 30px);
     padding-right: 15%;
     white-space: pre-line;
 }
 
-.mein-berlin-proposal-detail-meta-item,
-.mein-berlin-proposal-detail-author {
+.meinberlin-proposal-detail-meta-item,
+.meinberlin-proposal-detail-author {
     @include rem(font-size, $font-size-small);
     color: $color-text-introvert;
 }
 
-.mein-berlin-proposal-detail-author {
+.meinberlin-proposal-detail-author {
     @include rem(margin-bottom, 30px);
 }
 
-.mein-berlin-proposal-detail-meta {
+.meinberlin-proposal-detail-meta {
     @include clearfix;
     @include rem(margin, 0 0 40px);
     list-style-type: none;
     padding: 0;
 
-    .mein-berlin-proposal-detail-meta-item {
+    .meinberlin-proposal-detail-meta-item {
         @include gallery(3 of 12);
 
         &:nth-child(2) {
@@ -103,23 +103,23 @@
         }
     }
 
-    .mein-berlin-proposal-detail-meta-participation {
+    .meinberlin-proposal-detail-meta-participation {
         text-align: right;
     }
 
-    .mein-berlin-proposal-detail-meta-item-icon {
+    .meinberlin-proposal-detail-meta-item-icon {
         @include rem(margin-right, 8px);
         vertical-align: middle;
     }
 
-    .mein-berlin-proposal-detail-meta-item-text {
+    .meinberlin-proposal-detail-meta-item-text {
         @include inline-block;
         margin: 0;
         text-align: left;
     }
 
-    .mein-berlin-proposal-detail-meta-item-comments,
-    .mein-berlin-proposal-detail-meta-item-location {
+    .meinberlin-proposal-detail-meta-item-comments,
+    .meinberlin-proposal-detail-meta-item-location {
         a {
             color: $color-text-highlight-introvert;
         }
@@ -128,44 +128,36 @@
 
 /*doc
 ---
-title: Kiezkassen Proposal List Item
-name: mein-berlin-proposal-list-item
+title: Kiezkasse Proposal List Item
+name: meinberlin-proposal-list-item
 category: meinberlin
 ---
 
-Kiezkassen Proposal List Item contains all the key information about a
-kiezkassen proposal.  Key information may be content from the proposal as well
+Kiezkasse Proposal List Item contains all the key information about a
+kiezkasse proposal.  Key information may be content from the proposal as well
 as metadata.  It serves as an entry to a detail view.
 
 
 ```html_example
-<div class="meinberlin-proposal-map-list-item">
-    <a class="meinberlin-proposal-map-list-item-detail-link" href="">
-        <div class="map-list-item-col-left">
-            <h3 class="map-list-item-title">The title of my proposal</h3>
-            By God on 12/10/15
-        </div>
-        <div class="map-list-item-col-right">
-            <p class="map-list-item-comments map-list-meta-item"><i class="map-list-meta-item-icon icon-speechbubble-unfilled"></i> 12 Comments</p>
-            <p class="map-list-item-votes map-list-meta-item"><i class="map-list-meta-item-icon icon-voting"></i> +12 votes</p>
-            <p class="map-list-item-location map-list-meta-item"><i class="map-list-meta-item-icon icon-pin-detail"></i> Berlin</p>
-        </div>
-    </a>
-</div>
+<a class="proposal-list-item is-selected" href="" style="overflow:hidden">
+    <div class="proposal-list-item-col-left">
+        <h3 class="meinberlin-proposal-list-item-title">A title here</h3>
+        by Cliff on 12.10.15
+        <span class="badge is-realized">is realized</span>
+        <span class="badge is-not-realized">is not realized</span>
+    </div>
+    <div class="proposal-list-item-col-right">
+        <ul class="meta-list m-vertical">
+            <li class="meta-list-item"><i class="meta-list-meta-item-icon icon-speechbubble-unfilled"></i
+            > 12 comments</li>
+            <li class="meta-list-item"><i class="meta-list-meta-item-icon icon-voting"></i
+            > +12</li>
+            <li class="meta-list-item"><i class="meta-list-meta-item-icon icon-pin-detail"></i
+            > Berlin</li>
+        </ul>
+    </div>
+</a>
 
-<div class="meinberlin-proposal-map-list-item is-selected">
-    <a class="meinberlin-proposal-map-list-item-detail-link" href="">
-        <div class="map-list-item-col-left">
-            <h3 class="map-list-item-title">The title of my proposal</h3>
-            By God on 12/10/15
-        </div>
-        <div class="map-list-item-col-right">
-            <p class="map-list-item-comments map-list-meta-item"><i class="map-list-meta-item-icon icon-speechbubble-unfilled"></i> 12 Comments</p>
-            <p class="map-list-item-votes map-list-meta-item"><i class="map-list-meta-item-icon icon-voting"></i> +12 votes</p>
-            <p class="map-list-item-location map-list-meta-item"><i class="map-list-meta-item-icon icon-pin-detail"></i> Berlin</p>
-        </div>
-    </a>
-</div>
 ```
 */
 
@@ -193,16 +185,6 @@ as metadata.  It serves as an entry to a detail view.
     }
 }
 
-.meinberlin-proposal-list-item-col-left,
-.meinberlin-alexanderplatz-proposal-list-item-col-left {
-    @include span(8 of 12 first);
-}
-
-.meinberlin-proposal-list-item-col-right,
-.meinberlin-alexanderplatz-proposal-list-item-col-right {
-    @include span(4 of 12 last);
-}
-
 .meinberlin-alexanderplatz-proposal-list-item,
 .section-jump-cover {
     .badge {
@@ -221,17 +203,7 @@ as metadata.  It serves as an entry to a detail view.
     @include rem(margin, 0 0 15px);
 }
 
-.meinberlin-proposal-list-meta-item {
-    @include rem(font-size, $font-size-small);
-    @include rem(margin-bottom, 15px);
-}
-
-.meinberlin-proposal-list-meta-item-icon {
-    @include rem(font-size, $font-size-small);
-    @include rem(margin-right, 8px);
-}
-
-.mein-berlin-proposal-form-footer {
+.meinberlin-proposal-form-footer {
     .form-footer-button {
         @include rem(padding-left, 10px);
     }

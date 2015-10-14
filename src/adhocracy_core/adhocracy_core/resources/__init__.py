@@ -270,3 +270,4 @@ def includeme(config):
     config.include('.badge')
     config.include('.service')
     config.include('.logbook')
+    config.include('.relation')

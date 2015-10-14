@@ -25,9 +25,10 @@ export var register = (angular) => {
             AdhPreliminaryNamesModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("blog-post");
-            adhEmbedProvider.embeddableDirectives.push("blog-post-create");
-            adhEmbedProvider.embeddableDirectives.push("blog");
+            adhEmbedProvider
+                .registerDirective("blog-post")
+                .registerDirective("blog-post-create")
+                .registerDirective("blog");
         }])
         .directive("adhBlogPost", [
             "$q",

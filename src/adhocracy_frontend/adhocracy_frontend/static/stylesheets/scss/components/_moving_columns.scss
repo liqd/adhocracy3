@@ -181,7 +181,8 @@ The menu should always have the same state as its columns.
 .moving-column-body {
     @include rem(border-width, 0 $moving-column-border-width $moving-column-border-width);
     @include rem(font-size, $font-size-normal);
-    border: 0 solid $color-structure-normal;
+    border-color: $color-structure-normal;
+    border-style: solid;
 
     @media print {
         border: 0;
@@ -421,7 +422,8 @@ A list of alert messages to notify users in the moving column
     @include rem(padding, 1rem);
     background: $color-structure-normal;
     border-top: 1px solid $color-structure-border;
-    z-index: 3;
+    // .leaflet-top has 1000
+    z-index: 1000;
     max-height: 80%;
     overflow-y: auto;
 
@@ -447,4 +449,8 @@ A list of alert messages to notify users in the moving column
     @media print {
         display: none;
     }
+}
+
+.moving-column-tab {
+    float: left;
 }

@@ -30,7 +30,10 @@ export var register = (angular) => {
         ])
         .provider("adhMapData", AdhMapping.MapDataProvider)
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider.registerEmbeddableDirectives(["map-input", "map-detail", "map-listing-internal"]);
+            adhEmbedProvider
+                .registerDirective("map-input")
+                .registerDirective("map-detail")
+                .registerDirective("map-listing-internal");
         }])
         .config(["adhMapDataProvider", (adhMapDataProvider : AdhMapping.MapDataProvider) => {
             adhMapDataProvider.style = {

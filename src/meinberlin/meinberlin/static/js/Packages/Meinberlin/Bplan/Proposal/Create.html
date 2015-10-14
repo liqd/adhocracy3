@@ -1,0 +1,100 @@
+<form
+    novalidate="novalidate"
+    data-ng-submit="submit()"
+    class="meinberlin-bplan-proposal-form"
+    name="meinberlinProposalForm">
+
+    <div class="meinberlin-bplan-proposal-form-inner">
+        <div class="form-error" data-ng-repeat="error in errors track by $index">
+            <p>{{ error | adhFormatError | translate }}</p>
+        </div>
+
+        <!-- Name -->
+        <label>
+            <span class="label-text">{{ "TR__MEINBERLIN_NAME" | translate }}</span>
+            <input
+                type="text"
+                data-ng-model="data.name"
+                name="name"
+                minlength="3"
+                maxlength="100"
+                required="required" />
+            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.name, 'required')">
+                {{ "TR__MEINBERLIN_ERROR_REQUIRED_NAME" | translate }}
+            </span>
+        </label>
+
+        <!-- Street and house number -->
+        <label>
+            <span class="label-text">{{ "TR__MEINBERLIN_STREET" | translate }}</span>
+            <input
+                type="text"
+                data-ng-model="data.street"
+                name="street"
+                minlength="3"
+                maxlength="100"
+                required="required" />
+            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.street, 'required')">
+                {{ "TR__MEINBERLIN_ERROR_REQUIRED_STREET" | translate }}
+            </span>
+        </label>
+
+        <!-- city code and city -->
+        <label>
+            <span class="label-text">{{ "TR__MEINBERLIN_CITY" | translate }}</span>
+            <input
+                type="text"
+                data-ng-model="data.city"
+                name="city"
+                minlength="3"
+                maxlength="100"
+                required="required" />
+            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.city, 'required')">
+                {{ "TR__MEINBERLIN_ERROR_REQUIRED_CITY" | translate }}
+            </span>
+        </label>
+
+        <!-- email -->
+        <label>
+            <span class="label-text">{{ "TR__MEINBERLIN_EMAIL" | translate }}</span>
+            <input
+                type="email"
+                data-ng-model="data.email"
+                name="email"
+                minlength="3"
+                maxlength="100"
+                required="required" />
+            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.email, 'required')">
+                {{ "TR__MEINBERLIN_ERROR_REQUIRED_EMAIL" | translate }}
+            </span>
+            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.email, 'email')">
+                {{ "TR__ERROR_MUST_BE_A_VALID_EMAIL_STRING" | translate }}
+            </span>
+        </label>
+
+        <!--  statement -->
+        <label>
+            <span class="label-text">{{ "TR__MEINBERLIN_STATEMENT" | translate }}</span>
+
+            <textarea
+                data-msd-elastic=""
+                data-ng-model="data.statement"
+                name="statement"
+                maxlength="17500"
+                required="required"></textarea>
+
+            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.statement, 'required')">
+                {{ "TR__MEINBERLIN_ERROR_REQUIRED_STATEMENT" | translate }}
+            </span>
+        </label>
+    </div>
+
+    <!-- DATA SUBMIT -->
+    <footer class="form-footer meinberlin-proposal-form-footer">
+        <input
+            type="submit"
+            name="submit"
+            value="{{ 'TR__MEINBERLIN_SEND' | translate }}"
+            class="button-cta form-footer-button-cta" />
+    </footer>
+</form>

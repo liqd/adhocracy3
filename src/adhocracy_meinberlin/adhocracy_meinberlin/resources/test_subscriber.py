@@ -20,10 +20,6 @@ def test_set_root_acms(monkeypatch):
 class TestBplanSubmissionConfirmationEmailSubscriber:
 
     @fixture
-    def event(self, context, mock_sheet):
-        return testing.DummyResource(object=mock_sheet, registry=Mock())
-
-    @fixture
     def registry(self, config):
         config.include('pyramid_mailer.testing')
         config.include('pyramid_mako')

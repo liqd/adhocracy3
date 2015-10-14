@@ -414,9 +414,9 @@ export class Service {
 
     private cameFrom : string;
 
-    public setCameFrom(path? : string) : boolean {
-        if (typeof path === "undefined") {
-            path = this.$location.path();
+    public setCameFrom(url? : string) : boolean {
+        if (typeof url === "undefined") {
+            url = this.$location.url();
         }
 
         var denylist = [
@@ -427,9 +427,8 @@ export class Service {
             "/activate"
         ];
 
-        // FIXME: DefinitelyTyped
-        if (!(<any>_).includes(denylist, path)) {
-            this.cameFrom = path;
+        if (!_.includes(denylist, url)) {
+            this.cameFrom = url;
             return true;
         } else {
             return false;
