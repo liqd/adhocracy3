@@ -13,6 +13,7 @@ from adhocracy_core.resources.logbook import add_logbook_service
 from adhocracy_core.resources import process
 from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.sheets.rate import ILikeable
+from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.sheets.logbook import IHasLogbookPool
 
@@ -416,6 +417,8 @@ mercator_proposal_meta = item_meta._replace(
                    IFinance,
                    IExperience,
                    ),
+    extended_sheets=(IBadgeable,
+                     ),
     item_type=IMercatorProposalVersion,
     is_implicit_addable=True,
     permission_create='create_mercator_proposal',
