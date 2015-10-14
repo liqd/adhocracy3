@@ -23,5 +23,5 @@ export var register = (angular) => {
                 .registerDirective("meinberlin-bplan-process-create");
         }])
         .directive("adhMeinberlinBplanProcessCreate", [
-            "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", Process.createDirective]);
+            "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", "$window", Process.createDirective]);
 };

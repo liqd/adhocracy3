@@ -80,4 +80,22 @@
             value="{{ 'TR__PUBLISH' | translate }}"
             class="button-cta form-footer-button-cta" />
     </footer>
+
+    <pre class="embed-snippet" data-ng-if="resultUrl">
+&lt;script type=&quot;text/javascript&quot; src=&quot;{{origin}}/AdhocracySDK.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+    adhocracy.init('{{origin}}', function(adhocracy) {
+        adhocracy.embed('.adhocracy_marker');
+    });
+&lt;/script&gt;
+&lt;div
+    class=&quot;adhocracy_marker&quot;
+    data-widget=&quot;buergerhaushalt&quot;
+    data-initial-url=&quot;{{resultUrl}}&quot;
+    data-locale=&quot;de&quot;
+    data-autoresize=&quot;false&quot;
+    data-autourl=&quot;false&quot;
+    style=&quot;height: 650px&quot;&gt;
+&lt;/div&gt;
+    </pre>
 </form>

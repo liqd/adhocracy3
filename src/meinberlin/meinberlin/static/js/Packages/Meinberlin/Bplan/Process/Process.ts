@@ -60,7 +60,8 @@ export var createDirective = (
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhShowError,
-    adhSubmitIfValid
+    adhSubmitIfValid,
+    $window : angular.IWindowService
 ) => {
     return {
         restrict: "E",
@@ -72,10 +73,13 @@ export var createDirective = (
             scope.errors = [];
             scope.data = {};
             scope.showError = adhShowError;
+            scope.origin = $window.location.origin;
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.processForm, () => {
-                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.poolPath);
+                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.poolPath).then((responses) => {
+                        scope.resultUrl = responses[0].path;
+                    });
                 });
             };
         }
