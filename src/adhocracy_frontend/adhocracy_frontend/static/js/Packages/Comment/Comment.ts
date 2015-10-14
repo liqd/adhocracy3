@@ -350,13 +350,14 @@ export var adhCreateOrShowCommentListing = (
 ) => {
     return {
         restrict: "E",
-        template: "<adh-comment-listing data-ng-if=\"display\" data-path=\"{{commentablePath}}\"></adh-comment-listing>",
+        template: "<adh-comment-listing data-ng-if=\"display\" data-path=\"{{commentablePath}}\"></adh-comment-listing>"
+                  + "<div data-ng-if=\"display === false\">{{ 'TR__COMMENT_EMPTY_TEXT' | translate }}</div>",
         scope: {
             poolPath: "@",
             key: "@"
         },
         link: (scope) => {
-            scope.display = false;
+            scope.display = undefined;
             var commentablePath = scope.poolPath + scope.key + "/";
 
             var setScope = (path) => {
@@ -386,6 +387,8 @@ export var adhCreateOrShowCommentListing = (
                                     setScope(commentablePath);
                                     unwatch();
                                 });
+                            } else {
+                                scope.display = false;
                             }
                         });
                     }
