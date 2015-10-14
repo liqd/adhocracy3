@@ -10,7 +10,6 @@ import * as AdhPermissionsModule from "../Permissions/Module";
 import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
 import * as AdhRateModule from "../Rate/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
-import * as AdhUserModule from "../User/Module";
 
 import * as AdhListing from "../Listing/Listing";
 
@@ -35,8 +34,7 @@ export var register = (angular) => {
             AdhPermissionsModule.moduleName,
             AdhPreliminaryNamesModule.moduleName,
             AdhRateModule.moduleName,
-            AdhTopLevelStateModule.moduleName,
-            AdhUserModule.moduleName
+            AdhTopLevelStateModule.moduleName
         ])
         .directive("adhCommentListingPartial",
             ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
@@ -55,5 +53,5 @@ export var register = (angular) => {
             "$q",
             AdhComment.commentDetailDirective(adapter)])
         .directive("adhCommentCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", AdhComment.commentCreateDirective(adapter)])
-        .directive("adhCommentColumn", ["adhConfig", "adhUser", AdhComment.commentColumnDirective]);
+        .directive("adhCommentColumn", ["adhConfig", AdhComment.commentColumnDirective]);
 };

@@ -9,7 +9,6 @@ import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as AdhResourceUtil from "../Util/ResourceUtil";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
-import * as AdhUser from "../User/User";
 import * as AdhUtil from "../Util/Util";
 
 import * as ResourcesBase from "../../ResourcesBase";
@@ -400,17 +399,13 @@ export var adhCreateOrShowCommentListing = (
 };
 
 export var commentColumnDirective = (
-    adhConfig : AdhConfig.IService,
-    adhUser : AdhUser.Service
+    adhConfig : AdhConfig.IService
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Column.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            if (typeof adhUser.data !== "undefined") {
-                scope.userName = adhUser.data.name;
-            }
             column.bindVariablesAndClear(scope, ["commentCloseUrl", "commentableUrl"]);
             scope.frontendOrderPredicate = (id) => id;
             scope.frontendOrderReverse = true;
