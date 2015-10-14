@@ -8,13 +8,13 @@ import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as AdhResourceUtil from "../Util/ResourceUtil";
-import * as AdhResourceWidgets from "../ResourceWidgets/ResourceWidgets";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 
 import * as ResourcesBase from "../../ResourcesBase";
 
 import RIExternalResource from "../../Resources_/adhocracy_core/resources/external_resource/IExternalResource";
+import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 
 var pkgLocation = "/Comment";
@@ -37,12 +37,17 @@ export interface ICommentAdapter<T extends ResourcesBase.Resource> extends AdhLi
 }
 
 
-export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidgetScope {
+export interface ICommentResourceScope extends angular.IScope {
+    path : string;
+    submit : () => any;
+    delete : () => angular.IPromise<void>;
     refersTo : string;
     poolPath : string;
     hideCancel? : boolean;
     poolOptions : AdhHttp.IOptions;
-    createPath : string;
+    edit : () => void;
+    cancel : () => void;
+    mode : number;
     selectedState : string;
     show : {
         createForm : boolean;
@@ -50,11 +55,13 @@ export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidge
     createComment() : void;
     cancelCreateComment() : void;
     afterCreateComment() : angular.IPromise<void>;
+    item : any;
     report? : () => void;
     // update resource
-    update() : void;
+    update() : angular.IPromise<void>;
     // update outer listing
-    updateListing() : void;
+    onSubmit() : void;
+    onCancel() : void;
     data : {
         content : string;
         creator : string;
@@ -63,56 +70,129 @@ export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidge
         commentCount : number;
         comments : string[];
         path : string;
+        itemPath : string;
         replyPoolPath : string;
         edited : boolean;
     };
 }
 
-export class CommentResource<R extends ResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, ICommentResourceScope> {
-    constructor(
-        private adapter : ICommentAdapter<R>,
-        adhConfig : AdhConfig.IService,
-        adhHttp : AdhHttp.Service<any>,
-        public adhPermissions : AdhPermissions.Service,
-        adhPreliminaryNames : AdhPreliminaryNames.Service,
-        private adhTopLevelState : AdhTopLevelState.Service,
-        private $window : Window,
-        $q : angular.IQService
-    ) {
-        super(adhHttp, adhPreliminaryNames, $q);
-        this.templateUrl = adhConfig.pkg_path + pkgLocation + "/CommentDetail.html";
-    }
 
-    createRecursionDirective(adhRecursionHelper) {
-        var directive = this.createDirective();
-        directive.compile = (element) => adhRecursionHelper.compile(element, directive.link);
+export var update = (
+    adapter : ICommentAdapter<RICommentVersion>,
+    adhHttp : AdhHttp.Service<any>,
+    $q : angular.IQService
+) => (
+    scope : ICommentResourceScope,
+    itemPath : string
+) : angular.IPromise<void> => {
+    var p1 = adhHttp.get(itemPath);
+    var p2 = adhHttp.getNewestVersionPathNoFork(itemPath)
+        .then((path) => adhHttp.get(path));
+    return $q.all([p1, p2]).then((args : any[]) => {
+        var item = args[0];
+        var version = args[1];
 
-        directive.require.push("?^adhMovingColumn");
+        scope.item = item;
 
-        directive.scope.refersTo = "@";
-        directive.scope.poolPath = "@";
-        directive.scope.frontendOrderPredicate = "=?";
-        directive.scope.frontendOrderReverse = "=?";
-        directive.scope.updateListing = "=";
+        scope.data = {
+            path: version.path,
+            itemPath: item.path,
+            content: adapter.content(version),
+            creator: adapter.creator(item),
+            creationDate: adapter.creationDate(version),
+            modificationDate: adapter.modificationDate(version),
+            commentCount: adapter.commentCount(version),
+            comments: adapter.elemRefs(version),
+            replyPoolPath: adapter.poolPath(version),
+            edited: adapter.edited(version)
+        };
+    });
+};
 
-        return directive;
-    }
+export var bindPath = (
+    adapter : ICommentAdapter<RICommentVersion>,
+    adhHttp : AdhHttp.Service<any>,
+    $q : angular.IQService
+) => (
+    scope : ICommentResourceScope,
+    pathKey : string = "path"
+) : void => {
+    var _update = update(adapter, adhHttp, $q);
+    scope.$watch(pathKey, (itemPath : string) => {
+        if (itemPath) {
+            _update(scope, itemPath);
+        }
+    });
+};
 
-    public link(scope : ICommentResourceScope, element, attrs, controllers) {
-        var self = this;
+export var postCreate = (
+    adapter : ICommentAdapter<RICommentVersion>,
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service
+) => (
+    scope : ICommentResourceScope,
+    poolPath : string
+) => {
+    var item = adapter.createItem({
+        preliminaryNames: adhPreliminaryNames,
+        name: "comment"
+    });
+    item.parent = poolPath;
 
-        var instance = super.link(scope, element, attrs, controllers);
+    var version = adapter.create({
+        preliminaryNames: adhPreliminaryNames,
+        follows: [item.first_version_path]
+    });
+    adapter.content(version, scope.data.content);
+    adapter.refersTo(version, scope.refersTo);
+    version.parent = item.path;
 
-        // the report abuse UI is only available in moving columns
-        var column : AdhMovingColumns.MovingColumnController = controllers[1];
-        if (column) {
+    return adhHttp.deepPost([item, version]);
+};
+
+export var postEdit = (
+    adapter : ICommentAdapter<RICommentVersion>,
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service
+) => (
+    scope : ICommentResourceScope,
+    oldItem
+) => {
+    return adhHttp.getNewestVersionPathNoFork(oldItem.path)
+        .then((path) => adhHttp.get(path))
+        .then((oldVersion) => {
+            var resource = AdhResourceUtil.derive(oldVersion, {preliminaryNames: adhPreliminaryNames});
+            adapter.content(resource, scope.data.content);
+            resource.parent = oldItem.path;
+            return adhHttp.deepPost([resource]);
+        });
+};
+
+
+export var commentDetailDirective = (
+    adapter : ICommentAdapter<RICommentVersion>
+) => (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhRecursionHelper,
+    $window : Window,
+    $q : angular.IQService
+) => {
+    var _update = update(adapter, adhHttp, $q);
+    var _postEdit = postEdit(adapter, adhHttp, adhPreliminaryNames);
+
+    var link = (scope : ICommentResourceScope, element, attrs, column? : AdhMovingColumns.MovingColumnController) => {
+        if (typeof column !== "undefined") {
             scope.report = () => {
                 column.$scope.shared.abuseUrl = scope.data.path;
                 column.toggleOverlay("abuse");
             };
         }
 
-        scope.$on("$destroy", this.adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
+        scope.$on("$destroy", adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
             if (!commentVersionUrl) {
                 scope.selectedState = "";
             } else if (AdhUtil.parentPath(commentVersionUrl) === scope.path) {
@@ -128,7 +208,6 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
 
         scope.createComment = () => {
             scope.show.createForm = true;
-            scope.createPath = self.adhPreliminaryNames.nextPreliminary();
         };
 
         scope.cancelCreateComment = () => {
@@ -136,125 +215,104 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         };
 
         scope.afterCreateComment = () => {
-            return this.update(instance).then(() => {
+            return scope.update().then(() => {
                 scope.show.createForm = false;
             });
         };
 
+        scope.edit = () => {
+            scope.mode = 1;
+        };
+
+        scope.cancel = () => {
+            scope.mode = 0;
+        };
+
         scope.update = () => {
-            return this.update(instance);
+            return _update(scope, scope.path);
         };
 
-        var originalSubmit = scope.submit;
         scope.submit = () => {
-            return originalSubmit().then((x) => {
-                this.update(instance);
-                return x;
+            return _postEdit(scope, scope.item).then(() => {
+                scope.update();
+                scope.mode = 0;
             });
         };
 
-        this.adhPermissions.bindScope(scope, () => scope.data && scope.data.replyPoolPath, "poolOptions");
-        this.adhPermissions.bindScope(scope, () => {
-            if (scope.data && scope.data.path) {
-                return AdhUtil.parentPath(scope.data.path);
-            }
-        }, "commentItemOptions");
-        this.adhPermissions.bindScope(scope, () => scope.data && scope.data.path, "versionOptions");
-
-        return instance;
-    }
-
-    public _handleDelete(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>, path : string) {
-        // FIXME: use resource abstractions here
-        if (AdhUtil.parentPath(instance.scope.data.path) === path) {
+        scope.delete = () : angular.IPromise<void> => {
             // FIXME: translate
-            if (this.$window.confirm("Do you really want to delete this?")) {
-                return this.adhHttp.hide(path, this.adapter.itemContentType)
-                    .then(() => {
-                        instance.scope.updateListing();
-                    });
+            if ($window.confirm("Do you really want to delete this?")) {
+                return adhHttp.hide(scope.data.itemPath, adapter.itemContentType).then(() => {
+                    if (scope.onSubmit) {
+                        scope.onSubmit();
+                    }
+                });
+            } else {
+                return $q.when();
             }
+        };
+
+        adhPermissions.bindScope(scope, () => scope.data && scope.data.replyPoolPath, "poolOptions");
+        adhPermissions.bindScope(scope, () => scope.data && scope.data.itemPath, "commentItemOptions");
+        adhPermissions.bindScope(scope, () => scope.data && scope.data.path, "versionOptions");
+
+        scope.update();
+    };
+
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
+        require: "?^adhMovingColumn",
+        scope: {
+            path: "@",
+            frontendOrderPredicate: "=?",
+            frontendOrderReverse: "=?",
+            onSubmit: "=?"
+        },
+        compile: (element) => {
+            return adhRecursionHelper.compile(element, link);
         }
-        return this.$q.when();
-    }
+    };
+};
 
-    public _update(
-        instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>,
-        item : R
-    ) {
-        return this.adhHttp.getNewestVersionPathNoFork(item.path)
-            .then((path) => this.adhHttp.get(path))
-            .then((version) => {
-                var scope : ICommentResourceScope = instance.scope;
-                scope.data = {
-                    path: version.path,
-                    content: this.adapter.content(version),
-                    creator: this.adapter.creator(item),
-                    creationDate: this.adapter.creationDate(version),
-                    modificationDate: this.adapter.modificationDate(version),
-                    commentCount: this.adapter.commentCount(version),
-                    comments: this.adapter.elemRefs(version),
-                    replyPoolPath: this.adapter.poolPath(version),
-                    edited: this.adapter.edited(version)
-                };
-            });
-    }
+export var commentCreateDirective = (
+    adapter : ICommentAdapter<RICommentVersion>
+) => (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service
+) => {
+    var _postCreate = postCreate(adapter, adhHttp, adhPreliminaryNames);
 
-    public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>) {
-        var item = this.adapter.createItem({
-            preliminaryNames: this.adhPreliminaryNames,
-            name: "comment"
-        });
-        item.parent = instance.scope.poolPath;
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
+        scope: {
+            refersTo: "@",
+            poolPath: "@",
+            onSubmit: "=?",
+            onCancel: "=?",
+            hideCancel: "=?"
+        },
+        link: (scope : ICommentResourceScope) => {
+            scope.submit = () => {
+                return _postCreate(scope, scope.poolPath).then(() => {
+                    scope.data = <any>{};
+                    if (scope.onSubmit) {
+                        scope.onSubmit();
+                    }
+                });
+            };
 
-        var version = this.adapter.create({
-            preliminaryNames: this.adhPreliminaryNames,
-            follows: [item.first_version_path]
-        });
-        this.adapter.content(version, instance.scope.data.content);
-        this.adapter.refersTo(version, instance.scope.refersTo);
-        version.parent = item.path;
+            scope.cancel = () => {
+                if (scope.onCancel) {
+                    scope.onCancel();
+                }
+            };
+        }
+    };
+};
 
-        return this.$q.when([item, version]);
-    }
-
-    public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>, oldItem : R) {
-        return this.adhHttp.getNewestVersionPathNoFork(oldItem.path)
-            .then((path) => this.adhHttp.get(path))
-            .then((oldVersion) => {
-                var resource = AdhResourceUtil.derive(oldVersion, {preliminaryNames: this.adhPreliminaryNames});
-                this.adapter.content(resource, instance.scope.data.content);
-                resource.parent = AdhUtil.parentPath(oldVersion.path);
-                return [resource];
-            });
-    }
-
-    public _clear(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>) {
-        instance.scope.data = <any>{};
-    }
-}
-
-export class CommentCreate<R extends ResourcesBase.Resource> extends CommentResource<R> {
-    constructor(
-        adapter : ICommentAdapter<R>,
-        adhConfig : AdhConfig.IService,
-        adhHttp : AdhHttp.Service<any>,
-        public adhPermissions : AdhPermissions.Service,
-        adhPreliminaryNames : AdhPreliminaryNames.Service,
-        adhTopLevelState : AdhTopLevelState.Service,
-        $window : Window,
-        $q : angular.IQService
-    ) {
-        super(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $window, $q);
-        this.templateUrl = adhConfig.pkg_path + pkgLocation + "/CommentCreate.html";
-    }
-
-    public createDirective() {
-        var directive = super.createDirective();
-        directive.scope["hideCancel"] = "=?";
-        return directive;
-    }
-}
 
 export var adhCommentListing = (
     adhConfig : AdhConfig.IService,
@@ -263,7 +321,7 @@ export var adhCommentListing = (
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentListing.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
         scope: {
             path: "@",
             frontendOrderReverse: "=?",
@@ -345,7 +403,7 @@ export var commentColumnDirective = (
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Column.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["commentCloseUrl", "commentableUrl"]);
@@ -354,4 +412,3 @@ export var commentColumnDirective = (
         }
     };
 };
-

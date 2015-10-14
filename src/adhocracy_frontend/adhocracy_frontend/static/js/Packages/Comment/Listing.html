@@ -1,0 +1,24 @@
+<div class="comment-listing">
+    <adh-comment-listing-partial
+        data-path="{{path}}"
+        data-empty-text="{{ 'TR__COMMENT_EMPTY_TEXT' | translate }}"
+        data-frontend-order-predicate="frontendOrderPredicate"
+        data-frontend-order-reverse="frontendOrderReverse">
+        <div data-ng-switch="transclusionId">
+            <adh-comment-create
+                data-ng-switch-when="create-form-id"
+                data-refers-to="{{path}}"
+                data-pool-path="{{poolPath}}"
+                data-on-submit="onCreate"
+                data-hide-cancel="true">
+            </adh-comment-create>
+            <adh-comment
+                data-ng-switch-when="element-id"
+                data-path="{{element}}"
+                data-frontend-order-predicate="frontendOrderPredicate"
+                data-frontend-order-reverse="frontendOrderReverse"
+                data-on-submit="update">
+            </adh-comment>
+        </div>
+    </adh-comment-listing-partial>
+</div>

@@ -32,7 +32,7 @@ var EmbeddedCommentsPage = function(referer) {
         this.fillComment(content);
         this.submitButton.click();
         // FIXME: Return created comment
-        return this.listing.element(by.xpath("(//adh-comment-resource)[1]"));
+        return this.listing.element(by.xpath("(//adh-comment)[1]"));
 
         // return all.reduce(function(acc, elem) {
         //            return protractor.promise.all(
