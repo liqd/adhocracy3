@@ -85,5 +85,6 @@
     "TR__MERCATOR_PROPOSAL_VALUE_LABEL": "Why does Europe need your idea?",
     "TR__MERCATOR_PROPOSAL_WHO_BEHIND": "Who is behind it?",
     "TR__PROPOSAL_ADD": "Add proposal",
-    "TR__PROPOSAL_EMPTY_TEXT": "No proposals yet."
+    "TR__PROPOSAL_EMPTY_TEXT": "No proposals yet.",
+    "TR__REPORT_HELP": "Please only use this form to report violations in [[linkNettiquette:Nettiquette]]. To be a normal part of this discussion please [[link:close this overlay]] and use the regular reply functionality."
 }
