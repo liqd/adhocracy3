@@ -266,6 +266,8 @@ class AnnotationRessourceSheet(BaseResourceSheet):
 
     def delete_field_values(self, fields: [str]):
         """Delete value for every field name in `fields`."""
+        if not hasattr(self.context, self._annotation_key):
+            return None
         appstruct = getattr(self.context, self._annotation_key, {})
         for key in fields:
             if key in appstruct:
