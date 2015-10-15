@@ -327,12 +327,6 @@ class TestAnnotationRessourceSheet:
         inst.delete_field_values(['count'])
         assert not hasattr(inst.context, inst._annotation_key)
 
-    def test_delete_field_values_remove_data_dict_if_empty(self, inst):
-        appstruct = {'count': 2}
-        setattr(inst.context, inst._annotation_key, appstruct)
-        inst.delete_field_values(['count'])
-        assert not hasattr(inst.context, inst._annotation_key)
-
     def test_delete_field_values_no_delete_key_if_key_absent(self, inst):
         assert inst.delete_field_values(['count']) is None
 
