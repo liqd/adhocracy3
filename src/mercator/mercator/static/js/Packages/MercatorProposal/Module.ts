@@ -1,5 +1,6 @@
 import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
 import * as AdhBadgeModule from "../Badge/Module";
+import * as AdhBlogModule from "../Blog/Module";
 import * as AdhCredentialsModule from "../User/Module";
 import * as AdhHttpModule from "../Http/Module";
 import * as AdhImageModule from "../Image/Module";
@@ -28,6 +29,7 @@ export var register = (angular) => {
             "ngMessages",
             AdhAngularHelpersModule.moduleName,
             AdhBadgeModule.moduleName,
+            AdhBlogModule.moduleName,
             AdhCredentialsModule.moduleName,
             AdhHttpModule.moduleName,
             AdhImageModule.moduleName,
