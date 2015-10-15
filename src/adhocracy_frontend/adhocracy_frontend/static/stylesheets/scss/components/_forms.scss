@@ -53,7 +53,6 @@ They should all look and behave similarily.
     <option>This one</option>
     <option>The other one</option>
 </select>
-<textarea placeholder="textarea"></textarea>
 ```
 */
 
@@ -64,7 +63,8 @@ name: textinput.textarea
 parent: textinput
 ---
 
-Textareas behave exactly like text inputs however they are resizeable when enabled in modern browsers.
+Textareas behave exactly like text inputs however they are resizeable when
+enabled in modern browsers.
 
 ```html_example
 <textarea></textarea>
