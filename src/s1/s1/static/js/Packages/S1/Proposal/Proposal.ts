@@ -328,7 +328,7 @@ export var listingDirective = (
             scope.params = {};
 
             if (scope.creator) {
-                scope.params.creator = scope.creator.replace(adhConfig.rest_url, "").replace(/\/+$/, "");
+                scope.params[SIMetadata.nick + ":creator"] = scope.creator.replace(adhConfig.rest_url, "").replace(/\/+$/, "");
                 // processUrl is "/" in user space
                 scope.params.depth = "all";
             }
