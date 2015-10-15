@@ -50,6 +50,9 @@ adhocracy.site_name = Adhocracy Test Site
 adhocracy.frontend_url = http://localhost:6551/static/embed.html#!
 #adhocracy.frontend_url = http://localhost:6551
 
+# Nettiquitte URL - currently only used in mercator
+adhocracy.frontend.nettiquette_url = https://advocate-europe.eu/de/netiquette
+
 # performance workaround: disable filter references by view permission
 #adhocracy.filter_by_view_permission = False
 # performance workaround: disable filter references by visible (not deleted or hidden)
