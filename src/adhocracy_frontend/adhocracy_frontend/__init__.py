@@ -28,7 +28,8 @@ def config_view(request):
                                            'http://localhost:6551')
     config['rest_platform_path'] = settings.get('adhocracy.rest_platform_path',
                                                 '/adhocracy/')
-    config['nettiquette_url'] = settings.get('adhocracy.frontend.nettiquette_url')
+    config['nettiquette_url'] = settings.get(
+        'adhocracy.frontend.nettiquette_url')
     config['pkg_path'] = settings.get('adhocracy.frontend.pkg_path',
                                       '/static/js/Packages')
     config['trusted_domains'] = aslist(
