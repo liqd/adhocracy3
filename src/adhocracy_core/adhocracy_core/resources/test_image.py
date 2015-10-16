@@ -35,7 +35,6 @@ class TestImageDownload:
         inst = meta.content_class()
         return inst
 
-
     def test_meta(self, meta):
         from . import image
         from . import asset
@@ -59,45 +58,60 @@ class TestImageDownload:
             assert inst.get_response(registry)
 
     def test_get_response_return_old_resized_image(self, inst, registry):
-        file = Mock()
-        inst.resized = file
-        assert inst.get_response(registry) == file.get_response.return_value
+        inst._is_resized = Mock(return_value=True)
+        inst._get_response = Mock(return_value='FileResponse')
+        response = inst.get_response(registry)
+        assert response is inst._get_response.return_value
+
+    def test_is_resized_return_true_if_blob_has_size(self, inst):
+        inst.get_size = Mock(return_value=100)
+        assert inst._is_resized()
+
+    def test_is_resized_return_false_if_blob_no_size(self, inst):
+        inst.get_size = Mock(return_value=0)
+        assert not inst._is_resized()
+
+    def test_is_resized_return_false_if_blob_raises_error(self, inst):
+        from ZODB.blob import BlobError
+        inst.get_size = Mock(side_effect=BlobError)
+        assert not inst._is_resized()
 
     def test_get_response_return_resized_image_if_dimensions_and_asset_parent(
-            self, inst, asset, dimensions, mock_sheet, registry, monkeypatch):
-        from . import image
+            self, inst, asset, dimensions, mock_sheet, registry):
         asset['download'] = inst
+        original = Mock()
+        mock_sheet.get.return_value = {'data': original}
+        inst._upload_crop_and_resize = Mock()
         inst.dimensions = dimensions
-        file = Mock()
-        mock_crop_and_resize = Mock(return_value=file)
-        monkeypatch.setattr(image, 'crop_and_resize', mock_crop_and_resize)
-        mock_sheet.get.return_value = {'data': file}
-        assert inst.get_response(registry) == file.get_response.return_value
-        mock_crop_and_resize.assert_called_with(file, dimensions)
-        assert inst.resized is file
+        inst._get_response = Mock(return_value='FileResponse')
+        response = inst.get_response(registry)
+        assert response is inst._get_response.return_value
+        inst._upload_crop_and_resize.assert_called_with(original)
+
+    def test_upload_crop_and_resize(self, inst, monkeypatch, dimensions):
+        import io
+        from PIL import Image
+        from substanced.file import File
+        blob = Mock()
+        blob.open.return_value = io.BytesIO(b'dummy blob')
+        original = Mock(spec=File, mimetype= 'image/png', blob=blob)
+        mock_image = Mock(size=(840, 700))
+        mock_crop = Mock()
+        mock_image.crop.return_value = mock_crop
+        mock_open = Mock(spec=Image.open, return_value=mock_image)
+        monkeypatch.setattr(Image, 'open', mock_open)
+        inst.upload = Mock()
+        inst.dimensions = dimensions
+        inst._upload_crop_and_resize(original)
+        assert inst.mimetype == original.mimetype
+        assert mock_crop.resize.call_args[0] == (dimensions, Image.ANTIALIAS)
+        resized = inst.upload.call_args[0][0]
+        assert isinstance(resized, io.BytesIO)
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):
         assert registry.content.create(meta.iresource.__identifier__)
 
-
-def test_crop_and_resize_image(monkeypatch, dimensions):
-    from .image import crop_and_resize
-    import io
-    from PIL import Image
-    from substanced.file import File
-    blob = Mock()
-    blob.open.return_value = io.BytesIO(b'dummy blob')
-    file = Mock(spec=File, mimetype= 'image/png', blob=blob)
-    mock_image = Mock(size=(840, 700))
-    mock_crop = Mock()
-    mock_image.crop.return_value = mock_crop
-    mock_open = Mock(spec=Image.open, return_value=mock_image)
-    monkeypatch.setattr(Image, 'open', mock_open)
-    result = crop_and_resize(file, dimensions)
-    assert isinstance(result, File)
-    assert result.mimetype == file.mimetype
-    assert mock_crop.resize.call_args[0] == (dimensions, Image.ANTIALIAS)
 
 
 class TestCrop:

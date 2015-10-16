@@ -4,8 +4,9 @@ import io
 from pyramid.response import FileResponse
 from pyramid.registry import Registry
 from substanced.file import File
-import transaction
 from PIL import Image
+from ZODB.blob import BlobError
+import transaction
 
 from adhocracy_core.interfaces import Dimensions
 from adhocracy_core.resources import add_resource_type_to_registry
@@ -24,39 +25,45 @@ class IImageDownload(IAssetDownload):
     """Downloadable binary file for Images."""
 
 
-class ImageDownload(AssetDownload):
+class ImageDownload(File, AssetDownload):
 
     """Allow downloading the first image file in the term:`lineage`."""
 
     dimensions = None
     """:class:`adhocracy_core.interfaces.Dimension` to resize the image"""
-    resized = None
-    """Resized  image :class:`substanced.file.File`."""
 
     def get_response(self, registry: Registry=None) -> FileResponse:
         """Return response with resized binary content of the image data."""
-        if self.resized:
-            return self.resized.get_response()
-        original = self._get_asset_file_in_lineage(registry)
-        if self.dimensions:
-            self.resized = crop_and_resize(original, self.dimensions)
+        if self._is_resized():
+            return self._get_response()
+        elif self.dimensions:
+            original = self._get_asset_file_in_lineage(registry)
+            self._upload_crop_and_resize(original)
             transaction.commit()  # to avoid BlobError: Uncommitted changes
-            return self.resized.get_response()
+            return self._get_response()
         else:
+            original = self._get_asset_file_in_lineage(registry)
             return original.get_response()
 
+    def _is_resized(self) -> bool:
+        try:
+            return bool(self.get_size())
+        except BlobError:
+            return False
 
-def crop_and_resize(original: File, dimensions: Dimensions) -> File:
-    """"Crop and resize `file` image with mod:`PIL`."""
-    with original.blob.open('r') as blobdata:
-        mimetype = original.mimetype
-        image = Image.open(blobdata)
-        cropped = crop(image, dimensions)
-        resized = cropped.resize(dimensions, Image.ANTIALIAS)
-        bytestream = io.BytesIO()
-        resized.save(bytestream, image.format)
-        bytestream.seek(0)
-    return File(stream=bytestream, mimetype=mimetype)
+    def _get_response(self) -> FileResponse:
+        return File.get_response(self)
+
+    def _upload_crop_and_resize(self, original: File):
+        with original.blob.open('r') as blobdata:
+            image = Image.open(blobdata)
+            cropped = crop(image, self.dimensions)
+            resized = cropped.resize(self.dimensions, Image.ANTIALIAS)
+            bytestream = io.BytesIO()
+            resized.save(bytestream, image.format)
+            bytestream.seek(0)
+        self.upload(bytestream)
+        self.mimetype = original.mimetype
 
 
 def crop(image: Image, dimensions: Dimensions) -> Image:
