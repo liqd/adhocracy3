@@ -27,9 +27,9 @@ class TestPolarizableSheet:
         assert isinstance(inst, AnnotationRessourceSheet)
         assert inst.meta.isheet == IPolarizable
         assert inst.meta.schema_class == PolarizableSchema
-        assert inst.meta.editable is True
-        assert inst.meta.creatable is True
-        assert inst.meta.create_mandatory is True
+        assert inst.meta.editable is False
+        assert inst.meta.creatable is False
+        assert inst.meta.create_mandatory is False
 
 
     def test_get_empty(self, inst):

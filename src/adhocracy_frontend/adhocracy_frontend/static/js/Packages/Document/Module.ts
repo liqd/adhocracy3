@@ -8,7 +8,6 @@ import * as AdhMappingModule from "../Mapping/Module";
 import * as AdhMarkdownModule from "../Markdown/Module";
 import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
 import * as AdhResourceAreaModule from "../ResourceArea/Module";
-import * as AdhResourceWidgetsModule from "../ResourceWidgets/Module";
 import * as AdhStickyModule from "../Sticky/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
@@ -33,15 +32,15 @@ export var register = (angular) => {
             AdhMarkdownModule.moduleName,
             AdhPreliminaryNamesModule.moduleName,
             AdhResourceAreaModule.moduleName,
-            AdhResourceWidgetsModule.moduleName,
             AdhStickyModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("document-detail");
-            adhEmbedProvider.embeddableDirectives.push("document-create");
-            adhEmbedProvider.embeddableDirectives.push("document-edit");
-            adhEmbedProvider.embeddableDirectives.push("document-list-item");
+            adhEmbedProvider
+                .registerDirective("document-detail")
+                .registerDirective("document-create")
+                .registerDirective("document-edit")
+                .registerDirective("document-list-item");
         }])
         .directive("adhDocumentDetail", ["$q", "adhConfig", "adhHttp", "adhGetBadges", "adhTopLevelState", AdhDocument.detailDirective])
         .directive("adhDocumentCreate", [

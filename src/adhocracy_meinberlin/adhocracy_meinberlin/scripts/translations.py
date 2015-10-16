@@ -28,6 +28,8 @@ def change_german_salutation():
     data = json.load(open(args.jsonfile, 'r'))
 
     regexlist = [
+        ('ähle ein Badge', 'ählen Sie ein Badge'),
+        ('erstelle ein ', 'erstellen Sie ein '),
         ('Bitte entschuldige', 'Bitte entschuldigen Sie'),
         ('bekommst Du an Deine', 'bekommen Sie an Ihre'),
         ('aktiviere', 'aktivieren Sie'),

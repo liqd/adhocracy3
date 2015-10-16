@@ -64,8 +64,8 @@ $padding-medium: 1rem;
 
 //Other
 $section-jump-navigation-width: 2rem;
-$moving-column-single-width-max: $font-size-normal * 55;
-$moving-column-single-width-min: $font-size-normal * 35;
+$moving-column-single-width-max: 55rem;
+$moving-column-single-width-min: 35rem;
 $badge-line-height: 1 + 4px / $font-size-smaller;
 $badge-height: $badge-line-height * $font-size-smaller;
 
@@ -73,3 +73,6 @@ $badge-height: $badge-line-height * $font-size-smaller;
 $line-height-normal: 1.15;
 $line-height-large: 1.2;
 $line-height-plus: 1.6;
+
+//Breakpoints
+$breakpoint-small-device: 640px;

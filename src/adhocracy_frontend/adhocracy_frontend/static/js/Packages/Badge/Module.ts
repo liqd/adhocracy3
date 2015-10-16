@@ -21,12 +21,13 @@ export var register = (angular) => {
             AdhTopLevelStateModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("badge-assignment-create");
-            adhEmbedProvider.embeddableDirectives.push("badge-assignment-edit");
+            adhEmbedProvider
+                .registerDirective("badge-assignment-create")
+                .registerDirective("badge-assignment-edit");
         }])
         .factory("adhGetBadges", ["adhHttp", "$q", AdhBadge.getBadgesFactory])
         .directive("adhBadgeAssignmentCreate", ["adhConfig", "adhHttp", "$q", "adhCredentials", AdhBadge.badgeAssignmentCreateDirective])
         .directive("adhBadgeAssignmentEdit", ["adhConfig", "adhHttp", "$q", "adhCredentials", AdhBadge.badgeAssignmentEditDirective])
-        .directive("adhBadgeAssignment", ["adhConfig", "adhHttp", "$q", "adhCredentials", "adhTopLevelState",
+        .directive("adhBadgeAssignment", ["adhConfig", "adhHttp", "$q", "adhTopLevelState", "adhGetBadges",
             AdhBadge.badgeAssignmentDirective]);
 };

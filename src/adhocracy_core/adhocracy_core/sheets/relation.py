@@ -35,7 +35,7 @@ class Position(AdhocracySchemaNode):
     schema_type = colander.String
     missing = colander.drop
     default = 'pro'
-    validator = colander.OneOf(['pro', 'contra']),
+    validator = colander.OneOf(['pro', 'contra'])
 
 
 class PolarizationSubjectReference(SheetToSheet):
@@ -100,9 +100,8 @@ class PolarizableSchema(colander.MappingSchema):
 polarizable_meta = sheet_meta._replace(
     isheet=IPolarizable,
     schema_class=PolarizableSchema,
-    editable=True,
-    creatable=True,
-    create_mandatory=True
+    editable=False,
+    creatable=False,
 )
 
 

@@ -32,13 +32,15 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
                   {'name': 'alt-treptow'}}
     kiezregion = registry.content.create(IMultiPolygon.__identifier__,
                                          parent=locations,
-                                         appstructs=appstructs)
+                                         appstructs=appstructs,
+                                         registry=registry)
     # sample organisation
     appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
                   {'name': 'organisation'}}
     registry.content.create(IOrganisation.__identifier__,
                             parent=context,
-                            appstructs=appstructs)
+                            appstructs=appstructs,
+                            registry=registry)
     # sample kiezkasse
     appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
                   {'name': 'kiezkasse'},
@@ -48,7 +50,8 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
                   {'title': 'Sample Kiezkassen process'}}
     registry.content.create(resources.kiezkassen.IProcess.__identifier__,
                             parent=context['organisation'],
-                            appstructs=appstructs)
+                            appstructs=appstructs,
+                            registry=registry)
     # sample bplan
     office_worker = None
     users = find_service(context, 'principals', 'users')
@@ -68,7 +71,8 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
                    'participation_end_date': datetime.date(2015, 6, 11)}}
     registry.content.create(resources.bplan.IProcess.__identifier__,
                             parent=context['organisation'],
-                            appstructs=appstructs)
+                            appstructs=appstructs,
+                            registry=registry)
 
 
 meinberlin_acm = ACM().deserialize(

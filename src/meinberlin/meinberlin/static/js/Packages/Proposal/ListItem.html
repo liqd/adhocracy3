@@ -13,7 +13,7 @@
                 'm-is-realized': assignment.name === 'going_to_be_realized',
                 'm-is-not-realized': assignment.name === 'not_realizeable',
                 'm-on-test': assignment.name === 'on_test',
-                'm-color': isBurgerhaushalt && (assignment.name === 'going_to_be_realized' || assignment.name === 'not_realizeable' || assignment.name === 'on_test')
+                'm-color': isBuergerhaushalt && (assignment.name === 'going_to_be_realized' || assignment.name === 'not_realizeable' || assignment.name === 'on_test')
             }">{{ assignment.title }}</span>
     </div>
     <div class="proposal-list-item-col-right">
@@ -23,7 +23,7 @@
             <li class="meta-list-item"><i class="meta-list-meta-item-icon icon-voting"></i
             > {{ data.rateCount | signum }} {{ "TR__RATES" | translate }}</li>
             <li class="meta-list-item"
-            data-ng-if="isKiezkasse || isBurgerhaushalt"><i class="meta-list-meta-item-icon icon-pin-detail"></i
+            data-ng-if="isKiezkasse || isBuergerhaushalt"><i class="meta-list-meta-item-icon icon-pin-detail"></i
             > {{data.locationText}}</li>
         </ul>
     </div>
