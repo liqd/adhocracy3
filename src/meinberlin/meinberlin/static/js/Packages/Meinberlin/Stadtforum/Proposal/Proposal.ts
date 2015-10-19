@@ -39,6 +39,7 @@ export interface IScope extends angular.IScope {
     resource : any;
     frontendOrderPredicate : any;
     frontendOrderReverse : boolean;
+    goToLogin() : void;
 }
 
 var bindPath = (
@@ -156,6 +157,10 @@ export var detailDirective = (
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
             scope.frontendOrderPredicate = (id) => id;
             scope.frontendOrderReverse = true;
+
+            scope.goToLogin = () => {
+                adhTopLevelState.setCameFromAndGo("/login");
+            };
         }
     };
 };
