@@ -139,13 +139,13 @@ parent: comment
                 <a href="" class="comment-header-link" title="Reply">
                     <i class="comment-header-icon icon-reply"></i>
                 </a>
-                <a href="" class="comment-header-link ng-scope" title="Edit">
+                <a href="" class="comment-header-link" title="Edit">
                     <i class="comment-header-icon icon-pencil"></i>
                 </a>
-                <a href="" class="comment-header-link ng-scope" title="Report">
-                    <i class="comment-header-icon icon-ban-circle"></i>
+                <a href="" class="comment-header-link comment-header-link-report" title="Report">
+                    <i class="comment-header-icon icon-flag"></i>
                 </a>
-                <a href="" class="comment-header-link ng-scope" title="Delete">
+                <a href="" class="comment-header-link" title="Delete">
                     <i class="comment-header-icon icon-x"></i>
                 </a>
             </span>
@@ -244,6 +244,10 @@ parent: comment
     .comment-header-link {
         &:after {
             content: attr(title);
+        }
+
+        &.comment-header-link-report {
+            color: $color-function-invalid;
         }
     }
 

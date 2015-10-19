@@ -14,6 +14,7 @@ export var reportAbuseDirective = (adhHttp : AdhHttp.Service<any>, adhConfig : A
         },
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            scope.nettiquette_url = adhConfig.nettiquette_url;
             scope.submit = () => {
                 return adhHttp.postRaw(adhConfig.rest_url + "/report_abuse", {
                     url: scope.url,

@@ -41,6 +41,9 @@ adhocracy.site_name = Adhocracy Test Site
 # URL to terms and services
 adhocracy.frontend.terms_url =
 
+# Nettiquitte URL - currently only used in mercator
+adhocracy.frontend.nettiquette_url = https://advocate-europe.eu/de/netiquette
+
 # Piwik tracking configuration
 #adhocracy.frontend.piwik_enabled = true
 #adhocracy.frontend.piwik_host =
