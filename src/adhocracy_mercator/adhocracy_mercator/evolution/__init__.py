@@ -43,12 +43,13 @@ def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
         if introduction == '' or introduction is None:
             continue
         alsoProvides(proposal, ITitle)
-        if 'title' not in introduction._sheets[IIntroduction.__identifier__]:
+        sheet = registry.content.get_sheet(introduction, IIntroduction)
+        if 'title' not in sheet.get().keys():
             continue
-        value = introduction._sheets[IIntroduction.__identifier__]['title']
+        value = sheet.get()['title']
         title = registry.content.get_sheet(proposal, ITitle)
         title.set({'title': value})
-        del introduction._sheets[IIntroduction.__identifier__]['title']
+        sheet.delete_field_values(['title'])
 
 
 def evolve2_disable_add_proposal_permission(root):  # pragma: no cover
