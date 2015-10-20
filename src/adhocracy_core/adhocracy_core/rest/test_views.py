@@ -276,6 +276,13 @@ class TestValidateRequest:
             self.call_fut(context, request_)
         assert request_.validated == {}
 
+    def test_invalid_user_headers_but_check_disabled(self, context, request_):
+        request_.registry.settings['adhocracy.validate_user_token'] = False
+        request_.headers['X-User-Path'] = 2
+        request_.headers['X-User-Token'] = 3
+        self.call_fut(context, request_)
+        assert request_.validated == {}
+
 
 class TestValidatePOSTRootVersions:
 
