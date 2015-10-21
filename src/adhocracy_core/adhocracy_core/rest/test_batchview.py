@@ -46,6 +46,7 @@ class TestBatchView:
     @fixture
     def request_(self, request_, changelog, mock_invoke_subrequest):
         request_.registry.changelog = changelog
+        request_.registry.settings = {}
         request_.invoke_subrequest = mock_invoke_subrequest
         request_.method = 'POST'
         return request_
