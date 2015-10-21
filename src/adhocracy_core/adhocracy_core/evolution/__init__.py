@@ -63,8 +63,6 @@ def migrate_to_attribute_storage(context: IPool, isheet: IInterface):
             for field, value in data[annotation_key].items():
                 setattr(resource, field, value)
             delattr(resource, annotation_key)
-        else:
-            continue
 
 
 def migrate_new_sheet(context: IPool,
@@ -173,7 +171,8 @@ def _get_autonaming_prefixes(registry: Registry) -> [str]:
     return list(set(prefixes))
 
 
-def _get_used_autonaming_prefixes(pool: IPool, prefixes: [str]) -> [str]:
+def _get_used_autonaming_prefixes(pool: IPool,  # pragma: no cover
+                                  prefixes: [str]) -> [str]:
     used_prefixes = set()
     for child_name in pool:
         for prefix in prefixes:

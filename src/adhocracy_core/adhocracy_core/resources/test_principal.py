@@ -342,6 +342,14 @@ class TestUserLocatorAdapter:
         assert IRolesUserLocator.providedBy(inst)
         assert verifyObject(IRolesUserLocator, inst)
 
+    def test_get_users(self, inst, context):
+        from .principal import IUser
+        user = testing.DummyResource(__provides__=IUser)
+        context['principals']['users']['user'] = user
+        context['principals']['users']['other'] = testing.DummyResource()
+        result = inst.get_users()
+        assert list(result) == [user]
+
     def test_get_user_by_email_user_exists(self, inst, mock_catalogs,
                                            search_result, query):
         user = testing.DummyResource()
