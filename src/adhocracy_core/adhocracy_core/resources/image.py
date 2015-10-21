@@ -7,7 +7,6 @@ from adhocracy_core.sheets.image import IImageMetadata
 
 
 class IImage(IAsset):
-
     """An image asset, provided as example."""
 
 

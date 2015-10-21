@@ -15,7 +15,6 @@ changelog_meta = ChangelogMetadata(modified=False,
 
 
 class Changelog(defaultdict):
-
     """Transaction changelog for resources.
 
     Dictionary with resource path as key and default value

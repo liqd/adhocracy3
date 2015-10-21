@@ -14,22 +14,18 @@ from adhocracy_core.sheets import sheet_meta
 
 
 class IPolarization(IPredicateSheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for the polarization sheet."""
 
 
 class IPolarizable(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for resources than can be polarized."""
 
 
 class ICanPolarize(ISheet):
-
     """Marker interface for resources that can polarize."""
 
 
 class Position(AdhocracySchemaNode):
-
     """Schema node for the side (pro or contra)."""
 
     schema_type = colander.String
@@ -39,7 +35,6 @@ class Position(AdhocracySchemaNode):
 
 
 class PolarizationSubjectReference(SheetToSheet):
-
     """Reference from polarization to polarize."""
 
     source_isheet = IPolarization
@@ -48,7 +43,6 @@ class PolarizationSubjectReference(SheetToSheet):
 
 
 class PolarizationObjectReference(SheetToSheet):
-
     """Reference from polarization to polarized resource."""
 
     source_isheet = IPolarization
@@ -57,7 +51,6 @@ class PolarizationObjectReference(SheetToSheet):
 
 
 class PolarizationSchema(colander.MappingSchema):
-
     """Polarizable sheet data structure.
 
     `position`: the position in the debate, 'pro' or 'contra'.
@@ -73,7 +66,6 @@ polarization_meta = sheet_meta._replace(isheet=IPolarization,
 
 
 class CanPolarizeSchema(colander.MappingSchema):
-
     """CanPolarize sheet data structure."""
 
     polarization = Reference(reftype=PolarizationSubjectReference,
@@ -85,7 +77,6 @@ can_polarize_meta = sheet_meta._replace(isheet=ICanPolarize,
 
 
 class PolarizableSchema(colander.MappingSchema):
-
     """Polarizable sheet data structure.
 
     `post_pool`: Pool to post :class:`adhocracy_core.resource.IPolarization`.

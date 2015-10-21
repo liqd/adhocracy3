@@ -7,7 +7,6 @@ from adhocracy_core.resources.process import process_meta
 
 
 class IDocumentProcess(IProcess):
-
     """Document participation process."""
 
 

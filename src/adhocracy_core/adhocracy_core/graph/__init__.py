@@ -22,14 +22,12 @@ from adhocracy_core.events import SheetBackReferenceAdded
 
 
 class SheetReftype(namedtuple('ISheetReftype', 'isheet field reftype')):
-
     """Fields: isheet field reftype."""
 
 
 @content('Graph',
          )
 class Graph(Persistent):
-
     """Utility to work with versions/references.
 
     This implementation depends on the :class:`substanced.objectmap.Objectmap`
@@ -159,7 +157,7 @@ class Graph(Persistent):
 
     def set_references_for_isheet(self, source, isheet: ISheet,
                                   references: dict, registry: Registry):
-        """ Set references of this source for one isheet.
+        """Set references of this source for one isheet.
 
         :param references: dictionary with the following content:
                            key - isheet field name
@@ -183,7 +181,7 @@ class Graph(Persistent):
             self.set_references(source, targets, reftype, registry)
 
     def get_references_for_isheet(self, source, isheet: ISheet) -> dict:
-        """ Get references of this source for one isheet only.
+        """Get references of this source for one isheet only.
 
         :returns: dictionary with the following content:
                   key - isheet field name
@@ -197,7 +195,7 @@ class Graph(Persistent):
                                                 orientation='targets')
 
     def get_back_references_for_isheet(self, target, isheet: ISheet) -> dict:
-        """ Get references that point to this target for one isheet only.
+        """Get references that point to this target for one isheet only.
 
         : return: dictionary with the following content:
                   key - isheet field name

@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 
 
 class Client:
-
     """Websocket Client."""
 
     def __init__(self, ws_url):
@@ -106,9 +105,9 @@ class Client:
                            'opcode=%s, data="%s"', frame.opcode, frame.data)
 
     def _close_connection(self, reason: bytes):
-            self._ws_connection.send_close(reason=reason)
-            self._ws_connection.close()
-            self._is_running = False
+        self._ws_connection.send_close(reason=reason)
+        self._ws_connection.close()
+        self._is_running = False
 
     def send_messages(self, changelog_metadata=[]):
         """Send all changelog messages to the websocket server.

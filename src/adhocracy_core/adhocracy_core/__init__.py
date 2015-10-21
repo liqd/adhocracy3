@@ -18,7 +18,7 @@ logger = getLogger(__name__)
 
 
 def root_factory(request):
-    """ A function which can be used as a Pyramid ``root_factory``."""
+    """A function which can be used as a Pyramid ``root_factory``."""
     # Don't get the root object if the request already has one.
     # Workaround to make the subrequests in adhocracy_core.rest.batchview work.
     if getattr(request, 'root', False):
@@ -121,7 +121,7 @@ def includeme(config):
 
 
 def main(global_config, **settings):
-    """ Return a Pyramid WSGI application. """
+    """Return a Pyramid WSGI application."""
     config = Configurator(settings=settings, root_factory=root_factory)
     includeme(config)
     app = config.make_wsgi_app()

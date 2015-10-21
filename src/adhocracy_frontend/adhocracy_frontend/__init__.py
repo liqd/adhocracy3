@@ -176,7 +176,7 @@ def add_frontend_route(config, name, pattern):
 
 
 def main(global_config, **settings):
-    """ Return a Pyramid WSGI application to serve the frontend application."""
+    """Return a Pyramid WSGI application to serve the frontend application."""
     config = Configurator(settings=settings)
     includeme(config)
     return config.make_wsgi_app()

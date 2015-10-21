@@ -28,7 +28,6 @@ logger = logging.getLogger(__name__)
 
 
 class ClientTracker():
-
     """Keeps track of the clients that want notifications."""
 
     def __init__(self):
@@ -106,7 +105,6 @@ class ClientTracker():
 
 
 class DummyRequest:
-
     """Dummy :term:`request` to create/resolve resource urls.
 
     This is needed to de/serialize SchemaNodes with
@@ -127,7 +125,6 @@ class DummyRequest:
 
 
 class ClientCommunicator(WebSocketServerProtocol):
-
     """Communicates with a client through a WebSocket connection.
 
     Note that the `zodb_connection` attribute **must** be set

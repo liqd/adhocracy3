@@ -1,4 +1,4 @@
-""" Adhocracy catalog extensions."""
+"""Adhocracy catalog extensions."""
 from substanced.catalog import Keyword
 
 from adhocracy_core.catalog.adhocracy import AdhocracyCatalogIndexes
@@ -10,7 +10,6 @@ from adhocracy_mercator.sheets.mercator import ILocation
 
 
 class MercatorCatalogIndexes(AdhocracyCatalogIndexes):
-
     """Mercator indexes for the adhocracy catalog."""
 
     mercator_location = Keyword()
@@ -44,7 +43,7 @@ def index_requested_funding(resource: IResource, default) -> str:
     # This sounds like a bug, the default value for References is None,
     finance = get_sheet_field(resource, IMercatorSubResources, 'finance')
     if finance is None or finance == '':
-            return default
+        return default
     funding = get_sheet_field(finance, IFinance, 'requested_funding')
     for limit in BUDGET_INDEX_LIMIT_KEYWORDS:
         if funding <= limit:
@@ -53,15 +52,14 @@ def index_requested_funding(resource: IResource, default) -> str:
 
 
 def index_budget(resource: IResource, default) -> str:
-    """
-    Return search index keyword based on the "budget" field.
+    """Return search index keyword based on the "budget" field.
 
     The returned values are the same values as per the "requested_funding"
     field, or "above_50000" if the total budget value is more than 50,000 euro.
     """
     finance = get_sheet_field(resource, IMercatorSubResources, 'finance')
     if finance is None or finance == '':
-            return default
+        return default
     funding = get_sheet_field(finance, IFinance, 'budget')
     for limit in BUDGET_INDEX_LIMIT_KEYWORDS:
         if funding <= limit:

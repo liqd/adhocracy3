@@ -14,7 +14,6 @@ from adhocracy_core.sheets.rate import IRate
 
 
 class IRateVersion(IItemVersion):
-
     """Rate version."""
 
 
@@ -26,7 +25,6 @@ rateversion_meta = itemversion_meta._replace(
 
 
 class IRate(IItem):
-
     """Rate versions pool."""
 
 
@@ -41,7 +39,6 @@ rate_meta = item_meta._replace(
 
 
 class IRatesService(IServicePool):
-
     """The 'rates' ServicePool."""
 
 

@@ -113,7 +113,7 @@ def validate_post_root_versions(context, request: Request):
 
 def validate_request_data(context: ILocation, request: Request,
                           schema=MappingSchema(), extra_validators=[]):
-    """ Validate request data.
+    """Validate request data.
 
     :param context: passed to validator functions
     :param request: passed to validator functions
@@ -282,7 +282,6 @@ def _validate_extra_validators(validators: list, context, request: Request):
 
 
 class RESTView:
-
     """Class stub with request data validation support.
 
     Subclasses must implement the wanted request methods
@@ -369,7 +368,6 @@ def _get_schema_and_validators(view_class, request: Request) -> tuple:
     context=IResource,
 )
 class ResourceRESTView(RESTView):
-
     """Default view for Resources, implements get and options."""
 
     def __init__(self, context, request):
@@ -486,7 +484,6 @@ class ResourceRESTView(RESTView):
     context=ISimple,
 )
 class SimpleRESTView(ResourceRESTView):
-
     """View for simples (non versionable), implements get, options and put."""
 
     validation_PUT = (PUTResourceRequestSchema, [])
@@ -520,7 +517,6 @@ class SimpleRESTView(ResourceRESTView):
     context=IPool,
 )
 class PoolRESTView(SimpleRESTView):
-
     """View for Pools, implements get, options, put and post."""
 
     validation_GET = (GETPoolRequestSchema, [])
@@ -536,7 +532,7 @@ class PoolRESTView(SimpleRESTView):
         return super().get()
 
     def build_post_response(self, resource) -> dict:
-        """Build response data structure for a POST request. """
+        """Build response data structure for a POST request."""
         appstruct = {}
         if IItem.providedBy(resource):
             appstruct['first_version_path'] = self._get_first_version(resource)
@@ -586,7 +582,6 @@ class PoolRESTView(SimpleRESTView):
     context=IItem,
 )
 class ItemRESTView(PoolRESTView):
-
     """View for Items and ItemVersions, overwrites GET and  POST handling."""
 
     validation_POST = (POSTItemRequestSchema, [validate_post_root_versions])
@@ -656,7 +651,6 @@ class ItemRESTView(PoolRESTView):
     context=IBadgeAssignmentsService,
 )
 class BadgeAssignmentsRESTView(PoolRESTView):
-
     """REST view for the badge assignment."""
 
     @view_config(request_method='GET',
@@ -693,7 +687,6 @@ class BadgeAssignmentsRESTView(PoolRESTView):
     context=IUsersService,
 )
 class UsersRESTView(PoolRESTView):
-
     """View the IUsersService pool overwrites POST handling."""
 
     @view_config(request_method='POST',
@@ -709,7 +702,6 @@ class UsersRESTView(PoolRESTView):
     context=IAssetsService,
 )
 class AssetsServiceRESTView(PoolRESTView):
-
     """View allowing multipart requests for asset upload."""
 
     @view_config(request_method='POST',
@@ -725,7 +717,6 @@ class AssetsServiceRESTView(PoolRESTView):
     context=IAsset,
 )
 class AssetRESTView(SimpleRESTView):
-
     """View for assets, allows PUTting new versions via multipart."""
 
     @view_config(request_method='PUT',
@@ -743,7 +734,6 @@ class AssetRESTView(SimpleRESTView):
     context=IAssetDownload,
 )
 class AssetDownloadRESTView(SimpleRESTView):
-
     """
     View for downloading assets as binary blobs.
 
@@ -780,7 +770,6 @@ class AssetDownloadRESTView(SimpleRESTView):
     name='meta_api'
 )
 class MetaApiView(RESTView):
-
     """Access to metadata about the API specification of this installation.
 
     Returns a JSON document describing the existing resources and sheets.
@@ -1028,7 +1017,6 @@ def validate_account_active(context, request: Request):
     name='login_username',
 )
 class LoginUsernameView(RESTView):
-
     """Log in a user via their name."""
 
     validation_POST = (POSTLoginUsernameRequestSchema,
@@ -1066,7 +1054,6 @@ def _login_user(request: Request) -> dict:
     name='login_email',
 )
 class LoginEmailView(RESTView):
-
     """Log in a user via their email address."""
 
     validation_POST = (POSTLoginEmailRequestSchema,
@@ -1117,7 +1104,6 @@ def validate_activation_path(context, request: Request):
     name='activate_account',
 )
 class ActivateAccountView(RESTView):
-
     """Log in a user via their name."""
 
     validation_POST = (POSTActivateAccountViewRequestSchema,
@@ -1141,7 +1127,6 @@ class ActivateAccountView(RESTView):
     name='report_abuse',
 )
 class ReportAbuseView(RESTView):
-
     """Receive and process an abuse complaint."""
 
     validation_POST = (POSTReportAbuseViewRequestSchema, [])
@@ -1168,7 +1153,6 @@ class ReportAbuseView(RESTView):
     name='message_user',
 )
 class MessageUserView(RESTView):
-
     """Send a message to another user."""
 
     validation_POST = (POSTMessageUserViewRequestSchema, [])
@@ -1204,7 +1188,6 @@ class MessageUserView(RESTView):
     name='create_password_reset',
 )
 class CreatePasswordResetView(RESTView):
-
     """Create a password reset resource."""
 
     validation_POST = (POSTCreatePasswordResetRequestSchema, [])
@@ -1233,7 +1216,6 @@ class CreatePasswordResetView(RESTView):
     name='password_reset',
 )
 class PasswordResetView(RESTView):
-
     """Reset a user password."""
 
     validation_POST = (POSTPasswordResetRequestSchema, [])

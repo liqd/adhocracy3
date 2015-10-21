@@ -40,7 +40,7 @@ from adhocracy_mercator.sheets.mercator import ISteps
 
 
 def get_text_from_sheet(proposal, field, sheet):
-    """Get text from sheetfields and return it. """
+    """Get text from sheetfields and return it."""
     retrieved_field = get_sheet_field(proposal, IMercatorSubResources, field)
     field_text = get_sheet_field(
         retrieved_field,
@@ -52,7 +52,7 @@ def get_text_from_sheet(proposal, field, sheet):
 
 
 def export_proposals():
-    """Export all proposals from database and write them to csv file. """
+    """Export all proposals from database and write them to csv file."""
     doc = textwrap.dedent(inspect.getdoc(export_proposals))
     parser = argparse.ArgumentParser(description=doc)
     parser.add_argument('config')

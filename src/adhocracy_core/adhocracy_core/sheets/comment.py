@@ -13,17 +13,14 @@ from adhocracy_core.schema import PostPool
 
 
 class IComment(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for the comment sheet."""
 
 
 class ICommentable(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for resources that can be commented upon."""
 
 
 class CommentRefersToReference(SheetToSheet):
-
     """Reference from comment version to the commented-on item version."""
 
     source_isheet = IComment
@@ -32,7 +29,6 @@ class CommentRefersToReference(SheetToSheet):
 
 
 class CommentSchema(colander.MappingSchema):
-
     """Comment sheet data structure.
 
     `content`:  Text
@@ -48,7 +44,6 @@ comment_meta = sheet_meta._replace(isheet=IComment,
 
 
 class CommentableSchema(colander.MappingSchema):
-
     """Commentable sheet data structure.
 
     `comments`: list of comments (not stored)

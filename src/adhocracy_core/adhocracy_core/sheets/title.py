@@ -9,12 +9,10 @@ from adhocracy_core.schema import SingleLine
 
 
 class ITitle(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for the title sheet."""
 
 
 class TitleSchema(colander.MappingSchema):
-
     """Title sheet data structure.
 
     `title`: a human readable title

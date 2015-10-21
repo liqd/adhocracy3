@@ -21,18 +21,15 @@ from adhocracy_core.utils import get_user
 
 
 class IRate(IPredicateSheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for the rate sheet."""
 
 
 class IRateable(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for resources that can be rated."""
 
 
 @implementer(IRateValidator)
 class RateableRateValidator:
-
     """
     Validator for rates about IRateable.
 
@@ -59,13 +56,11 @@ class RateableRateValidator:
 
 
 class ILikeable(IRateable):
-
     """IRateable subclass that restricts the set of allowed values."""
 
 
 @implementer(IRateValidator)
 class LikeableRateValidator(RateableRateValidator):
-
     """
     Validator for rates about ILikeable.
 
@@ -79,12 +74,10 @@ class LikeableRateValidator(RateableRateValidator):
 
 
 class ICanRate(ISheet):
-
     """Marker interface for resources that can rate."""
 
 
 class RateSubjectReference(SheetToSheet):
-
     """Reference from rate to rater."""
 
     source_isheet = IRate
@@ -93,7 +86,6 @@ class RateSubjectReference(SheetToSheet):
 
 
 class RateObjectReference(SheetToSheet):
-
     """Reference from rate to rated resource."""
 
     source_isheet = IRate
@@ -102,7 +94,6 @@ class RateObjectReference(SheetToSheet):
 
 
 class RateSchema(colander.MappingSchema):
-
     """Rate sheet data structure."""
 
     subject = ReferenceSchema(reftype=RateSubjectReference)
@@ -171,7 +162,6 @@ rate_meta = sheet_meta._replace(isheet=IRate,
 
 
 class CanRateSchema(colander.MappingSchema):
-
     """CanRate sheet data structure."""
 
 
@@ -180,7 +170,6 @@ can_rate_meta = sheet_meta._replace(isheet=ICanRate,
 
 
 class RateableSchema(colander.MappingSchema):
-
     """Commentable sheet data structure.
 
     `post_pool`: Pool to post new :class:`adhocracy_sample.resource.IRate`.

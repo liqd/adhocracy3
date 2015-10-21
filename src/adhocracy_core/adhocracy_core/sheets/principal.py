@@ -20,27 +20,22 @@ from adhocracy_core.schema import Roles
 
 
 class IGroup(ISheet):
-
     """Marker interface for the group sheet."""
 
 
 class IUserBasic(ISheet):
-
     """Marker interface for the basic user sheet."""
 
 
 class IUserExtended(ISheet):
-
     """Marker interface for the extended user sheet."""
 
 
 class IPermissions(ISheet):
-
     """Marker interface for the permissions sheet."""
 
 
 class PermissionsGroupsReference(SheetToSheet):
-
     """permissions sheet reference to preceding versions."""
 
     source_isheet = IPermissions
@@ -49,7 +44,6 @@ class PermissionsGroupsReference(SheetToSheet):
 
 
 class GroupSchema(colander.MappingSchema):
-
     """Group sheet data structure."""
 
     users = UniqueReferences(readonly=True,
@@ -113,7 +107,6 @@ def deferred_validate_user_email(node: colander.SchemaNode, kw: dict)\
 
 
 class UserBasicSchema(colander.MappingSchema):
-
     """Basic user sheet data structure.
 
     This sheet must only store public information, as everyone can see it.
@@ -134,7 +127,6 @@ userbasic_meta = sheet_meta._replace(
 
 
 class UserExtendedSchema(colander.MappingSchema):
-
     """Extended user sheet data structure.
 
     Sensitive information (not for everyone's eyes) should be stored here.
@@ -177,7 +169,6 @@ def deferred_roles_and_group_roles(node: colander.SchemaNode, kw: dict)\
 
 
 class PermissionsSchema(colander.MappingSchema):
-
     """Permissions sheet data structure.
 
     `groups`: groups this user joined
@@ -190,7 +181,6 @@ class PermissionsSchema(colander.MappingSchema):
 
 
 class PermissionsAttributeResourceSheet(AttributeResourceSheet):
-
     """Store the groups field references also as object attribute."""
 
     def _store_references(self, appstruct, registry):
@@ -212,12 +202,10 @@ permissions_meta = sheet_meta._replace(
 
 
 class IPasswordAuthentication(ISheet):
-
     """Marker interface for the password sheet."""
 
 
 class PasswordAuthenticationSchema(colander.MappingSchema):
-
     """Data structure for password based user authentication.
 
     `password`: plaintext password :class:`adhocracy_core.schema.Password`.
@@ -227,7 +215,6 @@ class PasswordAuthenticationSchema(colander.MappingSchema):
 
 
 class PasswordAuthenticationSheet(AnnotationRessourceSheet):
-
     """Sheet for password based user authentication.
 
     The `password` data is encrypted and stored in the user object (context).
@@ -252,7 +239,7 @@ class PasswordAuthenticationSheet(AnnotationRessourceSheet):
         return {'password': password_encoded}
 
     def check_plaintext_password(self, password: str) -> bool:
-        """ Check if `password` matches the stored encrypted password.
+        """Check if `password` matches the stored encrypted password.
 
         :raises ValueError: if `password` is > 4096 bytes
         """

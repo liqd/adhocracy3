@@ -24,7 +24,6 @@ logger = getLogger(__name__)
 
 
 class BatchItemResponse:
-
     """Wrap the response to a nested request in a batch request.
 
     Attributes:
@@ -55,7 +54,6 @@ class BatchItemResponse:
     http_cache=0,
 )
 class BatchView(RESTView):
-
     """Process batch requests."""
 
     validation_POST = (POSTBatchRequestSchema, [])

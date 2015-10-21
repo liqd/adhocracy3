@@ -11,7 +11,6 @@ from adhocracy_core.sheets.geo import IPoint
 
 
 class IProposalVersion(proposal.IProposalVersion):
-
     """Alexanderplatz proposal version."""
 
 
@@ -21,7 +20,6 @@ proposal_version_meta = proposal.proposal_version_meta._replace(
 
 
 class IProposal(proposal.IProposal):
-
     """Alexanderplatz proposal versions pool."""
 
 proposal_meta = proposal.proposal_meta._replace(
@@ -32,7 +30,6 @@ proposal_meta = proposal.proposal_meta._replace(
 
 
 class IProcess(IDocumentProcess):
-
     """Alexanderplatz participation process."""
 
 process_meta = document_process_meta._replace(
