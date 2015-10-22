@@ -449,9 +449,9 @@ class GETPoolRequestSchema(colander.Schema):
             cstruct['depth'] = 100
         appstruct = super().deserialize(cstruct)
         search_query = {}
-        if appstruct:
+        if appstruct:  # pragma: no branch
             search_query['root'] = self.bindings['context']
-        if 'depth' in appstruct:
+        if 'depth' in appstruct:  # pragma: no branch
             depth = appstruct['depth']
             if depth == 100:
                 depth = None
