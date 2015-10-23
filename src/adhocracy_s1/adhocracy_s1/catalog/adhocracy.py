@@ -1,4 +1,4 @@
-""" Adhocracy catalog extensions."""
+"""Adhocracy catalog extensions."""
 from datetime import datetime
 from substanced.catalog import Field
 from pyramid.traversal import find_interface
@@ -11,7 +11,6 @@ from adhocracy_s1.resources.s1 import IProposalVersion
 
 
 class S1CatalogIndexes(AdhocracyCatalogIndexes):
-
     """S1 indexes for the adhocracy catalog."""
 
     decision_date = Field()

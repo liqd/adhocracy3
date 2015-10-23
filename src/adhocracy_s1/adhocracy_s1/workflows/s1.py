@@ -5,7 +5,7 @@ from datetime import datetime
 from pytz import UTC
 from pyramid.request import Request
 from pyrsistent import freeze
-from substanced.util  import find_service
+from substanced.util import find_service
 from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import search_query
@@ -33,7 +33,7 @@ def do_transition_to_result(context: IPool, request: Request, **kwargs):
     decision_date = datetime.utcnow().replace(tzinfo=UTC)
     _store_state_data(context, 'result', request, start_date=decision_date)
     _change_children_to_rejected_or_selected(context, request,
-                                              start_date=decision_date)
+                                             start_date=decision_date)
 
 
 def _change_children_to_rejected_or_selected(context: IPool, request: Request,
@@ -44,7 +44,7 @@ def _change_children_to_rejected_or_selected(context: IPool, request: Request,
     Save decision_date in state assignment data.
     """
     rated_children = _get_children_sort_by_rates(context)
-    for pos,child in enumerate(rated_children):
+    for pos, child in enumerate(rated_children):
         if pos == 0:
             _do_transition(child, request, from_state='voteable',
                            to_state='selected', start_date=start_date)

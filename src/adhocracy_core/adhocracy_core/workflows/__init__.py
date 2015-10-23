@@ -18,7 +18,6 @@ from adhocracy_core.workflows.schemas import create_workflow_meta_schema
 
 
 class ISample(Interface):
-
     """Sample workflow."""
 
 
@@ -27,7 +26,6 @@ deprecated('ISample', 'Backward compatible code, remove after migration')
 
 @implementer(IAdhocracyWorkflow)
 class AdhocracyACLWorkflow(ACLWorkflow):
-
     """Workflow that sets the :term:`acl` when entering a State."""
 
     def get_next_states(self, context, request: IRequest) -> list:

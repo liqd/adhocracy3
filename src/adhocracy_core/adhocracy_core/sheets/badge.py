@@ -21,32 +21,26 @@ from adhocracy_core.utils import get_sheet_field
 
 
 class IBadge(ISheet):
-
     """Marker interface for badge data sheet."""
 
 
 class IHasBadgesPool(ISheet):
-
     """Marker interface for resources that have a badge datas pool."""
 
 
 class ICanBadge(ISheet):
-
     """Marker interface for principals that can assign badges."""
 
 
 class IBadgeable(ISheet):
-
     """Marker interface for resources that can be badged."""
 
 
 class IBadgeAssignment(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for the badge assignment sheet."""
 
 
 class BadgeReference(SheetToSheet):
-
     """Reference from badge to badge data resource."""
 
     source_isheet = IBadgeAssignment
@@ -55,7 +49,6 @@ class BadgeReference(SheetToSheet):
 
 
 class BadgeSubjectReference(SheetToSheet):
-
     """Reference from badge to assigning user."""
 
     source_isheet = IBadgeAssignment
@@ -64,7 +57,6 @@ class BadgeSubjectReference(SheetToSheet):
 
 
 class BadgeObjectReference(SheetToSheet):
-
     """Reference from badge to badged content."""
 
     source_isheet = IBadgeAssignment
@@ -73,7 +65,6 @@ class BadgeObjectReference(SheetToSheet):
 
 
 class BadgeGroupReference(SheetToSheet):
-
     """Reference from badge to badge group."""
 
     source_isheet = IBadge
@@ -99,7 +90,6 @@ def deferred_groups_default(node: colander.SchemaNode, kw: dict) -> []:
 
 
 class BadgeSchema(colander.MappingSchema):
-
     """Badge sheet data structure."""
 
     groups = UniqueReferences(reftype=BadgeGroupReference,
@@ -114,7 +104,6 @@ badge_meta = sheet_meta._replace(isheet=IBadge,
 
 
 class HasBadgesPoolSchema(colander.MappingSchema):
-
     """Data structure pointing to a badges post pool."""
 
     badges_pool = PostPool(iresource_or_service_name='badges')
@@ -129,7 +118,6 @@ has_badges_pool_meta = sheet_meta._replace(
 
 
 class CanBadgeSchema(colander.MappingSchema):
-
     """CanBadge sheet data structure."""
 
 
@@ -142,7 +130,6 @@ can_badge_meta = sheet_meta._replace(
 
 
 class BadgeableSchema(colander.MappingSchema):
-
     """Badgeable sheet data structure.
 
     `post_pool`: Pool to post new
@@ -197,7 +184,6 @@ def create_unique_badge_assignment_validator(badge_ref: Reference,
 
 
 class BadgeAssignmentSchema(colander.MappingSchema):
-
     """Badge sheet data structure."""
 
     subject = Reference(reftype=BadgeSubjectReference)

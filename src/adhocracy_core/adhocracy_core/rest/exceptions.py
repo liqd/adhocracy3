@@ -30,7 +30,6 @@ error_entry = namedtuple('ErrorEntry', ['location', 'name', 'description'])
 
 
 class JSONHTTPClientError(HTTPClientError):
-
     """HTTPException with json body to describe the exception.
 
     :param:`errors`: error entries to generate the error description.
@@ -164,9 +163,9 @@ def _get_filtered_request_body(request) -> str:
 
 
 def _truncate(text: str, max_length: int) -> str:
-        if len(text) > max_length:
-            text = '{}...'.format(text[:max_length])
-        return text
+    if len(text) > max_length:
+        text = '{}...'.format(text[:max_length])
+    return text
 
 
 def get_json_body(request: Request) -> object:

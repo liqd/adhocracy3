@@ -12,7 +12,7 @@ def includeme(config):  # pragma: no cover
 
 
 def main(global_config, **settings):  # pragma: no cover
-    """ Return a Pyramid WSGI application. """
+    """Return a Pyramid WSGI application."""
     config = Configurator(settings=settings, root_factory=root_factory)
     includeme(config)
     return config.make_wsgi_app()

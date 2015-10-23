@@ -21,7 +21,6 @@ from adhocracy_core.interfaces import ISheet
          )
 @implementer(IIndex)
 class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
-
     """Use :func:`adhocracy_core.graph.Graph.get_source_ids` to query refs."""
 
     family = BTrees.family64

@@ -4,7 +4,6 @@ from adhocracy_core.resources import document_process
 
 
 class IProcess(document_process.IDocumentProcess):
-
     """Digital leben participation process."""
 
 

@@ -25,7 +25,6 @@ import adhocracy_core.sheets.title
 
 
 class IAssetDownload(ISimple):
-
     """Downloadable binary file for Assets."""
 
 
@@ -37,7 +36,6 @@ asset_download_meta = simple_meta._replace(
 
 
 class IAsset(ISimple):
-
     """A generic asset (binary file)."""
 
 
@@ -83,9 +81,9 @@ def _validate_mime_type(file: File,
 
 
 def _raise_mime_type_error(metadata_sheet: IAssetMetadata, msg: str):
-        raise_colander_style_error(metadata_sheet.meta.isheet,
-                                   'mime_type',
-                                   msg)
+    raise_colander_style_error(metadata_sheet.meta.isheet,
+                               'mime_type',
+                               msg)
 
 
 def _store_size_and_filename_as_metadata(file: File,
@@ -146,7 +144,6 @@ asset_meta = pool_meta._replace(
 
 
 class IAssetsService(IServicePool):
-
     """The 'assets' ServicePool."""
 
 
@@ -158,7 +155,6 @@ assets_service_meta = service_meta._replace(
 
 
 class IPoolWithAssets(IPool):
-
     """A pool with an auto-created asset service pool."""
 
 

@@ -30,7 +30,6 @@ logger = getLogger(__name__)
 
 @implementer(IResourceSheet)
 class BaseResourceSheet:
-
     """Basic Resource sheet to get/set resource appstruct data.
 
     Subclasses have to implement the `_data` property to store appstruct data.
@@ -240,7 +239,6 @@ class BaseResourceSheet:
 
 @implementer(IResourceSheet)
 class AnnotationRessourceSheet(BaseResourceSheet):
-
     """Resource Sheet that stores data in dictionary annotation."""
 
     def __init__(self, meta, context, registry=None):
@@ -278,7 +276,6 @@ class AnnotationRessourceSheet(BaseResourceSheet):
 
 @implementer(IResourceSheet)
 class AttributeResourceSheet(BaseResourceSheet):
-
     """Resource Sheet that stores data as context attributes."""
 
     def _get_data_appstruct(self) -> dict:

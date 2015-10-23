@@ -7,7 +7,6 @@ from adhocracy_core.resources.proposal import IProposal
 
 
 class IProcess(process.IProcess):
-
     """Stadtforum participation process."""
 
 process_meta = process.process_meta._replace(

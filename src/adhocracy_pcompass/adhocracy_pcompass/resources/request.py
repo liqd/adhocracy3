@@ -6,7 +6,6 @@ from adhocracy_core.resources.proposal import IProposal
 
 
 class IProcess(process.IProcess):
-
     """Policy Compass participation process."""
 
 process_meta = process.process_meta._replace(

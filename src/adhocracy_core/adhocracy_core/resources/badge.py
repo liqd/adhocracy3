@@ -17,7 +17,6 @@ import adhocracy_core.sheets.title
 
 
 class IBadge(ISimple):
-
     """A generic badge."""
 
 
@@ -32,7 +31,6 @@ badge_meta = simple_meta._replace(
 
 
 class IBadgeGroup(IPool):
-
     """A generic badge group pool."""
 
 
@@ -49,7 +47,6 @@ badge_group_meta = pool_meta._replace(
 
 
 class IBadgesService(IServicePool):
-
     """The 'badges' ServicePool."""
 
 
@@ -69,7 +66,6 @@ def add_badges_service(context: IPool, registry: Registry, options: dict):
 
 
 class IBadgeAssignment(ISimple):
-
     """A generic badge assignment."""
 
 
@@ -87,7 +83,6 @@ badge_assignment_meta = simple_meta._replace(
 
 
 class IBadgeAssignmentsService(IServicePool):
-
     """The 'badge_assignments' ServicePool."""
 
 

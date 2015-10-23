@@ -5,7 +5,6 @@ import string
 
 
 class AdhocracyExtensionTemplate(PyramidTemplate):
-
     """Basic python egg that extends adhocracy."""
 
     _template_dir = 'adhocracy'

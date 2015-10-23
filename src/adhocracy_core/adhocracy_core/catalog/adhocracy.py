@@ -26,14 +26,12 @@ from adhocracy_core.utils import find_graph
 
 
 class Reference(IndexFactory):
-
     """TODO: comment."""
 
     index_type = ReferenceIndex
 
 
 class AdhocracyCatalogIndexes:
-
     """Default indexes for the adhocracy catalog.
 
     Indexes starting with `private_` are private (not queryable from the

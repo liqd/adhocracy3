@@ -35,7 +35,6 @@ test_requires = [
     'polytester',
     'selenium',
     'webtest',
-    'pytest-splinter',
     'pytest-pyramid',
     'pytest-timeout',
     'coverage',

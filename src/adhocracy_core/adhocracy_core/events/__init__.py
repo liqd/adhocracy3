@@ -22,7 +22,6 @@ from adhocracy_core.interfaces import ISheetBackReferenceRemoved
 
 @implementer(IResourceCreatedAndAdded)
 class ResourceCreatedAndAdded:
-
     """An event type sent when a new IResource is created and added.
 
     :param object(adhocracy_core.interfaces.IResource):
@@ -41,7 +40,6 @@ class ResourceCreatedAndAdded:
 
 @implementer(IResourceSheetModified)
 class ResourceSheetModified:
-
     """An event type sent when a resource sheet is modified.
 
     :param object: adhocracy_core.interfaces.IResource
@@ -70,8 +68,7 @@ class ResourceSheetModified:
 
 @implementer(IItemVersionNewVersionAdded)
 class ItemVersionNewVersionAdded:
-
-    """ An event sent when a new IItemVersion is being added.
+    """An event sent when a new IItemVersion is being added.
 
     :param object(adhocracy_core.interfaces.IItem):
     :param new_version(adhocracy_core.interfaces.IItemVersion):
@@ -89,8 +86,7 @@ class ItemVersionNewVersionAdded:
 
 @implementer(ISheetReferenceNewVersion)
 class SheetReferenceNewVersion:
-
-    """ An event type sent when a referenced ItemVersion has a new follower.
+    """An event type sent when a referenced ItemVersion has a new follower.
 
     :param object(adhocracy_core.interfaces.IResource):
     :param isheet(adhocracy_core.interfaces.IISheet):
@@ -134,7 +130,6 @@ class SheetReferenceNewVersion:
 
 @implementer(ISheetBackReferenceRemoved)
 class SheetBackReferenceRemoved:
-
     """An event type sent when a back reference is removed."""
 
     def __init__(self,
@@ -157,7 +152,6 @@ class SheetBackReferenceRemoved:
 
 @implementer(ISheetBackReferenceAdded)
 class SheetBackReferenceAdded:
-
     """An event type sent when a back reference is added."""
 
     def __init__(self,
@@ -180,7 +174,6 @@ class SheetBackReferenceAdded:
 
 @implementer(ILocalRolesModfied)
 class LocalRolesModified:
-
     """An event type send when an resource`s :term:`local role` is modified."""
 
     def __init__(self, object, new_local_roles: dict, old_local_roles: dict,
@@ -193,7 +186,6 @@ class LocalRolesModified:
 
 
 class _ISheetPredicate:
-
     """Subscriber predicate  'isheet' to check event.isheet."""
 
     def __init__(self, isheet: IInterface, config):
@@ -212,7 +204,6 @@ class _ISheetPredicate:
 
 
 class _InterfacePredicate:
-
     """Subscriber predicate 'interface' to check interfaces of event.object."""
 
     def __init__(self, interface: IInterface, config):
@@ -230,7 +221,7 @@ class _InterfacePredicate:
 
 
 def includeme(config):
-    """ register event subscriber predicates 'isheet' and 'interface'."""
+    """register event subscriber predicates 'isheet' and 'interface'."""
     config.include('substanced.event')
     config.add_subscriber_predicate('event_isheet', _ISheetPredicate)
     config.add_subscriber_predicate('object_iface', _InterfacePredicate)

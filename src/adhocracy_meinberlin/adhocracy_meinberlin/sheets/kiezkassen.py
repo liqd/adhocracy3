@@ -13,12 +13,10 @@ from adhocracy_core.schema import Text
 
 
 class IProposal(ISheet):
-
     """Marker interface for the Kiezkassen proposal sheet."""
 
 
 class ProposalSchema(colander.MappingSchema):
-
     """Data structure for organizational information."""
 
     # TODO: check exact length restrictions
@@ -34,7 +32,6 @@ proposal_meta = sheet_meta._replace(isheet=IProposal,
 
 
 class IWorkflowAssignment(workflow.IWorkflowAssignment):
-
     """Marker interface for the kiezkassen workflow assignment sheet."""
 
 

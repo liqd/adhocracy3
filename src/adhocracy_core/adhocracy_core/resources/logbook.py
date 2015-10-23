@@ -9,7 +9,6 @@ from adhocracy_core.resources.document import IDocument
 
 
 class ILogbookService(IServicePool):
-
     """The 'logbook' ServicePool."""
 
 
