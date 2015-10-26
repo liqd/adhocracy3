@@ -26,7 +26,7 @@ def notify_policycompass(event):
 
     resource_name = get_sheet_field(external_resource, IName, 'name')
     match = re.match(
-        '(?P<type>visualization|event|dataset|metric|model|indicator)'
+        '(?P<type>visualization|event|dataset|metric|fuzzymap|indicator)'
         '_(?P<id>[0-9]+)',
         resource_name)
 
