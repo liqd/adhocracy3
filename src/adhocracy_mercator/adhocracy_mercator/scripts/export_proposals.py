@@ -40,21 +40,16 @@ from adhocracy_mercator.sheets.mercator import IExperience
 from adhocracy_mercator.sheets.mercator import ISteps
 
 
-def get_text_from_sheet(proposal, field, sheet):
-    """Get text from sheetfields and return it."""
-    retrieved_field = get_sheet_field(proposal, IMercatorSubResources, field)
-    field_text = get_sheet_field(
-        retrieved_field,
-        sheet,
-        field).replace(
-        ';',
-        '')
-    return field_text
-
-
 def normalize_text(s: str) -> str:
     """Normalize text to put it in CVS."""
     return s.replace(';', '')
+
+
+def get_text_from_sheet(proposal, field, sheet):
+    """Get text from sheetfields and return it."""
+    retrieved_field = get_sheet_field(proposal, IMercatorSubResources, field)
+    field_text = get_sheet_field(retrieved_field, sheet, field)
+    return normalize_text(field_text)
 
 
 def get_heard_from_text(heardfrom: dict) -> str:
