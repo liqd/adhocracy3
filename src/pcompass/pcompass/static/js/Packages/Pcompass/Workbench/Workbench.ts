@@ -86,7 +86,8 @@ export var proposalEditColumnDirective = (
 };
 
 export var processDetailColumnDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service
 ) => {
     return {
         restrict: "E",
@@ -94,6 +95,7 @@ export var processDetailColumnDirective = (
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl"]);
+            adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
             scope.contentType = RIProposalVersion.content_type;
         }
     };
