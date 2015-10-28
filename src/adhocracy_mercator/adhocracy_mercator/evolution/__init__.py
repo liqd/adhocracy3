@@ -38,6 +38,7 @@ def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
         & interfaces.eq(IMercatorProposalVersion) \
         & interfaces.noteq(ITitle)
     proposals = query.execute()
+    catalogs = find_service(root, 'catalogs')
     for proposal in proposals:
         logger.info('updating {0}'.format(proposal))
         introduction = get_sheet_field(proposal, IMercatorSubResources,
@@ -45,6 +46,7 @@ def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
         if introduction == '' or introduction is None:
             continue
         alsoProvides(proposal, ITitle)
+        catalogs.reindex_index(proposal, 'interfaces')
         sheet = registry.content.get_sheet(introduction, IIntroduction)
         if 'title' not in sheet.get().keys():
             continue

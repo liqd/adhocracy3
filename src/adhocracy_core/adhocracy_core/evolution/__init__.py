@@ -101,6 +101,7 @@ def migrate_new_sheet(context: IPool,
         if remove_isheet_old:
             logger.info('Remove {0} sheet'.format(isheet_old))
             noLongerProvides(resource, isheet_old)
+        catalogs.reindex_index(resource, 'interfaces')
 
 
 def migrate_new_iresource(context: IResource,
