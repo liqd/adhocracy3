@@ -25,7 +25,6 @@ _ = TranslationStringFactory('adhocracy')
 
 
 class Messenger:
-
     """Send messages to other people."""
 
     def __init__(self, registry: Registry):
@@ -164,7 +163,7 @@ class Messenger:
     def _get_user_name(self, user: IResource) -> str:
         return get_sheet_field(user, IUserBasic, 'name', self.registry)
 
-    def _get_user_url(self, user: IResource)-> str:
+    def _get_user_url(self, user: IResource) -> str:
         sender_path = resource_path(user)
         return '%s/r%s/' % (self.frontend_url, sender_path)
 

@@ -40,7 +40,6 @@ logger = getLogger(__name__)
 
 
 class IPrincipalsService(IServicePool):
-
     """Service Pool representing a collection of principals.
 
     If the object is created via
@@ -77,7 +76,6 @@ principals_meta = service_meta._replace(
 
 
 class IUser(IPool):
-
     """User resource.
 
     This inherits from IPool in order to allow to use this resource as a
@@ -96,7 +94,6 @@ class IUser(IPool):
 
 @implementer(IUser)
 class User(Pool):
-
     """User implementation.
 
     With attributes to be compatible with :class:`substanced.principals.User`
@@ -152,7 +149,6 @@ user_meta = pool_meta._replace(
 
 
 class IUsersService(IServicePool):
-
     """Service Pool for Users."""
 
 
@@ -166,13 +162,11 @@ users_meta = service_meta._replace(
 
 
 class IGroup(IPool):
-
     """Group for Users."""
 
 
 @implementer(IGroup)
 class Group(Pool):
-
     """Group implementation with roles attribute to improve performance."""
 
     def __init__(self, data=None, family=None):
@@ -192,7 +186,6 @@ group_meta = pool_meta._replace(
 
 
 class IGroupsService(IServicePool):
-
     """Pool for Groups."""
 
 
@@ -218,17 +211,15 @@ def hide(context: IResource, registry: Registry, options: dict):
 
 
 class IPasswordReset(IResource):
-
-    """ Resource to do one user password reset. """
+    """Resource to do one user password reset."""
 
 
 @implementer(IPasswordReset)
 class PasswordReset(Base):
-
-    """ Password reset implementation."""
+    """Password reset implementation."""
 
     def reset_password(self, password):
-        """ Set `password` for creator user and delete itself."""
+        """Set `password` for creator user and delete itself."""
         user = get_sheet_field(self, IMetadata, 'creator')
         password_sheet = get_sheet(
             user, adhocracy_core.sheets.principal.IPasswordAuthentication)
@@ -249,7 +240,6 @@ passwordreset_meta = resource_meta._replace(
 
 
 class IPasswordResetsService(IServicePool):
-
     """Service Pool for Password Resets."""
 
 
@@ -264,7 +254,6 @@ passwordresets_meta = service_meta._replace(
 
 @implementer(IRolesUserLocator)
 class UserLocatorAdapter(object):
-
     """Provides helper methods to find users."""
 
     def __init__(self, context, request):

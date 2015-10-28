@@ -108,7 +108,6 @@ image_download_meta = asset_download_meta._replace(
 
 
 class IImage(IAsset):
-
     """An image asset."""
 
 

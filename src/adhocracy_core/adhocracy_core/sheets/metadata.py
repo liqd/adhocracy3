@@ -22,12 +22,10 @@ logger = getLogger(__name__)
 
 
 class IMetadata(ISheet):
-
     """Market interface for the metadata sheet."""
 
 
 class MetadataCreatorsReference(SheetToSheet):
-
     """Metadata sheet creators reference."""
 
     source_isheet = IMetadata
@@ -36,7 +34,6 @@ class MetadataCreatorsReference(SheetToSheet):
 
 
 class MetadataModifiedByReference(SheetToSheet):
-
     """Points to the last person who modified a resource."""
 
     source_isheet = IMetadata
@@ -59,7 +56,6 @@ def deferred_validate_hidden(node, kw):
 
 
 class MetadataSchema(colander.MappingSchema):
-
     """Metadata sheet data structure.
 
     `creation_date`: Creation date of this resource. defaults to now.

@@ -11,8 +11,10 @@ from adhocracy_core.evolution import migrate_new_iresource
 from adhocracy_core.evolution import migrate_new_sheet
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.resources.badge import add_badge_assignments_service
+from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.resources.logbook import add_logbook_service
 from adhocracy_core.sheets.badge import IBadgeable
+from adhocracy_core.sheets.badge import IHasBadgesPool
 from adhocracy_core.sheets.logbook import IHasLogbookPool
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import get_sheet_field
@@ -36,6 +38,7 @@ def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
         & interfaces.eq(IMercatorProposalVersion) \
         & interfaces.noteq(ITitle)
     proposals = query.execute()
+    catalogs = find_service(root, 'catalogs')
     for proposal in proposals:
         logger.info('updating {0}'.format(proposal))
         introduction = get_sheet_field(proposal, IMercatorSubResources,
@@ -43,12 +46,14 @@ def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
         if introduction == '' or introduction is None:
             continue
         alsoProvides(proposal, ITitle)
-        if 'title' not in introduction._sheets[IIntroduction.__identifier__]:
+        catalogs.reindex_index(proposal, 'interfaces')
+        sheet = registry.content.get_sheet(introduction, IIntroduction)
+        if 'title' not in sheet.get().keys():
             continue
-        value = introduction._sheets[IIntroduction.__identifier__]['title']
+        value = sheet.get()['title']
         title = registry.content.get_sheet(proposal, ITitle)
         title.set({'title': value})
-        del introduction._sheets[IIntroduction.__identifier__]['title']
+        sheet.delete_field_values(['title'])
 
 
 def evolve2_disable_add_proposal_permission(root):  # pragma: no cover
@@ -141,6 +146,29 @@ def remove_mercator_workflow_assignment_sheet(root):  # pragma: no cover
                       )
 
 
+@log_migration
+def make_mercator_proposals_badgeable(root):  # pragma: no cover
+    """Add badge services processes and make mercator proposals badgeable."""
+    from adhocracy_core.evolution import _search_for_interfaces
+    from adhocracy_mercator.resources.mercator import IProcess
+    catalogs = find_service(root, 'catalogs')
+    proposals = _search_for_interfaces(catalogs, IMercatorProposal)
+    registry = get_current_registry(root)
+    for proposal in proposals:
+        if not IBadgeable.providedBy(proposal):
+            logger.info('add badgeable interface to {0}'.format(proposal))
+            alsoProvides(proposal, IBadgeable)
+        if 'badge_assignments' not in proposal:
+            logger.info('add badge assignments to {0}'.format(proposal))
+            add_badge_assignments_service(proposal, registry, {})
+    processes = _search_for_interfaces(catalogs, IProcess)
+    for process in processes:
+        if not IHasBadgesPool.providedBy(process):
+            logger.info('Add badges service to {0}'.format(process))
+            add_badges_service(process, registry, {})
+            alsoProvides(process, IHasBadgesPool)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(evolve1_add_ititle_sheet_to_proposals)
@@ -154,3 +182,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_logbook_service_to_proposal_items)
     config.add_evolution_step(add_haslogbookpool_sheet_to_proposal_versions)
     config.add_evolution_step(remove_mercator_workflow_assignment_sheet)
+    config.add_evolution_step(make_mercator_proposals_badgeable)

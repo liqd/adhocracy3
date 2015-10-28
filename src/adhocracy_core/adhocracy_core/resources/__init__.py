@@ -72,7 +72,6 @@ def add_resource_type_to_registry(metadata: ResourceMetadata,
 
 
 class ResourceFactory:
-
     """Basic resource factory."""
 
     name_identifier = IName.__identifier__

@@ -10,7 +10,6 @@ from adhocracy_core.resources.service import service_meta
 
 
 class IMultiPolygon(ISimple):
-
     """Geo location MultiPolygon.
 
     Polygons can store a large list of geo location points.
@@ -31,7 +30,6 @@ multipolygon_meta = simple_meta._replace(
 
 
 class ILocationsService(IServicePool):
-
     """The 'locations' ServicePool."""
 
 

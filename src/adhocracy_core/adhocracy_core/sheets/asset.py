@@ -17,12 +17,10 @@ from adhocracy_core.sheets import sheet_meta
 
 
 class IHasAssetPool(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for resources that have an asset pool."""
 
 
 class HasAssetPoolSchema(colander.MappingSchema):
-
     """Data structure pointing to an asset pool."""
 
     asset_pool = PostPool(iresource_or_service_name='assets')
@@ -37,19 +35,16 @@ has_asset_pool_meta = sheet_meta._replace(
 
 
 class IAssetMetadata(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for asset metadata."""
 
 
 class AssetReference(SheetToSheet):
-
     """Reference to an asset."""
 
     target_isheet = IAssetMetadata
 
 
 class AssetMetadataSchema(colander.MappingSchema):
-
     """Data structure storing asset metadata."""
 
     mime_type = SingleLine(missing=colander.required)
@@ -67,12 +62,10 @@ asset_metadata_meta = sheet_meta._replace(
 
 
 class IAssetData(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for the actual asset data."""
 
 
 class AssetDataSchema(colander.MappingSchema):
-
     """Data structure storing for the actual asset data."""
 
     data = FileStore(missing=colander.required)
@@ -86,7 +79,6 @@ asset_data_meta = sheet_meta._replace(
 
 
 class AssetFileDownload(Persistent):
-
     """Wrapper for a File object that allows downloading the asset data."""
 
 

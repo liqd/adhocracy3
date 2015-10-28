@@ -9,7 +9,6 @@ from adhocracy_core.utils import to_dotted_name
 
 @implementer(IResource)
 class Base(Persistent):
-
     """Persistent and location aware class."""
 
     __parent__ = None

@@ -28,6 +28,8 @@ def config_view(request):
                                            'http://localhost:6551')
     config['rest_platform_path'] = settings.get('adhocracy.rest_platform_path',
                                                 '/adhocracy/')
+    config['nettiquette_url'] = settings.get(
+        'adhocracy.frontend.nettiquette_url', '')
     config['pkg_path'] = settings.get('adhocracy.frontend.pkg_path',
                                       '/static/js/Packages')
     config['trusted_domains'] = aslist(
@@ -174,7 +176,7 @@ def add_frontend_route(config, name, pattern):
 
 
 def main(global_config, **settings):
-    """ Return a Pyramid WSGI application to serve the frontend application."""
+    """Return a Pyramid WSGI application to serve the frontend application."""
     config = Configurator(settings=settings)
     includeme(config)
     return config.make_wsgi_app()

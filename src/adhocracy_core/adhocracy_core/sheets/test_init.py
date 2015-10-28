@@ -327,6 +327,9 @@ class TestAnnotationRessourceSheet:
         inst.delete_field_values(['count'])
         assert not hasattr(inst.context, inst._annotation_key)
 
+    def test_delete_field_values_no_delete_key_if_key_absent(self, inst):
+        assert inst.delete_field_values(['count']) is None
+
     def test_set_with_other_sheet_name_conflicts(self, inst, sheet_meta,
                                                        context):
         from adhocracy_core.interfaces import ISheet

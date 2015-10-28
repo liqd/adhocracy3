@@ -54,7 +54,7 @@ compile python 3.4 and PIL ::
 
 install adhocracy ::
 
-    ./bin/python ./bootstrap.py -v 2.3.1 --setuptools-version=12.1
+    ./bin/python ./bootstrap.py --buildout-version 2.4.4 --setuptools-version=18.3.2
     ./bin/buildout
 
 update your shell environment::

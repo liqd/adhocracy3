@@ -11,7 +11,6 @@ import adhocracy_core.sheets.document
 
 
 class IParagraphVersion(IItemVersion):
-
     """Document paragraph (a leaf in the paragraph tree)."""
 
 
@@ -26,7 +25,6 @@ paragraphversion_meta = itemversion_meta._replace(
 
 
 class IParagraph(IItem):
-
     """Paragraph Versions Pool."""
 
 

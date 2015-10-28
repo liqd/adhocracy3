@@ -5,7 +5,6 @@ from adhocracy_core.sheets import workflow
 
 
 class IWorkflowAssignment(workflow.IWorkflowAssignment):
-
     """Marker interface for the digital leben workflow assignment sheet."""
 
 

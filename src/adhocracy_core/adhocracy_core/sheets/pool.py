@@ -16,7 +16,6 @@ from adhocracy_core.utils import remove_keys_from_dict
 
 
 class PoolSheet(AnnotationRessourceSheet):
-
     """Pool resource sheet that allows filtering and aggregating elements."""
 
     _additional_params = ('serialization_form', 'show_frequency', 'show_count')
@@ -139,12 +138,10 @@ class PoolSheet(AnnotationRessourceSheet):
 
 
 class IPool(ISheet):
-
     """Marker interface for the pool sheet."""
 
 
 class PoolElementsReference(SheetToSheet):
-
     """Pool sheet elements reference."""
 
     source_isheet = IPool
@@ -153,7 +150,6 @@ class PoolElementsReference(SheetToSheet):
 
 
 class PoolSchema(colander.MappingSchema):
-
     """Pool sheet data structure.
 
     `elements`: children of this resource (object hierarchy).

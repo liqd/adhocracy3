@@ -25,7 +25,6 @@ def namedtuple(typename, field_names, verbose=False, rename=False):
 
     Provide an _add method which concatenate elements to the value
     identified by the key.
-
     """
     def add(self, **kw):
         """Concat elements to the value identified by key."""
@@ -41,7 +40,6 @@ def namedtuple(typename, field_names, verbose=False, rename=False):
 
 
 class ISheet(Interface):
-
     """Marker interface for resources to enable a specific sheet type."""
 
 
@@ -61,7 +59,6 @@ class SheetMetadata(namedtuple('SheetMetadata',
                                 'creatable',
                                 'create_mandatory',
                                 ])):
-
     """Metadata to register a sheet type to set/get resource data.
 
     Generic fields:
@@ -94,7 +91,6 @@ class SheetMetadata(namedtuple('SheetMetadata',
 
 
 class ISheetReferenceAutoUpdateMarker(ISheet):
-
     """Sheet Interface to autoupdate sheets with references.
 
     If one referenced resource has a new version this sheet
@@ -104,7 +100,6 @@ class ISheetReferenceAutoUpdateMarker(ISheet):
 
 
 class IPostPoolSheet(ISheet):
-
     """Marker interfaces for sheets with :term:`post_pool` Attributes.
 
     This implies the sheet schema is a subtype of
@@ -117,7 +112,6 @@ deprecated('IPostPoolSheet', 'Not used anymore; kept for evolution scripts.')
 
 
 class IPredicateSheet(ISheet):
-
     """Marker interface for predicate sheets.
 
     A predicate sheet has outgoing references named `subject`
@@ -127,7 +121,6 @@ class IPredicateSheet(ISheet):
 
 
 class IResourceSheet(IPropertySheet):  # pragma: no cover
-
     """Sheet for resources to get/set the sheet data structure."""
 
     meta = Attribute('SheetMetadata')
@@ -138,7 +131,7 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
             send_event=True,
             request=None,
             omit_readonly=True) -> bool:
-        """ Store ``appstruct`` dictionary data.
+        """Store ``appstruct`` dictionary data.
 
         :param send_event: throw edit event.
         :param request: the current pyramid request for additional permission
@@ -147,7 +140,7 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
         """
 
     def get(params: dict={}, add_back_references=True) -> dict:
-        """ Get ``appstruct`` dictionary data.
+        """Get ``appstruct`` dictionary data.
 
         :param params: optional parameters that can modify the appearance
         of the returned dictionary. Valid keys/values are defined in
@@ -185,7 +178,6 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
                                    'workflow_name',
                                    'item_type',
                                    ])):
-
     """Metadata to register Resource Types.
 
     Basic fields:
@@ -239,28 +231,26 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
 
 
 class IResource(ILocation):
-
     """Basic resource type."""
 
 
 class IPool(IResource):  # pragma: no cover
-
-    """Resource with children - a folder in the object hierarchy. """
+    """Resource with children - a folder in the object hierarchy."""
 
     def keys() -> Iterable:
-        """ Return subobject names present in this pool."""
+        """Return subobject names present in this pool."""
 
     def __iter__() -> Iterable:
-        """ An alias for ``keys``."""
+        """An alias for ``keys``."""
 
     def values() -> Iterable:
-        """ Return subobjects present in this pool."""
+        """Return subobjects present in this pool."""
 
     def items() -> Iterable:
-        """ Return (name, value) pairs of subobjects in the folder."""
+        """Return (name, value) pairs of subobjects in the folder."""
 
     def get(name: str, default=None) -> object:
-        """ Get subobject by name.
+        """Get subobject by name.
 
         :raises substanced.folder.FolderKeyError: if `name` is not in this pool
         """
@@ -269,7 +259,7 @@ class IPool(IResource):  # pragma: no cover
         """Check if this pool contains an subobject named by name."""
 
     def add(name: str, other) -> str:
-        """ Add subobject other.
+        """Add subobject other.
 
         :returns: The name used to place the subobject in the
         folder (a derivation of ``name``, usually the result of
@@ -277,7 +267,7 @@ class IPool(IResource):  # pragma: no cover
         """
 
     def check_name(name: str) -> str:
-        """ Check that the passed name is valid.
+        """Check that the passed name is valid.
 
         :returns: The name.
         :raises substanced.folder.FolderKeyError:
@@ -295,7 +285,7 @@ class IPool(IResource):  # pragma: no cover
         """Add a term:`service` to this folder named `service_name`."""
 
     def find_service(service_name: str, *sub_service_names) -> IResource:
-        """ Return a :term:`service` named by `service_name`.
+        """Return a :term:`service` named by `service_name`.
 
         :param service_name: Search in this pool and his :term:`lineage` for a
                              service named `service_name`
@@ -313,32 +303,26 @@ class IPool(IResource):  # pragma: no cover
 
 
 class IServicePool(IPool, IService):
-
     """Pool serving as a :term:`service`."""
 
 
 class IItem(IPool):
-
-    """Pool for any versionable objects (DAG), tags and related Pools. """
+    """Pool for any versionable objects (DAG), tags and related Pools."""
 
 
 class ISimple(IResource):
-
     """Simple resource without versions and children."""
 
 
 class ITag(ISimple):
-
     """Tag to link specific versions."""
 
 
 class IItemVersion(IResource):
-
     """Versionable resource, created during a Participation Process."""
 
 
 class SheetReferenceClass(ReferenceClass):
-
     """Reference a source and target with a specific ISheet interface.
 
     Uses class attributes "target_*" and "source_*" to set tagged values.
@@ -374,17 +358,14 @@ SheetReference = SheetReferenceClass('SheetReference',
 
 
 class SheetToSheet(SheetReference):
-
     """Base type to reference resource ISheets."""
 
 
 class NewVersionToOldVersion(SheetReference):
-
     """Base type to reference an old ItemVersion."""
 
 
 class IResourceSheetModified(IObjectEvent):
-
     """An event type sent when a resource sheet is modified."""
 
     object = Attribute('The modified resource')
@@ -397,7 +378,6 @@ class IResourceSheetModified(IObjectEvent):
 
 
 class IResourceCreatedAndAdded(IObjectEvent):
-
     """An event type sent when a new IResource is created and added."""
 
     object = Attribute('The new resource')
@@ -407,7 +387,6 @@ class IResourceCreatedAndAdded(IObjectEvent):
 
 
 class IItemVersionNewVersionAdded(IObjectEvent):
-
     """An event type sent when a new ItemVersion is added."""
 
     object = Attribute('The old ItemVersion followed by the new one')
@@ -417,7 +396,6 @@ class IItemVersionNewVersionAdded(IObjectEvent):
 
 
 class ISheetReferenceNewVersion(IObjectEvent):
-
     """An event type sent when a referenced ItemVersion has a new follower."""
 
     object = Attribute('The resource referencing the outdated ItemVersion.')
@@ -436,7 +414,6 @@ class ISheetReferenceNewVersion(IObjectEvent):
 
 
 class ISheetBackReferenceModified(IObjectEvent):  # pragma: no cover
-
     """An event type sent when a sheet back reference was added/removed.
 
     See Subtypes for more detailed semantic.
@@ -449,17 +426,14 @@ class ISheetBackReferenceModified(IObjectEvent):  # pragma: no cover
 
 
 class ISheetBackReferenceAdded(ISheetBackReferenceModified):
-
     """An event type sent when a sheet back reference was added."""
 
 
 class ISheetBackReferenceRemoved(ISheetBackReferenceModified):
-
     """An event type sent when a sheet back reference was removed."""
 
 
 class ILocalRolesModfied(IObjectEvent):
-
     """An event type send when an resource`s :term:`local role` is modified."""
 
     object = Attribute('The resource being modified')
@@ -469,28 +443,26 @@ class ILocalRolesModfied(IObjectEvent):
 
 
 class ITokenManger(Interface):  # pragma: no cover
-
     """ITokenManger interface."""
 
     def create_token(userid: str) -> str:
-        """ Create authentication token for :term:`userid`."""
+        """Create authentication token for :term:`userid`."""
 
     def get_user_id(token: str) -> str:
-        """ Get :term:`userid` for authentication token.
+        """Get :term:`userid` for authentication token.
 
         :returns: user id for this token
         :raises KeyError: if there is no corresponding `userid`
         """
 
     def delete_token(token: str):
-        """ Delete authentication token."""
+        """Delete authentication token."""
 
     def delete_expired_tokens(timeout: float):
-        """ Delete expired authentication tokens."""
+        """Delete expired authentication tokens."""
 
 
 class VisibilityChange(Enum):
-
     """Track changes in the visibility of a resource."""
 
     visible = 1
@@ -515,7 +487,6 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
                                     'changed_descendants',
                                     'changed_backrefs',
                                     'visibility'])):
-
     """Metadata to track modified resources during one transaction.
 
     Fields:
@@ -546,7 +517,6 @@ class AuditlogEntry(namedtuple('AuditlogEntry', ['name',
                                                  'resource_path',
                                                  'user_name',
                                                  'user_path'])):
-
     """Metadata to log which user modifies resources.
 
     Fields:
@@ -564,7 +534,6 @@ class AuditlogEntry(namedtuple('AuditlogEntry', ['name',
 
 
 class AuditlogAction(Enum):
-
     """Name of the Resource modification action."""
 
     created = 'created'
@@ -587,19 +556,16 @@ search_result = SearchResult(elements=[],
 
 
 class Comparator(Enum):
-
     """Comparators for search query parameters."""
 
 
 class ReferenceComparator(Comparator):
-
     """Comparators for :class:`adhocracy_core.catalog.index.ReferenceIndex`."""
 
     eq = 'eq'
 
 
 class FieldComparator(Comparator):
-
     """Comparators for :class:`hypatia.field.FieldIndex` search index."""
 
     eq = 'eq'
@@ -611,7 +577,6 @@ class FieldComparator(Comparator):
 
 
 class FieldSequenceComparator(Comparator):
-
     """Comparators for :class:`hypatia.field.FieldIndex` search index.
 
     These comparators need to be combined with a sequence of index values.
@@ -622,7 +587,6 @@ class FieldSequenceComparator(Comparator):
 
 
 class KeywordComparator(Comparator):
-
     """Comparators for :class:`hypatia.keyword.KeywordIndex` search index."""
 
     eq = 'eq'
@@ -630,7 +594,6 @@ class KeywordComparator(Comparator):
 
 
 class KeywordSequenceComparator(Comparator):
-
     """Comparators for :class:`hypatia.keyword.KeywordIndex` search index.
 
     These comparators need to be combined with a sequence of index values.
@@ -655,7 +618,6 @@ class SearchQuery(namedtuple('Query', ['interfaces',
                                        'frequency_of',
                                        'group_by',
                                        ])):
-
     """Query parameters to search resources.
 
     Search resources:
@@ -729,7 +691,6 @@ search_query = SearchQuery(interfaces=(),
 
 
 class IRolesUserLocator(IUserLocator):  # pragma: no cover
-
     """Adapter responsible for returning a user or get info about it."""
 
     def get_roleids(userid: str) -> list:
@@ -753,7 +714,6 @@ class IRolesUserLocator(IUserLocator):  # pragma: no cover
 
 
 class IRoleACLAuthorizationPolicy(IAuthorizationPolicy):  # pragma: no cover
-
     """A :term:`authorization policy` supporting rule based permissions."""
 
     group_prefix = Attribute('Prefix to generate the :term:`groupid`')
@@ -773,7 +733,6 @@ class IRoleACLAuthorizationPolicy(IAuthorizationPolicy):  # pragma: no cover
 
 
 class IRateValidator(Interface):  # pragma: no cover
-
     """Adapter responsible for validating rates about rateables."""
 
     def validate(self, rate: int) -> bool:
@@ -784,7 +743,6 @@ class IRateValidator(Interface):  # pragma: no cover
 
 
 class Reference(namedtuple('Reference', 'source isheet field target')):
-
     """Reference between two resources.
 
     Fields:
@@ -802,7 +760,6 @@ class Reference(namedtuple('Reference', 'source isheet field target')):
 
 
 class HTTPCacheMode(Enum):
-
     """Caching Mode for :class:`IHTTPCacheStrategy`s.
 
     You can change the mode in you pyramid ini file with the
@@ -825,7 +782,6 @@ class HTTPCacheMode(Enum):
 
 
 class IHTTPCacheStrategy(Interface):  # pragma: no cover
-
     """Strategy to set http cache headers."""
 
     def set_cache_headers_for_mode(mode: HTTPCacheMode):
@@ -836,7 +792,6 @@ class IHTTPCacheStrategy(Interface):  # pragma: no cover
 
 
 class IAdhocracyWorkflow(IWorkflow):  # pragma: no cover
-
     """IAdhocracyWorkflow interface."""
 
     def get_next_states(context, request: IRequest) -> [str]:

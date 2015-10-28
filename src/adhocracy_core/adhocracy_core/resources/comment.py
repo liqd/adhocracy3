@@ -16,7 +16,6 @@ import adhocracy_core.sheets.relation
 
 
 class ICommentVersion(IItemVersion):
-
     """A comment in a discussion."""
 
 
@@ -33,7 +32,6 @@ commentversion_meta = itemversion_meta._replace(
 
 
 class IComment(IItem):
-
     """Comment versions pool."""
 
 
@@ -50,7 +48,6 @@ comment_meta = item_meta._replace(
 
 
 class ICommentsService(IServicePool):
-
     """The 'comments' ServicePool."""
 
 

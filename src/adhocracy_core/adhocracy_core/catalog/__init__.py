@@ -24,7 +24,6 @@ from adhocracy_core.utils import normalize_to_tuple
 
 
 class ICatalogsService(IServicePool):
-
     """The 'catalogs' ServicePool."""
 
 

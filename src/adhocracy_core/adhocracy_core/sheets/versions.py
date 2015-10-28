@@ -15,12 +15,10 @@ from adhocracy_core.utils import is_batchmode
 
 
 class IVersionable(ISheet):
-
     """Maker interface for resources with the versionable sheet."""
 
 
 class VersionableFollowsReference(NewVersionToOldVersion):
-
     """versionable sheet reference to preceding versions."""
 
     source_isheet = IVersionable
@@ -62,12 +60,12 @@ def validate_linear_history_no_fork(node: colander.SchemaNode, value: list):
 
 def _assert_follows_eq_last_version(node: colander.SchemaNode, value: list,
                                     last: object):
-        follows = value[0]
-        if follows is not last:
-            last_path = resource_path(last)
-            msg = 'No fork allowed - valid follows resources are: {0}'
-            msg = msg.format(str(last_path))
-            raise colander.Invalid(node, msg, value=value)
+    follows = value[0]
+    if follows is not last:
+        last_path = resource_path(last)
+        msg = 'No fork allowed - valid follows resources are: {0}'
+        msg = msg.format(str(last_path))
+        raise colander.Invalid(node, msg, value=value)
 
 
 @colander.deferred
@@ -80,8 +78,7 @@ def deferred_validate_follows(node: colander.SchemaNode, kw: dict) -> callable:
 
 
 class VersionableSchema(colander.MappingSchema):
-
-    """ Versionable sheet data structure.
+    """Versionable sheet data structure.
 
     Set/get predecessor (`follows`) and get successor (`followed_by`) versions
     of this resource.
@@ -101,7 +98,6 @@ versionable_meta = sheet_meta._replace(
 
 
 class IForkableVersionable(IVersionable):
-
     """Maker interface for resources that support forking.
 
     This means that the multiple heads are allowed (the LAST tag can point
@@ -115,13 +111,11 @@ forkable_versionable_meta = versionable_meta._replace(
 
 
 class IVersions(ISheet):
-
     """Marker interface for the versions sheet."""
 
 
 class IVersionsElementsReference(SheetToSheet):
-
-    """version sheet elements reference."""
+    """Version sheet elements reference."""
 
     source_isheet = IVersions
     source_isheet_field = 'elements'
@@ -129,7 +123,6 @@ class IVersionsElementsReference(SheetToSheet):
 
 
 class VersionsSchema(colander.MappingSchema):
-
     """Versions sheet data structure.
 
     `elements`: Dag for collecting all versions of one item.

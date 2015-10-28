@@ -21,17 +21,17 @@ def notify_policycompass(event):
     comment = event.object
     external_resource = find_interface(comment, IExternalResource)
 
-    if external_resource is None:
+    if external_resource is None:  # pragma: no cover
         return
 
     resource_name = get_sheet_field(external_resource, IName, 'name')
     match = re.match(
-        '(?P<type>visualization|event|dataset|metric|model|indicator)'
+        '(?P<type>visualization|event|dataset|metric|fuzzymap|indicator)'
         '_(?P<id>[0-9]+)',
         resource_name)
 
     # this is not a known policycompass external resource
-    if match is None:
+    if match is None:  # pragma: no cover
         return
 
     resource_type = match.group('type')

@@ -7,7 +7,6 @@ from adhocracy_core.sheets.logbook import IHasLogbookPool
 
 
 class IProcess(process.IProcess):
-
     """S1 participation process."""
 
 
@@ -18,7 +17,6 @@ process_meta = process.process_meta._replace(
 
 
 class IProposalVersion(proposal.IProposalVersion):
-
     """S1 participation process content version."""
 
 
@@ -29,7 +27,6 @@ proposal_version_meta = proposal.proposal_version_meta\
 
 
 class IProposal(proposal.IProposal):
-
     """S1 participation process content."""
 
 

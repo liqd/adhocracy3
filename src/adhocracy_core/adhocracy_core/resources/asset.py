@@ -27,7 +27,6 @@ import adhocracy_core.sheets.title
 
 
 class IAssetDownload(IResource):
-
     """Downloadable binary file for Assets."""
 
 
@@ -58,7 +57,6 @@ asset_download_meta = resource_meta._replace(
 
 
 class IAsset(ISimple):
-
     """A generic asset (binary file)."""
 
 
@@ -93,7 +91,6 @@ asset_meta = pool_meta._replace(
 
 
 class IAssetsService(IServicePool):
-
     """The 'assets' ServicePool."""
 
 
@@ -105,7 +102,6 @@ assets_service_meta = service_meta._replace(
 
 
 class IPoolWithAssets(IPool):
-
     """A pool with an auto-created asset service pool."""
 
 

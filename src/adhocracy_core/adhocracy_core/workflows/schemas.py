@@ -13,7 +13,6 @@ from adhocracy_core.schema import Roles
 
 
 class WorkflowCallback(SchemaNode):
-
     """Callable executed if this transition is called or state is entered.
 
     It needs to provide the following signature::
@@ -39,7 +38,6 @@ class WorkflowCallback(SchemaNode):
 
 
 class TransitionMeta(MappingSchema):
-
     """Workflow transition to state."""
 
     callback = WorkflowCallback()
@@ -50,7 +48,6 @@ class TransitionMeta(MappingSchema):
 
 
 class StateMeta(MappingSchema):
-
     """Workflow state."""
 
     title = SingleLine(missing='')
@@ -61,7 +58,6 @@ class StateMeta(MappingSchema):
 
 
 class WorkflowMeta(MappingSchema):
-
     """Data structure to define a workflow (finite state machine)."""
 
     initial_state = SingleLine(missing=required)

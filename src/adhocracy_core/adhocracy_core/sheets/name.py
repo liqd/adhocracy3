@@ -8,12 +8,10 @@ from adhocracy_core.schema import Name
 
 
 class IName(ISheet):
-
     """Market interface for the name sheet."""
 
 
 class NameSchema(colander.MappingSchema):
-
     """Name sheet data structure.
 
     `name`: a human readable resource Identifier

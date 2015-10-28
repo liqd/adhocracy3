@@ -1,6 +1,15 @@
 <form data-ng-submit="submit()">
-    <textarea data-ng-model="remark" data-msd-elastic="">
+    <textarea
+        data-ng-model="remark"
+        data-msd-elastic=""
+        placeholder="{{ 'TR__REPORT_PLACEHOLDER' | translate }}"
+        rows="4"
+        class="report-abuse-textarea">
     </textarea>
+    <p data-adh-html-translate="TR__REPORT_HELP" data-translate-templates="{
+        link: '&lt;a data-ng-click=&quot;cancel()&quot; href=&quot;&quot;&gt;{{ content }}&lt;/a&gt;',
+        linkNettiquette: '&lt;a href=&quot;\\{\\{ nettiquette_url \\}\\}&quot; target=&quot;_new&quot;&gt;{{ content }}&lt;/a&gt;'
+    }"></p>
     <footer class="form-footer">
         <input
             type="submit"

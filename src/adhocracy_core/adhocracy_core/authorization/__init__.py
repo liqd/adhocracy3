@@ -30,7 +30,6 @@ god_all_permission_ace = (Allow, 'role:god', ALL_PERMISSIONS)
 
 @implementer(IRoleACLAuthorizationPolicy)
 class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
-
     """A :term:`authorization policy` supporting :term:`local role`.
 
     You can get/set local role mapping for an resource with

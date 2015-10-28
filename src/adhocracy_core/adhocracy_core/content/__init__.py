@@ -23,7 +23,6 @@ resolver = DottedNameResolver()
 
 
 class ResourceContentRegistry(ContentRegistry):
-
     """Extend substanced content registry to work with resources."""
 
     def __init__(self, registry):

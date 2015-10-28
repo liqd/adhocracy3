@@ -23,7 +23,6 @@ from adhocracy_core.interfaces import IResourceSheet
 
 
 class Workflow(AdhocracySchemaNode):
-
     """Workflow :class:`adhocracy_core.interfaces.IWorkflow`.
 
     This schema node is readonly. The value is given by the node binding
@@ -38,7 +37,7 @@ class Workflow(AdhocracySchemaNode):
         return kw.get('workflow', None)
 
     def serialize(self, appstruct=null):
-        """ Serialize the :term:`appstruct` to a :term:`cstruct`."""
+        """Serialize the :term:`appstruct` to a :term:`cstruct`."""
         workflow = self.bindings['workflow']
         if workflow is None:
             return ''
@@ -46,7 +45,6 @@ class Workflow(AdhocracySchemaNode):
 
 
 class State(SingleLine):
-
     """Workflow state of `context` of the given `workflow` binding."""
 
     missing = drop
@@ -82,7 +80,6 @@ class State(SingleLine):
 
 
 class StateName(SingleLine):
-
     """Workflow state name.
 
     Possible values are set by the given `workflow` binding.
@@ -103,7 +100,6 @@ class StateName(SingleLine):
 
 
 class StateData(MappingSchema):
-
     """Resource specific data for a workflow state."""
 
     missing = drop
@@ -117,12 +113,12 @@ class StateData(MappingSchema):
 
 
 class StateDataList(AdhocracySequenceNode):
+    """List of StateData."""
 
     data = StateData()
 
 
 class WorkflowAssignmentSchema(MappingSchema):
-
     """Workflow assignment sheet data structure."""
 
     workflow = Workflow(missing=drop)
@@ -148,13 +144,11 @@ class WorkflowAssignmentSchema(MappingSchema):
 
 
 class IWorkflowAssignment(ISheet):
-
     """Market interface for the workflow assignment sheet."""
 
 
 @implementer(IResourceSheet)
 class WorkflowAssignmentSheet(AnnotationRessourceSheet):
-
     """Sheet class for workflow assignment sheets.
 
     It allows to view and modifiy the workflow state of `context`.

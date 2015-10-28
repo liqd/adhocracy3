@@ -23,6 +23,7 @@ class ConfigViewTest(unittest.TestCase):
              'support_email': 'support@unconfigured.domain',
              'locale': 'en',
              'site_name': 'Adhocracy',
+             'nettiquette_url': '',
              'canonical_url': 'http://localhost:6551',
              'custom': {},
              'debug': False,

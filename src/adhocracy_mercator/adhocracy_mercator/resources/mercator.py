@@ -12,6 +12,7 @@ from adhocracy_core.resources.rate import add_ratesservice
 from adhocracy_core.resources.logbook import add_logbook_service
 from adhocracy_core.resources import process
 from adhocracy_core.sheets.rate import ILikeable
+from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.sheets.logbook import IHasLogbookPool
 
@@ -20,7 +21,6 @@ import adhocracy_mercator.sheets.mercator
 
 
 class IOrganizationInfoVersion(IItemVersion):
-
     """One of the mercator commentable subresources."""
 
 
@@ -35,7 +35,6 @@ organization_info_version_meta = itemversion_meta._replace(
 
 
 class IOrganizationInfo(IItem):
-
     """One of the mercator commentable subresources version pool."""
 
 
@@ -51,7 +50,6 @@ organization_info_meta = item_meta._replace(
 
 
 class IIntroImage(IImage):
-
     """Image attached to the introduction of a proposal."""
 
 
@@ -64,7 +62,6 @@ intro_image_meta = asset_meta._replace(
 
 
 class IIntroductionVersion(IItemVersion):
-
     """One of the mercator commentable subresources."""
 
 
@@ -79,7 +76,6 @@ introduction_version_meta = itemversion_meta._replace(
 
 
 class IIntroduction(IItem):
-
     """One of the mercator commentable subresources version pool."""
 
 
@@ -95,7 +91,6 @@ introduction_meta = item_meta._replace(
 
 
 class IDescriptionVersion(IItemVersion):
-
     """One of the mercator commentable subresources."""
 
 
@@ -110,7 +105,6 @@ description_version_meta = itemversion_meta._replace(
 
 
 class IDescription(IItem):
-
     """One of the mercator commentable subresources version pool."""
 
 
@@ -126,7 +120,6 @@ description_meta = item_meta._replace(
 
 
 class ILocationVersion(IItemVersion):
-
     """One of the mercator commentable subresources."""
 
 
@@ -141,7 +134,6 @@ location_version_meta = itemversion_meta._replace(
 
 
 class ILocation(IItem):
-
     """One of the mercator commentable subresources version pool."""
 
 
@@ -157,7 +149,6 @@ location_meta = item_meta._replace(
 
 
 class IStoryVersion(IItemVersion):
-
     """One of the mercator commentable subresources."""
 
 
@@ -172,7 +163,6 @@ story_version_meta = itemversion_meta._replace(
 
 
 class IStory(IItem):
-
     """One of the mercator commentable subresources version pool."""
 
 
@@ -188,7 +178,6 @@ story_meta = item_meta._replace(
 
 
 class IOutcomeVersion(IItemVersion):
-
     """One of the mercator commentable subresources."""
 
 
@@ -203,7 +192,6 @@ outcome_version_meta = itemversion_meta._replace(
 
 
 class IOutcome(IItem):
-
     """One of the mercator commentable subresources version pool."""
 
 
@@ -219,7 +207,6 @@ outcome_meta = item_meta._replace(
 
 
 class IStepsVersion(IItemVersion):
-
     """One of the mercator commentable subresources."""
 
 
@@ -234,7 +221,6 @@ steps_version_meta = itemversion_meta._replace(
 
 
 class ISteps(IItem):
-
     """One of the mercator commentable subresources version pool."""
 
 
@@ -250,7 +236,6 @@ steps_meta = item_meta._replace(
 
 
 class IValueVersion(IItemVersion):
-
     """One of the mercator commentable subresources."""
 
 
@@ -265,7 +250,6 @@ value_version_meta = itemversion_meta._replace(
 
 
 class IValue(IItem):
-
     """One of the mercator commentable subresources version pool."""
 
 
@@ -281,7 +265,6 @@ value_meta = item_meta._replace(
 
 
 class IPartnersVersion(IItemVersion):
-
     """One of the mercator commentable subresources."""
 
 
@@ -296,7 +279,6 @@ partners_version_meta = itemversion_meta._replace(
 
 
 class IPartners(IItem):
-
     """One of the mercator commentable subresources version pool."""
 
 
@@ -311,7 +293,6 @@ partners_meta = item_meta._replace(
 
 
 class IFinanceVersion(IItemVersion):
-
     """One of the mercator commentable subresources."""
 
 
@@ -326,7 +307,6 @@ finance_version_meta = itemversion_meta._replace(
 
 
 class IFinance(IItem):
-
     """One of the mercator commentable subresources version pool."""
 
 
@@ -341,7 +321,6 @@ finance_meta = item_meta._replace(
 
 
 class IExperienceVersion(IItemVersion):
-
     """One of the mercator commentable subresources."""
 
 
@@ -356,7 +335,6 @@ experience_version_meta = itemversion_meta._replace(
 
 
 class IExperience(IItem):
-
     """One of the mercator commentable subresources version pool."""
 
 
@@ -371,7 +349,6 @@ experience_meta = item_meta._replace(
 
 
 class IMercatorProposalVersion(IItemVersion):
-
     """A Mercator proposal."""
 
 
@@ -392,7 +369,6 @@ mercator_proposal_version_meta = itemversion_meta._replace(
 
 
 class IMercatorProposal(IItem):
-
     """Mercator proposal versions pool."""
 
 
@@ -412,6 +388,8 @@ mercator_proposal_meta = item_meta._replace(
                    IFinance,
                    IExperience,
                    ),
+    extended_sheets=(IBadgeable,
+                     ),
     item_type=IMercatorProposalVersion,
     is_implicit_addable=True,
     permission_create='create_mercator_proposal',
@@ -423,7 +401,6 @@ mercator_proposal_meta = item_meta._replace(
 
 
 class IProcess(process.IProcess):
-
     """Mercator participation process."""
 
 

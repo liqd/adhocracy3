@@ -18,7 +18,6 @@ from adhocracy_core.sheets.relation import IPolarizable
 
 
 class IProposalVersion(IItemVersion):
-
     """Proposal version."""
 
 proposal_version_meta = itemversion_meta._replace(
@@ -36,7 +35,6 @@ proposal_version_meta = itemversion_meta._replace(
 
 
 class IProposal(IItem):
-
     """Proposal versions pool."""
 
 proposal_meta = item_meta._replace(
@@ -58,7 +56,6 @@ proposal_meta = item_meta._replace(
 
 
 class IGeoProposalVersion(IProposalVersion):
-
     """Geolocalisable proposal version."""
 
 
@@ -68,7 +65,6 @@ geo_proposal_version_meta = proposal_version_meta._replace(
 
 
 class IGeoProposal(IProposal):
-
     """Geolocalisable proposal versions pool."""
 
 geo_proposal_meta = proposal_meta._replace(
