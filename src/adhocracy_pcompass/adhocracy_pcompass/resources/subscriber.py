@@ -4,22 +4,19 @@ import re
 import requests
 import logging
 
-from pyramid.traversal import find_interface
-
-from adhocracy_core.interfaces import IResourceCreatedAndAdded
-from adhocracy_core.interfaces import IResourceSheetModified
-from adhocracy_core.resources.comment import IComment
+from adhocracy_core.interfaces import ISheetBackReferenceAdded
+from adhocracy_core.interfaces import ISheetBackReferenceModified
 from adhocracy_core.resources.external_resource import IExternalResource
 from adhocracy_core.sheets.name import IName
+from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.utils import get_sheet_field
 
 log = logging.getLogger(__name__)
 
 
-def notify_policycompass(event):
-    """Push comments of IExternalResource ressources to elastic search."""
-    comment = event.object
-    external_resource = find_interface(comment, IExternalResource)
+def notify_policy_compass(event):
+    """Send notification to policy compass to reindex an external resource."""
+    external_resource = event.object
 
     if external_resource is None:  # pragma: no cover
         return
@@ -54,9 +51,11 @@ def notify_policycompass(event):
 
 def includeme(config):
     """Register subscribers."""
-    config.add_subscriber(notify_policycompass,
-                          IResourceCreatedAndAdded,
-                          object_iface=IComment)
-    config.add_subscriber(notify_policycompass,
-                          IResourceSheetModified,
-                          object_iface=IComment)
+    config.add_subscriber(notify_policy_compass,
+                          ISheetBackReferenceModified,
+                          object_iface=IExternalResource,
+                          event_isheet=ICommentable)
+    config.add_subscriber(notify_policy_compass,
+                          ISheetBackReferenceAdded,
+                          object_iface=IExternalResource,
+                          event_isheet=ICommentable)
