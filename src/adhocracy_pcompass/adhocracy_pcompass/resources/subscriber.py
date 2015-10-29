@@ -33,9 +33,9 @@ def _get_index_endpoint(context: IExternalResource, settings: dict) -> str:
         '_(?P<id>[0-9]+)',
         resource_name)
 
-    # this is not a known policycompass external resource
     if match is None:  # pragma: no cover
-        return ''
+        msg = 'This is not a known policy compass resource type'
+        raise ValueError(msg)
 
     resource_type = match.group('type')
     resource_id = match.group('id')
