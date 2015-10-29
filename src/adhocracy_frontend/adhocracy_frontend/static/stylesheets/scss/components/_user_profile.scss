@@ -59,14 +59,27 @@
 }
 
 .user-activity-overview {
+    @include box-sizing(border-box);
     width: 100%;
-    border-top: 1px solid LightGray;
-    border-bottom: 1px solid LightGray;
-    
-    // td directives ordered this way to ensure rendering with
-    // less than three items will remove them in the order middle, last, first
-    td { text-align: center; }
-    td:last-child { text-align: right; }
-    td:first-child { text-align: left; }
-    
+    padding-left: 12px; // is there a variable for this width? --MH
+    padding-right: 12px;
+
+    .wrapper {
+        display: table;
+        width: 100%;
+
+        border-top: 1px solid $color-structure-normal;
+        border-bottom: 1px solid $color-structure-normal;
+        color: $color-brand-one-normal;
+
+        // directives ordered this way to ensure rendering with
+        // less than three items will remove them in the order: middle, last, first
+        > div { 
+            display: table-cell;
+            text-align: center;
+        }
+        
+        > div:last-child { text-align: right; }
+        > div:first-child { text-align: left; }
+    }
 }

@@ -1,9 +1,7 @@
-<table class="user-activity-overview">
-  <tbody>
-    <tr>
-      <td class="comments" data-ng-if="commentCount">{{ commentCount }} Beiträge</td>
-      <td class="proposals" data-ng-if="proposalCount">{{ proposalCount }} Eigene Vorschläge</td>
-      <td class="ratings" data-ng-if="rateCount">{{ rateCount }} Anhänger</td>
-    </tr>
-  </tbody>
-</table>
+<div class="user-activity-overview">
+  <div class="wrapper">
+    <div class="comments" data-ng-if="commentCount">{{ commentCount }} Beiträge</div>
+    <div class="proposals" data-ng-if="proposalCount">{{ proposalCount }} Eigene Vorschläge</div>
+    <div class="ratings" data-ng-if="rateCount">{{ rateCount }} Anhänger</div>
+  </div>
+</div>
