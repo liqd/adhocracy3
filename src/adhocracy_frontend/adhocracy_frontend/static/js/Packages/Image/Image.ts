@@ -111,12 +111,30 @@ export var uploadImageDirective = (
     };
 };
 
-export var imageUriFilter = () => {
-    return (path? : string, format : string = "detail") : string => {
-        if (path) {
-            return path.replace(/\/$/, "") + "/" + format;
-        } else {
-            return "/static/fallback_" + format + ".jpg";
+export var showImageDirective = (
+    adhHttp : AdhHttp.Service<any>
+) => {
+    return {
+        restrict: "E",
+        template: "<img class=\"{{ class }}\" data-ng-src=\"{{ imageUrl }}\" alt=\"\" />",
+        scope: {
+            path: "@",
+            format: "@?",
+            cssClass: "@"
+        },
+        link: (scope) => {
+            // FIXME: could be a loading image or nothing instead
+            var loadingUrl = "/static/fallback_" + scope.format + ".jpg";
+            scope.imageUrl = loadingUrl;
+            adhHttp.get(scope.path).then(
+                (asset) => {
+                    scope.imageUrl = asset.data[SIImageMetadata.nick][scope.format];
+                },
+                (reason) => {
+                    scope.imageUrl = loadingUrl;
+                }
+            );
+
         }
     };
 };

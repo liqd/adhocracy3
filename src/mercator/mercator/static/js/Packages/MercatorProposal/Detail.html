@@ -53,7 +53,7 @@
     </div>
 
     <div class="mercator-proposal-detail-view" data-ng-if="!showBlogTabs() || proposalTab !== 'blog'">
-        <img class="mercator-proposal-detail-view-image" data-ng-src="{{ data.introduction.picture | adhImageUri }}" alt="" />
+        <adh-show-image data-css-class="proposal-list-item-image" data-path="data.introduction.picture" />
 
         <div class="section-jump-body">
 

@@ -19,5 +19,5 @@ export var register = (angular) => {
         }])
         .factory("adhUploadImage", ["adhHttp", AdhImage.uploadImageFactory])
         .directive("adhUploadImage", ["adhConfig", "adhHttp", "adhUploadImage", "flowFactory", AdhImage.uploadImageDirective])
-        .filter("adhImageUri", AdhImage.imageUriFilter);
+        .directive("adhshowImage", ["adhHttp", AdhImage.showImageDirective]);
 };

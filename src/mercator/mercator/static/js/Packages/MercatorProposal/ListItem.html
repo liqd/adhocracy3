@@ -6,8 +6,7 @@
         'm-community-award': data.winnerBadgeAssignment.name === 'community'
     }"
     class="proposal-list-item {{ selectedState }}">
-    <img class="proposal-list-item-image"
-        data-ng-src="{{ data.introduction.picture | adhImageUri:'thumbnail' }}" alt="" />
+    <adh-show-image data-css-class="proposal-list-item-image" data-path="data.introduction.picture" data-format="thumbnail" />
     <div class="proposal-list-item-body">
         <p class="proposal-list-item-username">
             {{data.user_info.first_name}}<span data-ng-if="data.organization_info.name">,
