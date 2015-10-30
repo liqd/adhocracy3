@@ -308,3 +308,40 @@ export var facets = (adhConfig : AdhConfig.IService) => {
         }
     };
 };
+
+
+export var listfacets = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        scope: {
+            facets: "=",
+            update: "="
+        },
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Listfacets.html",
+        link: (scope : IFacetsScope) => {
+
+            scope.enableItem = (facet : IFacet, item : IFacetItem) => {
+                if (!item.enabled) {
+                    facet.items.forEach((_item : IFacetItem) => {
+                        _item.enabled = (item === _item);
+                    });
+                    scope.update();
+                }
+            };
+            scope.disableItem = (facet : IFacet, item : IFacetItem) => {
+                if (item.enabled) {
+                    item.enabled = false;
+                    scope.update();
+                }
+            };
+            scope.toggleItem = (facet : IFacet, item : IFacetItem, event) => {
+                event.stopPropagation();
+                if (item.enabled) {
+                    scope.disableItem(facet, item);
+                } else {
+                    scope.enableItem(facet, item);
+                }
+            };
+        }
+    };
+};

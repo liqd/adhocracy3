@@ -1,0 +1,18 @@
+<div>
+    <ul>
+        <li data-ng-repeat="facet in facets" class="facet facet-{{facet.key}}">
+            <h3 class="facet-header">{{ facet.name | translate }}</h3>
+            <ul>
+                <li data-ng-repeat="item in facet.items" class="facet-item-{{item.key}}">
+                    <a
+                        href=""
+                        class="facet-item"
+                        data-ng-class="{'is-active': item.enabled}"
+                        data-ng-click="toggleItem(facet, item, $event)">
+                        {{ item.name | translate }}
+                    </a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div><!-- /.facets -->
