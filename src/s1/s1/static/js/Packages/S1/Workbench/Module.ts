@@ -29,7 +29,7 @@ export var register = (angular) => {
             }];
         }])
         .directive("adhS1Workbench", ["adhConfig", "adhTopLevelState", Workbench.s1WorkbenchDirective])
-        .directive("adhS1Landing", ["adhConfig", "adhTopLevelState", Workbench.s1LandingDirective])
+        .directive("adhS1Landing", ["$translate", "adhConfig", "adhTopLevelState", Workbench.s1LandingDirective])
         .directive("adhS1CurrentColumn", ["adhConfig", "adhHttp", Workbench.s1CurrentColumnDirective])
         .directive("adhS1NextColumn", ["adhConfig", "adhHttp", Workbench.s1NextColumnDirective])
         .directive("adhS1ArchiveColumn", ["adhConfig", "adhHttp", Workbench.s1ArchiveColumnDirective])
