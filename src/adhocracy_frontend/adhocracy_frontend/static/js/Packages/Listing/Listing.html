@@ -1,4 +1,8 @@
 <div class="listing">
+    <div class="listing-action-bar">
+        <span ng-click="toggleFilter();" >Filter</span>
+        <adh-listfacets ng-if="showFilter" data-facets="facets" data-update="update" ></adh-listfacets>
+    </div>
     <div class="listing-create-form" data-ng-if="!noCreateForm && poolOptions.POST">
         <adh-inject data-transclusion-id="create-form-id"></adh-inject>
     </div>

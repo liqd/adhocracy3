@@ -75,6 +75,7 @@ export interface ListingScope<Container> extends angular.IScope {
     totalCount? : number;
     params? : any;
     emptyText? : string;
+    showFilter: boolean;
     container : Container;
     poolPath : string;
     poolOptions : AdhHttp.IOptions;
@@ -87,6 +88,7 @@ export interface ListingScope<Container> extends angular.IScope {
     wsOff : () => void;
     clear : () => void;
     onCreate : () => void;
+    toggleFilter: () => void;
 }
 
 export interface IFacetsScope extends angular.IScope {
@@ -190,6 +192,10 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     });
                 };
 
+                $scope.toggleFilter = () => {
+                    $scope.showFilter = !$scope.showFilter;
+                };
+
                 $scope.update = (warmup? : boolean) : angular.IPromise<void> => {
                     if ($scope.initialLimit) {
                         if (!$scope.currentLimit) {
@@ -283,6 +289,7 @@ export var facets = (adhConfig : AdhConfig.IService) => {
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Facets.html",
         link: (scope : IFacetsScope) => {
+
             scope.enableItem = (facet : IFacet, item : IFacetItem) => {
                 if (!item.enabled) {
                     facet.items.forEach((_item : IFacetItem) => {
