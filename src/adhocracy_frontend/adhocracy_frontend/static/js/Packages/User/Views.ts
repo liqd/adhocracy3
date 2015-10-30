@@ -607,6 +607,8 @@ export var adhUserActivityOverviewDirective = (
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserActivityOverview.html",
         link: (scope, element, attrs) => {
+            if (typeof scope.path === "undefined") { return; }
+
             var requestCountInto = (contentType, scopeTarget, shouldRequest) => {
                 // REFACT consider to just check that the tag is set instead of requiring it to be set to true
                 if (shouldRequest !== "true") { return; }
