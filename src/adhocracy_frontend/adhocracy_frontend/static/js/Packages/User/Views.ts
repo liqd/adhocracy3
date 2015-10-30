@@ -9,8 +9,13 @@ import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhCredentials from "./Credentials";
 import * as AdhUser from "./User";
 
+import RIComment from "../../Resources_/adhocracy_core/resources/comment/IComment";
+import RIProposal from "../../Resources_/adhocracy_core/resources/proposal/IProposal";
+import RIRate from "../../Resources_/adhocracy_core/resources/rate/IRate";
 import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
 import RIUsersService from "../../Resources_/adhocracy_core/resources/principal/IUsersService";
+import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
 
 var pkgLocation = "/User";
@@ -590,6 +595,52 @@ export var adhUserManagementHeaderDirective = (
     };
 };
 
+/**
+ * Usage:
+ *
+ *   <adh-user-activity-overview
+ *       data-show-comments="true"
+ *       data-show-proposals="true"
+ *       data-show-ratings="true"
+ *       data-path="{{userUrl}}"
+ *   >
+ *   </adh-user-activity-overview>
+ */
+export var adhUserActivityOverviewDirective = (
+    adhConfig: AdhConfig.IService,
+    adhHttp: AdhHttp.Service<any>
+) => {
+    return {
+        restrict: "E",
+        scope: {
+            path: "@"
+        },
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserActivityOverview.html",
+        link: (scope, element, attrs) => {
+            if (typeof scope.path === "undefined") { return; }
+
+            var requestCountInto = (contentType, scopeTarget, shouldRequest) => {
+                // REFACT consider to just check that the tag is set instead of requiring it to be set to true
+                if (shouldRequest !== "true") { return; }
+
+                var params = {
+                    depth: "all",
+                    count: true,
+                    elements: false,
+                    content_type: contentType.content_type
+                };
+                params[SIMetadata.nick + ":creator"] = scope.path;
+
+                adhHttp.get(adhConfig.rest_url, params)
+                    .then((pool) => { scope[scopeTarget] = pool.data[SIPool.nick].count; });
+            };
+
+            requestCountInto(RIComment, "commentCount", attrs.showComments);
+            requestCountInto(RIProposal, "proposalCount", attrs.showProposals);
+            requestCountInto(RIRate, "rateCount", attrs.showRatings);
+        }
+    };
+};
 
 export var registerRoutes = (
     context : string = ""
