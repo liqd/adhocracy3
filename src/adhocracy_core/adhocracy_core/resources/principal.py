@@ -33,6 +33,7 @@ import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.pool
 import adhocracy_core.sheets.rate
 import adhocracy_core.sheets.badge
+import adhocracy_core.sheets.image
 
 _ = TranslationStringFactory('adhocracy')
 
@@ -141,6 +142,7 @@ user_meta = pool_meta._replace(
                      adhocracy_core.sheets.rate.ICanRate,
                      adhocracy_core.sheets.badge.ICanBadge,
                      adhocracy_core.sheets.badge.IBadgeable,
+                     adhocracy_core.sheets.image.IImageReference,
                      ),
     element_types=(),  # we don't want the frontend to post resources here
     use_autonaming=True,

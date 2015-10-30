@@ -114,6 +114,7 @@ class TestUser:
                 adhocracy_core.sheets.rate.ICanRate,
                 adhocracy_core.sheets.badge.ICanBadge,
                 adhocracy_core.sheets.badge.IBadgeable,
+                adhocracy_core.sheets.image.IImageReference,
             )
         assert meta.element_types == ()
         assert meta.use_autonaming is True
