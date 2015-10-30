@@ -76,7 +76,8 @@ export interface ListingScope<Container> extends angular.IScope {
     params? : any;
     emptyText? : string;
     showFilter: boolean;
-    container : Container;
+    showSort: boolean;
+    container: Container;
     poolPath : string;
     poolOptions : AdhHttp.IOptions;
     createPath? : string;
@@ -89,6 +90,8 @@ export interface ListingScope<Container> extends angular.IScope {
     clear : () => void;
     onCreate : () => void;
     toggleFilter: () => void;
+    toggleSort: () => void;
+    setSort: (string) => void;
 }
 
 export interface IFacetsScope extends angular.IScope {
@@ -193,7 +196,13 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 };
 
                 $scope.toggleFilter = () => {
+                    $scope.showSort = false;
                     $scope.showFilter = !$scope.showFilter;
+                };
+
+                $scope.toggleSort = () => {
+                    $scope.showFilter = false;
+                    $scope.showSort = !$scope.showSort;
                 };
 
                 $scope.update = (warmup? : boolean) : angular.IPromise<void> => {
@@ -242,6 +251,10 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     $scope.container = undefined;
                     $scope.poolPath = undefined;
                     $scope.elements = [];
+                };
+
+                $scope.setSort = (sort: string) => {
+                    $scope.sort = sort;
                 };
 
                 $scope.onCreate = () : void => {
