@@ -24,6 +24,7 @@ from adhocracy_core.resources.service import service_meta
 from adhocracy_core.resources.base import Base
 from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.resources.badge import add_badges_service
+from adhocracy_core.resources.asset import add_assets_service
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.metadata import is_older_than
 from adhocracy_core.utils import get_sheet
@@ -34,6 +35,7 @@ import adhocracy_core.sheets.pool
 import adhocracy_core.sheets.rate
 import adhocracy_core.sheets.badge
 import adhocracy_core.sheets.image
+import adhocracy_core.sheets.asset
 
 _ = TranslationStringFactory('adhocracy')
 
@@ -159,7 +161,10 @@ users_meta = service_meta._replace(
     content_name='users',
     element_types=(IUser,),
     permission_create='create_service',
-    after_creation=(add_badge_assignments_service,),
+    extended_sheets=(adhocracy_core.sheets.asset.IHasAssetPool,),
+    after_creation=(add_badge_assignments_service,
+                    add_assets_service,
+                    ),
 )
 
 
