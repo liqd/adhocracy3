@@ -1,8 +1,7 @@
 <div data-ng-switch="transclusionId" data-ng-if="ready">
     <div data-ng-switch-when="menu">
         <i class="icon-list-filled moving-column-icon"></i>
-
-        <div class="moving-column-menu-sorts">
+        <!--<div class="moving-column-menu-sorts">
             <span class="moving-column-menu-sort-label">{{ "TR__SORT_BY" | translate }}</span>
             <a href=""
                 class="moving-column-menu-sort-option"
@@ -12,7 +11,7 @@
                 class="moving-column-menu-sort-option"
                 data-ng-click="shared.setSort('item_creation_date')"
                 data-ng-class="{'is-active': shared.sort==='item_creation_date'}">{{ "TR__CREATION_DATE" | translate }}</a>
-        </div>
+        </div>-->
     </div>
 
     <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ platformUrl | adhResourceUrl:undefined:{proposalUrl: proposalUrl, movingColumns: 'is-show-show-hide'} }}">
