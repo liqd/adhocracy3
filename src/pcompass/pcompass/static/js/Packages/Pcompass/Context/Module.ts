@@ -26,7 +26,6 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .directive("adhPcompassContextHeader", ["adhConfig", "adhPermissions", "adhTopLevelState", Context.headerDirective])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerContext("pcompass");
         }])

@@ -1567,6 +1567,10 @@ custom filters:
   Valid query comparable: 'eq'
   Supports sorting.
 
+    >>> resp_data = testapp.get('/Documents', params={'creator': god_header['X-User-Path']}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
+    ['http://localhost/Documents/document_0000000/']
+
 * *item_creation_date* the the item_creation_date value of resources with :class:`adhocracy_core.sheets.metadata.IMetadata`.
   Valid query comparable: 'eq', 'noteq', 'lt', 'le', 'gt', 'ge', 'any', 'notany'
 

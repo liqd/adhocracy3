@@ -2,11 +2,15 @@
 from substanced.catalog import Keyword
 
 from adhocracy_core.catalog.adhocracy import AdhocracyCatalogIndexes
+from adhocracy_core.rest.schemas import INDEX_EXAMPLE_VALUES
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_mercator.sheets.mercator import IMercatorSubResources
 from adhocracy_mercator.sheets.mercator import IFinance
 from adhocracy_mercator.sheets.mercator import ILocation
+
+
+INDEX_EXAMPLE_VALUES['mercator_requested_funding'] = 1
 
 
 class MercatorCatalogIndexes(AdhocracyCatalogIndexes):
@@ -36,7 +40,7 @@ def index_location(resource, default) -> list:
 BUDGET_INDEX_LIMIT_KEYWORDS = [5000, 10000, 20000, 50000]
 
 
-def index_requested_funding(resource: IResource, default) -> str:
+def index_requested_funding(resource: IResource, default) -> int:
     """Return search index keyword based on the "requested_funding" field."""
     # TODO: Why is finance '' in the first pass of that function
     # during MercatorProposal create?
@@ -47,7 +51,7 @@ def index_requested_funding(resource: IResource, default) -> str:
     funding = get_sheet_field(finance, IFinance, 'requested_funding')
     for limit in BUDGET_INDEX_LIMIT_KEYWORDS:
         if funding <= limit:
-            return [str(limit)]
+            return [limit]
     return default
 
 

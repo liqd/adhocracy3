@@ -75,7 +75,6 @@ mail.ssl = False
 use = egg:gunicorn#main
 host = 0.0.0.0
 port = 6541
-workers = 2
 
 [websockets]
 port = 6561
