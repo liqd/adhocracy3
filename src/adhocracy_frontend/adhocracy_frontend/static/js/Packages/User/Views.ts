@@ -595,7 +595,17 @@ export var adhUserManagementHeaderDirective = (
     };
 };
 
-
+/**
+ * Usage:
+ *
+ *   <adh-user-activity-overview
+ *       data-show-comments="true"
+ *       data-show-proposals="true"
+ *       data-show-ratings="true"
+ *       data-path="{{userUrl}}"
+ *   >
+ *   </adh-user-activity-overview>
+ */
 export var adhUserActivityOverviewDirective = (
     adhConfig: AdhConfig.IService,
     adhHttp: AdhHttp.Service<any>
