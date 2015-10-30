@@ -374,9 +374,9 @@ def _create_proposal():
                 "data": {
                     "adhocracy_mercator.sheets.mercator.IFinance": {
                         "granted": false,
-                        "budget": randint(0,50000),
+                        "budget": 1000,
                         "other_sources": "hidden treasure",
-                        "requested_funding": randint(0,50000)
+                        "requested_funding": 1000
                     },
                     "adhocracy_core.sheets.versions.IVersionable": {
                         "follows": [

@@ -39,9 +39,6 @@ def set_cache_header(context: IResource, request: IRequest):
 
 
 def _get_cache_mode(registry) -> HTTPCacheMode:
-    setting = registry.settings
-    if setting is None:
-        return  # ease testing
     mode_name = registry.settings.get('adhocracy_core.caching.http.mode',
                                       HTTPCacheMode.no_cache.name)
     mode = HTTPCacheMode[mode_name]

@@ -1073,12 +1073,6 @@ class TestGetIndexExampleValue:
         result = self.call_fut(index)
         assert isinstance(result, Base)
 
-    def test_return_object_if_creator_index(self, index):
-        from adhocracy_core.resources.base import Base
-        index.__name__ = 'creator'
-        result = self.call_fut(index)
-        assert isinstance(result, Base)
-
 
 class TestCreateArbitraryFilterNode:
 

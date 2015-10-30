@@ -111,7 +111,7 @@ class TestMercatorRequestedFundingIndex:
             context,
             finance_appstruct={'requested_funding': 5000})
         result = index_requested_funding(resource, 'default')
-        assert result == ['5000']
+        assert result == [5000]
 
     def test_index_requested_funding_lte_10000(self, context):
         from .adhocracy import index_requested_funding
@@ -119,7 +119,7 @@ class TestMercatorRequestedFundingIndex:
             context,
             finance_appstruct={'requested_funding': 10000})
         result = index_requested_funding(resource, 'default')
-        assert result == ['10000']
+        assert result == [10000]
 
     def test_index_requested_funding_lte_20000(self, context):
         from .adhocracy import index_requested_funding
@@ -127,7 +127,7 @@ class TestMercatorRequestedFundingIndex:
             context,
             finance_appstruct={'requested_funding': 20000})
         result = index_requested_funding(resource, 'default')
-        assert result == ['20000']
+        assert result == [20000]
 
     def test_index_requested_funding_lte_50000(self, context):
         from .adhocracy import index_requested_funding
@@ -135,7 +135,7 @@ class TestMercatorRequestedFundingIndex:
             context,
             finance_appstruct={'requested_funding': 50000})
         result = index_requested_funding(resource, 'default')
-        assert result == ['50000']
+        assert result == [50000]
 
     def test_index_requested_funding_gt_50000(self, context):
         from .adhocracy import index_requested_funding

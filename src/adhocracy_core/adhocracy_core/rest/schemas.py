@@ -67,7 +67,6 @@ resolver = DottedNameResolver()
 INDEX_EXAMPLE_VALUES = {
     'default': 'str',
     'reference': Base(),
-    'creator': Base(),
     'item_creation_date': datetime.now(),
     'rate': 1,
     'rates': 1,
