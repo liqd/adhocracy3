@@ -183,7 +183,7 @@ class TestMercatorWorkflow:
         postable_types = app_participant.get_postable_types( proposal + 'logbook')
         assert postable_types == []
 
-    def test_result_participate_list_proposals(self, app_participant):
+    def test_result_participant_can_search_proposals(self, app_participant):
         from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
         from adhocracy_core.sheets.pool import IPool
         params = dict(content_type=IMercatorProposalVersion.__identifier__,

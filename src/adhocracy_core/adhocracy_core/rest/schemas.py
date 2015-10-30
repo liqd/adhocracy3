@@ -498,10 +498,7 @@ def add_arbitrary_filter_nodes(cstruct: dict,
             continue  # pragma: no cover
         index = catalogs.get_index(index_name)
         example_value = _get_index_example_value(index)
-        try:
-            node = create_arbitrary_filter_node(index, example_value, query)
-        except:
-            import pdb;pdb.set_trace()
+        node = create_arbitrary_filter_node(index, example_value, query)
         _add_node(schema, node, filter_name)
     return schema
 
