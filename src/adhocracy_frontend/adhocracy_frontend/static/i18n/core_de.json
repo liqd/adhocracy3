@@ -24,7 +24,7 @@
     "TR__CREATE_PASSWORD_RESET_PROCEED": "Dein Passwort wurde erfolgreich gesetzt. Gehe zurück zu [[link:{{siteName}}]], um weiter zu machen.",
     "TR__CREATE_PASSWORD_RESET_SUCCESS": "Wir haben Deine Anfrage zum Zurücksetzen Deines Passworts erhalten und werden Dir innerhalb der nächsten 24 Stunden einen neuen Link zur Authentifizierung zusenden. Bitte überprüfe Deine E-Mails und schaue auch im Spam-Ordner nach.",
     "TR__CREATE_PASSWORD_RESET_TITLE": "Passwort zurücksetzen",
-    "TR__CREATION_DATE": "Datum",
+    "TR__ITEM_CREATION_DATE": "Datum",
     "TR__DELETE": "löschen",
     "TR__DOCUMENT_EMPTY_TEXT": "Noch keine Dokumente",
     "TR__EDIT": "bearbeiten",
