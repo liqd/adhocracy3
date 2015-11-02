@@ -77,11 +77,15 @@ class TestUsers:
 
     def test_meta(self, meta):
         from . import badge
+        from . import asset
         from . import principal
+        from adhocracy_core import sheets
         assert meta.iresource is principal.IUsersService
         assert meta.permission_create == 'create_service'
         assert meta.content_name == 'users'
+        assert sheets.asset.IHasAssetPool in meta.extended_sheets
         assert badge.add_badge_assignments_service in meta.after_creation
+        assert asset.add_assets_service in meta.after_creation
 
     @mark.usefixtures('integration')
     def test_create(self, meta, registry):
@@ -114,6 +118,7 @@ class TestUser:
                 adhocracy_core.sheets.rate.ICanRate,
                 adhocracy_core.sheets.badge.ICanBadge,
                 adhocracy_core.sheets.badge.IBadgeable,
+                adhocracy_core.sheets.image.IImageReference,
             )
         assert meta.element_types == ()
         assert meta.use_autonaming is True
