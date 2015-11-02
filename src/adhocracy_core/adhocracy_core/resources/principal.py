@@ -300,8 +300,12 @@ class UserLocatorAdapter(object):
         query = search_query._replace(indexes={index_name: value},
                                       resolve=True)
         users = catalogs.search(query).elements
-        if len(users) == 1:
+        users_count = len(users)
+        if users_count == 1:
             return users[0]
+        elif users_count > 1:
+            raise ValueError('{} users are indexed by `{}` with value `{}`.'
+                             .format(users_count, index_name, value))
 
     def get_groupids(self, userid: str) -> [str]:
         """Get :term:`groupid`s for term:`userid` or return None."""
