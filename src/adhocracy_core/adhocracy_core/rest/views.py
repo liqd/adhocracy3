@@ -16,7 +16,6 @@ from pyramid.request import Request
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.security import remember
-from pyramid.settings import asbool
 from pyramid.traversal import resource_path
 from zope.interface.interfaces import IInterface
 from zope.interface import Interface
@@ -192,9 +191,6 @@ def validate_user_headers(request: Request):
     If the request has a 'X-User-Path' and/or 'X-User-Token' header, we
     ensure that the session takes belongs to the user and is not expired.
     """
-    settings = request.registry.settings
-    if not asbool(settings.get('adhocracy.validate_user_token', True)):
-        return
     headers = request.headers
     if 'X-User-Path' in headers or 'X-User-Token' in headers:
         if get_user(request) is None:
