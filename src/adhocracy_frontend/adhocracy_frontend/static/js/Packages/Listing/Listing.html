@@ -1,16 +1,22 @@
 <div class="listing">
     <div class="listing-action-bar">
         <span ng-if="facets" ng-click="toggleFilter();">Filter</span>
-        <span ng-if="sort" ng-click="toggleSort();">Sort</span>
+        <span ng-if="sorts" ng-click="toggleSort();">Sort</span>
         <adh-listfacets ng-if="showFilter" data-facets="facets" data-update="update" ></adh-listfacets>
         <div ng-if="showSort">
             <span>{{ "TR__SORT_BY" | translate }}</span>
-            <a href=""
+            <a
+                href=""
+                data-ng-repeat="s in sorts"
+                data-ng-click="setSort(s)"
+                data-ng-class="{'is-active': sort==='item_creation_date'}">{{ ('TR__' + s) | uppercase | translate }}
+            </a>
+            <!--<a href=""
                 data-ng-click="setSort('rates')"
                 data-ng-class="{'is-active': (sort==='rates')}">{{ "TR__RATES" | translate }}</a>
             <a href=""
                 data-ng-click="setSort('item_creation_date')"
-                data-ng-class="{'is-active': sort==='item_creation_date'}">{{ "TR__CREATION_DATE" | translate }}</a>
+                data-ng-class="{'is-active': sort==='item_creation_date'}">{{ "TR__CREATION_DATE" | translate }}</a>-->
         </div>
     </div>
     <div class="listing-create-form" data-ng-if="!noCreateForm && poolOptions.POST">

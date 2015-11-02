@@ -69,6 +69,7 @@ export interface ListingScope<Container> extends angular.IScope {
     contentType? : string;
     facets? : IFacet[];
     sort? : string;
+    sorts?: string[];
     reverse? : boolean;
     initialLimit? : number;
     currentLimit? : number;
@@ -129,6 +130,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 contentType: "@",
                 facets: "=?",
                 sort: "=?",
+                sorts: "=?",
                 reverse: "=?",
                 initialLimit: "=?",
                 frontendOrderPredicate: "=?",

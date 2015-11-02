@@ -122,6 +122,8 @@ export var mercatorProposalListingColumnDirective = (
             column.bindVariablesAndClear(scope, ["platformUrl", "proposalUrl"]);
             scope.contentType = RIMercatorProposalVersion.content_type;
 
+            scope.sorts = ["rates", "item_creation_date"];
+
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
                 var currentPhase = resource.data[SIWorkflow.nick].workflow_state;
