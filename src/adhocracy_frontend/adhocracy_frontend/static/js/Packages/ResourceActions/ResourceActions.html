@@ -1,0 +1,7 @@
+<div>
+    <a class="moving-column-menu-button" data-ng-if="editurl && proposalItemOptions.POST" data-ng-href="{{editurl}}">{{ "TR__EDIT" | translate }}</a>
+    <a class="moving-column-menu-button" href="" data-ng-if="reportfunction" data-ng-click="reportfunction();">{{ "TR__REPORT" | translate }}</a>
+    <a class="moving-column-menu-button" href="" data-ng-if="sharefunction" data-ng-click="sharefunction();">{{ "TR__SHARE" | translate }}</a>
+    <a class="moving-column-menu-button" href="" data-ng-if="deletefunction && proposalItemOptions.POST" data-ng-click="deletefunction();">{{ "TR__DELETE" | translate }}</a>
+    <a class="moving-column-menu-button" href="" data-ng-if="printfunction" data-ng-click="printfunction();">{{ "TR__PRINT" | translate }}</a>
+</div>
