@@ -11,12 +11,6 @@
                 data-ng-click="setSort(s)"
                 data-ng-class="{'is-active': sort==='item_creation_date'}">{{ ('TR__' + s) | uppercase | translate }}
             </a>
-            <!--<a href=""
-                data-ng-click="setSort('rates')"
-                data-ng-class="{'is-active': (sort==='rates')}">{{ "TR__RATES" | translate }}</a>
-            <a href=""
-                data-ng-click="setSort('item_creation_date')"
-                data-ng-class="{'is-active': sort==='item_creation_date'}">{{ "TR__CREATION_DATE" | translate }}</a>-->
         </div>
     </div>
     <div class="listing-create-form" data-ng-if="!noCreateForm && poolOptions.POST">
