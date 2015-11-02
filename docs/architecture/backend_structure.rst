@@ -150,6 +150,7 @@ Modules API and separation of responsibility
     adhocracy_core.events
     adhocracy_core.schema
     adhocracy_core.exceptions
+    adhocracy_core.stats
 
 .. rubric:: Other stuff
 
