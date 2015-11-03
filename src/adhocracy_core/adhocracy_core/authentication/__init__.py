@@ -13,6 +13,7 @@ from pyramid.settings import asbool
 from zope.interface import implementer
 from zope.interface import Interface
 from zope.component import ComponentLookupError
+from substanced.stats import statsd_timer
 
 from adhocracy_core.interfaces import ITokenManger
 from adhocracy_core.interfaces import IRolesUserLocator
@@ -247,10 +248,11 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         cached_principals = getattr(request, '__cached_principals__', None)
         if cached_principals:
             return cached_principals
-        if self.authenticated_userid(request) is None:
-            return [Everyone, Anonymous]
-        principals = super().effective_principals(request)
-        request.__cached_principals__ = principals
+        with statsd_timer('authenticationuser', rate=.1):
+            if self.authenticated_userid(request) is None:
+                return [Everyone, Anonymous]
+            principals = super().effective_principals(request)
+            request.__cached_principals__ = principals
         return principals
 
 
