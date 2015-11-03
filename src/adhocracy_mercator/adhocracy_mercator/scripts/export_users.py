@@ -23,6 +23,7 @@ from adhocracy_core.utils import create_filename
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.pool import IPool
+from adhocracy_core.sheets.principal import IPasswordAuthentication
 
 
 def export_users():
@@ -128,7 +129,8 @@ def _append_user_data(user: IUser, row: [str]):
     email = get_sheet_field(user, IUserExtended, 'email')
     creation_date = get_sheet_field(user, IMetadata, 'creation_date')
     creation_date_str = creation_date.strftime('%Y-%m-%d_%H:%M:%S')
-    row.extend([name, email, creation_date_str])
+    passw = get_sheet_field(user, IPasswordAuthentication, 'password')
+    row.extend([name, email, creation_date_str, passw])
 
 
 def _append_rate_dates(user: IUser, rateables: [(IRateable, set(IUser))],
