@@ -314,7 +314,9 @@ class RESTView:
         """Context Resource."""
         self.request = request
         """:class:`pyramid.request.Request`."""
-        with statsd_timer('validate', rate=.1, registry=self.request.registry):
+        self.registry = request.registry
+        """:class:`pyramid.registry.Registry`."""
+        with statsd_timer('validate', rate=.1, registry=self.registry):
             respond_if_blocked(context, request)
             set_cache_header(context, request)
             schema_class, validators = _get_schema_and_validators(self,
@@ -378,68 +380,66 @@ class ResourceRESTView(RESTView):
     def __init__(self, context, request):
         """Initialize self."""
         super().__init__(context, request)
-        self.registry = request.registry.content
-        """:class:`pyramid.registry.Registry`."""
+        self.content = request.registry.content
+        """:class:`adhocracy_core.content.ResourceContentRegistry`."""
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
         """Get possible request/response data structures and http methods."""
-        with statsd_timer('processoptions', rate=.1,
-                          registry=self.request.registry):
-            context = self.context
-            request = self.request
-            registry = self.registry
-            empty = {}  # tiny performance tweak
-            cstruct = deepcopy(options_resource_response_data_dict)
+        with statsd_timer('processoptions', rate=.1, registry=self.registry):
+            cstruct = self._options(self.context, self.request)
+        return cstruct
 
-            if request.has_permission('edit_some', context):
-                edits = self.registry.get_sheets_edit(context, request)
-                put_sheets = [(s.meta.isheet.__identifier__, empty)
-                              for s in edits]
-                if put_sheets:
-                    put_sheets_dict = dict(put_sheets)
-                    self._add_metadata_edit_permission_info(put_sheets_dict)
-                    self._add_workflow_edit_permission_info(put_sheets_dict,
-                                                            edits)
-                    cstruct['PUT']['request_body']['data'] = put_sheets_dict
-                else:
-                    del cstruct['PUT']
+    def _options(self, context: IResource, request: Request) -> dict:
+        empty = {}  # tiny performance tweak
+        cstruct = deepcopy(options_resource_response_data_dict)
+
+        if request.has_permission('edit_some', context):
+            edits = self.content.get_sheets_edit(context, request)
+            put_sheets = [(s.meta.isheet.__identifier__, empty) for s in edits]
+            if put_sheets:
+                put_sheets_dict = dict(put_sheets)
+                self._add_metadata_edit_permission_info(put_sheets_dict)
+                self._add_workflow_edit_permission_info(put_sheets_dict, edits)
+                cstruct['PUT']['request_body']['data'] = put_sheets_dict
             else:
                 del cstruct['PUT']
+        else:
+            del cstruct['PUT']
 
-            if request.has_permission('view', context):
-                views = self.registry.get_sheets_read(context, request)
-                get_sheets = [(s.meta.isheet.__identifier__, empty)
-                              for s in views]
-                if get_sheets:
-                    cstruct['GET']['response_body']['data'] = dict(get_sheets)
-                else:
-                    del cstruct['GET']
+        if request.has_permission('view', context):
+            views = self.content.get_sheets_read(context, request)
+            get_sheets = [(s.meta.isheet.__identifier__, empty) for s in views]
+            if get_sheets:
+                cstruct['GET']['response_body']['data'] = dict(get_sheets)
             else:
                 del cstruct['GET']
+        else:
+            del cstruct['GET']
 
-            is_users = IUsersService.providedBy(context) \
-                and request.has_permission('create_user', self.context)
-            # TODO move the is_user specific part the UsersRestView
-            if request.has_permission('create', self.context) or is_users:
-                addables = registry.get_resources_meta_addable(context,
+        is_users = IUsersService.providedBy(context) \
+            and request.has_permission('create_user', context)
+        # TODO move the is_user specific part the UsersRestView
+        if request.has_permission('create', self.context) or is_users:
+            addables = self.content.get_resources_meta_addable(context,
                                                                request)
-                if addables:
-                    for resource_meta in addables:
-                        iresource = resource_meta.iresource
-                        resource_typ = iresource.__identifier__
-                        creates = registry.get_sheets_create(context, request,
+            if addables:
+                for resource_meta in addables:
+                    iresource = resource_meta.iresource
+                    resource_typ = iresource.__identifier__
+                    creates = self.content.get_sheets_create(context,
+                                                             request,
                                                              iresource)
-                        sheet_typs = [s.meta.isheet.__identifier__ for s in
-                                      creates]
-                        sheets_dict = dict.fromkeys(sheet_typs, empty)
-                        post_data = {'content_type': resource_typ,
-                                     'data': sheets_dict}
-                        cstruct['POST']['request_body'].append(post_data)
-                else:
-                    del cstruct['POST']
+                    sheet_typs = [s.meta.isheet.__identifier__ for s
+                                  in creates]
+                    sheets_dict = dict.fromkeys(sheet_typs, empty)
+                    post_data = {'content_type': resource_typ,
+                                 'data': sheets_dict}
+                    cstruct['POST']['request_body'].append(post_data)
             else:
                 del cstruct['POST']
+        else:
+            del cstruct['POST']
         return cstruct
 
     def _add_metadata_edit_permission_info(self, cstruct: dict):
@@ -470,7 +470,7 @@ class ResourceRESTView(RESTView):
     def get(self) -> dict:
         """Get resource data (unless deleted or hidden)."""
         metric = self._get_get_metric_name()
-        with statsd_timer(metric, rate=.1, registry=self.request.registry):
+        with statsd_timer(metric, rate=.1, registry=self.registry):
             schema = GETResourceResponseSchema().bind(request=self.request,
                                                       context=self.context)
             cstruct = schema.serialize()
@@ -485,8 +485,8 @@ class ResourceRESTView(RESTView):
 
     def _get_sheets_data_cstruct(self):
         queryparams = self.request.validated if self.request.validated else {}
-        sheets_view = self.registry.get_sheets_read(self.context,
-                                                    self.request)
+        sheets_view = self.content.get_sheets_read(self.context,
+                                                   self.request)
         data_cstruct = {}
         for sheet in sheets_view:
             key = sheet.meta.isheet.__identifier__
@@ -512,9 +512,8 @@ class SimpleRESTView(ResourceRESTView):
                  accept='application/json')
     def put(self) -> dict:
         """Edit resource and get response data."""
-        with statsd_timer('processput', rate=.1,
-                          registry=self.request.registry):
-            sheets = self.registry.get_sheets_edit(self.context, self.request)
+        with statsd_timer('processput', rate=.1, registry=self.registry):
+            sheets = self.content.get_sheets_edit(self.context, self.request)
             appstructs = self.request.validated.get('data', {})
             for sheet in sheets:
                 name = sheet.meta.isheet.__identifier__
@@ -583,13 +582,13 @@ class PoolRESTView(SimpleRESTView):
         appstructs = self.request.validated.get('data', {})
         creator = get_user(self.request)
         metric = self._get_post_metric_name(iresource)
-        with statsd_timer(metric, rate=1, registry=self.request.registry):
-            resource = self.registry.create(resource_type,
-                                            self.context,
-                                            creator=creator,
-                                            appstructs=appstructs,
-                                            request=self.request,
-                                            )
+        with statsd_timer(metric, rate=1, registry=self.registry):
+            resource = self.content.create(resource_type,
+                                           self.context,
+                                           creator=creator,
+                                           appstructs=appstructs,
+                                           request=self.request,
+                                           )
         return self.build_post_response(resource)
 
     def _get_post_metric_name(self, iresource: IInterface) -> str:
@@ -621,8 +620,7 @@ class ItemRESTView(PoolRESTView):
                  permission='view')
     def get(self) -> dict:
         """Get resource data."""
-        with statsd_timer('processget', rate=.1,
-                          registry=self.request.registry):
+        with statsd_timer('processget', rate=.1, registry=self.registry):
             schema = GETItemResponseSchema().bind(request=self.request,
                                                   context=self.context)
             appstruct = {}
@@ -657,11 +655,10 @@ class ItemRESTView(PoolRESTView):
         last_new_version = validated.get('_last_new_version_in_transaction',
                                          None)
         metric = self._get_post_metric_name(iresource)
-        with statsd_timer(metric, rate=1,
-                          registry=self.request.registry):
+        with statsd_timer(metric, rate=1, registry=self.registry):
             if last_new_version is not None:  # only happens in batch request
-                sheets = self.registry.get_sheets_create(last_new_version,
-                                                         self.request)
+                sheets = self.content.get_sheets_create(last_new_version,
+                                                        self.request)
                 appstructs = self.request.validated.get('data', {})
                 for sheet in sheets:
                     name = sheet.meta.isheet.__identifier__
@@ -670,14 +667,14 @@ class ItemRESTView(PoolRESTView):
                                   request=self.request)
                 resource = last_new_version
             else:
-                resource = self.registry.create(resource_type,
-                                                self.context,
-                                                appstructs=appstructs,
-                                                creator=creator,
-                                                root_versions=root_versions,
-                                                request=self.request,
-                                                is_batchmode=batchmode,
-                                                )
+                resource = self.content.create(resource_type,
+                                               self.context,
+                                               appstructs=appstructs,
+                                               creator=creator,
+                                               root_versions=root_versions,
+                                               request=self.request,
+                                               is_batchmode=batchmode,
+                                               )
         return self.build_post_response(resource)
 
 
@@ -941,8 +938,7 @@ class MetaApiView(RESTView):
     def get(self) -> dict:
         """Get the API specification of this installation as JSON."""
         # Collect info about all resources
-        with statsd_timer('processgetmetapi', rate=.1,
-                          registry=self.request.registry):
+        with statsd_timer('processgetmetapi', rate=.1, registry=self.registry):
             resources_meta = self.request.registry.content.resources_meta
             resource_map = self._describe_resources(resources_meta)
 
