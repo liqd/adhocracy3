@@ -77,7 +77,7 @@ def get_titles(resources: [ITitle]) -> [str]:
 
 def _get_users(root: IResource) -> [IUser]:
     users = find_service(root, 'principals', 'users')
-    return users.values()
+    return [u for u in users.values() if IUser.providedBy(u)]
 
 
 def get_most_rated_proposals(root: IResource,
