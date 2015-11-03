@@ -40,19 +40,24 @@ def export_users():
     parser.add_argument('min_rate',
                         type=int,
                         help='minimal rate to restrict listed proposals')
+    parser.add_argument('-p',
+                        '--include-passwords',
+                        help='export passwords (in bcrypted form)',
+                        action='store_true')
     args = parser.parse_args()
     env = bootstrap(args.ini_file)
     filename = create_filename(directory='./var/export/',
                                prefix='adhocracy-users',
                                suffix='.csv')
-    _export_users_and_proposals_rates(env['root'], filename,
-                                      min_rate=args.min_rate)
+    _export_users_and_proposals_rates(env['root'], filename, args)
     env['closer']()
 
 
 def _export_users_and_proposals_rates(root: IResource, filename: str,
-                                      min_rate=0):
-    proposals = get_most_rated_proposals(root, min_rate)
+                                      args):
+    if not args.min_rate:
+        args.min_rate = 0
+    proposals = get_most_rated_proposals(root, args.min_rate)
     proposals_titles = get_titles(proposals)
     column_names = ['Username', 'Email', 'Creation date'] + proposals_titles
     with open(filename, 'w', newline='') as result_file:
@@ -63,7 +68,7 @@ def _export_users_and_proposals_rates(root: IResource, filename: str,
         proposals_users_map = _map_rating_users(proposals)
         for pos, user in enumerate(users):
             row = []
-            _append_user_data(user, row)
+            _append_user_data(user, row, args.include_passwords)
             _append_rate_dates(user, proposals_users_map, row)
             wr.writerow(row)
             print('exported user {0} of {1}'.format(pos, len(users)))
@@ -124,12 +129,15 @@ def _map_rating_users(rateables: [IRateable]) -> [(IRateable, set(IUser))]:
     return rateables_users_map
 
 
-def _append_user_data(user: IUser, row: [str]):
+def _append_user_data(user: IUser, row: [str], include_passwords: bool):
     name = get_sheet_field(user, IUserBasic, 'name')
     email = get_sheet_field(user, IUserExtended, 'email')
     creation_date = get_sheet_field(user, IMetadata, 'creation_date')
     creation_date_str = creation_date.strftime('%Y-%m-%d_%H:%M:%S')
-    passw = get_sheet_field(user, IPasswordAuthentication, 'password')
+    if include_passwords:
+        passw = get_sheet_field(user, IPasswordAuthentication, 'password')
+    else:
+        passw = ''
     row.extend([name, email, creation_date_str, passw])
 
 
