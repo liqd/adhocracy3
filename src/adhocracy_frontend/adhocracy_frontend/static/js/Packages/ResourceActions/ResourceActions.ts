@@ -22,7 +22,6 @@ adhPermissions : AdhPermissions.Service,
 		templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceActions.html",
         link: (scope, element) => {
 			adhPermissions.bindScope(scope, () => scope.path && AdhUtil.parentPath(scope.path), "proposalItemOptions");
-			console.log(scope);
         }
     };
 };
