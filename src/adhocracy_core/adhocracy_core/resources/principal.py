@@ -6,6 +6,7 @@ from pyramid.traversal import find_resource
 from pyramid.request import Request
 from pyramid.i18n import TranslationStringFactory
 from substanced.util import find_service
+from substanced.stats import statsd_incr
 from zope.interface import Attribute
 from zope.interface import Interface
 from zope.interface import implementer
@@ -125,6 +126,7 @@ class User(Pool):
         sheet = get_sheet(self, IMetadata)
         appstruct = sheet.get()
         appstruct['hidden'] = not active
+        statsd_incr('useractivated', 1)
         sheet.set(appstruct)
 
 
@@ -227,6 +229,7 @@ class PasswordReset(Base):
         if not user.active:  # pragma: no cover
             user.activate()
         del self.__parent__[self.__name__]
+        statsd_incr('pwordresetreseted', 1)
 
 
 passwordreset_meta = resource_meta._replace(

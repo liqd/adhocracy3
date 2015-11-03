@@ -37,6 +37,7 @@ test_requires = [
     'webtest',
     'pytest-pyramid',
     'pytest-timeout',
+    'pytest-mock',
     'coverage',
     'python-coveralls',
     'babel',

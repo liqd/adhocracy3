@@ -4,3 +4,4 @@
 def includeme(config):
     """Add statsd client."""
     config.include('substanced.stats')
+    config.include('.subscriber')
