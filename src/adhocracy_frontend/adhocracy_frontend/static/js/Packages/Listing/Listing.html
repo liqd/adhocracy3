@@ -12,7 +12,7 @@
                 class="button-cta-secondary sort-item"
                 data-ng-repeat="s in sorts"
                 data-ng-click="setSort(s)"
-                data-ng-class="{'is-active': sort==='item_creation_date'}">{{ ('TR__' + s) | uppercase | translate }}
+                data-ng-class="{'is-active': sort === s }">{{ ('TR__' + s) | uppercase | translate }}
             </a>
         </div>
     </div>
