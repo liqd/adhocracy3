@@ -475,9 +475,9 @@ class ResourceRESTView(RESTView):
 
     def _get_get_metric_name(self) -> str:
         if self.request.validated:
-            return 'processsgetwithquery'
+            return 'processgetwithquery'
         else:
-            return 'processsgetwithoutquery'
+            return 'processgetwithoutquery'
 
     def _get_sheets_data_cstruct(self):
         queryparams = self.request.validated if self.request.validated else {}

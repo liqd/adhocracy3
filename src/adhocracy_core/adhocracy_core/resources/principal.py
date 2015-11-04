@@ -237,7 +237,7 @@ class PasswordReset(Base):
         if not user.active:  # pragma: no cover
             user.activate()
         del self.__parent__[self.__name__]
-        statsd_incr('pwordresetreseted', 1)
+        statsd_incr('pwordreseted', 1)
 
 
 passwordreset_meta = resource_meta._replace(

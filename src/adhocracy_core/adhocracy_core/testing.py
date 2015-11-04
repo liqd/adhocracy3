@@ -230,7 +230,9 @@ def request_():
     Additional Attributes:
         `errors`, `validated`
     """
-    return DummyRequest()
+    request = DummyRequest()
+    request.registry.settings = {}
+    return request
 
 
 @fixture
@@ -765,7 +767,6 @@ def backend_with_ws(request, zeo, websocket, supervisor):
 
 
 class AppUser:
-
     """:class:`webtest.TestApp` wrapper for backend functional testing."""
 
     def __init__(self, app,

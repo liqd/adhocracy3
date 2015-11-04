@@ -1,5 +1,4 @@
-#from unittest.mock import patch
-from mock import patch
+from unittest.mock import patch
 from pytest import mark
 from pytest import fixture
 from pyramid import testing
