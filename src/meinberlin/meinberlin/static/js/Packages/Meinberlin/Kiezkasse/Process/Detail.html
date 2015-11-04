@@ -1,16 +1,5 @@
 <div class="meinberlin-kiezkasse-detail">
-    <div class="map-switch">
-        <a
-            class="map-switch-item"
-            href=""
-            data-ng-click="showMap(false)"
-            data-ng-class="{ 'is-active': !isShowMap }"><i class="icon-list-column"></i></a>
-        <a
-            class="map-switch-item"
-            href=""
-            data-ng-click="showMap(true)"
-            data-ng-class="{ 'is-active': isShowMap }"><i class="icon-map-filled"></i></a>
-    </div>
+    <adh-map-switch></adh-map-switch>
     <div data-ng-switch="currentPhase.name">
         <div data-ng-switch-when="announce" class="meinberlin-kiezkasse-detail-announce">
             {{ currentPhase.description }}
