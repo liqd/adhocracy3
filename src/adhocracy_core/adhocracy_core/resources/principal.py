@@ -6,6 +6,8 @@ from pyramid.traversal import find_resource
 from pyramid.request import Request
 from pyramid.i18n import TranslationStringFactory
 from substanced.util import find_service
+from substanced.stats import statsd_incr
+from substanced.stats import statsd_timer
 from zope.interface import Attribute
 from zope.interface import Interface
 from zope.interface import implementer
@@ -128,6 +130,7 @@ class User(Pool):
         sheet = get_sheet(self, IMetadata)
         appstruct = sheet.get()
         appstruct['hidden'] = not active
+        statsd_incr('useractivated', 1)
         sheet.set(appstruct)
 
 
@@ -234,6 +237,7 @@ class PasswordReset(Base):
         if not user.active:  # pragma: no cover
             user.activate()
         del self.__parent__[self.__name__]
+        statsd_incr('pwordresetreseted', 1)
 
 
 passwordreset_meta = resource_meta._replace(
@@ -361,16 +365,19 @@ class UserLocatorAdapter(object):
 
 def groups_and_roles_finder(userid: str, request: Request) -> list:
     """A Pyramid authentication policy groupfinder callback."""
-    userlocator = request.registry.getMultiAdapter((request.context, request),
-                                                   IRolesUserLocator)
-    groupids = userlocator.get_groupids(userid) or []
-    roleids = userlocator.get_role_and_group_roleids(userid) or []
+    with statsd_timer('authenticationgroups', rate=.1):
+        userlocator = request.registry.getMultiAdapter((request.context,
+                                                        request),
+                                                       IRolesUserLocator)
+        groupids = userlocator.get_groupids(userid) or []
+        roleids = userlocator.get_role_and_group_roleids(userid) or []
     return groupids + roleids
 
 
 def delete_not_activated_users(request: Request, age_in_days: int):
     """Delete not activate users that are older than `age_in_days`."""
-    userlocator = request.registry.getMultiAdapter((request.context, request),
+    userlocator = request.registry.getMultiAdapter((request.context,
+                                                    request),
                                                    IRolesUserLocator)
     users = userlocator.get_users()
     not_activated = (u for u in users if not u.active)
