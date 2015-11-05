@@ -276,13 +276,6 @@ class TestValidateRequest:
             self.call_fut(context, request_)
         assert request_.validated == {}
 
-    def test_invalid_user_headers_but_check_disabled(self, context, request_):
-        request_.registry.settings['adhocracy.validate_user_token'] = False
-        request_.headers['X-User-Path'] = 2
-        request_.headers['X-User-Token'] = 3
-        self.call_fut(context, request_)
-        assert request_.validated == {}
-
 
 class TestValidatePOSTRootVersions:
 
@@ -386,7 +379,7 @@ class TestResourceRESTView:
         from adhocracy_core.rest.views import RESTView
         inst = self.make_one(context, request_)
         assert isinstance(inst, RESTView)
-        assert inst.registry is request_.registry.content
+        assert inst.content is request_.registry.content
 
     def test_create_method_get_and_resource_blocked(self, request_, context):
         from pyramid.httpexceptions import HTTPGone

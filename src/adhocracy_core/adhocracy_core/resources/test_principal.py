@@ -1,12 +1,12 @@
 """Tests for the principal package."""
-import unittest
-from unittest.mock import Mock
-
 from pyramid import testing
 from pytest import fixture
-from pytest import mark
-from pytest import mark
 from pytest import fixture
+from pytest import mark
+from pytest import mark
+from unittest.mock import Mock
+import pytest
+import unittest
 
 
 @fixture
@@ -77,11 +77,15 @@ class TestUsers:
 
     def test_meta(self, meta):
         from . import badge
+        from . import asset
         from . import principal
+        from adhocracy_core import sheets
         assert meta.iresource is principal.IUsersService
         assert meta.permission_create == 'create_service'
         assert meta.content_name == 'users'
+        assert sheets.asset.IHasAssetPool in meta.extended_sheets
         assert badge.add_badge_assignments_service in meta.after_creation
+        assert asset.add_assets_service in meta.after_creation
 
     @mark.usefixtures('integration')
     def test_create(self, meta, registry):
@@ -114,6 +118,7 @@ class TestUser:
                 adhocracy_core.sheets.rate.ICanRate,
                 adhocracy_core.sheets.badge.ICanBadge,
                 adhocracy_core.sheets.badge.IBadgeable,
+                adhocracy_core.sheets.image.IImageReference,
             )
         assert meta.element_types == ()
         assert meta.use_autonaming is True
@@ -360,6 +365,15 @@ class TestUserLocatorAdapter:
             indexes={'private_user_email': 'test@test.de'},
             resolve=True,
         )
+
+    def test_get_user_by_email_two_identical_user_exists(self, inst, mock_catalogs,
+                                                         search_result, query):
+        user = testing.DummyResource()
+        user2 = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user, user2])
+        with pytest.raises(ValueError):
+            inst.get_user_by_email('test@test.de')
 
     def test_get_user_by_email_user_not_exists(self, inst, mock_catalogs):
         assert inst.get_user_by_email('wrong@test.de') is None

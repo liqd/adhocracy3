@@ -25,6 +25,12 @@ substanced.uploads_tempdir = %(here)s/../var/uploads_tmp
 substanced.autosync_catalogs = true
 substanced.autoevolve = true
 
+# send runtime statistics to statsd
+#substanced.statsd.enabled = true
+#substanced.statsd.host = localhost
+#substanced.statsd.port = 8125
+#substanced.statsd.prefix = a3
+
 # The websocket url to notify about resource modifications
 adhocracy.ws_url = ws://localhost:6561
 # The login name for the initial user

@@ -115,6 +115,7 @@ def includeme(config):
     config.include('.workflows')
     config.include('.websockets')
     config.include('.rest')
+    config.include('.stats')
     if settings.get('adhocracy.add_test_users', False):
         from adhocracy_core.testing import add_create_test_users_subscriber
         add_create_test_users_subscriber(config)
