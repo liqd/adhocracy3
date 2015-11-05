@@ -45,6 +45,7 @@ import * as AdhPermissionsModule from "./Packages/Permissions/Module";
 import * as AdhPreliminaryNamesModule from "./Packages/PreliminaryNames/Module";
 import * as AdhProcessModule from "./Packages/Process/Module";
 import * as AdhRateModule from "./Packages/Rate/Module";
+import * as AdhResourceActions from "./Packages/ResourceActions/Module";
 import * as AdhResourceAreaModule from "./Packages/ResourceArea/Module";
 import * as AdhResourceWidgetsModule from "./Packages/ResourceWidgets/Module";
 import * as AdhShareSocialModule from "./Packages/ShareSocial/Module";
@@ -178,6 +179,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhRateModule.register(angular);
     AdhAngularHelpersModule.register(angular);
     AdhResourceAreaModule.register(angular);
+    AdhResourceActionsModule.register(angular);
     AdhResourceWidgetsModule.register(angular);
     AdhShareSocialModule.register(angular);
     AdhStickyModule.register(angular);

@@ -1,7 +1,10 @@
-<div>
-    <a class="moving-column-menu-button" data-ng-if="editurl && proposalItemOptions.POST" data-ng-href="{{editurl}}">{{ "TR__EDIT" | translate }}</a>
-    <a class="moving-column-menu-button" href="" data-ng-if="reportfunction" data-ng-click="reportfunction();">{{ "TR__REPORT" | translate }}</a>
-    <a class="moving-column-menu-button" href="" data-ng-if="sharefunction" data-ng-click="sharefunction();">{{ "TR__SHARE" | translate }}</a>
-    <a class="moving-column-menu-button" href="" data-ng-if="deletefunction && proposalItemOptions.POST" data-ng-click="deletefunction();">{{ "TR__DELETE" | translate }}</a>
-    <a class="moving-column-menu-button" href="" data-ng-if="printfunction" data-ng-click="printfunction();">{{ "TR__PRINT" | translate }}</a>
+<div class="action-bar">
+    <a class="action-bar-item" data-ng-if="editResource && proposalItemOptions.POST" data-ng-click="edit()">{{ "TR__EDIT" | translate }}</a>
+    <!-- FIXME: removed permissions to get this working -->
+    <a class="action-bar-item" data-ng-if="createDocumentPath" data-ng-href="{{createDocumentPath}}">{{ "TR__CREATE_DOCUMENT" | translate }}</a>
+    <a class="action-bar-item" href="" data-ng-if="reportfunction" data-ng-click="reportfunction();">{{ "TR__REPORT" | translate }}</a>
+    <a class="action-bar-item" href="" data-ng-if="sharefunction" data-ng-click="sharefunction();">{{ "TR__SHARE" | translate }}</a>
+    <a class="action-bar-item" href="" data-ng-if="deletefunction && proposalItemOptions.POST" data-ng-click="deletefunction();">{{ "TR__DELETE" | translate }}</a>
+    <a class="action-bar-item" href="" data-ng-if="printfunction" data-ng-click="printfunction();">{{ "TR__PRINT" | translate }}</a>
+    <adh-cancel data-ng-if="cancel && resourcePath" data-class="action-bar-item" data-resource-path="{{resourcePath}}"></adh-cancel>
 </div>
