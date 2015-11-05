@@ -169,6 +169,19 @@ def make_mercator_proposals_badgeable(root):  # pragma: no cover
             alsoProvides(process, IHasBadgesPool)
 
 
+@log_migration
+def reindex_requested_funding(root):  # pragma: no cover
+    """Reindex requested funding index for proposals (stores integer now)."""
+    from adhocracy_core.evolution import _search_for_interfaces
+    from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
+    catalogs = find_service(root, 'catalogs')
+    index = catalogs['adhocracy']['mercator_requested_funding']
+    proposals = _search_for_interfaces(catalogs, IMercatorProposalVersion)
+    index.reset()
+    for proposal in proposals:
+        catalogs.reindex_index(proposal, 'mercator_requested_funding')
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(evolve1_add_ititle_sheet_to_proposals)
@@ -183,3 +196,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_haslogbookpool_sheet_to_proposal_versions)
     config.add_evolution_step(remove_mercator_workflow_assignment_sheet)
     config.add_evolution_step(make_mercator_proposals_badgeable)
+    config.add_evolution_step(reindex_requested_funding)

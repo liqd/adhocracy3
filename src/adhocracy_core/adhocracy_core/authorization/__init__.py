@@ -11,6 +11,7 @@ from pyramid.request import Request
 from pyramid.router import Router
 from zope.interface import implementer
 from substanced.util import get_acl
+from substanced.stats import statsd_timer
 import substanced.util
 import transaction
 
@@ -42,12 +43,13 @@ class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
                 principals: list,
                 permission: str) -> ACLPermitsResult:
         """Check `permission` for `context`. Read interface docstring."""
-        local_roles = get_local_roles_all(context)
-        principals_with_roles = set(principals)
-        for principal, roles in local_roles.items():
-            if principal in principals:
-                principals_with_roles.update(roles)
-        return super().permits(context, principals_with_roles, permission)
+        with statsd_timer('authorization', rate=.1):
+            local_roles = get_local_roles_all(context)
+            principals_with_roles = set(principals)
+            for principal, roles in local_roles.items():
+                if principal in principals:
+                    principals_with_roles.update(roles)
+            return super().permits(context, principals_with_roles, permission)
 
 
 def set_local_roles(resource, new_local_roles: dict, registry: Registry=None):

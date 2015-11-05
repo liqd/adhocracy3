@@ -23,15 +23,19 @@ from adhocracy_core.resources.asset import IPoolWithAssets
 from adhocracy_core.resources.badge import IBadgeAssignmentsService
 from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.resources.badge import add_badges_service
+from adhocracy_core.resources.asset import add_assets_service
 from adhocracy_core.resources.comment import ICommentVersion
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.principal import IUser
+from adhocracy_core.resources.principal import IUsersService
 from adhocracy_core.resources.process import IProcess
 from adhocracy_core.resources.proposal import IProposal
 from adhocracy_core.resources.proposal import IProposalVersion
 from adhocracy_core.resources.relation import add_relationsservice
+from adhocracy_core.sheets.asset import IHasAssetPool
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.badge import IHasBadgesPool
+from adhocracy_core.sheets.image import IImageReference
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.relation import ICanPolarize
@@ -413,6 +417,18 @@ def move_sheet_annotation_data_to_attributes(root):  # pragma: no cover
         delattr(resource, '_sheets')
 
 
+@log_migration
+def add_image_reference_to_users(root):  # pragma: no cover
+    """Add image reference to users and add assets service to users service."""
+    registry = get_current_registry(root)
+    users = find_service(root, 'principals', 'users')
+    if not IHasAssetPool.providedBy(users):
+        logger.info('Add assets service to {0}'.format(users))
+        add_assets_service(users, registry, {})
+    migrate_new_sheet(root, IUsersService, IHasAssetPool)
+    migrate_new_sheet(root, IUser, IImageReference)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -432,3 +448,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(move_autoname_last_counters_to_attributes)
     config.add_evolution_step(make_proposalversions_polarizable)
     config.add_evolution_step(add_icanpolarize_sheet_to_comments)
+    config.add_evolution_step(add_image_reference_to_users)
