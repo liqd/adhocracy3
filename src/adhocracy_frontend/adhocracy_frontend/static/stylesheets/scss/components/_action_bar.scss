@@ -3,7 +3,7 @@
     line-height: 2;
 }
 
-.action-bar-link {
+.action-bar-item {
     @include inline-block;
     @include rem(margin-right, 2rem);
     position: relative;
