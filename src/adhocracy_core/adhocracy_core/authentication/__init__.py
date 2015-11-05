@@ -25,7 +25,6 @@ Anonymous = 'system.Anonymous'
 
 @implementer(ITokenManger)
 class TokenMangerAnnotationStorage:
-
     """Manage authentication tokens and use object annotation to store them.
 
     Constructor arguments:
@@ -153,7 +152,6 @@ def _get_x_user_headers(request: Request) -> tuple:
 
 @implementer(IAuthenticationPolicy)
 class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
-
     """A :term:`authentication policy` based on the the X-User-* header.
 
     To authenticate the client has to send http header with `X-User-Token`

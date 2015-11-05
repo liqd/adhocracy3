@@ -31,6 +31,7 @@ from adhocracy_mercator.sheets.mercator import IUserInfo
 from adhocracy_mercator.sheets.mercator import ILocation
 from adhocracy_mercator.sheets.mercator import IIntroduction
 from adhocracy_mercator.sheets.mercator import IDescription
+from adhocracy_mercator.sheets.mercator import IHeardFrom
 from adhocracy_mercator.sheets.mercator import IStory
 from adhocracy_mercator.sheets.mercator import IOutcome
 from adhocracy_mercator.sheets.mercator import IValue
@@ -39,20 +40,33 @@ from adhocracy_mercator.sheets.mercator import IExperience
 from adhocracy_mercator.sheets.mercator import ISteps
 
 
+def normalize_text(s: str) -> str:
+    """Normalize text to put it in CVS."""
+    return s.replace(';', '')
+
+
 def get_text_from_sheet(proposal, field, sheet):
-    """Get text from sheetfields and return it. """
+    """Get text from sheetfields and return it."""
     retrieved_field = get_sheet_field(proposal, IMercatorSubResources, field)
-    field_text = get_sheet_field(
-        retrieved_field,
-        sheet,
-        field).replace(
-        ';',
-        '')
-    return field_text
+    field_text = get_sheet_field(retrieved_field, sheet, field)
+    return normalize_text(field_text)
+
+
+def get_heard_from_text(heardfrom: dict) -> str:
+    """Return text for the 'heard from' field."""
+    def kv_to_text(k, v):
+        if k == 'heard_elsewhere':
+            return normalize_text(v)
+        return {'heard_from_colleague': 'colleague',
+                'heard_from_facebook': 'facebook',
+                'heard_from_newsletter': 'newsletter',
+                'heard_from_website': 'website'}[k]
+
+    return ','.join([kv_to_text(k, v) for (k, v) in heardfrom.items() if v])
 
 
 def export_proposals():
-    """Export all proposals from database and write them to csv file. """
+    """Export all proposals from database and write them to csv file."""
     doc = textwrap.dedent(inspect.getdoc(export_proposals))
     parser = argparse.ArgumentParser(description=doc)
     parser.add_argument('config')
@@ -107,7 +121,8 @@ def export_proposals():
                  'Outcome',
                  'Value',
                  'Partners',
-                 'Experience'])
+                 'Experience',
+                 'Heard from'])
 
     for proposal in proposals:
 
@@ -260,6 +275,10 @@ def export_proposals():
         result.append(get_text_from_sheet(proposal, 'value', IValue))
         result.append(get_text_from_sheet(proposal, 'partners', IPartners))
         result.append(get_text_from_sheet(proposal, 'experience', IExperience))
+
+        # Heard from
+        heard_from = get_sheet(proposal, IHeardFrom)
+        result.append(get_heard_from_text(heard_from.get()))
 
         wr.writerow(result)
 

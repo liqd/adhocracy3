@@ -1,4 +1,4 @@
-""" Sheets for spd."""
+"""Sheets for spd."""
 
 
 def includeme(config):

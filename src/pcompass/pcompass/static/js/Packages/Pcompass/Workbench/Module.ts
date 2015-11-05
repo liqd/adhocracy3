@@ -40,5 +40,5 @@ export var register = (angular) => {
         .directive("adhPcompassProposalDetailColumn", ["adhConfig", "adhHttp", "adhPermissions", Workbench.proposalDetailColumnDirective])
         .directive("adhPcompassProposalCreateColumn", ["adhConfig", Workbench.proposalCreateColumnDirective])
         .directive("adhPcompassProposalEditColumn", ["adhConfig", Workbench.proposalEditColumnDirective])
-        .directive("adhPcompassProcessDetailColumn", ["adhConfig", Workbench.processDetailColumnDirective]);
+        .directive("adhPcompassProcessDetailColumn", ["adhConfig", "adhPermissions", Workbench.processDetailColumnDirective]);
 };

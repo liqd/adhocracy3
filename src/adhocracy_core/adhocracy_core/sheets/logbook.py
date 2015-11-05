@@ -8,12 +8,10 @@ from adhocracy_core.schema import PostPool
 
 
 class IHasLogbookPool(ISheet):
-
     """Marker interface for resources that have a logbook pool."""
 
 
 class HasLogbookPoolSchema(colander.MappingSchema):
-
     """Data structure pointing to a logbook pool."""
 
     logbook_pool = PostPool(iresource_or_service_name='logbook')

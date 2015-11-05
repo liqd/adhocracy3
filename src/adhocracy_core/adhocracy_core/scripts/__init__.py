@@ -90,7 +90,7 @@ def _resolve_users(resource_info: PMap,
 
     """
     def _resolve_user(s):
-        if not type(s) == str or not s.startswith('user_by_login:'):
+        if not isinstance(s, str) or not s.startswith('user_by_login:'):
             return s
         user_locator = _get_user_locator(root, registry)
         user_name = s.split('user_by_login:')[1]

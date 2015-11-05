@@ -11,7 +11,6 @@ import adhocracy_core.sheets.comment
 
 
 class IExternalResource(IBasicPool):
-
     """An external resource.
 
     This is currently a commentable simple.

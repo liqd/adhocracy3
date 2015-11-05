@@ -19,7 +19,6 @@ import adhocracy_core.sheets.workflow
 
 
 class IDocumentVersion(IItemVersion):
-
     """Versionable item with Document propertysheet."""
 
 
@@ -37,7 +36,6 @@ document_version_meta = itemversion_meta._replace(
 
 
 class IDocument(IItem):
-
     """All versions of a Proposal."""
 
 
@@ -61,7 +59,6 @@ document_meta = item_meta._replace(
 
 
 class IGeoDocumentVersion(IDocumentVersion):
-
     """Versionable document with geo-location."""
 
 
@@ -73,7 +70,6 @@ geo_document_version_meta = document_version_meta._replace(
 
 
 class IGeoDocument(IDocument):
-
     """Geolocalisable document."""
 
 

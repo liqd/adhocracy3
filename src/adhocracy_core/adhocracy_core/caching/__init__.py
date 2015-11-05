@@ -39,9 +39,6 @@ def set_cache_header(context: IResource, request: IRequest):
 
 
 def _get_cache_mode(registry) -> HTTPCacheMode:
-    setting = registry.settings
-    if setting is None:
-        return  # ease testing
     mode_name = registry.settings.get('adhocracy_core.caching.http.mode',
                                       HTTPCacheMode.no_cache.name)
     mode = HTTPCacheMode[mode_name]
@@ -75,7 +72,6 @@ def register_cache_strategy(strategy_adapter: IHTTPCacheStrategy,
 
 @implementer(IHTTPCacheStrategy)
 class HTTPCacheStrategyBaseAdapter:
-
     """Basic cache strategy adapter a to set http cache headers.
 
     You can register a cache strategy for a specific context and view with
@@ -239,7 +235,6 @@ def etag_blocked(context: IResource, request: IRequest) -> str:
 
 @implementer(IHTTPCacheStrategy)
 class HTTPCacheStrategyWeakAdapter(HTTPCacheStrategyBaseAdapter):
-
     """Weak strategy adapter to set http cache header.
 
     mode without-proxy-cache: browser cache 0 and force revalidate
@@ -257,7 +252,6 @@ class HTTPCacheStrategyWeakAdapter(HTTPCacheStrategyBaseAdapter):
 
 @implementer(IHTTPCacheStrategy)
 class HTTPCacheStrategyWeakAssetDownloadAdapter(HTTPCacheStrategyBaseAdapter):
-
     """Weak strategy adapter for :class:`IAssetDownload`."""
 
     browser_max_age = 60 * 5

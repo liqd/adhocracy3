@@ -23,12 +23,10 @@ from adhocracy_core.schema import URL
 
 
 class IMercatorSubResources(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for commentable subresources of MercatorProposal."""
 
 
 class ITitle(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for the proposal title."""
 
 
@@ -36,72 +34,58 @@ deprecated('ITitle', 'moved to adhocracy_core.sheets.title')
 
 
 class IUserInfo(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for information about the proposal submitter."""
 
 
 class IOrganizationInfo(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for organizational information."""
 
 
 class IIntroduction(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for the proposal introduction."""
 
 
 class IDescription(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for proposal description."""
 
 
 class ILocation(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for proposal location."""
 
 
 class IStory(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for the story description."""
 
 
 class IOutcome(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for the outcome description."""
 
 
 class ISteps(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for the steps description."""
 
 
 class IValue(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for the value description."""
 
 
 class IPartners(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for the partner description."""
 
 
 class IFinance(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for financial aspects."""
 
 
 class IExperience(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for additional fields."""
 
 
 class IHeardFrom(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for heard from fields."""
 
 
 class TitleSchema(colander.MappingSchema):
-
     """Data structure for the proposal title."""
 
     title = SingleLine(validator=colander.Length(min=1, max=100))
@@ -115,7 +99,6 @@ title_meta = sheet_meta._replace(isheet=ITitle,
 
 
 class UserInfoSchema(colander.MappingSchema):
-
     """Data structure for information about the proposal submitter."""
 
     personal_name = SingleLine(missing=colander.required)
@@ -128,14 +111,12 @@ userinfo_meta = sheet_meta._replace(isheet=IUserInfo,
 
 
 class OrganizationInfoReference(SheetToSheet):
-
     source_isheet = IMercatorSubResources
     source_isheet_field = 'organization_info'
     target_isheet = IOrganizationInfo
 
 
 class IntroductionReference(SheetToSheet):
-
     source_isheet = IMercatorSubResources
     source_isheet_field = 'introduction'
     target_isheet = IIntroduction
@@ -225,7 +206,6 @@ mercator_sub_resources_meta = sheet_meta._replace(
 
 
 class StatusEnum(AdhocracySchemaNode):
-
     """Enum of organizational statuses."""
 
     schema_type = colander.String
@@ -239,7 +219,6 @@ class StatusEnum(AdhocracySchemaNode):
 
 
 class OrganizationInfoSchema(colander.MappingSchema):
-
     """Data structure for organizational information."""
 
     name = SingleLine()
@@ -276,7 +255,6 @@ organizationinfo_meta = sheet_meta._replace(
 
 
 class IIntroImageMetadata(IAssetMetadata):
-
     """Marker interface for intro images."""
 
 
@@ -293,7 +271,6 @@ intro_image_metadata_meta = asset_metadata_meta._replace(
 
 
 class IntroImageReference(SheetToSheet):
-
     """Reference to an intro image."""
 
     source_isheet = IIntroduction
@@ -302,7 +279,6 @@ class IntroImageReference(SheetToSheet):
 
 
 class IntroductionSchema(colander.MappingSchema):
-
     """Data structure for the proposal introduction."""
 
     teaser = Text(validator=colander.Length(min=1, max=300))
@@ -314,7 +290,6 @@ introduction_meta = sheet_meta._replace(
 
 
 class DescriptionSchema(colander.MappingSchema):
-
     """Data structure for for proposal description."""
 
     description = Text(validator=colander.Length(min=1, max=1000))
@@ -325,7 +300,6 @@ description_meta = sheet_meta._replace(
 
 
 class LocationSchema(colander.MappingSchema):
-
     """Data structure for for proposal location."""
 
     location_is_specific = Boolean()
@@ -381,7 +355,6 @@ partners_meta = sheet_meta._replace(
 
 
 class FinanceSchema(colander.MappingSchema):
-
     """Data structure for financial aspects."""
 
     budget = CurrencyAmount(missing=colander.required)
@@ -397,7 +370,6 @@ finance_meta = sheet_meta._replace(isheet=IFinance,
 
 
 class ExperienceSchema(colander.MappingSchema):
-
     """Data structure for additional fields."""
 
     experience = Text()
@@ -427,7 +399,6 @@ heardfrom_meta = sheet_meta._replace(
 
 
 class IWorkflowAssignment(workflow.IWorkflowAssignment):
-
     """Marker interface for the mercator workflow assignment sheet."""
 
 

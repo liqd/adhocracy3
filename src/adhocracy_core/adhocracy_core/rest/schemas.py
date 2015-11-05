@@ -72,7 +72,6 @@ INDEX_EXAMPLE_VALUES = {
 }
 
 class UpdatedResourcesSchema(colander.Schema):
-
     """List the resources affected by a transaction."""
 
     created = Resources()
@@ -82,26 +81,22 @@ class UpdatedResourcesSchema(colander.Schema):
 
 
 class ResourceResponseSchema(ResourcePathSchema):
-
     """Data structure for responses of Resource requests."""
 
     updated_resources = UpdatedResourcesSchema()
 
 
 class ItemResponseSchema(ResourceResponseSchema):
-
     """Data structure for responses of IItem requests."""
 
     first_version_path = Resource()
 
 
 class GETResourceResponseSchema(ResourcePathAndContentSchema):
-
     """Data structure for Resource GET requests."""
 
 
 class GETItemResponseSchema(ResourcePathAndContentSchema):
-
     """Data structure for responses of IItem requests."""
 
     first_version_path = Resource()
@@ -126,7 +121,6 @@ def add_put_data_subschemas(node: colander.Schema, kw: dict):
 
 
 class BlockExplanationResponseSchema(colander.Schema):
-
     """Data structure explaining a 410 Gone response."""
 
     reason = SingleLine()
@@ -135,7 +129,6 @@ class BlockExplanationResponseSchema(colander.Schema):
 
 
 class PUTResourceRequestSchema(colander.Schema):
-
     """Data structure for Resource PUT requests.
 
     The subschemas for the Resource Sheets
@@ -187,7 +180,6 @@ def deferred_validate_post_content_type(node, kw):
 
 
 class POSTResourceRequestSchema(PUTResourceRequestSchema):
-
     """Data structure for Resource POST requests."""
 
     content_type = ContentType(validator=deferred_validate_post_content_type,
@@ -199,28 +191,24 @@ class POSTResourceRequestSchema(PUTResourceRequestSchema):
 
 
 class AbsolutePaths(colander.SequenceSchema):
-
     """List of resource paths."""
 
     path = AbsolutePath()
 
 
 class POSTItemRequestSchema(POSTResourceRequestSchema):
-
     """Data structure for Item and ItemVersion POST requests."""
 
     root_versions = Resources(missing=[])
 
 
 class POSTResourceRequestSchemaList(colander.List):
-
     """Overview of POST request/response data structure."""
 
     request_body = POSTResourceRequestSchema()
 
 
 class GETLocationMapping(colander.Schema):
-
     """Overview of GET request/response data structure."""
 
     request_querystring = SchemaNode(colander.Mapping(), default={})
@@ -229,7 +217,6 @@ class GETLocationMapping(colander.Schema):
 
 
 class PUTLocationMapping(colander.Schema):
-
     """Overview of PUT request/response data structure."""
 
     request_body = PUTResourceRequestSchema()
@@ -237,7 +224,6 @@ class PUTLocationMapping(colander.Schema):
 
 
 class POSTLocationMapping(colander.Schema):
-
     """Overview of POST request/response data structure."""
 
     request_body = SchemaNode(POSTResourceRequestSchemaList(), default=[])
@@ -245,7 +231,6 @@ class POSTLocationMapping(colander.Schema):
 
 
 class POSTLoginUsernameRequestSchema(colander.Schema):
-
     """Schema for login requests via username and password."""
 
     name = SchemaNode(colander.String(), missing=colander.required)
@@ -253,7 +238,6 @@ class POSTLoginUsernameRequestSchema(colander.Schema):
 
 
 class POSTActivateAccountViewRequestSchema(colander.Schema):
-
     """Schema for account activation."""
 
     path = SchemaNode(colander.String(),
@@ -262,7 +246,6 @@ class POSTActivateAccountViewRequestSchema(colander.Schema):
 
 
 class POSTLoginEmailRequestSchema(colander.Schema):
-
     """Schema for login requests via email and password."""
 
     email = Email(missing=colander.required)
@@ -270,7 +253,6 @@ class POSTLoginEmailRequestSchema(colander.Schema):
 
 
 class POSTReportAbuseViewRequestSchema(colander.Schema):
-
     """Schema for abuse reports."""
 
     url = URL(missing=colander.required)
@@ -278,14 +260,12 @@ class POSTReportAbuseViewRequestSchema(colander.Schema):
 
 
 class MessageUserReference(SheetToSheet):
-
     """Dummy reference to validate user resources."""
 
     target_isheet = IUserExtended
 
 
 class POSTMessageUserViewRequestSchema(colander.Schema):
-
     """Schema for messages to a user."""
 
     recipient = Reference(missing=colander.required,
@@ -295,7 +275,6 @@ class POSTMessageUserViewRequestSchema(colander.Schema):
 
 
 class BatchHTTPMethod(SchemaNode):
-
     """An HTTP method in a batch request."""
 
     schema_type = colander.String
@@ -304,7 +283,6 @@ class BatchHTTPMethod(SchemaNode):
 
 
 class BatchRequestPath(AdhocracySchemaNode):
-
     """A path in a batch request.
 
     Either a resource url or a preliminary resource path (a relative path
@@ -325,7 +303,6 @@ class BatchRequestPath(AdhocracySchemaNode):
 
 
 class POSTBatchRequestItem(colander.Schema):
-
     """A single item in a batch request, encoding a single request."""
 
     method = BatchHTTPMethod()
@@ -337,14 +314,12 @@ class POSTBatchRequestItem(colander.Schema):
 
 
 class POSTBatchRequestSchema(colander.SequenceSchema):
-
     """Schema for batch requests (list of POSTBatchRequestItem's)."""
 
     items = POSTBatchRequestItem()
 
 
 class PoolElementsForm(SchemaNode):
-
     """The form of the elements attribute returned by the pool sheet."""
 
     schema_type = colander.String
@@ -353,7 +328,6 @@ class PoolElementsForm(SchemaNode):
 
 
 class PoolQueryDepth(SchemaNode):
-
     """The nesting depth of descendants in a pool response.
 
     Either a positive number or the string 'all' to return descendants of
@@ -362,7 +336,7 @@ class PoolQueryDepth(SchemaNode):
 
     schema_type = colander.Integer
     missing = 1
-    validator=colander.Range(min=1)
+    validator = colander.Range(min=1)
 
 
 @colander.deferred
@@ -449,9 +423,9 @@ class GETPoolRequestSchema(colander.Schema):
             cstruct['depth'] = 100
         appstruct = super().deserialize(cstruct)
         search_query = {}
-        if appstruct:
+        if appstruct:  # pragma: no branch
             search_query['root'] = self.bindings['context']
-        if 'depth' in appstruct:
+        if 'depth' in appstruct:  # pragma: no branch
             depth = appstruct['depth']
             if depth == 100:
                 depth = None
@@ -496,16 +470,17 @@ class GETPoolRequestSchema(colander.Schema):
                 if 'indexes' not in search_query:
                     search_query['indexes'] = {}
                 if filter == 'content_type':
-                    search_query['indexes']['interfaces'] = appstruct['content_type']
+                    search_query['indexes'][
+                        'interfaces'] = appstruct['content_type']
                     continue
                 search_query['indexes'][filter] = query
         return search_query
 
 
 def add_arbitrary_filter_nodes(cstruct: dict,
-                                       schema: GETPoolRequestSchema,
-                                       context: IResource,
-                                       registry) -> GETPoolRequestSchema:
+                               schema: GETPoolRequestSchema,
+                               context: IResource,
+                               registry) -> GETPoolRequestSchema:
     """Add schema nodes for arbitrary/references filters to `schema`."""
     extra_filters = [(k, v) for k, v in cstruct.items() if k not in schema]
     if extra_filters:
@@ -663,7 +638,6 @@ def create_arbitrary_filter_node(index, example_value, query):
 
 
 class KeywordComparableSchema(SingleLine):
-
     """SingleLine of KeywordComparable value."""
 
     validator = colander.OneOf(
@@ -671,7 +645,6 @@ class KeywordComparableSchema(SingleLine):
 
 
 class FieldComparableSchema(SingleLine):
-
     """SingleLine of FieldComparable value."""
 
     validator = colander.OneOf(
@@ -679,7 +652,6 @@ class FieldComparableSchema(SingleLine):
 
 
 class KeywordSequenceComparableSchema(SingleLine):
-
     """SingleLine of KeywordSequenceComparable value."""
 
     validator = colander.OneOf(
@@ -687,7 +659,6 @@ class KeywordSequenceComparableSchema(SingleLine):
 
 
 class FieldSequenceComparableSchema(SingleLine):
-
     """SingleLine of FieldSequenceComparable value."""
 
     validator = colander.OneOf(
@@ -695,91 +666,78 @@ class FieldSequenceComparableSchema(SingleLine):
 
 
 class KeywordComparableSequenceBase(colander.TupleSchema):
-
     """Tuple with value KeywordSequenceComparable."""
 
     comparable = KeywordSequenceComparableSchema()
 
 
 class KeywordComparableIntegers(KeywordComparableSequenceBase):
-
     """Tuple with values KeywordSequenceComparable and Integers."""
 
     value = Integers()
 
 
 class KeywordComparableInterfaces(KeywordComparableSequenceBase):
-
     """Tuple with values KeywordSequenceComparable and Interfaces."""
 
     value = Interfaces()
 
 
 class KeywordComparableSingleLines(KeywordComparableSequenceBase):
-
     """Tuple with values KeywordSequenceComparable and SingleLines."""
 
     value = SingleLines()
 
 
 class KeywordComparableDateTimes(KeywordComparableSequenceBase):
-
     """Tuple with values KeywordSequenceComparable and DateTimes."""
 
     value = DateTimes()
 
 
 class KeywordComparableBooleans(KeywordComparableSequenceBase):
-
     """Tuple with values KeywordSequenceComparable and Booleans."""
 
     value = Booleans()
 
 
 class KeywordComparableBase(colander.TupleSchema):
-
     """Tuple with value KeywordComparable."""
 
     comparable = KeywordComparableSchema()
 
 
 class KeywordComparableInteger(KeywordComparableBase):
-
     """Tuple with values KeywordComparable and Integer."""
 
     value = Integer()
 
 
 class KeywordComparableInterface(KeywordComparableBase):
-
     """Tuple with values KeywordComparable and Interface."""
 
     value = Interface()
 
 
 class KeywordComparableSingleLine(KeywordComparableBase):
-
     """Tuple with values KeywordComparable and SingleLine."""
 
     value = SingleLine()
 
 
 class KeywordComparableBoolean(KeywordComparableBase):
-
     """Tuple with values KeywordComparable and Boolean."""
 
     value = Boolean()
 
 
 class KeywordComparableDateTime(KeywordComparableBase):
-
     """Tuple with values KeywordComparable and DateTime."""
 
     value = DateTime()
 
 
 class FieldComparableSchema(SingleLine):
-
     """SingleLine of FieldComparable value."""
 
     validator = colander.OneOf(
@@ -787,7 +745,6 @@ class FieldComparableSchema(SingleLine):
 
 
 class FieldComparableSchema(SingleLine):
-
     """SingleLine of FieldComparable value."""
 
     validator = colander.OneOf(
@@ -795,7 +752,6 @@ class FieldComparableSchema(SingleLine):
 
 
 class FieldSequenceComparableSchema(SingleLine):
-
     """SingleLine of FieldSequenceComparable value."""
 
     validator = colander.OneOf(
@@ -803,7 +759,6 @@ class FieldSequenceComparableSchema(SingleLine):
 
 
 class FieldSequenceComparableSchema(SingleLine):
-
     """SingleLine of FieldSequenceComparable value."""
 
     validator = colander.OneOf(
@@ -811,84 +766,72 @@ class FieldSequenceComparableSchema(SingleLine):
 
 
 class FieldComparableSequenceBase(colander.TupleSchema):
-
     """Tuple with value FieldSequenceComparable."""
 
     comparable = FieldSequenceComparableSchema()
 
 
 class FieldComparableIntegers(FieldComparableSequenceBase):
-
     """Tuple with values FieldSequenceComparable and Integers."""
 
     value = Integers()
 
 
 class FieldComparableInterfaces(FieldComparableSequenceBase):
-
     """Tuple with values FieldSequenceComparable and Interfaces."""
 
     value = Interfaces()
 
 
 class FieldComparableSingleLines(FieldComparableSequenceBase):
-
     """Tuple with values FieldSequenceComparable and SingleLines."""
 
     value = SingleLines()
 
 
 class FieldComparableDateTimes(FieldComparableSequenceBase):
-
     """Tuple with values FieldSequenceComparable and DateTimes."""
 
     value = DateTimes()
 
 
 class FieldComparableBooleans(FieldComparableSequenceBase):
-
     """Tuple with values FieldSequenceComparable and Booleans."""
 
     value = Booleans()
 
 
 class FieldComparableBase(colander.TupleSchema):
-
     """Tuple with value FieldComparable."""
 
     comparable = FieldComparableSchema()
 
 
 class FieldComparableInteger(FieldComparableBase):
-
     """Tuple with values FieldComparable and Integer."""
 
     value = Integer()
 
 
 class FieldComparableInterface(FieldComparableBase):
-
     """Tuple with values FieldComparable and Interface."""
 
     value = Interface()
 
 
 class FieldComparableSingleLine(FieldComparableBase):
-
     """Tuple with values FieldComparable and SingleLine."""
 
     value = SingleLine()
 
 
 class FieldComparableBoolean(FieldComparableBase):
-
     """Tuple with values FieldComparable and Boolean."""
 
     value = Boolean()
 
 
 class FieldComparableDateTime(FieldComparableBase):
-
     """Tuple with values FieldComparable and DateTime."""
 
     value = DateTime()
@@ -976,7 +919,6 @@ def _raise_if_outdated(node: SchemaNode, value: IPasswordReset,
 
 
 class POSTPasswordResetRequestSchema(colander.Schema):
-
     """Schema to get a user password reset resource."""
 
     path = Resource(missing=colander.required,

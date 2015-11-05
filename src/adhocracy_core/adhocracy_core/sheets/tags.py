@@ -17,12 +17,10 @@ logger = getLogger(__name__)
 
 
 class ITag(ISheet):
-
     """Marker interface for the tag sheet."""
 
 
 class TagElementsReference(SheetToSheet):
-
     """Tag sheet elements reference."""
 
     source_isheet = ITag
@@ -31,7 +29,6 @@ class TagElementsReference(SheetToSheet):
 
 
 class TagSchema(colander.MappingSchema):
-
     """Tag sheet data structure.
 
     `elements`: Resources with this Tag
@@ -46,12 +43,10 @@ tag_meta = sheet_meta._replace(isheet=ITag,
 
 
 class ITags(ISheet):
-
     """Marker interface for the tag sheet."""
 
 
 class TagsElementsReference(SheetToSheet):
-
     """Tags sheet elements reference."""
 
     source_isheet = ITags
@@ -60,7 +55,6 @@ class TagsElementsReference(SheetToSheet):
 
 
 class TagsSchema(colander.MappingSchema):
-
     """Tags sheet data structure.
 
     `elements`: Tags in this Pool

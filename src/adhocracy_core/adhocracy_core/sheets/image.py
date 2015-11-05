@@ -11,7 +11,6 @@ from adhocracy_core.interfaces import SheetToSheet
 
 
 class IImageMetadata(IAssetMetadata):
-
     """Marker interface for images."""
 
 
@@ -29,12 +28,10 @@ image_metadata_meta = asset_metadata_meta._replace(
 
 
 class IImageReference(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for an image reference."""
 
 
 class ImageReference(SheetToSheet):
-
     """Reference to an image."""
 
     source_isheet = IImageReference
@@ -43,7 +40,6 @@ class ImageReference(SheetToSheet):
 
 
 class ImageReferenceSchema(MappingSchema):
-
     """Data structure for the image reference sheet."""
 
     picture = Reference(reftype=ImageReference)

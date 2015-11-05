@@ -41,6 +41,9 @@ adhocracy.site_name = Adhocracy Test Site
 # URL to terms and services
 adhocracy.frontend.terms_url =
 
+# Nettiquitte URL - currently only used in mercator
+adhocracy.frontend.nettiquette_url = https://advocate-europe.eu/de/netiquette
+
 # Piwik tracking configuration
 #adhocracy.frontend.piwik_enabled = true
 #adhocracy.frontend.piwik_host =
@@ -62,11 +65,14 @@ adhocracy.trusted_domains =
 #     http://localhost:9000
 #     http://localhost:9001
 
-adhocracy.custom = mercator_platform_path financial_plan_url_de financial_plan_url_en show_add_button allow_rate embed_only
+adhocracy.custom = mercator_platform_path financial_plan_url_de financial_plan_url_en show_add_button allow_rate embed_only hide_header
 adhocracy.custom.mercator_platform_path = /mercator/
 adhocracy.custom.show_add_button = true
 adhocracy.custom.allow_rate = true
 adhocracy.custom.embed_only = false
+
+# if set to true the hader is not shown
+#adhocracy.custom.hide_header = true
 
 cachebust.enabled = false
 cachebust.method = init

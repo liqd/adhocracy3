@@ -235,7 +235,7 @@ export var createDirective = (
             };
 
             scope.cancel = () => {
-                var fallback = adhResourceUrlFilter(scope.processUrl);
+                var fallback = adhResourceUrlFilter(processUrl);
                 adhTopLevelState.goToCameFrom(fallback);
             };
         }

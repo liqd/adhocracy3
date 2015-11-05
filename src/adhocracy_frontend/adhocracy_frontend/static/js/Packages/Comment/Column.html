@@ -1,13 +1,19 @@
 <div data-ng-switch="transclusionId">
     <div data-ng-switch-when="menu">
-        <div class="moving-column-tab">
-            <i class="icon-speechbubbles moving-column-icon"></i>
-            {{ "TR__COMMENTS" | translate }}
+        <div class="moving-column-tab" data-ng-switch on="overlay">
+            <span ng-switch-when="abuse">
+                <i class="icon-flag moving-column-icon"></i>
+                {{ "TR__REPORT_COMMENT" | translate }}
+            </span>
+            <span ng-switch-default>
+                <i class="icon-speechbubbles moving-column-icon"></i>
+                {{ "TR__COMMENTS" | translate }}
+            </span>
         </div>
         <div class="moving-column-menu-nav">
             <a
                 class="moving-column-menu-nav-button"
-                data-ng-href="{{ commentCloseUrl | adhParentPath | adhResourceUrl }}"
+                data-ng-href="{{ commentCloseUrl | adhResourceUrl }}"
                 title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
         </div>
     </div>

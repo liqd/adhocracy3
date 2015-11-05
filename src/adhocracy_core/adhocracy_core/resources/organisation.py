@@ -6,7 +6,6 @@ from adhocracy_core.resources.process import IProcess
 
 
 class IOrganisation(IPool):
-
     """Organisation Pool."""
 
 

@@ -244,7 +244,9 @@ def _delete_badges_assignments(user: IUser) -> None:
     to_delete = []
     for assignment in assignments.values():
         appstruct = get_sheet(assignment, sheets.badge.IBadgeAssignment).get()
-        if appstruct['subject'] == user and appstruct['object'] == user:
+        subject, object = appstruct['subject'], appstruct['object']
+        is_user_assignment = subject == object == user
+        if is_user_assignment:  # pragma: no branch
             to_delete.append(assignment.__name__)
     for assignment_name in to_delete:
         assignments.remove(assignment_name)

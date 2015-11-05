@@ -7,7 +7,6 @@ from adhocracy_core.sheets import AnnotationRessourceSheet
 
 
 class DummyNameSheet(AnnotationRessourceSheet):
-
     """Dummy sheet class without persistent data store."""
 
     _data = {}
@@ -17,12 +16,10 @@ dummy_name_metadata = name_meta._replace(sheet_class=DummyNameSheet)
 
 
 class IExtendedName(name_meta.isheet):
-
     """Marker interface for the extended name sheet."""
 
 
 class ExtendedNameSchema(name_meta.schema_class):
-
     """Data structure for the extended name sheet."""
 
     description_x = colander.SchemaNode(colander.String(),

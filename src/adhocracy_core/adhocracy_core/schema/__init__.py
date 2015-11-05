@@ -33,7 +33,6 @@ from adhocracy_core.interfaces import IResource
 
 
 class AdhocracySchemaNode(colander.SchemaNode):
-
     """Subclass of :class: `colander.SchemaNode` with extended keyword support.
 
     The constructor accepts these additional keyword arguments:
@@ -44,13 +43,13 @@ class AdhocracySchemaNode(colander.SchemaNode):
     readonly = False
 
     def deserialize(self, cstruct=colander.null):
-        """ Deserialize the :term:`cstruct` into an :term:`appstruct`. """
+        """Deserialize the :term:`cstruct` into an :term:`appstruct`."""
         if self.readonly and cstruct != colander.null:
             raise colander.Invalid(self, 'This field is ``readonly``.')
         return super().deserialize(cstruct)
 
     def serialize(self, appstruct=colander.null):
-        """ Serialize the :term:`appstruct` to a :term:`cstruct`.
+        """Serialize the :term:`appstruct` to a :term:`cstruct`.
 
         If the appstruct is None and None is the default value, serialize
         to None instead of :class:`colander.null`.
@@ -61,7 +60,6 @@ class AdhocracySchemaNode(colander.SchemaNode):
 
 
 class AdhocracySequenceNode(colander.SequenceSchema, AdhocracySchemaNode):
-
     """Subclass of :class: `AdhocracySchema` with Sequence type.
 
     The default value is a deferred returning [] to prevent modify it.
@@ -106,7 +104,6 @@ def validate_name_is_unique(node: colander.SchemaNode, value: str):
 
 
 class Identifier(AdhocracySchemaNode):
-
     """Like :class:`Name`, but doesn't check uniqueness..
 
     Example value: blu.ABC_12-3
@@ -128,8 +125,7 @@ def deferred_validate_name(node: colander.SchemaNode, kw: dict) -> callable:
 
 
 class Name(AdhocracySchemaNode):
-
-    """ The unique `name` of a resource inside the parent pool.
+    """The unique `name` of a resource inside the parent pool.
 
     Allowed characters are: "alpha" "numeric" "_"  "-" "."
     The maximal length is 100 characters, the minimal length 1.
@@ -146,7 +142,6 @@ class Name(AdhocracySchemaNode):
 
 
 class Email(AdhocracySchemaNode):
-
     """String with email address.
 
     Example value: test@test.de
@@ -166,7 +161,6 @@ class Email(AdhocracySchemaNode):
 
 
 class URL(AdhocracySchemaNode):
-
     """String with a URL.
 
     Example value: http://colander.readthedocs.org/en/latest/
@@ -193,7 +187,6 @@ _ZONES = pytz.all_timezones
 
 
 class TimeZoneName(AdhocracySchemaNode):
-
     """String with time zone.
 
     Example value: UTC
@@ -219,7 +212,6 @@ SYSTEM_PRINCIPALS = ['everyone',
 
 
 class Role(AdhocracySchemaNode):
-
     """Permission :term:`role` name.
 
     Example value: 'reader'
@@ -232,7 +224,6 @@ class Role(AdhocracySchemaNode):
 
 
 class Roles(AdhocracySequenceNode):
-
     """List of Permssion :term:`role` names.
 
     Example value: ['initiator']
@@ -252,7 +243,6 @@ class Roles(AdhocracySequenceNode):
 
 
 class InterfaceType(colander.SchemaType):
-
     """A ZOPE interface in dotted name notation.
 
     Example value: adhocracy_core.sheets.name.IName
@@ -285,7 +275,6 @@ class Interfaces(AdhocracySequenceNode):
 
 
 class AbsolutePath(AdhocracySchemaNode):
-
     """Absolute path made with  Identifier Strings.
 
     Example value: /bluaABC/_123/3
@@ -302,7 +291,6 @@ def string_has_no_newlines_validator(value: str) -> bool:
 
 
 class SingleLine(AdhocracySchemaNode):
-
     r"""UTF-8 encoded String without line breaks.
 
     Disallowed characters are linebreaks like: \n, \r.
@@ -325,7 +313,6 @@ def deferred_content_type_default(node: colander.MappingSchema,
 
 
 class Boolean(AdhocracySchemaNode):
-
     """SchemaNode for boolean values.
 
     Example value: false
@@ -345,7 +332,6 @@ class Booleans(AdhocracySequenceNode):
 
 
 class ContentType(AdhocracySchemaNode):
-
     """ContentType schema."""
 
     schema_type = InterfaceType
@@ -366,7 +352,6 @@ def get_sheet_cstructs(context: IResource, request) -> dict:
 
 
 class CurrencyAmount(AdhocracySchemaNode):
-
     """SchemaNode for currency amounts.
 
     Values are stored precisely with 2 fractional digits.
@@ -385,7 +370,6 @@ class CurrencyAmount(AdhocracySchemaNode):
 
 
 class ISOCountryCode(AdhocracySchemaNode):
-
     """An ISO 3166-1 alpha-2 country code (two uppercase ASCII letters).
 
     Example value: US
@@ -398,7 +382,6 @@ class ISOCountryCode(AdhocracySchemaNode):
 
 
 class ResourceObject(colander.SchemaType):
-
     """Schema type that de/serialized a :term:`location`-aware object.
 
     Example values:  'http://a.org/bluaABC/_123/3' '/blua/ABC/'
@@ -497,7 +480,6 @@ class ResourceObject(colander.SchemaType):
 
 
 class Resource(AdhocracySchemaNode):
-
     """A resource SchemaNode.
 
     Example value:  'http://a.org/bluaABC/_123/3'
@@ -515,7 +497,6 @@ def deferred_path_default(node: colander.MappingSchema, kw: dict) -> str:
 
 
 class ResourcePathSchema(colander.MappingSchema):
-
     """Resource Path schema."""
 
     content_type = ContentType()
@@ -524,7 +505,6 @@ class ResourcePathSchema(colander.MappingSchema):
 
 
 class ResourcePathAndContentSchema(ResourcePathSchema):
-
     """Resource Path with content schema."""
 
     data = colander.SchemaNode(colander.Mapping(unknown='preserve'),
@@ -532,16 +512,15 @@ class ResourcePathAndContentSchema(ResourcePathSchema):
 
 
 def _validate_reftype(node: colander.SchemaNode, value: ILocation):
-        reftype = node.reftype
-        isheet = reftype.getTaggedValue('target_isheet')
-        if not isheet.providedBy(value):
-            error = 'This Resource does not provide interface %s' % \
-                    (isheet.__identifier__)
-            raise colander.Invalid(node, msg=error, value=value)
+    reftype = node.reftype
+    isheet = reftype.getTaggedValue('target_isheet')
+    if not isheet.providedBy(value):
+        error = 'This Resource does not provide interface %s' % \
+                (isheet.__identifier__)
+        raise colander.Invalid(node, msg=error, value=value)
 
 
 class Reference(Resource):
-
     """Schema Node to reference a resource that implements a specific sheet.
 
     The constructor accepts these additional keyword arguments:
@@ -563,7 +542,6 @@ class Reference(Resource):
 
 
 class Resources(AdhocracySequenceNode):
-
     """List of :class:`Resource:`s."""
 
     missing = []
@@ -577,7 +555,6 @@ def _validate_reftypes(node: colander.SchemaNode, value: Sequence):
 
 
 class References(Resources):
-
     """Schema Node to reference resources that implements a specific sheet.
 
     The constructor accepts these additional keyword arguments:
@@ -599,7 +576,6 @@ class References(Resources):
 
 
 class UniqueReferences(References):
-
     """Schema Node to reference resources that implements a specific sheet.
 
     The order is preserved, duplicates are removed.
@@ -616,8 +592,7 @@ class UniqueReferences(References):
 
 
 class Text(AdhocracySchemaNode):
-
-    """ UTF-8 encoded String with line breaks.
+    """UTF-8 encoded String with line breaks.
 
     Example value: This is a something
                    with new lines.
@@ -629,8 +604,7 @@ class Text(AdhocracySchemaNode):
 
 
 class Password(AdhocracySchemaNode):
-
-    """ UTF-8 encoded text.
+    """UTF-8 encoded text.
 
     Minimal length=6, maximal length=100 characters.
     Example value: secret password?
@@ -649,8 +623,7 @@ def deferred_date_default(node: colander.MappingSchema, kw: dict) -> datetime:
 
 
 class DateTime(AdhocracySchemaNode):
-
-    """ DateTime object.
+    """DateTime object.
 
     This type serializes python ``datetime.datetime`` objects to a
     `ISO8601 <http://en.wikipedia.org/wiki/ISO_8601>`_ string format.
@@ -705,7 +678,6 @@ def _get_post_pool(context: IPool, iresource_or_service_name) -> IResource:
 
 
 class PostPool(Reference):
-
     """Reference to the common place to post resources used by the this sheet.
 
     Constructor arguments:
@@ -765,7 +737,6 @@ def _validate_post_pool(node, resources: list, post_pool: IPool):
 
 
 class Integer(AdhocracySchemaNode):
-
     """SchemaNode for Integer values.
 
     Example value: 1
@@ -777,7 +748,6 @@ class Integer(AdhocracySchemaNode):
 
 
 class Integers(AdhocracySequenceNode):
-
     """SchemaNode for a list of Integer values.
 
     Example value: [1,2]
@@ -787,7 +757,6 @@ class Integers(AdhocracySequenceNode):
 
 
 class FileStoreType(colander.SchemaType):
-
     """Accepts raw file data as per as 'multipart/form-data' upload."""
 
     SIZE_LIMIT = 16 * 1024 ** 2  # 16 MB
@@ -821,7 +790,6 @@ class FileStoreType(colander.SchemaType):
 
 
 class FileStore(AdhocracySchemaNode):
-
     """SchemaNode wrapping :class:`FileStoreType`."""
 
     schema_type = FileStoreType
@@ -830,14 +798,12 @@ class FileStore(AdhocracySchemaNode):
 
 
 class SingleLines(colander.SequenceSchema):
-
     """List of SingleLines."""
 
     item = SingleLine()
 
 
 class ACEPrincipalType(colander.SchemaType):
-
     """Adhocracy :term:`role` or pyramid system principal."""
 
     valid_principals = ROLE_PRINCIPALS + SYSTEM_PRINCIPALS
@@ -873,14 +839,12 @@ class ACEPrincipalType(colander.SchemaType):
 
 
 class ACEPrincipal(colander.SchemaNode):
-
     """Adhocracy :term:`role` or pyramid system principal."""
 
     schema_type = ACEPrincipalType
 
 
 class ACMCell(colander.SchemaNode):
-
     """ACM Cell."""
 
     schema_type = colander.String
@@ -888,7 +852,6 @@ class ACMCell(colander.SchemaNode):
 
 
 class ACMRow(colander.SequenceSchema):
-
     """ACM Row."""
 
     item = ACMCell()
@@ -915,7 +878,6 @@ class ACMRow(colander.SequenceSchema):
 
 
 class ACMPrincipals(colander.SequenceSchema):
-
     """ACM Principals."""
 
     principal = ACEPrincipal()
@@ -924,7 +886,6 @@ class ACMPrincipals(colander.SequenceSchema):
 
 
 class ACMPermissions(colander.SequenceSchema):
-
     """ACM Permissions."""
 
     row = ACMRow()
@@ -933,7 +894,6 @@ class ACMPermissions(colander.SequenceSchema):
 
 
 class ACM(colander.MappingSchema):
-
     """Access Control Matrix."""
 
     principals = ACMPrincipals()

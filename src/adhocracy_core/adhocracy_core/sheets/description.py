@@ -9,12 +9,10 @@ from adhocracy_core.schema import Text
 
 
 class IDescription(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Market interface for the description sheet."""
 
 
 class DescriptionSchema(colander.MappingSchema):
-
     """Description sheet data structure.
 
     `description`: a description

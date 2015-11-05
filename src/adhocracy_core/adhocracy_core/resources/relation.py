@@ -15,17 +15,14 @@ import adhocracy_core.sheets.comment
 
 
 class IRelation(IItem):
-
     """Relation versions pool."""
 
 
 class IRelationVersion(IItemVersion):
-
     """Relation version."""
 
 
 class IPolarizationVersion(IRelationVersion):
-
     """A polarization in a discussion."""
 
 
@@ -39,7 +36,6 @@ polarizationversion_meta = itemversion_meta._replace(
 
 
 class IPolarization(IRelation):
-
     """Polarization versions pool."""
 
 
@@ -57,7 +53,6 @@ polarization_meta = item_meta._replace(
 
 
 class IRelationsService(IServicePool):
-
     """The 'relations' ServicePool."""
 
 
