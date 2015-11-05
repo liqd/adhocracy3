@@ -193,6 +193,7 @@ export var s1ProposalEditColumnDirective = (
 };
 
 export var s1LandingDirective = (
+    $translate: any,
     adhConfig : AdhConfig.IService,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
@@ -201,6 +202,9 @@ export var s1LandingDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Landing.html",
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            $translate("TR__S1_ABOUT_TEXT").then((translated) => {
+                scope.aboutText = translated;
+            });
         }
     };
 };
