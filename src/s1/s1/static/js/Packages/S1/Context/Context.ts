@@ -21,6 +21,12 @@ export var headerDirective = (
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("meeting", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
+
+            scope.shouldShowS1StateIndicator = function(meeting) {
+                // means it also won't be shown on 'create proposal' screen, but thats good enough
+                return "current" === meeting
+                    || "next" === meeting;
+            };
         }
     };
 };
