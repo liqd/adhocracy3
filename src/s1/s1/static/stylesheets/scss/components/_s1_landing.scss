@@ -25,10 +25,10 @@ $susy: (
 }
 
 .s1-landing-section-header {
-    @include rem(font-size, $font-size-normal);
+    @include rem(font-size, $font-size-large);
     @include rem(margin, 0 0 20px);
     color: $color-text-normal;
-    font-weight: $font-weight-medium;
+    font-weight: $font-weight-extrovert;
 }
 
 .s1-landing-section-footer {
