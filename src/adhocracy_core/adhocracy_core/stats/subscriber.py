@@ -24,7 +24,7 @@ def incr_event_metric(name: str, rate: float, event: object):
     statsd_incr(name, value=1, rate=rate, registry=registry)
 
 incr_started = partial(incr_event_metric, 'app.started', 1)
-incr_resource_created = partial(incr_event_metric, 'resources.created', .05)
+incr_resource_created = partial(incr_event_metric, 'resources.created', .1)
 incr_pwordreset_created = partial(incr_event_metric, 'pwordresets.created', 1)
 incr_user_created = partial(incr_event_metric, 'users.created', 1)
 
