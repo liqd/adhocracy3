@@ -7,8 +7,12 @@
     <adh-report-action
         data-ng-if="report"
         data-class="action-bar-item"></adh-report-action>
-    <a class="action-bar-item" href="" data-ng-if="share" data-ng-click="share();">{{ "TR__SHARE" | translate }}</a>
-    <a class="action-bar-item" href="" data-ng-if="delete" data-ng-click="delete();">{{ "TR__DELETE" | translate }}</a>
-    <a class="action-bar-item" href="" data-ng-if="printfunction" data-ng-click="printfunction();">{{ "TR__PRINT" | translate }}</a>
+    <adh-share-action
+        data-ng-if="share"
+        data-class="action-bar-item"></adh-share-action>
+    <adh-delete-action
+        data-ng-if="delete && resourcePath"
+        data-class="action-bar-item"
+        data-resource-path="{{resourcePath}}"></adh-delete-action>
     <adh-cancel-action data-ng-if="cancel && resourcePath" data-class="action-bar-item" data-resource-path="{{resourcePath}}"></adh-cancel-action>
 </div>

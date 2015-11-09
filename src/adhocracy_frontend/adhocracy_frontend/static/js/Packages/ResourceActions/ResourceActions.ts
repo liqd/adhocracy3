@@ -45,6 +45,39 @@ export var reportActionDirective = () => {
     };
 };
 
+export var shareActionDirective = () => {
+    return {
+        restrict: "E",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"report();\">{{ \"TR__SHARE\" | translate }}</a>",
+        require: "^adhMovingColumn",
+        scope: {
+            class: "@"
+        },
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            scope.report = () => {
+                column.toggleOverlay("share");
+            };
+        }
+    };
+};
+
+export var deleteActionDirective = () => {
+    return {
+        restrict: "E",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"delete();\">{{ \"TR__DELETE\" | translate }}</a>",
+        require: "^adhMovingColumn",
+        scope: {
+            resourcePath: "@",
+            class: "@"
+        },
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            scope.delete = () => {
+                column.$broadcast("triggerDelete", scope.proposalUrl);
+            };
+        }
+    };
+};
+
 export var editActionDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhResourceUrl,
