@@ -400,6 +400,8 @@ def move_autoname_last_counters_to_attributes(root):  # pragma: no cover
                 logger.info('Move counter object for prefix {0} to attribute'
                             .format(prefix))
                 counter = pool._autoname_lasts.get(prefix, Length())
+                if isinstance(counter, int):
+                    counter = Length(counter)
                 setattr(pool, '_autoname_last_' + prefix, counter)
             logger.info('Remove "_autoname_lasts" attribute')
             delattr(pool, '_autoname_lasts')
