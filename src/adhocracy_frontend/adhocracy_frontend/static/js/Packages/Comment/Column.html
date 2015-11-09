@@ -1,11 +1,11 @@
 <div data-ng-switch="transclusionId">
     <div data-ng-switch-when="menu">
-        <div class="moving-column-tab" data-ng-switch on="overlay">
-            <span ng-switch-when="abuse">
+        <div class="moving-column-tab" data-ng-switch="overlay">
+            <span data-ng-switch-when="abuse">
                 <i class="icon-flag moving-column-icon"></i>
                 {{ "TR__REPORT_COMMENT" | translate }}
             </span>
-            <span ng-switch-default>
+            <span data-ng-switch-default="">
                 <i class="icon-speechbubbles moving-column-icon"></i>
                 {{ "TR__COMMENTS" | translate }}
             </span>
