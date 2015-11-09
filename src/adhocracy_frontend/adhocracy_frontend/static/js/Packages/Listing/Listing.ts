@@ -69,16 +69,16 @@ export interface ListingScope<Container> extends angular.IScope {
     contentType? : string;
     facets? : IFacet[];
     sort? : string;
-    sorts?: string[];
+    sorts? : string[];
     reverse? : boolean;
     initialLimit? : number;
     currentLimit? : number;
     totalCount? : number;
     params? : any;
     emptyText? : string;
-    showFilter: boolean;
-    showSort: boolean;
-    container: Container;
+    showFilter : boolean;
+    showSort : boolean;
+    container : Container;
     poolPath : string;
     poolOptions : AdhHttp.IOptions;
     createPath? : string;
@@ -90,9 +90,9 @@ export interface ListingScope<Container> extends angular.IScope {
     wsOff : () => void;
     clear : () => void;
     onCreate : () => void;
-    toggleFilter: () => void;
-    toggleSort: () => void;
-    setSort: (string) => void;
+    toggleFilter : () => void;
+    toggleSort : () => void;
+    setSort : (string) => void;
 }
 
 export interface IFacetsScope extends angular.IScope {
@@ -255,7 +255,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     $scope.elements = [];
                 };
 
-                $scope.setSort = (sort: string) => {
+                $scope.setSort = (sort : string) => {
                     $scope.sort = sort;
                 };
 
