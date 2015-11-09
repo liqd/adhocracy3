@@ -24,7 +24,7 @@ export var resourceActionsDirective = (
 		templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceActions.html",
         link: (scope, element) => {
             console.log(scope);
-			adhPermissions.bindScope(scope, () => scope.path && AdhUtil.parentPath(scope.path), "proposalItemOptions");
+			adhPermissions.bindScope(scope, () => scope.resourcePath && AdhUtil.parentPath(scope.resourcePath), "proposalItemOptions");
         }
     };
 };
@@ -73,6 +73,25 @@ export var deleteActionDirective = () => {
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             scope.delete = () => {
                 column.$broadcast("triggerDelete", scope.proposalUrl);
+            };
+        }
+    };
+};
+
+export var printActionDirective = (
+    adhTopLevelState : AdhTopLevelState.Service,
+    $window : Window) => {
+    return {
+        restrict: "E",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"print();\">{{ \"TR__PRINT\" | translate }}</a>",
+        scope: {
+            class: "@"
+        },
+        link: (scope, element, attrs) => {
+            scope.print = () => {
+                // only the focused column is printed
+                adhTopLevelState.set("focus", 1);
+                $window.print();
             };
         }
     };

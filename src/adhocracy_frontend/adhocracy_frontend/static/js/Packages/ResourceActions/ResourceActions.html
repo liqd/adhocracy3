@@ -14,5 +14,11 @@
         data-ng-if="delete && resourcePath"
         data-class="action-bar-item"
         data-resource-path="{{resourcePath}}"></adh-delete-action>
-    <adh-cancel-action data-ng-if="cancel && resourcePath" data-class="action-bar-item" data-resource-path="{{resourcePath}}"></adh-cancel-action>
+    <adh-print-action
+        data-ng-if="print"
+        data-class="action-bar-item"></adh-print-action>
+    <adh-cancel-action
+        data-ng-if="cancel && resourcePath"
+        data-class="action-bar-item"
+        data-resource-path="{{resourcePath}}"></adh-cancel-action>
 </div>
