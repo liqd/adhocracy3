@@ -1,3 +1,4 @@
+import * as AdhMovingColumnsModule from "../MovingColumns/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 import * as AdhResourceAreaModule from "../ResourceArea/Module";
 
@@ -9,8 +10,10 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhTopLevelStateModule.moduleName,
-            AdhResourceAreaModule.moduleName
+            AdhResourceAreaModule.moduleName,
+            AdhMovingColumnsModule.moduleName
         ])
         .directive("adhResourceActions", ["adhPermissions", "adhConfig", AdhResourceActions.resourceActionsDirective])
-        .directive("adhCancel", ["adhConfig", "adhTopLevelState", "adhResourceUrlFilter", AdhResourceActions.cancelDirective]);
+        .directive("adhReportAction", ["adhConfig", AdhResourceActions.reportActionDirective])
+        .directive("adhCancelAction", ["adhConfig", "adhTopLevelState", "adhResourceUrlFilter", AdhResourceActions.cancelActionDirective]);
 };
