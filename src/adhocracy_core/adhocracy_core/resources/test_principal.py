@@ -1,12 +1,12 @@
 """Tests for the principal package."""
-import unittest
-from unittest.mock import Mock
-
 from pyramid import testing
 from pytest import fixture
-from pytest import mark
-from pytest import mark
 from pytest import fixture
+from pytest import mark
+from pytest import mark
+from unittest.mock import Mock
+import pytest
+import unittest
 
 
 @fixture
@@ -365,6 +365,15 @@ class TestUserLocatorAdapter:
             indexes={'private_user_email': 'test@test.de'},
             resolve=True,
         )
+
+    def test_get_user_by_email_two_identical_user_exists(self, inst, mock_catalogs,
+                                                         search_result, query):
+        user = testing.DummyResource()
+        user2 = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user, user2])
+        with pytest.raises(ValueError):
+            inst.get_user_by_email('test@test.de')
 
     def test_get_user_by_email_user_not_exists(self, inst, mock_catalogs):
         assert inst.get_user_by_email('wrong@test.de') is None

@@ -305,13 +305,23 @@ def hide_password_resets(root):  # pragma: no cover
 
 @log_migration
 def lower_case_users_emails(root):  # pragma: no cover
-    """Lower case users email."""
+    """Lower case users email, add 'private_user_email'/'user_name' index."""
+    _update_adhocracy_catalog(root)
+    catalogs = find_service(root, 'catalogs')
     users = find_service(root, 'principals', 'users')
     for user in users.values():
         if not IUserExtended.providedBy(user):
             return
         sheet = get_sheet(user, IUserExtended)
         sheet.set({'email': user.email.lower()})
+        catalogs.reindex_index(user, 'private_user_email')
+        catalogs.reindex_index(user, 'user_name')
+
+
+def _update_adhocracy_catalog(root):  # pragma: no cover
+    """Add/Remove indexes for catalog `adhocracy`."""
+    adhocracy = find_service(root, 'catalogs', 'adhocracy')
+    adhocracy.update_indexes()
 
 
 @log_migration

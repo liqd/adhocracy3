@@ -379,7 +379,7 @@ class TestResourceRESTView:
         from adhocracy_core.rest.views import RESTView
         inst = self.make_one(context, request_)
         assert isinstance(inst, RESTView)
-        assert inst.registry is request_.registry.content
+        assert inst.content is request_.registry.content
 
     def test_create_method_get_and_resource_blocked(self, request_, context):
         from pyramid.httpexceptions import HTTPGone

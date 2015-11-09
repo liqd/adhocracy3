@@ -45,11 +45,6 @@
     @include rem(padding, 0 1rem);
 }
 
-.listing-action-bar {
-    @include rem(font-size, $font-size-small);
-    background: $color-structure-normal;
-}
-
 .listing-action-bar,
 .listing-action-bar-link {
     line-height: 2;
@@ -73,6 +68,29 @@
         position: absolute;
         right: 50%;
         width: 0;
+    }
+}
+
+.listing-action-bar {
+    @include rem(font-size, $font-size-small);
+    @include inline-block;
+    @include rem(padding, 0 7px);
+    background: $color-structure-normal;
+    width: 100%;
+
+    .map-switch {
+        float: right;
+    }
+
+    .map-switch-item {
+        @extend .listing-action-bar-link;
+        @include rem(margin, 0 0 0 5px);
+
+        &.m-selected {
+            &:after {
+                @include rem(margin-right, -4.5px);
+            }
+        }
     }
 }
 
