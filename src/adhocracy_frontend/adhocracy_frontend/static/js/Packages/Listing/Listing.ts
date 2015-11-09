@@ -92,7 +92,7 @@ export interface ListingScope<Container> extends angular.IScope {
     onCreate : () => void;
     toggleFilter : () => void;
     toggleSort : () => void;
-    setSort : (string) => void;
+    setSort : (sort : string) => void;
 }
 
 export interface IFacetsScope extends angular.IScope {
