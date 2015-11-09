@@ -14,6 +14,7 @@ export var register = (angular) => {
             AdhMovingColumnsModule.moduleName
         ])
         .directive("adhResourceActions", ["adhPermissions", "adhConfig", AdhResourceActions.resourceActionsDirective])
-        .directive("adhReportAction", ["adhConfig", AdhResourceActions.reportActionDirective])
-        .directive("adhCancelAction", ["adhConfig", "adhTopLevelState", "adhResourceUrlFilter", AdhResourceActions.cancelActionDirective]);
+        .directive("adhReportAction", [AdhResourceActions.reportActionDirective])
+        .directive("adhEditAction", ["adhTopLevelState", "adhResourceUrlFilter", "$location", AdhResourceActions.editActionDirective])
+        .directive("adhCancelAction", ["adhTopLevelState", "adhResourceUrlFilter", AdhResourceActions.cancelActionDirective]);
 };

@@ -19,7 +19,8 @@ export var resourceActionsDirective = (
         	delete: "=?",
             print: "=?",
         	report: "=?",
-            cancel: "=?"
+            cancel: "=?",
+            edit: "=?"
         },
 		templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceActions.html",
         link: (scope, element) => {
@@ -29,7 +30,7 @@ export var resourceActionsDirective = (
     };
 };
 
-export var reportActionDirective = (adhConfig : AdhConfig.IService) => {
+export var reportActionDirective = () => {
     return {
         restrict: "E",
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"report();\">{{ \"TR__REPORT\" | translate }}</a>",
@@ -45,8 +46,26 @@ export var reportActionDirective = (adhConfig : AdhConfig.IService) => {
     };
 };
 
+export var editActionDirective = (
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhResourceUrl,
+    $location : angular.ILocationService) => {
+    return {
+        restrict: "E",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"edit();\">{{ \"TR__EDIT\" | translate }}</a>",
+        require: "^adhMovingColumn",
+        scope: {
+            resourcePath: "@",
+            class: "@"
+        },
+        link: (scope, element, attrs) => {
+            var url = adhResourceUrl(scope.resourcePath, "edit");
+            $location.url(url);
+        }
+    };
+};
+
 export var cancelActionDirective = (
-        adhConfig : AdhConfig.IService,
         adhTopLevelState : AdhTopLevelState.Service,
         adhResourceUrl) => {
     return {
