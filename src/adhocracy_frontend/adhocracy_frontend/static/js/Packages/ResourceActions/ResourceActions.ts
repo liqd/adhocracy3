@@ -14,7 +14,6 @@ export var resourceActionsDirective = (
         restrict: "E",
         scope: {
             resourcePath: "@",
-        	createDocumentPath: "=?",
         	share: "=?",
         	delete: "=?",
             print: "=?",
