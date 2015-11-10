@@ -122,7 +122,10 @@ export var mercatorProposalListingColumnDirective = (
             column.bindVariablesAndClear(scope, ["platformUrl", "proposalUrl"]);
             scope.contentType = RIMercatorProposalVersion.content_type;
 
-            scope.sorts = ["rates", "item_creation_date"];
+            scope.sorts = {
+                rates: "TR__RATES",
+                item_creation_date: "TR__CREATION_DATE"
+            };
 
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {

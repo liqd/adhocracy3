@@ -10,9 +10,9 @@
             <a
                 href=""
                 class="button-cta-secondary sort-item"
-                data-ng-repeat="s in sorts"
-                data-ng-click="setSort(s)"
-                data-ng-class="{'is-active': sort === s }">{{ ('TR__' + s) | uppercase | translate }}
+                data-ng-repeat="(key, name) in sorts"
+                data-ng-click="setSort(key)"
+                data-ng-class="{'is-active': sort === key }">{{ name | uppercase | translate }}
             </a>
         </div>
     </div>
