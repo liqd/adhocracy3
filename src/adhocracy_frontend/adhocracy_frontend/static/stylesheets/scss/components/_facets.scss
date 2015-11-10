@@ -1,4 +1,6 @@
 .facets {
+    @include container;
+
     ul {
         list-style-type: none;
         margin: 0;
@@ -6,38 +8,63 @@
     }
 
     .facet {
-        @include rem(margin-bottom, 50px);
+        @include gallery(6 of 12);
+    }
+}
+
+.facet-header,
+.sort-header {
+    @include rem(font-size, $font-size-small);
+    @include rem(margin, 0 0 15px);
+    color: $color-text-introvert;
+    line-height: 1.15;
+}
+
+.sort-item,
+.facet-item {
+    @include rem(margin-bottom, 1rem);
+    @include rem(margin-right, 1rem);
+}
+
+.sort-item {
+    min-width: 1px;
+
+    &.is-active {
+        @extend .button-cta-secondary:focus;
+    }
+}
+
+.facet-item {
+    color: inherit;
+    text-decoration: inherit;
+
+    &:hover, &:focus {
+        color: $color-text-highlight-normal;
     }
 
-    .facet-header {
-        @include rem(font-size, $font-size-small);
-        @include rem(margin, 0 0 20px);
-        color: $color-text-introvert;
-        font-weight: $font-weight-normal;
-        line-height: 1.15;
+    &.is-active, &:active {
+        color: $color-function-valid;
     }
 
-    .facet-item {
-        @include rem(margin-bottom, 1rem);
-        display: block;
-        line-height: 1;
-        color: inherit;
-        text-decoration: inherit;
-
-        &:hover, &:focus {
-            color: $color-text-highlight-normal;
-        }
-
-        &.is-active, &:active {
-            color: $color-function-valid;
-        }
-
-        &.is-active:after, &:active:after {
-            content: "\2713";
-            font-size: 135%;
-            line-height: 0.5;
-        }
+    &.is-active:after, &:active:after {
+        content: "\2713";
+        font-size: 135%;
+        line-height: 0.5;
     }
+}
+
+.sort-header, .sort-item {
+    margin-bottom: 0;
+}
+
+.sort-header {
+    @include inline-block;
+    margin-bottom: 0;
+}
+
+.listing-action-bar,
+.listing-results {
+    @include rem(padding, 0 1rem);
 }
 
 .listing-action-bar,
@@ -87,4 +114,10 @@
             }
         }
     }
+}
+
+.listing-results {
+    @include rem(padding-bottom, 1rem);
+    @include rem(padding-top, 1rem);
+    border-bottom: 2px solid $color-structure-normal;
 }

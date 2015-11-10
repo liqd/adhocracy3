@@ -1,4 +1,21 @@
 <div class="listing">
+    <div class="listing-action-bar">
+        <a data-ng-if="facets" class="listing-action-bar-link" data-ng-class="{ 'm-selected': showFilter }" data-ng-click="toggleFilter();" href="">Filter</a>
+        <a data-ng-if="sorts" class="listing-action-bar-link" data-ng-class="{ 'm-selected': showSort }" data-ng-click="toggleSort();" href="">Sort</a>
+    </div>
+    <div class="listing-results" data-ng-if="showFilter || showSort">
+        <adh-facets data-ng-if="showFilter" data-facets="facets" data-update="update" ></adh-facets>
+        <div data-ng-if="showSort">
+            <h3 class="sort-header">{{ "TR__SORT_BY" | translate }}</h3>
+            <a
+                href=""
+                class="button-cta-secondary sort-item"
+                data-ng-repeat="(key, name) in sorts"
+                data-ng-click="setSort(key)"
+                data-ng-class="{'is-active': sort === key }">{{ name | uppercase | translate }}
+            </a>
+        </div>
+    </div>
     <div class="listing-create-form" data-ng-if="!noCreateForm && poolOptions.POST">
         <adh-inject data-transclusion-id="create-form-id"></adh-inject>
     </div>

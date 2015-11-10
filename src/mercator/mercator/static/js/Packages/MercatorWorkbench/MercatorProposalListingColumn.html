@@ -1,21 +1,6 @@
 <div data-ng-switch="transclusionId" data-ng-if="ready">
     <div data-ng-switch-when="menu">
         <i class="icon-list-filled moving-column-icon"></i>
-        <a href=""
-            data-ng-click="ctrl.toggleSidebar()"
-            data-ng-class="{'is-active': _showSidebar}"
-            class="moving-column-menu-button">{{ "TR__FILTERS" | translate }}</a>
-        <div class="moving-column-menu-sorts">
-            <span class="moving-column-menu-sort-label">{{ "TR__SORT_BY" | translate }}</span>
-            <a href=""
-                class="moving-column-menu-sort-option"
-                data-ng-click="shared.setSort('rates')"
-                data-ng-class="{'is-active': (shared.sort==='rates')}">{{ "TR__RATES" | translate }}</a>
-            <a href=""
-                class="moving-column-menu-sort-option"
-                data-ng-click="shared.setSort('item_creation_date')"
-                data-ng-class="{'is-active': shared.sort==='item_creation_date'}">{{ "TR__CREATION_DATE" | translate }}</a>
-        </div>
     </div>
 
     <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ platformUrl | adhResourceUrl:undefined:{proposalUrl: proposalUrl, movingColumns: 'is-show-show-hide'} }}">
@@ -24,12 +9,6 @@
         </div>
     </a>
 
-    <adh-facets
-        data-ng-switch-when="sidebar"
-        data-update="shared.update"
-        data-facets="shared.facets">
-    </adh-facets>
-
     <adh-mercator-proposal-listing
         data-ng-switch-when="body"
         data-path="{{platformUrl}}"
@@ -37,6 +16,7 @@
         data-update="shared.update"
         data-facets="shared.facets"
         data-sort="shared.sort"
+        data-sorts="sorts"
         data-reverse="shared.reverse"
         data-frontend-order-predicate="frontendOrderPredicate"
         data-frontend-order-reverse="frontendOrderReverse"
