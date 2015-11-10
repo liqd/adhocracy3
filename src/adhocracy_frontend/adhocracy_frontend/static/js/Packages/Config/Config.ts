@@ -20,7 +20,7 @@ export interface IService {
     support_email : string;
     custom : {[key : string]: string};
     site_name : string;
-    nettiquette_url : string;
+    netiquette_url : string;
     cachebust : boolean;
     cachebust_suffix : string;
     debug : boolean;
