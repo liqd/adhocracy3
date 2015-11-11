@@ -475,6 +475,7 @@ class ResourceObject(colander.SchemaType):
             application_url_len = len(request.application_url)
             if application_url_len > len(str(value)):
                 raise KeyError
+            # Fixme: This does not work with :term:`virtual hosting`
             path = urllib.parse.urlparse(value).path
             return find_resource(request.root, path)
 
