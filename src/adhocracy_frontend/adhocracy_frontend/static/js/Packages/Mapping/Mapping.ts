@@ -527,9 +527,12 @@ export var mapSwitch = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MapSwitch.html",
+        scope: {
+            model: "="
+        },
         link: (scope) => {
             scope.showMap = (isShowMap) => {
-                scope.isShowMap = isShowMap;
+                scope.model = isShowMap;
             };
         }
     };
