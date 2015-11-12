@@ -7,6 +7,7 @@ from colander import drop
 from pyramid.testing import DummyRequest
 from pyramid.threadlocal import get_current_request
 from substanced.workflow import IWorkflow
+from zope.deprecation import deprecated
 from zope.interface import implementer
 
 from adhocracy_core.exceptions import RuntimeConfigurationError
@@ -20,6 +21,13 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import AnnotationRessourceSheet
 from adhocracy_core.interfaces import IResourceSheet
+
+
+class ISample(ISheet):
+    """Sheet with the sample workflow."""
+
+
+deprecated('ISample', 'Backward compatible code, dont use')
 
 
 class Workflow(AdhocracySchemaNode):
