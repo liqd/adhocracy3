@@ -11,5 +11,5 @@
     </div>
 </div>
 <adh-workflow-switch ng-if="shouldShowS1StateIndicator(meeting)" data-path="{{ processUrl }}">
-    <adh-s1-state-indicator></adh-s1-state-indicator>
+    <adh-s1-state-indicator data-meeting="{{meeting}}"></adh-s1-state-indicator>
 </adh-workflow-switch>

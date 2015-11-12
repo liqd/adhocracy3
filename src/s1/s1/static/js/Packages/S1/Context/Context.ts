@@ -39,6 +39,10 @@ export var stateIndicatorDirective = (
 ) => {
     return {
         restrict: "E",
+        scope: {
+            workflowState: "@",
+            meeting: "@"
+        },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/StateIndicator.html",
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.on("processUrl", (processUrl) => {
