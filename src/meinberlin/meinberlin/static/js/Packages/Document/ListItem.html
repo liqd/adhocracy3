@@ -1,9 +1,13 @@
+
 <a data-ng-href="{{ path | adhParentPath | adhResourceUrl }}"
     ng-class="{'m-no-picture':!data.picture}"
     class="proposal-list-item meinberlin-alexanderplatz-proposal-list-item {{ selectedState }}">
-    <img class="proposal-list-item-image"
+    <adh-show-image
         data-ng-if="data.picture"
-        data-ng-src="{{ data.picture | adhImageUri:'thumbnail' }}" alt="" />
+        data-path="{{data.picture}}"
+        data-css-class="proposal-list-item-image"
+        data-format="thumbnail"
+    ></adh-show-image>
     <div class="proposal-list-item-body">
         <div class="proposal-list-item-col-left">
             <span data-ng-repeat="badge in data.assignments" class="badge m-info">{{ badge.title }}</span>
