@@ -116,10 +116,11 @@ export var showImageDirective = (
 ) => {
     return {
         restrict: "E",
-        template: "<img class=\"{{ class }}\" data-ng-src=\"{{ imageUrl }}\" alt=\"\" />",
+        template: "<img class=\"{{ class }}\" data-ng-src=\"{{ imageUrl }}\" alt=\"{{alt}}\" />",
         scope: {
             path: "@", // of the attachment resource
             cssClass: "@",
+            alt: "@?",
             format: "@?", // defaults to "detail"
             imageMetadataNick: "@?" // defaults to SIImageMetadata.nick
         },
