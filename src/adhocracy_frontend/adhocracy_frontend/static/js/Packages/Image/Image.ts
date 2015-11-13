@@ -118,23 +118,25 @@ export var showImageDirective = (
         restrict: "E",
         template: "<img class=\"{{ class }}\" data-ng-src=\"{{ imageUrl }}\" alt=\"\" />",
         scope: {
-            path: "@",
-            format: "@?",
-            cssClass: "@"
+            path: "@", // of the attachment resource
+            cssClass: "@",
+            format: "@?", // defaults to "detail"
+            imageMetadataNick: "@?" // defaults to SIImageMetadata.nick
         },
         link: (scope) => {
-            // FIXME: could be a loading image or nothing instead
-            var loadingUrl = "/static/fallback_" + scope.format + ".jpg";
-            scope.imageUrl = loadingUrl;
-            adhHttp.get(scope.path).then(
-                (asset) => {
-                    scope.imageUrl = asset.data[SIImageMetadata.nick][scope.format];
-                },
-                (reason) => {
-                    scope.imageUrl = loadingUrl;
-                }
-            );
+            if ( ! scope.imageMetadataNick) { scope.imageMetadataNick = SIImageMetadata.nick; }
+            if ( ! scope.format) { scope.format = "detail"; }
 
+            var fallbackUrl = "/static/fallback_" + scope.format + ".jpg";
+
+            scope.$watch("path", (path) => {
+                // often instantiated before the path can be provided by the surrounding dom
+                if ( ! path) { return; }
+                adhHttp.get(scope.path).then(
+                    (asset) => { scope.imageUrl = asset.data[scope.imageMetadataNick][scope.format]; },
+                    (error) => { scope.imageUrl = fallbackUrl; }
+                );
+            });
         }
     };
 };
