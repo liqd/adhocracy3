@@ -1,6 +1,7 @@
 """Authentication with support for token http headers."""
 import hashlib
 from datetime import datetime
+import urllib
 
 from colander import Invalid
 from persistent.dict import PersistentDict
@@ -125,12 +126,7 @@ def _get_raw_x_user_headers(request: Request) -> tuple:
     # well with the pyramid authentication system. We don't have the
     # a context or root object to resolve the resource path when processing
     # the unauthenticated_userid and effective_principals methods.
-    app_url_length = len(request.application_url)
-    user_path = None
-    if user_url.startswith('/'):
-        user_path = user_url
-    elif len(user_url) >= app_url_length:
-        user_path = user_url[app_url_length:][:-1]
+    user_path = urllib.parse.urlparse(user_url).path.rstrip('/') or None
     token = request.headers.get('X-User-Token', None)
     return user_path, token
 
