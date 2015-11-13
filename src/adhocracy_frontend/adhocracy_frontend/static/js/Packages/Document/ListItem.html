@@ -1,6 +1,9 @@
 <a data-ng-href="{{ path | adhParentPath | adhResourceUrl }}" class="proposal-list-item {{ selectedState }}">
-    <img class="proposal-list-item-image"
-        data-ng-src="{{ data.picture | adhImageUri:'thumbnail' }}" alt="" />
+    <adh-show-image
+        data-css-class="proposal-list-item-image"
+        data-path="{{data.picture}}"
+        data-format="thumbnail"
+    ></adh-show-image>
     <div class="proposal-list-item-body">
         <h3 class="proposal-list-item-title">{{ data.title }}</h3>
         <ul class="meta-list">

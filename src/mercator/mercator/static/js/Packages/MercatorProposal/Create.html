@@ -370,9 +370,13 @@
                             name="introduction-picture-upload">
                             <div data-ng-if="data.introduction.picture && (!$flow.files || $flow.files.length == 0)">
                                 {{ "TR__IMAGE_CURRENT" | translate }}:
-                                <img class="mercator-proposal-detail-view-image image-upload-preview"
-                                     data-ng-src="{{ data.introduction.picture | adhImageUri }}"
-                                     alt="{{ 'TR__IMAGE_CURRENT' | translate }}" />
+                                <adh-show-image
+                                    data-css-class="mercator-proposal-detail-view-image image-upload-preview"
+                                    data-path="{{data.introduction.picture}}"
+                                    data-format="thumbnail"
+                                    data-alt="{{ 'TR__IMAGE_CURRENT' | translate }}"
+                                    data-image-metadata-nick="adhocracy_mercator.sheets.mercator.IIntroImageMetadata"
+                                ></adh-show-image>
                             </div>
                             <button
                                 type="button"

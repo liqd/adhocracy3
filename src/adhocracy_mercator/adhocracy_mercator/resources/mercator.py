@@ -2,8 +2,8 @@
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.resources.asset import asset_meta
-from adhocracy_core.resources.asset import IAsset
+from adhocracy_core.resources.image import IImage
+from adhocracy_core.resources.image import image_meta
 from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.resources.itemversion import itemversion_meta
 from adhocracy_core.resources.item import item_meta
@@ -11,7 +11,6 @@ from adhocracy_core.resources.comment import add_commentsservice
 from adhocracy_core.resources.rate import add_ratesservice
 from adhocracy_core.resources.logbook import add_logbook_service
 from adhocracy_core.resources import process
-from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.sheets.rate import ILikeable
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.comment import ICommentable
@@ -50,18 +49,15 @@ organization_info_meta = item_meta._replace(
 )._add(after_creation=(add_commentsservice,))
 
 
-class IIntroImage(IAsset):
+class IIntroImage(IImage):
     """Image attached to the introduction of a proposal."""
 
 
-intro_image_meta = asset_meta._replace(
+intro_image_meta = image_meta._replace(
     content_name='IIntroImage',
     iresource=IIntroImage,
     is_implicit_addable=True,
-    # replace IAssetMetadata sheet by IIntroImageMetadata
-    basic_sheets=tuple(
-        set(asset_meta.basic_sheets) - {IAssetMetadata, }
-        | {adhocracy_mercator.sheets.mercator.IIntroImageMetadata, }),
+    extended_sheets=(adhocracy_mercator.sheets.mercator.IIntroImageMetadata,)
 )
 
 
