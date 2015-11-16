@@ -156,9 +156,9 @@ export var movingColumns = (
 /**
  * Moving Column directive
  *
- * Every moving column should be wrapped in an instance of this directive.
- * It provides common functionality, e.g. alerts, sidebar and overlays
- * via a controller that can be required by subelements.
+ * Every moving column should be wrapped in an instance of this
+ * directive.  It provides common functionality, e.g. alerts and
+ * overlays via a controller that can be required by subelements.
  *
  * Subelements can inject template code with the following transclusionIds
  * (see AdhInject):
