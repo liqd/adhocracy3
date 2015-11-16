@@ -87,7 +87,7 @@ export var printActionDirective = (
         scope: {
             class: "@"
         },
-        link: () => {
+        link: (scope) => {
             scope.print = () => {
                 // only the focused column is printed
                 adhTopLevelState.set("focus", 1);
