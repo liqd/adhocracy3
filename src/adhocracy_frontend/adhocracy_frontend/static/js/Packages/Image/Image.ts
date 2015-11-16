@@ -116,7 +116,7 @@ export var showImageDirective = (
 ) => {
     return {
         restrict: "E",
-        template: "<img class=\"{{ class }}\" data-ng-src=\"{{ imageUrl }}\" alt=\"{{alt}}\" />",
+        template: "<img class=\"{{ cssClass }}\" data-ng-src=\"{{ imageUrl }}\" alt=\"{{alt}}\" />",
         scope: {
             path: "@", // of the attachment resource
             cssClass: "@",
