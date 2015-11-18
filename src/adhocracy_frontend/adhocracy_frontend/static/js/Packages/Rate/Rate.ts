@@ -18,6 +18,7 @@ import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
 import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIRate from "../../Resources_/adhocracy_core/sheets/rate/IRate";
 import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
+import * as SIWorkflow from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/Rate";
 
@@ -49,6 +50,7 @@ export interface IRateScope extends angular.IScope {
     optionsPostPool : AdhHttp.IOptions;
     ready : boolean;
     hasCast : boolean;
+    forceResult : boolean;
 
     cast(value : number) : angular.IPromise<void>;
     uncast() : angular.IPromise<void>;
@@ -80,6 +82,29 @@ export interface IRateAdapter<T extends ResourcesBase.Resource> {
     creationDate(resource : T) : string;
     modificationDate(resource : T) : string;
 }
+
+
+/**
+ * promise workflow state.
+ */
+export var getWorkflowState = (
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service,
+    $q : angular.IQService
+) => () : angular.IPromise<string> => {
+    var processUrl = adhTopLevelState.get("processUrl");
+
+    if (typeof processUrl !== "undefined") {
+        return adhHttp.get(processUrl).then((resource) => {
+            var workflowSheet = resource.data[SIWorkflow.nick];
+            if (typeof workflowSheet !== "undefined") {
+                return workflowSheet.workflow_state;
+            }
+        });
+    } else {
+        return $q.when(undefined);
+    }
+};
 
 
 export class Service {
@@ -349,6 +374,13 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                     adhPermissions.bindScope(scope, postPoolPath, "optionsPostPool");
                     scope.ready = true;
                     adhDone();
+                });
+
+            getWorkflowState(adhHttp, adhTopLevelState, $q)()
+                .then((workflowState : string) => {
+                    if (workflowState === "result") {
+                        scope.forceResult = true;
+                    }
                 });
         }
     };
