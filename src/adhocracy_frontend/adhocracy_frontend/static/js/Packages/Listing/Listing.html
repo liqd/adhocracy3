@@ -1,5 +1,5 @@
 <div class="listing">
-    <div class="action-bar">
+    <div class="action-bar" data-ng-if="facets || sorts">
         <a data-ng-if="facets" class="action-bar-item" data-ng-class="{ 'm-selected': showFilter }" data-ng-click="toggleFilter();" href="">Filter</a>
         <a data-ng-if="sorts" class="action-bar-item" data-ng-class="{ 'm-selected': showSort }" data-ng-click="toggleSort();" href="">Sort</a>
     </div>
