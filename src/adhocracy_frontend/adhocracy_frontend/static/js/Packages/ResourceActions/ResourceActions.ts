@@ -73,7 +73,7 @@ export var deleteActionDirective = () => {
         },
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             scope.delete = () => {
-                column.$broadcast("triggerDelete", scope.proposalUrl);
+                column.$broadcast("triggerDelete", scope.resourcePath);
             };
         }
     };
