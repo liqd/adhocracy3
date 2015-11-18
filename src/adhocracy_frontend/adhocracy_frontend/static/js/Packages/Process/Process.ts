@@ -73,7 +73,7 @@ export var workflowSwitchDirective = (
             path: "@"
         },
         transclude: true,
-        link: (scope, element) => {
+        link: (scope) => {
 
             adhHttp.options(scope.path, {importOptions: false}).then((raw) => {
                 scope.availableStates = AdhUtil.deepPluck(raw, [
