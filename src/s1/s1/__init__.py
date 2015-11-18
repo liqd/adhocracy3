@@ -12,7 +12,7 @@ def includeme(config):
 
 
 def main(global_config, **settings):
-    """ Return a Pyramid WSGI application. """
+    """Return a Pyramid WSGI application."""
     config = Configurator(settings=settings)
     includeme(config)
     app = config.make_wsgi_app()
