@@ -1,7 +1,7 @@
 [main]
 host = https://www.transifex.com
 
-[adhocracy3mercator.core]
+[adhocracy3.core]
 file_filter = adhocracy_frontend/static/i18n/core_<lang>.json
 source_file = adhocracy_frontend/static/i18n/core_en.json
 source_lang = en
