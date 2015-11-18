@@ -23,6 +23,8 @@ from pyramid.traversal import resource_path
 
 from adhocracy_core.resources.comment import ICommentVersion
 from adhocracy_core.sheets.title import ITitle
+from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from adhocracy_mercator.sheets.mercator import IFinance
 from adhocracy_mercator.sheets.mercator import IMercatorSubResources
@@ -137,12 +139,18 @@ def export_proposals():
             'item_creation_date')
         date = creation_date.date().strftime('%d.%m.%Y')
         result.append(date)
-
         result.append(get_sheet_field(proposal, ITitle, 'title'))
-        result.append(get_sheet_field(proposal, IMetadata, 'creator').name)
+        creator = get_sheet_field(proposal, IMetadata, 'creator')
+        if creator is None:
+            name = ''
+            email = ''
+        else:
+            name = get_sheet_field(creator, IUserBasic, 'name')
+            email = get_sheet_field(creator, IUserExtended, 'email')
+        result.append(name)
         result.append(get_sheet_field(proposal, IUserInfo, 'personal_name'))
         result.append(get_sheet_field(proposal, IUserInfo, 'family_name'))
-        result.append(get_sheet_field(proposal, IMetadata, 'creator').email)
+        result.append(email)
         result.append(get_sheet_field(proposal, IUserInfo, 'country'))
 
         # Organisation
