@@ -33,7 +33,6 @@ from adhocracy_core.interfaces import ILocation
 from adhocracy_core.resources.asset import IAsset
 from adhocracy_core.resources.asset import IAssetDownload
 from adhocracy_core.resources.asset import IAssetsService
-from adhocracy_core.resources.asset import validate_and_complete_asset
 from adhocracy_core.resources.principal import IUsersService
 from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.resources.proposal import IProposalVersion
@@ -50,7 +49,9 @@ from adhocracy_core.rest.schemas import POSTCreatePasswordResetRequestSchema
 from adhocracy_core.rest.schemas import POSTPasswordResetRequestSchema
 from adhocracy_core.rest.schemas import POSTReportAbuseViewRequestSchema
 from adhocracy_core.rest.schemas import POSTResourceRequestSchema
+from adhocracy_core.rest.schemas import POSTAssetRequestSchema
 from adhocracy_core.rest.schemas import PUTResourceRequestSchema
+from adhocracy_core.rest.schemas import PUTAssetRequestSchema
 from adhocracy_core.rest.schemas import GETPoolRequestSchema
 from adhocracy_core.rest.schemas import GETItemResponseSchema
 from adhocracy_core.rest.schemas import GETResourceResponseSchema
@@ -59,7 +60,6 @@ from adhocracy_core.rest.schemas import add_arbitrary_filter_nodes
 from adhocracy_core.rest.exceptions import error_entry
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
-from adhocracy_core.sheets.asset import retrieve_asset_file
 from adhocracy_core.sheets.badge import get_assignable_badges
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.metadata import IMetadata
@@ -732,6 +732,8 @@ class UsersRESTView(PoolRESTView):
 class AssetsServiceRESTView(PoolRESTView):
     """View allowing multipart requests for asset upload."""
 
+    validation_POST = (POSTAssetRequestSchema, [])
+
     @view_config(request_method='POST',
                  permission='create_asset',
                  accept='multipart/form-data')
@@ -747,33 +749,28 @@ class AssetsServiceRESTView(PoolRESTView):
 class AssetRESTView(SimpleRESTView):
     """View for assets, allows PUTting new versions via multipart."""
 
+    validation_PUT = (PUTAssetRequestSchema, [])
+
     @view_config(request_method='PUT',
                  permission='create_asset',
                  accept='multipart/form-data')
     def put(self) -> dict:
         """HTTP PUT."""
-        result = super().put()
-        validate_and_complete_asset(self.context, self.request.registry)
-        return result
+        return super().put()
 
 
 @view_defaults(
     renderer='json',
     context=IAssetDownload,
 )
-class AssetDownloadRESTView(SimpleRESTView):
-    """
-    View for downloading assets as binary blobs.
-
-    Allows GET, but no POST or PUT.
-    """
+class AssetDownloadRESTView(ResourceRESTView):
+    """View for downloading assets as binary blobs."""
 
     @view_config(request_method='GET',
                  permission='view')
     def get(self) -> dict:
-        """Get asset data (unless deleted or hidden)."""
-        file = retrieve_asset_file(self.context, self.request.registry)
-        response = file.get_response(self.context, self.request.registry)
+        """Get asset data."""
+        response = self.context.get_response(self.request.registry)
         self.ensure_caching_headers(response)
         return response
 
@@ -782,14 +779,6 @@ class AssetDownloadRESTView(SimpleRESTView):
         response.cache_control = self.request.response.cache_control
         response.etag = self.request.response.etag
         response.last_modified = self.request.response.last_modified
-
-    def put(self) -> dict:
-        """HTTP PUT."""
-        raise HTTPMethodNotAllowed()
-
-    def post(self) -> dict:
-        """HTTP POST."""
-        raise HTTPMethodNotAllowed()
 
 
 @view_defaults(

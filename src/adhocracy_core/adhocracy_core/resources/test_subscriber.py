@@ -542,5 +542,7 @@ def test_register_subscriber(registry):
     assert subscriber.update_modification_date_modified_by.__name__ in handlers
     assert subscriber.send_password_reset_mail.__name__ in handlers
     assert subscriber.send_activation_mail_or_activate_user.__name__ in handlers
+    assert subscriber.update_asset_download.__name__ in handlers
+    assert subscriber.update_image_downloads.__name__ in handlers
 
 

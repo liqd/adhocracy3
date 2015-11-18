@@ -22,6 +22,10 @@ from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IPasswordReset
+from adhocracy_core.resources.asset import add_metadata
+from adhocracy_core.resources.asset import IAsset
+from adhocracy_core.resources.image import add_image_size_downloads
+from adhocracy_core.resources.image import IImage
 from adhocracy_core.sheets.principal import IPermissions
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
 from adhocracy_core.utils import find_graph
@@ -36,6 +40,7 @@ from adhocracy_core.utils import get_user
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.tags import ITag
+from adhocracy_core.sheets.asset import IAssetData
 
 
 logger = getLogger(__name__)
@@ -256,6 +261,16 @@ def autoupdate_tag_has_new_version(event):
     sheet.set(appstruct)
 
 
+def update_asset_download(event):
+    """Update asset download."""
+    add_metadata(event.object, event.registry)
+
+
+def update_image_downloads(event):
+    """Update image downloads."""
+    add_image_size_downloads(event.object, event.registry)
+
+
 def includeme(config):
     """Register subscribers."""
     config.add_subscriber(autoupdate_versionable_has_new_version,
@@ -285,3 +300,11 @@ def includeme(config):
     config.add_subscriber(send_password_reset_mail,
                           IResourceCreatedAndAdded,
                           object_iface=IPasswordReset)
+    config.add_subscriber(update_asset_download,
+                          IResourceSheetModified,
+                          object_iface=IAsset,
+                          event_isheet=IAssetData)
+    config.add_subscriber(update_image_downloads,
+                          IResourceSheetModified,
+                          object_iface=IImage,
+                          event_isheet=IAssetData)

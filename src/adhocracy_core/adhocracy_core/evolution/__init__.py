@@ -15,11 +15,14 @@ from substanced.util import find_service
 from substanced.interfaces import IFolder
 
 from adhocracy_core.catalog import ICatalogsService
+from adhocracy_core.interfaces import IItem
+from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ISimple
 from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.resources.asset import IPoolWithAssets
+from adhocracy_core.resources.asset import IAsset
 from adhocracy_core.resources.badge import IBadgeAssignmentsService
 from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.resources.badge import add_badges_service
@@ -41,8 +44,10 @@ from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.relation import ICanPolarize
 from adhocracy_core.sheets.relation import IPolarizable
 from adhocracy_core.sheets.title import ITitle
+from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import get_sheet_field
 
 
 logger = logging.getLogger(__name__)
@@ -441,6 +446,66 @@ def add_image_reference_to_users(root):  # pragma: no cover
     migrate_new_sheet(root, IUser, IImageReference)
 
 
+@log_migration
+def remove_empty_first_versions(root):  # pragma: no cover
+    """Remove empty first versions."""
+    registry = get_current_registry(root)
+    catalogs = find_service(root, 'catalogs')
+    items = _search_for_interfaces(catalogs, IItem)
+    count = len(items)
+    for index, item in enumerate(items):
+        logger.info('Migrating resource {0} of {1}'.format(index + 1, count))
+        if 'VERSION_0000000' not in item:
+            continue
+        first_version = item['VERSION_0000000']
+        is_empty = _is_version_without_data(first_version)
+        has_follower = _has_follower(first_version, registry)
+        if is_empty and has_follower:
+            logger.info('Delete empty version {0}.'.format(first_version))
+            del item['VERSION_0000000']
+
+
+def _is_version_without_data(version: IItemVersion) -> bool:
+    for attribute in version.__dict__:
+        if attribute.startswith('_sheet_'):
+            return False
+        if attribute == 'rate':
+            return False
+    else:
+        return True
+
+
+def _has_follower(version: IItemVersion, registry: Registry) -> bool:
+    followed_by = get_sheet_field(version, IVersionable, 'followed_by',
+                                  registry=registry)
+    return followed_by != []
+
+
+@log_migration
+def update_asset_download_children(root):  # pragma: no cover
+    """Add asset downloads and update IAssetMetadata sheet."""
+    from adhocracy_core.sheets.asset import IAssetMetadata
+    from adhocracy_core.sheets.image import IImageMetadata
+    from adhocracy_core.resources.asset import add_metadata
+    from adhocracy_core.resources.image import add_image_size_downloads
+    registry = get_current_registry(root)
+    catalogs = find_service(root, 'catalogs')
+    assets = _search_for_interfaces(catalogs, IAsset)
+    count = len(assets)
+    for index, asset in enumerate(assets):
+        logger.info('Migrating resource {0} of {1}'.format(index + 1, count))
+        old_downloads = [x for x in asset]
+        for old in old_downloads:
+            del asset[old]
+        try:
+            if IAssetMetadata.providedBy(asset):
+                add_metadata(asset, registry)
+            if IImageMetadata.providedBy(asset):
+                add_image_size_downloads(asset, registry)
+        except AttributeError:
+            logger.warn('Asset {} has no downloads to migrate.'.format(asset))
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -461,3 +526,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(make_proposalversions_polarizable)
     config.add_evolution_step(add_icanpolarize_sheet_to_comments)
     config.add_evolution_step(add_image_reference_to_users)
+    config.add_evolution_step(update_asset_download_children)

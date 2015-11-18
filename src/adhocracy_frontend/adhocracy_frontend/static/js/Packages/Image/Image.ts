@@ -111,12 +111,33 @@ export var uploadImageDirective = (
     };
 };
 
-export var imageUriFilter = () => {
-    return (path? : string, format : string = "detail") : string => {
-        if (path) {
-            return path.replace(/\/$/, "") + "/" + format;
-        } else {
-            return "/static/fallback_" + format + ".jpg";
+export var showImageDirective = (
+    adhHttp : AdhHttp.Service<any>
+) => {
+    return {
+        restrict: "E",
+        template: "<img class=\"{{ cssClass }}\" data-ng-src=\"{{ imageUrl }}\" alt=\"{{alt}}\" />",
+        scope: {
+            path: "@", // of the attachment resource
+            cssClass: "@",
+            alt: "@?",
+            format: "@?", // defaults to "detail"
+            imageMetadataNick: "@?" // defaults to SIImageMetadata.nick
+        },
+        link: (scope) => {
+            if ( ! scope.imageMetadataNick) { scope.imageMetadataNick = SIImageMetadata.nick; }
+            if ( ! scope.format) { scope.format = "detail"; }
+
+            var fallbackUrl = "/static/fallback_" + scope.format + ".jpg";
+
+            scope.$watch("path", (path) => {
+                // often instantiated before the path can be provided by the surrounding dom
+                if ( ! path) { return; }
+                adhHttp.get(scope.path).then(
+                    (asset) => { scope.imageUrl = asset.data[scope.imageMetadataNick][scope.format]; },
+                    (error) => { scope.imageUrl = fallbackUrl; }
+                );
+            });
         }
     };
 };

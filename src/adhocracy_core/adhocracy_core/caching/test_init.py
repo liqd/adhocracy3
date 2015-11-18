@@ -286,19 +286,19 @@ class TestHTTPCacheStrategyWeakAdapter:
                               etag_userid, etag_blocked)
 
 
-class TestHTTPCacheStrategyWeakAssetDownloadAdapter:
+class TestHTTPCacheStrategyStrongAdapter:
 
     @fixture
     def inst(self, context):
-        from . import HTTPCacheStrategyWeakAssetDownloadAdapter
-        return HTTPCacheStrategyWeakAssetDownloadAdapter(context, None)
+        from . import HTTPCacheStrategyStrongAdapter
+        return HTTPCacheStrategyStrongAdapter(context, None)
 
     def test_create(self, inst):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IHTTPCacheStrategy
         from . import etag_modified, etag_userid, etag_blocked
         assert verifyObject(IHTTPCacheStrategy, inst)
-        assert inst.browser_max_age == 60 * 5
+        assert inst.browser_max_age == inst.proxy_max_age == 31104000
         assert inst.etags == (etag_modified, etag_userid, etag_blocked)
 
 
@@ -348,13 +348,13 @@ class TestIntegrationCaching:
 
     def test_registered_strategies_iassetdownload(self, registry, request_):
         from adhocracy_core.interfaces import IHTTPCacheStrategy
-        from . import HTTPCacheStrategyWeakAssetDownloadAdapter
+        from . import HTTPCacheStrategyStrongAdapter
         from adhocracy_core.resources.asset import IAssetDownload
         context = testing.DummyResource(__provides__=IAssetDownload)
         strategies = dict(registry.getAdapters((context, request_),
                                                IHTTPCacheStrategy))
-        assert isinstance(strategies['GET'], HTTPCacheStrategyWeakAssetDownloadAdapter)
-        assert isinstance(strategies['HEAD'], HTTPCacheStrategyWeakAssetDownloadAdapter)
+        assert isinstance(strategies['GET'], HTTPCacheStrategyStrongAdapter)
+        assert isinstance(strategies['HEAD'], HTTPCacheStrategyStrongAdapter)
 
     def test_registered_strategy_modifies_headers(self, app_user):
         resp = app_user.get('/', status=200)

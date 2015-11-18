@@ -306,8 +306,6 @@ sheet_meta = SheetMetadata(isheet=ISheet,
                            editable=True,
                            creatable=True,
                            create_mandatory=False,
-                           mime_type_validator=None,
-                           image_sizes=None,
                            )
 
 

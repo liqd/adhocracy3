@@ -1,37 +1,58 @@
 """Resources for managing assets."""
 
-from pyramid.registry import Registry
 from substanced.file import File
+from pyramid.registry import Registry
+from pyramid.response import FileResponse
+from pyramid.traversal import find_interface
 from zope.deprecation import deprecated
 
-from adhocracy_core.interfaces import Dimensions
+from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.interfaces import IPool
+from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.interfaces import ISimple
 from adhocracy_core.resources import add_resource_type_to_registry
+from adhocracy_core.resources.base import Base
 from adhocracy_core.resources.pool import pool_meta
 from adhocracy_core.resources.service import service_meta
-from adhocracy_core.resources.simple import simple_meta
-from adhocracy_core.sheets.asset import AssetFileDownload
+from adhocracy_core.resources import resource_meta
 from adhocracy_core.sheets.asset import IAssetData
 from adhocracy_core.sheets.asset import IAssetMetadata
-from adhocracy_core.sheets.name import IName
 from adhocracy_core.utils import get_matching_isheet
 from adhocracy_core.utils import get_sheet
-from adhocracy_core.utils import raise_colander_style_error
+from adhocracy_core.utils import get_sheet_field
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.asset
 import adhocracy_core.sheets.title
 
 
-class IAssetDownload(ISimple):
+class IAssetDownload(IResource):
     """Downloadable binary file for Assets."""
 
 
-asset_download_meta = simple_meta._replace(
+class AssetDownload(Base):
+
+    """Allow downloading the first asset file in the term:`lineage`."""
+
+    def get_response(self, registry: Registry=None) -> FileResponse:
+        """Return response with binary content of the asset data."""
+        file = self._get_asset_file_in_lineage(registry)
+        return file.get_response()
+
+    def _get_asset_file_in_lineage(self, registry) -> File:
+        asset = find_interface(self, IAssetData)
+        if asset is None:
+            msg = 'No IAssetData in lineage of {}'.format(self)
+            raise RuntimeConfigurationError(details=msg)
+        return get_sheet_field(asset, IAssetData, 'data', registry)
+
+
+asset_download_meta = resource_meta._replace(
     content_name='AssetDownload',
     iresource=IAssetDownload,
-    basic_sheets=(IName, IAssetData),
+    use_autonaming=True,
+    content_class=AssetDownload,
+    permission_create='create_asset_download'
 )
 
 
@@ -39,90 +60,16 @@ class IAsset(ISimple):
     """A generic asset (binary file)."""
 
 
-def validate_and_complete_asset(context: IAsset,
-                                registry: Registry,
-                                options: dict={}):
-    """Complete the initialization of an asset and ensure that it's valid."""
-    data_sheet = get_sheet(context, IAssetData, registry=registry)
-    data_appstruct = data_sheet.get()
-    metadata_isheet = get_matching_isheet(context, IAssetMetadata)
-    metadata_sheet = get_sheet(context, metadata_isheet, registry=registry)
-    metadata_appstruct = metadata_sheet.get()
-    file = data_appstruct['data']
-    if not file:
-        return  # to facilitate testing
-    _validate_mime_type(file, metadata_appstruct, metadata_sheet)
-    _store_size_and_filename_as_metadata(file,
-                                         metadata_appstruct,
-                                         metadata_sheet,
-                                         registry=registry)
-    _add_downloads_as_children(context, metadata_sheet, registry)
-
-
-def _validate_mime_type(file: File,
-                        metadata_appstruct: dict,
-                        metadata_sheet: IAssetMetadata):
-    detected_mime_type = file.mimetype
-    claimed_mime_type = metadata_appstruct['mime_type']
-    if detected_mime_type != claimed_mime_type:
-        _raise_mime_type_error(
-            metadata_sheet,
-            'Claimed MIME type is {} but file content seems to be {}'.format(
-                claimed_mime_type, detected_mime_type))
-    mime_type_validator = metadata_sheet.meta.mime_type_validator
-    if mime_type_validator is None:
-        _raise_mime_type_error(
-            metadata_sheet,
-            'Sheet is abstract and does\'t allow storing data')
-    if not mime_type_validator(detected_mime_type):
-        _raise_mime_type_error(
-            metadata_sheet,
-            'Invalid MIME type for this sheet: {}'.format(detected_mime_type))
-
-
-def _raise_mime_type_error(metadata_sheet: IAssetMetadata, msg: str):
-    raise_colander_style_error(metadata_sheet.meta.isheet,
-                               'mime_type',
-                               msg)
-
-
-def _store_size_and_filename_as_metadata(file: File,
-                                         metadata_appstruct: dict,
-                                         metadata_sheet: IAssetMetadata,
-                                         registry: Registry):
-    metadata_appstruct['size'] = file.size
-    metadata_appstruct['filename'] = file.title
-    metadata_sheet.set(metadata_appstruct,
-                       omit_readonly=False)
-
-
-def _add_downloads_as_children(context: IAsset,
-                               metadata_sheet: IAssetMetadata,
-                               registry: Registry):
-    """
-    Add raw and possible resized download objects as children of an asset.
-
-    If a child with the same name already exists, it will be deleted and
-    replaced.
-    """
-    _create_asset_download(context=context, name='raw', registry=registry)
-    if metadata_sheet.meta.image_sizes:  # pragma: no branch
-        for name, dimensions in metadata_sheet.meta.image_sizes.items():
-            _create_asset_download(context=context, name=name,
-                                   registry=registry, dimensions=dimensions)
-
-
-def _create_asset_download(context: IAsset, name: str, registry: Registry,
-                           dimensions: Dimensions=None) -> dict:
-    file_download = AssetFileDownload(dimensions)
-    if name in context:
-        del context[name]
-    appstructs = {IName.__identifier__: {'name': name},
-                  IAssetData.__identifier__: {'data': file_download}}
-    registry.content.create(IAssetDownload.__identifier__,
-                            parent=context,
-                            appstructs=appstructs,
-                            registry=registry)
+def add_metadata(context: IAsset, registry: Registry, **kwargs):
+    """Store asset file metadata and add `raw` download to `context`."""
+    file = get_sheet_field(context, IAssetData, 'data', registry=registry)
+    meta_isheet = get_matching_isheet(context, IAssetMetadata)
+    meta_sheet = get_sheet(context, meta_isheet, registry=registry)
+    meta_appstruct = {
+        'size': file.size,
+        'filename': file.title,
+    }
+    meta_sheet.set(meta_appstruct, omit_readonly=False)
 
 
 asset_meta = pool_meta._replace(
@@ -139,7 +86,7 @@ asset_meta = pool_meta._replace(
     ),
     use_autonaming=True,
     permission_create='create_asset',
-    after_creation=[validate_and_complete_asset],
+    after_creation=(add_metadata,),
 )
 
 

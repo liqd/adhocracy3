@@ -45,11 +45,13 @@
                     class="button image-upload-reset"
                     data-ng-if="$flow.files.length"
                     data-ng-click="$flow.cancel()">{{ "TR__RESET" | translate }}</a>
-                <img
-                    class="image-upload-preview"
+                <adh-show-image
                     data-ng-if="!$flow.files.length && data.picture"
-                    data-ng-src="{{ data.picture | adhImageUri }}"
-                    alt="{{ 'TR__IMAGE_SELECTED' | translate }}" />
+                    data-css-class="image-upload-preview"
+                    data-path="{{data.picture}}"
+                    data-format="thumbnail"
+                    data-alt="{{ 'TR__IMAGE_SELECTED' | translate }}"
+                ></adh-show-image>
                 <img
                     class="image-upload-preview"
                     data-ng-if="$flow.files.length"
