@@ -174,6 +174,29 @@ class TestIndexRate:
         assert index_rates(item['rateable'], None) == 0
 
 
+class TestIndexComments:
+
+    @fixture
+    def mock_catalogs(self, monkeypatch, mock_catalogs) -> Mock:
+        from . import adhocracy
+        monkeypatch.setattr(adhocracy, 'find_service',
+                            lambda x, y: mock_catalogs)
+        return mock_catalogs
+
+    def test_index_comments(self, item, mock_catalogs, query, search_result):
+        from .adhocracy import index_comments
+        from adhocracy_core.resources.comment import ICommentVersion
+        item['commentable'] = testing.DummyResource()
+        search_result = search_result._replace(count=5)
+        mock_catalogs.search.return_value = search_result
+        query = query._replace(root=item,
+                               interfaces=ICommentVersion,
+                               indexes={'tag': 'LAST'},
+                               )
+        assert index_comments(item['commentable'], None) == 5
+        assert mock_catalogs.search.call_args[0][0] == query
+
+
 @mark.usefixtures('integration')
 def test_includeme_register_index_rate(registry):
     from adhocracy_core.sheets.rate import IRate
