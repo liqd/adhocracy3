@@ -1,10 +1,15 @@
 <div data-ng-switch="transclusionId">
-    <a class="moving-column-menu-button" data-ng-switch-when="menu" data-ng-href="{{ platformUrl | adhResourceUrl }}">{{ "TR__CANCEL" | translate }}</a>
+    <div data-ng-switch-when="menu">
+        <i class="icon-document moving-column-icon"></i>
+    </div>
 
     <adh-resource-wrapper
         data-ng-switch-when="body"
         data-on-submit="redirectAfterProposalSubmit(result)"
         data-on-cancel="redirectAfterProposalCancel(platformUrl)">
+        <adh-resource-actions
+            data-resource-path="{{platformUrl}}"
+            data-cancel="true"></adh-resource-actions>
         <adh-mercator-proposal-create
             data-path="@preliminary"
             data-mode="edit"
