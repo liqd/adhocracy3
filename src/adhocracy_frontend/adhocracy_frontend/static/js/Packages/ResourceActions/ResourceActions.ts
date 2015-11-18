@@ -8,7 +8,7 @@ var pkgLocation = "/ResourceActions";
 
 export var resourceActionsDirective = (
     adhPermissions : AdhPermissions.Service,
-	adhConfig: AdhConfig.IService
+    adhConfig: AdhConfig.IService
 ) => {
     return {
         restrict: "E",
@@ -18,7 +18,7 @@ export var resourceActionsDirective = (
         	share: "=?",
         	delete: "=?",
             print: "=?",
-        	report: "=?",
+            report: "=?",
             cancel: "=?",
             edit: "=?"
         },
@@ -81,14 +81,15 @@ export var deleteActionDirective = () => {
 
 export var printActionDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
-    $window : Window) => {
+    $window : Window
+) => {
     return {
         restrict: "E",
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"print();\">{{ \"TR__PRINT\" | translate }}</a>",
         scope: {
             class: "@"
         },
-        link: (scope, element, attrs) => {
+        link: (scope) => {
             scope.print = () => {
                 // only the focused column is printed
                 adhTopLevelState.set("focus", 1);
@@ -101,7 +102,8 @@ export var printActionDirective = (
 export var editActionDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhResourceUrl,
-    $location : angular.ILocationService) => {
+    $location : angular.ILocationService
+) => {
     return {
         restrict: "E",
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"edit();\">{{ \"TR__EDIT\" | translate }}</a>",
@@ -111,7 +113,7 @@ export var editActionDirective = (
             parentPath: "@",
             class: "@"
         },
-        link: (scope, element, attrs) => {
+        link: (scope) => {
             scope.edit = () => {
                 var url = adhResourceUrl(scope.resourcePath, "edit");
                 $location.url(url);
@@ -121,8 +123,9 @@ export var editActionDirective = (
 };
 
 export var cancelActionDirective = (
-        adhTopLevelState : AdhTopLevelState.Service,
-        adhResourceUrl) => {
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhResourceUrl
+) => {
     return {
         restrict: "E",
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"cancel();\">{{ \"TR__CANCEL\" | translate }}</a>",
@@ -131,7 +134,7 @@ export var cancelActionDirective = (
             parentPath: "@",
             class: "@"
         },
-        link: (scope, element, attrs) => {
+        link: (scope) => {
             scope.cancel = () => {
                 if (!scope.resourcePath) {
                     scope.resourcePath = adhTopLevelState.get("processUrl");
