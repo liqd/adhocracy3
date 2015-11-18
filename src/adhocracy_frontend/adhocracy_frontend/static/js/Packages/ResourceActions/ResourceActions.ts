@@ -14,7 +14,7 @@ export var resourceActionsDirective = (
         restrict: "E",
         scope: {
             resourcePath: "@",
-            parentPath: "@",
+            parentPath: "=?",
             share: "=?",
             delete: "=?",
             print: "=?",
@@ -68,7 +68,7 @@ export var deleteActionDirective = () => {
         require: "^adhMovingColumn",
         scope: {
             resourcePath: "@",
-            parentPath: "@",
+            parentPath: "=?",
             class: "@"
         },
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
@@ -110,12 +110,13 @@ export var editActionDirective = (
         require: "^adhMovingColumn",
         scope: {
             resourcePath: "@",
-            parentPath: "@",
+            parentPath: "=?",
             class: "@"
         },
         link: (scope) => {
             scope.edit = () => {
-                var url = adhResourceUrl(scope.resourcePath, "edit");
+                var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
+                var url = adhResourceUrl(path, "edit");
                 $location.url(url);
             };
         }
@@ -131,7 +132,7 @@ export var cancelActionDirective = (
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"cancel();\">{{ \"TR__CANCEL\" | translate }}</a>",
         scope: {
             resourcePath: "@",
-            parentPath: "@",
+            parentPath: "=?",
             class: "@"
         },
         link: (scope) => {

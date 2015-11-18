@@ -3,6 +3,7 @@
     <adh-edit-action
         data-ng-if="edit && resourcePath"
         data-class="action-bar-item"
+        data-parent-path="parentPath"
         data-resource-path="{{resourcePath}}"></adh-edit-action>
     <adh-report-action
         data-ng-if="report"
@@ -13,6 +14,7 @@
     <adh-delete-action
         data-ng-if="delete && resourcePath"
         data-class="action-bar-item"
+        data-parent-path="parentPath"
         data-resource-path="{{resourcePath}}"></adh-delete-action>
     <adh-print-action
         data-ng-if="print"
@@ -20,5 +22,6 @@
     <adh-cancel-action
         data-ng-if="cancel && resourcePath"
         data-class="action-bar-item"
+        data-parent-path="parentPath"
         data-resource-path="{{resourcePath}}"></adh-cancel-action>
 </div>
