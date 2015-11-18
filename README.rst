@@ -1,5 +1,5 @@
-Adhocracy with customizations for advocate-europe
-=================================================
+Adhocracy 3 with customizations for various projects
+====================================================
 
 .. image:: https://api.travis-ci.org/liqd/adhocracy3.png?branch=master
     :target: http://travis-ci.org/liqd/adhocracy3
@@ -9,7 +9,7 @@ Adhocracy with customizations for advocate-europe
     :target: https://adhocracy3.readthedocs.org/
 
 This repository contains the source code of the Adhocracy 3 backend and
-frontend cores as well as customizations for the advocate-europe project.
+frontend cores as well as customizations for various projects.
 
 Note::
 
