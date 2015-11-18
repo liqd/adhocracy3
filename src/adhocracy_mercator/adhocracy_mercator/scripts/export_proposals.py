@@ -11,17 +11,18 @@ import textwrap
 
 from pyramid.registry import Registry
 from pyramid.paster import bootstrap
+from substanced.util import find_service
 from adhocracy_core.utils import create_filename
 
 from adhocracy_core.catalog.adhocracy import index_rates
+from adhocracy_core.catalog.adhocracy import index_comments
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import get_sheet_field
-from adhocracy_core.sheets.pool import IPool
+from adhocracy_core.interfaces import search_query
 from adhocracy_core.utils import get_sheet
 
 from pyramid.traversal import resource_path
 
-from adhocracy_core.resources.comment import ICommentVersion
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.principal import IUserExtended
@@ -78,16 +79,14 @@ def export_proposals():
 
     root = env['root']
     registry = env['registry']
-    pool = get_sheet(root, IPool)
-    params = {'depth': 3,
-              'interfaces': IMercatorProposalVersion,
-              'sort_by': 'rates',
-              'reverse': True,
-              'indexes': {'tag': 'LAST'},
-              'resolve': True,
-              }
-    results = pool.get(params)
-    proposals = results['elements']
+    catalogs = find_service(root, 'catalogs')
+    query = search_query._replace(interfaces=IMercatorProposalVersion,
+                                  sort_by='rates',
+                                  reverse=True,
+                                  indexes={'tag': 'LAST'},
+                                  resolve=True,
+                                  )
+    proposals = catalogs.search(query).elements
 
     filename = create_filename(directory='./var/export',
                                prefix='MercatorProposalExport',
@@ -182,14 +181,8 @@ def export_proposals():
         result.append(rates)
 
         # Comments
-        query = {'interfaces': ICommentVersion,
-                 'depth': 'all',
-                 'indexes': {'tag': 'LAST'},
-                 'resolve': False}
-        proposal_item = proposal.__parent__
-        proposal_sheet = get_sheet(proposal_item, IPool)
-        query_result = proposal_sheet.get(query)
-        result.append(query_result['count'])
+        comments = index_comments(proposal, None)
+        result.append(comments)
 
         # requested funding
         finance = get_sheet_field(proposal,
