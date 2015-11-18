@@ -10,6 +10,7 @@ from adhocracy_core.utils import is_deleted
 from adhocracy_core.utils import is_hidden
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import search_query
+from adhocracy_core.resources.comment import ICommentVersion
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.sheets.rate import IRateable
@@ -117,6 +118,22 @@ def index_rates(resource, default) -> int:
     for value, count in result.frequency_of.items():
         rate_sum += value * count
     return rate_sum
+
+
+def index_comments(resource, default) -> int:
+    """
+    Return aggregated values of comments below the `item` parent of `resource`.
+
+    Only the LAST version of each rate is counted.
+    """
+    item = find_interface(resource, IItem)
+    catalogs = find_service(resource, 'catalogs')
+    query = search_query._replace(root=item,
+                                  interfaces=ICommentVersion,
+                                  indexes={'tag': 'LAST'},
+                                  )
+    result = catalogs.search(query)
+    return result.count
 
 
 def index_tag(resource, default) -> [str]:
