@@ -14,6 +14,7 @@ export var resourceActionsDirective = (
         restrict: "E",
         scope: {
             resourcePath: "@",
+            parentPath: "@",
         	share: "=?",
         	delete: "=?",
             print: "=?",
@@ -68,6 +69,7 @@ export var deleteActionDirective = () => {
         require: "^adhMovingColumn",
         scope: {
             resourcePath: "@",
+            parentPath: "@",
             class: "@"
         },
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
@@ -107,6 +109,7 @@ export var editActionDirective = (
         require: "^adhMovingColumn",
         scope: {
             resourcePath: "@",
+            parentPath: "@",
             class: "@"
         },
         link: (scope, element, attrs) => {
