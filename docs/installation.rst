@@ -1,8 +1,8 @@
 Installation
 ==============
 
-Installation (backend)
-----------------------
+Installation
+------------
 
 Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 
