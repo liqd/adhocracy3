@@ -98,3 +98,13 @@ Run test suite::
 
 .. NOTE:: You need to have chrome/chromium installed in order to run the
    acceptance tests.
+
+
+Troubleshooting
+---------------
+If you encounter this error when starting adhocracy
+
+    Problem connecting to WebSocket server: ConnectionRefusedError: [Errno 111] Connection refused
+
+delete the `var/WS_SERVER.pid` file and retry again. This happens when
+the Websocket server is not shutdown properly.
