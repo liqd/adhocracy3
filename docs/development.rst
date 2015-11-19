@@ -160,6 +160,10 @@ Create scaffold for extension packages
 
 4.  Create ``buildout-xx.cfg``
 
+5.  Add ``src/adhocracy_xx`` to ``.coveragerc``
+
+6.  Add ``src/xx/xx/build`` to ``.gitignore``
+
 You may then want to run ``bin/buildout -c buildout-xx.cfg`` to check
 that everything works fine.
 
