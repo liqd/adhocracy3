@@ -83,3 +83,7 @@
         > div:first-child { text-align: left; }
     }
 }
+
+.user-profile-image {
+    @include border-radius(50%);
+}
