@@ -15,6 +15,7 @@ import * as angularCache from "angularCache";  if (angularCache) { ; };
 import * as angularTranslate from "angularTranslate";  if (angularTranslate) { ; };
 import * as angularTranslateLoader from "angularTranslateLoader";  if (angularTranslateLoader) { ; };
 import * as angularElastic from "angularElastic";  if (angularElastic) { ; };
+import * as angularFlow from "angularFlow";  if (angularFlow) { ; };
 
 import * as modernizr from "modernizr";
 import * as moment from "moment";
@@ -88,6 +89,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "ngAnimate",
         "ngAria",
         "ngMessages",
+        "flow",
         AdhCommentModule.moduleName,
         AdhDocumentWorkbenchModule.moduleName,
         AdhDoneModule.moduleName,
@@ -160,6 +162,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     app.value("moment", moment);
     app.value("leaflet", leaflet);
     app.value("markdownit", markdownit);
+    app.value("angularFlow", angularFlow);
 
     // register our modules
     app.value("adhConfig", config);
