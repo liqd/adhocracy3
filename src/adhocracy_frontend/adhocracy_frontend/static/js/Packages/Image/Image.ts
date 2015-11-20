@@ -7,6 +7,7 @@ import RIImage from "../../Resources_/adhocracy_core/resources/image/IImage";
 import * as SIHasAssetPool from "../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
 import * as SIImageMetadata from "../../Resources_/adhocracy_core/sheets/image/IImageMetadata";
 import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
+import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
 var pkgLocation = "/Image";
 
@@ -72,12 +73,21 @@ export var addImage = (
     resourcePath : string,
     imagePath : string
 ) => {
-    return adhHttp.get(resourcePath).then((version) => {
-        var newVersion = _.clone(version);
-        newVersion.data[SIImageReference.nick] = new SIImageReference.Sheet({
-            picture: imagePath
-        });
-        return adhHttp.postNewVersionNoFork(resourcePath, newVersion);
+    return adhHttp.get(resourcePath).then((resource) => {
+        var patch = {
+            data: {},
+            content_type: resource.content_type
+        };
+        patch.data[SIImageReference.nick] = new SIImageReference.Sheet({ picture: imagePath });
+
+        // Versioned resources are on the way out, so they get the special treatment
+        if (resource.data[SIVersionable.nick]) {
+            var newVersion = _.clone(resource);
+            _.merge(newVersion.data, patch.data);
+            return adhHttp.postNewVersionNoFork(resourcePath, newVersion);
+        } else {
+            return adhHttp.put(resourcePath, patch);
+        }
     });
 };
 
