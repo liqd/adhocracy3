@@ -103,9 +103,12 @@ export var uploadImageDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Upload.html",
         scope: {
             poolPath: "@",
-            path: "@"
+            path: "@",
+            didCompleteUpload: "&?",
+            didCancelUpload: "&?"
         },
         link: (scope) => {
+            scope.isUploadDone = false;
             scope.$flow = flowFactory.create();
 
             scope.$flow.on("fileAdded", (file, event) => {
@@ -115,7 +118,8 @@ export var uploadImageDirective = (
 
             scope.submit = () => {
                 return adhUploadImage(scope.poolPath, scope.$flow)
-                    .then((imagePath : string) => addImage(adhHttp)(scope.path, imagePath));
+                    .then((imagePath : string) => addImage(adhHttp)(scope.path, imagePath)
+                        .then(scope.didCompleteUpload));
             };
         }
     };
