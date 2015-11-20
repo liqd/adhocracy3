@@ -136,20 +136,34 @@ export var showImageDirective = (
             cssClass: "@",
             alt: "@?",
             format: "@?", // defaults to "detail"
-            imageMetadataNick: "@?" // defaults to SIImageMetadata.nick
+            imageMetadataNick: "@?", // defaults to SIImageMetadata.nick
+            fallbackUrl: "@?", // defaults to "/static/fallback_$format.jpg";
+            isImageMissing: "=?"
         },
         link: (scope) => {
-            if ( ! scope.imageMetadataNick) { scope.imageMetadataNick = SIImageMetadata.nick; }
-            if ( ! scope.format) { scope.format = "detail"; }
-
-            var fallbackUrl = "/static/fallback_" + scope.format + ".jpg";
+            var imageMetadataNick = () =>
+                scope.imageMetadataNick ? scope.imageMetadataNick : SIImageMetadata.nick;
+            var format = () => scope.format ? scope.format : "detail";
+            var fallbackUrl = () => scope.fallbackUrl || ("/static/fallback_" + format() + ".jpg");
+            scope.isImageMissing = false;
+            var handleError = () => {
+                scope.imageUrl = fallbackUrl();
+                scope.isImageMissing = true;
+            };
 
             scope.$watch("path", (path) => {
                 // often instantiated before the path can be provided by the surrounding dom
                 if ( ! path) { return; }
                 adhHttp.get(scope.path).then(
-                    (asset) => { scope.imageUrl = asset.data[scope.imageMetadataNick][scope.format]; },
-                    (error) => { scope.imageUrl = fallbackUrl; }
+                    (asset) => {
+                        var imageUrl = asset.data[imageMetadataNick()][format()];
+                        if ( ! imageUrl) {
+                            return handleError();
+                        }
+
+                        scope.imageUrl = imageUrl;
+                    },
+                    handleError
                 );
             });
         }
