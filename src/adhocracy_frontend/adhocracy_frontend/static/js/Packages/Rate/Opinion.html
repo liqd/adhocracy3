@@ -33,12 +33,13 @@
     </span>
     <span class="opinion-results" data-ng-if="showResult()" data-ng-class="{
         'is-opinion-yes': myRate === 1,
-        'is-opinion-no': myRate === -1
+        'is-opinion-no': myRate === -1,
+        'is-opinion-none': myRate !== 1 && myRate !== -1
     }">
         <span class="opinion-bar-container">
             <span
                 class="opinion-bar opinion-bar-yes"
-                data-ng-if="myRate === 1"
+                data-ng-if="myRate !== -1"
                 title="{{'TR__YOU_VOTED' | translate}} {{'TR__YES' | translate}}"
                 style="width: {{rates(1) | percentage:(rates(1) + rates(-1))}}"></span>
             <span
