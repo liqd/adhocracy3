@@ -823,7 +823,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
     public link(scope, element, attrs, wrapper) {
         var instance = super.link(scope, element, attrs, wrapper);
         instance.scope.data = <any>{};
-        instance.scope.$watch("$viewContentLoaded", function() {
+        instance.scope.$watch("$viewContentLoaded", () => {
             if (!this.modernizr.inputtypes.number) {
                 element.find(":input[type='number']").updatePolyfill();
                 $(".has-input-buttons").removeClass( "has-input-buttons").css({"display" : "inline-block"});
