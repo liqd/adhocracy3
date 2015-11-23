@@ -39,8 +39,7 @@ import * as AdhListingModule from "./Packages/Listing/Module";
 import * as AdhLocaleModule from "./Packages/Locale/Module";
 import * as AdhLocalSocketModule from "./Packages/LocalSocket/Module";
 import * as AdhMarkdownModule from "./Packages/Markdown/Module";
-import * as AdhMercatorProposalModule from "./Packages/MercatorProposal/Module";
-import * as AdhMercatorWorkbenchModule from "./Packages/MercatorWorkbench/Module";
+import * as AdhMercatorModule from "./Packages/Mercator/Module";
 import * as AdhMovingColumnsModule from "./Packages/MovingColumns/Module";
 import * as AdhPermissionsModule from "./Packages/Permissions/Module";
 import * as AdhPreliminaryNamesModule from "./Packages/PreliminaryNames/Module";
@@ -93,7 +92,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         AdhCommentModule.moduleName,
         AdhCrossWindowMessagingModule.moduleName,
         AdhEmbedModule.moduleName,
-        AdhMercatorWorkbenchModule.moduleName,
+        AdhMercatorModule.moduleName,
         AdhResourceActionsModule.moduleName,
         AdhResourceAreaModule.moduleName,
         AdhTrackingModule.moduleName,
@@ -184,8 +183,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhLocaleModule.register(angular);
     AdhLocalSocketModule.register(angular);
     AdhMarkdownModule.register(angular);
-    AdhMercatorProposalModule.register(angular);
-    AdhMercatorWorkbenchModule.register(angular);
+    AdhMercatorModule.register(angular);
     AdhMovingColumnsModule.register(angular);
     AdhPermissionsModule.register(angular);
     AdhPreliminaryNamesModule.register(angular);

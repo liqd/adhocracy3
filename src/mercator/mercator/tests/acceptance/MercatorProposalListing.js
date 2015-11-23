@@ -8,7 +8,7 @@ var EmbeddedCommentsPage = require("./core/EmbeddedCommentsPage.js");
 var MercatorProposalDetailPage = require("./MercatorProposalDetailPage.js");
 
 var MercatorProposalListing = function() {
-    this.listing = element(by.tagName("adh-mercator-proposal-listing"));
+    this.listing = element(by.tagName("adh-mercator-2015-proposal-listing"));
 
     this.columns = element.all(by.tagName("adh-moving-column"));
 
@@ -18,7 +18,7 @@ var MercatorProposalListing = function() {
     };
 
     this.selectProposal = function(idx) {
-        var item = this.listing.all(by.tagName("adh-mercator-proposal")).get(idx).element(by.tagName("a"));
+        var item = this.listing.all(by.tagName("adh-mercator-2015-proposal")).get(idx).element(by.tagName("a"));
         item.click();
     };
 

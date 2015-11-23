@@ -1,26 +1,26 @@
-import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
-import * as AdhBadgeModule from "../Badge/Module";
-import * as AdhBlogModule from "../Blog/Module";
-import * as AdhCredentialsModule from "../User/Module";
-import * as AdhHttpModule from "../Http/Module";
-import * as AdhImageModule from "../Image/Module";
-import * as AdhInjectModule from "../Inject/Module";
-import * as AdhLocaleModule from "../Locale/Module";
-import * as AdhPermissionsModule from "../Permissions/Module";
-import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
-import * as AdhResourceAreaModule from "../ResourceArea/Module";
-import * as AdhResourceWidgetsModule from "../ResourceWidgets/Module";
-import * as AdhStickyModule from "../Sticky/Module";
-import * as AdhTopLevelStateModule from "../TopLevelState/Module";
+import * as AdhAngularHelpersModule from "../../../AngularHelpers/Module";
+import * as AdhBadgeModule from "../../../Badge/Module";
+import * as AdhBlogModule from "../../../Blog/Module";
+import * as AdhCredentialsModule from "../../../User/Module";
+import * as AdhHttpModule from "../../../Http/Module";
+import * as AdhImageModule from "../../../Image/Module";
+import * as AdhInjectModule from "../../../Inject/Module";
+import * as AdhLocaleModule from "../../../Locale/Module";
+import * as AdhPermissionsModule from "../../../Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../../../PreliminaryNames/Module";
+import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
+import * as AdhResourceWidgetsModule from "../../../ResourceWidgets/Module";
+import * as AdhStickyModule from "../../../Sticky/Module";
+import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 
-import * as AdhUtil from "../Util/Util";
+import * as AdhUtil from "../../../Util/Util";
 
-import RIProcess from "../../Resources_/adhocracy_mercator/resources/mercator/IProcess";
+import RIProcess from "../../../../Resources_/adhocracy_mercator/resources/mercator/IProcess";
 
-import * as MercatorProposal from "./MercatorProposal";
+import * as Proposal from "./Proposal";
 
 
-export var moduleName = "adhMercatorProposal";
+export var moduleName = "adhMercator2015Proposal";
 
 export var register = (angular) => {
     angular
@@ -42,7 +42,7 @@ export var register = (angular) => {
             AdhStickyModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .config(["adhResourceAreaProvider", MercatorProposal.registerRoutes(RIProcess.content_type)])
+        .config(["adhResourceAreaProvider", Proposal.registerRoutes(RIProcess.content_type)])
         .config(["flowFactoryProvider", (flowFactoryProvider) => {
             if (typeof flowFactoryProvider.defaults === "undefined") {
                 flowFactoryProvider.defaults = {};
@@ -64,8 +64,8 @@ export var register = (angular) => {
             };
         }])
         // NOTE: we do not use a Widget based directive here for performance reasons
-        .directive("adhMercatorProposal", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", "adhGetBadges", MercatorProposal.listItem])
-        .directive("adhMercatorProposalDetailView", [
+        .directive("adhMercator2015Proposal", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", "adhGetBadges", Proposal.listItem])
+        .directive("adhMercator2015ProposalDetailView", [
             "adhConfig",
             "adhHttp",
             "adhPreliminaryNames",
@@ -78,10 +78,10 @@ export var register = (angular) => {
             "$location",
             "$q",
             (...args) => {
-                var widget = AdhUtil.construct(MercatorProposal.DetailWidget, args);
+                var widget = AdhUtil.construct(Proposal.DetailWidget, args);
                 return widget.createDirective();
             }])
-        .directive("adhMercatorProposalCreate", [
+        .directive("adhMercator2015ProposalCreate", [
             "adhConfig",
             "adhHttp",
             "adhPreliminaryNames",
@@ -96,20 +96,20 @@ export var register = (angular) => {
             "$location",
             "$q",
             (...args) => {
-                var widget = AdhUtil.construct(MercatorProposal.CreateWidget, args);
+                var widget = AdhUtil.construct(Proposal.CreateWidget, args);
                 return widget.createDirective();
             }])
-        .directive("adhMercatorProposalListing", ["adhConfig", MercatorProposal.listing])
-        .directive("adhMercatorUserProposalListing", ["adhConfig", MercatorProposal.userListing])
-        .directive("adhMercatorProposalAddButton", [
+        .directive("adhMercator2015ProposalListing", ["adhConfig", Proposal.listing])
+        .directive("adhMercator2015UserProposalListing", ["adhConfig", Proposal.userListing])
+        .directive("adhMercator2015ProposalAddButton", [
             "adhConfig",
             "adhHttp",
             "adhTopLevelState",
             "adhPermissions",
             "adhCredentials",
             "$q",
-            MercatorProposal.addButton
+            Proposal.addButton
             ])
         .controller("mercatorProposalFormController", [
-            "$scope", "$element", "$window", "adhShowError", "adhSubmitIfValid", MercatorProposal.mercatorProposalFormController]);
+            "$scope", "$element", "$window", "adhShowError", "adhSubmitIfValid", Proposal.mercatorProposalFormController]);
 };

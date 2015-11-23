@@ -1,29 +1,29 @@
-/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import * as AdhConfig from "../Config/Config";
-import * as AdhHttp from "../Http/Http";
-import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
-import * as AdhPermissions from "../Permissions/Permissions";
-import * as AdhResourceArea from "../ResourceArea/ResourceArea";
-import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
-import * as AdhUtil from "../Util/Util";
+import * as AdhConfig from "../../../Config/Config";
+import * as AdhHttp from "../../../Http/Http";
+import * as AdhMovingColumns from "../../../MovingColumns/MovingColumns";
+import * as AdhPermissions from "../../../Permissions/Permissions";
+import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
+import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
+import * as AdhUtil from "../../../Util/Util";
 
-import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
-import RIMercatorProposalVersion from "../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion";
-import RIProcess from "../../Resources_/adhocracy_mercator/resources/mercator/IProcess";
-import * as SIComment from "../../Resources_/adhocracy_core/sheets/comment/IComment";
-import * as SIWorkflow from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
+import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIMercatorProposalVersion from "../../../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion";
+import RIProcess from "../../../../Resources_/adhocracy_mercator/resources/mercator/IProcess";
+import * as SIComment from "../../../../Resources_/adhocracy_core/sheets/comment/IComment";
+import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/MercatorWorkbench";
+var pkgLocation = "/Mercator/2015/Workbench";
 
 
-export var mercatorWorkbenchDirective = (
+export var workbenchDirective = (
     adhConfig : AdhConfig.IService,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorWorkbench.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html",
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("view", scope));
         }
@@ -47,14 +47,14 @@ var bindRedirectsToScope = (scope, adhConfig, adhResourceUrlFilter, $location) =
 };
 
 
-export var mercatorProposalCreateColumnDirective = (
+export var proposalCreateColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhResourceUrlFilter : (path : string) => string,
     $location : angular.ILocationService
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalCreateColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalCreateColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["platformUrl"]);
@@ -64,7 +64,7 @@ export var mercatorProposalCreateColumnDirective = (
 };
 
 
-export var mercatorProposalDetailColumnDirective = (
+export var proposalDetailColumnDirective = (
     $window : Window,
     adhTopLevelState : AdhTopLevelState.Service,
     adhPermissions : AdhPermissions.Service,
@@ -72,7 +72,7 @@ export var mercatorProposalDetailColumnDirective = (
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalDetailColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalDetailColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["platformUrl", "proposalUrl"]);
@@ -92,14 +92,14 @@ export var mercatorProposalDetailColumnDirective = (
 };
 
 
-export var mercatorProposalEditColumnDirective = (
+export var proposalEditColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhResourceUrlFilter : (path : string) => string,
     $location : angular.ILocationService
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalEditColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalEditColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["platformUrl", "proposalUrl"]);
@@ -109,14 +109,14 @@ export var mercatorProposalEditColumnDirective = (
 };
 
 
-export var mercatorProposalListingColumnDirective = (
+export var proposalListingColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalListingColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalListingColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["platformUrl", "proposalUrl"]);

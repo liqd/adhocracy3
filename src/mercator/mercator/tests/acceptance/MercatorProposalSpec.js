@@ -196,7 +196,7 @@ describe("mercator proposal form", function() {
         form.submitButton.click();
         expect(browser.getCurrentUrl()).not.toContain("@edit");
         browser.waitForAngular();
-        expect(element(by.tagName("adh-mercator-proposal-detail-view")).element(by.tagName("adh-user-meta")).getText()).toContain("pita rasta");
+        expect(element(by.tagName("adh-mercator-2015-proposal-detail-view")).element(by.tagName("adh-user-meta")).getText()).toContain("pita rasta");
     });
 
     it("disallows anonymous to edit existing proposals (depends on submit)", function() {
