@@ -5,7 +5,7 @@
     'm-show-results-hover': showResults==='hover',
     'is-cast': hasCastInSession
 }" data-ng-if="ready">
-    <span class="opinion-button-container" data-ng-if="!(hasCast || forceResult)">
+    <span class="opinion-button-container" data-ng-if="!showResult()">
         <a
             href=""
             class="opinion-yes opinion-button"
@@ -19,7 +19,7 @@
         </a>
 
     </span>
-    <span class="opinion-button-container" data-ng-if="!(hasCast || forceResult)">
+    <span class="opinion-button-container" data-ng-if="!showResult()">
         <a
             href=""
             class="opinion-no opinion-button"
@@ -31,7 +31,7 @@
             {{'TR__NO' | translate}}
         </a>
     </span>
-    <span class="opinion-results" data-ng-if="(hasCast || forceResult)" data-ng-class="{
+    <span class="opinion-results" data-ng-if="showResult()" data-ng-class="{
         'is-opinion-yes': myRate === 1,
         'is-opinion-no': myRate === -1
     }">

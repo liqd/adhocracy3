@@ -52,11 +52,11 @@ export interface IRateScope extends angular.IScope {
     optionsPostPool : AdhHttp.IOptions;
     ready : boolean;
     hasCast : boolean;
-    forceResult : boolean;
 
     cast(value : number) : angular.IPromise<void>;
     uncast() : angular.IPromise<void>;
     toggle(value : number) : angular.IPromise<void>;
+    showResult() : boolean;
 
     // not currently used in the UI
     auditTrail : { subject: string; rate: number }[];
@@ -233,6 +233,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             var rates : {[key : string]: number};
             var lock : boolean;
             var storeMyRateResource : (resource : RIRateVersion) => void;
+            var forceResult : boolean = false;
 
             var updateMyRate = () : angular.IPromise<void> => {
                 if (adhCredentials.loggedIn) {
@@ -355,6 +356,10 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                 }
             };
 
+            scope.showResult = () : boolean => {
+                return scope.hasCast || forceResult;
+            };
+
             // sync with other local rate buttons
             scope.$on("$destroy", adhRateEventManager.on(scope.refersTo, () => {
                 updateMyRate();
@@ -376,7 +381,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             getWorkflowState(adhResourceArea)(scope.refersTo)
                 .then((workflowState : string) => {
                     if (workflowState === "result") {
-                        scope.forceResult = true;
+                        forceResult = true;
                     }
                 });
         }
