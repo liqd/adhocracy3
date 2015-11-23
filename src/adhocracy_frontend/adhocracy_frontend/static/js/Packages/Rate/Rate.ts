@@ -6,6 +6,7 @@ import * as AdhEventManager from "../EventManager/EventManager";
 import * as AdhHttp from "../Http/Http";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
+import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 import * as AdhResourceUtil from "../Util/ResourceUtil";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
@@ -13,6 +14,7 @@ import * as AdhWebSocket from "../WebSocket/WebSocket";
 
 import * as ResourcesBase from "../../ResourcesBase";
 
+import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
 import RIRateVersion from "../../Resources_/adhocracy_core/resources/rate/IRateVersion";
 import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
 import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
@@ -88,22 +90,16 @@ export interface IRateAdapter<T extends ResourcesBase.Resource> {
  * promise workflow state.
  */
 export var getWorkflowState = (
-    adhHttp : AdhHttp.Service<any>,
-    adhTopLevelState : AdhTopLevelState.Service,
-    $q : angular.IQService
-) => () : angular.IPromise<string> => {
-    var processUrl = adhTopLevelState.get("processUrl");
-
-    if (typeof processUrl !== "undefined") {
-        return adhHttp.get(processUrl).then((resource) => {
+    adhResourceArea : AdhResourceArea.Service
+) => (resourceUrl : string) : angular.IPromise<string> => {
+    return adhResourceArea.getProcess(resourceUrl, false).then((resource : RIProcess) => {
+        if (typeof resource !== "undefined") {
             var workflowSheet = resource.data[SIWorkflow.nick];
             if (typeof workflowSheet !== "undefined") {
                 return workflowSheet.workflow_state;
             }
-        });
-    } else {
-        return $q.when(undefined);
-    }
+        }
+    });
 };
 
 
@@ -167,6 +163,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
     adhCredentials : AdhCredentials.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
+    adhResourceArea : AdhResourceArea.Service,
     adhDone
 ) => {
     "use strict";
@@ -376,7 +373,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                     adhDone();
                 });
 
-            getWorkflowState(adhHttp, adhTopLevelState, $q)()
+            getWorkflowState(adhResourceArea)(scope.refersTo)
                 .then((workflowState : string) => {
                     if (workflowState === "result") {
                         scope.forceResult = true;
