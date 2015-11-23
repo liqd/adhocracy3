@@ -4,6 +4,7 @@ import * as AdhEventManagerModule from "../EventManager/Module";
 import * as AdhHttpModule from "../Http/Module";
 import * as AdhPermissionsModule from "../Permissions/Module";
 import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
+import * as AdhResourceAreaModule from "../ResourceArea/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 import * as AdhWebSocketModule from "../WebSocket/Module";
 
@@ -22,6 +23,7 @@ export var register = (angular) => {
             AdhHttpModule.moduleName,
             AdhPermissionsModule.moduleName,
             AdhPreliminaryNamesModule.moduleName,
+            AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName,
             AdhWebSocketModule.moduleName
         ])
@@ -38,6 +40,7 @@ export var register = (angular) => {
             "adhCredentials",
             "adhPreliminaryNames",
             "adhTopLevelState",
+            "adhResourceArea",
             "adhDone",
             AdhRate.directiveFactory("/Rate.html", new Adapter.RateAdapter())])
         .directive("adhLike", [
@@ -51,6 +54,7 @@ export var register = (angular) => {
             "adhCredentials",
             "adhPreliminaryNames",
             "adhTopLevelState",
+            "adhResourceArea",
             "adhDone",
             AdhRate.directiveFactory("/Like.html", new Adapter.LikeAdapter())])
         .directive("adhOpinion", [
@@ -64,6 +68,7 @@ export var register = (angular) => {
             "adhCredentials",
             "adhPreliminaryNames",
             "adhTopLevelState",
+            "adhResourceArea",
             "adhDone",
             AdhRate.directiveFactory("/Opinion.html", new Adapter.RateAdapter())]);
 };
