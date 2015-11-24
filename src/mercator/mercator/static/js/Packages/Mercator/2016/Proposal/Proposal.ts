@@ -7,15 +7,15 @@ var pkgLocation = "/Mercator/2016/Proposal";
 
 
 export var createDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    flowFactory
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {},
         link: (scope) => {
-            console.log(scope);
-
+            scope.$flow = flowFactory.create();
         }
     };
 };
