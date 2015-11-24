@@ -40,6 +40,7 @@ import * as AdhLocaleModule from "./Packages/Locale/Module";
 import * as AdhLocalSocketModule from "./Packages/LocalSocket/Module";
 import * as AdhMarkdownModule from "./Packages/Markdown/Module";
 import * as AdhMercatorProposalModule from "./Packages/MercatorProposal/Module";
+import * as AdhMercatorProposal2016Module from "./Packages/MercatorProposal2016/Module";
 import * as AdhMercatorWorkbenchModule from "./Packages/MercatorWorkbench/Module";
 import * as AdhMovingColumnsModule from "./Packages/MovingColumns/Module";
 import * as AdhPermissionsModule from "./Packages/Permissions/Module";
@@ -94,6 +95,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         AdhCrossWindowMessagingModule.moduleName,
         AdhEmbedModule.moduleName,
         AdhMercatorWorkbenchModule.moduleName,
+        AdhMercatorProposal2016Module.moduleName,
         AdhResourceActionsModule.moduleName,
         AdhResourceAreaModule.moduleName,
         AdhTrackingModule.moduleName,
@@ -185,6 +187,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhLocalSocketModule.register(angular);
     AdhMarkdownModule.register(angular);
     AdhMercatorProposalModule.register(angular);
+    AdhMercatorProposal2016Module.register(angular);
     AdhMercatorWorkbenchModule.register(angular);
     AdhMovingColumnsModule.register(angular);
     AdhPermissionsModule.register(angular);
