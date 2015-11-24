@@ -551,6 +551,144 @@
                     <p>{{ "TR__MERCATOR_PROPOSAL_IMAGE_ANNOTATION_2" | translate:$flow.opts }}</p>
                 </div>
             </div><!-- /.annotated-section -->
+
+            <!-- partnerships -->
+            <div class="annotated-section">
+                <div class="annotated-section-body">
+                    <label>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNERS_LABEL" | translate }}:</span>
+                        <!-- FIXME: no option triggers required error -->
+                        <select data-ng-model="data.partners" required="required" name="introduction-partners">
+                            <option value="true">{{ "TR__YES" | translate }}</option>
+                            <option value="">{{ "TR__NO" | translate }}</option>
+                        </select>
+
+                        <span
+                            class="input-error"
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-partners'], 'required')">
+                            {{ "TR__ERROR_REQUIRED_SELECTION" | translate }}</span>
+                    </label>
+
+                    <fieldset data-ng-if="data.partners">
+                        <div>
+                            <label>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNER1_NAME_LABEL" | translate }}:</span>
+                                <input
+                                    type="text"
+                                    data-ng-model="data.partner1.name"
+                                    name="introduction-partner1-name" />
+                            </label>
+                            <label>
+                                <span class="label-text">{{ "TR__WEBSITE" | translate }}</span>
+                                <input
+                                    type="url"
+                                    data-ng-model="data.partner1.website"
+                                    name="introduction-partner1-website"
+                                    data-required="required" />
+                                <span
+                                    class="input-error"
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-partner1-website'], 'url')">
+                                    {{ "TR__ERROR_INVALID_URL" | translate }}</span>
+                            </label>
+                            <label>
+                                <span class="label-text">{{ "TR__EMAIL" | translate }}</span>
+                                <input
+                                    type="email"
+                                    data-ng-model="data.partner1.email"
+                                    name="introduction-partner1-email"
+                                    data-required="required" />
+                                <span
+                                    class="input-error"
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-partner1-email'], 'email')">
+                                    {{ "TR__ERROR_INVALID_EMAIL_2016" | translate }}</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNER2_NAME_LABEL" | translate }}:</span>
+                                <input
+                                    type="text"
+                                    data-ng-model="data.partner2.name"
+                                    name="introduction-partner2-name" />
+                            </label>
+                            <label>
+                                <span class="label-text">{{ "TR__WEBSITE" | translate }}</span>
+                                <input
+                                    type="url"
+                                    data-ng-model="data.partner2.website"
+                                    name="introduction-partner2-website"
+                                    data-required="required" />
+                                <span
+                                    class="input-error"
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-partner2-website'], 'url')">
+                                    {{ "TR__ERROR_INVALID_URL" | translate }}</span>
+                            </label>
+                            <label>
+                                <span class="label-text">{{ "TR__EMAIL" | translate }}</span>
+                                <input
+                                    type="email"
+                                    data-ng-model="data.partner2.email"
+                                    name="introduction-partner2-email"
+                                    data-required="required" />
+                                <span
+                                    class="input-error"
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-partner2-email'], 'email')">
+                                    {{ "TR__ERROR_INVALID_EMAIL_2016" | translate }}</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNER3_NAME_LABEL" | translate }}:</span>
+                                <input
+                                    type="text"
+                                    data-ng-model="data.partner3.name"
+                                    name="introduction-partner3-name" />
+                            </label>
+                            <label>
+                                <span class="label-text">{{ "TR__WEBSITE" | translate }}</span>
+                                <input
+                                    type="url"
+                                    data-ng-model="data.partner3.website"
+                                    name="introduction-partner3-website"
+                                    data-required="required" />
+                                <span
+                                    class="input-error"
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-partner3-website'], 'url')">
+                                    {{ "TR__ERROR_INVALID_URL" | translate }}</span>
+                            </label>
+                            <label>
+                                <span class="label-text">{{ "TR__EMAIL" | translate }}</span>
+                                <input
+                                    type="email"
+                                    data-ng-model="data.partner3.email"
+                                    name="introduction-partner3-email"
+                                    data-required="required" />
+                                <span
+                                    class="input-error"
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-partner3-email'], 'email')">
+                                    {{ "TR__ERROR_INVALID_EMAIL_2016" | translate }}</span>
+                            </label>
+                        </div>
+                        <label>
+                            <input type="checkbox" data-ng-model="data.morePartners" name="introduction-more-partners" />
+                            <span class="label-text">{{ "TR__MORE_PARTNERS" | translate }}</span>
+                        </label>
+                        <label>
+                            <textarea
+                                data-ng-if="data.morePartners"
+                                data-msd-elastic=""
+                                maxlength="500"
+                                placeholder="{{ 'TR__MAX_CHARS_500' | translate }}">
+                            </textarea>
+                        </label>
+                    </fieldset>
+                </div>
+
+                <div class="annotated-section-annotation mercator-proposal-form-annotation">
+                    {{ "TR__MERCATOR_PROPOSAL_NO_INFLUENCE" | translate }}
+                </div>
+            </div><!-- /.annotated-section -->
+
         </section>
 
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalDetailForm" id="mercator-proposal-detail">
