@@ -1,24 +1,24 @@
-import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
-import * as AdhBadgeModule from "../Badge/Module";
-import * as AdhBlogModule from "../Blog/Module";
-import * as AdhCredentialsModule from "../User/Module";
-import * as AdhHttpModule from "../Http/Module";
-import * as AdhImageModule from "../Image/Module";
-import * as AdhInjectModule from "../Inject/Module";
-import * as AdhLocaleModule from "../Locale/Module";
-import * as AdhPermissionsModule from "../Permissions/Module";
-import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
-import * as AdhResourceAreaModule from "../ResourceArea/Module";
-import * as AdhResourceWidgetsModule from "../ResourceWidgets/Module";
-import * as AdhStickyModule from "../Sticky/Module";
-import * as AdhTopLevelStateModule from "../TopLevelState/Module";
+import * as AdhAngularHelpersModule from "../../../AngularHelpers/Module";
+import * as AdhBadgeModule from "../../../Badge/Module";
+import * as AdhBlogModule from "../../../Blog/Module";
+import * as AdhCredentialsModule from "../../../User/Module";
+import * as AdhHttpModule from "../../../Http/Module";
+import * as AdhImageModule from "../../../Image/Module";
+import * as AdhInjectModule from "../../../Inject/Module";
+import * as AdhLocaleModule from "../../../Locale/Module";
+import * as AdhPermissionsModule from "../../../Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../../../PreliminaryNames/Module";
+import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
+import * as AdhResourceWidgetsModule from "../../../ResourceWidgets/Module";
+import * as AdhStickyModule from "../../../Sticky/Module";
+import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 
-import * as AdhEmbed from "../Embed/Embed";
+import * as AdhEmbed from "../../../Embed/Embed";
 
-import * as MercatorProposal2016 from "./MercatorProposal2016";
+import * as Proposal from "./Proposal";
 
 
-export var moduleName = "adhMercatorProposal2016";
+export var moduleName = "adhMercator2016Proposal";
 
 export var register = (angular) => {
     angular
@@ -61,9 +61,9 @@ export var register = (angular) => {
             };
         }])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider.registerDirective("mercator-proposal-create-view");
-                        }])
-        .directive("adhMercatorProposalCreateView", [
+            adhEmbedProvider.registerDirective("mercator-2016-proposal-create");
+        }])
+        .directive("adhMercator2016ProposalCreate", [
             "adhConfig",
             "adhHttp",
             "adhPreliminaryNames",
@@ -75,5 +75,5 @@ export var register = (angular) => {
             "$window",
             "$location",
             "$q",
-            MercatorProposal2016.createDirective]);
+            Proposal.createDirective]);
 };
