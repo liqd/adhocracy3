@@ -743,6 +743,28 @@
                 </div>
             </div><!-- /.annotated-section -->
 
+            <!-- duration -->
+            <div class="annotated-section">
+                <div class="annotated-section-body">
+                    <label>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_DURATION_LABEL" | translate }}:</span>
+                        <input
+                            type="number"
+                            data-ng-model="data.duration"
+                            name="introduction-duration"
+                            required="required" />
+
+                        <span
+                            class="input-error"
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-duration'], 'required')">
+                            {{ "TR__ERROR_REQUIRED_NUMBER" | translate }}</span>
+                    </label>
+                </div>
+
+                <div class="annotated-section-annotation mercator-proposal-form-annotation">
+                    {{ "TR__MERCATOR_PROPOSAL_DURATION_ANNOTATION" | translate }}
+                </div>
+            </div><!-- /.annotated-section -->
         </section>
 
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalDetailForm" id="mercator-proposal-detail">
