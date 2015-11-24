@@ -689,6 +689,60 @@
                 </div>
             </div><!-- /.annotated-section -->
 
+            <!-- topic -->
+            <div class="annotated-section">
+                <div class="annotated-section-body">
+                    <label>
+                        <input type="checkbox" name="introduction-topic-democracy" data-ng-model="data.topic.democracy"/>
+                        <span class="label-text">{{ "TR__MERCATOR_TOPIC_DEMOCRACY" | translate }}</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" name="introduction-topic-culture" data-ng-model="data.topic.culture"/>
+                        <span class="label-text">{{ "TR__MERCATOR_TOPIC_CULTURE" | translate }}</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" name="introduction-topic-environment" data-ng-model="data.topic.environment"/>
+                        <span class="label-text">{{ "TR__MERCATOR_TOPIC_ENVIRONMENT" | translate }}</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" name="introduction-topic-social" data-ng-model="data.topic.social"/>
+                        <span class="label-text">{{ "TR__MERCATOR_TOPIC_SOCIAL" | translate }}</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" name="introduction-topic-migration" data-ng-model="data.topic.migration"/>
+                        <span class="label-text">{{ "TR__MERCATOR_TOPIC_MIGRATION" | translate }}</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" name="introduction-topic-community" data-ng-model="data.topic.community"/>
+                        <span class="label-text">{{ "TR__MERCATOR_TOPIC_COMMUNITY" | translate }}</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" name="introduction-topic-urban" data-ng-model="data.topic.urban"/>
+                        <span class="label-text">{{ "TR__MERCATOR_TOPIC_URBAN" | translate }}</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" name="introduction-topic-education" data-ng-model="data.topic.education"/>
+                        <span class="label-text">{{ "TR__MERCATOR_TOPIC_EDUCATION" | translate }}</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" name="introduction-topic-other" data-ng-model="data.topic.other"/>
+                        <span class="label-text">{{ "TR__MERCATOR_TOPIC_OTHER" | translate }}</span>
+                    </label>
+                    <label data-ng-if="data.topic.other">
+                        <textarea
+                            data-msd-elastic=""
+                            data-ng-model="data.topic.otherText"
+                            name="introduction-topic-other-text"
+                            required="required">
+                        </textarea>
+                    </label>
+                </div>
+
+                <div class="annotated-section-annotation mercator-proposal-form-annotation">
+                    {{ "TR__MERCATOR_PROPOSAL_NO_INFLUENCE" | translate }}
+                </div>
+            </div><!-- /.annotated-section -->
+
         </section>
 
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalDetailForm" id="mercator-proposal-detail">
