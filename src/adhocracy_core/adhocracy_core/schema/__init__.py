@@ -6,7 +6,6 @@ import decimal
 import io
 import os
 import re
-import urllib
 
 from pyramid.path import DottedNameResolver
 from pyramid.traversal import find_resource
@@ -476,7 +475,7 @@ class ResourceObject(colander.SchemaType):
             if application_url_len > len(str(value)):
                 raise KeyError
             # Fixme: This does not work with :term:`virtual hosting`
-            path = urllib.parse.urlparse(value).path
+            path = value[application_url_len:]
             return find_resource(request.root, path)
 
 
