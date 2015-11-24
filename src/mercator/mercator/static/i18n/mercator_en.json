@@ -85,5 +85,16 @@
     "TR__MERCATOR_PROPOSAL_VALUE_LABEL": "Why does Europe need your idea?",
     "TR__MERCATOR_PROPOSAL_WHO_BEHIND": "Who is behind it?",
     "TR__PROPOSAL_ADD": "Add proposal",
-    "TR__PROPOSAL_EMPTY_TEXT": "No proposals yet."
+    "TR__PROPOSAL_EMPTY_TEXT": "No proposals yet.",
+    "TR__MERCATOR_PROPOSAL_USER_INFO_ANNOTATION_2016": "Your first name and last name will be published together with the proposal.",
+    "TR__MERCATOR_PROPOSAL_ORGANISATION_INFO_ANNOTATION_2016": "This will be visible along with other details about your  proposal.",
+    "TR__MERCATOR_PROPOSAL_ORGANISATION_INFO_2016": "Organisation Information (select from the 4 options below)",
+    "TR__MERCATOR_PROPOSAL_ORGANIZATION_STATUS_NONPROFIT_2016": "I am applying on behalf of a registered non-profit, e.g. NGO",
+    "TR__MERCATOR_PROPOSAL_ORGANIZATION_NAME" : "Name of organisation",
+    "TR__MERCATOR_PROPOSAL_ORGANIZATION_CITY_2016" : "City of organisation",
+    "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_CITY": "Please enter your organization city",
+    "TR__EMAIL_2016": "Contact Email",
+    "TR__ERROR_INVALID_EMAIL_2016": "Please enter a valid email address",
+    "TR__MERCATOR_PROPOSAL_ORGANIZATION_DATE_OF_REGISTRATION_2016" : "Date of registration (year)",
+    "TR__MERCATOR_PROPOSAL_ORGANIZATION_NAME_2016" : "Name of organisation"
 }
