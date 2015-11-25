@@ -1,0 +1,13 @@
+<div data-adh-moving-columns="" class="moving-columns">
+    <adh-moving-column>
+        <adh-mercator-2015-proposal-create-column data-ng-if="view === 'create_proposal'"></adh-mercator-2015-proposal-create-column>
+        <adh-mercator-2015-proposal-listing-column data-ng-if="view !== 'create_proposal'"></adh-mercator-2015-proposal-listing-column>
+    </adh-moving-column>
+    <adh-moving-column>
+        <adh-mercator-2015-proposal-edit-column data-ng-if="view === 'edit'"></adh-mercator-2015-proposal-edit-column>
+        <adh-mercator-2015-proposal-detail-column data-ng-if="view !== 'edit'"></adh-mercator-2015-proposal-detail-column>
+    </adh-moving-column>
+    <adh-moving-column>
+        <adh-comment-column></adh-comment-column>
+    </adh-moving-column>
+</div>

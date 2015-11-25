@@ -7,7 +7,7 @@ var shared = require("./core/shared.js");
 
 var MercatorProposalFormPage = function() {
 
-    this.form = element(by.css("adh-mercator-proposal-create form"));
+    this.form = element(by.css("adh-mercator-2015-proposal-create form"));
     this.userInfoFirstName = this.form.element(by.model("data.user_info.first_name"));
     this.userInfoLastName = this.form.element(by.model("data.user_info.last_name"));
 

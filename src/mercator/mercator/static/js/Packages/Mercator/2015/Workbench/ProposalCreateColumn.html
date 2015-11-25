@@ -6,16 +6,15 @@
     <adh-resource-wrapper
         data-ng-switch-when="body"
         data-on-submit="redirectAfterProposalSubmit(result)"
-        data-on-cancel="redirectAfterProposalCancel(proposalUrl)">
+        data-on-cancel="redirectAfterProposalCancel(platformUrl)">
         <adh-resource-actions
-            data-resource-path="{{proposalUrl}}"
+            data-resource-path="{{platformUrl}}"
             data-cancel="true"></adh-resource-actions>
-        <adh-mercator-proposal-create
-            data-ng-if="proposalUrl"
-            data-path="{{proposalUrl}}"
+        <adh-mercator-2015-proposal-create
+            data-path="@preliminary"
             data-mode="edit"
-            data-create="false"
+            data-create="true"
             data-pool-path="{{platformUrl}}">
-        </adh-mercator-proposal-create>
+        </adh-mercator-2015-proposal-create>
     </adh-resource-wrapper>
 </div>
