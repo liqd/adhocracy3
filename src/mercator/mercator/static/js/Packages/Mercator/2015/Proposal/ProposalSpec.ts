@@ -1,10 +1,10 @@
-/// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
+/// <reference path="../../../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import * as AdhMercatorProposal from "./MercatorProposal";
+import * as AdhMercatorProposal from "./Proposal";
 
 
 export var register = () => {
-    describe("MercatorProposal", () => {
+    describe("Proposal", () => {
         xit("dummy", () => {
             expect(AdhMercatorProposal).toBeDefined();
         });
