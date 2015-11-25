@@ -15,6 +15,7 @@ mercator2_meta = standard_meta \
                               ['edit_comment',                  None,          None,       'Allow',    None],
                               ['create_rate',                  'Allow',        None,        None,      None],
                               ['edit_rate',                     None,          None,       'Allow',    None],
+                              ['create_badge_assignment',      'Allow',        None,        None,      None],
                               ['view_mercator2_extra_funding', 'Deny',        'Allow',     'Allow',    None],
                               ['view_mercator2_winnerinfo',    'Deny',        'Deny',       None,      None],
                               ['edit_mercator2_winnerinfo',    'Deny',        'Deny',       None,      None]

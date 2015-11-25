@@ -123,6 +123,19 @@ class TestMercator2:
         data = resp.json_body['PUT']['request_body']['data']
         assert IWinnerInfo not in data
 
+
+    def test_participate_participant_can_assign_badge(self,
+                                                 registry,
+                                                 app,
+                                                 process_url,
+                                                 app_participant,
+                                                 proposal0_url):
+        from adhocracy_core.resources.badge import IBadgeAssignment
+        url = proposal0_url + '/badge_assignments'
+        postable_types = app_participant.get_postable_types(url)
+        assert IBadgeAssignment in postable_types
+
+
     def test_set_evaluate_state(self, registry, app, process_url, app_admin):
         resp = do_transition_to(app_admin,
                                 process_url,
