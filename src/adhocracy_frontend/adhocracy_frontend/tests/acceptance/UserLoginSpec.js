@@ -45,14 +45,6 @@ describe("user login", function() {
         expect(UserPages.isLoggedIn()).toBe(false);
     });
 
-    it("cannot login with short password", function() {
-        var page = new UserPages.LoginPage().get();
-        page.loginInput.sendKeys("abc");
-        page.passwordInput.sendKeys("abc");
-        page.submitButton.click();
-        expect(element(by.css(".form-error")).getText()).toContain("Short");
-    });
-
     it("login is persistent", function() {
         UserPages.login(UserPages.participantName, UserPages.participantPassword);
         expect(UserPages.isLoggedIn()).toBe(true);
