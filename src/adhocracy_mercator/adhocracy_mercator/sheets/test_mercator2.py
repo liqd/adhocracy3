@@ -352,9 +352,9 @@ class TestLocationSchema:
 
     @fixture
     def cstruct_required(self):
-        return {'city': 'Berlin',
-                'country': 'DE',
+        return {'location': 'Berlin',
                 'has_link_to_ruhr': 'false',
+                'is_online': 'false',
                 'link_to_ruhr': ''
         }
 
@@ -363,16 +363,16 @@ class TestLocationSchema:
         cstruct = {}
         with raises(Invalid) as error:
             inst.deserialize(cstruct)
-        assert error.value.asdict() == {'city': 'Required',
-                                        'country': 'Required',
+        assert error.value.asdict() == {'location': 'Required',
                                         'has_link_to_ruhr': 'Required'}
 
     def test_deserialize_with_required(self, inst, cstruct_required):
         wanted = cstruct_required
         assert inst.deserialize(cstruct_required) == \
-              {'city': 'Berlin',
-               'country': 'DE',
-               'has_link_to_ruhr': False}
+              {'location': 'Berlin',
+               'is_online': False,
+               'has_link_to_ruhr': False,
+               'is_online': False}
 
     def test_deserialize_with_link_to_ruhr_but_no_text(self,
                                                        inst,

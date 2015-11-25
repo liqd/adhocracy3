@@ -185,8 +185,8 @@ class ILocation(ISheet):
 
 
 class LocationSchema(colander.MappingSchema):
-    city = Text(missing=colander.required)
-    country = ISOCountryCode(missing=colander.required)
+    location = SingleLine(missing=colander.required)
+    is_online = Boolean()
     has_link_to_ruhr = Boolean(missing=colander.required, default=False)
     link_to_ruhr = Text()
 
