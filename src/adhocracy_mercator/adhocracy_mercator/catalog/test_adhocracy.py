@@ -261,6 +261,16 @@ class TestMercator2LocationIndex:
         result = mercator2_index_location(resource, 'default')
         assert set(result) == set(['online', 'linked_to_ruhr'])
 
+    def test_index_location_is_specific(self, context):
+        from .adhocracy import mercator2_index_location
+        resource = _make_mercator2_resource(
+            context,
+            location_appstruct={'location': 'Berlin',
+                                'is_online': False,
+                                'has_link_to_ruhr': False})
+        result = mercator2_index_location(resource, 'default')
+        assert set(result) == set(['specific'])
+
     def test_register_index_location(self, registry):
         from adhocracy_mercator.sheets.mercator2 import ILocation
         from substanced.interfaces import IIndexView
