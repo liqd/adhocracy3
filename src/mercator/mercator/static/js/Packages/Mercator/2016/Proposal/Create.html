@@ -557,10 +557,9 @@
                 <div class="annotated-section-body">
                     <label>
                         <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNERS_LABEL" | translate }}:</span>
-                        <!-- FIXME: no option triggers required error -->
                         <select data-ng-model="data.partners" required="required" name="introduction-partners">
                             <option value="true">{{ "TR__YES" | translate }}</option>
-                            <option value="">{{ "TR__NO" | translate }}</option>
+                            <option value="false">{{ "TR__NO" | translate }}</option>
                         </select>
 
                         <span
@@ -569,7 +568,7 @@
                             {{ "TR__ERROR_REQUIRED_SELECTION" | translate }}</span>
                     </label>
 
-                    <fieldset data-ng-if="data.partners">
+                    <fieldset data-ng-if="data.partners === 'true'">
                         <div>
                             <label>
                                 <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNER1_NAME_LABEL" | translate }}:</span>
