@@ -523,6 +523,7 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(move_sheet_annotation_data_to_attributes)
     config.add_evolution_step(migrate_rate_sheet_to_attribute_storage)
     config.add_evolution_step(move_autoname_last_counters_to_attributes)
+    config.add_evolution_step(remove_empty_first_versions)
     config.add_evolution_step(make_proposalversions_polarizable)
     config.add_evolution_step(add_icanpolarize_sheet_to_comments)
     config.add_evolution_step(add_image_reference_to_users)
