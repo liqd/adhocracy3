@@ -93,14 +93,6 @@ form[name]
                                 {{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_STATUS_NONPROFIT_2016" | translate }}
                         </label>
 
-                        <!--
-                            Name of organisation*
-                            City of organisation*
-                            Country of organisation*
-                            Website of organisation*
-                            Contact email*
-                            Date of registration (year)*
-                        -->
                         <fieldset
                             data-ng-if="data.organization_info.status_enum == 'registered_nonprofit'">
 
@@ -120,7 +112,7 @@ form[name]
 
                             <!-- City of organisation* -->
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_CITY_2016_2016" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_CITY_2016" | translate }} *</span>
                                 <input
                                     type="text"
                                     data-ng-model="data.organization_info.city"
@@ -232,7 +224,7 @@ form[name]
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_NAME" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_CITY_2016_PLANNED_NONPROFIT_2016" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_CITY_PLANNED_NONPROFIT_2016" | translate }} *</span>
                                 <input
                                     type="text"
                                     data-ng-model="data.organization_info.city"
@@ -332,7 +324,7 @@ form[name]
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_NAME" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_CITY_2016_SUPPORT_NEEDED_2016" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_CITY_PLANNED_NONPROFIT_2016" | translate }}</span>
                                 <input
                                     type="text"
                                     data-ng-model="data.organization_info.city"
@@ -381,7 +373,7 @@ form[name]
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__EMAIL_2016" | translate }}</span>
+                                <span class="label-text">{{ "TR__EMAIL_2016" | translate }} *</span>
                                 <input
                                     type="email"
                                     data-ng-model="data.organization_info.email"
@@ -407,7 +399,7 @@ form[name]
                                 required="required" />
 
                             {{ "TR__OTHER" | translate }}<span data-ng-if="data.organization_info.status_enum == 'other'">.
-                                {{ "TR__PLEASE_SPECIFY" | translate }}:</span>
+                                {{ "TR__PLEASE_SPECIFY" | translate }}: *</span>
                         </label>
 
                         <fieldset data-ng-if="data.organization_info.status_enum == 'other'">
@@ -427,7 +419,7 @@ form[name]
                                     {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_CITY_2016" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_CITY_OTHER_2016" | translate }} *</span>
                                 <input
                                     type="text"
                                     data-ng-model="data.organization_info.city"
@@ -439,7 +431,7 @@ form[name]
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_CITY" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_PLANNED_COUNTRY" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_COUNTRY_OTHER_2016" | translate }} *</span>
                                 <country-select
                                     data-ng-model="data.organization_info.country"
                                     data-name="organization-info-country"
@@ -447,7 +439,7 @@ form[name]
                                 <span
                                     class="input-error"
                                     data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-country'], 'required')">
-                                    {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_COUNTRY" | translate }}</span>
+                                    {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_COUNTRY" | translate }} *</span>
                             </label>
 
                         </fieldset>
@@ -474,7 +466,7 @@ form[name]
             <div class="annotated-section">
                 <div class="annotated-section-body">
                     <label>
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_TITLE_LABEL" | translate }}:</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_TITLE_LABEL_2016" | translate }} *</span>
                         <input
                             type="text"
                             data-ng-model="data.title"
@@ -498,7 +490,7 @@ form[name]
             <div class="annotated-section">
                 <div class="annotated-section-body">
                     <label>
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PITCH" | translate }}:</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PITCH" | translate }} *</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.introduction.teaser"
@@ -515,14 +507,14 @@ form[name]
                 </div><!-- /.annotated-section-body -->
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
-                    {{ "TR__MERCATOR_PROPOSAL_TEASER_ANNOTATION" | translate }}
+                    {{ "TR__MERCATOR_PROPOSAL_TEASER_ANNOTATION_2016" | translate }}
                 </div>
             </div><!-- /.annotated-section -->
 
             <div class="annotated-section" data-ng-if="$flow.support">
                 <div class="annotated-section-body">
                     <label>
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_IMAGE_UPLOAD_2006" | translate }}</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_IMAGE_UPLOAD_2006" | translate }} *</span>
                         <div
                             data-flow-file-added="!!{png:1,gif:1,jpg:1,jpeg:1}[$file.getExtension()]"
                             data-flow-init=""
@@ -581,8 +573,8 @@ form[name]
                 </div><!-- /.annotated-section-body -->
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
-                    <p>{{ "TR__MERCATOR_PROPOSAL_IMAGE_ANNOTATION_1" | translate }}</p>
-                    <p>{{ "TR__MERCATOR_PROPOSAL_IMAGE_ANNOTATION_2" | translate:$flow.opts }}</p>
+                    <p>{{ "TR__MERCATOR_PROPOSAL_IMAGE_ANNOTATION_1_2016" | translate }}</p>
+                    <p>{{ "TR__MERCATOR_PROPOSAL_IMAGE_ANNOTATION_2_2016" | translate:$flow.opts }}</p>
                 </div>
             </div><!-- /.annotated-section -->
 
@@ -590,7 +582,7 @@ form[name]
             <div class="annotated-section">
                 <div class="annotated-section-body">
                     <label>
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNERS_LABEL" | translate }}:</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNERS_LABEL_2016" | translate }} *</span>
                         <select data-ng-model="data.partners" required="required" name="introduction-partners">
                             <option value="true">{{ "TR__YES" | translate }}</option>
                             <option value="false">{{ "TR__NO" | translate }}</option>
@@ -605,7 +597,7 @@ form[name]
                     <fieldset data-ng-if="data.partners === 'true'">
                         <div>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNER1_NAME_LABEL" | translate }}:</span>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNER1_NAME_LABEL_2016" | translate }}:</span>
                                 <input
                                     type="text"
                                     data-ng-model="data.partner1.name"
@@ -638,7 +630,7 @@ form[name]
                         </div>
                         <div>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNER2_NAME_LABEL" | translate }}:</span>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNER2_NAME_LABEL_2016" | translate }}:</span>
                                 <input
                                     type="text"
                                     data-ng-model="data.partner2.name"
@@ -671,7 +663,7 @@ form[name]
                         </div>
                         <div>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNER3_NAME_LABEL" | translate }}:</span>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNER3_NAME_LABEL_2016" | translate }}:</span>
                                 <input
                                     type="text"
                                     data-ng-model="data.partner3.name"
@@ -780,7 +772,7 @@ form[name]
             <div class="annotated-section">
                 <div class="annotated-section-body">
                     <label>
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_DURATION_LABEL" | translate }}:</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_DURATION_LABEL" | translate }} *</span>
                         <input
                             type="number"
                             data-ng-model="data.duration"
