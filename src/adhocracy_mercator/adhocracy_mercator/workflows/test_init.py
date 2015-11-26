@@ -197,7 +197,7 @@ class TestMercatorWorkflow:
                       )
         resp = app_participant.get('/', params=params).json
         assert resp['data'][IPool.__identifier__]['elements'] == \
-             ['http://localhost/mercator/proposal_0000001/VERSION_0000002/']
+            ['http://localhost/mercator/proposal_0000001/VERSION_0000001/']
 
 
 
