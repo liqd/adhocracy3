@@ -162,9 +162,9 @@ export var movingColumns = (
 /**
  * Moving Column directive
  *
- * Every moving column should be wrapped in an instance of this directive.
- * It provides common functionality, e.g. alerts, sidebar and overlays
- * via a controller that can be required by subelements.
+ * Every moving column should be wrapped in an instance of this
+ * directive.  It provides common functionality, e.g. alerts and
+ * overlays via a controller that can be required by subelements.
  *
  * Subelements can inject template code with the following transclusionIds
  * (see AdhInject):
@@ -172,7 +172,6 @@ export var movingColumns = (
  * -   body
  * -   menu
  * -   collapsed
- * -   sidebar
  * -   overlays
  */
 export interface IMovingColumnScope extends angular.IScope {
@@ -190,7 +189,6 @@ export interface IMovingColumnScope extends angular.IScope {
         message : string;
         mode : string;
     }};
-    _showSidebar : boolean;
 }
 
 export class MovingColumnController {
@@ -211,7 +209,6 @@ export class MovingColumnController {
     public clear() : void {
         this.$scope._alerts = {};
         this.$scope.overlay = undefined;
-        this.$scope._showSidebar = false;
     }
 
     public alert(message : string, mode : string = "info", duration : number = 3000) : void {
@@ -244,21 +241,6 @@ export class MovingColumnController {
         } else if (this.$scope.overlay === key) {
             this.$scope.overlay = undefined;
         }
-    }
-
-    public showSidebar() : void {
-        this.toggleSidebar(true);
-    }
-
-    public hideSidebar() : void {
-        this.toggleSidebar(false);
-    }
-
-    public toggleSidebar(condition? : boolean) : void {
-        if (typeof condition === "undefined") {
-            condition = !this.$scope._showSidebar;
-        }
-        this.$scope._showSidebar = condition;
     }
 
     public $broadcast(name : string, ...args : any[]) {

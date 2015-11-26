@@ -1,24 +1,8 @@
 Installation
 ==============
 
-Installation with Vagrant virtual machine
------------------------------------------
-
-Requirements:
-
-1. virtualbox: https://virtualbox.org/wiki/Downloads
-2. vagrant: http://docs.vagrantup.com/v2/installation/index.html
-
-create virtual machine and login:
-
-    (LINUX:)    wget https://raw.githubusercontent.com/liqd/adhocracy3/master/Vagrantfile
-    (OSX:)      curl -O https://raw.githubusercontent.com/liqd/adhocracy3/master/Vagrantfile
-    vagrant up
-    vagrant ssh
-
-
-Installation (backend)
-----------------------
+Installation
+------------
 
 Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 
@@ -114,3 +98,13 @@ Run test suite::
 
 .. NOTE:: You need to have chrome/chromium installed in order to run the
    acceptance tests.
+
+
+Troubleshooting
+---------------
+If you encounter this error when starting adhocracy
+
+    Problem connecting to WebSocket server: ConnectionRefusedError: [Errno 111] Connection refused
+
+delete the `var/WS_SERVER.pid` file and retry again. This happens when
+the Websocket server is not shutdown properly.

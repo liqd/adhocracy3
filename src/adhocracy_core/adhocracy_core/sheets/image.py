@@ -23,7 +23,6 @@ image_mime_type_validator = OneOf(('image/gif', 'image/jpeg', 'image/png'))
 
 
 class ImageMetadataSchema(AssetMetadataSchema):
-
     """Data structure storing image asset metadata."""
 
     mime_type = SingleLine(missing=required,

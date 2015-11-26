@@ -5,6 +5,7 @@ import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUtil from "../Util/Util";
 
 import * as AdhCredentials from "./Credentials";
 import * as AdhUser from "./User";
@@ -14,6 +15,8 @@ import RIProposal from "../../Resources_/adhocracy_core/resources/proposal/IProp
 import RIRate from "../../Resources_/adhocracy_core/resources/rate/IRate";
 import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
 import RIUsersService from "../../Resources_/adhocracy_core/resources/principal/IUsersService";
+import * as SIHasAssetPool from "../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
+import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
@@ -613,12 +616,10 @@ export var adhUserActivityOverviewDirective = (
     return {
         restrict: "E",
         scope: {
-            path: "@"
+            path: "@" // userUrl
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserActivityOverview.html",
         link: (scope, element, attrs) => {
-            if (typeof scope.path === "undefined") { return; }
-
             var requestCountInto = (contentType, scopeTarget, shouldRequest) => {
                 // REFACT consider to just check that the tag is set instead of requiring it to be set to true
                 if (shouldRequest !== "true") { return; }
@@ -638,6 +639,64 @@ export var adhUserActivityOverviewDirective = (
             requestCountInto(RIComment, "commentCount", attrs.showComments);
             requestCountInto(RIProposal, "proposalCount", attrs.showProposals);
             requestCountInto(RIRate, "rateCount", attrs.showRatings);
+        }
+    };
+};
+
+export var adhUserProfileImageDirective = (
+    adhHttp: AdhHttp.Service<any>,
+    adhConfig: AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        scope: {
+            path: "@",
+            format: "@?", // thumbnail [default] or detail
+            isImageMissing: "=?"
+        },
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfileImage.html",
+        link: (scope) => {
+            scope.isImageMissing = false;
+            var handleImageMissing = () => scope.isImageMissing = true;
+            scope.$watch("path", (path) => {
+               adhHttp.get(scope.path).then((user) => {
+                   scope.assetPath = user.data[SIImageReference.nick].picture;
+                   scope.userName = user.data[SIUserBasic.nick].name;
+                   if ( ! scope.assetPath) {
+                       handleImageMissing();
+                   }
+               },
+               handleImageMissing
+               );
+            });
+        }
+    };
+};
+
+export var adhUserProfileImageEditDirective = (
+    adhHttp: AdhHttp.Service<any>,
+    adhPermissions: AdhPermissions.Service,
+    adhConfig: AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        scope: {
+            path: "@"
+        },
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfileImageEdit.html",
+        link: (scope) => {
+            adhHttp.get(AdhUtil.parentPath(scope.path)).then((userPool) => {
+                scope.assetPool = userPool.data[SIHasAssetPool.nick].asset_pool;
+            });
+            scope.triggerUpload = () => {
+                scope.isUploading = true;
+            };
+            scope.didUpload = () => {
+               scope.isUploading = false;
+            };
+            scope.$watch("path", (path) => {
+                adhPermissions.bindScope(scope, () => scope.path, "userOptions");
+            });
         }
     };
 };

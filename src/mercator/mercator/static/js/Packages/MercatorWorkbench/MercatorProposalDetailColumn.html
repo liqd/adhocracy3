@@ -1,11 +1,6 @@
 <div data-ng-switch="transclusionId">
     <div data-ng-switch-when="menu">
         <i class="icon-document moving-column-icon"></i>
-        <a class="moving-column-menu-button" data-ng-if="proposalItemOptions.POST" data-ng-href="{{ proposalUrl | adhResourceUrl:'edit' }}">{{ "TR__EDIT" | translate }}</a>
-        <a class="moving-column-menu-button" href="" data-ng-click="ctrl.toggleOverlay('abuse')">{{ "TR__REPORT" | translate }}</a>
-        <a class="moving-column-menu-button" href="" data-ng-click="ctrl.toggleOverlay('share')">{{ "TR__SHARE" | translate }}</a>
-        <a class="moving-column-menu-button" data-ng-if="proposalItemOptions.hide" href="" data-ng-click="delete()">{{ "TR__DELETE" | translate }}</a>
-        <a class="moving-column-menu-button" href="" data-ng-click="print()">{{ "TR__PRINT" | translate }}</a>
 
         <div class="moving-column-menu-nav">
             <a class="moving-column-menu-nav-button" data-ng-href="{{ platformUrl | adhResourceUrl }}" title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
@@ -19,6 +14,15 @@
     </a>
 
     <adh-recompile-on-change data-ng-switch-when="body" data-value="{{proposalUrl}}">
+        <adh-resource-actions
+            data-resource-path="{{proposalUrl}}"
+            data-edit="true"
+            data-report="true"
+            data-share="true"
+            data-delete="true"
+            data-print="true"></adh-resource-actions>
+
+        <adh-document-create data-path="{{processUrl}}" data-has-map="true" data-has-image="true" data-polygon="polygon"></adh-document-create>
         <adh-resource-wrapper>
             <adh-mercator-proposal-detail-view data-ng-if="proposalUrl" data-path="{{proposalUrl}}"></adh-mercator-proposal-detail-view>
         </adh-resource-wrapper>

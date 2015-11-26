@@ -8,20 +8,6 @@
     <div class="moving-column-collapsed">
         <adh-inject data-transclusion-id="collapsed"></adh-inject>
     </div>
-    <div
-        class="moving-column-sidebar"
-        data-ng-class="{'is-visible': _showSidebar}"
-        aria-visible="{{_showSidebar}}"
-        data-ng-click="ctrl.hideSidebar()">
-        <a
-            title="{{ 'TR__CLOSE' | translate }}"
-            href=""
-            class="moving-column-sidebar-close"
-            data-ng-click="ctrl.hideSidebar()">
-            <i class="icon-x"></i></a>
-        <adh-inject data-transclusion-id="sidebar"></adh-inject>
-    </div>
-
     <div class="moving-column-mask" data-ng-show="overlay"></div>
     <div class="moving-column-overlay" data-ng-if="overlay">
         <adh-inject data-transclusion-id="overlays"></adh-inject>

@@ -37,7 +37,7 @@ from subprocess import Popen, PIPE
 def call_git_describe(abbrev=4):
     """Call git describe to get the current version number."""
     try:
-        p = Popen(['git', 'describe', '--abbrev=%d' % abbrev],
+        p = Popen(['git', 'describe', '--tags', '--abbrev=%d' % abbrev],
                   stdout=PIPE, stderr=PIPE)
         p.stderr.close()
         line = p.stdout.readlines()[0]
@@ -47,7 +47,7 @@ def call_git_describe(abbrev=4):
 
 
 def read_release_version():
-    """ Read current version number from RELEASE-VERSION."""
+    """Read current version number from RELEASE-VERSION."""
     try:
         f = open('RELEASE-VERSION', 'r')
         try:
@@ -67,7 +67,7 @@ def write_release_version(version):
 
 
 def get_git_version(abbrev=4):
-    """Try to get version from git and fallback to file. """
+    """Try to get version from git and fallback to file."""
     # Read in the version that's currently in RELEASE-VERSION.
 
     release_version = read_release_version()

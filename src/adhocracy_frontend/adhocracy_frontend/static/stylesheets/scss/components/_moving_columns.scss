@@ -24,9 +24,8 @@ States:
 <div class="moving-columns" style="height: 10em; position: relative;">
     <div class="moving-column moving-column-structure">
         <div class="debug-placeholder moving-column-menu">
-            <a onclick="$('.moving-column-sidebar').toggleClass('is-visible')">toggle sidebar</a>
+            <a>action</a>
         </div>
-        <div class="debug-placeholder moving-column-sidebar">sidebar</div>
         <div class="debug-placeholder moving-column-body">structure column
             this is scrolling
             this is scrolling
@@ -88,11 +87,7 @@ Each moving column has a menu. The menu may contain some arbitrary control
 elements.  Many columns do also have control elements to close (hide) or
 collapse the column.
 
-Additionally, the moving column optionally contains a sidebar that is not shown
-by default. It can be shown by adding the `is-visible` state to the
-`moving-column-sidebar` element.
-
-The menu and sidebar are fixed to the top/side of the column.
+The menu is fixed to the top of the column.
 
 The menu should always have the same state as its columns.
 
@@ -115,8 +110,7 @@ The menu should always have the same state as its columns.
         padding-left: 0;
 
         .moving-column-body,
-        .moving-column-menu,
-        .moving-column-sidebar {
+        .moving-column-menu {
             display: none;
         }
 
@@ -155,27 +149,19 @@ The menu should always have the same state as its columns.
 }
 
 .moving-column-body,
-.moving-column-sidebar,
 .moving-column-overlay,
 .moving-column-alerts,
 .moving-column-mask {
     position: absolute;
     top: $moving-column-menu-height;
     left: 0;
+    right: 0;
     overflow-y: auto;
 }
 
 .moving-column-body,
-.moving-column-sidebar,
 .moving-column-mask {
     bottom: 0;
-}
-
-.moving-column-body,
-.moving-column-overlay,
-.moving-column-alerts,
-.moving-column-mask {
-    right: 0;
 }
 
 .moving-column-body {
@@ -320,43 +306,6 @@ States:
             @include rem(font-size, $font-size-smaller);
             line-height: 24px / $font-size-smaller;
         }
-    }
-}
-
-.moving-column-sidebar {
-    @include rem(padding, 16px 20px);
-    @include transition(left 0.5s);
-    border-top: 1px solid $color-structure-border;
-    display: none;
-    left: -25%;
-    width: 25%;
-    z-index: 1;
-    background-color: $color-structure-normal;
-
-    &.is-visible {
-        left: 0;
-    }
-
-    &.is-visible,
-    &.is-visible-add,
-    &.is-visible-remove {
-        display: block;
-    }
-
-    .moving-column-sidebar-close {
-        @include rem(right, 1rem);
-        @include rem(top, 1rem);
-        color: $color-text-introvert;
-        position: absolute;
-        text-decoration: none;
-
-        &:hover, &:focus {
-            color: $color-text-extrovert;
-        }
-    }
-
-    @media print {
-        display: none;
     }
 }
 

@@ -108,4 +108,4 @@ Missing Features
 
 
 .. _angular-translate: https://angular-translate.github.io
-.. _transifex: https://www.transifex.com/projects/p/adhocracy3mercator/
+.. _transifex: https://www.transifex.com/liqd/adhocracy3/

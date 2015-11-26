@@ -69,12 +69,15 @@ export interface ListingScope<Container> extends angular.IScope {
     contentType? : string;
     facets? : IFacet[];
     sort? : string;
+    sorts? : string[];
     reverse? : boolean;
     initialLimit? : number;
     currentLimit? : number;
     totalCount? : number;
     params? : any;
     emptyText? : string;
+    showFilter : boolean;
+    showSort : boolean;
     container : Container;
     poolPath : string;
     poolOptions : AdhHttp.IOptions;
@@ -87,6 +90,9 @@ export interface ListingScope<Container> extends angular.IScope {
     wsOff : () => void;
     clear : () => void;
     onCreate : () => void;
+    toggleFilter : () => void;
+    toggleSort : () => void;
+    setSort : (sort : string) => void;
 }
 
 export interface IFacetsScope extends angular.IScope {
@@ -124,6 +130,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 contentType: "@",
                 facets: "=?",
                 sort: "=?",
+                sorts: "=?",
                 reverse: "=?",
                 initialLimit: "=?",
                 frontendOrderPredicate: "=?",
@@ -190,6 +197,16 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     });
                 };
 
+                $scope.toggleFilter = () => {
+                    $scope.showSort = false;
+                    $scope.showFilter = !$scope.showFilter;
+                };
+
+                $scope.toggleSort = () => {
+                    $scope.showFilter = false;
+                    $scope.showSort = !$scope.showSort;
+                };
+
                 $scope.update = (warmup? : boolean) : angular.IPromise<void> => {
                     if ($scope.initialLimit) {
                         if (!$scope.currentLimit) {
@@ -238,6 +255,10 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     $scope.elements = [];
                 };
 
+                $scope.setSort = (sort : string) => {
+                    $scope.sort = sort;
+                };
+
                 $scope.onCreate = () : void => {
                     $scope.update();
                     $scope.createPath = adhPreliminaryNames.nextPreliminary();
@@ -283,6 +304,7 @@ export var facets = (adhConfig : AdhConfig.IService) => {
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Facets.html",
         link: (scope : IFacetsScope) => {
+
             scope.enableItem = (facet : IFacet, item : IFacetItem) => {
                 if (!item.enabled) {
                     facet.items.forEach((_item : IFacetItem) => {

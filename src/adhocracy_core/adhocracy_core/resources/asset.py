@@ -31,7 +31,6 @@ class IAssetDownload(IResource):
 
 
 class AssetDownload(Base):
-
     """Allow downloading the first asset file in the term:`lineage`."""
 
     def get_response(self, registry: Registry=None) -> FileResponse:

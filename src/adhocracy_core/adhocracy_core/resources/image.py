@@ -21,12 +21,10 @@ import adhocracy_core.sheets.image
 
 
 class IImageDownload(IAssetDownload):
-
     """Downloadable binary file for Images."""
 
 
 class ImageDownload(File, AssetDownload):
-
     """Allow downloading the first image file in the term:`lineage`."""
 
     dimensions = None
