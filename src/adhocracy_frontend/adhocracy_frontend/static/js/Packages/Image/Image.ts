@@ -145,9 +145,16 @@ export var showImageDirective = (
                 scope.imageMetadataNick ? scope.imageMetadataNick : SIImageMetadata.nick;
             var format = () => scope.format ? scope.format : "detail";
             var fallbackUrl = () => scope.fallbackUrl || ("/static/fallback_" + format() + ".jpg");
+            scope.imageUrl = fallbackUrl(); // show fallback till real image is loaded
             scope.isImageMissing = false;
+
+            // can also be set by outer scopes
+            scope.$watch("isImageMissing", (isImageMissing) => {
+                if (isImageMissing) {
+                    scope.imageUrl = fallbackUrl();
+                }
+            });
             var handleError = () => {
-                scope.imageUrl = fallbackUrl();
                 scope.isImageMissing = true;
             };
 
