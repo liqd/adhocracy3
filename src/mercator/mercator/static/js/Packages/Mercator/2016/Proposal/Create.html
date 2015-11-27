@@ -457,6 +457,7 @@ form[name]
             </div><!-- /.annotated-section -->
         </section>
 
+        <!-- YOUR IDEA IN BRIEF -->
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalIntroductionForm" id="mercator-proposal-introduction">
             <h2
                 data-du-scrollspy="mercator-proposal-introduction"
@@ -698,9 +699,9 @@ form[name]
                             <input type="checkbox" data-ng-model="data.morePartners" name="introduction-more-partners" />
                             <span class="label-text">{{ "TR__MORE_PARTNERS" | translate }}</span>
                         </label>
-                        <label>
+                        <label data-ng-if="data.morePartners">
+                            <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNERS_MORE_PARTNERS_SPECIFY" | translate }} *</span>
                             <textarea
-                                data-ng-if="data.morePartners"
                                 data-msd-elastic=""
                                 maxlength="500"
                                 placeholder="{{ 'TR__MAX_CHARS_500' | translate }}">
@@ -845,6 +846,15 @@ form[name]
                                 name="location-location-is-linked-to-ruhr" />
                             {{ "TR__MERCATOR_PROPOSAL_LOCATION_LINKAGE_TO_RUHR" | translate }}
                         </label>
+                        <label data-ng-if="data.location.location_is_linked_to_ruhr" class="label-text">
+                            <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_LOCATION_RUHR_CONNECTION_SPECIFY" | translate }} *</span>
+                            <textarea
+                                data-ng-model="data.location.location_is_linked_to_ruhr_text"
+                                data-msd-elastic=""
+                                maxlength="300"
+                                placeholder="{{ 'TR__MAX_CHARS_300' | translate }}">
+                            </textarea>
+                        </label>
                     </div><!-- /.ng-invalid -->
 
                     <span
@@ -854,7 +864,8 @@ form[name]
                 </div><!-- /.annotated-section-body -->
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
-                    {{ "TR__MERCATOR_PROPOSAL_LOCATION_ANNOTATION" | translate }}
+                   <p>{{ "TR__MERCATOR_PROPOSAL_LOCATION_ANNOTATION" | translate }}</p>
+                   <p>{{ "TR__MERCATOR_PROPOSAL_LOCATION_ANNOTATION_2" | translate }}</p>
                 </div>
             </div><!-- /.annotated-section -->
 
@@ -863,22 +874,48 @@ form[name]
                 <div class="annotated-section-body">
                     <label>
                         <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_LABEL" | translate }}:</span>
-                        <select
-                            data-ng-model="data.status">
-                            <option value="starting">{{ "TR__MERCATOR_PROPOSAL_STATUS_STARTING" | translate }}</option>
-                            <option value="developing">{{ "TR__MERCATOR_PROPOSAL_STATUS_DEVELOPING" | translate }}</option>
-                            <option value="scaling">{{ "TR__MERCATOR_PROPOSAL_STATUS_SCALING" | translate }}</option>
-                            <option value="other">{{ "TR__MERCATOR_PROPOSAL_STATUS_OTHER" | translate }}</option>
-                        </select>
+                        <label>
+                            <input
+                                type="radio"
+                                name="status"
+                                value="starting"
+                                data-ng-model="data.status"/>
+                            <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_STARTING" | translate }}</span>
+                        </label>
+                        <label>
+                            <input
+                                type="radio"
+                                name="status"
+                                value="developing"
+                                data-ng-model="data.status"/>
+                            <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_DEVELOPING" | translate }}</span>
+                        </label>
+                        <label>
+                            <input
+                                type="radio"
+                                name="status"
+                                value="scaling"
+                                data-ng-model="data.status"/>
+                            <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_SCALING" | translate }}</span>
+                        </label>
+                        <label>
+                            <input
+                                type="radio"
+                                name="status"
+                                value="other"
+                                data-ng-model="data.status"/>
+                            <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_OTHER" | translate }}</span>
+                        </label>
                     </label>
                 </div>
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
-                    {{ "TR__MERCATOR_PROPOSAL_STATUS_ANNOTATION" | translate }}
+                    {{ "TR__MERCATOR_PROPOSAL_STATUS_ANNOTATION_2016" | translate }}
                 </div>
             </div><!-- /.annotated-section -->
         </section>
 
+        <!-- Road to impact -->
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalDetailForm" id="mercator-proposal-detail">
             <h2
                 data-du-scrollspy="mercator-proposal-impact"
@@ -888,13 +925,13 @@ form[name]
             <div class="annotated-section">
                 <div class="annotated-section-body">
                     <label>
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_DESCRIPTION_LABEL" | translate }}:</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_IMPACT_CHALLENGE_LABEL" | translate }} *</span>
                         <textarea
                             data-msd-elastic=""
-                            data-ng-model="data.description.description"
-                            name="description-description"
-                            maxlength="1000"
-                            placeholder="{{ 'TR__MAX_CHARS_1000' | translate }}"
+                            data-ng-model="data.impact.challenge"
+                            name="impact-challenge"
+                            maxlength="500"
+                            placeholder="{{ 'TR__MAX_CHARS_500' | translate }}"
                             required="required"></textarea>
 
                         <span

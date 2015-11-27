@@ -37,7 +37,7 @@
     "TR__MERCATOR_PROPOSAL_IMAGE_ANNOTATION_1": "Upload a photo, icon, or illustration that visually supports or explains your idea. Make sure that you have the property rights to share this picture publically.",
     "TR__MERCATOR_PROPOSAL_IMAGE_ANNOTATION_2": "Image must be of type {{acceptedFileTypes | join}}, no bigger than {{maximumByteSize/1000000}}MB, and not less than {{minimumWidth}}px wide.",
     "TR__MERCATOR_PROPOSAL_INTRODUCTION": "Your idea in brief",
-    "TR__MERCATOR_PROPOSAL_LOCATION_ANNOTATION": "Where will your initiative, project or activity mainly take place?",
+    "TR__MERCATOR_PROPOSAL_LOCATION_ANNOTATION": "Where will your initiative, project or activity primarily take place?",
     "TR__MERCATOR_PROPOSAL_LOCATION_FORMAT": "City, Country",
     "TR__MERCATOR_PROPOSAL_LOCATION_LABEL": "Location",
     "TR__MERCATOR_PROPOSAL_LOCATION_LINKAGE_TO_RUHR": "with linkage to Ruhr area",
@@ -136,5 +136,17 @@
     "TR__MERCATOR_TOPIC_EDUCATION":"Education",
     "TR__MERCATOR_TOPIC_OTHER":"Other (please specify)",
     "TR__MERCATOR_PROPOSAL_DURATION_LABEL":"Duration of project",
-    "TR__MERCATOR_PROPOSAL_DURATION_ANNOTATION":"How many months will it take to implement your project? Funds from Advocate Europe can be used between 2016 and March 2017"
+    "TR__MERCATOR_PROPOSAL_DURATION_ANNOTATION":"How many months will it take to implement your project? Funds from Advocate Europe can be used between 2016 and March 2017",
+    "TR__MERCATOR_PROPOSAL_LOCATION_ANNOTATION_2": "Is your project connected to the Ruhr area of Germany through project partners, audiences or in some other way? Please provide details.",
+    "TR__MERCATOR_PROPOSAL_LOCATION_RUHR_CONNECTION_SPECIFY": "Please specify",
+    "TR__MERCATOR_PROPOSAL_STATUS_LABEL":"Project status",
+    "TR__MERCATOR_PROPOSAL_STATUS_ANNOTATION":"What is the current status of your project idea? Is it brand new, or already implemented?",
+    "TR__MERCATOR_PROPOSAL_STATUS_STARTING":"Starting out: A project idea that has not yet been realised",
+    "TR__MERCATOR_PROPOSAL_STATUS_DEVELOPING":"Developing: A project that is already underway and is ready to grow beyond its beginning stages",
+    "TR__MERCATOR_PROPOSAL_STATUS_SCALING":"Scaling up and transferring: An established project that is ready for scale-up or transfer to other countries, sectors or",
+    "TR__MORE_PARTNERS":"I have more than 3 partner organisations",
+    "TR__MERCATOR_PROPOSAL_PARTNERS_MORE_PARTNERS_SPECIFY": "Please specify",
+    "TR__MERCATOR_PROPOSAL_STATUS_OTHER":"Other",
+    "TR__MERCATOR_PROPOSAL_IMPACT":"Road to impact",
+    "TR__MERCATOR_PROPOSAL_IMPACT_CHALLENGE_LABEL":"What is the challenge you are addressing?"
 }
