@@ -130,7 +130,6 @@ var bindServerErrors = (
     }
 };
 
-
 export var activateArea = (
     adhConfig : AdhConfig.IService,
     adhUser : AdhUser.Service,
@@ -661,14 +660,14 @@ export var adhUserProfileImageDirective = (
             scope.isImageMissing = false;
             var handleImageMissing = () => scope.isImageMissing = true;
             scope.$watch("path", (path) => {
-               adhHttp.get(scope.path).then((user) => {
-                   scope.assetPath = user.data[SIImageReference.nick].picture;
-                   scope.userName = user.data[SIUserBasic.nick].name;
-                   if ( ! scope.assetPath) {
-                       handleImageMissing();
-                   }
                 if ( ! path) { return; }
 
+                adhHttp.get(scope.path).then((user) => {
+                    scope.assetPath = user.data[SIImageReference.nick].picture;
+                    scope.userName = user.data[SIUserBasic.nick].name;
+                    if ( ! scope.assetPath) {
+                        handleImageMissing();
+                    }
                },
                handleImageMissing
                );
