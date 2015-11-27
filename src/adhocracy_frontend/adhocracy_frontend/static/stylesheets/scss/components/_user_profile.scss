@@ -59,8 +59,10 @@
 }
 
 .user-profile-image-edit {
-    @include rem(height, 100px);
-    @include rem(width, 100px);
+    $image-base-size: 200px;
+    
+    @include rem(height, $image-base-size);
+    @include rem(width, $image-base-size);
     position: relative;
 
     // position nicely on top of the username
@@ -71,14 +73,19 @@
     margin-right: auto;
     margin-left: auto;
 
+    .user-profile-image {
+        @include rem(height, $image-base-size);
+        @include rem(width, $image-base-size);
+    }
+    
     &.user-profile-image-edit-uploading {
-        @include rem(width, 200px);
+        @include rem(width, $image-base-size);
         height: auto;
     }
 
     .user-profile-image-edit-button {
-        @include rem(width, 100px);
-        @include rem(height, 100px);
+        @include rem(width, $image-base-size);
+        @include rem(height, $image-base-size);
         @include border-radius(50%);
 
         position: absolute;
@@ -90,7 +97,8 @@
 
         > span {
             // vertically centered
-            @include rem(height, 100px);
+            @include rem(height, $image-base-size);
+            @include rem(width, $image-base-size);
             display: table-cell;
             vertical-align: middle;
             // We actually want the 'button' to wrap
