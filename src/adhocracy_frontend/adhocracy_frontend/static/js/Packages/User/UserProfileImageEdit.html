@@ -1,4 +1,8 @@
-<div class="user-profile-image-edit" ng-class="{'user-profile-image-edit-uploading': isUploading}">
+<div
+    class="user-profile-image-edit"
+    data-ng-class="{'user-profile-image-edit-uploading': isUploading}"
+    data-ng-if="config.profile_images_enabled"
+>
     <adh-recompile-on-change
         data-value="{{isUploading}}">
         <adh-user-profile-image
