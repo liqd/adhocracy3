@@ -6,7 +6,7 @@
     <adh-recompile-on-change
         data-value="{{isUploading}}">
         <adh-user-profile-image
-            ng-hide="isImageMissing || isUploading"
+            data-ng-hide="isUploading"
             data-path="{{path}}"
             data-format="detail"
             data-is-image-missing="isImageMissing"
