@@ -71,7 +71,16 @@
     border-width: 1px 0;
     display: block;
     text-decoration: none;
+    
+    &.user-profile-image {
+        // center vertically
+        @include rem(margin-top, 10px);
+        // undo border and padding from above so the icon is rendered completely
+        border: 0;
+        padding: 0;
+    }
 }
+
 
 .s1-proposal-detail-text {
     @include rem(padding-top, 28px);
