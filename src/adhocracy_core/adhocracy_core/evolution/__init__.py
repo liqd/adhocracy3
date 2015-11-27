@@ -6,13 +6,13 @@ from BTrees.Length import Length
 from persistent.mapping import PersistentMapping
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
-from zope.interface.interfaces import IInterface
-from zope.interface import alsoProvides
-from zope.interface import noLongerProvides
-from zope.interface import directlyProvides
 from substanced.evolution import add_evolution_step
-from substanced.util import find_service
 from substanced.interfaces import IFolder
+from substanced.util import find_service
+from zope.interface import alsoProvides
+from zope.interface import directlyProvides
+from zope.interface import noLongerProvides
+from zope.interface.interfaces import IInterface
 
 from adhocracy_core.catalog import ICatalogsService
 from adhocracy_core.interfaces import IItem
@@ -21,12 +21,12 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ISimple
 from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.interfaces import search_query
-from adhocracy_core.resources.asset import IPoolWithAssets
 from adhocracy_core.resources.asset import IAsset
+from adhocracy_core.resources.asset import IPoolWithAssets
+from adhocracy_core.resources.asset import add_assets_service
 from adhocracy_core.resources.badge import IBadgeAssignmentsService
 from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.resources.badge import add_badges_service
-from adhocracy_core.resources.asset import add_assets_service
 from adhocracy_core.resources.comment import ICommentVersion
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.principal import IUser
@@ -48,7 +48,7 @@ from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
-
+from adhocracy_core.utils import has_annotation_sheet_data
 
 logger = logging.getLogger(__name__)
 
@@ -458,21 +458,12 @@ def remove_empty_first_versions(root):  # pragma: no cover
         if 'VERSION_0000000' not in item:
             continue
         first_version = item['VERSION_0000000']
-        is_empty = _is_version_without_data(first_version)
+        has_sheet_data = has_annotation_sheet_data(first_version)\
+            or hasattr(first_version, 'rate')
         has_follower = _has_follower(first_version, registry)
-        if is_empty and has_follower:
+        if not has_sheet_data and has_follower:
             logger.info('Delete empty version {0}.'.format(first_version))
             del item['VERSION_0000000']
-
-
-def _is_version_without_data(version: IItemVersion) -> bool:
-    for attribute in version.__dict__:
-        if attribute.startswith('_sheet_'):
-            return False
-        if attribute == 'rate':
-            return False
-    else:
-        return True
 
 
 def _has_follower(version: IItemVersion, registry: Registry) -> bool:

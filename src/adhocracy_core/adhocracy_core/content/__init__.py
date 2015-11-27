@@ -17,6 +17,7 @@ from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.utils import get_iresource
+from adhocracy_core.utils import has_annotation_sheet_data
 
 
 resolver = DottedNameResolver()
@@ -64,7 +65,7 @@ class ResourceContentRegistry(ContentRegistry):
 
     def _can_add_resource(self, request, resource_meta, context):
         allowed = False
-        if self._only_version_zero_exists(context, resource_meta):
+        if self._only_empty_version_zero_exists(context, resource_meta):
             allowed = self._can_add_version_one(request, context)
         else:
             permission = resource_meta.permission_create
@@ -73,21 +74,26 @@ class ResourceContentRegistry(ContentRegistry):
 
     def _can_add_version_one(self, request, context):
         iresource = get_iresource(context)
-        # since there is only version zero, the permission of
+        # since there is only an empty version zero, the permission of
         # the item is checked instead of the one from the itemversion
         permission = self.resources_meta[iresource].permission_create
-        return request.has_permission(permission, context)
+        allow = request.has_permission(permission, context)
+        return allow
 
-    def _only_version_zero_exists(self, context: object, meta:
-                                  ResourceMetadata) -> bool:
+    def _only_empty_version_zero_exists(self, context: object, meta:
+                                        ResourceMetadata) -> bool:
         only_first_version = False
+        is_empty_first_version = False
         is_item_version = meta.iresource.isOrExtends(IItemVersion)
         has_item_parent = IItem.providedBy(context)
         if has_item_parent and is_item_version:
             children = context.values()
             versions = [x for x in children if IItemVersion.providedBy(x)]
-            only_first_version = len(versions) == 1
-        return only_first_version
+            if len(versions) == 1:
+                only_first_version = True
+                is_empty_first_version = not has_annotation_sheet_data(
+                    versions[0])
+        return only_first_version and is_empty_first_version
 
     @reify
     def resources_meta_addable(self):
