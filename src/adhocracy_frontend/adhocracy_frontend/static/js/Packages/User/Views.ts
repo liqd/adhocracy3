@@ -656,6 +656,7 @@ export var adhUserProfileImageDirective = (
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfileImage.html",
         link: (scope) => {
+            scope.config = adhConfig;
             scope.isImageMissing = false;
             var handleImageMissing = () => scope.isImageMissing = true;
             scope.$watch("path", (path) => {
@@ -685,6 +686,7 @@ export var adhUserProfileImageEditDirective = (
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfileImageEdit.html",
         link: (scope) => {
+            scope.config = adhConfig;
             adhHttp.get(AdhUtil.parentPath(scope.path)).then((userPool) => {
                 scope.assetPool = userPool.data[SIHasAssetPool.nick].asset_pool;
             });
