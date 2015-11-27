@@ -1,31 +1,28 @@
 .user-indicator {
+    @include inline-block;
     vertical-align: top;
-
-    .button {
-        margin-right: 0;
-        text-align: left;
-    }
 
     a {
         @include inline-block;
     }
 
-    .user-indicator-icon {
-        @include rem(font-size, 20px);
-        @include rem(margin-right, 5px);
-    }
-
-    .user-data {
-        @include inline-block;
-
-        .button {
-            @include border-radius(0);
-            display: block;
-        }
-    }
-
-    .user-indicator-lout {
+    .user-indicator-logout {
         height: auto;
         line-height: 1;
     }
+
+    .user-profile-image {
+        @include rem(margin-right, 10px);
+        float: left;
+    }
+
+    .user-indicator-name,
+    .user-indicator-logout {
+        display: block;
+    }
+
+    .user-indicator-name-logout-separator {
+        display: none;
+    }
+
 }
