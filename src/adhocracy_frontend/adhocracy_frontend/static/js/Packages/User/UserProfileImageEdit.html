@@ -16,7 +16,7 @@
         data-ng-class="{ 'user-profile-image-edit-button-force-visible': isImageMissing }"
         data-ng-if="userOptions.PUT && ! isUploading"
         data-ng-click="triggerUpload()"
-    ><span>Edit Profile Image<!-- FIXME translate --></span></a>
+    ><span>{{ "TR__EDIT_PROFILE_IMAGE" | translate}}</span></a>
     <adh-upload-image
         data-ng-if="isUploading"
         data-pool-path="{{path|adhParentPath}}"
