@@ -667,6 +667,8 @@ export var adhUserProfileImageDirective = (
                    if ( ! scope.assetPath) {
                        handleImageMissing();
                    }
+                if ( ! path) { return; }
+
                },
                handleImageMissing
                );
