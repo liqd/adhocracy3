@@ -1,5 +1,6 @@
 <div class="user-indicator" data-ng-switch="credentials.loggedIn">
     <div data-ng-switch-when="true">
+        <adh-user-profile-image data-path="{{credentials.userPath}}"></adh-user-profile-image>
         <a data-ng-if="!noLink" data-ng-href="{{ credentials.userPath | adhResourceUrl }}" class="user-indicator-name">{{user.data.name}}</a
         ><span data-ng-if="noLink" class="user-indicator-name">{{user.data.name}}</span
         ><span class="user-indicator-name-logout-separator">,</span>
