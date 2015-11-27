@@ -1,0 +1,6 @@
+.user-meta.user-profile-image {
+    @include rem(height, 35px);
+    @include rem(width, 35px);
+    @include rem(margin-right, 10px);
+    vertical-align: top;
+}
