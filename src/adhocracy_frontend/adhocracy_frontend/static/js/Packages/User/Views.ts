@@ -652,7 +652,8 @@ export var adhUserProfileImageDirective = (
         scope: {
             path: "@",
             format: "@?", // thumbnail [default] or detail
-            isImageMissing: "=?"
+            isImageMissing: "=?",
+            cssClass: "@?"
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfileImage.html",
         link: (scope) => {
