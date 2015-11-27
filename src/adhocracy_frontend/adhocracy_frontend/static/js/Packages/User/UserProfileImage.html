@@ -4,4 +4,6 @@
     data-format="{{format || 'thumbnail' }}" 
     data-css-class="{{ cssClass }} user-profile-image" 
     data-alt="{{ 'TR__USER_PROFILE_IMAGE_OF' |translate:{userName: userName} }}"
+    data-fallback-url="/static/images/avatar_fallback.svg"
+    data-is-image-missing="isImageMissing"
 ></adh-show-image>
