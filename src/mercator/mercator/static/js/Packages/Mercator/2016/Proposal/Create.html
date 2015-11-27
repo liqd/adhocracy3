@@ -942,31 +942,31 @@ form[name]
                 </div><!-- /.form_body -->
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
-                    {{ "TR__MERCATOR_PROPOSAL_DESCRIPTION_ANNOTATION" | translate }}
+                    {{ "TR__MERCATOR_PROPOSAL_IMPACT_CHALLENGE_ANNOTATION" | translate }}
                 </div>
             </div><!-- /.annotated-section -->
 
             <div class="annotated-section">
                 <div class="annotated-section-body">
                     <label>
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STORY_LABEL" | translate }}</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_IMPACT_AIM_LABEL" | translate }}</span>
                         <textarea
                             data-msd-elastic=""
-                            data-ng-model="data.story"
-                            name="story"
-                            maxlength="800"
-                            placeholder="{{ 'TR__MAX_CHARS_800' | translate }}"
+                            data-ng-model="data.impact.aim"
+                            name="impact-aim"
+                            maxlength="500"
+                            placeholder="{{ 'TR__MAX_CHARS_500' | translate }}"
                             required="required"></textarea>
 
                         <span
                             class="input-error"
-                            data-ng-if="showError(mercatorProposalForm, mercatorProposalDetailForm.story, 'required')">
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalDetailForm.impact-aim, 'required')">
                             {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
                     </label>
                 </div><!-- /.annotated-section-body -->
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
-                    {{ "TR__MERCATOR_PROPOSAL_STORY_ANNOTATION" | translate }}
+                    {{ "TR__MERCATOR_PROPOSAL_IMPACT_AIM_ANNOTATION" | translate }}
                 </div><!-- /.annotated-section-annotation mercator-proposal-form-annotation -->
             </div><!-- /.annotated-section -->
         </section>

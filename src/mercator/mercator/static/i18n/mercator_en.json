@@ -148,5 +148,8 @@
     "TR__MERCATOR_PROPOSAL_PARTNERS_MORE_PARTNERS_SPECIFY": "Please specify",
     "TR__MERCATOR_PROPOSAL_STATUS_OTHER":"Other",
     "TR__MERCATOR_PROPOSAL_IMPACT":"Road to impact",
-    "TR__MERCATOR_PROPOSAL_IMPACT_CHALLENGE_LABEL":"What is the challenge you are addressing?"
+    "TR__MERCATOR_PROPOSAL_IMPACT_CHALLENGE_LABEL":"What is the challenge you are addressing?",
+    "TR__MERCATOR_PROPOSAL_IMPACT_CHALLENGE_ANNOTATION":"Which problem or societal need are you working on?",
+    "TR__MERCATOR_PROPOSAL_IMPACT_AIM_LABEL":"What are you aiming for?",
+    "TR__MERCATOR_PROPOSAL_IMPACT_AIM_ANNOTATION":"What would be a successful outcome for your project? If selected, what will be different a year from now? What will have changed?"
 }
