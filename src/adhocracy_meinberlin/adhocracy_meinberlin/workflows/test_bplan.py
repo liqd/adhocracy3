@@ -68,8 +68,15 @@ def _post_proposal_item(app_user, path='') -> TestResponse:
 
 
 def _post_proposal_itemversion(app_user, path='') -> TestResponse:
+    from adhocracy_meinberlin.sheets.bplan import IProposal
     from adhocracy_meinberlin.resources.bplan import IProposalVersion
-    resp = app_user.post_resource(path, IProposalVersion, {})
+    appstructs = {IProposal.__identifier__: {'name': 'test',
+                                             'street_number': '1',
+                                             'postal_code_city': '1',
+                                             'email': 'test@test.de',
+                                             'statement': 'buh',
+                                             }}
+    resp = app_user.post_resource(path, IProposalVersion, appstructs)
     return resp
 
 
