@@ -94,7 +94,7 @@ class TestImageDownload:
         from substanced.file import File
         blob = Mock()
         blob.open.return_value = io.BytesIO(b'dummy blob')
-        original = Mock(spec=File, mimetype= 'image/png', blob=blob)
+        original = Mock(spec=File, mimetype='image/png', blob=blob)
         mock_image = Mock(size=(840, 700))
         mock_crop = Mock()
         mock_image.crop.return_value = mock_crop
@@ -103,7 +103,7 @@ class TestImageDownload:
         inst.upload = Mock()
         inst.dimensions = dimensions
         inst._upload_crop_and_resize(original)
-        assert inst.mimetype == original.mimetype
+        assert inst.mimetype == 'image/jpeg'
         assert mock_crop.resize.call_args[0] == (dimensions, Image.ANTIALIAS)
         resized = inst.upload.call_args[0][0]
         assert isinstance(resized, io.BytesIO)

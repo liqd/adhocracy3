@@ -31,7 +31,10 @@ class ImageDownload(File, AssetDownload):
     """:class:`adhocracy_core.interfaces.Dimension` to resize the image"""
 
     def get_response(self, registry: Registry=None) -> FileResponse:
-        """Return response with resized binary content of the image data."""
+        """Return response with resized binary content of the image data.
+
+        The image mimetype is converted to JPEG to decrease the file size.
+        """
         if self._is_resized():
             return self._get_response()
         elif self.dimensions:
@@ -58,10 +61,10 @@ class ImageDownload(File, AssetDownload):
             cropped = crop(image, self.dimensions)
             resized = cropped.resize(self.dimensions, Image.ANTIALIAS)
             bytestream = io.BytesIO()
-            resized.save(bytestream, image.format)
+            resized.convert('RGB').save(bytestream, 'jpeg')
             bytestream.seek(0)
         self.upload(bytestream)
-        self.mimetype = original.mimetype
+        self.mimetype = 'image/jpeg'
 
 
 def crop(image: Image, dimensions: Dimensions) -> Image:
@@ -118,7 +121,9 @@ def add_image_size_downloads(context: IImage, registry: Registry, **kwargs):
     appstruct = {}
     for field in size_fields:
         download = registry.content.create(IImageDownload.__identifier__,
-                                           parent=context)
+                                           parent=context,
+                                           )
+        download.mimetype = 'image/jpeg'
         download.dimensions = field.dimensions
         appstruct[field.name] = download
     sheet.set(appstruct, omit_readonly=False)
