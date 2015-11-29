@@ -465,7 +465,8 @@ def remove_empty_first_versions(root):  # pragma: no cover
             del item['VERSION_0000000']
 
 
-def _is_version_without_data(version: IItemVersion) -> bool:
+def _is_version_without_data(version: IItemVersion)\
+        -> bool:  # pragma: no cover
     for attribute in version.__dict__:
         if attribute.startswith('_sheet_'):
             return False
@@ -475,7 +476,8 @@ def _is_version_without_data(version: IItemVersion) -> bool:
         return True
 
 
-def _has_follower(version: IItemVersion, registry: Registry) -> bool:
+def _has_follower(version: IItemVersion,
+                  registry: Registry) -> bool:  # pragma: no cover
     followed_by = get_sheet_field(version, IVersionable, 'followed_by',
                                   registry=registry)
     return followed_by != []
@@ -506,6 +508,30 @@ def update_asset_download_children(root):  # pragma: no cover
             logger.warn('Asset {} has no downloads to migrate.'.format(asset))
 
 
+@log_migration
+def migrate_all_image_size_downloads_to_jpeg(root):  # pragma: no cover
+    """Migrate all image size downloads to jpeg images.
+
+    This happens automatically if we recreate them.
+    """
+    from adhocracy_core.sheets.asset import IAssetMetadata
+    from adhocracy_core.sheets.image import IImageMetadata
+    from adhocracy_core.resources.image import add_image_size_downloads
+    from adhocracy_core.resources.image import IImageDownload
+    registry = get_current_registry(root)
+    catalogs = find_service(root, 'catalogs')
+    assets = _search_for_interfaces(catalogs, IAssetMetadata)
+    images = [x for x in assets if IImageMetadata.providedBy(x)]
+    count = len(images)
+    for index, image in enumerate(images):
+        logger.info('Migrating resource {0} of {1}'.format(index + 1, count))
+        for old_download in image.values():
+            if IImageDownload.providedBy(old_download):
+                del image[old_download.__name__]
+        add_image_size_downloads(image, registry)
+        catalogs.reindex_index(image, 'interfaces')  # we missed reindexing
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -527,3 +553,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_icanpolarize_sheet_to_comments)
     config.add_evolution_step(add_image_reference_to_users)
     config.add_evolution_step(update_asset_download_children)
+    config.add_evolution_step(migrate_all_image_size_downloads_to_jpeg)
