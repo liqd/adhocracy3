@@ -36,9 +36,9 @@ export var mercatorProposalFormController2016 = ($scope, $element, $window, adhS
     ];
 
     $scope.topicChange = (elem) => {
-        topicTotal = elem ? (topicTotal+1) : (topicTotal-1);
+        topicTotal = elem ? (topicTotal + 1) : (topicTotal - 1);
         console.log($scope);
-        $scope.mercatorProposalForm.mercatorProposalIntroductionForm.$setValidity('enoughTopics', (topicTotal >= 2));
+        $scope.mercatorProposalForm.mercatorProposalIntroductionForm.$setValidity("enoughTopics", (topicTotal >= 2));
     };
 
     $scope.topicTrString = (topic) => {
