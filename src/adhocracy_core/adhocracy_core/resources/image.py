@@ -61,7 +61,11 @@ class ImageDownload(File, AssetDownload):
             cropped = crop(image, self.dimensions)
             resized = cropped.resize(self.dimensions, Image.ANTIALIAS)
             bytestream = io.BytesIO()
-            resized.convert('RGB').save(bytestream, 'jpeg')
+            resized.convert('RGB').save(bytestream,
+                                        'jpeg',
+                                        progressive=True,
+                                        quality=80,
+                                        optimize=True)
             bytestream.seek(0)
         self.upload(bytestream)
         self.mimetype = 'image/jpeg'
