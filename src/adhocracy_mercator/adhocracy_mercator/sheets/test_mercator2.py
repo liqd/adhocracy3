@@ -21,12 +21,9 @@ class TestUserInfoSheet:
 
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
-        from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_mercator.sheets.mercator2 import IUserInfo
         from adhocracy_mercator.sheets.mercator2 import UserInfoSchema
         inst = meta.sheet_class(meta, context)
-        assert IResourceSheet.providedBy(inst)
-        assert verifyObject(IResourceSheet, inst)
         assert inst.meta.isheet == IUserInfo
         assert inst.meta.schema_class == UserInfoSchema
 
@@ -52,12 +49,9 @@ class TestOrganizationInfoSheet:
 
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
-        from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_mercator.sheets.mercator2 import IOrganizationInfo
         from adhocracy_mercator.sheets.mercator2 import OrganizationInfoSchema
         inst = meta.sheet_class(meta, context)
-        assert IResourceSheet.providedBy(inst)
-        assert verifyObject(IResourceSheet, inst)
         assert inst.meta.isheet == IOrganizationInfo
         assert inst.meta.schema_class == OrganizationInfoSchema
 
