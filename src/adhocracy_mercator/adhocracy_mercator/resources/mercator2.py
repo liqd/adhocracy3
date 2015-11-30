@@ -1,4 +1,7 @@
-"""Mercator 2 proposal."""
+"""Proposal forms for the 2016 advocate europe participation process.
+
+Proposals are not versionable anymore.
+"""
 
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import process
