@@ -9,63 +9,6 @@ import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/
 
 export var register = () => {
     describe("CommentAdapter", () => {
-        describe("ListingCommentableAdapter", () => {
-            var adapter;
-
-            beforeEach(() => {
-                adapter = new AdhCommentAdapter.ListingCommentableAdapter();
-            });
-
-            describe("elemRefs", () => {
-                var generateResource = () => {
-                    return {
-                        data: {
-                            "adhocracy_core.sheets.comment.ICommentable": {
-                                comments: [
-                                    "/asd/version2",
-                                    "/asd/version3",
-                                    "/foo/version1",
-                                    "/bar/version1",
-                                    "/asd/version1",
-                                    "/foo/version2"
-                                ]
-                            }
-                        }
-                    };
-
-                };
-
-                it("returns the refered comment items from the adhocracy_core.sheets.comment.ICommentable sheet", () => {
-                    jasmine.addMatchers(JasmineHelpers.customMatchers);
-
-                    var resource = generateResource();
-                    var result = adapter.elemRefs(resource);
-                    (<any>expect(result)).toSetEqual(["/asd", "/foo", "/bar"]);
-                });
-
-                it("does not modify the resource", () => {
-                    var resource = generateResource();
-                    adapter.elemRefs(resource);
-                    expect(resource).toEqual(generateResource());
-                });
-            });
-
-            describe("poolPath", () => {
-                it("returns the post_pool of the container path", () => {
-                    var resource = {
-                        path: "some/path/parent",
-                        data: {
-                            "adhocracy_core.sheets.comment.ICommentable": {
-                                post_pool: "some/path"
-                            }
-                        }
-                    };
-
-                    expect(adapter.poolPath(resource)).toEqual("some/path");
-                });
-            });
-        });
-
         describe("CommentAdapter", () => {
             var resource;
             var adapter;
@@ -178,6 +121,55 @@ export var register = () => {
                         "foo/VERSION_0000002"
                     ];
                     expect(adapter.commentCount(resource)).toBe(1);
+                });
+            });
+
+            describe("elemRefs", () => {
+                var generateResource = () => {
+                    return {
+                        data: {
+                            "adhocracy_core.sheets.comment.ICommentable": {
+                                comments: [
+                                    "/asd/version2",
+                                    "/asd/version3",
+                                    "/foo/version1",
+                                    "/bar/version1",
+                                    "/asd/version1",
+                                    "/foo/version2"
+                                ]
+                            }
+                        }
+                    };
+
+                };
+
+                it("returns the refered comment items from the adhocracy_core.sheets.comment.ICommentable sheet", () => {
+                    jasmine.addMatchers(JasmineHelpers.customMatchers);
+
+                    var resource = generateResource();
+                    var result = adapter.elemRefs(resource);
+                    (<any>expect(result)).toSetEqual(["/asd", "/foo", "/bar"]);
+                });
+
+                it("does not modify the resource", () => {
+                    var resource = generateResource();
+                    adapter.elemRefs(resource);
+                    expect(resource).toEqual(generateResource());
+                });
+            });
+
+            describe("poolPath", () => {
+                it("returns the post_pool of the container path", () => {
+                    var resource = {
+                        path: "some/path/parent",
+                        data: {
+                            "adhocracy_core.sheets.comment.ICommentable": {
+                                post_pool: "some/path"
+                            }
+                        }
+                    };
+
+                    expect(adapter.poolPath(resource)).toEqual("some/path");
                 });
             });
         });

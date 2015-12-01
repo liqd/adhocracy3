@@ -3,7 +3,6 @@ import * as _ from "lodash";
 import * as AdhConfig from "../Config/Config";
 import * as AdhCredentials from "../User/Credentials";
 import * as AdhHttp from "../Http/Http";
-import * as AdhListing from "../Listing/Listing";
 import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
@@ -21,7 +20,7 @@ import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 var pkgLocation = "/Comment";
 
 
-export interface ICommentAdapter<T extends ResourcesBase.Resource> extends AdhListing.IListingContainerAdapter {
+export interface ICommentAdapter<T extends ResourcesBase.Resource> {
     contentType : string;
     itemContentType : string;
     create(settings : any) : T;
@@ -35,6 +34,8 @@ export interface ICommentAdapter<T extends ResourcesBase.Resource> extends AdhLi
     modificationDate(resource : T) : string;
     commentCount(resource : T) : number;
     edited(resource : T) : boolean;
+    elemRefs(any) : string[];
+    poolPath(any) : string;
 }
 
 
