@@ -1,3 +1,4 @@
+from copy import copy
 from unittest.mock import Mock
 
 from pyramid import testing
@@ -88,30 +89,80 @@ class TestImageDownload:
         assert response is inst._get_response.return_value
         inst._upload_crop_and_resize.assert_called_with(original)
 
-    def test_upload_crop_and_resize(self, inst, monkeypatch, dimensions):
+    @fixture
+    def mock_file(self, mock_open):
         import io
-        from PIL import Image
         from substanced.file import File
         blob = Mock()
         blob.open.return_value = io.BytesIO(b'dummy blob')
-        original = Mock(spec=File, mimetype='image/png', blob=blob)
-        mock_image = Mock(size=(840, 700))
-        mock_crop = Mock()
-        mock_image.crop.return_value = mock_crop
-        mock_open = Mock(spec=Image.open, return_value=mock_image)
+        return Mock(spec=File, mimetype='image/xyz', blob=blob)
+
+    @fixture
+    def mock_open(self, monkeypatch, mock_original):
+        from PIL import Image
+        mock_open = Mock(spec=Image.open, return_value=mock_original)
         monkeypatch.setattr(Image, 'open', mock_open)
+        return mock_open
+
+    @fixture
+    def mock_crop(self, monkeypatch, mock_cropped):
+        from . import image
+        mock_crop = Mock(spec=image.crop, return_value=mock_cropped)
+        monkeypatch.setattr(image, 'crop', mock_crop)
+        return mock_crop
+
+    @fixture
+    def mock_original(self):
+        from PIL.Image import Image
+        mock_original = Mock(spec=Image)
+        return mock_original
+
+    @fixture
+    def mock_cropped(self, mock_resized):
+        mock_cropped = copy(mock_resized)
+        mock_cropped.resize.return_value = mock_resized
+        return mock_cropped
+
+    @fixture
+    def mock_resized(self, mock_original):
+        mock_resized = copy(mock_original)
+        mock_resized.save.return_value = copy(mock_original)
+        return mock_resized
+
+    def test_upload_crop_and_resize(self, inst, mock_file, mock_crop,
+                                    mock_original, mock_cropped, mock_resized):
+        import io
+        from PIL.Image import ANTIALIAS
         inst.upload = Mock()
-        inst.dimensions = dimensions
-        inst._upload_crop_and_resize(original)
-        assert inst.mimetype == 'image/jpeg'
-        assert mock_crop.resize.call_args[0] == (dimensions, Image.ANTIALIAS)
-        resized = inst.upload.call_args[0][0]
-        assert isinstance(resized, io.BytesIO)
+        inst.dimensions = (1, 1)
+        inst._upload_crop_and_resize(mock_file)
+        assert mock_crop.call_args[0] == (mock_original, inst.dimensions)
+        assert mock_cropped.resize.call_args(dimensions, ANTIALIAS)
+        file_resized = mock_resized.save.call_args[0][0]
+        assert isinstance(file_resized, io.BytesIO)
+        assert inst.upload.call_args[0][0] == file_resized
+        assert mock_resized.save.call_args[0][1] == mock_original.format
+
+    def test_upload_crop_and_resize_jpeg(self, inst, mock_crop, mock_original,
+                                         mock_resized, mock_file):
+        mock_original.format = 'JPEG'
+        inst.upload = Mock()
+        inst._upload_crop_and_resize(mock_file)
+        assert mock_resized.save.call_args[0][1] == 'JPEG'
+
+    def test_upload_crop_and_resize_png(self, inst, mock_crop, mock_original,
+                                        mock_resized, mock_file):
+        mock_original.format = 'PNG'
+        mock_converted = copy(mock_original)
+        mock_resized.convert.return_value = mock_converted
+        inst.upload = Mock()
+        inst._upload_crop_and_resize(mock_file)
+        assert mock_resized.convert.call_args[0][0] == 'P'
+        assert mock_converted.save.call_args[0][1] == 'PNG'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):
         assert registry.content.create(meta.iresource.__identifier__)
-
 
 
 class TestCrop:

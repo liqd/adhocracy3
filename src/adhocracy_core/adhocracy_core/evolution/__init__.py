@@ -509,11 +509,8 @@ def update_asset_download_children(root):  # pragma: no cover
 
 
 @log_migration
-def migrate_all_image_size_downloads_to_jpeg(root):  # pragma: no cover
-    """Migrate all image size downloads to jpeg images.
-
-    This happens automatically if we recreate them.
-    """
+def recreate_all_image_size_downloads(root):  # pragma: no cover
+    """Recreate all image size downloads to optimize file size."""
     from adhocracy_core.sheets.asset import IAssetMetadata
     from adhocracy_core.sheets.image import IImageMetadata
     from adhocracy_core.resources.image import add_image_size_downloads
@@ -553,4 +550,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_icanpolarize_sheet_to_comments)
     config.add_evolution_step(add_image_reference_to_users)
     config.add_evolution_step(update_asset_download_children)
-    config.add_evolution_step(migrate_all_image_size_downloads_to_jpeg)
+    config.add_evolution_step(recreate_all_image_size_downloads)

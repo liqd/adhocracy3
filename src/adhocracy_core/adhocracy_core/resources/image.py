@@ -61,14 +61,25 @@ class ImageDownload(File, AssetDownload):
             cropped = crop(image, self.dimensions)
             resized = cropped.resize(self.dimensions, Image.ANTIALIAS)
             bytestream = io.BytesIO()
-            resized.convert('RGB').save(bytestream,
-                                        'jpeg',
-                                        progressive=True,
-                                        quality=80,
-                                        optimize=True)
+            if image.format == 'PNG':
+                reduced_colors = resized.convert('P',
+                                                 colors=128,
+                                                 palette=Image.ADAPTIVE)
+                reduced_colors.save(bytestream,
+                                    image.format,
+                                    bits=7,
+                                    optimize=True)
+            elif image.format == 'JPEG':
+                resized.save(bytestream,
+                             'JPEG',
+                             progressive=True,
+                             quality=80,
+                             optimize=True)
+            else:
+                resized.save(bytestream,
+                             image.format)
             bytestream.seek(0)
         self.upload(bytestream)
-        self.mimetype = 'image/jpeg'
 
 
 def crop(image: Image, dimensions: Dimensions) -> Image:
@@ -125,9 +136,7 @@ def add_image_size_downloads(context: IImage, registry: Registry, **kwargs):
     appstruct = {}
     for field in size_fields:
         download = registry.content.create(IImageDownload.__identifier__,
-                                           parent=context,
-                                           )
-        download.mimetype = 'image/jpeg'
+                                           parent=context)
         download.dimensions = field.dimensions
         appstruct[field.name] = download
     sheet.set(appstruct, omit_readonly=False)
