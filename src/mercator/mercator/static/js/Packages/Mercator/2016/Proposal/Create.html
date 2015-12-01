@@ -722,7 +722,9 @@ form[name]
                         <input type="checkbox" name="introduction-topic-{{topic}}" data-ng-change="topicChange(data.topic[topic])" data-ng-model="data.topic[topic]"/>
                         {{ topicTrString(topic) | translate }}
                     </label>
+
                     <label data-ng-if="data.topic.other">
+
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.topic.otherText"
@@ -730,9 +732,10 @@ form[name]
                             required="required">
                         </textarea>
                     </label>
+                    <input type="hidden" name="introduction-topics" data-ng-model="data.topics" />
                     <span
                         class="input-error"
-                        data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm, 'enoughTopics')">
+                        data-ng-if="mercatorProposalForm.mercatorProposalIntroductionForm['introduction-topics'].$error.enoughTopics">
                         {{ "TR__ERROR_ENOUGH_TOPICS" | translate }}</span>
                 </div><!-- /.annotated-section-body -->
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">

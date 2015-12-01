@@ -21,6 +21,9 @@ export var createDirective = (
 };
 
 export var mercatorProposalFormController2016 = ($scope, $element, $window, adhShowError) => {
+
+    $scope.data = {};
+
     var topicTotal = 0;
 
     $scope.topics = [
@@ -35,10 +38,10 @@ export var mercatorProposalFormController2016 = ($scope, $element, $window, adhS
         "other",
     ];
 
-    $scope.topicChange = (elem) => {
-        topicTotal = elem ? (topicTotal + 1) : (topicTotal - 1);
-        console.log($scope);
-        $scope.mercatorProposalForm.mercatorProposalIntroductionForm.$setValidity("enoughTopics", (topicTotal >= 2));
+    $scope.topicChange = (isChecked) => {
+        topicTotal = isChecked ? (topicTotal + 1) : (topicTotal - 1);
+        $scope.mercatorProposalForm.mercatorProposalIntroductionForm["introduction-topics"].$setValidity("enoughTopics", (topicTotal >= 2));
+        $scope.mercatorProposalForm.mercatorProposalIntroductionForm["introduction-topics"].$setDirty();
     };
 
     $scope.topicTrString = (topic) => {
