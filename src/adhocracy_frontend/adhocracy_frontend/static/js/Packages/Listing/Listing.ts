@@ -80,8 +80,6 @@ export interface ListingScope<Container> extends angular.IScope {
     showSort : boolean;
     container : Container;
     poolPath : string;
-    poolOptions : AdhHttp.IOptions;
-    createPath? : string;
     elements : string[];
     frontendOrderPredicate : IPredicate;
     frontendOrderReverse : boolean;
@@ -89,7 +87,6 @@ export interface ListingScope<Container> extends angular.IScope {
     loadMore : () => void;
     wsOff : () => void;
     clear : () => void;
-    onCreate : () => void;
     toggleFilter : () => void;
     toggleSort : () => void;
     setSort : (sort : string) => void;
@@ -137,7 +134,6 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 frontendOrderReverse: "=?",
                 params: "=?",
                 update: "=?",
-                noCreateForm: "=?",
                 emptyText: "@"
             },
             transclude: true,
@@ -153,10 +149,6 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 adhPreliminaryNames : AdhPreliminaryNames.Service,
                 adhPermissions : AdhPermissions.Service
             ) : void => {
-                adhPermissions.bindScope($scope, () => $scope.poolPath, "poolOptions");
-
-                $scope.createPath = adhPreliminaryNames.nextPreliminary();
-
                 var getElements = (
                     warmup? : boolean, count? : boolean, limit? : number, offset? : number
                 ) : angular.IPromise<Container> => {
@@ -257,11 +249,6 @@ export class Listing<Container extends ResourcesBase.Resource> {
 
                 $scope.setSort = (sort : string) => {
                     $scope.sort = sort;
-                };
-
-                $scope.onCreate = () : void => {
-                    $scope.update();
-                    $scope.createPath = adhPreliminaryNames.nextPreliminary();
                 };
 
                 $scope.$watch("sort", (sort : string) => {
