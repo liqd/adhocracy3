@@ -15,6 +15,7 @@ import * as ResourcesBase from "../../ResourcesBase";
 
 import RIExternalResource from "../../Resources_/adhocracy_core/resources/external_resource/IExternalResource";
 import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import * as SICommentable from "../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 
 var pkgLocation = "/Comment";
@@ -316,6 +317,8 @@ export var commentCreateDirective = (
 
 export var adhCommentListing = (
     adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     $location : angular.ILocationService
 ) => {
@@ -327,8 +330,18 @@ export var adhCommentListing = (
             frontendOrderReverse: "=?",
             frontendOrderPredicate: "=?"
         },
-        link: () => {
+        link: (scope) => {
             adhTopLevelState.setCameFrom($location.url());
+
+            scope.update = () => {
+                return adhHttp.get(scope.path).then((commentable) => {
+                    scope.elements = AdhUtil.eachItemOnce(commentable.data[SICommentable.nick].comments);
+                    scope.poolPath = commentable.data[SICommentable.nick].post_pool;
+                });
+            };
+
+            scope.$watch("path", scope.update);
+            adhPermissions.bindScope(scope, () => scope.poolPath, "poolOptions");
         }
     };
 };
