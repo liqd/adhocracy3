@@ -141,6 +141,7 @@
     "TR__MERCATOR_PROPOSAL_LOCATION_ANNOTATION_2": "Is your project connected to the Ruhr area of Germany through project partners, audiences or in some other way? Please provide details.",
     "TR__MERCATOR_PROPOSAL_LOCATION_RUHR_CONNECTION_SPECIFY": "Please specify",
     "TR__MERCATOR_PROPOSAL_STATUS_LABEL":"Project status",
+    "TR__MERCATOR_PROPOSAL_STATUS_LABEL_SUB":"What is the current status of your project idea?",
     "TR__MERCATOR_PROPOSAL_STATUS_ANNOTATION":"What is the current status of your project idea? Is it brand new, or already implemented?",
     "TR__MERCATOR_PROPOSAL_STATUS_STARTING":"Starting out: A project idea that has not yet been realised",
     "TR__MERCATOR_PROPOSAL_STATUS_DEVELOPING":"Developing: A project that is already underway and is ready to grow beyond its beginning stages",
@@ -153,5 +154,7 @@
     "TR__MERCATOR_PROPOSAL_IMPACT_CHALLENGE_LABEL":"What is the challenge you are addressing?",
     "TR__MERCATOR_PROPOSAL_IMPACT_CHALLENGE_ANNOTATION":"Which problem or societal need are you working on?",
     "TR__MERCATOR_PROPOSAL_IMPACT_AIM_LABEL":"What are you aiming for?",
-    "TR__MERCATOR_PROPOSAL_IMPACT_AIM_ANNOTATION":"What would be a successful outcome for your project? If selected, what will be different a year from now? What will have changed?"
+    "TR__MERCATOR_PROPOSAL_IMPACT_AIM_ANNOTATION":"What would be a successful outcome for your project? If selected, what will be different a year from now? What will have changed?",
+    "TR__MERCATOR_PROPOSAL_ABOUT_YOU": "About You",
+    "TR__MERCATOR_PROPOSAL_BRIEF": "Your idea in brief"
 }

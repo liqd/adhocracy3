@@ -1,8 +1,8 @@
 <div class="mercator-proposal-form-container">
     <nav class="mercator-proposal-form-nav" data-adh-sticky="">
         <ol>
-            <li data-du-scrollspy="mercator-proposal-basic"><a href="#mercator-proposal-basic" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_BASIC" | translate }}</a></li>
-            <li data-du-scrollspy="mercator-proposal-introduction" data-offset="50"><a href="#mercator-proposal-introduction" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_INTRODUCTION" | translate }}</a></li>
+            <li data-du-scrollspy="mercator-proposal-about-you"><a href="#mercator-proposal-about-you" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_ABOUT_YOU" | translate }}</a></li>
+            <li data-du-scrollspy="mercator-proposal-brief" data-offset="50"><a href="#mercator-proposal-brief" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_BRIEF" | translate }}</a></li>
             <li data-du-scrollspy="mercator-proposal-detail" data-offset="50"><a href="#mercator-proposal-detail" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_DETAIL" | translate }}</a></li>
             <li data-du-scrollspy="mercator-proposal-motivation" data-offset="50"><a href="#mercator-proposal-motivation" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_MOTIVATION" | translate }}</a></li>
             <li data-du-scrollspy="mercator-proposal-finance" data-offset="50"><a href="#mercator-proposal-finance" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_FINANCE" | translate }}</a></li>
@@ -15,7 +15,6 @@ form[name]
             class="mercator-proposal-form"
             name="mercatorProposalForm"
             data-ng-submit="submitIfValid()"
-            data-ng-init="setFormDefaults()"
             data-du-spy-context=""
             data-ng-controller="mercatorProposalFormController2016 as form">
         <div class="form-error" data-ng-repeat="error in errors track by $index">
@@ -25,8 +24,8 @@ form[name]
 
 
         <!-- SECTION 1 user info -->
-        <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalBasicForm" id="mercator-proposal-basic">
-            <h2 data-du-scrollspy="mercator-proposal-basic" class="mercator-proposal-form-heading">1. {{ "TR__MERCATOR_PROPOSAL_BASIC" | translate }}</h2>
+        <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalAboutYouForm" id="mercator-proposal-about-you">
+            <h2 data-du-scrollspy="mercator-proposal-about-you" class="mercator-proposal-form-heading">1. {{ "TR__MERCATOR_PROPOSAL_ABOUT_YOU" | translate }}</h2>
 
             <div class="annotated-section">
                 <div class="annotated-section-body">
@@ -44,7 +43,7 @@ form[name]
                                     required="required" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['user-info-first-name'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['user-info-first-name'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_FIRSTNAME" | translate }}</span>
                             </label>
                         </div>
@@ -58,7 +57,7 @@ form[name]
                                     required="required" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['user-info-last-name'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['user-info-last-name'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_LASTNAME" | translate }}</span>
                             </label>
                         </div>
@@ -77,7 +76,7 @@ form[name]
                     <h3 class="mercator-proposal-form-subheading">{{ "TR__MERCATOR_PROPOSAL_ORGANISATION_INFO_2016" | translate }}:</h3>
 
                     <div
-                        data-ng-class="{ 'ng-invalid': mercatorProposalBasicForm['organization-info-status-enum'].$invalid
+                        data-ng-class="{ 'ng-invalid': mercatorProposalAboutYouForm['organization-info-status-enum'].$invalid
                             && mercatorProposalForm.$submitted }">
 
 
@@ -106,7 +105,7 @@ form[name]
                                     required="required" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-name'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-name'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_NAME" | translate }}</span>
                             </label>
 
@@ -120,7 +119,7 @@ form[name]
                                     required="required" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-city'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-city'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_CITY" | translate }}</span>
                             </label>
 
@@ -134,7 +133,7 @@ form[name]
                                     class="country-select"></country-select>
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-country'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-country'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_COUNTRY" | translate }}</span>
                             </label>
 
@@ -148,11 +147,11 @@ form[name]
                                     data-required="required" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-website'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-website'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_WEBSITE" | translate }}</span>
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-website'], 'url')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-website'], 'url')">
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
 
@@ -166,11 +165,11 @@ form[name]
                                     data-required="required" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-email'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-email'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_EMAIL_2016" | translate }}</span>
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-email'], 'email')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-email'], 'email')">
                                     {{ "TR__ERROR_INVALID_EMAIL_2016" | translate }}</span>
                             </label>
 
@@ -187,12 +186,12 @@ form[name]
                                     />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-date-of-registration'],
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-date-of-registration'],
                                     'required')">
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_DATE_OF_REGISTRATION_2016" | translate }}</span>
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-date-of-registration'],
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-date-of-registration'],
                                     'pattern')">
                                     {{ "TR__ERROR_INVALID_MERCATOR_PROPOSAL_ORGANIZATION_DATE_OF_REGISTRATION_2016" | translate }}</span>
                             </label>
@@ -221,7 +220,7 @@ form[name]
                                     required="required" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-name'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-name'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_NAME" | translate }}</span>
                             </label>
                             <label>
@@ -233,7 +232,7 @@ form[name]
                                     required="required" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-city'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-city'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_CITY" | translate }}</span>
                             </label>
                             <label>
@@ -245,7 +244,7 @@ form[name]
                                     class="country-select"></country-select>
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-country'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-country'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_COUNTRY" | translate }}</span>
                             </label>
                             <label>
@@ -259,12 +258,12 @@ form[name]
                                     required="required" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-date-of-foreseen-registration'],
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-date-of-foreseen-registration'],
                                     'pattern')">
                                     {{ "TR__ERROR_INVALID_DATE" | translate }}</span>
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-date-of-foreseen-registration'],
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-date-of-foreseen-registration'],
                                     'required')">
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_DATE_OF_FORESEEN_REGISTRATION" | translate }}</span>
                             </label>
@@ -276,7 +275,7 @@ form[name]
                                     name="organization-info-website" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-website'], 'url')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-website'], 'url')">
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
@@ -288,11 +287,11 @@ form[name]
                                     required="required" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-email'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-email'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_EMAIL_2016" | translate }}</span>
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-email'], 'email')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-email'], 'email')">
                                     {{ "TR__ERROR_INVALID_EMAIL_2016" | translate }}</span>
                             </label>
                         </fieldset>
@@ -317,7 +316,7 @@ form[name]
                                     required="required" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-name'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-name'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_NAME" | translate }}</span>
                             </label>
                             <label>
@@ -329,7 +328,7 @@ form[name]
                                     required="required" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-city'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-city'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_CITY" | translate }}</span>
                             </label>
                             <label>
@@ -340,7 +339,7 @@ form[name]
                                     required="required"></country-select>
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-country'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-country'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_COUNTRY" | translate }}</span>
                             </label>
                             <label>
@@ -355,7 +354,7 @@ form[name]
                                 </textarea>
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-how-can-we-help-you'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-how-can-we-help-you'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_STATUS_SUPPORT_NEEDED_HOW" | translate }}</span>
                             </label>
                             <label>
@@ -366,7 +365,7 @@ form[name]
                                     name="organization-info-website" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-website'], 'url')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-website'], 'url')">
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
@@ -378,11 +377,11 @@ form[name]
                                     required="required" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-email'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-email'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_EMAIL_2016" | translate }}</span>
                                  <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-email'], 'email')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-email'], 'email')">
                                     {{ "TR__ERROR_INVALID_EMAIL_2016" | translate }}</span>
                             </label>
 
@@ -412,7 +411,7 @@ form[name]
 
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-status-other'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-status-other'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
                             </label>
                             <label>
@@ -424,7 +423,7 @@ form[name]
                                     required="required" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-city'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-city'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_CITY" | translate }}</span>
                             </label>
                             <label>
@@ -435,7 +434,7 @@ form[name]
                                     data-required="required"></country-select>
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-country'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-country'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_COUNTRY" | translate }} *</span>
                             </label>
 
@@ -445,7 +444,7 @@ form[name]
 
                     <span
                         class="input-error"
-                        data-ng-if="showError(mercatorProposalForm, mercatorProposalBasicForm['organization-info-status-enum'], 'required')">
+                        data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-status-enum'], 'required')">
                         {{ "TR__ERROR_REQUIRED_RADIO" | translate }}</span>
                 </div><!-- /.annotated-section-body -->
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
@@ -455,11 +454,11 @@ form[name]
         </section>
 
         <!-- YOUR IDEA IN BRIEF -->
-        <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalIntroductionForm" id="mercator-proposal-introduction">
+        <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalBriefForm" id="mercator-proposal-brief">
             <h2
-                data-du-scrollspy="mercator-proposal-introduction"
+                data-du-scrollspy="mercator-proposal-brief"
                 class="mercator-proposal-form-heading"
-                data-offset="50">2. {{ "TR__MERCATOR_PROPOSAL_INTRODUCTION" | translate }}</h2>
+                data-offset="50">2. {{ "TR__MERCATOR_PROPOSAL_BRIEF" | translate }}</h2>
 
             <div class="annotated-section">
                 <div class="annotated-section-body">
@@ -475,7 +474,7 @@ form[name]
 
                         <span
                             class="input-error"
-                            data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-title'], 'required')">
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-title'], 'required')">
                             {{ "TR__ERROR_REQUIRED_TITLE" | translate }}</span>
                     </label>
                 </div>
@@ -499,7 +498,7 @@ form[name]
 
                         <span
                             class="input-error"
-                            data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-teaser'], 'required')">
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-teaser'], 'required')">
                             {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_PITCH" | translate }}</span>
                     </label>
                 </div><!-- /.annotated-section-body -->
@@ -518,7 +517,7 @@ form[name]
                             data-flow-init=""
                             data-flow-object="$flow"
                             data-ng-model="data.introduction.imageUpload"
-                            data-ng-class="{ 'ng-invalid': mercatorProposalIntroductionForm['introduction-picture-upload'].$invalid }"
+                            data-ng-class="{ 'ng-invalid': mercatorProposalBriefForm['introduction-picture-upload'].$invalid }"
                             class="image-upload"
                             name="introduction-picture-upload">
                             <div data-ng-if="data.introduction.picture && (!$flow.files || $flow.files.length == 0)">
@@ -540,8 +539,8 @@ form[name]
                                 <span data-ng-if="!$flow.files.length || $flow.files.length == 0">{{ "TR__IMAGE_CHOOSE" | translate }}</span>
                             </button>
                             <div
-                                data-ng-messages="mercatorProposalIntroductionForm['introduction-picture-upload'].$error"
-                                data-ng-if="mercatorProposalIntroductionForm['introduction-picture-upload'].$dirty || mercatorProposalForm.$submitted">
+                                data-ng-messages="mercatorProposalBriefForm['introduction-picture-upload'].$error"
+                                data-ng-if="mercatorProposalBriefForm['introduction-picture-upload'].$dirty || mercatorProposalForm.$submitted">
                                 <span
                                     class="input-error"
                                     data-ng-message="wrongType">
@@ -588,7 +587,7 @@ form[name]
 
                         <span
                             class="input-error"
-                            data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-partners'], 'required')">
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-partners'], 'required')">
                             {{ "TR__ERROR_REQUIRED_SELECTION" | translate }}</span>
                     </label>
 
@@ -603,7 +602,7 @@ form[name]
                                     required="required" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-partner1-name'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-partner1-name'], 'required')">
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
@@ -614,7 +613,7 @@ form[name]
                                     name="introduction-partner1-website" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-partner1-website'], 'url')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-partner1-website'], 'url')">
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
@@ -634,7 +633,7 @@ form[name]
                                     name="introduction-partner2-name" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-partner2-name'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-partner2-name'], 'required')">
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
@@ -645,7 +644,7 @@ form[name]
                                     name="introduction-partner2-website" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-partner2-website'], 'url')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-partner2-website'], 'url')">
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
@@ -665,7 +664,7 @@ form[name]
                                     name="introduction-partner1-name" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-partner1-name'], 'required')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-partner1-name'], 'required')">
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
@@ -676,7 +675,7 @@ form[name]
                                     name="introduction-partner3-website" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-partner3-website'], 'url')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-partner3-website'], 'url')">
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
@@ -717,26 +716,29 @@ form[name]
                 <div class="annotated-section-body">
 
                     <span class="label-text">{{ "TR__MERCATOR_TOPIC_LABEL" | translate }}</span>
+                    {{mercatorProposalForm.mercatorProposalBriefForm['introduction-topics'].$error}}
+                    <div
+                        data-ng-class="{ 'ng-invalid': mercatorProposalForm.mercatorProposalBriefForm['introduction-topics'].$invalid }">
+                        <label data-ng-repeat="topic in topics" class="label-text">
+                            <input type="checkbox" name="introduction-topic-{{topic}}" data-ng-change="topicChange(data.topic[topic])" data-ng-model="data.topic[topic]"/>
+                            {{ topicTrString(topic) | translate }}
+                        </label>
 
-                    <label data-ng-repeat="topic in topics" class="label-text">
-                        <input type="checkbox" name="introduction-topic-{{topic}}" data-ng-change="topicChange(data.topic[topic])" data-ng-model="data.topic[topic]"/>
-                        {{ topicTrString(topic) | translate }}
-                    </label>
+                        <label data-ng-if="data.topic.other">
 
-                    <label data-ng-if="data.topic.other">
-
-                        <textarea
-                            data-msd-elastic=""
-                            data-ng-model="data.topic.otherText"
-                            name="introduction-topic-other-text"
-                            required="required">
-                        </textarea>
-                    </label>
-                    <input type="hidden" name="introduction-topics" data-ng-model="data.topics" />
-                    <span
-                        class="input-error"
-                        data-ng-if="mercatorProposalForm.mercatorProposalIntroductionForm['introduction-topics'].$error.enoughTopics">
-                        {{ "TR__ERROR_ENOUGH_TOPICS" | translate }}</span>
+                            <textarea
+                                data-msd-elastic=""
+                                data-ng-model="data.topic.otherText"
+                                name="introduction-topic-other-text"
+                                required="required">
+                            </textarea>
+                        </label>
+                        <input type="hidden" name="introduction-topics" data-ng-model="data.topics" />
+                        <span
+                            class="input-error"
+                            data-ng-if="mercatorProposalForm.mercatorProposalBriefForm['introduction-topics'].$error.enoughTopics">
+                            {{ "TR__ERROR_ENOUGH_TOPICS" | translate }}</span>
+                    </div>
                 </div><!-- /.annotated-section-body -->
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     {{ "TR__MERCATOR_PROPOSAL_NO_INFLUENCE" | translate }}
@@ -755,7 +757,7 @@ form[name]
 
                         <span
                             class="input-error"
-                            data-ng-if="showError(mercatorProposalForm, mercatorProposalIntroductionForm['introduction-duration'], 'required')">
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-duration'], 'required')">
                             {{ "TR__ERROR_REQUIRED_NUMBER" | translate }}</span>
                     </label>
                 </div>
@@ -846,12 +848,13 @@ form[name]
             <div class="annotated-section">
                 <div class="annotated-section-body">
                     <label>
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_LABEL" | translate }}:</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_LABEL" | translate }}<br/>{{ "TR__MERCATOR_PROPOSAL_STATUS_LABEL_SUB" | translate }}:</span>
                         <label>
                             <input
                                 type="radio"
                                 name="status"
                                 value="starting"
+                                required="required"
                                 data-ng-model="data.status"/>
                             <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_STARTING" | translate }}</span>
                         </label>
@@ -860,6 +863,7 @@ form[name]
                                 type="radio"
                                 name="status"
                                 value="developing"
+                                required="required"
                                 data-ng-model="data.status"/>
                             <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_DEVELOPING" | translate }}</span>
                         </label>
@@ -868,6 +872,7 @@ form[name]
                                 type="radio"
                                 name="status"
                                 value="scaling"
+                                required="required"
                                 data-ng-model="data.status"/>
                             <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_SCALING" | translate }}</span>
                         </label>
@@ -876,11 +881,17 @@ form[name]
                                 type="radio"
                                 name="status"
                                 value="other"
+                                required="required"
                                 data-ng-model="data.status"/>
                             <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_OTHER" | translate }}</span>
                         </label>
                     </label>
-                </div>
+                    {{mercatorProposalForm.mercatorProposalBriefForm["status"].$error}}
+                    <span
+                        class="input-error"
+                        data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['status'], 'required')">
+                        {{ "TR__ERROR_REQUIRED_RADIO" | translate }}</span>
+            </div>
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     {{ "TR__MERCATOR_PROPOSAL_STATUS_ANNOTATION_2016" | translate }}
