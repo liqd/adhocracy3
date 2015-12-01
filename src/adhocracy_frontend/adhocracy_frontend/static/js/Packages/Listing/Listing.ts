@@ -29,8 +29,6 @@ export interface IListingContainerAdapter {
 
     // The pool a new element should be posted to.
     poolPath(any) : string;
-
-    canWarmup : boolean;
 }
 
 export class ListingPoolAdapter implements IListingContainerAdapter {
@@ -45,8 +43,6 @@ export class ListingPoolAdapter implements IListingContainerAdapter {
     public poolPath(container : ResourcesBase.Resource) {
         return container.path;
     }
-
-    public canWarmup = true;
 }
 
 export interface IFacetItem {
@@ -157,9 +153,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
 
                 $scope.createPath = adhPreliminaryNames.nextPreliminary();
 
-                var getElements = (
-                    warmup? : boolean, count? : boolean, limit? : number, offset? : number
-                ) : angular.IPromise<Container> => {
+                var getElements = (count? : boolean, limit? : number, offset? : number) : angular.IPromise<Container> => {
                     var params = <any>_.extend({}, $scope.params);
                     if (typeof $scope.contentType !== "undefined") {
                         params.content_type = $scope.contentType;
@@ -193,7 +187,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                         params["count"] = "true";
                     }
                     return adhHttp.get($scope.path, params, {
-                        warmupPoolCache: warmup
+                        warmupPoolCache: true
                     });
                 };
 
@@ -207,13 +201,13 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     $scope.showSort = !$scope.showSort;
                 };
 
-                $scope.update = (warmup? : boolean) : angular.IPromise<void> => {
+                $scope.update = () : angular.IPromise<void> => {
                     if ($scope.initialLimit) {
                         if (!$scope.currentLimit) {
                             $scope.currentLimit = $scope.initialLimit;
                         }
                     }
-                    return getElements(warmup, true, $scope.currentLimit).then((container) => {
+                    return getElements(true, $scope.currentLimit).then((container) => {
                         $scope.container = container;
                         $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
                         $scope.totalCount = _self.containerAdapter.totalCount($scope.container);
@@ -241,7 +235,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
 
                 $scope.loadMore = () : void => {
                     if ($scope.currentLimit < $scope.totalCount) {
-                        getElements(true, false, $scope.initialLimit, $scope.currentLimit).then((container) => {
+                        getElements(false, $scope.initialLimit, $scope.currentLimit).then((container) => {
                             var elements = _.clone(_self.containerAdapter.elemRefs(container));
                             $scope.elements = $scope.elements.concat(elements);
                             $scope.currentLimit += $scope.initialLimit;
@@ -277,7 +271,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                         // order to not miss any messages in between. But in
                         // order to subscribe we already need the resource. So
                         // that is not possible.
-                        $scope.update(_self.containerAdapter.canWarmup).then(() => {
+                        $scope.update().then(() => {
                             try {
                                 $scope.wsOff = adhWebSocket.register($scope.poolPath, () => $scope.update());
                             } catch (e) {
