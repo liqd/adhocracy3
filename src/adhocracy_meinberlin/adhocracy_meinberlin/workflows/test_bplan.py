@@ -119,8 +119,10 @@ class TestBPlanWorkflow:
         resp = _post_proposal_item(app_anonymous, path='/bplan')
         assert resp.status_code == 200
 
-    def test_participate_anonymous_edits_proposal_version0(self, app_anonymous):
-        resp = _post_proposal_itemversion(app_anonymous, path='/bplan/proposal_0000000')
+    def test_participate_anonymous_edits_proposal_version0(self,
+                                                           app_anonymous):
+        resp = _post_proposal_itemversion(app_anonymous,
+                                          path='/bplan/proposal_0000000')
         assert resp.status_code == 200
 
     def test_participate_anonymous_gets_notification(self, mailer):
@@ -128,12 +130,13 @@ class TestBPlanWorkflow:
         assert msg.subject.startswith('Ihre Stellungnahme')
         assert msg.recipients == ['test@test.de']
 
-    def test_participate_office_worker_gets_notificationl(self, mailer):
+    def test_participate_office_worker_gets_notification(self, mailer):
         msg = mailer.outbox[-1]
         assert msg.subject.startswith('Ihre Stellungnahme')
         assert msg.recipients == ['sysadmin@test.de']
 
-    def test_participate_anonymous_cannot_edit_proposal_version1(self, app_anonymous):
+    def test_participate_anonymous_cannot_edit_proposal_version1(self,
+                                                                 app_anonymous):
         from adhocracy_meinberlin.resources.bplan import IProposalVersion
         assert IProposalVersion not in app_anonymous.get_postable_types(
             '/bplan/proposal_0000000')

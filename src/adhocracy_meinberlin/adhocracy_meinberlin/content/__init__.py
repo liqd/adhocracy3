@@ -19,7 +19,7 @@ class MeinBerlinResourceContentRegistry(ResourceContentRegistry):
         the item create permission instead of the version create permission if
         the first version is empty (without sheet data).
         """
-        if self._is_bplan_and_first_version_empty(meta, context):
+        if self._is_bplan_and_has_no_version_with_sheet_data(meta, context):
             from adhocracy_core.utils import get_iresource
             iresource = get_iresource(context)
             permission = self.resources_meta[iresource].permission_create
@@ -28,8 +28,9 @@ class MeinBerlinResourceContentRegistry(ResourceContentRegistry):
         allowed = request.has_permission(permission, context)
         return allowed
 
-    def _is_bplan_and_first_version_empty(self, meta: ResourceMetadata,
-                                          context: IPool) -> bool:
+    def _is_bplan_and_has_no_version_with_sheet_data(self,
+                                                     meta: ResourceMetadata,
+                                                     context: IPool) -> bool:
         is_bplan_version = meta.iresource.isOrExtends(IProposalVersion)
         if not is_bplan_version:
             return False
