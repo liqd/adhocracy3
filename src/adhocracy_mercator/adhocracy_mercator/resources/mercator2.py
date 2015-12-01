@@ -71,32 +71,137 @@ duration_meta = simple_meta._replace(
 )
 
 
-class IRoadToImpact(ISimple):
-    """Road to impact."""
+class IChallenge(ISimple):
+    """Challenge."""
 
-road_to_impact_meta = simple_meta._replace(
-    content_name='road_to_impact',
-    iresource=IRoadToImpact,
+challenge_meta = simple_meta._replace(
+    content_name='challenge',
+    iresource=IChallenge,
     permission_create='create_proposal',
     use_autonaming=True,
-    autonaming_prefix='road_to_impact',
+    autonaming_prefix='challenge',
     extended_sheets=(
-        adhocracy_mercator.sheets.mercator2.IRoadToImpact,
+        adhocracy_mercator.sheets.mercator2.IChallenge,
         adhocracy_core.sheets.comment.ICommentable),
 )
 
 
-class ISelectionCriteria(ISimple):
-    """Road to impact."""
+class IGoal(ISimple):
+    """Goal."""
 
-selection_criteria_meta = simple_meta._replace(
-    content_name='selection_criteria',
-    iresource=ISelectionCriteria,
+goal_meta = simple_meta._replace(
+    content_name='goal',
+    iresource=IGoal,
     permission_create='create_proposal',
     use_autonaming=True,
-    autonaming_prefix='selection_criteria',
+    autonaming_prefix='goal',
     extended_sheets=(
-        adhocracy_mercator.sheets.mercator2.ISelectionCriteria,
+        adhocracy_mercator.sheets.mercator2.IGoal,
+        adhocracy_core.sheets.comment.ICommentable),
+)
+
+
+class IPlan(ISimple):
+    """Plan."""
+
+plan_meta = simple_meta._replace(
+    content_name='plan',
+    iresource=IPlan,
+    permission_create='create_proposal',
+    use_autonaming=True,
+    autonaming_prefix='plan',
+    extended_sheets=(
+        adhocracy_mercator.sheets.mercator2.IPlan,
+        adhocracy_core.sheets.comment.ICommentable),
+)
+
+
+class ITarget(ISimple):
+    """Target."""
+
+target_meta = simple_meta._replace(
+    content_name='target',
+    iresource=ITarget,
+    permission_create='create_proposal',
+    use_autonaming=True,
+    autonaming_prefix='target',
+    extended_sheets=(
+        adhocracy_mercator.sheets.mercator2.ITarget,
+        adhocracy_core.sheets.comment.ICommentable),
+)
+
+
+class ITeam(ISimple):
+    """Team."""
+
+team_meta = simple_meta._replace(
+    content_name='team',
+    iresource=ITeam,
+    permission_create='create_proposal',
+    use_autonaming=True,
+    autonaming_prefix='team',
+    extended_sheets=(
+        adhocracy_mercator.sheets.mercator2.ITeam,
+        adhocracy_core.sheets.comment.ICommentable),
+)
+
+
+class IExtraInfo(ISimple):
+    """Extrainfo."""
+
+extrainfo_meta = simple_meta._replace(
+    content_name='extrainfo',
+    iresource=IExtraInfo,
+    permission_create='create_proposal',
+    use_autonaming=True,
+    autonaming_prefix='extrainfo',
+    extended_sheets=(
+        adhocracy_mercator.sheets.mercator2.IExtraInfo,
+        adhocracy_core.sheets.comment.ICommentable),
+)
+
+
+class IConnectionCohesion(ISimple):
+    """Connectioncohesion."""
+
+connectioncohesion_meta = simple_meta._replace(
+    content_name='connectioncohesion',
+    iresource=IConnectionCohesion,
+    permission_create='create_proposal',
+    use_autonaming=True,
+    autonaming_prefix='connectioncohesion',
+    extended_sheets=(
+        adhocracy_mercator.sheets.mercator2.IConnectionCohesion,
+        adhocracy_core.sheets.comment.ICommentable),
+)
+
+
+class IDifference(ISimple):
+    """Difference."""
+
+difference_meta = simple_meta._replace(
+    content_name='difference',
+    iresource=IDifference,
+    permission_create='create_proposal',
+    use_autonaming=True,
+    autonaming_prefix='difference',
+    extended_sheets=(
+        adhocracy_mercator.sheets.mercator2.IDifference,
+        adhocracy_core.sheets.comment.ICommentable),
+)
+
+
+class IPracticalRelevance(ISimple):
+    """Practicalrelevance."""
+
+practicalrelevance_meta = simple_meta._replace(
+    content_name='practicalrelevance',
+    iresource=IPracticalRelevance,
+    permission_create='create_proposal',
+    use_autonaming=True,
+    autonaming_prefix='practicalrelevance',
+    extended_sheets=(
+        adhocracy_mercator.sheets.mercator2.IPracticalRelevance,
         adhocracy_core.sheets.comment.ICommentable),
 )
 
@@ -110,8 +215,16 @@ proposal_meta = proposal.proposal_meta._replace(
     iresource=IMercatorProposal,
     element_types=(IPitch,
                    IPartners,
-                   IRoadToImpact,
-                   ISelectionCriteria),
+                   IDuration,
+                   IChallenge,
+                   IGoal,
+                   IPlan,
+                   ITarget,
+                   ITeam,
+                   IExtraInfo,
+                   IConnectionCohesion,
+                   IDifference,
+                   IPracticalRelevance,),
     after_creation=(
         add_commentsservice,
         add_ratesservice,
@@ -154,5 +267,12 @@ def includeme(config):
     add_resource_type_to_registry(pitch_meta, config)
     add_resource_type_to_registry(partners_meta, config)
     add_resource_type_to_registry(duration_meta, config)
-    add_resource_type_to_registry(road_to_impact_meta, config)
-    add_resource_type_to_registry(selection_criteria_meta, config)
+    add_resource_type_to_registry(challenge_meta, config)
+    add_resource_type_to_registry(goal_meta, config)
+    add_resource_type_to_registry(plan_meta, config)
+    add_resource_type_to_registry(target_meta, config)
+    add_resource_type_to_registry(team_meta, config)
+    add_resource_type_to_registry(extrainfo_meta, config)
+    add_resource_type_to_registry(connectioncohesion_meta, config)
+    add_resource_type_to_registry(difference_meta, config)
+    add_resource_type_to_registry(practicalrelevance_meta, config)

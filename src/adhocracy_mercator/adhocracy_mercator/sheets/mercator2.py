@@ -237,48 +237,147 @@ status_meta = sheet_meta._replace(
 )
 
 
-class IRoadToImpact(ISheet):
-    """Marker interface for the road to impact."""
+class IChallenge(ISheet):
+    """Marker interface for the challenge in the road to impact section."""
 
 
-class RoadToImpactSchema(colander.MappingSchema):
+class ChallengeSchema(colander.MappingSchema):
+    """Datastruct for the challenge field."""
+
     challenge = Text(missing=colander.required,
                      validator=colander.Length(min=3, max=500))
-    aim = Text(missing=colander.required,
-               validator=colander.Length(min=3, max=500))
-    plan = Text(missing=colander.required,
-                validator=colander.Length(min=3, max=800))
-    doing = Text(missing=colander.required,
-                 validator=colander.Length(min=3, max=500))
-    team = Text(missing=colander.required,
-                validator=colander.Length(min=3, max=800))
-    other = Text(missing=colander.required,
-                 validator=colander.Length(min=3, max=500))
 
-
-roadtoimpact_meta = sheet_meta._replace(
-    isheet=IRoadToImpact,
-    schema_class=RoadToImpactSchema,
+challenge_meta = sheet_meta._replace(
+    isheet=IChallenge,
+    schema_class=ChallengeSchema,
 )
 
 
-class ISelectionCriteria(ISheet):
-    """Marker interface for the selection criteria."""
+class IGoal(ISheet):
+    """Marker interface for the 'aiming for' in the road to impact section."""
 
 
-class SelectionCriteriaSchema(colander.MappingSchema):
-    connection_and_cohesion_europe = Text(
-        missing=colander.required,
-        validator=colander.Length(min=3, max=500))
-    difference = Text(missing=colander.required,
-                      validator=colander.Length(min=3, max=500))
-    practical_relevance = Text(missing=colander.required,
+class GoalSchema(colander.MappingSchema):
+    """Datastruct for the goal."""
+
+    goal = Text(missing=colander.required,
+                validator=colander.Length(min=3, max=500))
+
+goal_meta = sheet_meta._replace(
+    isheet=IGoal,
+    schema_class=GoalSchema,
+)
+
+
+class IPlan(ISheet):
+    """Marker interface for the 'plan' in the road to impact section."""
+
+
+class PlanSchema(colander.MappingSchema):
+    """Datastruct for the challenge field."""
+
+    plan = Text(missing=colander.required,
+                validator=colander.Length(min=3, max=800))
+
+plan_meta = sheet_meta._replace(
+    isheet=IPlan,
+    schema_class=PlanSchema,
+)
+
+
+class ITarget(ISheet):
+    """Marker interface for the 'target' in the road to impact section."""
+
+
+class TargetSchema(colander.MappingSchema):
+    """Datastruct for the challenge field."""
+
+    target = Text(missing=colander.required,
+                  validator=colander.Length(min=3, max=500))
+
+target_meta = sheet_meta._replace(
+    isheet=ITarget,
+    schema_class=TargetSchema,
+)
+
+
+class ITeam(ISheet):
+    """Marker interface for the 'team' in the road to impact section."""
+
+
+class TeamSchema(colander.MappingSchema):
+    """Datastruct for the challenge field."""
+
+    team = Text(missing=colander.required,
+                validator=colander.Length(min=3, max=800))
+
+team_meta = sheet_meta._replace(
+    isheet=ITeam,
+    schema_class=TeamSchema,
+)
+
+
+class IExtraInfo(ISheet):
+    """Marker interface for the 'extrainfo' in the road to impact section."""
+
+
+class ExtraInfoSchema(colander.MappingSchema):
+    """Datastruct for the challenge field."""
+
+    extrainfo = Text(missing=colander.required,
+                     validator=colander.Length(min=3, max=500))
+
+extrainfo_meta = sheet_meta._replace(
+    isheet=IExtraInfo,
+    schema_class=ExtraInfoSchema,
+)
+
+
+class IConnectionCohesion(ISheet):
+    """Marker iface for 'connection and cohesion' in the selection criteria."""
+
+
+class ConnectionCohesionSchema(colander.MappingSchema):
+    """Datastruct for the connection and cohesion field."""
+
+    connection_cohesion = Text(missing=colander.required,
                                validator=colander.Length(min=3, max=500))
 
+connectioncohesion_meta = sheet_meta._replace(
+    isheet=IConnectionCohesion,
+    schema_class=ConnectionCohesionSchema,
+)
 
-selectioncriteria_meta = sheet_meta._replace(
-    isheet=ISelectionCriteria,
-    schema_class=SelectionCriteriaSchema,
+
+class IDifference(ISheet):
+    """Marker interface for the 'difference' in the selection section."""
+
+
+class DifferenceSchema(colander.MappingSchema):
+    """Datastruct for the challenge field."""
+
+    difference = Text(missing=colander.required,
+                      validator=colander.Length(min=3, max=500))
+
+difference_meta = sheet_meta._replace(
+    isheet=IDifference,
+    schema_class=DifferenceSchema,
+)
+
+
+class IPracticalRelevance(ISheet):
+    """Marker for the 'practical relevance' in the selection criteria."""
+
+
+class PracticalRelevanceSchema(colander.MappingSchema):
+    """Datastruct for the challenge field."""
+
+    practicalrelevance = Text(missing=colander.required,
+                              validator=colander.Length(min=3, max=500))
+
+practicalrelevance_meta = sheet_meta._replace(
+    isheet=IPracticalRelevance,
+    schema_class=PracticalRelevanceSchema,
 )
 
 
@@ -368,47 +467,116 @@ class IMercatorSubResources(ISheet, ISheetReferenceAutoUpdateMarker):
 
 
 class PitchReference(SheetToSheet):
+    """Reference to pitch."""
+
     source_isheet = IMercatorSubResources
     source_isheet_field = 'pitch'
     target_isheet = IPitch
 
 
 class PartnersReference(SheetToSheet):
+    """Reference to partners."""
+
     source_isheet = IMercatorSubResources
     source_isheet_field = 'partners'
     target_isheet = IPartners
 
 
 class DurationReference(SheetToSheet):
+    """Reference to duration."""
+
     source_isheet = IMercatorSubResources
     source_isheet_field = 'duration'
     target_isheet = IDuration
 
 
-class LocationReference(SheetToSheet):
+class ChallengeReference(SheetToSheet):
+    """Reference to challenge."""
+
     source_isheet = IMercatorSubResources
-    source_isheet_field = 'duration'
-    target_isheet = ILocation
+    source_isheet_field = 'challenge'
+    target_isheet = IChallenge
 
 
-class RoadToImpactReference(SheetToSheet):
+class GoalReference(SheetToSheet):
+    """Reference to goal."""
+
     source_isheet = IMercatorSubResources
-    source_isheet_field = 'road_to_impact'
-    target_isheet = IStatus
+    source_isheet_field = 'goal'
+    target_isheet = IGoal
 
 
-class SelectionCriteriaReference(SheetToSheet):
+class PlanReference(SheetToSheet):
+    """Reference to plan."""
+
     source_isheet = IMercatorSubResources
-    source_isheet_field = 'selection_criteria'
-    target_isheet = ISelectionCriteria
+    source_isheet_field = 'plan'
+    target_isheet = IPlan
+
+
+class TargetReference(SheetToSheet):
+    """Reference to target."""
+
+    source_isheet = IMercatorSubResources
+    source_isheet_field = 'target'
+    target_isheet = ITarget
+
+
+class TeamReference(SheetToSheet):
+    """Reference to team."""
+
+    source_isheet = IMercatorSubResources
+    source_isheet_field = 'team'
+    target_isheet = ITeam
+
+
+class ExtraInfoReference(SheetToSheet):
+    """Reference to extrainfo."""
+
+    source_isheet = IMercatorSubResources
+    source_isheet_field = 'extrainfo'
+    target_isheet = IExtraInfo
+
+
+class ConnectionCohesionReference(SheetToSheet):
+    """Reference to connectioncohesion."""
+
+    source_isheet = IMercatorSubResources
+    source_isheet_field = 'connectioncohesion'
+    target_isheet = IConnectionCohesion
+
+
+class DifferenceReference(SheetToSheet):
+    """Reference to difference."""
+
+    source_isheet = IMercatorSubResources
+    source_isheet_field = 'difference'
+    target_isheet = IDifference
+
+
+class PracticalRelevanceReference(SheetToSheet):
+    """Reference to practical relevance."""
+
+    source_isheet = IMercatorSubResources
+    source_isheet_field = 'difference'
+    target_isheet = IPracticalRelevance
 
 
 class MercatorSubResourcesSchema(colander.MappingSchema):
+    """Subresources of mercator."""
+
     pitch = Reference(reftype=PitchReference)
     partners = Reference(reftype=PartnersReference)
     duration = Reference(reftype=DurationReference)
-    road_to_impact = Reference(reftype=RoadToImpactReference)
-    selection_criteria = Reference(reftype=SelectionCriteriaReference)
+    challenge = Reference(reftype=ChallengeReference)
+    goal = Reference(reftype=GoalReference)
+    plan = Reference(reftype=PlanReference)
+    target = Reference(reftype=TargetReference)
+    team = Reference(reftype=TeamReference)
+    extrainfo = Reference(reftype=ExtraInfoReference)
+    connectioncohesion = Reference(reftype=ConnectionCohesionReference)
+    difference = Reference(reftype=DifferenceReference)
+    practicalrelevance = Reference(reftype=PracticalRelevanceReference)
 
 
 mercator_subresources_meta = sheet_meta._replace(
@@ -426,8 +594,15 @@ def includeme(config):
     add_sheet_to_registry(duration_meta, config.registry)
     add_sheet_to_registry(location_meta, config.registry)
     add_sheet_to_registry(status_meta, config.registry)
-    add_sheet_to_registry(roadtoimpact_meta, config.registry)
-    add_sheet_to_registry(selectioncriteria_meta, config.registry)
+    add_sheet_to_registry(challenge_meta, config.registry)
+    add_sheet_to_registry(goal_meta, config.registry)
+    add_sheet_to_registry(plan_meta, config.registry)
+    add_sheet_to_registry(target_meta, config.registry)
+    add_sheet_to_registry(team_meta, config.registry)
+    add_sheet_to_registry(extrainfo_meta, config.registry)
+    add_sheet_to_registry(connectioncohesion_meta, config.registry)
+    add_sheet_to_registry(difference_meta, config.registry)
+    add_sheet_to_registry(practicalrelevance_meta, config.registry)
     add_sheet_to_registry(financialplanning_meta, config.registry)
     add_sheet_to_registry(extra_funding_meta, config.registry)
     add_sheet_to_registry(community_meta, config.registry)
