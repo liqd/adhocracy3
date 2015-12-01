@@ -211,3 +211,187 @@ class TestMercatorBudgetIndex:
         from substanced.interfaces import IIndexView
         assert registry.adapters.lookup((IMercatorSubResources,), IIndexView,
                                         name='adhocracy|mercator_budget')
+
+
+def _make_mercator2_resource(context,
+                             location_appstruct={},
+                             financialplanning_appstruct={}):
+    from adhocracy_core.interfaces import IResource
+    from adhocracy_mercator.sheets.mercator2 import ILocation
+    from adhocracy_mercator.sheets.mercator2 import IFinancialPlanning
+    from adhocracy_core.utils import get_sheet
+    resource = testing.DummyResource(__provides__=[IResource,
+                                                   ILocation,
+                                                   IFinancialPlanning])
+    context['res'] = resource
+    location_sheet = get_sheet(resource, ILocation)
+    location_sheet.set(location_appstruct)
+    financialplanning_sheet = get_sheet(resource, IFinancialPlanning)
+    financialplanning_sheet.set(financialplanning_appstruct)
+    return resource
+
+
+@mark.usefixtures('integration')
+class TestMercator2LocationIndex:
+
+    @fixture
+    def context(self, pool_with_catalogs):
+        return pool_with_catalogs
+
+    def test_index_location_default(self, context):
+        from .adhocracy import mercator2_index_location
+        resource = _make_mercator2_resource(context)
+        result = mercator2_index_location(resource, 'default')
+        assert result == 'default'
+
+    def test_index_location_is_linked_to_ruhr(self, context):
+        from .adhocracy import mercator2_index_location
+        resource = _make_mercator2_resource(
+            context,
+            location_appstruct={'has_link_to_ruhr': True})
+        result = mercator2_index_location(resource, 'default')
+        assert result == ['linked_to_ruhr']
+
+    def test_index_location_is_online_and_linked_to_ruhr(self, context):
+        from .adhocracy import mercator2_index_location
+        resource = _make_mercator2_resource(
+            context,
+            location_appstruct={'is_online': True,
+                                'has_link_to_ruhr': True})
+        result = mercator2_index_location(resource, 'default')
+        assert set(result) == set(['online', 'linked_to_ruhr'])
+
+    def test_index_location_is_specific(self, context):
+        from .adhocracy import mercator2_index_location
+        resource = _make_mercator2_resource(
+            context,
+            location_appstruct={'location': 'Berlin',
+                                'is_online': False,
+                                'has_link_to_ruhr': False})
+        result = mercator2_index_location(resource, 'default')
+        assert set(result) == set(['specific'])
+
+    def test_register_index_location(self, registry):
+        from adhocracy_mercator.sheets.mercator2 import ILocation
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((ILocation,), IIndexView,
+                                        name='adhocracy|mercator_location')
+
+@mark.usefixtures('integration')
+class TestMercator2RequestedFundingIndex:
+
+    @fixture
+    def context(self, pool_with_catalogs):
+        return pool_with_catalogs
+
+    def test_index_requested_funding_default(self, context):
+        from .adhocracy import mercator2_index_requested_funding
+        resource = _make_mercator2_resource(context)
+        result = mercator2_index_requested_funding(resource, 'default')
+        assert result == [5000]
+
+    def test_index_requested_funding_lte_5000(self, context):
+        from .adhocracy import mercator2_index_requested_funding
+        resource = _make_mercator2_resource(
+            context,
+            financialplanning_appstruct={'requested_funding': 5000})
+        result = mercator2_index_requested_funding(resource, 'default')
+        assert result == [5000]
+
+    def test_index_requested_funding_lte_10000(self, context):
+        from .adhocracy import mercator2_index_requested_funding
+        resource = _make_mercator2_resource(
+            context,
+            financialplanning_appstruct={'requested_funding': 10000})
+        result = mercator2_index_requested_funding(resource, 'default')
+        assert result == [10000]
+
+    def test_index_requested_funding_lte_20000(self, context):
+        from .adhocracy import mercator2_index_requested_funding
+        resource = _make_mercator2_resource(
+            context,
+            financialplanning_appstruct={'requested_funding': 20000})
+        result = mercator2_index_requested_funding(resource, 'default')
+        assert result == [20000]
+
+    def test_index_requested_funding_lte_50000(self, context):
+        from .adhocracy import mercator2_index_requested_funding
+        resource = _make_mercator2_resource(
+            context,
+            financialplanning_appstruct={'requested_funding': 50000})
+        result = mercator2_index_requested_funding(resource, 'default')
+        assert result == [50000]
+
+    def test_index_requested_funding_gt_50000(self, context):
+        from .adhocracy import mercator2_index_requested_funding
+        resource = _make_mercator2_resource(
+            context,
+            financialplanning_appstruct={'requested_funding': 50001})
+        result = mercator2_index_requested_funding(resource, 'default')
+        assert result == 'default'
+
+    def test_register_mercator2_index_requested_funding(self, registry):
+        from adhocracy_mercator.sheets.mercator2 import IFinancialPlanning
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IFinancialPlanning,), IIndexView,
+                                        name='adhocracy|mercator_requested_funding')
+
+
+@mark.usefixtures('integration')
+class TestMercator2BudgetIndex:
+
+    @fixture
+    def context(self, pool_with_catalogs):
+        return pool_with_catalogs
+
+    def test_index_budget_default(self, context):
+        from .adhocracy import mercator2_index_budget
+        resource = _make_mercator2_resource(context)
+        result = mercator2_index_budget(resource, 'default')
+        assert result == ['5000']
+
+    def test_index_budget_lte_5000(self, context):
+        from .adhocracy import mercator2_index_budget
+        resource = _make_mercator2_resource(
+            context,
+            financialplanning_appstruct={'budget': 5000})
+        result = mercator2_index_budget(resource, 'default')
+        assert result == ['5000']
+
+    def test_index_budget_lte_10000(self, context):
+        from .adhocracy import mercator2_index_budget
+        resource = _make_mercator2_resource(
+            context,
+            financialplanning_appstruct={'budget': 10000})
+        result = mercator2_index_budget(resource, 'default')
+        assert result == ['10000']
+
+    def test_index_budget_lte_20000(self, context):
+        from .adhocracy import mercator2_index_budget
+        resource = _make_mercator2_resource(
+            context,
+            financialplanning_appstruct={'budget': 20000})
+        result = mercator2_index_budget(resource, 'default')
+        assert result == ['20000']
+
+    def test_index_budget_lte_50000(self, context):
+        from .adhocracy import mercator2_index_budget
+        resource = _make_mercator2_resource(
+            context,
+            financialplanning_appstruct={'budget': 50000})
+        result = mercator2_index_budget(resource, 'default')
+        assert result == ['50000']
+
+    def test_index_budget_gt_50000(self, context):
+        from .adhocracy import mercator2_index_budget
+        resource = _make_mercator2_resource(
+            context,
+            financialplanning_appstruct={'budget': 50001})
+        result = mercator2_index_budget(resource, 'default')
+        assert result == ['above_50000']
+
+    def test_register_index_budget(self, registry):
+        from adhocracy_mercator.sheets.mercator2 import IFinancialPlanning
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IFinancialPlanning,), IIndexView,
+                                        name='adhocracy|mercator_budget')
