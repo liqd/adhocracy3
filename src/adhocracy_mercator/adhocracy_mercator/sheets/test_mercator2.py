@@ -1,5 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
+from pytz import UTC
 
 from pyramid import testing
 from pytest import fixture
@@ -106,7 +107,6 @@ class TestOrganizationInfoSchema:
                                         'status': 'Required'}
 
     def test_deserialize_with_required(self, inst, cstruct_required):
-        from pytz import UTC
         wanted = cstruct_required
         assert inst.deserialize(cstruct_required) == \
             {'country': 'DE',
@@ -127,6 +127,41 @@ class TestOrganizationInfoSchema:
             inst.deserialize(cstruct)
         assert error.value.asdict() == {'status_other':
                                         'Required iff status == other'}
+
+    def test_deserialize_with_status_other(
+            self, inst, cstruct_required):
+        from colander import Invalid
+        cstruct = cstruct_required
+        cstruct['status'] = 'other'
+        cstruct['status_other'] = 'Blabla'
+        assert inst.deserialize(cstruct) == \
+            {'country': 'DE',
+             'name': 'Name',
+             'status': 'other',
+             'status_other': 'Blabla',
+             'contact_email': 'anna@example.com',
+             'registration_date': datetime(2015, 2, 18,
+                                           14, 17, 24, 0, tzinfo=UTC),
+             'city': 'Berlin',
+            }
+
+    def test_deserialize_with_status_support_needed(
+            self, inst, cstruct_required):
+        from colander import Invalid
+        cstruct = cstruct_required
+        cstruct['status'] = 'support_needed'
+        cstruct['help_request'] = 'Blabla'
+        assert inst.deserialize(cstruct) == \
+            {'country': 'DE',
+             'name': 'Name',
+             'status': 'support_needed',
+             'help_request': 'Blabla',
+             'contact_email': 'anna@example.com',
+             'registration_date': datetime(2015, 2, 18,
+                                           14, 17, 24, 0, tzinfo=UTC),
+             'city': 'Berlin',
+            }
+
 
     def test_deserialize_with_status_support_needed_and_no_help_request(
             self, inst, cstruct_required):
@@ -261,6 +296,17 @@ class TestTopicSchema:
         assert error.value.asdict() == {'other':
                                         'Required iff topic == other'}
 
+    def test_deserialize_with_status_other(
+            self, inst, cstruct_required):
+        from colander import Invalid
+        cstruct = cstruct_required
+        cstruct['topic'] = 'other'
+        cstruct['other'] = 'Blabla'
+        assert inst.deserialize(cstruct_required) == \
+            {'topic': 'other',
+             'other': 'Blabla'}
+
+
 class TestTopicSheet:
 
     @fixture
@@ -378,6 +424,19 @@ class TestLocationSchema:
             inst.deserialize(cstruct)
         assert error.value.asdict() == {'link_to_ruhr':
                                         'Required iff has_link_to_ruhr == True'}
+
+    def test_deserialize_with_link_to_ruhr(self,
+                                           inst,
+                                           cstruct_required):
+        from colander import Invalid
+        cstruct = cstruct_required
+        cstruct['has_link_to_ruhr'] = True
+        cstruct['link_to_ruhr'] = 'Blabla'
+        assert inst.deserialize(cstruct) == \
+            {'has_link_to_ruhr': True,
+             'is_online': False,
+             'link_to_ruhr': 'Blabla',
+             'location': 'Berlin'}
 
 class TestLocationSheet:
 
