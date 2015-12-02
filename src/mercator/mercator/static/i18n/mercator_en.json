@@ -165,5 +165,25 @@
     "TR__MERCATOR_PROPOSAL_IMPACT_TEAM_ANNOTATION":"Please list the members of your project team and briefly summarise their relevant experience and skills.",
     "TR__MERCATOR_PROPOSAL_IMPACT_WHATELSE_LABEL":"What else should we know about you or your project idea?",
     "TR__ERROR_REQUIRED_TEXT":"This field is required",
-    "TR__MERCATOR_PROPOSAL_CRITERIA":"Selection Criteria"
+    "TR__MERCATOR_PROPOSAL_CRITERIA":"Selection Criteria",
+    "TR__MERCATOR_PROPOSAL_STRENGTHEN_LABEL":"How will your project idea strengthen connection and cohesion in Europe?",
+    "TR__MERCATOR_PROPOSAL_STRENGTHEN_ANNOTATION":"This is a ‘must have’ criterion for the Advocate Europe idea challenge. You can find all selection criteria [[link:here]]",
+    "TR__MERCATOR_PROPOSAL_DIFFERENT_LABEL":"What makes your idea different from others?",
+    "TR__MERCATOR_PROPOSAL_DIFFERENT_ANNOTATION":"What is surprising or unconventional about your idea? What is special about your idea?\n\nThis is a ‘must-have’ criterion for the Advocate Europe idea challenge. You can find all selection criteria [[link:here]].",
+    "TR__MERCATOR_PROPOSAL_PRACTICAL_LABEL":"What is the practical relevance of your idea to the everyday lives of people in Europe?",
+    "TR__MERCATOR_PROPOSAL_PRACTICAL_ANNOTATION":"How will your project connect to, or influence, people’s everyday lives?\n\nThis is a ‘must-have’ criterion for the Advocate Europe idea challenge. You can find all selection criteria [[link:here]].",
+    "TR__MERCATOR_PROPOSAL_FINANCE_2016":"Financial Planning",
+    "TR__MERCATOR_PROPOSAL_TOTAL_BUDGET_PLACEHOLDER":"e.g. 100000",
+    "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING_PLACEHOLDER":"e.g. 5000",
+    "TR__MERCATOR_PROPOSAL_TOTAL_BUDGET_ANNOTATION_2016":"Provide an indication of your overall budget. The total budget can (but does not have to) include the applicant’s own contribution and/or external sources of funding.\n\nOnce we have reviewed all entries, we might come back to you and ask for a more detailed financial plan. You can see the template [[link:here]] and use it while preparing your proposal, if you wish.",
+    "TR__MERCATOR_PROPOSAL_MAJOR_EXPENSES_LABEL":"Major expenses",
+    "TR__MERCATOR_PROPOSAL_MAJOR_EXPENSES_ANNOTATION":"Which are the major expenses and cost categories you foresee for the implementation of your idea? Please share a rough estimate (e.g. office expenses 1000 EUR, traveland accommodation costs 3000 EUR, public relations 2000 EUR, personnel costs etc.)",
+    "TR__MERCATOR_PROPOSAL_OTHER_SOURCES_ANNOTATION_2016":"Do you anticipate receiving funding for your activity or initiative from other sources (e.g. own contribution, other grants or financial aid)?",
+    "TR__MERCATOR_PROPOSAL_FINANCE_SECURED":"Secured?",
+    "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_FINANCE_SECURED":"If yes, have these already been secured?",
+    "TR__MERCATOR_PROPOSAL_COMMUNITY":"Community",
+    "TR__MERCATOR_PROPOSAL_SHARE_EXPERIENCE_LABEL_2016":"Reach out – get feedback, ideas and inspiration",
+    "TR__PERSONAL_CONTACT":"Personal contact",
+    "TR__TWITTER":"twitter"
+
 }
