@@ -80,6 +80,7 @@ class ImageDownload(File, AssetDownload):
                              image.format)
             bytestream.seek(0)
         self.upload(bytestream)
+        self.mimetype = original.mimetype
 
 
 def crop(image: Image, dimensions: Dimensions) -> Image:

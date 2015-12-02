@@ -142,6 +142,7 @@ class TestImageDownload:
         assert isinstance(file_resized, io.BytesIO)
         assert inst.upload.call_args[0][0] == file_resized
         assert mock_resized.save.call_args[0][1] == mock_original.format
+        assert inst.mimetype == mock_file.mimetype
 
     def test_upload_crop_and_resize_jpeg(self, inst, mock_crop, mock_original,
                                          mock_resized, mock_file):
