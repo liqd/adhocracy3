@@ -1,5 +1,4 @@
 import * as AdhComment from "./Comment";
-import * as AdhListing from "../Listing/Listing";
 import * as AdhUtil from "../Util/Util";
 
 import * as ResourcesBase from "../../ResourcesBase";
@@ -12,26 +11,7 @@ import * as SIComment from "../../Resources_/adhocracy_core/sheets/comment/IComm
 import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 
 
-export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
-    public elemRefs(container : ResourcesBase.Resource) {
-        return AdhUtil.eachItemOnce(container.data[SICommentable.nick].comments);
-    }
-
-    // NOTE: this is *not* a recursive comment count.
-    // "total" here means that it is not affected by any pagination
-    // which is not supported by this adapter anyway.
-    public totalCount(container : ResourcesBase.Resource) {
-        return this.elemRefs(container).length;
-    }
-
-    public poolPath(container : ResourcesBase.Resource) {
-        return container.data[SICommentable.nick].post_pool;
-    }
-
-    public canWarmup = false;
-}
-
-export class CommentAdapter extends ListingCommentableAdapter implements AdhComment.ICommentAdapter<RICommentVersion> {
+export class CommentAdapter implements AdhComment.ICommentAdapter<RICommentVersion> {
     contentType : string = RICommentVersion.content_type;
     itemContentType : string = RIComment.content_type;
 
@@ -106,5 +86,13 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
         // encoding changes.
         var meta = resource.data[SIMetadata.nick];
         return meta.modification_date > meta.item_creation_date;
+    }
+
+    elemRefs(container : ResourcesBase.Resource) {
+        return AdhUtil.eachItemOnce(container.data[SICommentable.nick].comments);
+    }
+
+    poolPath(container : ResourcesBase.Resource) {
+        return container.data[SICommentable.nick].post_pool;
     }
 }

@@ -1,0 +1,13 @@
+[ {"path": "/",
+   "content_type": "adhocracy_core.resources.organisation.IOrganisation",
+   "data": {"adhocracy_core.sheets.name.IName":
+            {"name": "organisation"}
+           }},
+  {"path": "/organisation",
+   "content_type": "adhocracy_mercator.resources.mercator2.IProcess",
+   "data": {"adhocracy_core.sheets.name.IName":
+            {"name": "advocate-europe2"},
+            "adhocracy_core.sheets.title.ITitle":
+            {"title": "Sample mercator2 process"}
+           }}
+]
