@@ -135,7 +135,7 @@
     "TR__MERCATOR_TOPIC_URBAN":"Urban dvelopment",
     "TR__MERCATOR_TOPIC_EDUCATION":"Education",
     "TR__MERCATOR_TOPIC_OTHER":"Other (please specify)",
-    "TR__ERROR_ENOUGH_TOPICS":"Please pick at least 2 topics",
+    "TR__ERROR_ENOUGH_TOPICS":"Please pick up to 2 topics",
     "TR__MERCATOR_PROPOSAL_DURATION_LABEL":"Duration of project",
     "TR__MERCATOR_PROPOSAL_DURATION_ANNOTATION":"How many months will it take to implement your project? Funds from Advocate Europe can be used between 2016 and March 2017",
     "TR__MERCATOR_PROPOSAL_LOCATION_ANNOTATION_2": "Is your project connected to the Ruhr area of Germany through project partners, audiences or in some other way? Please provide details.",
@@ -156,5 +156,14 @@
     "TR__MERCATOR_PROPOSAL_IMPACT_AIM_LABEL":"What are you aiming for?",
     "TR__MERCATOR_PROPOSAL_IMPACT_AIM_ANNOTATION":"What would be a successful outcome for your project? If selected, what will be different a year from now? What will have changed?",
     "TR__MERCATOR_PROPOSAL_ABOUT_YOU": "About You",
-    "TR__MERCATOR_PROPOSAL_BRIEF": "Your idea in brief"
+    "TR__MERCATOR_PROPOSAL_BRIEF": "Your idea in brief",
+    "TR__MERCATOR_PROPOSAL_IMPACT_PLAN_LABEL":"How do you plan to get there?",
+    "TR__MERCATOR_PROPOSAL_IMPACT_PLAN_ANNOTATION":"Describe, as practically as possible, the approach and method you plan to use when implementing your idea. Which are the steps that you will take?",
+    "TR__MERCATOR_PROPOSAL_IMPACT_TARGETGROUP_LABEL":"Who are you doing it for?",
+    "TR__MERCATOR_PROPOSAL_IMPACT_TARGETGROUP_ANNOTATION":"Which target group, stakeholders, beneficiaries or audiences are at the centre of your project?",
+    "TR__MERCATOR_PROPOSAL_IMPACT_TEAM_LABEL":"Who is part of your project team?",
+    "TR__MERCATOR_PROPOSAL_IMPACT_TEAM_ANNOTATION":"Please list the members of your project team and briefly summarise their relevant experience and skills.",
+    "TR__MERCATOR_PROPOSAL_IMPACT_WHATELSE_LABEL":"What else should we know about you or your project idea?",
+    "TR__ERROR_REQUIRED_TEXT":"This field is required",
+    "TR__MERCATOR_PROPOSAL_CRITERIA":"Selection Criteria"
 }

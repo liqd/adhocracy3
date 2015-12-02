@@ -24,7 +24,7 @@ export var mercatorProposalFormController2016 = ($scope, $element, $window, adhS
 
     $scope.data = {};
 
-    var topicTotal = -1;
+    var topicTotal = 0;
 
     $scope.topics = [
         "democracy",
@@ -40,7 +40,8 @@ export var mercatorProposalFormController2016 = ($scope, $element, $window, adhS
 
     $scope.topicChange = (isChecked) => {
         topicTotal = isChecked ? (topicTotal + 1) : (topicTotal - 1);
-        $scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$setValidity("enoughTopics", (topicTotal >= 1));
+        var validity = topicTotal > 0 && topicTotal < 3;
+        $scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$setValidity("enoughTopics", validity);
         $scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$setDirty();
     };
 

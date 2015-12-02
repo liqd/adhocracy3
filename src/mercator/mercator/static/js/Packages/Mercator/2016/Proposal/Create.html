@@ -492,8 +492,8 @@ form[name]
                             data-msd-elastic=""
                             data-ng-model="data.introduction.teaser"
                             name="introduction-teaser"
-                            maxlength="300"
-                            placeholder="{{ 'TR__MAX_CHARS_300' | translate }}"
+                            maxlength="500"
+                            placeholder="{{ 'TR__MAX_CHARS_500' | translate }}"
                             required="required"></textarea>
 
                         <span
@@ -716,7 +716,7 @@ form[name]
                 <div class="annotated-section-body">
 
                     <span class="label-text">{{ "TR__MERCATOR_TOPIC_LABEL" | translate }}</span>
-                    {{mercatorProposalForm.mercatorProposalBriefForm['introduction-topics'].$error}}
+
                     <div
                         data-ng-class="{ 'ng-invalid': mercatorProposalForm.mercatorProposalBriefForm['introduction-topics'].$invalid }">
                         <label data-ng-repeat="topic in topics" class="label-text">
@@ -886,11 +886,11 @@ form[name]
                             <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_OTHER" | translate }}</span>
                         </label>
                     </label>
-                    {{mercatorProposalForm.mercatorProposalBriefForm["status"].$error}}
                     <span
                         class="input-error"
                         data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['status'], 'required')">
-                        {{ "TR__ERROR_REQUIRED_RADIO" | translate }}</span>
+                        {{ "TR__ERROR_REQUIRED_RADIO" | translate }}
+                    </span>
             </div>
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
@@ -933,7 +933,7 @@ form[name]
             <div class="annotated-section">
                 <div class="annotated-section-body">
                     <label>
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_IMPACT_AIM_LABEL" | translate }}</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_IMPACT_AIM_LABEL" | translate }} *</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.impact.aim"
@@ -953,13 +953,107 @@ form[name]
                     {{ "TR__MERCATOR_PROPOSAL_IMPACT_AIM_ANNOTATION" | translate }}
                 </div><!-- /.annotated-section-annotation mercator-proposal-form-annotation -->
             </div><!-- /.annotated-section -->
+
+            <div class="annotated-section">
+                <div class="annotated-section-body">
+                    <label>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_IMPACT_PLAN_LABEL" | translate }} *</span>
+                        <textarea
+                            data-msd-elastic=""
+                            data-ng-model="data.impact.plan"
+                            name="impact-plan"
+                            maxlength="800"
+                            placeholder="{{ 'TR__MAX_CHARS_800' | translate }}"
+                            required="required"></textarea>
+
+                        <span
+                            class="input-error"
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalDetailForm.impact-plan, 'required')">
+                            {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
+                    </label>
+                </div><!-- /.annotated-section-body -->
+
+                <div class="annotated-section-annotation mercator-proposal-form-annotation">
+                    {{ "TR__MERCATOR_PROPOSAL_IMPACT_PLAN_ANNOTATION" | translate }}
+                </div><!-- /.annotated-section-annotation mercator-proposal-form-annotation -->
+            </div><!-- /.annotated-section -->
+
+            <div class="annotated-section">
+                <div class="annotated-section-body">
+                    <label>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_IMPACT_TARGETGROUP_LABEL" | translate }} *</span>
+                        <textarea
+                            data-msd-elastic=""
+                            data-ng-model="data.impact.targetgroup"
+                            name="impact-targetgroup"
+                            maxlength="500"
+                            placeholder="{{ 'TR__MAX_CHARS_500' | translate }}"
+                            required="required"></textarea>
+
+                        <span
+                            class="input-error"
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalDetailForm.impact-targetgroup, 'required')">
+                            {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
+                    </label>
+                </div><!-- /.annotated-section-body -->
+
+                <div class="annotated-section-annotation mercator-proposal-form-annotation">
+                    {{ "TR__MERCATOR_PROPOSAL_IMPACT_TARGETGROUP_ANNOTATION" | translate }}
+                </div><!-- /.annotated-section-annotation mercator-proposal-form-annotation -->
+            </div><!-- /.annotated-section -->
+
+            <div class="annotated-section">
+                <div class="annotated-section-body">
+                    <label>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_IMPACT_TEAM_LABEL" | translate }} *</span>
+                        <textarea
+                            data-msd-elastic=""
+                            data-ng-model="data.impact.team"
+                            name="impact-team"
+                            maxlength="800"
+                            placeholder="{{ 'TR__MAX_CHARS_800' | translate }}"
+                            required="required"></textarea>
+
+                        <span
+                            class="input-error"
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalDetailForm.impact-team, 'required')">
+                            {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
+                    </label>
+                </div><!-- /.annotated-section-body -->
+
+                <div class="annotated-section-annotation mercator-proposal-form-annotation">
+                    {{ "TR__MERCATOR_PROPOSAL_IMPACT_TEAM_ANNOTATION" | translate }}
+                </div><!-- /.annotated-section-annotation mercator-proposal-form-annotation -->
+            </div><!-- /.annotated-section -->
+
+            <div class="annotated-section">
+                <div class="annotated-section-body">
+                    <label>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_IMPACT_WHATELSE_LABEL" | translate }}</span>
+                        <textarea
+                            data-msd-elastic=""
+                            data-ng-model="data.impact.whatelse"
+                            name="impact-whatelse"
+                            maxlength="500"
+                            placeholder="{{ 'TR__MAX_CHARS_500' | translate }}"
+                            required="required"></textarea>
+
+                        <span
+                            class="input-error"
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalDetailForm.impact-whatelse, 'required')">
+                            {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
+                    </label>
+                </div><!-- /.annotated-section-body -->
+            </div><!-- /.annotated-section -->
+
+
         </section>
 
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalMotivationForm" id="mercator-proposal-motivation">
             <h2
                 data-du-scrollspy="mercator-proposal-motivation"
                 class="mercator-proposal-form-heading"
-                data-offset="50">4. {{ "TR__MERCATOR_PROPOSAL_MOTIVATION" | translate }}</h2>
+                data-offset="50">4. {{ "TR__MERCATOR_PROPOSAL_CRITERIA" | translate }}</h2>
 
             <div class="annotated-section">
                 <div class="annotated-section-body">
