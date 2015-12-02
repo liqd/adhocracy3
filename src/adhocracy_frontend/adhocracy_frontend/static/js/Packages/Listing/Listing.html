@@ -1,10 +1,21 @@
 <div class="listing">
     <div class="action-bar" data-ng-if="facets || sorts">
         <a data-ng-if="facets" class="action-bar-item" data-ng-class="{ 'm-selected': showFilter }" data-ng-click="toggleFilter();" href="">Filter</a>
+        <span class="facet-group" data-ng-repeat="facet in facets">
+            <a
+                href=""
+                data-ng-repeat="item in facet.items"
+                data-ng-if="item.enabled"
+                data-ng-click="toggleItem(facet, item, $event)"
+                class="facet-item-{{item.key}} facet-toggle facet-toggle-{{$index}}">
+                {{ item.name | translate }}
+                <span class="facet-cancel">x</span>
+            </a>
+        </span>
         <a data-ng-if="sorts" class="action-bar-item" data-ng-class="{ 'm-selected': showSort }" data-ng-click="toggleSort();" href="">Sort</a>
     </div>
     <div class="listing-results" data-ng-if="showFilter || showSort">
-        <adh-facets data-ng-if="showFilter" data-facets="facets" data-update="update" ></adh-facets>
+        <adh-facets data-ng-if="showFilter" data-facets="facets" data-update="update" data-toggle-item="toggleItem" data-enable-item="enableItem" data-disable-item="disableItem"></adh-facets>
         <div data-ng-if="showSort">
             <h3 class="sort-header">{{ "TR__SORT_BY" | translate }}</h3>
             <a
