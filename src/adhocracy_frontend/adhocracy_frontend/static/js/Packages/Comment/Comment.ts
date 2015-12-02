@@ -3,7 +3,6 @@ import * as _ from "lodash";
 import * as AdhConfig from "../Config/Config";
 import * as AdhCredentials from "../User/Credentials";
 import * as AdhHttp from "../Http/Http";
-import * as AdhListing from "../Listing/Listing";
 import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
@@ -15,12 +14,13 @@ import * as ResourcesBase from "../../ResourcesBase";
 
 import RIExternalResource from "../../Resources_/adhocracy_core/resources/external_resource/IExternalResource";
 import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import * as SICommentable from "../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 
 var pkgLocation = "/Comment";
 
 
-export interface ICommentAdapter<T extends ResourcesBase.Resource> extends AdhListing.IListingContainerAdapter {
+export interface ICommentAdapter<T extends ResourcesBase.Resource> {
     contentType : string;
     itemContentType : string;
     create(settings : any) : T;
@@ -34,6 +34,8 @@ export interface ICommentAdapter<T extends ResourcesBase.Resource> extends AdhLi
     modificationDate(resource : T) : string;
     commentCount(resource : T) : number;
     edited(resource : T) : boolean;
+    elemRefs(any) : string[];
+    poolPath(any) : string;
 }
 
 
@@ -316,6 +318,8 @@ export var commentCreateDirective = (
 
 export var adhCommentListing = (
     adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     $location : angular.ILocationService
 ) => {
@@ -327,8 +331,18 @@ export var adhCommentListing = (
             frontendOrderReverse: "=?",
             frontendOrderPredicate: "=?"
         },
-        link: () => {
+        link: (scope) => {
             adhTopLevelState.setCameFrom($location.url());
+
+            scope.update = () => {
+                return adhHttp.get(scope.path).then((commentable) => {
+                    scope.elements = AdhUtil.eachItemOnce(commentable.data[SICommentable.nick].comments);
+                    scope.poolPath = commentable.data[SICommentable.nick].post_pool;
+                });
+            };
+
+            scope.$watch("path", scope.update);
+            adhPermissions.bindScope(scope, () => scope.poolPath, "poolOptions");
         }
     };
 };
