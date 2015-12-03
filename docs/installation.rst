@@ -33,7 +33,7 @@ Create virtualenv ::
     virtualenv -p python3.4 .
 
 If you don't have python 3.4 on your system, you may compile python 3.4 and
-PIL instead of creating a virtualenv ::
+Pillow instead of creating a virtualenv ::
 
     cd python
     python ./bootstrap.py
