@@ -108,7 +108,6 @@ export var uploadImageDirective = (
             didCancelUpload: "&?"
         },
         link: (scope) => {
-            scope.isUploadDone = false;
             scope.$flow = flowFactory.create();
 
             scope.$flow.on("fileAdded", (file, event) => {
