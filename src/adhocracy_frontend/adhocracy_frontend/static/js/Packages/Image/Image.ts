@@ -137,7 +137,7 @@ export var showImageDirective = (
             format: "@?", // defaults to "detail"
             imageMetadataNick: "@?", // defaults to SIImageMetadata.nick
             fallbackUrl: "@?", // defaults to "/static/fallback_$format.jpg";
-            isImageMissing: "=?"
+            didFailToLoadImage: "&?"
         },
         link: (scope) => {
             var imageMetadataNick = () =>
@@ -145,17 +145,6 @@ export var showImageDirective = (
             var format = () => scope.format ? scope.format : "detail";
             var fallbackUrl = () => scope.fallbackUrl || ("/static/fallback_" + format() + ".jpg");
             scope.imageUrl = fallbackUrl(); // show fallback till real image is loaded
-            scope.isImageMissing = false;
-
-            // can also be set by outer scopes
-            scope.$watch("isImageMissing", (isImageMissing) => {
-                if (isImageMissing) {
-                    scope.imageUrl = fallbackUrl();
-                }
-            });
-            var handleError = () => {
-                scope.isImageMissing = true;
-            };
 
             scope.$watch("path", (path) => {
                 // often instantiated before the path can be provided by the surrounding dom
@@ -166,12 +155,12 @@ export var showImageDirective = (
                         if ( ! imageUrl) {
                             console.log("Couldn't load image format <" + format() + ">"
                                 + " from asset: " + angular.toJson(asset));
-                            return handleError();
+                            scope.didFailToLoadImage();
+                            return; // don't override the fallback image path
                         }
-
                         scope.imageUrl = imageUrl;
                     },
-                    handleError
+                    scope.didFailToLoadImage
                 );
             });
         }

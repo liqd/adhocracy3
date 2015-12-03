@@ -651,14 +651,12 @@ export var adhUserProfileImageDirective = (
         scope: {
             path: "@",
             format: "@?", // thumbnail [default] or detail
-            isImageMissing: "=?",
+            didFailToLoadImage: "&?",
             cssClass: "@?"
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfileImage.html",
         link: (scope) => {
             scope.config = adhConfig;
-            scope.isImageMissing = false;
-            var handleImageMissing = () => scope.isImageMissing = true;
             scope.$watch("path", (path) => {
                 if ( ! path) { return; }
 
@@ -666,9 +664,9 @@ export var adhUserProfileImageDirective = (
                     scope.assetPath = user.data[SIImageReference.nick].picture;
                     scope.userName = user.data[SIUserBasic.nick].name;
                     if ( ! scope.assetPath) {
-                        handleImageMissing();
+                        scope.didFailToLoadImage();
                     }
-                }, handleImageMissing);
+                }, scope.didFailToLoadImage);
             });
         }
     };
