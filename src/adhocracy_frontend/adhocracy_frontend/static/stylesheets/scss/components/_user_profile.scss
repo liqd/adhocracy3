@@ -90,13 +90,13 @@
 
         visibility: hidden;
 
-        > span {
+        > * {
             // vertically centered
             @include rem(height, $image-base-size);
             @include rem(width, $image-base-size);
             display: table-cell;
             vertical-align: middle;
-            // We actually want the 'button' to wrap
+            // We actually want the button text to wrap
             white-space: normal;
         }
     }
