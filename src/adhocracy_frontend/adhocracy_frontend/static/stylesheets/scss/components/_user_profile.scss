@@ -126,13 +126,13 @@
 
         // directives ordered this way to ensure rendering with
         // less than three items will remove them in the order: middle, last, first
-        > div { 
+        > * { 
             display: table-cell;
             text-align: center;
         }
         
-        > div:last-child { text-align: right; }
-        > div:first-child { text-align: left; }
+        > *:last-child { text-align: right; }
+        > *:first-child { text-align: left; }
     }
 }
 
