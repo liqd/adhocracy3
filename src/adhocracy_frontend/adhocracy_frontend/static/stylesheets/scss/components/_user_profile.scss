@@ -60,24 +60,19 @@
 
 .user-profile-image-edit {
     $image-base-size: 200px;
-    
+
+    // position nicely on top of the username and center
+    @include rem(margin, 60px auto -60px);
+
     @include rem(height, $image-base-size);
     @include rem(width, $image-base-size);
     position: relative;
-
-    // position nicely on top of the username
-    margin-top: 60px;
-    margin-bottom: -60px;
-
-    // center
-    margin-right: auto;
-    margin-left: auto;
 
     .user-profile-image {
         @include rem(height, $image-base-size);
         @include rem(width, $image-base-size);
     }
-    
+
     &.user-profile-image-edit-uploading {
         @include rem(width, $image-base-size);
         height: auto;
