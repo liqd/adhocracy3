@@ -668,9 +668,7 @@ export var adhUserProfileImageDirective = (
                     if ( ! scope.assetPath) {
                         handleImageMissing();
                     }
-               },
-               handleImageMissing
-               );
+                }, handleImageMissing);
             });
         }
     };
