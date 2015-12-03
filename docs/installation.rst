@@ -28,7 +28,12 @@ Checkout source code ::
     cd adhocracy3
     git submodule update --init
 
-compile python 3.4 and PIL ::
+Create virtualenv ::
+
+    virtualenv -p python3.4 .
+
+If you don't have python 3.4 on your system, you may compile python 3.4 and
+PIL instead of creating a virtualenv ::
 
     cd python
     python ./bootstrap.py
