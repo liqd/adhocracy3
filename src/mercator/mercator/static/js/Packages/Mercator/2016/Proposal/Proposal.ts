@@ -20,11 +20,16 @@ export var createDirective = (
     };
 };
 
-export var mercatorProposalFormController2016 = ($scope, $element, $window, adhShowError) => {
+export var mercatorProposalFormController2016 = (
+    $scope,
+    $element,
+    $window,
+    adhShowError
+) => {
 
     $scope.data = {};
 
-    var topicTotal = -1;
+    var topicTotal = -0;
 
     $scope.topics = [
         "democracy",
