@@ -925,7 +925,7 @@ form[name]
 
                         <span
                             class="input-error"
-                            data-ng-if="showError(mercatorProposalForm, mercatorProposalImpactForm['description-description'], 'required')">
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalImpactForm['impact-challenge'], 'required')">
                             {{ "TR__ERROR_REQUIRED_DESCRIPTION" | translate }}</span>
                     </label>
                 </div><!-- /.form_body -->
@@ -949,7 +949,7 @@ form[name]
 
                         <span
                             class="input-error"
-                            data-ng-if="showError(mercatorProposalForm, mercatorProposalImpactForm.impact-aim, 'required')">
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalImpactForm['impact-aim'], 'required')">
                             {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
                     </label>
                 </div><!-- /.annotated-section-body -->
@@ -973,7 +973,7 @@ form[name]
 
                         <span
                             class="input-error"
-                            data-ng-if="showError(mercatorProposalForm, mercatorProposalImpactForm.impact-plan, 'required')">
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalImpactForm['impact-plan'], 'required')">
                             {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
                     </label>
                 </div><!-- /.annotated-section-body -->
@@ -997,7 +997,7 @@ form[name]
 
                         <span
                             class="input-error"
-                            data-ng-if="showError(mercatorProposalForm, mercatorProposalImpactForm.impact-targetgroup, 'required')">
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalImpactForm['impact-targetgroup'], 'required')">
                             {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
                     </label>
                 </div><!-- /.annotated-section-body -->
@@ -1021,7 +1021,7 @@ form[name]
 
                         <span
                             class="input-error"
-                            data-ng-if="showError(mercatorProposalForm, mercatorProposalImpactForm.impact-team, 'required')">
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalImpactForm['impact-team'], 'required')">
                             {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
                     </label>
                 </div><!-- /.annotated-section-body -->
@@ -1045,7 +1045,7 @@ form[name]
 
                         <span
                             class="input-error"
-                            data-ng-if="showError(mercatorProposalForm, mercatorProposalImpactForm.impact-whatelse, 'required')">
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalImpactForm['impact-whatelse'], 'required')">
                             {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
                     </label>
                 </div><!-- /.annotated-section-body -->
@@ -1064,7 +1064,7 @@ form[name]
                 <div class="annotated-section-body">
 
                     <label>
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STRENGTHEN_LABEL" | translate }}</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STRENGTHEN_LABEL" | translate }} *</span>
 
                         <textarea
                             data-msd-elastic=""
@@ -1076,7 +1076,7 @@ form[name]
 
                         <span
                             class="input-error"
-                            data-ng-if="showError(mercatorProposalForm, mercatorProposalCriteriaForm.strenthen, 'required')">
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalCriteriaForm.strengthen, 'required')">
                             {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
                     </label>
                 </div><!-- /.annotated-section-body -->

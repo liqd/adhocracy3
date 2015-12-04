@@ -29,7 +29,7 @@ export var mercatorProposalFormController2016 = (
 
     $scope.data = {};
 
-    var topicTotal = -0;
+    var topicTotal = 0;
 
     $scope.topics = [
         "democracy",
@@ -97,6 +97,8 @@ export var mercatorProposalFormController2016 = (
     $scope.showHeardFromError = () : boolean => {
         return showCheckboxGroupError($scope.mercatorProposalCommunityForm, heardFromCheckboxes);
     };
+
+    $scope.showError = adhShowError;
 
     // FIXME !
     $scope.create = "true";

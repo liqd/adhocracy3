@@ -184,6 +184,7 @@
     "TR__MERCATOR_PROPOSAL_COMMUNITY":"Community",
     "TR__MERCATOR_PROPOSAL_SHARE_EXPERIENCE_LABEL_2016":"Reach out – get feedback, ideas and inspiration",
     "TR__PERSONAL_CONTACT":"Personal contact",
-    "TR__TWITTER":"twitter"
+    "TR__TWITTER":"twitter",
+    "TR__ERROR_REQUIRED_SELECTION":"This field is required"
 
 }
