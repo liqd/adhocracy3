@@ -52,16 +52,16 @@
     @include rem(line-height, 20px);
     @include rem(margin-right, 10px);
     @include rem(padding, 0 10px);
-    background: $color-brand-one-introvert;
-    color: $color-background-base;
+    background: $color-button-cta-base;
+    color: $color-button-cta-text;
     padding-right: 1.5em;
     position: relative;
     text-decoration: none;
     text-transform: uppercase;
 
     &:hover, &:focus {
-        background: $color-brand-one-normal;
-        color: $color-background-base;
+        background: $color-button-cta-hover-background;
+        color: $color-button-cta-text;
     }
 
     .facet-cancel {
