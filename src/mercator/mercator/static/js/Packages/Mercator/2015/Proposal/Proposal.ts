@@ -889,7 +889,6 @@ export var listing = (adhConfig : AdhConfig.IService) => {
         scope: {
             path: "@",
             contentType: "@",
-            update: "=?",
             facets: "=?",
             sort: "=?",
             sorts: "=?",

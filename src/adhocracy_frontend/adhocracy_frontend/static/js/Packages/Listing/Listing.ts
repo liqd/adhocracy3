@@ -135,7 +135,6 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 frontendOrderPredicate: "=?",
                 frontendOrderReverse: "=?",
                 params: "=?",
-                update: "=?",
                 noCreateForm: "=?",
                 emptyText: "@"
             },
