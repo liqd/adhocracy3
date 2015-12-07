@@ -8,7 +8,7 @@
                 data-ng-repeat="item in facet.items"
                 data-ng-if="item.enabled"
                 data-ng-click="toggleItem(facet, item, $event)"
-                class="facet-item-{{item.key}} facet-toggle facet-toggle-{{$index}}">
+                class="facet-item-{{item.key}} facet-toggle">
                 {{ item.name | translate }}
                 <span class="facet-cancel">x</span>
             </a>

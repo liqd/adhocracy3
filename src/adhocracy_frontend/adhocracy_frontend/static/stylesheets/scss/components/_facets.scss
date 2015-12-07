@@ -48,6 +48,7 @@
 .facet-toggle {
     @include ellipsis(12em);
     @include inline-block;
+    @include rem(left, -18px);
     @include rem(line-height, 20px);
     @include rem(margin-right, 10px);
     @include rem(padding, 0 10px);
@@ -68,8 +69,4 @@
         position: absolute;
         right: 0.5em;
     }
-}
-
-.facet-toggle-0 {
-    @include rem(margin-left, -18px);
 }
