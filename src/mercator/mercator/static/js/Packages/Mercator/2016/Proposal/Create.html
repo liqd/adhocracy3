@@ -34,7 +34,7 @@ form[name]
                     <div class="row">
                         <div class="cols-2">
                             <label>
-                                <span class="label-text">{{ "TR__FIRSTNAME" | translate }}</span>
+                                <span class="label-text">{{ "TR__FIRSTNAME" | translate }} *</span>
                                 <input
                                     type="text"
                                     data-ng-change="changefield()"
@@ -49,7 +49,7 @@ form[name]
                         </div>
                         <div class="cols-2">
                             <label>
-                                <span class="label-text">{{ "TR__LASTNAME" | translate }}</span>
+                                <span class="label-text">{{ "TR__LASTNAME" | translate }} *</span>
                                 <input
                                     type="text"
                                     data-ng-model="data.user_info.last_name"
@@ -73,7 +73,7 @@ form[name]
             <!-- SECTION 1 organisation info -->
             <div class="annotated-section">
                 <div class="annotated-section-body">
-                    <h3 class="mercator-proposal-form-subheading">{{ "TR__MERCATOR_PROPOSAL_ORGANISATION_INFO_2016" | translate }}:</h3>
+                    <h3 class="mercator-proposal-form-subheading">{{ "TR__MERCATOR_PROPOSAL_ORGANISATION_INFO_2016" | translate }} *</h3>
 
                     <div
                         data-ng-class="{ 'ng-invalid': mercatorProposalAboutYouForm['organization-info-status-enum'].$invalid
@@ -125,7 +125,7 @@ form[name]
 
                             <!-- Country of organisation* -->
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_COUNTRY" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_COUNTRY" | translate }} *</span>
                                 <country-select
                                     data-ng-model="data.organization_info.country"
                                     data-name="organization-info-country"
@@ -139,7 +139,7 @@ form[name]
 
                             <!-- Website of organisation* -->
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_WEBSITE_2016" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_WEBSITE_2016" | translate }} *</span>
                                 <input
                                     type="url"
                                     data-ng-model="data.organization_info.website"
@@ -157,7 +157,7 @@ form[name]
 
                             <!-- Contact email* -->
                             <label>
-                                <span class="label-text">{{ "TR__EMAIL_2016" | translate }}</span>
+                                <span class="label-text">{{ "TR__EMAIL_2016" | translate }} *</span>
                                 <input
                                     type="email"
                                     data-ng-model="data.organization_info.email"
@@ -236,7 +236,7 @@ form[name]
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_CITY" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_COUNTRY_PLANNED_NONPROFIT_2016" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_COUNTRY_PLANNED_NONPROFIT_2016" | translate }} *</span>
                                 <country-select
                                     data-ng-model="data.organization_info.country"
                                     data-name="organization-info-country"
@@ -279,7 +279,7 @@ form[name]
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__EMAIL_2016" | translate }}</span>
+                                <span class="label-text">{{ "TR__EMAIL_2016" | translate }} *</span>
                                 <input
                                     type="email"
                                     data-ng-model="data.organization_info.email"
@@ -320,7 +320,7 @@ form[name]
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_NAME" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_CITY_PLANNED_NONPROFIT_2016" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_CITY_INITIATIVE_2016" | translate }} *</span>
                                 <input
                                     type="text"
                                     data-ng-model="data.organization_info.city"
@@ -332,7 +332,7 @@ form[name]
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_CITY" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_COUNTRY_SUPPORT_NEEDED_2016" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_COUNTRY_SUPPORT_NEEDED_2016" | translate }} *</span>
                                 <country-select
                                     data-ng-model="data.organization_info.country"
                                     data-name="organization-info-country"
@@ -343,7 +343,7 @@ form[name]
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_COUNTRY" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_STATUS_SUPPORT_NEEDED_HOW" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_STATUS_SUPPORT_NEEDED_HOW" | translate }} *</span>
                                 <textarea
                                     data-msd-elastic=""
                                     data-ng-model="data.organization_info.how_can_we_help_you"
@@ -395,7 +395,7 @@ form[name]
                                 required="required" />
 
                             {{ "TR__OTHER" | translate }}<span data-ng-if="data.organization_info.status_enum == 'other'">.
-                                {{ "TR__PLEASE_SPECIFY" | translate }}: *</span>
+                                {{ "TR__PLEASE_SPECIFY" | translate }} *</span>
                         </label>
 
                         <fieldset data-ng-if="data.organization_info.status_enum == 'other'">
@@ -598,12 +598,7 @@ form[name]
                                 <input
                                     type="text"
                                     data-ng-model="data.partner1.name"
-                                    name="introduction-partner1-name"
-                                    required="required" />
-                                <span
-                                    class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-partner1-name'], 'required')">
-                                    {{ "TR__ERROR_INVALID_URL" | translate }}</span>
+                                    name="introduction-partner1-name"/>
                             </label>
                             <label>
                                 <span class="label-text">{{ "TR__WEBSITE" | translate }}</span>
@@ -611,7 +606,7 @@ form[name]
                                     type="url"
                                     data-ng-model="data.partner1.website"
                                     name="introduction-partner1-website" />
-                                <span
+                                    <span
                                     class="input-error"
                                     data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-partner1-website'], 'url')">
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
@@ -631,10 +626,6 @@ form[name]
                                     type="text"
                                     data-ng-model="data.partner2.name"
                                     name="introduction-partner2-name" />
-                                <span
-                                    class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-partner2-name'], 'required')">
-                                    {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
                                 <span class="label-text">{{ "TR__WEBSITE" | translate }}</span>
@@ -662,10 +653,6 @@ form[name]
                                     type="text"
                                     data-ng-model="data.partner1.name"
                                     name="introduction-partner1-name" />
-                                <span
-                                    class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-partner1-name'], 'required')">
-                                    {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
                                 <span class="label-text">{{ "TR__WEBSITE" | translate }}</span>
@@ -699,6 +686,7 @@ form[name]
                             <textarea
                                 data-msd-elastic=""
                                 maxlength="500"
+                                data-ng-model="data.partners_more"
                                 placeholder="{{ 'TR__MAX_CHARS_500' | translate }}">
                             </textarea>
                         </label>
@@ -712,11 +700,8 @@ form[name]
 
             <!-- topic -->
             <div class="annotated-section">
-
                 <div class="annotated-section-body">
-
                     <span class="label-text">{{ "TR__MERCATOR_TOPIC_LABEL" | translate }}</span>
-
                     <div
                         data-ng-class="{ 'ng-invalid': mercatorProposalForm.mercatorProposalBriefForm['introduction-topics'].$invalid }">
                         <label data-ng-repeat="topic in topics" class="label-text">
@@ -761,7 +746,7 @@ form[name]
                         <span
                             class="input-error"
                             data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-duration'], 'required')">
-                            {{ "TR__ERROR_REQUIRED_NUMBER" | translate }}</span>
+                            {{ "TR__ERROR_REQUIRED_DURATION" | translate }}</span>
                     </label>
                 </div>
 
@@ -772,7 +757,7 @@ form[name]
 
             <div class="annotated-section">
                 <div class="annotated-section-body">
-                    <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_LOCATION_LABEL" | translate }}</span>
+                    <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_LOCATION_LABEL" | translate }} *</span>
 
                     <!-- FIXME: red border should show on dirty -->
                     <div
@@ -830,8 +815,14 @@ form[name]
                                 data-ng-model="data.location.location_is_linked_to_ruhr_text"
                                 data-msd-elastic=""
                                 maxlength="300"
-                                placeholder="{{ 'TR__MAX_CHARS_300' | translate }}">
+                                name="location-location-is-linked-to-ruhr-specify"
+                                placeholder="{{ 'TR__MAX_CHARS_300' | translate }}"
+                                required="required">
                             </textarea>
+                            <span
+                            class="input-error"
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['location-location-is-linked-to-ruhr-specify'], 'required')">
+                            {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
                         </label>
                     </div><!-- /.ng-invalid -->
 
@@ -853,7 +844,7 @@ form[name]
                     <div
                         data-ng-class="{ 'ng-invalid': mercatorProposalBriefForm['status'].$invalid
                             && mercatorProposalForm.$submitted }">
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_LABEL" | translate }}<br/>{{ "TR__MERCATOR_PROPOSAL_STATUS_LABEL_SUB" | translate }}:</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_LABEL" | translate }}<br/>{{ "TR__MERCATOR_PROPOSAL_STATUS_LABEL_SUB" | translate }} *</span>
                         <label>
                             <input
                                 type="radio"
@@ -1050,8 +1041,6 @@ form[name]
                     </label>
                 </div><!-- /.annotated-section-body -->
             </div><!-- /.annotated-section -->
-
-
         </section>
 
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalCriteriaForm" id="mercator-proposal-criteria">
@@ -1092,7 +1081,7 @@ form[name]
                 <div class="annotated-section-body">
 
                     <label>
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_DIFFERENT_LABEL" | translate }}</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_DIFFERENT_LABEL" | translate }} *</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.different"
@@ -1119,7 +1108,7 @@ form[name]
                 <div class="annotated-section-body">
 
                     <label>
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PRACTICAL_LABEL" | translate }}</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PRACTICAL_LABEL" | translate }} *</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.practical"
@@ -1156,7 +1145,7 @@ form[name]
             <div class="annotated-section">
                 <div class="annotated-section-body">
                     <label>
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_TOTAL_BUDGET" | translate }}:</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_TOTAL_BUDGET" | translate }} *</span>
                         <input
                             type="number"
                             data-ng-model="data.finance.budget"
@@ -1185,7 +1174,7 @@ form[name]
             <div class="annotated-section">
                 <div class="annotated-section-body">
                     <label>
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING" | translate }}:</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING" | translate }} *</span>
                         <input
                             type="number"
                             data-ng-model="data.finance.requested_funding"
@@ -1223,7 +1212,7 @@ form[name]
                 <div class="annotated-section-body">
 
                     <label>
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_MAJOR_EXPENSES_LABEL" | translate }}</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_MAJOR_EXPENSES_LABEL" | translate }} *</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.major"
@@ -1234,7 +1223,7 @@ form[name]
 
                         <span
                             class="input-error"
-                            data-ng-if="showError(mercatorProposalForm, mercatorProposalCriteriaForm.major, 'required')">
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalFinanceForm['major'], 'required')">
                             {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
                     </label>
                 </div><!--/.annotated-section-body -->

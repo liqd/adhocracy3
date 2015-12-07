@@ -33,7 +33,7 @@
     "TR__MERCATOR_PROPOSAL_FINANCE_GRANTED_ANNOTATION": "If you are planning to include other sources of funding, are these already granted?",
     "TR__MERCATOR_PROPOSAL_FINANCE_OTHERS_SOURCES": "Other source of income",
     "TR__MERCATOR_PROPOSAL_GRANTED": "Granted",
-    "TR__MERCATOR_PROPOSAL_HEARD_FROM_LABEL": "How did you hear about “Advocate Europe”?",
+    "TR__MERCATOR_PROPOSAL_HEARD_FROM_LABEL": "Last, but not least ... How did you hear about “Advocate Europe”?",
     "TR__MERCATOR_PROPOSAL_IMAGE_ANNOTATION_1": "Upload a photo, icon, or illustration that visually supports or explains your idea. Make sure that you have the property rights to share this picture publically.",
     "TR__MERCATOR_PROPOSAL_IMAGE_ANNOTATION_2": "Image must be of type {{acceptedFileTypes | join}}, no bigger than {{maximumByteSize/1000000}}MB, and not less than {{minimumWidth}}px wide.",
     "TR__MERCATOR_PROPOSAL_INTRODUCTION": "Your idea in brief",
@@ -104,8 +104,8 @@
     "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_DATE_OF_REGISTRATION_2016": "Please enter an organization date of registration.",
     "TR__MERCATOR_PROPOSAL_ORGANIZATION_NAME_2016" : "Name of organisation",
     "TR__MERCATOR_PROPOSAL_ORGANIZATION_STATUS_PLANNED_NONPROFIT_2016": "A non-profit registration is planned or is already underway",
-    "TR__MERCATOR_PROPOSAL_ORGANIZATION_NAME_PLANNED_NONPROFIT_2016": "Name of your initiative",
-    "TR__MERCATOR_PROPOSAL_ORGANIZATION_CITY_PLANNED_NONPROFIT_2016": "City of initiative",
+    "TR__MERCATOR_PROPOSAL_ORGANIZATION_NAME_PLANNED_NONPROFIT_2016": "Name of your initiative or organisation",
+    "TR__MERCATOR_PROPOSAL_ORGANIZATION_CITY_PLANNED_NONPROFIT_2016": "City of initiative or organisation",
     "TR__MERCATOR_PROPOSAL_ORGANIZATION_COUNTRY_PLANNED_NONPROFIT_2016": "Country of planned registration",
     "TR__MERCATOR_PROPOSAL_ORGANIZATION_DATE_PLANNED_NONPROFIT_2016": "Envisioned date of registration (mm-yyyy)",
     "TR__MERCATOR_PROPOSAL_ORGANIZATION_WEBSITE_PLANNED_NONPROFIT_2016": "Website of initiative or organisation",
@@ -185,6 +185,8 @@
     "TR__MERCATOR_PROPOSAL_SHARE_EXPERIENCE_LABEL_2016":"Reach out – get feedback, ideas and inspiration",
     "TR__PERSONAL_CONTACT":"Personal contact",
     "TR__TWITTER":"twitter",
-    "TR__ERROR_REQUIRED_SELECTION":"This field is required"
+    "TR__ERROR_REQUIRED_SELECTION":"This field is required",
+    "TR__MERCATOR_PROPOSAL_ORGANIZATION_CITY_INITIATIVE_2016":"City of initiative",
+    "TR__ERROR_REQUIRED_DURATION":"Please enter a number"
 
 }
