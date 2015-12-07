@@ -30,7 +30,7 @@ from adhocracy_core.sheets.principal import IPermissions
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
 from adhocracy_core.utils import find_graph
 from adhocracy_core.utils import get_following_new_version
-from adhocracy_core.utils import get_last_new_version
+from adhocracy_core.utils import get_last_new_version_in_transaction
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import get_iresource
@@ -39,7 +39,6 @@ from adhocracy_core.utils import get_modification_date
 from adhocracy_core.utils import get_user
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_core.sheets.tags import ITag
 from adhocracy_core.sheets.asset import IAssetData
 
 
@@ -142,7 +141,8 @@ def _get_updated_appstruct(event: ISheetReferenceNewVersion,
 def _get_last_version_created_in_transaction(event: ISheetReferenceNewVersion)\
         -> IItemVersion:
     if event.is_batchmode:
-        new_version = get_last_new_version(event.registry, event.object)
+        new_version = get_last_new_version_in_transaction(event.registry,
+                                                          event.object)
     else:
         new_version = get_following_new_version(event.registry, event.object)
     return new_version
@@ -251,16 +251,6 @@ def _generate_activation_path() -> str:
     return '/activate/' + b64encode(random_bytes, altchars=b'+_').decode()
 
 
-def autoupdate_tag_has_new_version(event):
-    """Auto update last but not first tag if a reference has new version."""
-    name = event.object.__name__
-    if name and 'FIRST' in name:
-        return
-    sheet = get_sheet(event.object, event.isheet, event.registry)
-    appstruct = _get_updated_appstruct(event, sheet)
-    sheet.set(appstruct)
-
-
 def update_asset_download(event):
     """Update asset download."""
     add_metadata(event.object, event.registry)
@@ -285,9 +275,6 @@ def includeme(config):
                           ISheetReferenceNewVersion,
                           object_iface=ISimple,
                           event_isheet=ISheetReferenceAutoUpdateMarker)
-    config.add_subscriber(autoupdate_tag_has_new_version,
-                          ISheetReferenceNewVersion,
-                          event_isheet=ITag)
     config.add_subscriber(add_default_group_to_user,
                           IResourceCreatedAndAdded,
                           object_iface=IUser)

@@ -1,6 +1,8 @@
 """Basic versionable type typically for process content."""
+from pyramid.traversal import find_interface
 from adhocracy_core.events import ItemVersionNewVersionAdded
 from adhocracy_core.events import SheetReferenceNewVersion
+from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.resources import add_resource_type_to_registry
@@ -11,6 +13,24 @@ from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import find_graph
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.versions
+import adhocracy_core.sheets.tags
+
+
+def update_last_tag(version, registry, options):
+    """Get `item` in lineage of `version` and update `last` tag to `version`.
+
+    This needs to be the first 'after_creation' script executed,
+    to assure the last tag is updated before any
+    :class:`from adhocracy_core.interfaces import IItemVersionNewVersionAdded`
+    is send.
+    """
+    item = find_interface(version, IItem)
+    if item is None:  # ease tests
+        return
+    tags_sheet = registry.content.get_sheet(item,
+                                            adhocracy_core.sheets.tags.ITags)
+    request = options.get('request', None)
+    tags_sheet.set({'LAST': version}, request=request)
 
 
 def notify_new_itemversion_created(context, registry, options):
@@ -88,7 +108,8 @@ itemversion_meta = resource_meta._replace(
                   adhocracy_core.sheets.versions.IVersionable,
                   ),
     extended_sheets=(),
-    after_creation=(notify_new_itemversion_created,),
+    after_creation=(update_last_tag,  # needs to run first, see docstring.
+                    notify_new_itemversion_created),
     use_autonaming=True,
     autonaming_prefix='VERSION_',
 )

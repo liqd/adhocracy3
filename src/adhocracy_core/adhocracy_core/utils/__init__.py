@@ -312,15 +312,10 @@ def unflatten_multipart_request(request: Request) -> dict:
 def get_last_version(resource: IItemVersion,
                      registry: Registry) -> IItemVersion:
     """Get last version of  resource' according to the last tag."""
-    from adhocracy_core.sheets.tags import ITag  # prevent circle imports
+    from adhocracy_core.sheets.tags import ITags  # prevent circle imports
     item = find_interface(resource, IItem)
-    if item is None:
-        return
-    last_tag = item['LAST']
-    last_versions = get_sheet_field(last_tag, ITag, 'elements',
-                                    registry=registry)
-    last_version = [x for x in last_versions][0]
-    return last_version
+    last = get_sheet_field(item, ITags, 'LAST', registry=registry)
+    return last
 
 
 def get_changelog_metadata(resource, registry) -> ChangelogMetadata:
@@ -354,7 +349,7 @@ def get_following_new_version(registry, resource) -> IResource:
     return new_version
 
 
-def get_last_new_version(registry, resource) -> IResource:
+def get_last_new_version_in_transaction(registry, resource) -> IResource:
     """Return last new version created in this transaction."""
     item = find_interface(resource, IItem)
     item_changelog = get_changelog_metadata(item, registry)

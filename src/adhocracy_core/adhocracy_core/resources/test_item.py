@@ -72,30 +72,26 @@ class TestItem:
         return inst
 
     def test_create(self, context, registry):
-        from adhocracy_core.sheets.tags import ITag as ITagS
+        from adhocracy_core.sheets.tags import ITags
 
         item = self.make_one(context, registry)
 
         version0 = item['VERSION_0000000']
         assert IItemVersion.providedBy(version0)
-        first_tag = item['FIRST']
-        assert ITag.providedBy(first_tag)
-        last_tag = item['LAST']
-        assert ITag.providedBy(last_tag)
-        first_targets = context.__graph__.get_references_for_isheet(first_tag, ITagS)['elements']
-        assert first_targets == [version0]
-        last_targets = context.__graph__.get_references_for_isheet(last_tag, ITagS)['elements']
-        assert last_targets == [version0]
+        tags_sheet = registry.content.get_sheet(item, ITags)
+        first = tags_sheet.get()['FIRST']
+        last = tags_sheet.get()['LAST']
+        assert first == version0
+        assert last == version0
 
     def test_update_last_tag(self, context, registry):
         """Test that LAST tag is updated correctly."""
-        from adhocracy_core.sheets.tags import ITag as ITagS
+        from adhocracy_core.sheets.tags import ITags
         item = self.make_one(context, registry)
         version0 = item['VERSION_0000000']
 
         version1 = make_itemversion(parent=item, follows=[version0])
 
-        last_tag = item['LAST']
-        last_targets = context.__graph__.get_references_for_isheet(last_tag, ITagS)['elements']
-        assert last_targets == [version1]
-
+        tags_sheet = registry.content.get_sheet(item, ITags)
+        last = tags_sheet.get()['LAST']
+        assert last == version1
