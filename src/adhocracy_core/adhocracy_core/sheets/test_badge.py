@@ -193,6 +193,11 @@ class TestCreateUniqueBadgeAssignmentValidator:
 class TestBadgeAssignmentsSheet:
 
     @fixture
+    def badge(self):
+        from .badge import IBadge
+        return testing.DummyResource(__provides__=IBadge)
+
+    @fixture
     def meta(self):
         from adhocracy_core.sheets.badge import badge_assignment_meta
         return badge_assignment_meta
@@ -245,11 +250,51 @@ class TestBadgeAssignmentsSheet:
         mock_create_assignment_validator\
             .assert_called_with(inst.schema['badge'], inst.schema['object'], {})
 
+    def test_validate_bade_validator(self, inst):
+        from .badge import deferred_validate_badge
+        node = inst.schema['badge']
+        assert node.validator == deferred_validate_badge
+
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta):
         from adhocracy_core.utils import get_sheet
         context = testing.DummyResource(__provides__=meta.isheet)
         assert get_sheet(context, meta.isheet)
+
+
+class TestDeferredValidateBadge:
+
+    def call_fut(self, *args):
+        from .badge import deferred_validate_badge
+        return deferred_validate_badge(*args)
+
+    def test_validate_reftype(self, node, request_, context):
+        from adhocracy_core.schema import validate_reftype
+        validator = self.call_fut(node, {'request': request_,
+                                         'context': context})
+        assert validator.validators[0] == validate_reftype
+
+    def test_validate_permission_ignore_if_allowed(self, node, request_,
+                                                   context):
+        request_.has_permission = Mock(return_value=True)
+        validator = self.call_fut(node, {'request': request_,
+                                         'context': context})
+        badge = testing.DummyResource()
+        permission_validator = validator.validators[1]
+        permission_validator(node, badge)
+        request_.has_permission.assert_called_with('assign_badge', badge)
+
+    def test_validate_permission_ignore_if_allowed(self, node, request_,
+                                                   context):
+        from colander import Invalid
+        request_.has_permission = Mock(return_value=False)
+        validator = self.call_fut(node, {'request': request_,
+                                         'context': context})
+        badge = testing.DummyResource(__name__='badge')
+        permission_validator = validator.validators[1]
+        with raises(Invalid) as error:
+            permission_validator(node, badge)
+        assert str(error.value).endswith("permission for: badge'}")
 
 
 class TestBadgeSheet:
