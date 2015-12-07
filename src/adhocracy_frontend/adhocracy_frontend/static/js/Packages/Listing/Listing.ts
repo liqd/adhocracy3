@@ -156,7 +156,8 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 $scope.createPath = adhPreliminaryNames.nextPreliminary();
 
                 var getElements = (count? : boolean, limit? : number, offset? : number) : angular.IPromise<Container> => {
-                    var params = <any>_.extend({}, $scope.params);
+                    var params = {};
+
                     if (typeof $scope.contentType !== "undefined") {
                         params.content_type = $scope.contentType;
                         if (_.endsWith($scope.contentType, "Version")) {
@@ -164,6 +165,9 @@ export class Listing<Container extends ResourcesBase.Resource> {
                             params.tag = "LAST";
                         }
                     }
+
+                    _.extend(params, $scope.params);
+
                     if ($scope.facets) {
                         $scope.facets.forEach((facet : IFacet) => {
                             facet.items.forEach((item : IFacetItem) => {
