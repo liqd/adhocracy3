@@ -10,8 +10,6 @@ var MercatorProposalDetailPage = require("./MercatorProposalDetailPage.js");
 var MercatorProposalListing = function() {
     this.listing = element(by.tagName("adh-mercator-2015-proposal-listing"));
 
-    this.columns = element.all(by.tagName("adh-moving-column"));
-
     this.get = function() {
         browser.get("/r/mercator/");
         return this;
