@@ -114,7 +114,7 @@ class Messenger:
                    }
         subject = _('mail_abuse_complaint_subject',
                     mapping=mapping,
-                    default='[${site_name} Abuse Complaint')
+                    default='${site_name} Abuse Complaint')
         body = render('adhocracy_core:templates/abuse_complaint.txt.mako',
                       mapping)
         # FIXME For security reasons, we should check that the url starts
@@ -144,7 +144,7 @@ class Messenger:
                    'text': text}
         subject = _('mail_sent_message_to_user_subject',
                     mapping=mapping,
-                    default='[${site_name}] Message from ${sender_name}: '
+                    default='${site_name} Message from ${sender_name}: '
                             '${title}')
         body = _('mail_sent_message_to_user_body_txt',
                  mapping=mapping,
