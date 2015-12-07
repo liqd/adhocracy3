@@ -94,7 +94,7 @@ export var register = () => {
                 adapter.poolPath.and.returnValue(poolPath);
 
                 var listing = new AdhListing.Listing(adapter);
-                var directive: angular.IDirective = listing.createDirective(config, adhWebSocketMock);
+                var directive : angular.IDirective = listing.createDirective(config, adhWebSocketMock);
 
                 registerDirectiveSpec(directive);
 
@@ -159,7 +159,7 @@ export var register = () => {
                         });
 
                         it("updates scope.container from server", () => {
-                            expect(adhHttpMock.get).toHaveBeenCalledWith(path, {count: "true"}, {warmupPoolCache: undefined});
+                            expect(adhHttpMock.get).toHaveBeenCalledWith(path, {count: "true"}, {warmupPoolCache: true});
                             expect(scope.container).toBe(container);
                         });
 
@@ -187,7 +187,7 @@ export var register = () => {
                             expect(adhHttpMock.get).toHaveBeenCalledWith(path, {
                                 content_type: "some_content_type",
                                 count: "true"
-                            }, {warmupPoolCache: undefined});
+                            }, {warmupPoolCache: true});
                             expect(scope.container).toBe(container);
                         });
                     });
