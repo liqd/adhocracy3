@@ -88,6 +88,9 @@ export interface ListingScope<Container> extends angular.IScope {
     onCreate : () => void;
     toggleFilter : () => void;
     toggleSort : () => void;
+    enableItem : (facet : IFacet, item : IFacetItem) => void;
+    toggleItem : (facet : IFacet, item : IFacetItem, event) => void;
+    disableItem : (facet : IFacet, item : IFacetItem) => void;
     setSort : (sort : string) => void;
 }
 
@@ -201,7 +204,31 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     $scope.showSort = !$scope.showSort;
                 };
 
-                $scope.update = () : angular.IPromise<void> => {
+                $scope.enableItem = (facet : IFacet, item : IFacetItem) => {
+                    if (!item.enabled) {
+                        facet.items.forEach((_item : IFacetItem) => {
+                            _item.enabled = (item === _item);
+                        });
+                        $scope.update();
+                    }
+                };
+                $scope.disableItem = (facet : IFacet, item : IFacetItem) => {
+                    if (item.enabled) {
+                        item.enabled = false;
+                        $scope.update();
+                    }
+                };
+                $scope.toggleItem = (facet : IFacet, item : IFacetItem, event) => {
+                    event.stopPropagation();
+                    if (item.enabled) {
+                        $scope.disableItem(facet, item);
+                    } else {
+                        $scope.enableItem(facet, item);
+                    }
+                };
+
+                $scope.update = (warmup? : boolean) : angular.IPromise<void> => {
+
                     if ($scope.initialLimit) {
                         if (!$scope.currentLimit) {
                             $scope.currentLimit = $scope.initialLimit;
@@ -294,33 +321,11 @@ export var facets = (adhConfig : AdhConfig.IService) => {
         restrict: "E",
         scope: {
             facets: "=",
-            update: "="
+            update: "=",
+            toggleItem: "=",
+            disableItem: "=",
+            enableItem: "="
         },
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Facets.html",
-        link: (scope : IFacetsScope) => {
-
-            scope.enableItem = (facet : IFacet, item : IFacetItem) => {
-                if (!item.enabled) {
-                    facet.items.forEach((_item : IFacetItem) => {
-                        _item.enabled = (item === _item);
-                    });
-                    scope.update();
-                }
-            };
-            scope.disableItem = (facet : IFacet, item : IFacetItem) => {
-                if (item.enabled) {
-                    item.enabled = false;
-                    scope.update();
-                }
-            };
-            scope.toggleItem = (facet : IFacet, item : IFacetItem, event) => {
-                event.stopPropagation();
-                if (item.enabled) {
-                    scope.disableItem(facet, item);
-                } else {
-                    scope.enableItem(facet, item);
-                }
-            };
-        }
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Facets.html"
     };
 };

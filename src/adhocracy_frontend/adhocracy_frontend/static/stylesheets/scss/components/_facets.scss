@@ -44,3 +44,29 @@
     @include rem(padding, 1rem);
     border-bottom: 2px solid $color-structure-normal;
 }
+
+.facet-toggle {
+    @include ellipsis(12em);
+    @include inline-block;
+    @include rem(left, -18px);
+    @include rem(line-height, 20px);
+    @include rem(margin-right, 10px);
+    @include rem(padding, 0 10px);
+    background: $color-brand-one-introvert;
+    color: $color-background-base;
+    padding-right: 1.5em;
+    position: relative;
+    text-decoration: none;
+    text-transform: uppercase;
+
+    &:hover, &:focus {
+        background: $color-brand-one-normal;
+        color: $color-background-base;
+    }
+
+    .facet-cancel {
+        text-transform: none;
+        position: absolute;
+        right: 0.5em;
+    }
+}
