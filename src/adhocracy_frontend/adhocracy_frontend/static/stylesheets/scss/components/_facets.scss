@@ -46,12 +46,15 @@
 }
 
 .facet-toggle {
+    @include ellipsis(12em);
     @include inline-block;
     @include rem(line-height, 20px);
     @include rem(margin-right, 10px);
     @include rem(padding, 0 10px);
     background: $color-brand-one-introvert;
     color: $color-background-base;
+    padding-right: 1.5em;
+    position: relative;
     text-decoration: none;
     text-transform: uppercase;
 
@@ -62,6 +65,8 @@
 
     .facet-cancel {
         text-transform: none;
+        position: absolute;
+        right: 0.5em;
     }
 }
 

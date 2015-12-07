@@ -4,6 +4,7 @@
         <span class="facet-group" data-ng-repeat="facet in facets">
             <a
                 href=""
+                title="{{ item.name | translate }}"
                 data-ng-repeat="item in facet.items"
                 data-ng-if="item.enabled"
                 data-ng-click="toggleItem(facet, item, $event)"
