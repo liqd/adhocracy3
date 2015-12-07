@@ -7,13 +7,6 @@ from pytest import mark
 from unittest.mock import Mock
 
 
-@fixture
-def integration(config):
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.sheets.badge')
-
-
 class TestBadgeableSheet:
 
     @fixture
@@ -92,8 +85,8 @@ class TestCreateUniqueBadgeAssignmentValidator:
         monkeypatch.setattr(badge, 'find_service', mock)
         return mock
 
-    def test_raise_if_assignment_already_exists(
-            self, node, context, registry, mock_sheet):
+    def test_raise_if_assignment_already_exists(self, node, context, registry,
+                                                mock_sheet):
         import colander
         from .badge import IBadge
         from .badge import IBadgeAssignment
@@ -110,10 +103,7 @@ class TestCreateUniqueBadgeAssignmentValidator:
             validator(node, {'badge': badge,
                              'object': node['object']})
 
-
-    def test_no_raise_if_updating(
-            self, node, context, registry, mock_sheet):
-        import colander
+    def test_no_raise_if_updating(self, node, context, registry, mock_sheet):
         from .badge import IBadge
         from .badge import IBadgeAssignment
         badge = testing.DummyResource(__provides__=IBadge)
@@ -163,10 +153,8 @@ class TestCreateUniqueBadgeAssignmentValidator:
             validator(node, {'badge': badge,
                              'object': node['object2']})
 
-
-    def test_no_raise_if_object_different(
-            self, node, context, registry, mock_sheet):
-        import colander
+    def test_no_raise_if_object_different(self, node, context,
+                                          registry, mock_sheet):
         from .badge import IBadge
         from .badge import IBadgeAssignment
         badge = testing.DummyResource(__provides__=IBadge)
@@ -178,11 +166,10 @@ class TestCreateUniqueBadgeAssignmentValidator:
         validator = self.call_fut(node['badge'], node['object'], kw)
         assign0 = testing.DummyResource(__provides__=IBadgeAssignment)
         context['badge_assignments']['assign0'] = assign0
-        assert validator(node, {'badge': badge, 'object': testing.DummyResource()}) is None
+        assert validator(node, {'badge': badge,
+                                'object': testing.DummyResource()}) is None
 
-    def test_valid(
-            self, node, context, registry, mock_sheet):
-        import colander
+    def test_valid(self, node, context, registry, mock_sheet):
         from .badge import IBadge
         from .badge import IBadgeAssignment
         from copy import deepcopy
@@ -193,13 +180,15 @@ class TestCreateUniqueBadgeAssignmentValidator:
         mock_sheet2.get.return_value = {'badge': badge,
                                         'object': testing.DummyResource()}
         mock_sheet3.get.return_value = {'name': 'badge1'}
-        registry.content.get_sheet.side_effect = [mock_sheet, mock_sheet2, mock_sheet3]
+        registry.content.get_sheet.side_effect = [mock_sheet, mock_sheet2,
+                                                  mock_sheet3]
         kw = {'registry': registry, 'context': context}
         validator = self.call_fut(node['badge'], node['object'], kw)
         assign0 = testing.DummyResource(__provides__=IBadgeAssignment)
         context['badge_assignments']['assign0'] = assign0
         assert validator(node, {'badge': badge,
                                 'object': testing.DummyResource()}) is None
+
 
 class TestBadgeAssignmentsSheet:
 
@@ -213,17 +202,18 @@ class TestBadgeAssignmentsSheet:
         return meta.sheet_class(meta, context)
 
     @fixture
-    def mock_create_post_pool_validator(self, monkeypatch):
+    def mock_create_post_validator(self, monkeypatch):
         from . import badge
         mock = Mock(spec=badge.create_post_pool_validator)
         monkeypatch.setattr(badge, 'create_post_pool_validator', mock)
         return mock
 
     @fixture
-    def mock_create_unique_badge_assignment_validator(self, monkeypatch):
+    def mock_create_assignment_validator(self, monkeypatch):
         from . import badge
         mock = Mock(spec=badge.create_unique_badge_assignment_validator)
-        monkeypatch.setattr(badge, 'create_unique_badge_assignment_validator', mock)
+        monkeypatch.setattr(badge, 'create_unique_badge_assignment_validator',
+                            mock)
         return mock
 
     def test_meta(self, meta):
@@ -247,14 +237,13 @@ class TestBadgeAssignmentsSheet:
                               }
 
     def test_validate_object_post_pool(self, inst,
-                                       mock_create_post_pool_validator,
-                                       mock_create_unique_badge_assignment_validator):
+                                       mock_create_post_validator,
+                                       mock_create_assignment_validator):
         inst.schema.validator(inst.schema, {})
-        mock_create_post_pool_validator.assert_called_with(inst.schema['object'],
-                                                           {})
-        mock_create_unique_badge_assignment_validator.assert_called_with(inst.schema['badge'],
-                                                                         inst.schema['object'],
-                                                                         {})
+        mock_create_post_validator.assert_called_with(inst.schema['object'],
+                                                      {})
+        mock_create_assignment_validator\
+            .assert_called_with(inst.schema['badge'], inst.schema['object'], {})
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta):
@@ -372,17 +361,16 @@ class TestGetAssignableBadges:
         context_without_badges_service = testing.DummyResource()
         assert self.call_fut(context_without_badges_service, request_) == []
 
-    def test_all_badges_inside_badges_service(self,
-            mock_catalogs, search_result, query, mock_badges, context, request_):
+    def test_all_badges_inside_badges_service(
+            self, mock_catalogs, search_result, query, mock_badges, context,
+            request_):
         from .badge import IBadge
         badge = testing.DummyResource()
-        mock_catalogs.search.return_value = search_result._replace(elements=[badge])
+        mock_catalogs.search.return_value = search_result\
+            ._replace(elements=[badge])
         assert self.call_fut(context, request_) == [badge]
         assert mock_catalogs.search.call_args[0][0] == query._replace(
             root=mock_badges,
             interfaces=IBadge,
             allows=(request_.effective_principals, 'assign_badge')
             )
-
-
-
