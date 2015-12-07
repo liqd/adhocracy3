@@ -35,3 +35,4 @@ mercator_meta = standard_meta \
 def includeme(config):
     """Add workflow."""
     add_workflow(config.registry, mercator_meta, 'mercator')
+    config.include('.mercator2')
