@@ -46,6 +46,9 @@ def notify_new_itemversion_created(context, registry, options):
                                                         registry,
                                                         creator,
                                                         is_batchmode)
+    if follows == []:
+        _notify_itemversion_has_new_version(None, new_version, registry,
+                                            creator)
 
 
 def _notify_itemversion_has_new_version(old_version, new_version, registry,
