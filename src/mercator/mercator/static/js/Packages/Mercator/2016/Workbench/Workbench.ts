@@ -141,8 +141,8 @@ export var proposalListingColumnDirective = (
             adhHttp.get(processUrl).then((resource) => {
                 var currentPhase = resource.data[SIWorkflow.nick].workflow_state;
 
-                if (typeof scope.shared.facets === "undefined") {
-                    scope.shared.facets = [{
+                if (typeof scope.facets === "undefined") {
+                    scope.facets = [{
                         key: "mercator_location",
                         name: "TR__MERCATOR_PROPOSAL_LOCATION_LABEL",
                         items: [
@@ -162,7 +162,7 @@ export var proposalListingColumnDirective = (
                     }];
 
                     if (currentPhase === "result") {
-                        scope.shared.facets.push({
+                        scope.facets.push({
                             key: "badge",
                             name: "TR__MERCATOR_BADGE_AWARDS_LABEL",
                             items: [
@@ -173,9 +173,9 @@ export var proposalListingColumnDirective = (
                     }
                 }
 
-                scope.shared.sort = "item_creation_date";
-                scope.shared.setSort = (sort : string) => {
-                    scope.shared.sort = sort;
+                scope.sort = "item_creation_date";
+                scope.setSort = (sort : string) => {
+                    scope.sort = sort;
                 };
                 scope.initialLimit = 50;
 
