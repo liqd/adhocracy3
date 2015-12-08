@@ -267,8 +267,6 @@ export var commentDetailDirective = (
         require: "?^adhMovingColumn",
         scope: {
             path: "@",
-            frontendOrderPredicate: "=?",
-            frontendOrderReverse: "=?",
             onSubmit: "=?"
         },
         compile: (element) => {

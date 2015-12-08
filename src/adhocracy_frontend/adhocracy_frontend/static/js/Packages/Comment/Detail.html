@@ -77,8 +77,6 @@
         <adh-comment
             data-ng-repeat="comment in data.comments | orderBy:frontendOrderPredicate:frontendOrderReverse"
             data-path="{{comment}}"
-            data-frontend-order-predicate="frontendOrderPredicate"
-            data-frontend-order-reverse="frontendOrderReverse"
             data-on-submit="update">
         </adh-comment>
     </div>
