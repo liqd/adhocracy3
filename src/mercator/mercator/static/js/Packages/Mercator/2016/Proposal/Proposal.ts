@@ -44,46 +44,47 @@ var pkgLocation = "/Mercator/2016/Proposal";
 
 
 export interface IData {
-    user_info : {
-        first_name : string;
-        last_name : string;
+    userInfo : {
+        firstName : string;
+        lastName : string;
     };
-    organization_info : {
+    organizationInfo : {
         name : string;
         email : string;
         website : string;
         city : string;
         country : string;
-        status_enum : string;
-        status_other : string;
-        date_of_foreseen_registration : string;
-        date_of_registration : string;
-        how_can_we_help_you : string;
+        status : string;
+        otherText : string;
+        registrationDate : string;
+        helpRequest : string;
     };
     title : string;
     introduction : {
-        teaser : string;
+        pitch : string;
         imageUpload : any;
         picture : any;
     };
-    partners : boolean;
-    partner1 : {
-        name : string;
-        country : string;
-        website : string;
+    partners : {
+        hasPartners : boolean;
+        partner1 : {
+            name : string;
+            country : string;
+            website : string;
+        };
+        partner2 : {
+            name : string;
+            country : string;
+            website : string;
+        };
+        partner3 : {
+            name : string;
+            country : string;
+            website : string;
+        };
+        hasOther : boolean;
+        otherText : string;
     };
-    partner2 : {
-        name : string;
-        country : string;
-        website : string;
-    };
-    partner3 : {
-        name : string;
-        country : string;
-        website : string;
-    };
-    morePartners : boolean;
-    partners_more : string;
     topic : {
         democracy : boolean;
         culture : boolean;
@@ -109,22 +110,22 @@ export interface IData {
     status : string;
     impact : {
         challenge : string;
-        aim : string;
+        goal : string;
         plan : string;
-        targetgroup : string;
+        target : string;
         team : string;
-        whatelse : string;
+        extraInfo : string;
     };
     criteria : {
         strengthen : string;
-        different : string;
+        difference : string;
         practical : string;
     };
     finance : {
         budget : number;
-        requested_funding : number;
+        requestedFunding : number;
         major : string;
-        other_sources : string;
+        otherSources : string;
         secured : boolean;
         experience : string;
     };
@@ -132,7 +133,7 @@ export interface IData {
         facebook : boolean;
         newsletter : boolean;
         other : boolean;
-        other_specify : string;
+        otherText : string;
         personal_contact : boolean;
         twitter : boolean;
         website : boolean;
@@ -146,19 +147,19 @@ var fill = (data : IData, resource) => {
         case RIMercatorProposal.content_type:
             resource.data[SIMercatorSubResources.nick] = new SIMercatorSubResources.Sheet(<any>{});
             resource.data[SIUserInfo.nick] = new SIUserInfo.Sheet({
-                first_name: data.user_info.first_name,
-                last_name: data.user_info.last_name
+                first_name: data.userInfo.firstName,
+                last_name: data.userInfo.lastName
             });
             resource.data[SIOrganizationInfo.nick] = new SIOrganizationInfo.Sheet({
-                name: data.organization_info.name,
-                city: data.organization_info.city,
-                country: data.organization_info.country,
-                help_request: data.organization_info.how_can_we_help_you,
-                registration_date: data.organization_info.date_of_registration,
-                website: data.organization_info.website,
-                contact_email: data.organization_info.email,
-                status: data.organization_info.status_enum,
-                status_other: data.organization_info.status_other
+                name: data.organizationInfo.name,
+                city: data.organizationInfo.city,
+                country: data.organizationInfo.country,
+                help_request: data.organizationInfo.helpRequest,
+                registration_date: data.organizationInfo.registrationDate,
+                website: data.organizationInfo.website,
+                contact_email: data.organizationInfo.email,
+                status: data.organizationInfo.status,
+                status_other: data.organizationInfo.otherText
             });
             resource.data[SITopic.nick] = new SITopic.Sheet({
                 topic: null,  // FIXME
@@ -178,17 +179,17 @@ var fill = (data : IData, resource) => {
             });
             resource.data[SIFinancialPlanning.nick] = new SIFinancialPlanning.Sheet({
                 budget: data.finance.budget,
-                requested_funding: data.finance.requested_funding,
+                requested_funding: data.finance.requestedFunding,
                 major_expenses: data.finance.major
             });
             resource.data[SIExtraFunding.nick] = new SIExtraFunding.Sheet({
-                other_sources: data.finance.other_sources,
+                other_sources: data.finance.otherSources,
                 secured: data.finance.secured
             });
             resource.data[SICommunity.nick] = new SICommunity.Sheet({
                 expected_feedback: null,  // FIXME
                 heard_from: null,  // FIXME
-                heard_from_other: data.heardFrom.other_specify
+                heard_from_other: data.heardFrom.otherText
             });
             resource.data[SIWinnerInfo.nick] = new SIWinnerInfo.Sheet({
                 explanation: null,  // FIXME
@@ -197,22 +198,22 @@ var fill = (data : IData, resource) => {
             break;
         case RIPitch.content_type:
             resource.data[SIPitch.nick] = new SIPitch.Sheet({
-                pitch: data.introduction.teaser
+                pitch: data.introduction.pitch
             });
             break;
         case RIPartners.content_type:
             resource.data[SIPartners.nick] = new SIPartners.Sheet({
-                has_partners: data.partners,
-                partner1_name: data.partner1.name,
-                partner1_website: data.partner1.website,
-                partner1_country: data.partner1.country,
-                partner2_name: data.partner2.name,
-                partner2_website: data.partner2.website,
-                partner2_country: data.partner2.country,
-                partner3_name: data.partner3.name,
-                partner3_website: data.partner3.website,
-                partner3_country: data.partner3.country,
-                other_partners: data.partners_more
+                has_partners: data.partners.hasPartners,
+                partner1_name: data.partners.partner1.name,
+                partner1_website: data.partners.partner1.website,
+                partner1_country: data.partners.partner1.country,
+                partner2_name: data.partners.partner2.name,
+                partner2_website: data.partners.partner2.website,
+                partner2_country: data.partners.partner2.country,
+                partner3_name: data.partners.partner3.name,
+                partner3_website: data.partners.partner3.website,
+                partner3_country: data.partners.partner3.country,
+                other_partners: data.partners.otherText
             });
             break;
         case RIDuration.content_type:
@@ -227,7 +228,7 @@ var fill = (data : IData, resource) => {
             break;
         case RIGoal.content_type:
             resource.data[SIGoal.nick] = new SIGoal.Sheet({
-                goal: data.impact.aim
+                goal: data.impact.goal
             });
             break;
         case RIPlan.content_type:
@@ -237,7 +238,7 @@ var fill = (data : IData, resource) => {
             break;
         case RITarget.content_type:
             resource.data[SITarget.nick] = new SITarget.Sheet({
-                target: data.impact.targetgroup
+                target: data.impact.target
             });
             break;
         case RITeam.content_type:
@@ -247,12 +248,12 @@ var fill = (data : IData, resource) => {
             break;
         case RIExtraInfo.content_type:
             resource.data[SIExtraInfo.nick] = new SIExtraInfo.Sheet({
-                extrainfo: data.impact.whatelse
+                extrainfo: data.impact.extraInfo
             });
             break;
         case RIDifference.content_type:
             resource.data[SIDifference.nick] = new SIDifference.Sheet({
-                difference: data.criteria.different
+                difference: data.criteria.difference
             });
             break;
         case RIPracticalRelevance.content_type:
@@ -320,9 +321,11 @@ export var mercatorProposalFormController2016 = (
         user_info: {},
         organization_info: {},
         introduction: {},
-        partner1: {},
-        partner2: {},
-        partner3: {},
+        partners: {
+            partner1: {},
+            partner2: {},
+            partner3: {}
+        },
         topic: {},
         location: {},
         impact: {},
