@@ -58,6 +58,13 @@ export interface IFacet {
     items : IFacetItem[];
 }
 
+export interface ISortItem {
+    key : string;
+    name : string;
+    index : string;
+    reverse? : boolean;
+}
+
 export type IPredicate = string | {[key : string]: string}
 
 export interface ListingScope<Container> extends angular.IScope {
@@ -65,8 +72,7 @@ export interface ListingScope<Container> extends angular.IScope {
     contentType? : string;
     facets? : IFacet[];
     sort? : string;
-    sorts? : string[];
-    reverse? : boolean;
+    sorts? : ISortItem[];
     initialLimit? : number;
     currentLimit? : number;
     totalCount? : number;
@@ -130,7 +136,6 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 facets: "=?",
                 sort: "=?",
                 sorts: "=?",
-                reverse: "=?",
                 initialLimit: "=?",
                 frontendOrderPredicate: "=?",
                 frontendOrderReverse: "=?",
@@ -178,10 +183,11 @@ export class Listing<Container extends ResourcesBase.Resource> {
                         });
                     }
                     if ($scope.sort) {
-                        params["sort"] = $scope.sort;
-                        if ($scope.reverse) {
-                            params["reverse"] = $scope.reverse;
-                        }
+                        var sortItem = _.find($scope.sorts, (sortItem) => {
+                            return sortItem.key === key;
+                        });
+                        params.sort = sortItem.index;
+                        params.reverse = !!sortItem.reverse;
                     }
                     if (limit) {
                         params["limit"] = limit;

@@ -22,9 +22,9 @@
             <a
                 href=""
                 class="button-cta-secondary sort-item"
-                data-ng-repeat="(key, name) in sorts"
-                data-ng-click="setSort(key)"
-                data-ng-class="{'is-active': sort === key }">{{ name | uppercase | translate }}
+                data-ng-repeat="sortItem in sorts"
+                data-ng-click="setSort(sortItem.key)"
+                data-ng-class="{'is-active': sortItem.key === sort }">{{ sortItem.name | uppercase | translate }}
             </a>
         </div>
     </div>

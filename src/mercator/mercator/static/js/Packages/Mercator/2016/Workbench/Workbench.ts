@@ -125,10 +125,17 @@ export var proposalListingColumnDirective = (
             column.bindVariablesAndClear(scope, ["platformUrl", "proposalUrl"]);
             scope.contentType = RIProposal.content_type;
 
-            scope.sorts = {
-                rates: "TR__RATES",
-                item_creation_date: "TR__CREATION_DATE"
-            };
+            scope.sorts = [{
+                key: "rates",
+                name: "TR__RATES",
+                index: "rates",
+                reverse: true
+            }, {
+                key: "item_creation_date",
+                name: "TR__CREATION_DATE",
+                index: "item_creation_date",
+                reverse: true
+            }];
 
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
@@ -167,7 +174,6 @@ export var proposalListingColumnDirective = (
                 }
 
                 scope.shared.sort = "item_creation_date";
-                scope.shared.reverse = true;
                 scope.shared.setSort = (sort : string) => {
                     scope.shared.sort = sort;
                 };
