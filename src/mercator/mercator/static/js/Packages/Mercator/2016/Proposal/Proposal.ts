@@ -6,6 +6,104 @@ import * as AdhConfig from "../../../Config/Config";
 var pkgLocation = "/Mercator/2016/Proposal";
 
 
+export interface IData {
+    user_info : {
+        first_name : string;
+        last_name : string;
+    };
+    organization_info : {
+        name : string;
+        email : string;
+        website : string;
+        city : string;
+        country : string;
+        status_enum : string;
+        status_other : string;
+        date_of_foreseen_registration : string;
+        date_of_registration : string;
+        how_can_we_help_you : string;
+    };
+    title : string;
+    introduction : {
+        teaser : string;
+        imageUpload : any;
+        picture : any;
+    };
+    partners : boolean;
+    partner1 : {
+        name : string;
+        country : string;
+        website : string;
+    };
+    partner2 : {
+        name : string;
+        country : string;
+        website : string;
+    };
+    partner3 : {
+        name : string;
+        country : string;
+        website : string;
+    };
+    morePartners : boolean;
+    partners_more : string;
+    topic : {
+        democracy : boolean;
+        culture : boolean;
+        environment : boolean;
+        social : boolean;
+        migration : boolean;
+        community : boolean;
+        urban : boolean;
+        education : boolean;
+        other : boolean;
+        otherText : string;
+    };
+    duration : number;
+    location : {
+        location_is_linked_to_ruhr : boolean;
+        location_is_linked_to_ruhr_text : string;
+        location_is_online : boolean;
+        location_is_specific : boolean;
+        location_specific_1 : string;
+        location_specific_2 : string;
+        location_specific_3 : string;
+    };
+    status : string;
+    impact : {
+        challenge : string;
+        aim : string;
+        plan : string;
+        targetgroup : string;
+        team : string;
+        whatelse : string;
+    };
+    criteria : {
+        strengthen : string;
+        different : string;
+        practical : string;
+    };
+    finance : {
+        budget : number;
+        requested_funding : number;
+        major : string;
+        other_sources : string;
+        secured : boolean;
+        experience : string;
+    };
+    heardFrom : {
+        facebook : boolean;
+        newsletter : boolean;
+        other : boolean;
+        other_specify : string;
+        personal_contact : boolean;
+        twitter : boolean;
+        website : boolean;
+    };
+    acceptDisclaimer : boolean;
+}
+
+
 export var createDirective = (
     adhConfig : AdhConfig.IService,
     flowFactory
