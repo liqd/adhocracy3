@@ -182,13 +182,28 @@ export class Listing<Container extends ResourcesBase.Resource> {
                             });
                         });
                     }
-                    if ($scope.sort) {
-                        var sortItem = _.find($scope.sorts, (sortItem) => {
-                            return sortItem.key === key;
-                        });
+
+                    var sortItem;
+                    if ($scope.sorts && $scope.sorts.length > 0) {
+                        if ($scope.sort) {
+                            sortItem = _.find($scope.sorts, (sortItem) => {
+                                return sortItem.key === $scope.sort;
+                            });
+                            if (!sortItem) {
+                                console.log("Unknown listing sort '" + $scope.sort + "'. Switching to default.");
+                                sortItem = $scope.sorts[0];
+                                $scope.sort = sortItem.key;
+                            }
+                        } else {
+                            sortItem = $scope.sorts[0];
+                            $scope.sort = sortItem.key;
+                        }
+                    }
+                    if (sortItem) {
                         params.sort = sortItem.index;
                         params.reverse = !!sortItem.reverse;
                     }
+
                     if (limit) {
                         params.limit = limit;
                         if (offset) {
