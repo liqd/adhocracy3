@@ -85,8 +85,6 @@ export interface ListingScope<Container> extends angular.IScope {
     poolOptions : AdhHttp.IOptions;
     createPath? : string;
     elements : string[];
-    frontendOrderPredicate : IPredicate;
-    frontendOrderReverse : boolean;
     update : (boolean?) => angular.IPromise<void>;
     loadMore : () => void;
     wsOff : () => void;
@@ -137,8 +135,6 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 sort: "=?",
                 sorts: "=?",
                 initialLimit: "=?",
-                frontendOrderPredicate: "=?",
-                frontendOrderReverse: "=?",
                 params: "=?",
                 noCreateForm: "=?",
                 emptyText: "@"
@@ -263,23 +259,14 @@ export class Listing<Container extends ResourcesBase.Resource> {
                         $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
                         $scope.totalCount = _self.containerAdapter.totalCount($scope.container);
 
-                        // FIXME: Sorting direction should be implemented in backend, working on a copy is used,
-                        // because otherwise sometimes the already reversed sorted list (from cache) would be
-                        // reversed again
-                        var elements = _.clone(_self.containerAdapter.elemRefs($scope.container));
+                        // avoid modifying the cached result
+                        $scope.elements = _.clone(_self.containerAdapter.elemRefs($scope.container));
 
-                        // trying to maintain compatible with builtin orderBy functionality, but
-                        // allow to not specify predicate or reverse.
-                        if ($scope.frontendOrderPredicate) {
-                            $scope.elements = $filter("orderBy")(
-                                elements,
-                                $scope.frontendOrderPredicate,
-                                $scope.frontendOrderReverse
-                            );
-                        } else if ($scope.frontendOrderReverse) {
-                            $scope.elements = elements.reverse();
-                        } else {
-                            $scope.elements = elements;
+                        if (!$scope.sorts || $scope.sorts.length === 0) {
+                            // If no backend based sorting is used, we
+                            // apply some sorting to get consistent
+                            // results across requests.
+                            $scope.elements = _.sortBy($scope.elements).reverse();
                         }
                     });
                 };
