@@ -896,6 +896,13 @@ def app_god(app):
     return AppUser(app, header=god_header)
 
 
+@fixture(scope='class')
+def mailer(app) -> TestApp:
+    """Return :class:`pyramid_mailer.mailer.DummyMailer` of `app` fixture."""
+    mailer = app.registry.messenger.mailer
+    return mailer
+
+
 @fixture
 def datadir(tmpdir, request):
     """Fixture to access tests data.

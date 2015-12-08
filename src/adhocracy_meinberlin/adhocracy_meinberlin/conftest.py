@@ -23,4 +23,5 @@ def integration(integration):
     integration.include('adhocracy_meinberlin.sheets')
     integration.include('adhocracy_meinberlin.resources')
     integration.include('adhocracy_meinberlin.workflows')
+    integration.include('adhocracy_meinberlin.content')
     return integration

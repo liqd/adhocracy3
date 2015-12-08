@@ -65,15 +65,8 @@ export var register = (angular) => {
         }])
         .directive("adhMercator2016ProposalCreate", [
             "adhConfig",
-            "adhHttp",
-            "adhPreliminaryNames",
-            "adhTopLevelState",
-            "adhGetBadges",
-            "adhUploadImage",
             "flowFactory",
-            "moment",
-            "$window",
-            "$location",
-            "$q",
-            Proposal.createDirective]);
+            Proposal.createDirective])
+        .controller("mercatorProposalFormController2016", [
+            "$scope", "$element", "$window", "adhShowError", Proposal.mercatorProposalFormController2016]);
 };
