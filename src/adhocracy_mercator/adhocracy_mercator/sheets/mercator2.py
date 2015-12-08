@@ -158,9 +158,8 @@ class TopicSchema(colander.MappingSchema):
         if topic == 'other':
             if not value.get('other', None):
                 other = node['other']
-                raise colander.Invalid(
-                    other,
-                    msg='Required iff topic == other')
+                raise colander.Invalid(other,
+                                       msg='Required iff topic == other')
 
 topic_meta = sheet_meta._replace(
     isheet=ITopic,
