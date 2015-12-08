@@ -162,14 +162,15 @@ form[name]
                                     type="email"
                                     data-ng-model="data.organization_info.email"
                                     name="organization-info-email"
-                                    data-required="required" />
+                                    data-required="required"
+                                    ng-pattern="/^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/" />
                                 <span
                                     class="input-error"
                                     data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-email'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_EMAIL_2016" | translate }}</span>
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-email'], 'email')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-email'], 'pattern')">
                                     {{ "TR__ERROR_INVALID_EMAIL_2016" | translate }}</span>
                             </label>
 
