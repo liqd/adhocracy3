@@ -415,13 +415,13 @@ class TestMercator2IndexTopic:
         from .adhocracy import mercator2_index_topic
         return mercator2_index_topic(*args)
 
-    def test_return_default_if_topic_none(self, context, mock_topic_sheet):
-        mock_topic_sheet.get.return_value = {'topic': None}
+    def test_return_default_if_topic_empty(self, context, mock_topic_sheet):
+        mock_topic_sheet.get.return_value = {'topic': []}
         assert self.call_fut(context, 'default') == 'default'
 
     def test_return_topic(self, context, mock_topic_sheet):
-        mock_topic_sheet.get.return_value = {'topic': 'other'}
-        assert self.call_fut(context, 'default') == ['other']
+        mock_topic_sheet.get.return_value = {'topic': ['other', 'bla']}
+        assert self.call_fut(context, 'default') == ['other', 'bla']
 
     @mark.usefixtures('integration')
     def test_register(self, registry):

@@ -266,7 +266,11 @@ class TestTopicSchema:
 
     @fixture
     def cstruct_required(self):
-        return {'topic': 'urban_development'}
+        return {'topic': ['urban_development']}
+
+    def test_serialize_empty(self, inst):
+        assert inst.bind().serialize() == {'topic': [],
+                                           'other': ''}
 
     def test_deserialize_empty(self, inst):
         from colander import Invalid
@@ -275,27 +279,41 @@ class TestTopicSchema:
             inst.deserialize(cstruct)
         assert error.value.asdict() == {'topic': 'Required'}
 
+    def test_deserialize_with_gt_2_topics(self, inst, cstruct_required):
+        from colander import Invalid
+        cstruct_required['topic'] = ['education', 'migration', 'communities']
+        with raises(Invalid) as error:
+            inst.deserialize(cstruct_required)
+        assert error.value.asdict() == {'topic': 'Longer than maximum length 2'}
+
+    def test_deserialize_with_duplicated_topics(self, inst, cstruct_required):
+        from colander import Invalid
+        cstruct_required['topic'] = ['migration', 'migration']
+        with raises(Invalid) as error:
+            inst.deserialize(cstruct_required)
+        assert error.value.asdict() == {'topic': 'Duplicates are not allowed'}
+
     def test_deserialize_with_required(self, inst, cstruct_required):
         assert inst.deserialize(cstruct_required) == \
-            {'topic': 'urban_development'}
+            {'topic': ['urban_development']}
 
     def test_deserialize_with_status_other_and_no_text(
             self, inst, cstruct_required):
         from colander import Invalid
         cstruct = cstruct_required
-        cstruct['topic'] = 'other'
+        cstruct['topic'] = ['other', 'urban_development']
         with raises(Invalid) as error:
             inst.deserialize(cstruct)
         assert error.value.asdict() == {'other':
-                                        'Required iff topic == other'}
+                                        'Required if "other" in topic'}
 
     def test_deserialize_with_status_other(
             self, inst, cstruct_required):
         cstruct = cstruct_required
-        cstruct['topic'] = 'other'
+        cstruct['topic'] = ['other', 'urban_development']
         cstruct['other'] = 'Blabla'
         assert inst.deserialize(cstruct_required) == \
-            {'topic': 'other',
+            {'topic': ['other', 'urban_development'],
              'other': 'Blabla'}
 
 

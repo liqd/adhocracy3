@@ -119,9 +119,9 @@ def mercator2_index_budget(resource: IResource, default) -> str:
 def mercator2_index_topic(resource: IResource, default) -> [str]:
     """Return search index keywords based on the "topic" field."""
     topic = get_sheet_field(resource, sheets.mercator2.ITopic, 'topic')
-    if topic is None:
+    if topic == []:
         return default
-    return [topic]
+    return topic
 
 
 def includeme(config):
