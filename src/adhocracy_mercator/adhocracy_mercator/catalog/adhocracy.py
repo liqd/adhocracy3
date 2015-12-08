@@ -20,6 +20,7 @@ class MercatorCatalogIndexes(AdhocracyCatalogIndexes):
     mercator_location = Keyword()
     mercator_requested_funding = Keyword()
     mercator_budget = Keyword()
+    mercator_topic = Keyword()
 
 
 LOCATION_INDEX_KEYWORDS = ['specific', 'online', 'linked_to_ruhr']
@@ -115,6 +116,14 @@ def mercator2_index_budget(resource: IResource, default) -> str:
     return ['above_50000']
 
 
+def mercator2_index_topic(resource: IResource, default) -> [str]:
+    """Return search index keywords based on the "topic" field."""
+    topic = get_sheet_field(resource, sheets.mercator2.ITopic, 'topic')
+    if topic is None:
+        return default
+    return [topic]
+
+
 def includeme(config):
     """Register catalog utilities and index functions."""
     config.add_catalog_factory('adhocracy', MercatorCatalogIndexes)
@@ -145,3 +154,7 @@ def includeme(config):
                          catalog_name='adhocracy',
                          index_name='mercator_budget',
                          context=sheets.mercator2.IFinancialPlanning)
+    config.add_indexview(mercator2_index_budget,
+                         catalog_name='adhocracy',
+                         index_name='mercator_topic',
+                         context=sheets.mercator2.ITopic)

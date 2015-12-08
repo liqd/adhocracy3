@@ -38,6 +38,7 @@ def test_create_mercator_catalog_indexes():
     inst = MercatorCatalogIndexes()
     assert isinstance(inst.mercator_requested_funding, Keyword)
     assert isinstance(inst.mercator_location, Keyword)
+    assert isinstance(inst.mercator_topic, Keyword)
 
 
 @mark.usefixtures('integration')
@@ -397,3 +398,34 @@ class TestMercator2BudgetIndex:
         from substanced.interfaces import IIndexView
         assert registry.adapters.lookup((IFinancialPlanning,), IIndexView,
                                         name='adhocracy|mercator_budget')
+
+
+class TestMercator2IndexTopic:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    @fixture
+    def mock_topic_sheet(self, registry, mock_sheet):
+        registry.content.get_sheet.return_value = mock_sheet
+        return mock_sheet
+
+    def call_fut(self, *args):
+        from .adhocracy import mercator2_index_topic
+        return mercator2_index_topic(*args)
+
+    def test_return_default_if_topic_none(self, context, mock_topic_sheet):
+        mock_topic_sheet.get.return_value = {'topic': None}
+        assert self.call_fut(context, 'default') == 'default'
+
+    def test_return_topic(self, context, mock_topic_sheet):
+        mock_topic_sheet.get.return_value = {'topic': 'other'}
+        assert self.call_fut(context, 'default') == ['other']
+
+    @mark.usefixtures('integration')
+    def test_register(self, registry):
+        from adhocracy_mercator.sheets.mercator2 import ITopic
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((ITopic,), IIndexView,
+                                        name='adhocracy|mercator_topic')
