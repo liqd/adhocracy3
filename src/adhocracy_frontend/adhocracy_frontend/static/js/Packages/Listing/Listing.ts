@@ -161,7 +161,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 $scope.createPath = adhPreliminaryNames.nextPreliminary();
 
                 var getElements = (count? : boolean, limit? : number, offset? : number) : angular.IPromise<Container> => {
-                    var params = {};
+                    var params = <any>{};
 
                     if (typeof $scope.contentType !== "undefined") {
                         params.content_type = $scope.contentType;
@@ -190,13 +190,13 @@ export class Listing<Container extends ResourcesBase.Resource> {
                         params.reverse = !!sortItem.reverse;
                     }
                     if (limit) {
-                        params["limit"] = limit;
+                        params.limit = limit;
                         if (offset) {
-                            params["offset"] = offset;
+                            params.offset = offset;
                         }
                     }
                     if (count) {
-                        params["count"] = "true";
+                        params.count = "true";
                     }
                     return adhHttp.get($scope.path, params, {
                         warmupPoolCache: true
