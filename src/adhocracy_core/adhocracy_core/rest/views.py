@@ -67,9 +67,11 @@ from adhocracy_core.sheets.metadata import is_older_than
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.sheets.pool import IPool as IPoolSheet
+from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.utils import extract_events_from_changelog_metadata
 from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import get_user
 from adhocracy_core.utils import is_batchmode
 from adhocracy_core.utils import strip_optional_prefix
@@ -516,12 +518,10 @@ class SimpleRESTView(ResourceRESTView):
                 if name in appstructs:
                     sheet.set(appstructs[name],
                               request=self.request)
-
             appstruct = {}
             if not is_batchmode(self.request):  # pragma: no branch
-                appstruct[
-                    'updated_resources'] = self._build_updated_resources_dict()
-
+                updated = self._build_updated_resources_dict()
+                appstruct['updated_resources'] = updated
             schema = ResourceResponseSchema().bind(request=self.request,
                                                    context=self.context)
             cstruct = schema.serialize(appstruct)
@@ -652,14 +652,23 @@ class ItemRESTView(PoolRESTView):
                                          None)
         metric = self._get_post_metric_name(iresource)
         with statsd_timer(metric, rate=1, registry=self.registry):
-            if last_new_version is not None:  # only happens in batch request
+            if last_new_version is not None:  # only happens in batch requests
+                follows = get_sheet_field(last_new_version,
+                                          IVersionable,
+                                          'follows',
+                                          registry=self.request.registry)
+                is_first_version = follows == []
                 sheets = self.content.get_sheets_create(last_new_version,
                                                         self.request)
                 appstructs = self.request.validated.get('data', {})
                 for sheet in sheets:
-                    name = sheet.meta.isheet.__identifier__
-                    if name in appstructs:  # pragma: no branch
-                        sheet.set(appstructs[name],
+                    isheet = sheet.meta.isheet
+                    is_version_sheet = IVersionable.isEqualOrExtendedBy(isheet)
+                    if is_first_version and is_version_sheet:
+                        continue
+                    isheet_name = isheet.__identifier__
+                    if isheet_name in appstructs:  # pragma: no branch
+                        sheet.set(appstructs[isheet.__identifier__],
                                   request=self.request)
                 resource = last_new_version
             else:
