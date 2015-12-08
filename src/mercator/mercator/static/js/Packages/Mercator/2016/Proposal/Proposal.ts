@@ -384,7 +384,18 @@ export var mercatorProposalFormController2016 = (
     };
 
     $scope.topicTrString = (topic) => {
-        return ("TR__MERCATOR_TOPIC_" + topic.toUpperCase());
+        var topics = {
+            democracy: "TR__MERCATOR_TOPIC_DEMOCRACY",
+            culture: "TR__MERCATOR_TOPIC_CULTURE",
+            environment: "TR__MERCATOR_TOPIC_ENVIRONMENT",
+            social: "TR__MERCATOR_TOPIC_SOCIAL",
+            migration: "TR__MERCATOR_TOPIC_MIGRATION",
+            community: "TR__MERCATOR_TOPIC_COMMUNITY",
+            urban: "TR__MERCATOR_TOPIC_URBAN",
+            education: "TR__MERCATOR_TOPIC_EDUCATION",
+            other: "TR__MERCATOR_TOPIC_OTHER"
+        };
+        return topics[topic];
     };
 
     var showCheckboxGroupError = (form, names : string[]) : boolean => {
