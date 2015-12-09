@@ -161,7 +161,12 @@ var fill = (data : IData, resource) => {
                 status_other: data.organizationInfo.otherText
             });
             resource.data[SITopic.nick] = new SITopic.Sheet({
-                topic: null,  // FIXME
+                topic: _.reduce(<any>data.topic, (result, include, topic) => {
+                    if (include) {
+                        result.push(topic);
+                    }
+                    return result;
+                }, []),
                 other: data.topic.otherText
             });
             resource.data[SITitle.nick] = new SITitle.Sheet({
