@@ -104,9 +104,7 @@ export interface IData {
         location_is_linked_to_ruhr_text : string;
         location_is_online : boolean;
         location_is_specific : boolean;
-        location_specific_1 : string;
-        location_specific_2 : string;
-        location_specific_3 : string;
+        location_specific : string;
     };
     status : string;
     impact : {
@@ -170,7 +168,7 @@ var fill = (data : IData, resource) => {
                 title: data.title
             });
             resource.data[SILocation.nick] = new SILocation.Sheet({
-                location: null,  // FIXME
+                location: data.location.location_specific,
                 is_online: data.location.location_is_online,
                 has_link_to_ruhr: data.location.location_is_linked_to_ruhr,
                 link_to_ruhr: data.location.location_is_linked_to_ruhr_text
