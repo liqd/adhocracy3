@@ -11,6 +11,7 @@ def includeme(config):
     # commit to allow overriding pyramid config
     config.commit()
     # include custom resource types
+    config.include('adhocracy_meinberlin.content')
     config.include('adhocracy_meinberlin.workflows')
     config.include('adhocracy_meinberlin.resources')
     config.include('adhocracy_meinberlin.sheets')

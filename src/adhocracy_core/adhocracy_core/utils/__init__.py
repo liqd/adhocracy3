@@ -503,3 +503,12 @@ def load_json(filename):
     """Load a json file from the disk."""
     with open(filename, 'r') as f:
         return json.load(f)
+
+
+def has_annotation_sheet_data(resource: IResource) -> bool:
+    """Check if `resource` has no data stored in AnnotationResourceSheets."""
+    for attribute in resource.__dict__:
+        if attribute.startswith('_sheet_'):
+            return True
+    else:
+        return False
