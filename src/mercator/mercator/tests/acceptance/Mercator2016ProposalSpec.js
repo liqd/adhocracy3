@@ -4,17 +4,12 @@ var fs = require("fs");
 var EC = protractor.ExpectedConditions;
 var shared = require("./core/shared.js");
 var _ = require("lodash");
-var MercatorProposalFormPage = require("./MercatorProposalFormPage.js");
-var MercatorProposalListing = require("./MercatorProposalListing.js");
-var MercatorProposalDetailPage = require("./MercatorProposalDetailPage.js");
+var MercatorProposalFormPage = require("./MercatorProposalFormPage2016.js");
 
 describe("mercator proposal form", function() {
-    afterEach(function() {
-        shared.logout();
-    });
 
     it("is validated correctly", function() {
-        shared.loginParticipant();
+        //shared.loginParticipant();
 
         var page = new MercatorProposalFormPage().create();
         expect(page.isValid()).toBe(false);
@@ -23,27 +18,29 @@ describe("mercator proposal form", function() {
         page.fillValid();
         expect(page.isValid()).toBe(true);
 
-        // experience is optional
-        page.experience.clear();
+        // date only accepts yyyy
+        page.organizationInfoDate.clear();
+        page.organizationInfoDate.sendKeys("xyz");
+        expect(page.isValid()).toBe(false);
+        page.organizationInfoDate.clear();
+        page.organizationInfoDate.sendKeys("000");
+
+        // Check other org info fields
+        page.organizationInfoStatusEnum2.click();
+        page.organizationInfoCity.sendKeys("city");
+        page.organizationInfoDateForseen.sendKeys("12-1972");
         expect(page.isValid()).toBe(true);
 
-        // location is required
-        page.locationLocationIsSpecific.click();
-        page.locationLocationIsLinkedToRuhr.click();
-        expect(page.isValid()).toBe(false);
-        page.locationLocationIsLinkedToRuhr.click();
+        // website is optional
+        page.organizationInfoWebsite.clear();
         expect(page.isValid()).toBe(true);
 
-        // name is required
-        page.userInfoFirstName.clear();
-        expect(page.isValid()).toBe(false);
-        page.userInfoFirstName.sendKeys("pizza");
+        page.organizationInfoStatusEnum3.click();
+        page.organizationHelp.sendKeys("Help me please");
         expect(page.isValid()).toBe(true);
 
-        // heard_from is required
-        page.heardFromColleague.click();
-        expect(page.isValid()).toBe(false);
-        page.heardFromColleague.click();
+        page.organizationInfoStatusEnum4.click();
+        page.organizationOther.sendKeys("Other");
         expect(page.isValid()).toBe(true);
 
         // image has min width
@@ -52,6 +49,20 @@ describe("mercator proposal form", function() {
         expect(page.isValid()).toBe(false);
         page.setImage("./proposalImageValid.png");
         expect(page.isValid()).toBe(true);
+
+        // No more than 2 topics
+        page.topic3.click();
+        expect(page.isValid()).toBe(false);
+
+        // Must be at least 1 topics
+        page.topic1.click();
+        page.topic2.click();
+        page.topic3.click();
+        expect(page.isValid()).toBe(false);
+
+
+        browser.pause();
+
     });
 
     it("is submitted properly", function() {
