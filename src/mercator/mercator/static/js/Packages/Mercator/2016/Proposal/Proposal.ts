@@ -175,8 +175,8 @@ var fill = (data : IData, resource) => {
             });
             resource.data[SILocation.nick] = new SILocation.Sheet({
                 location: data.location.location_specific,
-                is_online: data.location.location_is_online,
-                has_link_to_ruhr: data.location.location_is_linked_to_ruhr,
+                is_online: !!data.location.location_is_online,
+                has_link_to_ruhr: !!data.location.location_is_linked_to_ruhr,
                 link_to_ruhr: data.location.location_is_linked_to_ruhr_text
             });
             resource.data[SIStatus.nick] = new SIStatus.Sheet({
@@ -189,7 +189,7 @@ var fill = (data : IData, resource) => {
             });
             resource.data[SIExtraFunding.nick] = new SIExtraFunding.Sheet({
                 other_sources: data.finance.otherSources,
-                secured: data.finance.secured
+                secured: !!data.finance.secured
             });
             resource.data[SICommunity.nick] = new SICommunity.Sheet({
                 expected_feedback: data.experience,
@@ -208,7 +208,7 @@ var fill = (data : IData, resource) => {
             break;
         case RIPartners.content_type:
             resource.data[SIPartners.nick] = new SIPartners.Sheet({
-                has_partners: data.partners.hasPartners,
+                has_partners: !!data.partners.hasPartners,
                 partner1_name: data.partners.partner1.name,
                 partner1_website: data.partners.partner1.website,
                 partner1_country: data.partners.partner1.country,
