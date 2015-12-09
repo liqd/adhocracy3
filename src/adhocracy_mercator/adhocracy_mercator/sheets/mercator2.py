@@ -158,10 +158,7 @@ class TopicSchema(colander.MappingSchema):
     other = Text()
 
     def validator(self, node: colander.SchemaNode, value: dict):
-        """Extra validation depending on the status of the topic.
-
-        Make field `other` required if `other` in `topic` field.
-        """
+        """Extra validation depending on the status of the topic."""
         topics = value.get('topic', [])
         if 'other' in topics:
             if not value.get('other', None):
@@ -448,11 +445,29 @@ class HeardFromEnum(AdhocracySchemaNode):
                                 ])
 
 
+class HeardFromEnums(AdhocracySequenceNode):
+    """List of HeardFromEnums."""
+
+    missing = colander.required
+    heard_froms = HeardFromEnum()
+
+
 class CommunitySchema(colander.MappingSchema):
     expected_feedback = Text(missing=colander.required)
-    heard_from = HeardFromEnum(missing=colander.required)
+    heard_froms = HeardFromEnums(validator=colander.Length(min=1))
     heard_from_other = Text()
 
+    def validator(self, node: colander.SchemaNode, value: dict):
+        """Extra validation depending on the status of the heard froms."""
+        heard_froms = value.get('heard_froms', [])
+        if 'other' in heard_froms:
+            if not value.get('heard_from_other', None):
+                raise colander.Invalid(
+                    node['heard_from_other'],
+                    msg='Required if "other" in heard_froms')
+        if _has_duplicates(heard_froms):
+            raise colander.Invalid(node['heard_froms'],
+                                   msg='Duplicates are not allowed')
 
 community_meta = sheet_meta._replace(
     isheet=ICommunity,
