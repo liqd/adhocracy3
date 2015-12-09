@@ -321,7 +321,7 @@ export var listItem = (
 ) => {
     return {
         retrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/../../2015/Proposal/ListItem.html",
         scope: {
 
         },
