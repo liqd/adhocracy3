@@ -4,11 +4,11 @@ var fs = require("fs");
 var EC = protractor.ExpectedConditions;
 var shared = require("./core/shared.js");
 var _ = require("lodash");
-var MercatorProposalFormPage = require("./MercatorProposalFormPage.js");
-var MercatorProposalListing = require("./MercatorProposalListing.js");
-var MercatorProposalDetailPage = require("./MercatorProposalDetailPage.js");
+var MercatorProposalFormPage = require("./Mercator2015ProposalFormPage.js");
+var MercatorProposalListing = require("./Mercator2015ProposalListing.js");
+var MercatorProposalDetailPage = require("./Mercator2015ProposalDetailPage.js");
 
-describe("mercator proposal form", function() {
+describe("mercator 2015 proposal form", function() {
     afterEach(function() {
         shared.logout();
     });

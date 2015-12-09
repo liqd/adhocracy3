@@ -1,7 +1,7 @@
 "use strict";
 
 var EmbeddedCommentsPage = require("./core/EmbeddedCommentsPage.js");
-var MercatorProposalFormPage = require("./MercatorProposalFormPage.js");
+var MercatorProposalFormPage = require("./Mercator2015ProposalFormPage.js");
 
 var MercatorProposalDetailPage = function() {
     this.coverCommentsButton = element(by.css(".mercator-proposal-cover-show-comments"));
