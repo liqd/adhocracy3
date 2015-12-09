@@ -16,7 +16,7 @@ exports.config = {
     beforeLaunch: function() {
         exec("bin/supervisord");
         exec("bin/supervisorctl restart  adhocracy_test:test_zeo test_backend_with_ws adhocracy_test:test_autobahn adhocracy_test:test_frontend");
-        exec("src/current/current/tests/acceptance/setup_test.sh");
+        exec("src/current/current/tests/acceptance/setup_tests.sh");
     },
     afterLaunch: function() {
         exec("bin/supervisorctl stop adhocracy_test:test_zeo test_backend_with_ws adhocracy_test:test_autobahn adhocracy_test:test_frontend");
