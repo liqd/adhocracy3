@@ -8,8 +8,8 @@ var shared = require("./core/shared.js");
 var MercatorProposalFormPage = function() {
 
     this.form = element(by.css("adh-mercator-2016-proposal-create form"));
-    this.userInfoFirstName = this.form.element(by.model("data.user_info.first_name"));
-    this.userInfoLastName = this.form.element(by.model("data.user_info.last_name"));
+    this.userInfoFirstName = this.form.element(by.model("data.userInfo.firstName"));
+    this.userInfoLastName = this.form.element(by.model("data.userInfo.lastName"));
 
     // NOTE: Due to angular magic used in ng-options, the value which is
     // stored in the respective ng-model (e.g. 'DE') isn't reflected in the
@@ -17,21 +17,20 @@ var MercatorProposalFormPage = function() {
     this.organizationInfoStatusEnum1 = this.form.element(by.css("input[value=registered_nonprofit]"));
     this.organizationInfoStatusEnum2 = this.form.element(by.css("input[value=planned_nonprofit]"));
     this.organizationInfoStatusEnum3 = this.form.element(by.css("input[value=support_needed]"));
-    this.organizationInfoStatusEnum4 = this.form.element(by.css("input[name=organization-info-status-enum][value=other]"));
-    this.organizationInfoName = this.form.element(by.model("data.organization_info.name"));
-    this.organizationInfoCountry = this.form.element(by.model("data.organization_info.country"));
-    this.organizationInfoCity = this.form.element(by.model("data.organization_info.city"));
-    this.organizationInfoWebsite = this.form.element(by.model("data.organization_info.website"));
-    this.organizationInfoEmail = this.form.element(by.model("data.organization_info.email"));
-    this.organizationInfoDate = this.form.element(by.model("data.organization_info.date_of_registration"));
-    this.organizationInfoDateForseen = this.form.element(by.model("data.organization_info.date_of_foreseen_registration"));
-    this.organizationOther = this.form.element(by.model("data.organization_info.status_other"));
-    this.organizationHelp = this.form.element(by.model("data.organization_info.how_can_we_help_you"));
+    this.organizationInfoStatusEnum4 = this.form.element(by.css("input[name=organization-info-status][value=other]"));
+    this.organizationInfoName = this.form.element(by.model("data.organizationInfo.name"));
+    this.organizationInfoCountry = this.form.element(by.model("data.organizationInfo.country"));
+    this.organizationInfoCity = this.form.element(by.model("data.organizationInfo.city"));
+    this.organizationInfoWebsite = this.form.element(by.model("data.organizationInfo.website"));
+    this.organizationInfoEmail = this.form.element(by.model("data.organizationInfo.email"));
+    this.organizationInfoDate = this.form.element(by.model("data.organizationInfo.registrationDate"));
+    this.organizationOther = this.form.element(by.model("data.organizationInfo.otherText"));
+    this.organizationHelp = this.form.element(by.model("data.organizationInfo.helpRequest"));
 
     this.title = this.form.element(by.model("data.title"));
-    this.introductionTeaser = this.form.element(by.model("data.introduction.teaser"));
+    this.introductionPitch = this.form.element(by.model("data.introduction.pitch"));
     this.image = this.form.element(by.css("input[type=\"file\"]"));
-    this.partners = this.form.element(by.model("data.partners"));
+    this.partners = this.form.element(by.model("data.partners.hasPartners"));
     this.topic1 = this.form.element(by.css("[name=introduction-topic-democracy]"));
     this.topic2 = this.form.element(by.css("[name=introduction-topic-culture]"));
     this.topic3 = this.form.element(by.css("[name=introduction-topic-environment]"));
@@ -40,19 +39,19 @@ var MercatorProposalFormPage = function() {
     this.locationLocationSpecific1 = this.form.element(by.model("data.location.location_specific_1"));
     this.status = this.form.all(by.model("data.status")).first();
     this.impactChallenge = this.form.element(by.model("data.impact.challenge"));
-    this.impactAim = this.form.element(by.model("data.impact.aim"));
+    this.impactAim = this.form.element(by.model("data.impact.goal"));
     this.impactPlan = this.form.element(by.model("data.impact.plan"));
-    this.impactTarget = this.form.element(by.model("data.impact.targetgroup"));
+    this.impactTarget = this.form.element(by.model("data.impact.target"));
     this.impactTeam = this.form.element(by.model("data.impact.team"));
-    this.impactElse = this.form.element(by.model("data.impact.whatelse"));
-    this.strengthen = this.form.element(by.model("data.strengthen"));
-    this.different = this.form.element(by.model("data.different"));
-    this.practical = this.form.element(by.model("data.practical"));
+    this.impactElse = this.form.element(by.model("data.impact.extraInfo"));
+    this.strengthen = this.form.element(by.model("data.criteria.strengthen"));
+    this.different = this.form.element(by.model("data.criteria.difference"));
+    this.practical = this.form.element(by.model("data.criteria.practical"));
     this.financeBudget = this.form.element(by.model("data.finance.budget"));
-    this.financeRequestedFunding = this.form.element(by.model("data.finance.requested_funding"));
-    this.major = this.form.element(by.model("data.major"));
-    this.personalContact = this.form.element(by.model("data.heard_from.personal_contact"));
-    this.accept = this.form.element(by.model("data.accept_disclaimer"));
+    this.financeRequestedFunding = this.form.element(by.model("data.finance.requestedFunding"));
+    this.major = this.form.element(by.model("data.finance.major"));
+    this.personalContact = this.form.element(by.model("data.heardFrom.personal_contact"));
+    this.accept = this.form.element(by.model("data.acceptDisclaimer"));
 
     this.submitButton = this.form.element(by.css("input[type=\"submit\"]"));
 
@@ -72,7 +71,7 @@ var MercatorProposalFormPage = function() {
         this.organizationInfoEmail.sendKeys("test@hotmail.com");
         this.organizationInfoDate.sendKeys("1972");
         this.title.sendKeys("protitle");
-        this.introductionTeaser.sendKeys("proteaser");
+        this.introductionPitch.sendKeys("proteaser");
         this.setImage("./proposalImageValid.png");
         this.partners.element(by.cssContainingText("option", "yes")).click();
         this.topic1.click();

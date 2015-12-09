@@ -28,7 +28,7 @@ describe("mercator proposal form", function() {
         // Check other org info fields
         page.organizationInfoStatusEnum2.click();
         page.organizationInfoCity.sendKeys("city");
-        page.organizationInfoDateForseen.sendKeys("12-1972");
+        page.organizationInfoDate.sendKeys("12-1972");
         expect(page.isValid()).toBe(true);
 
         // website is optional
