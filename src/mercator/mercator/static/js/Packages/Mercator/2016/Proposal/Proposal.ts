@@ -421,7 +421,7 @@ export var mercatorProposalFormController2016 = (
     };
 
     $scope.showFinanceGrantedInfo = () : boolean => {
-        return ($scope.data.finance && $scope.data.finance.other_sources && $scope.data.finance.other_sources !== "");
+        return ($scope.data.finance && $scope.data.finance.otherSources && $scope.data.finance.otherSources !== "");
     };
 
     $scope.showHeardFromError = () : boolean => {
