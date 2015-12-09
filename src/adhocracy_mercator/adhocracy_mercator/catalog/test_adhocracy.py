@@ -3,7 +3,9 @@ from pytest import fixture
 from pytest import mark
 
 
-def _make_mercator_resource(context, location_appstruct={}, finance_appstruct={}):
+def _make_mercator_resource(context,
+                            location_appstruct={},
+                            finance_appstruct={}):
     from adhocracy_core.interfaces import IResource
     from adhocracy_mercator.sheets.mercator import IMercatorSubResources
     from adhocracy_mercator.sheets.mercator import ILocation
@@ -36,6 +38,7 @@ def test_create_mercator_catalog_indexes():
     inst = MercatorCatalogIndexes()
     assert isinstance(inst.mercator_requested_funding, Keyword)
     assert isinstance(inst.mercator_location, Keyword)
+    assert isinstance(inst.mercator_topic, Keyword)
 
 
 @mark.usefixtures('integration')
@@ -81,9 +84,9 @@ class TestMercatorLocationIndex:
         resource = _make_mercator_resource(
             context,
             location_appstruct={'location_is_online': True,
-                               'location_is_linked_to_ruhr': True})
+                                'location_is_linked_to_ruhr': True})
         result = index_location(resource, 'default')
-        assert set(result) == set(['online', 'linked_to_ruhr'])
+        assert set(result) == {'online', 'linked_to_ruhr'}
 
     def test_register_index_location(self, registry):
         from adhocracy_mercator.sheets.mercator import IMercatorSubResources
@@ -152,7 +155,6 @@ class TestMercatorRequestedFundingIndex:
                                         name='adhocracy|mercator_requested_funding')
 
 
-
 @mark.usefixtures('integration')
 class TestMercatorBudgetIndex:
 
@@ -215,7 +217,7 @@ class TestMercatorBudgetIndex:
 
 def _make_mercator2_resource(context,
                              location_appstruct={},
-                             financialplanning_appstruct={}):
+                             financial_planning_appstruct={}):
     from adhocracy_core.interfaces import IResource
     from adhocracy_mercator.sheets.mercator2 import ILocation
     from adhocracy_mercator.sheets.mercator2 import IFinancialPlanning
@@ -226,8 +228,8 @@ def _make_mercator2_resource(context,
     context['res'] = resource
     location_sheet = get_sheet(resource, ILocation)
     location_sheet.set(location_appstruct)
-    financialplanning_sheet = get_sheet(resource, IFinancialPlanning)
-    financialplanning_sheet.set(financialplanning_appstruct)
+    financial_planning_sheet = get_sheet(resource, IFinancialPlanning)
+    financial_planning_sheet.set(financial_planning_appstruct)
     return resource
 
 
@@ -259,7 +261,7 @@ class TestMercator2LocationIndex:
             location_appstruct={'is_online': True,
                                 'has_link_to_ruhr': True})
         result = mercator2_index_location(resource, 'default')
-        assert set(result) == set(['online', 'linked_to_ruhr'])
+        assert set(result) == {'online', 'linked_to_ruhr'}
 
     def test_index_location_is_specific(self, context):
         from .adhocracy import mercator2_index_location
@@ -269,13 +271,14 @@ class TestMercator2LocationIndex:
                                 'is_online': False,
                                 'has_link_to_ruhr': False})
         result = mercator2_index_location(resource, 'default')
-        assert set(result) == set(['specific'])
+        assert set(result) == {'specific'}
 
     def test_register_index_location(self, registry):
         from adhocracy_mercator.sheets.mercator2 import ILocation
         from substanced.interfaces import IIndexView
         assert registry.adapters.lookup((ILocation,), IIndexView,
                                         name='adhocracy|mercator_location')
+
 
 @mark.usefixtures('integration')
 class TestMercator2RequestedFundingIndex:
@@ -294,7 +297,7 @@ class TestMercator2RequestedFundingIndex:
         from .adhocracy import mercator2_index_requested_funding
         resource = _make_mercator2_resource(
             context,
-            financialplanning_appstruct={'requested_funding': 5000})
+            financial_planning_appstruct={'requested_funding': 5000})
         result = mercator2_index_requested_funding(resource, 'default')
         assert result == [5000]
 
@@ -302,7 +305,7 @@ class TestMercator2RequestedFundingIndex:
         from .adhocracy import mercator2_index_requested_funding
         resource = _make_mercator2_resource(
             context,
-            financialplanning_appstruct={'requested_funding': 10000})
+            financial_planning_appstruct={'requested_funding': 10000})
         result = mercator2_index_requested_funding(resource, 'default')
         assert result == [10000]
 
@@ -310,7 +313,7 @@ class TestMercator2RequestedFundingIndex:
         from .adhocracy import mercator2_index_requested_funding
         resource = _make_mercator2_resource(
             context,
-            financialplanning_appstruct={'requested_funding': 20000})
+            financial_planning_appstruct={'requested_funding': 20000})
         result = mercator2_index_requested_funding(resource, 'default')
         assert result == [20000]
 
@@ -318,7 +321,7 @@ class TestMercator2RequestedFundingIndex:
         from .adhocracy import mercator2_index_requested_funding
         resource = _make_mercator2_resource(
             context,
-            financialplanning_appstruct={'requested_funding': 50000})
+            financial_planning_appstruct={'requested_funding': 50000})
         result = mercator2_index_requested_funding(resource, 'default')
         assert result == [50000]
 
@@ -326,7 +329,7 @@ class TestMercator2RequestedFundingIndex:
         from .adhocracy import mercator2_index_requested_funding
         resource = _make_mercator2_resource(
             context,
-            financialplanning_appstruct={'requested_funding': 50001})
+            financial_planning_appstruct={'requested_funding': 50001})
         result = mercator2_index_requested_funding(resource, 'default')
         assert result == 'default'
 
@@ -354,7 +357,7 @@ class TestMercator2BudgetIndex:
         from .adhocracy import mercator2_index_budget
         resource = _make_mercator2_resource(
             context,
-            financialplanning_appstruct={'budget': 5000})
+            financial_planning_appstruct={'budget': 5000})
         result = mercator2_index_budget(resource, 'default')
         assert result == ['5000']
 
@@ -362,7 +365,7 @@ class TestMercator2BudgetIndex:
         from .adhocracy import mercator2_index_budget
         resource = _make_mercator2_resource(
             context,
-            financialplanning_appstruct={'budget': 10000})
+            financial_planning_appstruct={'budget': 10000})
         result = mercator2_index_budget(resource, 'default')
         assert result == ['10000']
 
@@ -370,7 +373,7 @@ class TestMercator2BudgetIndex:
         from .adhocracy import mercator2_index_budget
         resource = _make_mercator2_resource(
             context,
-            financialplanning_appstruct={'budget': 20000})
+            financial_planning_appstruct={'budget': 20000})
         result = mercator2_index_budget(resource, 'default')
         assert result == ['20000']
 
@@ -378,7 +381,7 @@ class TestMercator2BudgetIndex:
         from .adhocracy import mercator2_index_budget
         resource = _make_mercator2_resource(
             context,
-            financialplanning_appstruct={'budget': 50000})
+            financial_planning_appstruct={'budget': 50000})
         result = mercator2_index_budget(resource, 'default')
         assert result == ['50000']
 
@@ -386,7 +389,7 @@ class TestMercator2BudgetIndex:
         from .adhocracy import mercator2_index_budget
         resource = _make_mercator2_resource(
             context,
-            financialplanning_appstruct={'budget': 50001})
+            financial_planning_appstruct={'budget': 50001})
         result = mercator2_index_budget(resource, 'default')
         assert result == ['above_50000']
 
@@ -395,3 +398,34 @@ class TestMercator2BudgetIndex:
         from substanced.interfaces import IIndexView
         assert registry.adapters.lookup((IFinancialPlanning,), IIndexView,
                                         name='adhocracy|mercator_budget')
+
+
+class TestMercator2IndexTopic:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    @fixture
+    def mock_topic_sheet(self, registry, mock_sheet):
+        registry.content.get_sheet.return_value = mock_sheet
+        return mock_sheet
+
+    def call_fut(self, *args):
+        from .adhocracy import mercator2_index_topic
+        return mercator2_index_topic(*args)
+
+    def test_return_default_if_topic_empty(self, context, mock_topic_sheet):
+        mock_topic_sheet.get.return_value = {'topic': []}
+        assert self.call_fut(context, 'default') == 'default'
+
+    def test_return_topic(self, context, mock_topic_sheet):
+        mock_topic_sheet.get.return_value = {'topic': ['other', 'bla']}
+        assert self.call_fut(context, 'default') == ['other', 'bla']
+
+    @mark.usefixtures('integration')
+    def test_register(self, registry):
+        from adhocracy_mercator.sheets.mercator2 import ITopic
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((ITopic,), IIndexView,
+                                        name='adhocracy|mercator_topic')
