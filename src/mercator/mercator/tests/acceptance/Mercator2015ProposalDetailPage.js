@@ -1,7 +1,7 @@
 "use strict";
 
 var EmbeddedCommentsPage = require("./core/EmbeddedCommentsPage.js");
-var MercatorProposalFormPage = require("./MercatorProposalFormPage.js");
+var MercatorProposalFormPage = require("./Mercator2015ProposalFormPage.js");
 
 var MercatorProposalDetailPage = function() {
     this.column = element.all(by.tagName("adh-mercator-2015-proposal-detail-column")).first();

@@ -4,9 +4,9 @@ var fs = require("fs");
 var EC = protractor.ExpectedConditions;
 var shared = require("./core/shared.js");
 var _ = require("lodash");
-var MercatorProposalFormPage = require("./MercatorProposalFormPage2016.js");
+var MercatorProposalFormPage = require("./Mercator2016ProposalFormPage.js");
 
-describe("mercator proposal form", function() {
+describe("mercator 2016 proposal form", function() {
 
     it("is validated correctly", function() {
         var page = new MercatorProposalFormPage().create();

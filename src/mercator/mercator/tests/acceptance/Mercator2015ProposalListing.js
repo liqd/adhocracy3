@@ -3,9 +3,9 @@
 var path = require("path");
 
 var shared = require("./core/shared.js");
-var MercatorProposalFormPage = require("./MercatorProposalFormPage.js");
+var MercatorProposalFormPage = require("./Mercator2015ProposalFormPage.js");
 var EmbeddedCommentsPage = require("./core/EmbeddedCommentsPage.js");
-var MercatorProposalDetailPage = require("./MercatorProposalDetailPage.js");
+var MercatorProposalDetailPage = require("./Mercator2015ProposalDetailPage.js");
 
 var MercatorProposalListing = function() {
     this.listing = element(by.tagName("adh-mercator-2015-proposal-listing"));
