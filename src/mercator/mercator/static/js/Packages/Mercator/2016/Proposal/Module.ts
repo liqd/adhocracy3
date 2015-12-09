@@ -67,6 +67,8 @@ export var register = (angular) => {
             "adhConfig",
             "flowFactory",
             Proposal.createDirective])
+        .directive("adhMercator2016ProposalListing", ["adhConfig", Proposal.listing])
+        .directive("adhMercator2016Listitem", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", "adhGetBadges", Proposal.listItem])
         .controller("mercatorProposalFormController2016", [
             "$scope", "$element", "$window", "adhShowError", "adhPreliminaryNames", Proposal.mercatorProposalFormController2016]);
 };

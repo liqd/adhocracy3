@@ -312,6 +312,26 @@ export var createDirective = (
     };
 };
 
+export var listing = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
+        scope: {
+            path: "@",
+            contentTpe: "@",
+            updae: "=?",
+            facets: "=?",
+            sort: "=?",
+            sorts: "=?",
+            reverse: "=?",
+            frontendOrderPredicate: "=?",
+            frontendOrderReverse: "=?",
+            initialLimit: "=?",
+            params: "=?"
+        }
+    };
+};
+
 export var listItem = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
