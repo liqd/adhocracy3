@@ -6,6 +6,7 @@ import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames
 
 import * as SIChallenge from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IChallenge";
 import * as SICommunity from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ICommunity";
+import * as SIConnectionCohesion from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IConnectionCohesion";
 import * as SIDifference from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IDifference";
 import * as SIDuration from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IDuration";
 import * as SIExtraFunding from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IExtraFunding";
@@ -249,6 +250,11 @@ var fill = (data : IData, resource) => {
         case RIExtraInfo.content_type:
             resource.data[SIExtraInfo.nick] = new SIExtraInfo.Sheet({
                 extrainfo: data.impact.extraInfo
+            });
+            break;
+        case RIConnectionCohesion.content_type:
+            resource.data[SIConnectionCohesion.nick] = new SIConnectionCohesion.Sheet({
+                connection_cohesion: data.criteria.strengthen
             });
             break;
         case RIDifference.content_type:
