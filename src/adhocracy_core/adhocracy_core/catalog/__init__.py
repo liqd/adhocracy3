@@ -8,6 +8,7 @@ from collections.abc import Iterable
 from substanced import catalog
 from substanced.interfaces import IIndexingActionProcessor
 from substanced.catalog import CatalogsService
+from substanced.objectmap import find_objectmap
 from hypatia.interfaces import IIndex
 from hypatia.interfaces import IResultSet
 from hypatia.util import ResultSet
@@ -61,6 +62,14 @@ class CatalogsServiceAdhocracy(CatalogsService):
                                         group_by=group_by,
                                         frequency_of=frequency_of)
         return result
+
+    def _resolve_oids(self, elements: Iterable) -> Iterable:
+        objectmap = find_objectmap(self)
+        if isinstance(elements, IResultSet):
+            elements.resolver = objectmap.object_for
+            return elements.all()
+        elements = (objectmap.object_for(e) for e in elements)
+        return elements
 
     def _get_interfaces_index_query(self, query):
         interfaces_value = self._get_query_value(query.interfaces)
@@ -128,8 +137,8 @@ class CatalogsServiceAdhocracy(CatalogsService):
             index_query = indexes[0]
             for idx in indexes[1:]:
                 index_query &= idx
-            elements = index_query.execute(resolver=None)
-            elements.all(resolve=True)
+            no_resolver = lambda x: x
+            elements = index_query.execute(resolver=no_resolver)
         else:
             elements = ResultSet(set(), 0, None)
         return elements
@@ -218,6 +227,8 @@ class CatalogsServiceAdhocracy(CatalogsService):
             for key, intersect in group_by.items():
                 intersect_resolved = [x for x in intersect]
                 group_by[key] = intersect_resolved
+        for k in group_by.keys():
+            group_by[k] = self._resolve_oids(group_by[k])
         return group_by
 
     def _sort_elements(self, elements: IResultSet,
@@ -232,20 +243,20 @@ class CatalogsServiceAdhocracy(CatalogsService):
                                      limit=query.limit or None)
         return elements
 
-    def _get_slice(self, elements: IResultSet, query: IResultSet) -> Iterable:
+    def _get_slice(self, elements: [IResource], query: IResultSet) -> Iterable:
         """Get slice defined by `query.limit` and `query.offset`.
 
-        :returns: IResultSet if not `query.limit`, else [IResource]
+        :returns: [IResource]
         """
         elements_slice = elements
         if query.limit:
-            docids_slice = islice(elements.all(resolve=None),
-                                  query.offset,
-                                  query.offset + query.limit)
-            elements_slice = [elements.resolver(x) for x in docids_slice]
+            elements_slice = islice(elements.all(resolve=None),
+                                    query.offset,
+                                    query.offset + query.limit)
         return elements_slice
 
     def _resolve(self, elements: Iterable, query: SearchQuery) -> Iterable:
+        elements = self._resolve_oids(elements)
         if query.resolve:
             elements = [x for x in elements]
         return elements
