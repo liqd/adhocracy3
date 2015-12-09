@@ -431,3 +431,67 @@ export var mercatorProposalFormController2016 = (
     };
 
 };
+
+export var detailDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
+        scope: {},
+        link: (scope) => {
+            var dummyData : IData = {
+                userInfo: {
+                    firstName: "Caroline",
+                    lastName: "Clifford"
+                },
+                organizationInfo: {
+                    name: "Liqd",
+                    email: "caroline@liqd.net",
+                    website: "http://www.liqd.net",
+                    city: "Berlin",
+                    country: "string:DE",
+                    status: "registered_nonprofit",
+                    otherText: "Something else",
+                    registrationDate: "2015",
+                    helpRequest: "Can;t think of a logo"
+                },
+                title: "Caroline's amazing project",
+                introduction: {
+                    pitch: "Lorem ipsum Cillum proident dolor culpa commodo minim ea amet esse nisi aliquip consequat",
+                    imageUpload: "",
+                    picture: ""
+                },
+                partners: {
+                    hasPartners: true,
+                    partner1: {
+                        name: "Magda",
+                        country: "string:DE",
+                        website: "www.magda.de"
+                    },
+                    partner2: {
+                        name: "Robin",
+                        country: "string:DE",
+                        website: "www.robin.de"
+                    },
+                    hasOther: true,
+                    otherText: "Tobi"
+                },
+                topic: {
+                    democracy: true,
+                    urban: true
+                },
+                duration: 12,
+                location: {
+                    location_is_linked_to_ruhr: true,
+                    location_is_linked_to_ruhr_text: "Lorem",
+                    location_specific_1: "Stanmore"
+                },
+                status: "starting",
+                impact: {
+                    challenge: "zzz"
+                }
+            };
+        }
+    };
+};
