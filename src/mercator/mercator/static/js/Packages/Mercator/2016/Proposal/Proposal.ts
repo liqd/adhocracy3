@@ -1,8 +1,11 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
 
+import * as AdhBadge from "../../../Badge/Badge";
 import * as AdhConfig from "../../../Config/Config";
+import * as AdhHttp from "../../../Http/Http";
 import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
+import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 
 import * as SIChallenge from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IChallenge";
 import * as SICommunity from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ICommunity";
@@ -305,6 +308,42 @@ export var createDirective = (
         scope: {},
         link: (scope) => {
             scope.$flow = flowFactory.create();
+        }
+    };
+};
+
+export var listItem = (
+    $q : angular.IQService,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhGetBadges : AdhBadge.IGetBadges
+) => {
+    return {
+        retrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
+        scope: {
+
+        },
+        link: (scope, element) => {
+            scope.data  = {
+                title: {title: "Super"},
+                user_info: {
+                    first_name: "Magda",
+                    createtime: "2015-12-10T11:12:04.291510+00:00"
+                },
+                organization_info: { name: "Liquid Democracy e.V." },
+                commentCountTotal: 25,
+                currentPhase: "participate",
+                supporterCount: 33,
+                finance: {
+                    requested_funding: 50000 },
+                winnerBadgeAssignment: {
+                    name: "winning"
+                },
+                introduction : {
+                    picture: "https://frontend.advocate-europe.eu/api/mercator/assets/0001799/0000001/" }
+            };
         }
     };
 };
