@@ -70,18 +70,20 @@ class TestItemVersion:
         version_0 = self.make_one(registry, item)
         assert IItemVersion.providedBy(version_0)
 
-    def test_create_new_version(self, registry, config, item):
+    def test_create_first_and_send_version_added_event(self, config,
+                                                       registry, item):
         events = create_event_listener(config, IItemVersionNewVersionAdded)
-        creator = self.make_one(registry, item)
-
         version_0 = self.make_one(registry, item)
-        version_1 = self.make_one(registry, item,
-                                  follows=[version_0], creator=creator)
+        assert events[0].object == None
+        assert events[0].new_version == version_0
 
-        assert len(events) == 1
+    def test_create_following_and_send_version_added_event(self, config,
+                                                           registry, item):
+        version_0 = self.make_one(registry, item)
+        events = create_event_listener(config, IItemVersionNewVersionAdded)
+        version_1 = self.make_one(registry, item, follows=[version_0])
         assert events[0].object == version_0
         assert events[0].new_version == version_1
-        assert events[0].creator == creator
 
     def test_create_new_version_with_referencing_non_versionable(self, registry,
                                                                  config, item):
@@ -112,7 +114,7 @@ class TestItemVersion:
         add_resource_type_to_registry(metadata, config)
         referenced_v0 = self.make_one(registry, item)
         referenced_v0.v0 = 1
-        appstructs={IDocument.__identifier__: {'elements': [referenced_v0]}}
+        appstructs = {IDocument.__identifier__: {'elements': [referenced_v0]}}
         referenceing_v0 = self.make_one(registry, other_item,
                                         appstructs=appstructs)
         referenceing_v0.vr0 = 1

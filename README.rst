@@ -29,7 +29,7 @@ Softwarestack
 
 Server (backend):
 
-- `Python 3 <http://www.python.org>`_ (programming language)
+- `Python 3 <https://www.python.org>`_ (programming language)
 
 - `Pyramid <http://pylonsproject.org>`_  (web framework)
 
@@ -45,9 +45,6 @@ Server (backend):
 
 - `websocket-client <https://github.com/liris/websocket-client>`_ (websocket
   client)
-
-- `asyncio <https://pypi.python.org/pypi/asyncio>`_ (required in Python 3.3
-  for Autobahn; comes pre-packaged with Python 3.4)
 
 - `buildout <http://www.buildout.org/en/latest/>`_ (build system)
 
@@ -66,7 +63,7 @@ Client (frontend):
 
 - `Lodash <https://lodash.com/>`_ (functional javascript helper library)
 
-- `Splinter <http://splinter.cobrateam.info/>`_ (acceptance and frontend tests)
+- `Protractor <https://angular.github.io/protractor/>`_ (acceptance tests)
 
 - `Jasmine <https://jasmine.github.io/>`_ (unit tests)
 

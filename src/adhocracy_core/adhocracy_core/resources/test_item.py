@@ -65,7 +65,6 @@ class TestItem:
         return pool_with_catalogs
 
     def make_one(self, context, registry, name='name'):
-        from adhocracy_core.sheets.name import IName
         inst = registry.content.create(IItem.__identifier__,
                                        appstructs={},
                                        parent=context)

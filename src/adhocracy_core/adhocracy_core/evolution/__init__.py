@@ -6,13 +6,13 @@ from BTrees.Length import Length
 from persistent.mapping import PersistentMapping
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
-from zope.interface.interfaces import IInterface
-from zope.interface import alsoProvides
-from zope.interface import noLongerProvides
-from zope.interface import directlyProvides
 from substanced.evolution import add_evolution_step
-from substanced.util import find_service
 from substanced.interfaces import IFolder
+from substanced.util import find_service
+from zope.interface import alsoProvides
+from zope.interface import directlyProvides
+from zope.interface import noLongerProvides
+from zope.interface.interfaces import IInterface
 
 from adhocracy_core.catalog import ICatalogsService
 from adhocracy_core.interfaces import IItem
@@ -21,12 +21,12 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ISimple
 from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.interfaces import search_query
-from adhocracy_core.resources.asset import IPoolWithAssets
 from adhocracy_core.resources.asset import IAsset
+from adhocracy_core.resources.asset import IPoolWithAssets
+from adhocracy_core.resources.asset import add_assets_service
 from adhocracy_core.resources.badge import IBadgeAssignmentsService
 from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.resources.badge import add_badges_service
-from adhocracy_core.resources.asset import add_assets_service
 from adhocracy_core.resources.comment import ICommentVersion
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.principal import IUser
@@ -48,7 +48,7 @@ from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
-
+from adhocracy_core.utils import has_annotation_sheet_data
 
 logger = logging.getLogger(__name__)
 
@@ -458,14 +458,16 @@ def remove_empty_first_versions(root):  # pragma: no cover
         if 'VERSION_0000000' not in item:
             continue
         first_version = item['VERSION_0000000']
-        is_empty = _is_version_without_data(first_version)
+        has_sheet_data = has_annotation_sheet_data(first_version)\
+            or hasattr(first_version, 'rate')
         has_follower = _has_follower(first_version, registry)
-        if is_empty and has_follower:
+        if not has_sheet_data and has_follower:
             logger.info('Delete empty version {0}.'.format(first_version))
             del item['VERSION_0000000']
 
 
-def _is_version_without_data(version: IItemVersion) -> bool:
+def _is_version_without_data(version: IItemVersion)\
+        -> bool:  # pragma: no cover
     for attribute in version.__dict__:
         if attribute.startswith('_sheet_'):
             return False
@@ -475,7 +477,8 @@ def _is_version_without_data(version: IItemVersion) -> bool:
         return True
 
 
-def _has_follower(version: IItemVersion, registry: Registry) -> bool:
+def _has_follower(version: IItemVersion,
+                  registry: Registry) -> bool:  # pragma: no cover
     followed_by = get_sheet_field(version, IVersionable, 'followed_by',
                                   registry=registry)
     return followed_by != []
@@ -506,6 +509,27 @@ def update_asset_download_children(root):  # pragma: no cover
             logger.warn('Asset {} has no downloads to migrate.'.format(asset))
 
 
+@log_migration
+def recreate_all_image_size_downloads(root):  # pragma: no cover
+    """Recreate all image size downloads to optimize file size."""
+    from adhocracy_core.sheets.asset import IAssetMetadata
+    from adhocracy_core.sheets.image import IImageMetadata
+    from adhocracy_core.resources.image import add_image_size_downloads
+    from adhocracy_core.resources.image import IImageDownload
+    registry = get_current_registry(root)
+    catalogs = find_service(root, 'catalogs')
+    assets = _search_for_interfaces(catalogs, IAssetMetadata)
+    images = [x for x in assets if IImageMetadata.providedBy(x)]
+    count = len(images)
+    for index, image in enumerate(images):
+        logger.info('Migrating resource {0} of {1}'.format(index + 1, count))
+        for old_download in image.values():
+            if IImageDownload.providedBy(old_download):
+                del image[old_download.__name__]
+        add_image_size_downloads(image, registry)
+        catalogs.reindex_index(image, 'interfaces')  # we missed reindexing
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -523,7 +547,9 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(move_sheet_annotation_data_to_attributes)
     config.add_evolution_step(migrate_rate_sheet_to_attribute_storage)
     config.add_evolution_step(move_autoname_last_counters_to_attributes)
+    config.add_evolution_step(remove_empty_first_versions)
     config.add_evolution_step(make_proposalversions_polarizable)
     config.add_evolution_step(add_icanpolarize_sheet_to_comments)
     config.add_evolution_step(add_image_reference_to_users)
     config.add_evolution_step(update_asset_download_children)
+    config.add_evolution_step(recreate_all_image_size_downloads)
