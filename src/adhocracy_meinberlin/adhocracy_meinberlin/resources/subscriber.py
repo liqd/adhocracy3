@@ -4,6 +4,7 @@ from pyramid.traversal import find_interface
 from pyramid.renderers import render
 
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
+from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.authorization import set_acms_for_app_root
 from adhocracy_core.resources.root import root_acm
 from adhocracy_core.utils import get_sheet
@@ -83,4 +84,7 @@ def includeme(config):
     config.add_subscriber(set_root_acms, ApplicationCreated)
     config.add_subscriber(send_bplan_submission_confirmation_email,
                           IResourceCreatedAndAdded,
+                          object_iface=IProposalVersion)
+    config.add_subscriber(send_bplan_submission_confirmation_email,
+                          IResourceSheetModified,
                           object_iface=IProposalVersion)
