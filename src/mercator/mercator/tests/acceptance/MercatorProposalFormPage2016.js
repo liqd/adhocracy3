@@ -101,29 +101,8 @@ var MercatorProposalFormPage = function() {
         return this;
     };
 
-    this.createProposal = function(content) {
-        this.fillValid();
-        this.submitButton.click();
-        // FIXME: Return created comment
-        return this.listing.element(by.tagName("adh-comment"));
-
-        /*
-        return all.reduce(function(acc, elem) {
-            return protractor.promise.all(
-                acc.getAttribute("data-path"),
-                elem.getAttribute("data-path")
-            ).then(function(paths) {
-                return (path[0] > path[1] ? acc : elem);
-            })
-        });*/
-    };
-
     this.isValid = function() {
-        return (shared.hasClass(this.form, "ng-valid"));
-    }
-
-    this.getEditLink = function(comment) {
-        return comment.element(by.css("[data-ng-click=\"edit()\"]"));
+        return shared.hasClass(this.form, "ng-valid");
     };
 };
 

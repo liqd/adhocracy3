@@ -9,8 +9,6 @@ var MercatorProposalFormPage = require("./MercatorProposalFormPage2016.js");
 describe("mercator proposal form", function() {
 
     it("is validated correctly", function() {
-        //shared.loginParticipant();
-
         var page = new MercatorProposalFormPage().create();
         expect(page.isValid()).toBe(false);
 
@@ -59,9 +57,5 @@ describe("mercator proposal form", function() {
         page.topic2.click();
         page.topic3.click();
         expect(page.isValid()).toBe(false);
-
-
-        browser.pause();
-
     });
 });
