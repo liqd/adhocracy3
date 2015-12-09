@@ -2,6 +2,7 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
 
 import * as AdhConfig from "../../../Config/Config";
+import * as AdhHttp from "../../../Http/Http";
 import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
 
 import * as SIChallenge from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IChallenge";
@@ -311,7 +312,9 @@ export var createDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
-        scope: {},
+        scope: {
+            poolPath: "@"
+        },
         link: (scope) => {
             scope.$flow = flowFactory.create();
         }
@@ -323,7 +326,9 @@ export var mercatorProposalFormController2016 = (
     $element,
     $window,
     adhShowError,
-    adhPreliminaryNames : AdhPreliminaryNames.Service
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhSubmitIfValid
 ) => {
 
     $scope.data = {
@@ -434,9 +439,10 @@ export var mercatorProposalFormController2016 = (
     $scope.create = "true";
 
     $scope.submitIfValid = () => {
-        // // check validation of topics
-        // $scope.topicChange(true);
-        console.log(create($scope, adhPreliminaryNames));
+        adhSubmitIfValid($scope, $element, $scope.mercatorProposalForm, () => {
+            var resources = create($scope, adhPreliminaryNames);
+            return adhHttp.deepPost(resources);
+        });
     };
 
 };
