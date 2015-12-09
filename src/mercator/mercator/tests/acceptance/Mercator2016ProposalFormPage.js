@@ -66,6 +66,7 @@ var MercatorProposalFormPage = function() {
         this.userInfoLastName.sendKeys("pasta");;
         this.organizationInfoStatusEnum1.click();
         this.organizationInfoName.sendKeys("organization name");
+        this.organizationInfoCity.sendKeys("Dijon");
         this.organizationInfoCountry.element(by.cssContainingText("option", "France")).click();
         this.organizationInfoWebsite.sendKeys("http://example.org");
         this.organizationInfoEmail.sendKeys("test@hotmail.com");
@@ -73,7 +74,7 @@ var MercatorProposalFormPage = function() {
         this.title.sendKeys("protitle");
         this.introductionPitch.sendKeys("proteaser");
         this.setImage("./proposalImageValid.png");
-        this.partners.element(by.cssContainingText("option", "yes")).click();
+        this.partners.element(by.cssContainingText("option", "no")).click();
         this.topic1.click();
         this.topic2.click();
         this.duration.sendKeys("20");

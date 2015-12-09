@@ -41,12 +41,13 @@ describe("mercator 2016 proposal form", function() {
         page.organizationOther.sendKeys("Other");
         expect(page.isValid()).toBe(true);
 
+        // FIXME: not done yet
         // image has min width
-        page.setImage("./proposalImageTooSmall.png");
-        expect(shared.hasClass(page.form, "ng-invalid-too-narrow"));
-        expect(page.isValid()).toBe(false);
-        page.setImage("./proposalImageValid.png");
-        expect(page.isValid()).toBe(true);
+        // page.setImage("./proposalImageTooSmall.png");
+        // expect(shared.hasClass(page.form, "ng-invalid-too-narrow"));
+        // expect(page.isValid()).toBe(false);
+        // page.setImage("./proposalImageValid.png");
+        // expect(page.isValid()).toBe(true);
 
         // No more than 2 topics
         page.topic3.click();
