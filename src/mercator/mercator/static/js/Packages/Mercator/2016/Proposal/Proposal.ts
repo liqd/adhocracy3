@@ -127,8 +127,8 @@ export interface IData {
         major : string;
         otherSources : string;
         secured : boolean;
-        experience : string;
     };
+    experience : string;
     heardFrom : {
         facebook : boolean;
         newsletter : boolean;
@@ -187,7 +187,7 @@ var fill = (data : IData, resource) => {
                 secured: data.finance.secured
             });
             resource.data[SICommunity.nick] = new SICommunity.Sheet({
-                expected_feedback: null,  // FIXME
+                expected_feedback: data.experience,
                 heard_from: null,  // FIXME
                 heard_from_other: data.heardFrom.otherText
             });
