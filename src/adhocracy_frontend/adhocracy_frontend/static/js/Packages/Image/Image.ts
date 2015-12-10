@@ -142,7 +142,7 @@ export var showImageDirective = (
         link: (scope) => {
             var imageMetadataNick = () =>
                 scope.imageMetadataNick ? scope.imageMetadataNick : SIImageMetadata.nick;
-            var format = () => scope.format ? scope.format : "detail";
+            var format = () => scope.format || "detail";
             var fallbackUrl = () => scope.fallbackUrl || ("/static/fallback_" + format() + ".jpg");
             scope.imageUrl = fallbackUrl(); // show fallback till real image is loaded
 
