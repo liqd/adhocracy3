@@ -18,7 +18,7 @@ export var headerDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/header.html",
         link: (scope) => {
-            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.processUrl = adhConfig.custom["s1_process_url"];
             scope.$on("$destroy", adhTopLevelState.bind("meeting", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
 
@@ -67,12 +67,13 @@ export var meetingSelectorDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MeetingSelector.html",
+        scope: {
+            processUrl: "@"
+        },
         link: (scope) => {
-            scope.$on("$destroy", adhTopLevelState.on("processUrl", (processUrl) => {
-                adhHttp.get(processUrl).then((process : RIS1Process) => {
-                    scope.workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
-                });
-            }));
+            adhHttp.get(scope.processUrl).then((process : RIS1Process) => {
+                scope.workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
+            });
         }
     };
 };
