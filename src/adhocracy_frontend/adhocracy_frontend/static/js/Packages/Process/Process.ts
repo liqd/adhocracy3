@@ -2,6 +2,7 @@
 
 import * as AdhConfig from "../Config/Config";
 import * as AdhHttp from "../Http/Http";
+import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhUtil from "../Util/Util";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
@@ -64,6 +65,7 @@ export class Service {
 export var workflowSwitchDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
     $window : angular.IWindowService
 ) => {
     return {
@@ -75,8 +77,9 @@ export var workflowSwitchDirective = (
         transclude: true,
         link: (scope) => {
 
-            adhHttp.options(scope.path, {importOptions: false}).then((raw) => {
-                scope.availableStates = AdhUtil.deepPluck(raw, [
+            adhPermissions.bindScope(scope, scope.path, "rawOptions", {importOptions: false});
+            scope.$watch("rawOptions", (rawOptions) => {
+                scope.availableStates = AdhUtil.deepPluck(rawOptions, [
                     "data", "PUT", "request_body", "data", SIWorkflow.nick, "workflow_state"]);
             });
 
