@@ -154,7 +154,7 @@ export var showImageDirective = (
                         var imageUrl = asset.data[imageMetadataNick()][format()];
                         if ( ! imageUrl) {
                             console.log("Couldn't load image format <" + format() + ">"
-                                + " from asset: " + angular.toJson(asset));
+                                + " from asset: " + scope.path);
                             scope.didFailToLoadImage();
                             return; // don't override the fallback image path
                         }
