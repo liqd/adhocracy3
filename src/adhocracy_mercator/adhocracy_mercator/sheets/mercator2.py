@@ -15,6 +15,7 @@ from adhocracy_core.schema import Reference
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import URL
+from adhocracy_core.schema import AdhocracySequenceNode
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 
@@ -141,26 +142,39 @@ class TopicEnum(AdhocracySchemaNode):
                                 ])
 
 
+class TopicEnums(AdhocracySequenceNode):
+    """List of TopicEnums."""
+
+    missing = colander.required
+    topics = TopicEnum()
+
+
 class ITopic(ISheet):
     """Marker interface for the topic (ex: democracy, art, environment etc)."""
 
 
 class TopicSchema(colander.MappingSchema):
-    topic = TopicEnum(missing=colander.required)
+    topic = TopicEnums(validator=colander.Length(min=1, max=2))
     other = Text()
 
-    def validator(self, node, value):
+    def validator(self, node: colander.SchemaNode, value: dict):
         """Extra validation depending on the status of the topic.
 
-        Make `other` required if `topic` == `other`.
+        Make field `other` required if `other` in `topic` field.
         """
-        topic = value.get('topic', None)
-        if topic == 'other':
+        topics = value.get('topic', [])
+        if 'other' in topics:
             if not value.get('other', None):
-                other = node['other']
-                raise colander.Invalid(
-                    other,
-                    msg='Required iff topic == other')
+                raise colander.Invalid(node['other'],
+                                       msg='Required if "other" in topic')
+        if _has_duplicates(topics):
+            raise colander.Invalid(node['topic'],
+                                   msg='Duplicates are not allowed')
+
+
+def _has_duplicates(iterable: list) -> bool:
+    return len(iterable) != len(set(iterable))
+
 
 topic_meta = sheet_meta._replace(
     isheet=ITopic,

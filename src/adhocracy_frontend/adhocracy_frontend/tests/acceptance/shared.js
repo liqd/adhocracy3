@@ -3,6 +3,7 @@
 var UserPages = require("./UserPages.js");
 var MailParser = require("mailparser").MailParser;
 var fs = require("fs");
+var EC = protractor.ExpectedConditions;
 
 var restUrl = "http://localhost:9080/";
 
@@ -21,6 +22,12 @@ var parseEmail = function(filename, callback) {
     mailparser.end();
 };
 
+var waitAndClick = function(element) {
+    var isClickable = EC.elementToBeClickable(element);
+    browser.wait(isClickable, 5000);
+    element.click();
+}
+
 module.exports = {
     restUrl: restUrl,
     register: UserPages.register,
@@ -31,5 +38,6 @@ module.exports = {
     participantName: UserPages.participantName,
     loginOtherParticipant: UserPages.loginOtherParticipant,
     hasClass: hasClass,
-    parseEmail: parseEmail
+    parseEmail: parseEmail,
+    waitAndClick: waitAndClick
 }

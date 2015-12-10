@@ -58,8 +58,60 @@
     }
 }
 
+.user-profile-image-edit {
+    $image-base-size: 200px;
+
+    // position nicely on top of the username and center
+    @include rem(margin, 60px auto -60px);
+
+    @include rem(height, $image-base-size);
+    @include rem(width, $image-base-size);
+    position: relative;
+
+    .user-profile-image {
+        @include rem(height, $image-base-size);
+        @include rem(width, $image-base-size);
+    }
+
+    &.user-profile-image-edit-uploading {
+        @include rem(width, $image-base-size);
+        height: auto;
+    }
+
+    .user-profile-image-edit-button {
+        @include rem(width, $image-base-size);
+        @include rem(height, $image-base-size);
+        @include border-radius(50%);
+
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+
+        visibility: hidden;
+
+        > * {
+            // vertically centered
+            @include rem(height, $image-base-size);
+            @include rem(width, $image-base-size);
+            display: table-cell;
+            vertical-align: middle;
+            // We actually want the button text to wrap
+            white-space: normal;
+        }
+    }
+
+    &:hover .user-profile-image-edit-button {
+        visibility: visible;
+    }
+
+    .user-profile-image-edit-button.user-profile-image-edit-button-force-visible {
+        @extend .button:hover;
+        visibility: visible;
+    }
+}
+
 .user-activity-overview {
-    @include box-sizing(border-box);
     width: 100%;
     padding-left: 12px; // is there a variable for this width? --MH
     padding-right: 12px;
@@ -74,12 +126,23 @@
 
         // directives ordered this way to ensure rendering with
         // less than three items will remove them in the order: middle, last, first
-        > div { 
+        > * { 
             display: table-cell;
             text-align: center;
         }
         
-        > div:last-child { text-align: right; }
-        > div:first-child { text-align: left; }
+        > *:last-child { text-align: right; }
+        > *:first-child { text-align: left; }
     }
+}
+
+.user-profile-image {
+    @include border-radius(50%);
+}
+
+.user-meta.user-profile-image {
+    @include rem(height, 35px);
+    @include rem(width, 35px);
+    @include rem(margin-right, 10px);
+    vertical-align: top;
 }

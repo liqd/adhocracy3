@@ -161,14 +161,15 @@
                                     type="email"
                                     data-ng-model="data.organizationInfo.email"
                                     name="organization-info-email"
-                                    data-required="required" />
+                                    data-required="required"
+                                    data-ng-pattern="/^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/" />
                                 <span
                                     class="input-error"
                                     data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-email'], 'required')">
                                     {{ "TR__ERROR_REQUIRED_EMAIL_2016" | translate }}</span>
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-email'], 'email')">
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-email'], 'pattern')">
                                     {{ "TR__ERROR_INVALID_EMAIL_2016" | translate }}</span>
                             </label>
 
@@ -177,20 +178,20 @@
                                 <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_DATE_OF_REGISTRATION_2016" | translate }} *</span>
                                 <input
                                     type="text"
-                                    data-ng-model="data.organizationInfo.date_of_registration"
-                                    name="organization-info-date-of-registration"
+                                    data-ng-model="data.organizationInfo.registrationDate"
+                                    name="organization-info-registration-date"
                                     data-ng-pattern="/^[0-9]{4}$/"
                                     placeholder="yyyy"
                                     data-required="required"
                                     />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-date-of-registration'],
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-registration-date'],
                                     'required')">
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_DATE_OF_REGISTRATION_2016" | translate }}</span>
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-date-of-registration'],
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-registration-date'],
                                     'pattern')">
                                     {{ "TR__ERROR_INVALID_MERCATOR_PROPOSAL_ORGANIZATION_DATE_OF_REGISTRATION_2016" | translate }}</span>
                             </label>
@@ -250,19 +251,19 @@
                                 <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_DATE_PLANNED_NONPROFIT_2016" | translate }} *</span>
                                 <input
                                     type="text"
-                                    data-ng-model="data.organizationInfo.date_of_foreseen_registration"
-                                    name="organization-info-date-of-foreseen-registration"
+                                    data-ng-model="data.organizationInfo.registrationDate"
+                                    name="organization-info-registration-date"
                                     data-ng-pattern="/(1[0-2]|0[1-9])-([0-9]{4})$/"
                                     placeholder="mm-yyyy"
                                     required="required" />
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-date-of-foreseen-registration'],
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-registration-date'],
                                     'pattern')">
                                     {{ "TR__ERROR_INVALID_DATE" | translate }}</span>
                                 <span
                                     class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-date-of-foreseen-registration'],
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-registration-date'],
                                     'required')">
                                     {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_DATE_OF_FORESEEN_REGISTRATION" | translate }}</span>
                             </label>
@@ -345,7 +346,7 @@
                                 <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_STATUS_SUPPORT_NEEDED_HOW" | translate }} *</span>
                                 <textarea
                                     data-msd-elastic=""
-                                    data-ng-model="data.organizationInfo.how_can_we_help_you"
+                                    data-ng-model="data.organizationInfo.helpRequest"
                                     name="organization-info-how-can-we-help-you"
                                     maxlength="300"
                                     required="required"
@@ -770,28 +771,12 @@
                         </label>
 
                         <div data-ng-show="data.location.location_is_specific" class="row">
-                            <div class="cols-3">
-                                <input
-                                    type="text"
-                                    data-ng-model="data.location.location_specific_1"
-                                    name="location-location-specific-1"
-                                    placeholder="{{ 'TR__MERCATOR_PROPOSAL_LOCATION_FORMAT' | translate }}"
-                                    data-ng-required="data.location.location_is_specific" />
-                            </div>
-                            <div class="cols-3">
-                                <input
-                                    type="text"
-                                    data-ng-model="data.location.location_specific_2"
-                                    name="location-location-specific-2"
-                                    placeholder="{{ 'TR__MERCATOR_PROPOSAL_LOCATION_FORMAT' | translate }}" />
-                            </div>
-                            <div class="cols-3">
-                                <input
-                                    type="text"
-                                    data-ng-model="data.location.location_specific_3"
-                                    name="location-location-specific-3"
-                                    placeholder="{{ 'TR__MERCATOR_PROPOSAL_LOCATION_FORMAT' | translate }}" />
-                            </div>
+                            <input
+                                type="text"
+                                data-ng-model="data.location.location_specific"
+                                name="location-location-specific"
+                                placeholder="{{ 'TR__MERCATOR_PROPOSAL_LOCATION_FORMAT' | translate }}"
+                                data-ng-required="data.location.location_is_specific" />
                         </div>
 
                         <label class="label-text">
