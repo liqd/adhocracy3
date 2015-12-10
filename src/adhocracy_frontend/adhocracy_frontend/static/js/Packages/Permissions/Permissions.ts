@@ -13,9 +13,9 @@ export class Service {
      * all-falses in order to avoid exceptions when scope.key is
      * accessed in javascript code (rather than ng templates).
      */
-    public bindScope(scope : angular.IScope, path : Function, key?) : void;
-    public bindScope(scope : angular.IScope, path : string, key?) : void;
-    public bindScope(scope, path, key = "options") {
+    public bindScope(scope : angular.IScope, path : Function, key?, config? : {}) : void;
+    public bindScope(scope : angular.IScope, path : string, key?, config? : {}) : void;
+    public bindScope(scope, path, key = "options", config = {}) {
         var self : Service = this;
 
         var pathFn = typeof path === "string" ? () => path : path;
@@ -25,7 +25,7 @@ export class Service {
 
         var update = () => {
             if (pathString) {
-                return self.adhHttp.options(pathString).then((options : AdhHttp.IOptions) => {
+                return self.adhHttp.options(pathString, config).then((options : AdhHttp.IOptions) => {
                     scope[key] = _.assign({}, options, {"loggedIn": self.adhCredentials.loggedIn});
                 });
             }
