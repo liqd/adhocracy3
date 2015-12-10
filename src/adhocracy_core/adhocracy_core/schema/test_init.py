@@ -479,11 +479,11 @@ class ReferenceUnitTest(unittest.TestCase):
 
     def test_create(self):
         from adhocracy_core.interfaces import SheetReference
-        from adhocracy_core.schema import _validate_reftype
+        from adhocracy_core.schema import validate_reftype
         inst = self.make_one()
         assert inst.backref is False
         assert inst.reftype == SheetReference
-        assert inst.validator.validators == (_validate_reftype,)
+        assert inst.validator.validators == (validate_reftype,)
 
     def test_with_backref(self):
         inst = self.make_one(backref=True)
