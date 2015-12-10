@@ -150,6 +150,7 @@
     "TR__SUBJECT": "Betreff",
     "TR__SUBMIT": "abschicken",
     "TR__SUPPORTERS": "Befürworter*innen",
+    "TR__SWITCH_STATE_TO": "Wechseln zu {{newState}}",
     "TR__TITLE_PLACEHOLDER": "Hier einen Titel eingeben.",
     "TR__TOTAL_VOTES": "Anzahl der Stimmen (gesamt)",
     "TR__USERNAME": "Nutzername",
