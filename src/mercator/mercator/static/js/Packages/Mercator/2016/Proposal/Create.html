@@ -771,28 +771,12 @@
                         </label>
 
                         <div data-ng-show="data.location.location_is_specific" class="row">
-                            <div class="cols-3">
-                                <input
-                                    type="text"
-                                    data-ng-model="data.location.location_specific_1"
-                                    name="location-location-specific-1"
-                                    placeholder="{{ 'TR__MERCATOR_PROPOSAL_LOCATION_FORMAT' | translate }}"
-                                    data-ng-required="data.location.location_is_specific" />
-                            </div>
-                            <div class="cols-3">
-                                <input
-                                    type="text"
-                                    data-ng-model="data.location.location_specific_2"
-                                    name="location-location-specific-2"
-                                    placeholder="{{ 'TR__MERCATOR_PROPOSAL_LOCATION_FORMAT' | translate }}" />
-                            </div>
-                            <div class="cols-3">
-                                <input
-                                    type="text"
-                                    data-ng-model="data.location.location_specific_3"
-                                    name="location-location-specific-3"
-                                    placeholder="{{ 'TR__MERCATOR_PROPOSAL_LOCATION_FORMAT' | translate }}" />
-                            </div>
+                            <input
+                                type="text"
+                                data-ng-model="data.location.location_specific"
+                                name="location-location-specific"
+                                placeholder="{{ 'TR__MERCATOR_PROPOSAL_LOCATION_FORMAT' | translate }}"
+                                data-ng-required="data.location.location_is_specific" />
                         </div>
 
                         <label class="label-text">

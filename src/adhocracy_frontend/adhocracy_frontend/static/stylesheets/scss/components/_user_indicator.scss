@@ -21,6 +21,12 @@ It is usually used in the header bar.
         text-decoration: none;
     }
 
+    .user-profile-image {
+        @include rem(height, 30px);
+        @include rem(width, 30px);
+        vertical-align: middle;
+    }
+
     .user-indicator-logout,
     .user-indicator-login,
     .user-indicator-register {

@@ -6,6 +6,7 @@ import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames
 
 import * as SIChallenge from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IChallenge";
 import * as SICommunity from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ICommunity";
+import * as SIConnectionCohesion from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IConnectionCohesion";
 import * as SIDifference from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IDifference";
 import * as SIDuration from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IDuration";
 import * as SIExtraFunding from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IExtraFunding";
@@ -103,9 +104,7 @@ export interface IData {
         location_is_linked_to_ruhr_text : string;
         location_is_online : boolean;
         location_is_specific : boolean;
-        location_specific_1 : string;
-        location_specific_2 : string;
-        location_specific_3 : string;
+        location_specific : string;
     };
     status : string;
     impact : {
@@ -127,8 +126,8 @@ export interface IData {
         major : string;
         otherSources : string;
         secured : boolean;
-        experience : string;
     };
+    experience : string;
     heardFrom : {
         facebook : boolean;
         newsletter : boolean;
@@ -162,14 +161,19 @@ var fill = (data : IData, resource) => {
                 status_other: data.organizationInfo.otherText
             });
             resource.data[SITopic.nick] = new SITopic.Sheet({
-                topic: null,  // FIXME
+                topic: _.reduce(<any>data.topic, (result, include, topic) => {
+                    if (include) {
+                        result.push(topic);
+                    }
+                    return result;
+                }, []),
                 other: data.topic.otherText
             });
             resource.data[SITitle.nick] = new SITitle.Sheet({
                 title: data.title
             });
             resource.data[SILocation.nick] = new SILocation.Sheet({
-                location: null,  // FIXME
+                location: data.location.location_specific,
                 is_online: data.location.location_is_online,
                 has_link_to_ruhr: data.location.location_is_linked_to_ruhr,
                 link_to_ruhr: data.location.location_is_linked_to_ruhr_text
@@ -187,7 +191,7 @@ var fill = (data : IData, resource) => {
                 secured: data.finance.secured
             });
             resource.data[SICommunity.nick] = new SICommunity.Sheet({
-                expected_feedback: null,  // FIXME
+                expected_feedback: data.experience,
                 heard_from: null,  // FIXME
                 heard_from_other: data.heardFrom.otherText
             });
@@ -249,6 +253,11 @@ var fill = (data : IData, resource) => {
         case RIExtraInfo.content_type:
             resource.data[SIExtraInfo.nick] = new SIExtraInfo.Sheet({
                 extrainfo: data.impact.extraInfo
+            });
+            break;
+        case RIConnectionCohesion.content_type:
+            resource.data[SIConnectionCohesion.nick] = new SIConnectionCohesion.Sheet({
+                connection_cohesion: data.criteria.strengthen
             });
             break;
         case RIDifference.content_type:
@@ -412,7 +421,7 @@ export var mercatorProposalFormController2016 = (
     };
 
     $scope.showFinanceGrantedInfo = () : boolean => {
-        return ($scope.data.finance && $scope.data.finance.other_sources && $scope.data.finance.other_sources !== "");
+        return ($scope.data.finance && $scope.data.finance.otherSources && $scope.data.finance.otherSources !== "");
     };
 
     $scope.showHeardFromError = () : boolean => {
