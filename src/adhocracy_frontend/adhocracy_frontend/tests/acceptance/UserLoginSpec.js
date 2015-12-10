@@ -49,8 +49,7 @@ describe("user login", function() {
         var page = new UserPages.LoginPage().get();
         page.loginInput.sendKeys("abc");
         page.passwordInput.sendKeys("abc");
-        page.submitButton.click();
-        expect(element(by.css(".form-error")).getText()).toContain("Short");
+        expect(page.submitButton.getAttribute("disabled")).toBe("true");
     });
 
     it("login is persistent", function() {

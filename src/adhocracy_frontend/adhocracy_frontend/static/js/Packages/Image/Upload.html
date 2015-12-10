@@ -14,7 +14,7 @@
             <img data-flow-img="file" height="120" alt="{{ 'TR__IMAGE_SELECTED' | translate }}" /><br/>{{file.name}}
         </div>
         <div class="form-footer">
-            <input type="submit" class="button" />
+            <input type="submit" ng-value="{{'TR__SUBMIT' | translate}}" class="button" data-ng-disabled="0 === $flow.files.length" />
             <input type="reset" ng-value="{{'TR__CANCEL' | translate }}" class="button" ng-click="didCancelUpload()"/>
         </div>
     </div>

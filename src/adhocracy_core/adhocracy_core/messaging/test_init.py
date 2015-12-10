@@ -156,7 +156,7 @@ class TestSendMessageToUser:
             from_user=sender)
         msgtext = _msg_to_str(mailer.outbox[0])
         assert 'From: sender@example.org' in msgtext
-        assert 'Subject: [Adhocracy] Message from Sandy Sender: Important Adhocracy notice' in msgtext
+        assert 'Subject: Adhocracy Message from Sandy Sender: Important Adhocracy notice' in msgtext
         assert 'To: recipient@example.org' in msgtext
 
 

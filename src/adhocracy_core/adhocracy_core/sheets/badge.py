@@ -2,6 +2,7 @@
 import colander
 from pyramid.request import Request
 from pyramid.traversal import lineage
+from pyramid.traversal import resource_path
 from substanced.util import find_service
 
 from adhocracy_core.interfaces import ISheet
@@ -12,6 +13,7 @@ from adhocracy_core.schema import PostPool
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import create_post_pool_validator
+from adhocracy_core.schema import validate_reftype
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.name import IName
@@ -183,11 +185,30 @@ def create_unique_badge_assignment_validator(badge_ref: Reference,
     return validator
 
 
+@colander.deferred
+def deferred_validate_badge(node, kw):
+    """Check `assign_badge` permission and ISheet interface of `badge` node."""
+    request = kw.get('request', None)
+    if request is None:
+        return
+
+    def check_assign_badge_permisson(node, value):
+        if not request.has_permission('assign_badge', value):
+            badge_path = resource_path(value)
+            raise colander.Invalid(node, 'Your are missing the `assign_badge` '
+                                         ' permission for: ' + badge_path)
+    return colander.All(validate_reftype,
+                        check_assign_badge_permisson,
+                        )
+
+
 class BadgeAssignmentSchema(colander.MappingSchema):
     """Badge sheet data structure."""
 
     subject = Reference(reftype=BadgeSubjectReference)
-    badge = Reference(reftype=BadgeReference)
+    badge = Reference(reftype=BadgeReference,
+                      validator=deferred_validate_badge
+                      )
     object = Reference(reftype=BadgeObjectReference)
 
     @colander.deferred

@@ -6,6 +6,7 @@ import * as AdhEventManager from "../EventManager/EventManager";
 import * as AdhHttp from "../Http/Http";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
+import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 import * as AdhResourceUtil from "../Util/ResourceUtil";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
@@ -13,11 +14,13 @@ import * as AdhWebSocket from "../WebSocket/WebSocket";
 
 import * as ResourcesBase from "../../ResourcesBase";
 
+import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
 import RIRateVersion from "../../Resources_/adhocracy_core/resources/rate/IRateVersion";
 import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
 import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIRate from "../../Resources_/adhocracy_core/sheets/rate/IRate";
 import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
+import * as SIWorkflow from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/Rate";
 
@@ -53,6 +56,7 @@ export interface IRateScope extends angular.IScope {
     cast(value : number) : angular.IPromise<void>;
     uncast() : angular.IPromise<void>;
     toggle(value : number) : angular.IPromise<void>;
+    showResult() : boolean;
 
     // not currently used in the UI
     auditTrail : { subject: string; rate: number }[];
@@ -80,6 +84,23 @@ export interface IRateAdapter<T extends ResourcesBase.Resource> {
     creationDate(resource : T) : string;
     modificationDate(resource : T) : string;
 }
+
+
+/**
+ * promise workflow state.
+ */
+export var getWorkflowState = (
+    adhResourceArea : AdhResourceArea.Service
+) => (resourceUrl : string) : angular.IPromise<string> => {
+    return adhResourceArea.getProcess(resourceUrl, false).then((resource : RIProcess) => {
+        if (typeof resource !== "undefined") {
+            var workflowSheet = resource.data[SIWorkflow.nick];
+            if (typeof workflowSheet !== "undefined") {
+                return workflowSheet.workflow_state;
+            }
+        }
+    });
+};
 
 
 export class Service {
@@ -142,6 +163,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
     adhCredentials : AdhCredentials.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
+    adhResourceArea : AdhResourceArea.Service,
     adhDone
 ) => {
     "use strict";
@@ -211,6 +233,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             var rates : {[key : string]: number};
             var lock : boolean;
             var storeMyRateResource : (resource : RIRateVersion) => void;
+            var forceResult : boolean = false;
 
             var updateMyRate = () : angular.IPromise<void> => {
                 if (adhCredentials.loggedIn) {
@@ -333,6 +356,10 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                 }
             };
 
+            scope.showResult = () : boolean => {
+                return scope.hasCast || forceResult;
+            };
+
             // sync with other local rate buttons
             scope.$on("$destroy", adhRateEventManager.on(scope.refersTo, () => {
                 updateMyRate();
@@ -349,6 +376,13 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                     adhPermissions.bindScope(scope, postPoolPath, "optionsPostPool");
                     scope.ready = true;
                     adhDone();
+                });
+
+            getWorkflowState(adhResourceArea)(scope.refersTo)
+                .then((workflowState : string) => {
+                    if (workflowState === "result") {
+                        forceResult = true;
+                    }
                 });
         }
     };

@@ -563,3 +563,14 @@ class TestLoadJson:
     def teardown_method(self, method):
         if hasattr(self, 'tempfd'):
             os.close(self._tempfd)
+
+
+def test_has_annotation_sheet_data_resource_without_data(context):
+    from . import has_annotation_sheet_data
+    assert has_annotation_sheet_data(context) is False
+
+
+def test_has_annotation_sheet_data_resource_with_data(context):
+    from . import has_annotation_sheet_data
+    context._sheet_xcv = {}
+    assert has_annotation_sheet_data(context) is True

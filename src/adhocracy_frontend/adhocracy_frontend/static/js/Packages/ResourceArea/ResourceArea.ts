@@ -227,7 +227,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
      *
      * If `fail` is false, it promises undefined instead of failing.
      */
-    private getProcess(resourceUrl : string, fail = true) : angular.IPromise<ResourcesBase.Resource> {
+    public getProcess(resourceUrl : string, fail = true) : angular.IPromise<ResourcesBase.Resource> {
         var paths = [];
 
         var path = resourceUrl.substr(this.adhConfig.rest_url.length);

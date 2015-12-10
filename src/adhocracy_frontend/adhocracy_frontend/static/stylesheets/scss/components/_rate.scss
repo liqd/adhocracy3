@@ -335,3 +335,7 @@ Click show results
         @include rem(margin-right, 20px);
     }
 }
+
+.is-opinion-none .opinion-bar {
+    background-color: $color-text-normal;
+}

@@ -108,7 +108,6 @@ export var uploadImageDirective = (
             didCancelUpload: "&?"
         },
         link: (scope) => {
-            scope.isUploadDone = false;
             scope.$flow = flowFactory.create();
 
             scope.$flow.on("fileAdded", (file, event) => {
@@ -138,18 +137,14 @@ export var showImageDirective = (
             format: "@?", // defaults to "detail"
             imageMetadataNick: "@?", // defaults to SIImageMetadata.nick
             fallbackUrl: "@?", // defaults to "/static/fallback_$format.jpg";
-            isImageMissing: "=?"
+            didFailToLoadImage: "&?"
         },
         link: (scope) => {
             var imageMetadataNick = () =>
                 scope.imageMetadataNick ? scope.imageMetadataNick : SIImageMetadata.nick;
-            var format = () => scope.format ? scope.format : "detail";
+            var format = () => scope.format || "detail";
             var fallbackUrl = () => scope.fallbackUrl || ("/static/fallback_" + format() + ".jpg");
-            scope.isImageMissing = false;
-            var handleError = () => {
-                scope.imageUrl = fallbackUrl();
-                scope.isImageMissing = true;
-            };
+            scope.imageUrl = fallbackUrl(); // show fallback till real image is loaded
 
             scope.$watch("path", (path) => {
                 // often instantiated before the path can be provided by the surrounding dom
@@ -158,12 +153,14 @@ export var showImageDirective = (
                     (asset) => {
                         var imageUrl = asset.data[imageMetadataNick()][format()];
                         if ( ! imageUrl) {
-                            return handleError();
+                            console.log("Couldn't load image format <" + format() + ">"
+                                + " from asset: " + scope.path);
+                            scope.didFailToLoadImage();
+                            return; // don't override the fallback image path
                         }
-
                         scope.imageUrl = imageUrl;
                     },
-                    handleError
+                    scope.didFailToLoadImage
                 );
             });
         }

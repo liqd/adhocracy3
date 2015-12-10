@@ -130,7 +130,6 @@ var bindServerErrors = (
     }
 };
 
-
 export var activateArea = (
     adhConfig : AdhConfig.IService,
     adhUser : AdhUser.Service,
@@ -652,22 +651,22 @@ export var adhUserProfileImageDirective = (
         scope: {
             path: "@",
             format: "@?", // thumbnail [default] or detail
-            isImageMissing: "=?"
+            didFailToLoadImage: "&?",
+            cssClass: "@?"
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfileImage.html",
         link: (scope) => {
-            scope.isImageMissing = false;
-            var handleImageMissing = () => scope.isImageMissing = true;
+            scope.config = adhConfig;
             scope.$watch("path", (path) => {
-               adhHttp.get(scope.path).then((user) => {
-                   scope.assetPath = user.data[SIImageReference.nick].picture;
-                   scope.userName = user.data[SIUserBasic.nick].name;
-                   if ( ! scope.assetPath) {
-                       handleImageMissing();
-                   }
-               },
-               handleImageMissing
-               );
+                if ( ! path) { return; }
+
+                adhHttp.get(scope.path).then((user) => {
+                    scope.assetPath = user.data[SIImageReference.nick].picture;
+                    scope.userName = user.data[SIUserBasic.nick].name;
+                    if ( ! scope.assetPath) {
+                        scope.didFailToLoadImage();
+                    }
+                }, scope.didFailToLoadImage);
             });
         }
     };
@@ -685,6 +684,7 @@ export var adhUserProfileImageEditDirective = (
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfileImageEdit.html",
         link: (scope) => {
+            scope.config = adhConfig;
             adhHttp.get(AdhUtil.parentPath(scope.path)).then((userPool) => {
                 scope.assetPool = userPool.data[SIHasAssetPool.nick].asset_pool;
             });

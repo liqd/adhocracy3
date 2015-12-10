@@ -1,18 +1,22 @@
-<div class="user-profile-image-edit" ng-class="{'user-profile-image-edit-uploading': isUploading}">
+<div
+    class="user-profile-image-edit"
+    data-ng-class="{'user-profile-image-edit-uploading': isUploading}"
+    data-ng-if="config.profile_images_enabled"
+>
     <adh-recompile-on-change
         data-value="{{isUploading}}">
         <adh-user-profile-image
-            ng-hide="isImageMissing || isUploading"
+            data-ng-hide="isUploading"
             data-path="{{path}}"
-            data-is-image-missing="isImageMissing"
+            data-format="detail"
+            data-did-fail-to-load-image="isImageMissing = true"
         ></adh-user-profile-image>
     </adh-recompile-on-change>
-    <!-- FIXME should be shown on hover over the user image -->
     <a href="" class="button user-profile-image-edit-button"
         data-ng-class="{ 'user-profile-image-edit-button-force-visible': isImageMissing }"
         data-ng-if="userOptions.PUT && ! isUploading"
         data-ng-click="triggerUpload()"
-    ><span>Edit Profile Image<!-- FIXME translate --></span></a>
+    ><span>{{ "TR__EDIT_PROFILE_IMAGE" | translate}}</span></a>
     <adh-upload-image
         data-ng-if="isUploading"
         data-pool-path="{{path|adhParentPath}}"
