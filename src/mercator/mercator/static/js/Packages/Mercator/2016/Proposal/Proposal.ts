@@ -24,7 +24,7 @@ import * as SIStatus from "../../../../Resources_/adhocracy_mercator/sheets/merc
 import * as SITarget from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITarget";
 import * as SITeam from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITeam";
 import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
-import * as SITopic from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITopic";
+// FIXME: import * as SITopic from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITopic";
 import * as SIUserInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IUserInfo";
 import * as SIWinnerInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IWinnerInfo";
 import RIChallenge from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IChallenge";
@@ -160,6 +160,7 @@ var fill = (data : IData, resource) => {
                 status: data.organizationInfo.status,
                 status_other: data.organizationInfo.otherText
             });
+            /* FIXME: Typescript error
             resource.data[SITopic.nick] = new SITopic.Sheet({
                 topic: _.reduce(<any>data.topic, (result, include, topic) => {
                     if (include) {
@@ -168,7 +169,7 @@ var fill = (data : IData, resource) => {
                     return result;
                 }, []),
                 other: data.topic.otherText
-            });
+            });*/
             resource.data[SITitle.nick] = new SITitle.Sheet({
                 title: data.title
             });
@@ -510,9 +511,7 @@ export var detailDirective = (
                     location_is_linked_to_ruhr_text : "sdfsdfsd",
                     location_is_online : false,
                     location_is_specific : false,
-                    location_specific_1 : "Berlin",
-                    location_specific_2 : "",
-                    location_specific_3 : ""
+                    location_specific : "Berlin"
                 },
                 status: "starting",
                 impact: {
@@ -533,9 +532,9 @@ export var detailDirective = (
                     requestedFunding : 5000,
                     major : "major something",
                     other_sources : "other sources",
-                    secured : true,
-                    experience : "experience"
+                    secured : true
                 },
+                experience : "experience",
                 heardFrom : {
                     facebook : true,
                     newsletter : false,
@@ -553,6 +552,21 @@ export var detailDirective = (
             scope.data.currentPhase = "participate";
             scope.path = "http://localhost:6541/mercator/proposal_0000000/VERSION_0000000/";
             // Dummy data end
+
+            scope.topicTrString = (topic) => {
+                var topics = {
+                    democracy: "TR__MERCATOR_TOPIC_DEMOCRACY",
+                    culture: "TR__MERCATOR_TOPIC_CULTURE",
+                    environment: "TR__MERCATOR_TOPIC_ENVIRONMENT",
+                    social: "TR__MERCATOR_TOPIC_SOCIAL",
+                    migration: "TR__MERCATOR_TOPIC_MIGRATION",
+                    community: "TR__MERCATOR_TOPIC_COMMUNITY",
+                    urban: "TR__MERCATOR_TOPIC_URBAN",
+                    education: "TR__MERCATOR_TOPIC_EDUCATION",
+                    other: "TR__MERCATOR_TOPIC_OTHER"
+                };
+                return topics[topic];
+            };
         }
     };
 };
