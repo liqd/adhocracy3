@@ -32,6 +32,7 @@ class ConfigViewTest(unittest.TestCase):
              'piwik_site_id': None,
              'piwik_track_user_id': False,
              'piwik_use_cookies': False,
+             'profile_images_enabled': True,
              'terms_url': None}
 
     def test_ws_url_without_ws_url_settings_scheme_https(self):
