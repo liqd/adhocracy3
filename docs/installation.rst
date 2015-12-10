@@ -18,17 +18,22 @@ some basic dependencies to build PIL (python image library):
 
 6. libjpeg8-dev zlib1g-dev (http://pillow.readthedocs.org/en/latest/installation.html)
 
-create SSH key and upload to github ::
+Create SSH key and upload to GitHub ::
 
     ssh-keygen -t rsa -C "your_email@example.com"
 
-checkout source code ::
+Checkout source code ::
 
     git clone git@github.com:liqd/adhocracy3.git
     cd adhocracy3
     git submodule update --init
 
-compile python 3.4 and PIL ::
+Create virtualenv ::
+
+    virtualenv -p python3.4 .
+
+If you don't have python 3.4 on your system, you may compile python 3.4 and
+Pillow instead of creating a virtualenv ::
 
     cd python
     python ./bootstrap.py
@@ -36,12 +41,12 @@ compile python 3.4 and PIL ::
     ./bin/install-links
     cd ..
 
-install adhocracy ::
+Install adhocracy ::
 
     ./bin/python ./bootstrap.py --buildout-version 2.4.4 --setuptools-version=18.3.2
     ./bin/buildout
 
-update your shell environment::
+Update your shell environment::
 
     source ./source_env
 
@@ -49,7 +54,7 @@ update your shell environment::
 Documentation
 -------------
 
-build sphinx documentation ::
+Build sphinx documentation ::
 
     bin/sphinx_build_adhocracy
     xdg-open docs/build/html/index.html  # (alternatively, cut & paste the url into your browser)

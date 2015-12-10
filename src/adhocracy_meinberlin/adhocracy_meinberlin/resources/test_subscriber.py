@@ -5,6 +5,7 @@ from pyramid import testing
 from pytest import fixture
 from pytest import mark
 
+
 def test_set_root_acms(monkeypatch):
     from adhocracy_core.resources.root import root_acm
     from .root import meinberlin_acm
@@ -16,14 +17,17 @@ def test_set_root_acms(monkeypatch):
     set_root_acms(event)
     mock_set_acms.assert_called_with(event.app, (meinberlin_acm, root_acm))
 
+
+@fixture
+def integration(integration):
+    integration.include('pyramid_mailer.testing')
+    integration.include('pyramid_mako')
+    integration.include('adhocracy_core.messaging')
+    return integration
+
+
 @mark.usefixtures('integration')
 class TestBplanSubmissionConfirmationEmailSubscriber:
-
-    @fixture
-    def registry(self, config):
-        config.include('pyramid_mailer.testing')
-        config.include('pyramid_mako')
-        return config.registry
 
     @fixture
     def process_settings_appstruct(self, registry, pool_with_catalogs):
@@ -44,17 +48,12 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
                 'participation_start_date': datetime.date(2015, 5, 5),
                 'participation_end_date': datetime.date(2015, 6, 11)}
 
-
     @fixture
     def process_settings_no_office_worker_appstruct(self, registry, pool_with_catalogs):
-        from adhocracy_core.resources.principal import IUser
         from adhocracy_core.resources.principal import IPrincipalsService
-        import adhocracy_core.sheets.principal
         context = pool_with_catalogs
         registry.content.create(IPrincipalsService.__identifier__,
                                 parent=context)
-        user_appstructs = {adhocracy_core.sheets.principal.IUserExtended.__identifier__:
-                           {'email': 'officeworkername@example.org'}}
         return {'office_worker': None,
                 'plan_number': '112233-ba',
                 'participation_start_date': datetime.date(2015, 5, 5),
@@ -97,8 +96,6 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
                 }}
 
     def make_bplan_proposal(self, context, registry, appstructs):
-        from adhocracy_core.sheets.name import IName
-        from adhocracy_meinberlin import sheets
         from adhocracy_meinberlin import resources
         proposal_item = registry.content.create(resources.bplan.IProposal.__identifier__,
                                                 parent=context['bplan'])
@@ -108,16 +105,14 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
         return inst
 
     @fixture
-    def messenger(self, registry):
-        from adhocracy_core.messaging import Messenger
-        return Messenger(registry)
+    def mailer(self, registry):
+        return registry.messenger.mailer
 
-    def test_email_sent_to_user(self, registry, context, messenger, appstructs):
-        registry.messenger = messenger
+    def test_email_sent_to_user(self, registry, context, mailer, appstructs):
+        mailer.outbox = []
         self.make_bplan_proposal(context, registry, appstructs)
-        assert len(messenger.mailer.outbox) == 2
-
-        msg_user = messenger.mailer.outbox[0]
+        assert len(mailer.outbox) == 2
+        msg_user = mailer.outbox[0]
         assert 'user@example.com' in msg_user.recipients
         assert 'Ihre Stellungnahme zum Bebauungsplan 112233-ba, öffentliche Auslegung' \
             ' von 05/05/2015 - 11/06/2015.'  == msg_user.subject
@@ -134,7 +129,11 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
         assert 'Ihre Stellungnahme zum Bebauungsplan 112233-ba, öffentliche Auslegung' \
             ' von 05/05/2015 - 11/06/2015.' in msg_user.body
 
-        msg_officeworker = messenger.mailer.outbox[1]
+    def test_email_sent_to_office_worker(self, registry, context, mailer, appstructs):
+        mailer.outbox = []
+        self.make_bplan_proposal(context, registry, appstructs)
+        assert len(mailer.outbox) == 2
+        msg_officeworker = mailer.outbox[1]
         assert 'officeworkername@example.org' in msg_officeworker.recipients
         assert 'Vielen Dank' in msg_officeworker.body
         assert 'Laura Muster' in msg_officeworker.body
@@ -147,8 +146,7 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
     def test_do_not_send_email_if_office_work_not_defined(self,
                                                           registry,
                                                           context_no_office_worker,
-                                                          messenger,
+                                                          mailer,
                                                           appstructs):
-        registry.messenger = messenger
         self.make_bplan_proposal(context_no_office_worker, registry, appstructs)
-        assert len(messenger.mailer.outbox) == 0
+        assert len(mailer.outbox) == 0

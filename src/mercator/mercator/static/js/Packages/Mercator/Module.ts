@@ -10,7 +10,7 @@ export var register = (angular) => {
 
     angular
         .module(moduleName, [
-            AdhMercator2015Module.moduleName,
-            AdhMercator2016Module.moduleName
+            AdhMercator2016Module.moduleName,
+            AdhMercator2015Module.moduleName
         ]);
 };

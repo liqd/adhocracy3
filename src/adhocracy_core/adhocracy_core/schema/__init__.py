@@ -21,7 +21,6 @@ from zope.interface.interfaces import IInterface
 import colander
 import pytz
 
-from adhocracy_core.interfaces import ILocation
 from adhocracy_core.utils import normalize_to_tuple
 from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.utils import get_sheet
@@ -511,7 +510,8 @@ class ResourcePathAndContentSchema(ResourcePathSchema):
                                default={})
 
 
-def _validate_reftype(node: colander.SchemaNode, value: ILocation):
+def validate_reftype(node: colander.SchemaNode, value: IResource):
+    """Raise if `value` doesn`t provide the ISheet set by `node.reftype`."""
     reftype = node.reftype
     isheet = reftype.getTaggedValue('target_isheet')
     if not isheet.providedBy(value):
@@ -538,7 +538,7 @@ class Reference(Resource):
 
     reftype = SheetReference
     backref = False
-    validator = colander.All(_validate_reftype)
+    validator = colander.All(validate_reftype)
 
 
 class Resources(AdhocracySequenceNode):
@@ -551,7 +551,7 @@ class Resources(AdhocracySequenceNode):
 
 def _validate_reftypes(node: colander.SchemaNode, value: Sequence):
     for resource in value:
-        _validate_reftype(node, resource)
+        validate_reftype(node, resource)
 
 
 class References(Resources):

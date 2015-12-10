@@ -198,46 +198,6 @@ class TestResourceContentRegistry:
         config.testing_securitypolicy(userid='hank', permissive=False)
         assert inst.get_resources_meta_addable(context, request_) == []
 
-    def test_get_resources_meta_addable_only_first_version_exists_has_permission(
-            self, inst, item, config, request_, resource_meta, mock_authpolicy):
-        from adhocracy_core.interfaces import IItem
-        from adhocracy_core.interfaces import IItemVersion
-        version0 = testing.DummyResource(__provides__=IItemVersion)
-        item['VERSION_0000000'] = version0
-        item_meta = resource_meta._replace(iresource=IItem,
-                                           permission_create='create_xyz')
-        version_meta = resource_meta._replace(iresource=IItemVersion,
-                                               permission_create='edit_xyz')
-        inst.resources_meta = {IItem: item_meta}
-        inst.resources_meta_addable = {IItem: [version_meta]}
-        effective_principals = ['authenticated']
-        mock_authpolicy.effective_principals.return_value = effective_principals
-        mock_authpolicy.permits.return_value = True
-        assert inst.get_resources_meta_addable(item, request_) == [version_meta]
-        mock_authpolicy.permits.assert_called_once_with(item,
-                                                        effective_principals,
-                                                        'create_xyz')
-
-    def test_get_resources_meta_addable_only_first_version_exists_no_permission(
-            self, inst, item, config, request_, resource_meta, mock_authpolicy):
-        from adhocracy_core.interfaces import IItem
-        from adhocracy_core.interfaces import IItemVersion
-        version0 = testing.DummyResource(__provides__=IItemVersion)
-        item['VERSION_0000000'] = version0
-        item_meta = resource_meta._replace(iresource=IItem,
-                                           permission_create='create_xyz')
-        version_meta = resource_meta._replace(iresource=IItemVersion,
-                                               permission_create='edit_xyz')
-        inst.resources_meta = {IItem: item_meta}
-        inst.resources_meta_addable = {IItem: [version_meta]}
-        effective_principals = ['authenticated']
-        mock_authpolicy.effective_principals.return_value = effective_principals
-        mock_authpolicy.permits.return_value = False
-        assert inst.get_resources_meta_addable(item, request_) == []
-        mock_authpolicy.permits.assert_called_once_with(item,
-                                                        effective_principals,
-                                                        'create_xyz')
-
     def test_permissions_resource_permission_create_defined(
             self, inst, resource_meta, mock_registry):
         simple_meta = resource_meta._replace(
