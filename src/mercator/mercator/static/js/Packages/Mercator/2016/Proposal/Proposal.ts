@@ -125,7 +125,7 @@ export interface IData {
         budget : number;
         requestedFunding : number;
         major : string;
-        otherSources : string;
+        other_sources : string;
         secured : boolean;
         experience : string;
     };
@@ -183,7 +183,7 @@ var fill = (data : IData, resource) => {
                 major_expenses: data.finance.major
             });
             resource.data[SIExtraFunding.nick] = new SIExtraFunding.Sheet({
-                other_sources: data.finance.otherSources,
+                other_sources: data.finance.other_sources,
                 secured: data.finance.secured
             });
             resource.data[SICommunity.nick] = new SICommunity.Sheet({
@@ -440,6 +440,7 @@ export var detailDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
         scope: {},
         link: (scope) => {
+            // FIXME : Dummy data
             var dummyData : IData = {
                 userInfo: {
                     firstName: "Caroline",
@@ -450,7 +451,7 @@ export var detailDirective = (
                     email: "caroline@liqd.net",
                     website: "http://www.liqd.net",
                     city: "Berlin",
-                    country: "string:DE",
+                    country: "DE",
                     status: "registered_nonprofit",
                     otherText: "Something else",
                     registrationDate: "2015",
@@ -460,38 +461,89 @@ export var detailDirective = (
                 introduction: {
                     pitch: "Lorem ipsum Cillum proident dolor culpa commodo minim ea amet esse nisi aliquip consequat",
                     imageUpload: "",
-                    picture: ""
+                    picture: "http://localhost:6541/mercator/assets/0000000/0000000/"
                 },
                 partners: {
                     hasPartners: true,
                     partner1: {
                         name: "Magda",
-                        country: "string:DE",
+                        country: "DE",
                         website: "www.magda.de"
                     },
                     partner2: {
                         name: "Robin",
-                        country: "string:DE",
+                        country: "DE",
                         website: "www.robin.de"
+                    },
+                    partner3: {
+                        name: "Robin2",
+                        country: "DE",
+                        website: "www.robin.de2"
                     },
                     hasOther: true,
                     otherText: "Tobi"
                 },
                 topic: {
-                    democracy: true,
-                    urban: true
+                    democracy : true,
+                    culture : false,
+                    environment : false,
+                    social : true,
+                    migration : false,
+                    community : false,
+                    urban : false,
+                    education : false,
+                    other : false,
+                    otherText : ""
                 },
                 duration: 12,
                 location: {
-                    location_is_linked_to_ruhr: true,
-                    location_is_linked_to_ruhr_text: "Lorem",
-                    location_specific_1: "Stanmore"
+                    location_is_linked_to_ruhr : true,
+                    location_is_linked_to_ruhr_text : "sdfsdfsd",
+                    location_is_online : false,
+                    location_is_specific : false,
+                    location_specific_1 : "Berlin",
+                    location_specific_2 : "",
+                    location_specific_3 : ""
                 },
                 status: "starting",
                 impact: {
-                    challenge: "zzz"
-                }
+                    challenge : "challenge",
+                    goal : "goal",
+                    plan : "plan",
+                    target : "tagrget",
+                    team : "team",
+                    extraInfo : "extraInfo"
+                },
+                criteria : {
+                    strengthen : "strengthen",
+                    difference : "Difference",
+                    practical : "practical"
+                },
+                finance : {
+                    budget : 50000,
+                    requestedFunding : 5000,
+                    major : "major something",
+                    other_sources : "other sources",
+                    secured : true,
+                    experience : "experience"
+                },
+                heardFrom : {
+                    facebook : true,
+                    newsletter : false,
+                    other : true,
+                    otherText : "other heard from",
+                    personal_contact : false,
+                    twitter : true,
+                    website : true
+                },
+                acceptDisclaimer : true
             };
+            scope.data = dummyData;
+            scope.data.commentCountTotal = 34;
+            scope.data.commentCount = 12;
+            scope.data.currentPhase = "participate";
+            scope.path = "http://localhost:6541/mercator/proposal_0000000/VERSION_0000000/";
+            // Dummy data end
         }
     };
 };
