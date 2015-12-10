@@ -530,6 +530,30 @@ def recreate_all_image_size_downloads(root):  # pragma: no cover
         catalogs.reindex_index(image, 'interfaces')  # we missed reindexing
 
 
+@log_migration
+def remove_tag_resources(root):  # pragma: no cover
+    """Remove all ITag resources, create ITags sheet references instead."""
+    from adhocracy_core.sheets.tags import ITags
+    from adhocracy_core.interfaces import IItem
+    registry = get_current_registry(root)
+    catalogs = find_service(root, 'catalogs')
+    items = _search_for_interfaces(catalogs, IItem)
+    items_with_tags = [x for x in items if 'FIRST' in x]
+    count = len(items_with_tags)
+    for index, item in enumerate(items_with_tags):
+        logger.info('Migrate tag resource {0} of {1}'.format(index + 1, count))
+        del item['FIRST']
+        del item['LAST']
+        version_names = [x[0] for x in item.items()
+                         if IItemVersion.providedBy(x[1])]
+        version_names.sort()  # older version names are lower then younger ones
+        first_version = version_names[0]
+        last_version = version_names[-1]
+        tags_sheet = registry.content.get_sheet(item, ITags)
+        tags_sheet.set({'LAST': item[last_version],
+                        'FIRST': item[first_version]})
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -553,3 +577,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_image_reference_to_users)
     config.add_evolution_step(update_asset_download_children)
     config.add_evolution_step(recreate_all_image_size_downloads)
+    config.add_evolution_step(remove_tag_resources)
