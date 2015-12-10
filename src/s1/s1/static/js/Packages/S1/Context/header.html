@@ -10,6 +10,6 @@
         <a data-ng-href="{{ '/principals/users' | adhResourceUrl }}" class="button-cta-secondary">{{ "TR__S1_USER_LIST" | translate }}</a>
     </div>
 </div>
-<adh-workflow-switch ng-if="shouldShowS1StateIndicator(meeting)" data-path="{{ processUrl }}">
+<adh-workflow-switch ng-if="'current' === meeting || 'next' === meeting" data-path="{{ processUrl }}">
     <adh-s1-state-indicator data-meeting="{{meeting}}"></adh-s1-state-indicator>
 </adh-workflow-switch>
