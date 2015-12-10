@@ -8,7 +8,7 @@ import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as ResourcesBase from "../../ResourcesBase";
 
 import RIParagraph from "../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
-import * as SITag from "../../Resources_/adhocracy_core/sheets/tags/ITag";
+import * as SITags from "../../Resources_/adhocracy_core/sheets/tags/ITags";
 
 import * as Convert from "./Convert";
 import * as Error from "./Error";
@@ -210,13 +210,13 @@ export var register = () => {
                     var returnPath1 = "path1/";
 
                     var dag = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
-                    dag.data["adhocracy_core.sheets.tags.ITag"] = new SITag.Sheet({ elements: [returnPath1] });
+                    dag.data["adhocracy_core.sheets.tags.ITags"] = new SITags.Sheet({ LAST: returnPath1 });
                     $httpMock.get.and.returnValue(q.when({ data: dag }));
 
                     adhHttp.getNewestVersionPathNoFork(path).then(
                         (ret) => {
                             expect(ret).toBe(returnPath1);
-                            expect($httpMock.get).toHaveBeenCalledWith(path + "LAST/", {
+                            expect($httpMock.get).toHaveBeenCalledWith(path, {
                                 params: undefined,
                                 headers: {}
                             });
@@ -227,34 +227,6 @@ export var register = () => {
                             expect(msg).toBe(false);
                             done();
                         }
-                    );
-                });
-                it("throws an exception if LAST.length === 0", (done) => {
-                    $httpMock.get.and.returnValue(q.when({
-                        data: {
-                            "adhocracy_core.sheets.tags.ITag": {
-                                elements: []
-                            }
-                        }
-                    }));
-
-                    adhHttp.getNewestVersionPathNoFork("anypath").then(
-                        () => { expect(true).toBe(false); done(); },
-                        () => { expect(true).toBe(true); done(); }
-                    );
-                });
-                it("throws an exception if LAST.length > 1", (done) => {
-                    $httpMock.get.and.returnValue(q.when({
-                        data: {
-                            "adhocracy_core.sheets.tags.ITag": {
-                                elements: ["p1", "p2"]
-                            }
-                        }
-                    }));
-
-                    adhHttp.getNewestVersionPathNoFork("anypath").then(
-                        () => { expect(true).toBe(false); done(); },
-                        () => { expect(true).toBe(true); done(); }
                     );
                 });
             });
@@ -359,7 +331,10 @@ export var register = () => {
 
                     var newHead = "new_head";
                     var dag = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
-                    dag.data["adhocracy_core.sheets.tags.ITag"] = new SITag.Sheet({ elements: [newHead] });
+                    dag.data["adhocracy_core.sheets.tags.ITags"] = new SITags.Sheet({ FIRST: undefined,
+                                                                                      LAST: newHead
+                                                                                    });
+
 
                     var postResponses = [q.reject({ data: error }), q.when({ data: dag })].reverse();
 
