@@ -151,6 +151,7 @@
     "TR__SUBJECT": "subject",
     "TR__SUBMIT": "submit",
     "TR__SUPPORTERS": "supporters",
+    "TR__SWITCH_STATE_TO": "Switch to {{newState}}",
     "TR__TITLE_PLACEHOLDER": "Add a title here.",
     "TR__TOTAL_VOTES": "total votes",
     "TR__USERNAME": "username",
