@@ -307,6 +307,7 @@ class TestTopicSchema:
         assert error.value.asdict() == {'other':
                                         'Required if "other" in topic'}
 
+
     def test_deserialize_with_status_other(
             self, inst, cstruct_required):
         cstruct = cstruct_required
@@ -1069,7 +1070,7 @@ class TestCommunitySchema:
     @fixture
     def cstruct_required(self):
         return {'expected_feedback': 'Nice comments',
-                'heard_from': 'website'}
+                'heard_froms': ['website']}
 
     def test_deserialize_empty(self, inst):
         from colander import Invalid
@@ -1078,10 +1079,38 @@ class TestCommunitySchema:
             inst.deserialize(cstruct)
         assert error.value.asdict() == \
             {'expected_feedback': 'Required',
-             'heard_from': 'Required'}
+             'heard_froms': 'Required'}
 
     def test_deserialize_with_required(self, inst, cstruct_required):
         assert inst.deserialize(cstruct_required) == cstruct_required
+
+    def test_deserialize_with_duplicate_heard_froms(self, inst, cstruct_required):
+        from colander import Invalid
+        cstruct_required['heard_froms'] = ['website', 'website']
+        with raises(Invalid) as error:
+            inst.deserialize(cstruct_required)
+        assert error.value.asdict() == {'heard_froms': 'Duplicates are not allowed'}
+
+    def test_deserialize_with_heard_from_other_and_no_text(
+            self, inst, cstruct_required):
+        from colander import Invalid
+        cstruct = cstruct_required
+        cstruct['heard_froms'] = ['other', 'website']
+        with raises(Invalid) as error:
+            inst.deserialize(cstruct)
+        assert error.value.asdict() == {'heard_from_other':
+                                        'Required if "other" in heard_froms'}
+
+    def test_deserialize_with_heard_from_other(
+            self, inst, cstruct_required):
+        from colander import Invalid
+        cstruct = cstruct_required
+        cstruct['heard_froms'] = ['other', 'website']
+        cstruct['heard_from_other'] = 'blabla'
+        assert inst.deserialize(cstruct) == \
+            {'expected_feedback': 'Nice comments',
+             'heard_from_other': 'blabla',
+             'heard_froms': ['other', 'website']}
 
 
 class TestCommunitySheet:
