@@ -24,7 +24,7 @@ import * as SIStatus from "../../../../Resources_/adhocracy_mercator/sheets/merc
 import * as SITarget from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITarget";
 import * as SITeam from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITeam";
 import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
-import * as SITopic from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITopic";
+// FIXME: import * as SITopic from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITopic";
 import * as SIUserInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IUserInfo";
 import * as SIWinnerInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IWinnerInfo";
 import RIChallenge from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IChallenge";
@@ -124,7 +124,7 @@ export interface IData {
         budget : number;
         requestedFunding : number;
         major : string;
-        otherSources : string;
+        other_sources : string;
         secured : boolean;
     };
     experience : string;
@@ -160,6 +160,7 @@ var fill = (data : IData, resource) => {
                 status: data.organizationInfo.status,
                 status_other: data.organizationInfo.otherText
             });
+            /* FIXME: Typescript error
             resource.data[SITopic.nick] = new SITopic.Sheet({
                 topic: _.reduce(<any>data.topic, (result, include, topic) => {
                     if (include) {
@@ -168,7 +169,7 @@ var fill = (data : IData, resource) => {
                     return result;
                 }, []),
                 other: data.topic.otherText
-            });
+            });*/
             resource.data[SITitle.nick] = new SITitle.Sheet({
                 title: data.title
             });
@@ -187,7 +188,7 @@ var fill = (data : IData, resource) => {
                 major_expenses: data.finance.major
             });
             resource.data[SIExtraFunding.nick] = new SIExtraFunding.Sheet({
-                other_sources: data.finance.otherSources,
+                other_sources: data.finance.other_sources,
                 secured: data.finance.secured
             });
             resource.data[SICommunity.nick] = new SICommunity.Sheet({
@@ -444,4 +445,133 @@ export var mercatorProposalFormController2016 = (
         console.log(create($scope, adhPreliminaryNames));
     };
 
+};
+
+export var detailDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
+        scope: {},
+        link: (scope) => {
+            // FIXME : Dummy data
+            var dummyData : IData = {
+                userInfo: {
+                    firstName: "Caroline",
+                    lastName: "Clifford"
+                },
+                organizationInfo: {
+                    name: "Liqd",
+                    email: "caroline@liqd.net",
+                    website: "http://www.liqd.net",
+                    city: "Berlin",
+                    country: "DE",
+                    status: "registered_nonprofit",
+                    otherText: "Something else",
+                    registrationDate: "2015",
+                    helpRequest: "Can;t think of a logo"
+                },
+                title: "Caroline's amazing project",
+                introduction: {
+                    pitch: "Lorem ipsum Cillum proident dolor culpa commodo minim ea amet esse nisi aliquip consequat",
+                    imageUpload: "",
+                    picture: "http://localhost:6541/mercator/assets/0000000/0000000/"
+                },
+                partners: {
+                    hasPartners: true,
+                    partner1: {
+                        name: "Magda",
+                        country: "DE",
+                        website: "www.magda.de"
+                    },
+                    partner2: {
+                        name: "Robin",
+                        country: "DE",
+                        website: "www.robin.de"
+                    },
+                    partner3: {
+                        name: "Robin2",
+                        country: "DE",
+                        website: "www.robin.de2"
+                    },
+                    hasOther: true,
+                    otherText: "Tobi"
+                },
+                topic: {
+                    democracy : true,
+                    culture : false,
+                    environment : false,
+                    social : true,
+                    migration : false,
+                    community : false,
+                    urban : false,
+                    education : false,
+                    other : false,
+                    otherText : ""
+                },
+                duration: 12,
+                location: {
+                    location_is_linked_to_ruhr : true,
+                    location_is_linked_to_ruhr_text : "sdfsdfsd",
+                    location_is_online : false,
+                    location_is_specific : false,
+                    location_specific : "Berlin"
+                },
+                status: "starting",
+                impact: {
+                    challenge : "challenge",
+                    goal : "goal",
+                    plan : "plan",
+                    target : "tagrget",
+                    team : "team",
+                    extraInfo : "extraInfo"
+                },
+                criteria : {
+                    strengthen : "strengthen",
+                    difference : "Difference",
+                    practical : "practical"
+                },
+                finance : {
+                    budget : 50000,
+                    requestedFunding : 5000,
+                    major : "major something",
+                    other_sources : "other sources",
+                    secured : true
+                },
+                experience : "experience",
+                heardFrom : {
+                    facebook : true,
+                    newsletter : false,
+                    other : true,
+                    otherText : "other heard from",
+                    personal_contact : false,
+                    twitter : true,
+                    website : true
+                },
+                acceptDisclaimer : true
+            };
+            scope.data = dummyData;
+            scope.data.commentCountTotal = 34;
+            scope.data.commentCount = 12;
+            scope.data.currentPhase = "participate";
+            scope.path = "http://localhost:6541/mercator/proposal_0000000/VERSION_0000000/";
+            // Dummy data end
+
+            scope.topicTrString = (topic) => {
+                var topics = {
+                    democracy: "TR__MERCATOR_TOPIC_DEMOCRACY",
+                    culture: "TR__MERCATOR_TOPIC_CULTURE",
+                    environment: "TR__MERCATOR_TOPIC_ENVIRONMENT",
+                    social: "TR__MERCATOR_TOPIC_SOCIAL",
+                    migration: "TR__MERCATOR_TOPIC_MIGRATION",
+                    community: "TR__MERCATOR_TOPIC_COMMUNITY",
+                    urban: "TR__MERCATOR_TOPIC_URBAN",
+                    education: "TR__MERCATOR_TOPIC_EDUCATION",
+                    other: "TR__MERCATOR_TOPIC_OTHER"
+                };
+                return topics[topic];
+            };
+        }
+    };
 };

@@ -62,11 +62,15 @@ export var register = (angular) => {
         }])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerDirective("mercator-2016-proposal-create");
+            adhEmbedProvider.registerDirective("mercator-2016-proposal-detail");
         }])
         .directive("adhMercator2016ProposalCreate", [
             "adhConfig",
-            "flowFactory",
             Proposal.createDirective])
         .controller("mercatorProposalFormController2016", [
-            "$scope", "$element", "$window", "adhShowError", "adhPreliminaryNames", Proposal.mercatorProposalFormController2016]);
+            "$scope", "$element", "$window", "adhShowError", "adhPreliminaryNames", Proposal.mercatorProposalFormController2016])
+        .directive("adhMercator2016ProposalDetail", [
+            "adhConfig",
+            "flowFactory",
+            Proposal.detailDirective]);
 };
