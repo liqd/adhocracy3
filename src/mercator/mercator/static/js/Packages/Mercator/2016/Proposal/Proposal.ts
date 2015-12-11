@@ -27,7 +27,7 @@ import * as SIStatus from "../../../../Resources_/adhocracy_mercator/sheets/merc
 import * as SITarget from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITarget";
 import * as SITeam from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITeam";
 import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
-// FIXME: import * as SITopic from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITopic";
+import * as SITopic from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITopic";
 import * as SIUserInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IUserInfo";
 import * as SIWinnerInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IWinnerInfo";
 import RIChallenge from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IChallenge";
@@ -163,7 +163,6 @@ var fill = (data : IData, resource) => {
                 status: data.organizationInfo.status,
                 status_other: data.organizationInfo.otherText
             });
-            /* FIXME: Typescript error
             resource.data[SITopic.nick] = new SITopic.Sheet({
                 topic: _.reduce(<any>data.topic, (result, include, topic) => {
                     if (include) {
@@ -172,7 +171,7 @@ var fill = (data : IData, resource) => {
                     return result;
                 }, []),
                 other: data.topic.otherText
-            });*/
+            });
             resource.data[SITitle.nick] = new SITitle.Sheet({
                 title: data.title
             });
