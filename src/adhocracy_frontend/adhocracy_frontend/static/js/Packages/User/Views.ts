@@ -656,6 +656,8 @@ export var adhUserProfileImageDirective = (
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfileImage.html",
         link: (scope) => {
+            scope.didFailToLoadImage = scope.didFailToLoadImage || (() => null);
+
             scope.config = adhConfig;
             scope.$watch("path", (path) => {
                 if ( ! path) { return; }
