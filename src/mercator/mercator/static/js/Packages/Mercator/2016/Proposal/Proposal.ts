@@ -27,7 +27,7 @@ import * as SIStatus from "../../../../Resources_/adhocracy_mercator/sheets/merc
 import * as SITarget from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITarget";
 import * as SITeam from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITeam";
 import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
-// FIXME: import * as SITopic from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITopic";
+import * as SITopic from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITopic";
 import * as SIUserInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IUserInfo";
 import * as SIWinnerInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IWinnerInfo";
 import RIChallenge from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IChallenge";
@@ -127,7 +127,7 @@ export interface IData {
         budget : number;
         requestedFunding : number;
         major : string;
-        other_sources : string;
+        otherSources : string;
         secured : boolean;
     };
     experience : string;
@@ -163,7 +163,6 @@ var fill = (data : IData, resource) => {
                 status: data.organizationInfo.status,
                 status_other: data.organizationInfo.otherText
             });
-            /* FIXME: Typescript error
             resource.data[SITopic.nick] = new SITopic.Sheet({
                 topic: _.reduce(<any>data.topic, (result, include, topic) => {
                     if (include) {
@@ -172,14 +171,14 @@ var fill = (data : IData, resource) => {
                     return result;
                 }, []),
                 other: data.topic.otherText
-            });*/
+            });
             resource.data[SITitle.nick] = new SITitle.Sheet({
                 title: data.title
             });
             resource.data[SILocation.nick] = new SILocation.Sheet({
                 location: data.location.location_specific,
-                is_online: data.location.location_is_online,
-                has_link_to_ruhr: data.location.location_is_linked_to_ruhr,
+                is_online: !!data.location.location_is_online,
+                has_link_to_ruhr: !!data.location.location_is_linked_to_ruhr,
                 link_to_ruhr: data.location.location_is_linked_to_ruhr_text
             });
             resource.data[SIStatus.nick] = new SIStatus.Sheet({
@@ -191,8 +190,8 @@ var fill = (data : IData, resource) => {
                 major_expenses: data.finance.major
             });
             resource.data[SIExtraFunding.nick] = new SIExtraFunding.Sheet({
-                other_sources: data.finance.other_sources,
-                secured: data.finance.secured
+                other_sources: data.finance.otherSources,
+                secured: !!data.finance.secured
             });
             resource.data[SICommunity.nick] = new SICommunity.Sheet({
                 expected_feedback: data.experience,
@@ -216,7 +215,7 @@ var fill = (data : IData, resource) => {
             break;
         case RIPartners.content_type:
             resource.data[SIPartners.nick] = new SIPartners.Sheet({
-                has_partners: data.partners.hasPartners,
+                has_partners: !!data.partners.hasPartners,
                 partner1_name: data.partners.partner1.name,
                 partner1_website: data.partners.partner1.website,
                 partner1_country: data.partners.partner1.country,
@@ -320,7 +319,9 @@ export var createDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
-        scope: {},
+        scope: {
+            poolPath: "@"
+        },
         link: (scope) => {
             scope.$flow = flowFactory.create();
         }
@@ -396,7 +397,9 @@ export var mercatorProposalFormController2016 = (
     $element,
     $window,
     adhShowError,
-    adhPreliminaryNames : AdhPreliminaryNames.Service
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhSubmitIfValid
 ) => {
 
     $scope.data = {
@@ -507,9 +510,10 @@ export var mercatorProposalFormController2016 = (
     $scope.create = "true";
 
     $scope.submitIfValid = () => {
-        // // check validation of topics
-        // $scope.topicChange(true);
-        console.log(create($scope, adhPreliminaryNames));
+        adhSubmitIfValid($scope, $element, $scope.mercatorProposalForm, () => {
+            var resources = create($scope, adhPreliminaryNames);
+            return adhHttp.deepPost(resources);
+        });
     };
 
 };
@@ -603,7 +607,7 @@ export var detailDirective = (
                     budget : 50000,
                     requestedFunding : 5000,
                     major : "major something",
-                    other_sources : "other sources",
+                    otherSources : "other sources",
                     secured : true
                 },
                 experience : "experience",

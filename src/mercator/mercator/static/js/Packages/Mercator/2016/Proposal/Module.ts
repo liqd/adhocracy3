@@ -70,7 +70,14 @@ export var register = (angular) => {
         .directive("adhMercator2016ProposalListing", ["adhConfig", Proposal.listing])
         .directive("adhMercator2016Listitem", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", "adhGetBadges", Proposal.listItem])
         .controller("mercatorProposalFormController2016", [
-            "$scope", "$element", "$window", "adhShowError", "adhPreliminaryNames", Proposal.mercatorProposalFormController2016])
+            "$scope",
+            "$element",
+            "$window",
+            "adhShowError",
+            "adhHttp",
+            "adhPreliminaryNames",
+            "adhSubmitIfValid",
+            Proposal.mercatorProposalFormController2016])
         .directive("adhMercator2016ProposalDetail", [
             "adhConfig",
             "flowFactory",
