@@ -318,8 +318,8 @@ export var listing = (adhConfig : AdhConfig.IService) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
         scope: {
             path: "@",
-            contentTpe: "@",
-            updae: "=?",
+            contentType: "@",
+            update: "=?",
             facets: "=?",
             sort: "=?",
             sorts: "=?",
@@ -347,22 +347,28 @@ export var listItem = (
         },
         link: (scope, element) => {
             scope.data  = {
-                title: {title: "Super"},
+                title: {
+                    title: "Super"
+                },
                 user_info: {
                     first_name: "Magda",
                     createtime: "2015-12-10T11:12:04.291510+00:00"
                 },
-                organization_info: { name: "Liquid Democracy e.V." },
+                organization_info: {
+                    name: "Liquid Democracy e.V."
+                },
                 commentCountTotal: 25,
                 currentPhase: "participate",
                 supporterCount: 33,
                 finance: {
-                    requested_funding: 50000 },
+                    requested_funding: 50000
+                },
                 winnerBadgeAssignment: {
                     name: "winning"
                 },
-                introduction : {
-                    picture: "https://frontend.advocate-europe.eu/api/mercator/assets/0001799/0000001/" }
+                introduction: {
+                    picture: "https://frontend.advocate-europe.eu/api/mercator/assets/0001799/0000001/"
+                }
             };
         }
     };
