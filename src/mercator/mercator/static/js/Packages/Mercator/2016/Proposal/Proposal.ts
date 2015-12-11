@@ -318,7 +318,6 @@ export var listing = (adhConfig : AdhConfig.IService) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
         scope: {
             path: "@",
-            contentType: "@",
             update: "=?",
             facets: "=?",
             sort: "=?",
@@ -328,6 +327,9 @@ export var listing = (adhConfig : AdhConfig.IService) => {
             frontendOrderReverse: "=?",
             initialLimit: "=?",
             params: "=?"
+        },
+        link: (scope) => {
+            scope.contentType = RIMercatorProposal.content_type;
         }
     };
 };
