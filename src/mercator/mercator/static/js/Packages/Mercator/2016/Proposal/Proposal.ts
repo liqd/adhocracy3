@@ -147,7 +147,6 @@ export interface IData {
 var fill = (data : IData, resource) => {
     switch (resource.content_type) {
         case RIMercatorProposal.content_type:
-            resource.data[SIMercatorSubResources.nick] = new SIMercatorSubResources.Sheet(<any>{});
             resource.data[SIUserInfo.nick] = new SIUserInfo.Sheet({
                 first_name: data.userInfo.firstName,
                 last_name: data.userInfo.lastName
@@ -281,34 +280,40 @@ var fill = (data : IData, resource) => {
     }
 };
 
-var create = (scope, adhPreliminaryNames) => {
+var create = (adhHttp : AdhHttp.Service<any>) => (scope, adhPreliminaryNames) => {
     var data : IData = scope.data;
-    var proposal = new RIMercatorProposal({preliminaryNames: adhPreliminaryNames});
-    proposal.parent = scope.poolPath;
-    fill(data, proposal);
+    return adhHttp.withTransaction((transaction) => {
+        var proposal = new RIMercatorProposal({preliminaryNames: adhPreliminaryNames});
+        fill(data, proposal);
+        var proposalRequest = transaction.post(scope.poolPath, proposal);
 
-    var subresources = _.map({
-        pitch: RIPitch,
-        partners: RIPartners,
-        duration: RIDuration,
-        challenge: RIChallenge,
-        goal: RIGoal,
-        plan: RIPlan,
-        target: RITarget,
-        team: RITeam,
-        extrainfo: RIExtraInfo,
-        connectioncohesion: RIConnectionCohesion,
-        difference: RIDifference,
-        practicalrelevance: RIPracticalRelevance
-    }, (cls, subresourceKey : string) => {
-        var resource = new cls({preliminaryNames: adhPreliminaryNames});
-        resource.parent = proposal.path;
-        fill(data, resource);
-        proposal.data[SIMercatorSubResources.nick][subresourceKey] = resource.path;
-        return resource;
+        var subResourcesSheet = new SIMercatorSubResources.Sheet(<any>{});
+        _.forEach({
+            pitch: RIPitch,
+            partners: RIPartners,
+            duration: RIDuration,
+            challenge: RIChallenge,
+            goal: RIGoal,
+            plan: RIPlan,
+            target: RITarget,
+            team: RITeam,
+            extrainfo: RIExtraInfo,
+            connectioncohesion: RIConnectionCohesion,
+            difference: RIDifference,
+            practicalrelevance: RIPracticalRelevance
+        }, (cls, subresourceKey : string) => {
+            var resource = new cls({preliminaryNames: adhPreliminaryNames});
+            fill(data, resource);
+            var request = transaction.post(proposalRequest.path, resource);
+            subResourcesSheet[subresourceKey] = request.path;
+        });
+
+        var proposal2 = new RIMercatorProposal({preliminaryNames: adhPreliminaryNames});
+        proposal2.data[SIMercatorSubResources.nick] = subResourcesSheet;
+        transaction.put(proposalRequest.path, proposal2);
+
+        return transaction.commit();
     });
-
-    return _.flatten([proposal, subresources]);
 };
 
 
@@ -511,8 +516,7 @@ export var mercatorProposalFormController2016 = (
 
     $scope.submitIfValid = () => {
         adhSubmitIfValid($scope, $element, $scope.mercatorProposalForm, () => {
-            var resources = create($scope, adhPreliminaryNames);
-            return adhHttp.deepPost(resources);
+            return create(adhHttp)($scope, adhPreliminaryNames);
         });
     };
 
