@@ -140,6 +140,8 @@ export var showImageDirective = (
             didFailToLoadImage: "&?"
         },
         link: (scope) => {
+            scope.didFailToLoadImage = scope.didFailToLoadImage || (() => null);
+
             var imageMetadataNick = () =>
                 scope.imageMetadataNick ? scope.imageMetadataNick : SIImageMetadata.nick;
             var format = () => scope.format || "detail";

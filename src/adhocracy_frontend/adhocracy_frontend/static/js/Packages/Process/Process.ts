@@ -1,8 +1,15 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
+import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhUtil from "../Util/Util";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
+import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
 import * as SIWorkflow from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
+
+var pkgLocation = "/Process";
 
 
 // mirrors adhocracy_core.sheets.workflow.StateData
@@ -54,6 +61,48 @@ export class Service {
         return this.$injector.invoke(fn);
     }
 }
+
+export var workflowSwitchDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
+    $window : angular.IWindowService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/WorkflowSwitch.html",
+        scope: {
+            path: "@"
+        },
+        transclude: true,
+        link: (scope) => {
+
+            adhPermissions.bindScope(scope, scope.path, "rawOptions", {importOptions: false});
+            scope.$watch("rawOptions", (rawOptions) => {
+                scope.availableStates = AdhUtil.deepPluck(rawOptions, [
+                    "data", "PUT", "request_body", "data", SIWorkflow.nick, "workflow_state"]);
+            });
+
+            adhHttp.get(scope.path).then((process) => {
+                scope.workflowState = process.data[SIWorkflow.nick].workflow_state;
+            });
+
+            scope.switchState = (newState) => {
+                adhHttp.get(scope.path).then((process) => {
+                    process.data[SIWorkflow.nick] = {
+                        workflow_state: newState
+                    };
+                    process.data[SIName.nick] = undefined;
+                    adhHttp.put(scope.path, process).then((response) => {
+                        $window.alert("Switched to process state " + newState + ". Page reloading...");
+                        $window.parent.location.reload();
+                    });
+                });
+            };
+
+        }
+    };
+};
 
 export var processViewDirective = (
     adhTopLevelState : AdhTopLevelState.Service,

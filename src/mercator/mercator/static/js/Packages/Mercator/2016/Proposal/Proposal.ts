@@ -1,8 +1,11 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
 
+import * as AdhBadge from "../../../Badge/Badge";
 import * as AdhConfig from "../../../Config/Config";
+import * as AdhHttp from "../../../Http/Http";
 import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
+import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 
 import * as SIChallenge from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IChallenge";
 import * as SICommunity from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ICommunity";
@@ -174,8 +177,8 @@ var fill = (data : IData, resource) => {
             });
             resource.data[SILocation.nick] = new SILocation.Sheet({
                 location: data.location.location_specific,
-                is_online: data.location.location_is_online,
-                has_link_to_ruhr: data.location.location_is_linked_to_ruhr,
+                is_online: !!data.location.location_is_online,
+                has_link_to_ruhr: !!data.location.location_is_linked_to_ruhr,
                 link_to_ruhr: data.location.location_is_linked_to_ruhr_text
             });
             resource.data[SIStatus.nick] = new SIStatus.Sheet({
@@ -188,11 +191,16 @@ var fill = (data : IData, resource) => {
             });
             resource.data[SIExtraFunding.nick] = new SIExtraFunding.Sheet({
                 other_sources: data.finance.otherSources,
-                secured: data.finance.secured
+                secured: !!data.finance.secured
             });
             resource.data[SICommunity.nick] = new SICommunity.Sheet({
                 expected_feedback: data.experience,
-                heard_from: null,  // FIXME
+                heard_froms: _.reduce(<any>data.heardFrom, (result, include, item) => {
+                    if (include) {
+                        result.push(item);
+                    }
+                    return result;
+                }, []),
                 heard_from_other: data.heardFrom.otherText
             });
             resource.data[SIWinnerInfo.nick] = new SIWinnerInfo.Sheet({
@@ -207,7 +215,7 @@ var fill = (data : IData, resource) => {
             break;
         case RIPartners.content_type:
             resource.data[SIPartners.nick] = new SIPartners.Sheet({
-                has_partners: data.partners.hasPartners,
+                has_partners: !!data.partners.hasPartners,
                 partner1_name: data.partners.partner1.name,
                 partner1_website: data.partners.partner1.website,
                 partner1_country: data.partners.partner1.country,
@@ -311,9 +319,75 @@ export var createDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
-        scope: {},
+        scope: {
+            poolPath: "@"
+        },
         link: (scope) => {
             scope.$flow = flowFactory.create();
+        }
+    };
+};
+
+export var listing = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
+        scope: {
+            path: "@",
+            update: "=?",
+            facets: "=?",
+            sort: "=?",
+            sorts: "=?",
+            reverse: "=?",
+            frontendOrderPredicate: "=?",
+            frontendOrderReverse: "=?",
+            initialLimit: "=?",
+            params: "=?"
+        },
+        link: (scope) => {
+            scope.contentType = RIMercatorProposal.content_type;
+        }
+    };
+};
+
+export var listItem = (
+    $q : angular.IQService,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhGetBadges : AdhBadge.IGetBadges
+) => {
+    return {
+        retrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/../../2015/Proposal/ListItem.html",
+        scope: {
+
+        },
+        link: (scope, element) => {
+            scope.data  = {
+                title: {
+                    title: "Super"
+                },
+                user_info: {
+                    first_name: "Magda",
+                    createtime: "2015-12-10T11:12:04.291510+00:00"
+                },
+                organization_info: {
+                    name: "Liquid Democracy e.V."
+                },
+                commentCountTotal: 25,
+                currentPhase: "participate",
+                supporterCount: 33,
+                finance: {
+                    requested_funding: 50000
+                },
+                winnerBadgeAssignment: {
+                    name: "winning"
+                },
+                introduction: {
+                    picture: "https://frontend.advocate-europe.eu/api/mercator/assets/0001799/0000001/"
+                }
+            };
         }
     };
 };
@@ -323,7 +397,9 @@ export var mercatorProposalFormController2016 = (
     $element,
     $window,
     adhShowError,
-    adhPreliminaryNames : AdhPreliminaryNames.Service
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhSubmitIfValid
 ) => {
 
     $scope.data = {
@@ -434,9 +510,139 @@ export var mercatorProposalFormController2016 = (
     $scope.create = "true";
 
     $scope.submitIfValid = () => {
-        // // check validation of topics
-        // $scope.topicChange(true);
-        console.log(create($scope, adhPreliminaryNames));
+        adhSubmitIfValid($scope, $element, $scope.mercatorProposalForm, () => {
+            var resources = create($scope, adhPreliminaryNames);
+            return adhHttp.deepPost(resources);
+        });
     };
 
+};
+
+export var detailDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
+        scope: {},
+        link: (scope) => {
+            // FIXME : Dummy data
+            var dummyData : IData = {
+                userInfo: {
+                    firstName: "Caroline",
+                    lastName: "Clifford"
+                },
+                organizationInfo: {
+                    name: "Liqd",
+                    email: "caroline@liqd.net",
+                    website: "http://www.liqd.net",
+                    city: "Berlin",
+                    country: "DE",
+                    status: "registered_nonprofit",
+                    otherText: "Something else",
+                    registrationDate: "2015",
+                    helpRequest: "Can;t think of a logo"
+                },
+                title: "Caroline's amazing project",
+                introduction: {
+                    pitch: "Lorem ipsum Cillum proident dolor culpa commodo minim ea amet esse nisi aliquip consequat",
+                    imageUpload: "",
+                    picture: "http://localhost:6541/mercator/assets/0000000/0000000/"
+                },
+                partners: {
+                    hasPartners: true,
+                    partner1: {
+                        name: "Magda",
+                        country: "DE",
+                        website: "www.magda.de"
+                    },
+                    partner2: {
+                        name: "Robin",
+                        country: "DE",
+                        website: "www.robin.de"
+                    },
+                    partner3: {
+                        name: "Robin2",
+                        country: "DE",
+                        website: "www.robin.de2"
+                    },
+                    hasOther: true,
+                    otherText: "Tobi"
+                },
+                topic: {
+                    democracy : true,
+                    culture : false,
+                    environment : false,
+                    social : true,
+                    migration : false,
+                    community : false,
+                    urban : false,
+                    education : false,
+                    other : false,
+                    otherText : ""
+                },
+                duration: 12,
+                location: {
+                    location_is_linked_to_ruhr : true,
+                    location_is_linked_to_ruhr_text : "sdfsdfsd",
+                    location_is_online : false,
+                    location_is_specific : false,
+                    location_specific : "Berlin"
+                },
+                status: "starting",
+                impact: {
+                    challenge : "challenge",
+                    goal : "goal",
+                    plan : "plan",
+                    target : "tagrget",
+                    team : "team",
+                    extraInfo : "extraInfo"
+                },
+                criteria : {
+                    strengthen : "strengthen",
+                    difference : "Difference",
+                    practical : "practical"
+                },
+                finance : {
+                    budget : 50000,
+                    requestedFunding : 5000,
+                    major : "major something",
+                    otherSources : "other sources",
+                    secured : true
+                },
+                experience : "experience",
+                heardFrom : {
+                    facebook : true,
+                    newsletter : false,
+                    other : true,
+                    otherText : "other heard from",
+                    personal_contact : false,
+                    twitter : true,
+                    website : true
+                },
+                acceptDisclaimer : true
+            };
+            scope.data = dummyData;
+            scope.data.commentCountTotal = 34;
+            scope.data.commentCount = 12;
+            scope.data.currentPhase = "participate";
+            scope.path = "http://localhost:6541/mercator/proposal_0000000/VERSION_0000000/";
+            // Dummy data end
+
+            scope.topicTrString = (topic) => {
+                var topics = {
+                    democracy: "TR__MERCATOR_TOPIC_DEMOCRACY",
+                    culture: "TR__MERCATOR_TOPIC_CULTURE",
+                    environment: "TR__MERCATOR_TOPIC_ENVIRONMENT",
+                    social: "TR__MERCATOR_TOPIC_SOCIAL",
+                    migration: "TR__MERCATOR_TOPIC_MIGRATION",
+                    community: "TR__MERCATOR_TOPIC_COMMUNITY",
+                    urban: "TR__MERCATOR_TOPIC_URBAN",
+                    education: "TR__MERCATOR_TOPIC_EDUCATION",
+                    other: "TR__MERCATOR_TOPIC_OTHER"
+                };
+                return topics[topic];
+            };
+        }
+    };
 };
