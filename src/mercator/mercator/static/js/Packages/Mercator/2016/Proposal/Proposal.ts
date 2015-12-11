@@ -128,16 +128,20 @@ export interface IData {
         secured : boolean;
     };
     experience : string;
-    community: {
-        expected_feedback: string,
-        heard_froms: string[];
-        heard_from_other: string;
+    heardFrom : {
+        facebook : boolean;
+        newsletter : boolean;
+        other : boolean;
+        otherText : string;
+        personal_contact : boolean;
+        twitter : boolean;
+        website : boolean;
     };
-    acceptDisclaimer: boolean;
+    acceptDisclaimer : boolean;
 }
 
 
-var fill = (data: IData, resource) => {
+var fill = (data : IData, resource) => {
     switch (resource.content_type) {
         case RIMercatorProposal.content_type:
             resource.data[SIMercatorSubResources.nick] = new SIMercatorSubResources.Sheet(<any>{});
@@ -187,9 +191,9 @@ var fill = (data: IData, resource) => {
                 secured: data.finance.secured
             });
             resource.data[SICommunity.nick] = new SICommunity.Sheet({
-                expected_feedback: data.community.expected_feedback,
-                heard_froms: data.community.heard_froms,  // FIXME
-                heard_from_other: data.community.heard_from_other
+                expected_feedback: data.experience,
+                heard_from: null,  // FIXME
+                heard_from_other: data.heardFrom.otherText
             });
             resource.data[SIWinnerInfo.nick] = new SIWinnerInfo.Sheet({
                 explanation: null,  // FIXME
