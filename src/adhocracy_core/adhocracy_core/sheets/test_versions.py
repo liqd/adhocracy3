@@ -35,10 +35,11 @@ class TestValidateLinearHistoryNoMerge:
 class TestValidateLinearHistoryNoFork:
 
     @fixture
-    def node(self, context, request_):
+    def node(self, context, request_, registry):
         node = testing.DummyResource(bindings={})
         node.bindings['context'] = context
         node.bindings['request'] = request_
+        node.bindings['registry'] = registry
         return node
 
     @fixture
@@ -94,14 +95,14 @@ class TestValidateLinearHistoryNoFork:
         assert err.value.msg == 'No fork allowed - valid follows resources '\
                                 'are: /last_version'
 
-    def test_batchmode_ingnore_if_last_new_new_version_in_transaction(
+    def test_batchmode_ingnore_if_last_version_created_in_transaction(
             self, node, last, other, mock_sheet, changelog, request_):
         from adhocracy_core.utils import set_batchmode
         request_.registry.changelog = changelog
         set_batchmode(request_)
         mock_sheet.get.return_value = {'LAST': last}
-        request_.registry.changelog['/'] = changelog['/']._replace(
-            last_version=other)
+        request_.registry.changelog['/last_version'] =\
+            changelog['/last_version']._replace(created=True)
         assert self.call_fut(node, [other]) is None
 
 

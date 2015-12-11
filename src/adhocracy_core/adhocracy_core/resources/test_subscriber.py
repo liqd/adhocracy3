@@ -170,11 +170,9 @@ class TestAutoupdateVersionableHasNewVersion:
 
     @fixture
     def mock_get_last_version(self, monkeypatch):
-        import adhocracy_core.resources.subscriber
-        mock = Mock(spec=adhocracy_core.utils.get_last_version)
-        monkeypatch.setattr(adhocracy_core.resources.subscriber,
-                            'get_last_version',
-                            mock)
+        from . import subscriber
+        mock = Mock(spec=subscriber._get_last_version)
+        monkeypatch.setattr(subscriber, '_get_last_version', mock)
         return mock
 
     @fixture

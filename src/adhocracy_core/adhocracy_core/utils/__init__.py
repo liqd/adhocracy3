@@ -17,7 +17,6 @@ from pyramid.location import lineage
 from pyramid.request import Request
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
-from pyramid.traversal import find_interface
 from pyramid.traversal import resource_path
 from pyramid.threadlocal import get_current_registry
 from pyramid.router import Router
@@ -32,8 +31,6 @@ import colander
 
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.interfaces import IItem
-from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IResourceSheet
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import VisibilityChange
@@ -309,15 +306,6 @@ def unflatten_multipart_request(request: Request) -> dict:
     return result
 
 
-def get_last_version(resource: IItemVersion,
-                     registry: Registry) -> IItemVersion:
-    """Get last version of  resource' according to the last tag."""
-    from adhocracy_core.sheets.tags import ITags  # prevent circle imports
-    item = find_interface(resource, IItem)
-    last = get_sheet_field(item, ITags, 'LAST', registry=registry)
-    return last
-
-
 def get_changelog_metadata(resource, registry) -> ChangelogMetadata:
     """Return transaction changelog for `resource`."""
     path = resource_path(resource)
@@ -337,23 +325,6 @@ def set_batchmode(request: Request, value=True):
 def is_batchmode(request: Request) -> bool:
     """Get 'batchmode' marker for the current request."""
     return getattr(request, '__is_batchmode__', False)
-
-
-def get_following_new_version(registry, resource) -> IResource:
-    """Return the following version created in this transaction."""
-    changelog = get_changelog_metadata(resource, registry)
-    if changelog.created:
-        new_version = resource
-    else:
-        new_version = changelog.followed_by
-    return new_version
-
-
-def get_last_new_version_in_transaction(registry, resource) -> IResource:
-    """Return last new version created in this transaction."""
-    item = find_interface(resource, IItem)
-    item_changelog = get_changelog_metadata(item, registry)
-    return item_changelog.last_version
 
 
 def is_deleted(resource: IResource) -> dict:
@@ -507,3 +478,10 @@ def has_annotation_sheet_data(resource: IResource) -> bool:
             return True
     else:
         return False
+
+
+def is_created_in_current_transaction(resource: IResource,
+                                      registry: Registry) -> bool:
+    """Check if `resource` is created during the current transaction."""
+    changelog = get_changelog_metadata(resource, registry)
+    return changelog.created

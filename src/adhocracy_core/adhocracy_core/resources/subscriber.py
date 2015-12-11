@@ -7,10 +7,12 @@ from os import urandom
 from pyramid.registry import Registry
 from pyramid.request import Request
 from pyramid.settings import asbool
+from pyramid.traversal import find_interface
 from pyramid.i18n import TranslationStringFactory
 from substanced.util import find_service
 
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ISimple
@@ -27,14 +29,13 @@ from adhocracy_core.resources.asset import IAsset
 from adhocracy_core.resources.image import add_image_size_downloads
 from adhocracy_core.resources.image import IImage
 from adhocracy_core.sheets.principal import IPermissions
+from adhocracy_core.sheets.tags import ITags
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
 from adhocracy_core.utils import find_graph
-from adhocracy_core.utils import get_following_new_version
-from adhocracy_core.utils import get_last_new_version_in_transaction
+from adhocracy_core.utils import get_changelog_metadata
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import get_iresource
-from adhocracy_core.utils import get_last_version
 from adhocracy_core.utils import get_modification_date
 from adhocracy_core.utils import get_user
 from adhocracy_core.sheets.versions import IVersionable
@@ -141,10 +142,15 @@ def _get_updated_appstruct(event: ISheetReferenceNewVersion,
 def _get_last_version_created_in_transaction(event: ISheetReferenceNewVersion)\
         -> IItemVersion:
     if event.is_batchmode:
-        new_version = get_last_new_version_in_transaction(event.registry,
-                                                          event.object)
+        item = find_interface(event.object, IItem)
+        changelog = get_changelog_metadata(item, event.registry)
+        new_version = changelog.last_version
     else:
-        new_version = get_following_new_version(event.registry, event.object)
+        changelog = get_changelog_metadata(event.object, event.registry)
+        if changelog.created:
+            new_version = event.object
+        else:
+            new_version = changelog.followed_by
     return new_version
 
 
@@ -162,7 +168,7 @@ def _new_version_needed_and_not_forking(event: ISheetReferenceNewVersion)\
     throw an AutoUpdateNoForkAllowedError. This should only happen in batch
     requests.
     """
-    last = get_last_version(event.object, event.registry)
+    last = _get_last_version(event.object, event.registry)
     if last is None or last is event.object:
         return True
     value = get_sheet_field(event.object, event.isheet, event.isheet_field,
@@ -173,6 +179,14 @@ def _new_version_needed_and_not_forking(event: ISheetReferenceNewVersion)\
         return False
     else:
         raise AutoUpdateNoForkAllowedError(event.object, event)
+
+
+def _get_last_version(resource: IItemVersion,
+                      registry: Registry) -> IItemVersion:
+    """Get last version of  resource' according to the last tag."""
+    item = find_interface(resource, IItem)
+    last = get_sheet_field(item, ITags, 'LAST', registry=registry)
+    return last
 
 
 def _create_new_version(event, appstruct) -> IResource:
