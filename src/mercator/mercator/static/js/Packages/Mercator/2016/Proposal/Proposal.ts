@@ -192,9 +192,9 @@ var fill = (data : IData, resource) => {
             });
             resource.data[SICommunity.nick] = new SICommunity.Sheet({
                 expected_feedback: data.experience,
-                heard_froms: _.reduce(<any>data.heardFrom, (result, include, topic) => {
+                heard_froms: _.reduce(<any>data.heardFrom, (result, include, item) => {
                     if (include) {
-                        result.push(topic);
+                        result.push(item);
                     }
                     return result;
                 }, []),
