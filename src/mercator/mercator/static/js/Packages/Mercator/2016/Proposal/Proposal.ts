@@ -127,7 +127,7 @@ export interface IData {
         budget : number;
         requestedFunding : number;
         major : string;
-        other_sources : string;
+        otherSources : string;
         secured : boolean;
     };
     experience : string;
@@ -608,7 +608,7 @@ export var detailDirective = (
                     budget : 50000,
                     requestedFunding : 5000,
                     major : "major something",
-                    other_sources : "other sources",
+                    otherSources : "other sources",
                     secured : true
                 },
                 experience : "experience",
