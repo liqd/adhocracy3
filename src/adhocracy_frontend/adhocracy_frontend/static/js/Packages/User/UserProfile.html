@@ -4,6 +4,8 @@
     data-ng-if="path"
     class="user-profile-info">
 
+    <adh-user-profile-image-edit data-path="{{path}}"></adh-user-profile-image-edit>
+
     <h1 data-itemprop="name" class="user-profile-info-name">
         <span class="user-profile-info-name-text">{{userBasic.name}}</span>
         <span data-ng-repeat="assignment in assignments">

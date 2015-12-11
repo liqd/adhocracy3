@@ -7,6 +7,7 @@ import RIImage from "../../Resources_/adhocracy_core/resources/image/IImage";
 import * as SIHasAssetPool from "../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
 import * as SIImageMetadata from "../../Resources_/adhocracy_core/sheets/image/IImageMetadata";
 import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
+import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
 var pkgLocation = "/Image";
 
@@ -72,12 +73,21 @@ export var addImage = (
     resourcePath : string,
     imagePath : string
 ) => {
-    return adhHttp.get(resourcePath).then((version) => {
-        var newVersion = _.clone(version);
-        newVersion.data[SIImageReference.nick] = new SIImageReference.Sheet({
-            picture: imagePath
-        });
-        return adhHttp.postNewVersionNoFork(resourcePath, newVersion);
+    return adhHttp.get(resourcePath).then((resource) => {
+        var patch = {
+            data: {},
+            content_type: resource.content_type
+        };
+        patch.data[SIImageReference.nick] = new SIImageReference.Sheet({ picture: imagePath });
+
+        // Versioned resources are on the way out, so they get the special treatment
+        if (resource.data[SIVersionable.nick]) {
+            var newVersion = _.clone(resource);
+            _.merge(newVersion.data, patch.data);
+            return adhHttp.postNewVersionNoFork(resourcePath, newVersion);
+        } else {
+            return adhHttp.put(resourcePath, patch);
+        }
     });
 };
 
@@ -93,7 +103,9 @@ export var uploadImageDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Upload.html",
         scope: {
             poolPath: "@",
-            path: "@"
+            path: "@",
+            didCompleteUpload: "&?",
+            didCancelUpload: "&?"
         },
         link: (scope) => {
             scope.$flow = flowFactory.create();
@@ -105,7 +117,8 @@ export var uploadImageDirective = (
 
             scope.submit = () => {
                 return adhUploadImage(scope.poolPath, scope.$flow)
-                    .then((imagePath : string) => addImage(adhHttp)(scope.path, imagePath));
+                    .then((imagePath : string) => addImage(adhHttp)(scope.path, imagePath)
+                        .then(scope.didCompleteUpload));
             };
         }
     };
@@ -122,20 +135,34 @@ export var showImageDirective = (
             cssClass: "@",
             alt: "@?",
             format: "@?", // defaults to "detail"
-            imageMetadataNick: "@?" // defaults to SIImageMetadata.nick
+            imageMetadataNick: "@?", // defaults to SIImageMetadata.nick
+            fallbackUrl: "@?", // defaults to "/static/fallback_$format.jpg";
+            didFailToLoadImage: "&?"
         },
         link: (scope) => {
-            if ( ! scope.imageMetadataNick) { scope.imageMetadataNick = SIImageMetadata.nick; }
-            if ( ! scope.format) { scope.format = "detail"; }
+            scope.didFailToLoadImage = scope.didFailToLoadImage || (() => null);
 
-            var fallbackUrl = "/static/fallback_" + scope.format + ".jpg";
+            var imageMetadataNick = () =>
+                scope.imageMetadataNick ? scope.imageMetadataNick : SIImageMetadata.nick;
+            var format = () => scope.format || "detail";
+            var fallbackUrl = () => scope.fallbackUrl || ("/static/fallback_" + format() + ".jpg");
+            scope.imageUrl = fallbackUrl(); // show fallback till real image is loaded
 
             scope.$watch("path", (path) => {
                 // often instantiated before the path can be provided by the surrounding dom
                 if ( ! path) { return; }
                 adhHttp.get(scope.path).then(
-                    (asset) => { scope.imageUrl = asset.data[scope.imageMetadataNick][scope.format]; },
-                    (error) => { scope.imageUrl = fallbackUrl; }
+                    (asset) => {
+                        var imageUrl = asset.data[imageMetadataNick()][format()];
+                        if ( ! imageUrl) {
+                            console.log("Couldn't load image format <" + format() + ">"
+                                + " from asset: " + scope.path);
+                            scope.didFailToLoadImage();
+                            return; // don't override the fallback image path
+                        }
+                        scope.imageUrl = imageUrl;
+                    },
+                    scope.didFailToLoadImage
                 );
             });
         }

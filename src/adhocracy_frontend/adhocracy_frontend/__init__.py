@@ -52,6 +52,8 @@ def config_view(request):
         'adhocracy.frontend.piwik_use_cookies', 'false'))
     config['piwik_track_user_id'] = asbool(settings.get(
         'adhocracy.frontend.piwik_track_user_id', 'false'))
+    config['profile_images_enabled'] = asbool(settings.get(
+        'adhocracy.frontend.profile_images_enabled', 'true'))
     use_cachbust = asbool(settings.get('cachebust.enabled', 'false'))
     if not use_cachbust:  # ease testing
         return config
