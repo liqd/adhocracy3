@@ -192,7 +192,12 @@ var fill = (data : IData, resource) => {
             });
             resource.data[SICommunity.nick] = new SICommunity.Sheet({
                 expected_feedback: data.experience,
-                heard_from: null,  // FIXME
+                heard_froms: _.reduce(<any>data.heardFrom, (result, include, item) => {
+                    if (include) {
+                        result.push(item);
+                    }
+                    return result;
+                }, []),
                 heard_from_other: data.heardFrom.otherText
             });
             resource.data[SIWinnerInfo.nick] = new SIWinnerInfo.Sheet({
