@@ -427,13 +427,13 @@ export var mercatorProposalFormController2016 = (
     var topicTotal = 0;
 
     $scope.topics = [
-        "democracy",
-        "culture",
+        "democracy_and_participation",
+        "arts_and_cultural_activities",
         "environment",
-        "social",
+        "social_inclusion",
         "migration",
-        "community",
-        "urban",
+        "communities",
+        "urban_development",
         "education",
         "other",
     ];
@@ -475,13 +475,13 @@ export var mercatorProposalFormController2016 = (
 
     $scope.topicTrString = (topic) => {
         var topics = {
-            democracy: "TR__MERCATOR_TOPIC_DEMOCRACY",
-            culture: "TR__MERCATOR_TOPIC_CULTURE",
+            democracy_and_participation: "TR__MERCATOR_TOPIC_DEMOCRACY",
+            arts_and_cultural_activities: "TR__MERCATOR_TOPIC_CULTURE",
             environment: "TR__MERCATOR_TOPIC_ENVIRONMENT",
-            social: "TR__MERCATOR_TOPIC_SOCIAL",
+            social_inclusion: "TR__MERCATOR_TOPIC_SOCIAL",
             migration: "TR__MERCATOR_TOPIC_MIGRATION",
-            community: "TR__MERCATOR_TOPIC_COMMUNITY",
-            urban: "TR__MERCATOR_TOPIC_URBAN",
+            communities: "TR__MERCATOR_TOPIC_COMMUNITY",
+            urban_development: "TR__MERCATOR_TOPIC_URBAN",
             education: "TR__MERCATOR_TOPIC_EDUCATION",
             other: "TR__MERCATOR_TOPIC_OTHER"
         };
