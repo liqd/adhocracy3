@@ -65,7 +65,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
 
     def _resolve_oids(self, elements: Iterable) -> Iterable:
         objectmap = find_objectmap(self)
-        if isinstance(elements, IResultSet):
+        if isinstance(elements, ResultSet):
             elements.resolver = objectmap.object_for
             return elements.all()
         elements = (objectmap.object_for(e) for e in elements)
@@ -153,9 +153,9 @@ class CatalogsServiceAdhocracy(CatalogsService):
         accumulated_refs = index.search_with_order(query.references[0])
         accumulated_refs.resolver = resolver
         for reference in query.references[1:]:
-             found = index.search_with_order(reference)
-             found.resolver = resolver
-             accumulated_refs = found.intersect(accumulated_refs)
+            found = index.search_with_order(reference)
+            found.resolver = resolver
+            accumulated_refs = found.intersect(accumulated_refs)
         return accumulated_refs
 
     def _combine_results(self, query, elements, references):
@@ -179,7 +179,6 @@ class CatalogsServiceAdhocracy(CatalogsService):
             self._get_indexes_index_query(query),
             [self._get_private_visibility_index_query(query)],
             [self._get_allowed_index_query(query)],)
-        # TODO: build_query
         elements = self._execute_query(indexes)
         references = self._search_references(query, elements.resolver)
         result = self._combine_results(query, elements, references)
@@ -238,10 +237,10 @@ class CatalogsServiceAdhocracy(CatalogsService):
                                      limit=query.limit or None)
         return elements
 
-    def _get_slice(self, elements: [IResource], query: IResultSet) -> Iterable:
+    def _get_slice(self, elements: Iterable, query: IResultSet) -> Iterable:
         """Get slice defined by `query.limit` and `query.offset`.
 
-        :returns: [IResource]
+        :returns: Iterable or IResultSet if limit is not specified
         """
         elements_slice = elements
         if query.limit:
