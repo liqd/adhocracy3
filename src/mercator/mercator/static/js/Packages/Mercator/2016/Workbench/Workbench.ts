@@ -7,6 +7,7 @@ import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 import * as AdhUtil from "../../../Util/Util";
+import * as AdhUserViews from "../../../User/Views";
 
 import * as AdhMercator2015Workbench from "../../2015/Workbench/Workbench";
 
@@ -313,4 +314,6 @@ export var registerRoutes = (
                 }
             );
     }).value();
+
+    AdhUserViews.registerRoutes(context)(adhResourceAreaProvider);
 };
