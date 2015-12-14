@@ -168,9 +168,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
         else:
             return elements
 
-    @profile
     def _search_elements(self, query) -> IResultSet:
-#        import pudb; pudb.set_trace() #  noqa
         interfaces_index = self.get_index('interfaces')
         if interfaces_index is None:  # pragma: no branch
             return ResultSet(set(), 0, None)
@@ -185,9 +183,6 @@ class CatalogsServiceAdhocracy(CatalogsService):
         elements = self._execute_query(indexes)
         references = self._search_references(query, elements.resolver)
         result = self._combine_results(query, elements, references)
-#        profile.print_stats()
-# TODO: see why yield references is called so many times
-
         return result
 
     def _get_frequency_of(self, elements: IResultSet,
