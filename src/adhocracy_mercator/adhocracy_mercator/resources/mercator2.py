@@ -12,7 +12,7 @@ from adhocracy_core.resources.proposal import IProposal
 from adhocracy_core.resources.simple import simple_meta
 from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.sheets.description import IDescription
-from adhocracy_core.sheets.rate import IRateable
+from adhocracy_core.sheets.rate import ILikeable
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.image import IImageReference
 from adhocracy_core.resources.comment import add_commentsservice
@@ -234,7 +234,7 @@ proposal_meta = proposal.proposal_meta._replace(
        (ITitle,
         IDescription,
         ICommentable,
-        IRateable,
+        ILikeable,
         IImageReference,
         adhocracy_mercator.sheets.mercator2.IMercatorSubResources,
         adhocracy_mercator.sheets.mercator2.IUserInfo,
