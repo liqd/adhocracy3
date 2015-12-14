@@ -39,8 +39,8 @@ export var phaseHeaderDirective = (
                     "geht es um die Arbeit am neuen Masterplan. Zwischenergebnisse und Vorschläge erweitern die Ausstellung im " +
                     "Alexanderhaus. Die Anmerkungen aus der Onlinebeteiligung werden in die Workshops mit einfließen.",
                 processType: "Workshopverfahren Alexanderplatz",
-                votingAvailable: true,
-                commentAvailable: true
+                votingAvailable: false,
+                commentAvailable: false
             }, {
                 name: "result",
                 shorttitle: "Phase 3",
