@@ -97,12 +97,7 @@ class TestOrganizationInfoSchema:
         cstruct = {}
         with raises(Invalid) as error:
             inst.deserialize(cstruct)
-        assert error.value.asdict() == {'city': 'Required',
-                                        'contact_email': 'Required',
-                                        'country': 'Required',
-                                        'name': 'Required',
-                                        'registration_date': 'Required',
-                                        'status': 'Required'}
+        assert error.value.asdict() == {'status': 'Required'}
 
     def test_deserialize_with_required(self, inst, cstruct_required):
         assert inst.deserialize(cstruct_required) == \
