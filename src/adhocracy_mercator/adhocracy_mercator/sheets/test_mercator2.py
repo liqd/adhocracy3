@@ -412,8 +412,7 @@ class TestLocationSchema:
         cstruct = {}
         with raises(Invalid) as error:
             inst.deserialize(cstruct)
-        assert error.value.asdict() == {'location': 'Required',
-                                        'has_link_to_ruhr': 'Required'}
+        assert error.value.asdict() == {'has_link_to_ruhr': 'Required'}
 
     def test_deserialize_with_required(self, inst, cstruct_required):
         assert inst.deserialize(cstruct_required) == \
