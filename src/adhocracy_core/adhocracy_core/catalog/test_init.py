@@ -129,10 +129,8 @@ class TestCatalogsServiceAdhocracy:
             inst.reindex_index(child, 'WRONG')
 
     def test_search_default_query(self, registry, pool, inst, query):
-#        from hypatia.interfaces import IResultSet
         child = self._make_resource(registry, parent=pool)
         result = inst.search(query)
-#        assert IResultSet.providedBy(result.elements)
         assert list(result.elements) == [child]
 
     def test_search_count_result_elements(self, registry, pool, inst, query):
