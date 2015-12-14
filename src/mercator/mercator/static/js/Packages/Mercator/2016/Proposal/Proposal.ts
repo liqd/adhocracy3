@@ -47,6 +47,22 @@ import RITeam from "../../../../Resources_/adhocracy_mercator/resources/mercator
 var pkgLocation = "/Mercator/2016/Proposal";
 
 
+var topicTrString = (topic : string) : string => {
+    var topics = {
+        democracy_and_participation: "TR__MERCATOR_TOPIC_DEMOCRACY",
+        arts_and_cultural_activities: "TR__MERCATOR_TOPIC_CULTURE",
+        environment: "TR__MERCATOR_TOPIC_ENVIRONMENT",
+        social_inclusion: "TR__MERCATOR_TOPIC_SOCIAL",
+        migration: "TR__MERCATOR_TOPIC_MIGRATION",
+        communities: "TR__MERCATOR_TOPIC_COMMUNITY",
+        urban_development: "TR__MERCATOR_TOPIC_URBAN",
+        education: "TR__MERCATOR_TOPIC_EDUCATION",
+        other: "TR__MERCATOR_TOPIC_OTHER"
+    };
+    return topics[topic];
+};
+
+
 export interface IData {
     userInfo : {
         firstName : string;
@@ -473,20 +489,7 @@ export var mercatorProposalFormController2016 = (
         return valid;
     };
 
-    $scope.topicTrString = (topic) => {
-        var topics = {
-            democracy_and_participation: "TR__MERCATOR_TOPIC_DEMOCRACY",
-            arts_and_cultural_activities: "TR__MERCATOR_TOPIC_CULTURE",
-            environment: "TR__MERCATOR_TOPIC_ENVIRONMENT",
-            social_inclusion: "TR__MERCATOR_TOPIC_SOCIAL",
-            migration: "TR__MERCATOR_TOPIC_MIGRATION",
-            communities: "TR__MERCATOR_TOPIC_COMMUNITY",
-            urban_development: "TR__MERCATOR_TOPIC_URBAN",
-            education: "TR__MERCATOR_TOPIC_EDUCATION",
-            other: "TR__MERCATOR_TOPIC_OTHER"
-        };
-        return topics[topic];
-    };
+    $scope.topicTrString = topicTrString;
 
     var showCheckboxGroupError = (form, names : string[]) : boolean => {
         var dirty = $scope.mercatorProposalForm.$submitted || _.some(names, (name) => form[name].$dirty);
@@ -633,20 +636,7 @@ export var detailDirective = (
             scope.path = "http://localhost:6541/mercator/proposal_0000000/VERSION_0000000/";
             // Dummy data end
 
-            scope.topicTrString = (topic) => {
-                var topics = {
-                    democracy: "TR__MERCATOR_TOPIC_DEMOCRACY",
-                    culture: "TR__MERCATOR_TOPIC_CULTURE",
-                    environment: "TR__MERCATOR_TOPIC_ENVIRONMENT",
-                    social: "TR__MERCATOR_TOPIC_SOCIAL",
-                    migration: "TR__MERCATOR_TOPIC_MIGRATION",
-                    community: "TR__MERCATOR_TOPIC_COMMUNITY",
-                    urban: "TR__MERCATOR_TOPIC_URBAN",
-                    education: "TR__MERCATOR_TOPIC_EDUCATION",
-                    other: "TR__MERCATOR_TOPIC_OTHER"
-                };
-                return topics[topic];
-            };
+            scope.topicTrString = topicTrString;
         }
     };
 };
