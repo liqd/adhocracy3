@@ -400,7 +400,7 @@ class TestMercatorProposal:
              adhocracy_core.sheets.title.ITitle,
              adhocracy_core.sheets.description.IDescription,
              adhocracy_core.sheets.comment.ICommentable,
-             adhocracy_core.sheets.rate.IRateable,
+             adhocracy_core.sheets.rate.ILikeable,
              adhocracy_core.sheets.image.IImageReference,
              adhocracy_mercator.sheets.mercator2.IMercatorSubResources,
              adhocracy_mercator.sheets.mercator2.IUserInfo,
