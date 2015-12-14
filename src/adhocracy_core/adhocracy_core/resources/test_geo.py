@@ -15,9 +15,11 @@ class TestMultiPolygon:
         import adhocracy_core.sheets
         from .geo import IMultiPolygon
         assert meta.iresource is IMultiPolygon
+        assert meta.use_autonaming is False
         assert IMultiPolygon.isOrExtends(ISimple)
         assert meta.permission_create == 'create_multipolygon'
-        assert meta.extended_sheets == (adhocracy_core.sheets.geo.IMultiPolygon,
+        assert meta.extended_sheets == (adhocracy_core.sheets.name.IName,
+                                        adhocracy_core.sheets.geo.IMultiPolygon,
                                         )
 
     @mark.usefixtures('integration')

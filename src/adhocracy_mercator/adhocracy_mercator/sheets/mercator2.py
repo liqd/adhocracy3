@@ -54,13 +54,13 @@ class OrganizationStatusEnum(AdhocracySchemaNode):
 class OrganizationInfoSchema(colander.MappingSchema):
     """Data structure for organizational information."""
 
-    name = SingleLine(missing=colander.required)
-    city = SingleLine(missing=colander.required)
-    country = ISOCountryCode(missing=colander.required)
+    name = SingleLine(missing=colander.drop)
+    city = SingleLine(missing=colander.drop)
+    country = ISOCountryCode(missing=colander.drop)
     help_request = Text(validator=colander.Length(max=300))
-    registration_date = DateTime(missing=colander.required, default=None)
+    registration_date = DateTime(missing=colander.drop, default=None)
     website = URL(missing=colander.drop)
-    contact_email = Email(missing=colander.required)
+    contact_email = Email(missing=colander.drop)
     status = OrganizationStatusEnum(missing=colander.required)
     status_other = Text(validator=colander.Length(max=300))
 
@@ -196,7 +196,7 @@ class ILocation(ISheet):
 
 
 class LocationSchema(colander.MappingSchema):
-    location = SingleLine(missing=colander.required)
+    location = SingleLine()
     is_online = Boolean()
     has_link_to_ruhr = Boolean(missing=colander.required, default=False)
     link_to_ruhr = Text()
@@ -232,7 +232,7 @@ class ProjectStatusEnum(AdhocracySchemaNode):
     default = 'other'
     missing = colander.required
     validator = colander.OneOf(['starting',
-                                'developping',
+                                'developing',
                                 'scaling',
                                 'other',
                                 ])
