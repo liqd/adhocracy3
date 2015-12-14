@@ -161,12 +161,9 @@ class CatalogsServiceAdhocracy(CatalogsService):
     def _combine_results(self, query, elements, references):
         if not query.references:
             return elements
-        elif query.interfaces and query.references:
+        if query.interfaces:
             return elements.intersect(references)
-        elif not query.interfaces and query.references:
-            return references
-        else:
-            return elements
+        return references
 
     def _search_elements(self, query) -> IResultSet:
         interfaces_index = self.get_index('interfaces')
