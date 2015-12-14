@@ -232,7 +232,7 @@ class ProjectStatusEnum(AdhocracySchemaNode):
     default = 'other'
     missing = colander.required
     validator = colander.OneOf(['starting',
-                                'developping',
+                                'developing',
                                 'scaling',
                                 'other',
                                 ])
