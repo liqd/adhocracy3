@@ -1,6 +1,7 @@
 """Geo location types."""
 from pyramid.registry import Registry
 import adhocracy_core.sheets.geo
+import adhocracy_core.sheets.name
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.interfaces import ISimple
@@ -22,8 +23,10 @@ class IMultiPolygon(ISimple):
 multipolygon_meta = simple_meta._replace(
     iresource=IMultiPolygon,
     permission_create='create_multipolygon',
+    use_autonaming=False,
     is_implicit_addable=False,
     extended_sheets=(
+        adhocracy_core.sheets.name.IName,
         adhocracy_core.sheets.geo.IMultiPolygon,
     ),
 )
