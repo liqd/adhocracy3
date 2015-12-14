@@ -73,11 +73,11 @@ class CatalogsServiceAdhocracy(CatalogsService):
 
     def _get_interfaces_index_query(self, query):
         interfaces_value = self._get_query_value(query.interfaces)
-        # if not interfaces_value and query.references:
-        #     # do not search for all IResource and then intersect with
-        #     # the references when searching for references with
-        #     # non-specified interfaces
-        #     return None
+        if not interfaces_value and query.references:
+            # do not search for all IResource and then intersect with
+            # the references when searching for references with
+            # non-specified interfaces
+            return None
         if not interfaces_value:
             interfaces_value = (IResource,)
         interfaces_comparator = self._get_query_comparator(query.interfaces)
