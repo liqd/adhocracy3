@@ -95,7 +95,7 @@ class IPitch(ISheet):
 
 class PitchSchema(colander.MappingSchema):
     pitch = Text(missing=colander.required,
-                 validator=colander.Length(min=3, max=100))
+                 validator=colander.Length(min=3, max=500))
 
 
 pitch_meta = sheet_meta._replace(
