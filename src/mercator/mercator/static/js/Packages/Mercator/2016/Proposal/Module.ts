@@ -63,6 +63,7 @@ export var register = (angular) => {
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerDirective("mercator-2016-proposal-create");
             adhEmbedProvider.registerDirective("mercator-2016-proposal-detail");
+            adhEmbedProvider.registerDirective("mercator-2016-proposal-listing");
         }])
         .directive("adhMercator2016ProposalCreate", [
             "adhConfig",
