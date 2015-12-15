@@ -64,16 +64,27 @@ class TestItem:
     def context(self, pool_with_catalogs):
         return pool_with_catalogs
 
-    def make_one(self, context, registry, name='name'):
+    @fixture
+    def creator(self, context, registry):
+        from adhocracy_core.resources.principal import IUser
+        creator = registry.content.create(IUser.__identifier__,
+                                          appstructs={},
+                                          parent=context,
+                                          send_event=False)
+        return creator
+
+    def make_one(self, context, registry, name='name', creator=None):
         inst = registry.content.create(IItem.__identifier__,
                                        appstructs={},
-                                       parent=context)
+                                       parent=context,
+                                       creator=creator,
+                                       )
         return inst
 
-    def test_create(self, context, registry):
+    def test_create(self, context, registry, creator):
+        from adhocracy_core.sheets.metadata import IMetadata
         from adhocracy_core.sheets.tags import ITags
-
-        item = self.make_one(context, registry)
+        item = self.make_one(context, registry, creator=creator)
 
         version0 = item['VERSION_0000000']
         assert IItemVersion.providedBy(version0)
@@ -82,6 +93,8 @@ class TestItem:
         last = tags_sheet.get()['LAST']
         assert first == version0
         assert last == version0
+        meta_sheet = registry.content.get_sheet(version0, IMetadata)
+        assert creator == meta_sheet.get()['creator']
 
     def test_update_last_tag(self, context, registry):
         """Test that LAST tag is updated correctly."""
