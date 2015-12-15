@@ -140,7 +140,6 @@
 
                     <div data-ng-switch="data.organizationInfo.status">
                         <div data-ng-switch-when="registered_nonprofit">
-
                             <ul class="mercator-proposal-detail-orgs-columns">
                                 <li>
                                     <a
@@ -149,14 +148,14 @@
                                         data-ng-href="{{ data.organizationInfo.website }}"
                                         target="_new">
                                         {{ data.organizationInfo.name }}</a>
-                                    <span ng-if="!data.organizationInfo.website">{{ data.organizationInfo.name }}</span>
+                                    <span data-ng-if="!data.organizationInfo.website">{{ data.organizationInfo.name }}</span>
                                     <a
                                         data-ng-if="data.organizationInfo.email"
                                         data-ng-href="mailto:{{ data.organizationInfo.email }}">
-                                        {{ "TR__EMAIL" | translate }}</a></li>
-                                <li><i class="icon-map-pin"></i> {{ data.organizationInfo.country | adhCountryName | translate }}</li>
-                                <li>{{ "TR__MERCATOR_PROPOSAL_NON_PROFIT" | translate }}
+                                        {{ "TR__EMAIL" | translate }}</a>
                                 </li>
+                                <li><i class="icon-map-pin"></i> {{ data.organizationInfo.country | adhCountryName | translate }}</li>
+                                <li>{{ "TR__MERCATOR_PROPOSAL_NON_PROFIT" | translate }}</li>
                             </ul>
                         </div>
                         <div data-ng-switch-when="planned_nonprofit">
@@ -168,13 +167,14 @@
                                         data-ng-href="{{ data.organizationInfo.website }}"
                                         target="_new">
                                         {{ data.organizationInfo.name }}</a>
-                                    <span ng-if="!data.organizationInfo.website">{{ data.organizationInfo.name }}</span>
+                                    <span data-ng-if="!data.organizationInfo.website">{{ data.organizationInfo.name }}</span>
                                     <a
                                         class="m-print-href"
                                         data-ng-if="data.organizationInfo.email"
                                         data-ng-href="mailto:{{ data.organizationInfo.email }}">
-                                        {{ "TR__EMAIL" | translate }}</a></li>
-                                 <li><i class="icon-map-pin"></i> {{ data.organizationInfo.country | adhCountryName | translate }}</li>
+                                        {{ "TR__EMAIL" | translate }}</a>
+                                </li>
+                                <li><i class="icon-map-pin"></i> {{ data.organizationInfo.country | adhCountryName | translate }}</li>
                                 <li>
                                     {{ "TR__MERCATOR_PROPOSAL_NGO" | translate }}
                                     <adh-time data-datetime="data.organizationInfo.registration_date" data-format="D/M/YYYY"></adh-time>
@@ -190,13 +190,14 @@
                                         data-ng-href="{{ data.organizationInfo.website }}"
                                         target="_new">
                                         {{ data.organizationInfo.name }}</a>
-                                    <span ng-if="!data.organizationInfo.website">{{ data.organizationInfo.name }}</span>
+                                    <span data-ng-if="!data.organizationInfo.website">{{ data.organizationInfo.name }}</span>
                                     <a
                                         class="m-print-href"
                                         data-ng-if="data.organizationInfo.email"
                                         data-ng-href="mailto:{{ data.organizationInfo.email }}">
-                                        {{ "TR__EMAIL" | translate }}</a></li>
-                                 <li><i class="icon-map-pin"></i> {{ data.organizationInfo.country | adhCountryName | translate }}</li>
+                                        {{ "TR__EMAIL" | translate }}</a>
+                                </li>
+                                <li><i class="icon-map-pin"></i> {{ data.organizationInfo.country | adhCountryName | translate }}</li>
                                 <li>
                                     {{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_STATUS_SUPPORT_NEEDED" | translate }}
                                 </li>
