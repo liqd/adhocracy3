@@ -1,6 +1,6 @@
-<div
-    class="section-jump" id="section-jump-top">
+<div class="section-jump" id="section-jump-top">
     <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
+
     <div class="section-jump-cover">
         <ul class="meta-list mercator-proposal-detail-meta-list m-phase-{{data.currentPhase}}">
             <li class="meta-list-item meta-list-item-total-comments">
@@ -19,12 +19,14 @@
                 <adh-like data-refers-to="{{path}}" data-disabled="data.currentPhase != 'participate'"></adh-like>
             </li>
         </ul>
+
         <h1 class="section-jump-cover-header screen-only">{{ data.title }}
             <a class="mercator-proposal-cover-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments' }}">
                 <i class="icon-speechbubble-document"></i> {{ data.commentCount }}
             </a>
         </h1>
-    </div><!-- /.cover -->
+    </div>
+
     <div class="mercator-proposal-detail-view">
         <adh-show-image
             data-css-class="mercator-proposal-detail-view-image"
@@ -33,7 +35,6 @@
         ></adh-show-image>
 
         <div class="section-jump-body">
-
             <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="">
                 <ol>
                     <li><a
@@ -74,7 +75,7 @@
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:introduction'}}">
                             <i class="icon-speechbubble"></i> {{ data.introduction.commentCount }}
                         </a>
-                    </section><!-- /.commentable-section -->
+                    </section>
 
                     <section class="commentable-section {{subResourceSelectedState('finance')}}">
                         <div class="mercator-proposal-budget-row">
@@ -235,9 +236,9 @@
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:organizationInfo'}}">
                             <i class="icon-speechbubble"></i> {{ data.organizationInfo.commentCount }}
                         </a>
-                    </section><!-- /.commentable-section -->
+                    </section>
 
-                </section><!-- /chapter -->
+                </section>
 
                 <section class="chapter" id="mercator-proposal-impact">
                     <section class="commentable-section {{subResourceSelectedState('description')}}">
@@ -256,7 +257,7 @@
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:challenge'}}">
                             <i class="icon-speechbubble"></i> {{ data.storyChallengeCount }}
                         </a>
-                    </section><!-- /.commentable-section -->
+                    </section>
 
                     <section class="commentable-section {{subResourceSelectedState('goal')}}">
                         <h3>{{ "TR__MERCATOR_PROPOSAL_IMPACT_GOAL_LABEL" | translate }}</h3>
@@ -264,7 +265,7 @@
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:goal'}}">
                             <i class="icon-speechbubble"></i> {{ data.storyGoalCount }}
                         </a>
-                    </section><!-- /.commentable-section -->
+                    </section>
 
                     <section class="commentable-section {{subResourceSelectedState('plan')}}">
                         <h3>{{ "TR__MERCATOR_PROPOSAL_IMPACT_PLAN_LABEL" | translate }}</h3>
@@ -272,7 +273,7 @@
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:plan'}}">
                             <i class="icon-speechbubble"></i> {{ data.storyPlanCount }}
                         </a>
-                    </section><!-- /.commentable-section -->
+                    </section>
 
                     <section class="commentable-section {{subResourceSelectedState('target')}}">
                         <h3>{{ "TR__MERCATOR_PROPOSAL_IMPACT_TARGETGROUP_LABEL" | translate }}</h3>
@@ -280,7 +281,7 @@
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:target'}}">
                             <i class="icon-speechbubble"></i> {{ data.storyTargetCount }}
                         </a>
-                    </section><!-- /.commentable-section -->
+                    </section>
 
                     <section class="commentable-section {{subResourceSelectedState('team')}}">
                         <h3>{{ "TR__MERCATOR_PROPOSAL_IMPACT_TEAM_LABEL" | translate }}</h3>
@@ -288,7 +289,7 @@
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:team'}}">
                             <i class="icon-speechbubble"></i> {{ data.storyTeamCount }}
                         </a>
-                    </section><!-- /.commentable-section -->
+                    </section>
 
                     <section class="commentable-section {{subResourceSelectedState('extraInfo')}}">
                         <h3>{{ "TR__MERCATOR_PROPOSAL_IMPACT_EXTRAINFO_LABEL" | translate }}</h3>
@@ -296,9 +297,8 @@
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:extraInfo'}}">
                             <i class="icon-speechbubble"></i> {{ data.storyExtraInfoCount }}
                         </a>
-                    </section><!-- /.commentable-section -->
-
-                </section><!-- /chapter -->
+                    </section>
+                </section>
 
                 <section class="chapter" id="mercator-proposal-criteria">
                     <section class="commentable-section {{subResourceSelectedState('outcome')}}">
@@ -310,7 +310,7 @@
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:strengthen'}}">
                             <i class="icon-speechbubble"></i> {{ data.strengthenCommentCount }}
                         </a>
-                    </section><!-- /.commentable-section -->
+                    </section>
 
                     <section class="commentable-section {{subResourceSelectedState('difference')}}">
                         <h3>{{ "TR__MERCATOR_PROPOSAL_DIFFERENCE_LABEL" | translate }}</h3>
@@ -318,7 +318,7 @@
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:difference'}}">
                             <i class="icon-speechbubble"></i> {{ data.storyDifferenceCount }}
                         </a>
-                    </section><!-- /.commentable-section -->
+                    </section>
 
                     <section class="commentable-section {{subResourceSelectedState('practical')}}">
                         <h3>{{ "TR__MERCATOR_PROPOSAL_PRACTICAL_LABEL" | translate }}</h3>
@@ -326,8 +326,7 @@
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:practical'}}">
                             <i class="icon-speechbubble"></i> {{ data.storyPracticalCount }}
                         </a>
-                    </section><!-- /.commentable-section -->
-
+                    </section>
                 </section>
 
                 <section class="chapter" id="mercator-proposal-community">
@@ -353,18 +352,16 @@
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:experience'}}">
                             <i class="icon-speechbubble"></i> {{ data.experienceCommentCount }}
                         </a>
-                    </section><!-- /.commentable-section -->
+                    </section>
                 </section>
 
                 <footer class="mercator-proposal-detail-footer">
-
                     <a class="button-back-to-top" data-du-smooth-scroll="" href="#section-jump-top">
                     <i class="icon-back-to-top"></i> {{ "TR__BACK_TO_TOP" | translate }}</a>
                     <adh-like data-refers-to="{{path}}"></adh-like>
-
                 </footer>
 
-            </div><!-- /.mercator-detail-body -->
-        </div><!-- /.section-jump-body -->
-    </div><!-- /.mercator-proposal-detail-view -->
+            </div>
+        </div>
+    </div>
 </div>
