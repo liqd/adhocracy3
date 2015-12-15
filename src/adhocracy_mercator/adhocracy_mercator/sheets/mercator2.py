@@ -587,7 +587,7 @@ class PracticalRelevanceReference(SheetToSheet):
     """Reference to practical relevance."""
 
     source_isheet = IMercatorSubResources
-    source_isheet_field = 'difference'
+    source_isheet_field = 'practicalrelevance'
     target_isheet = IPracticalRelevance
 
 
