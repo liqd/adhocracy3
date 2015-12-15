@@ -344,7 +344,7 @@ export var createDirective = (
             poolPath: "@"
         },
         link: (scope) => {
-           // scope.$flow = flowFactory.create();
+           scope.$flow = flowFactory.create();
         }
     };
 };
