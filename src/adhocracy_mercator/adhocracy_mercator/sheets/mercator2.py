@@ -453,7 +453,7 @@ class HeardFromEnums(AdhocracySequenceNode):
 
 
 class CommunitySchema(colander.MappingSchema):
-    expected_feedback = Text(missing=colander.required)
+    expected_feedback = Text(missing=colander.drop)
     heard_froms = HeardFromEnums(validator=colander.Length(min=1))
     heard_from_other = Text()
 
