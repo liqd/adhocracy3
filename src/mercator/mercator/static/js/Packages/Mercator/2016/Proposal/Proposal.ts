@@ -17,6 +17,7 @@ import * as SIExtraInfo from "../../../../Resources_/adhocracy_mercator/sheets/m
 import * as SIFinancialPlanning from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IFinancialPlanning";
 import * as SIGoal from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IGoal";
 import * as SILocation from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ILocation";
+import * as SIMetaData from "../../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 import * as SIMercatorSubResources from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IMercatorSubResources";
 import * as SIOrganizationInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IOrganizationInfo";
 import * as SIPartners from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IPartners";
@@ -30,6 +31,7 @@ import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITi
 import * as SITopic from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITopic";
 import * as SIUserInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IUserInfo";
 import * as SIWinnerInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IWinnerInfo";
+import * as SIMercatorUserInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IUserInfo";
 import RIChallenge from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IChallenge";
 import RIConnectionCohesion from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IConnectionCohesion";
 import RIDifference from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IDifference";
@@ -382,20 +384,34 @@ export var listItem = (
         retrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/../../2015/Proposal/ListItem.html",
         scope: {
-
+            path: "@"
         },
         link: (scope, element) => {
-            scope.data  = {
-                title: {
-                    title: "Super"
-                },
-                user_info: {
-                    first_name: "Magda",
-                    createtime: "2015-12-10T11:12:04.291510+00:00"
-                },
-                organization_info: {
-                    name: "Liquid Democracy e.V."
-                },
+
+            scope.data = {};
+
+            adhHttp.get(scope.path).then((proposal) => {
+                scope.data.title = {
+                    title: proposal.data[SITitle.nick].title
+                };
+                scope.data.user_info = {
+                    first_name: proposal.data[SIMercatorUserInfo.nick].first_name,
+                    last_name: proposal.data[SIMercatorUserInfo.nick].last_name,
+                    item_creation_date: proposal.data[SIMetaData.nick].item_creation_date,
+                    path: proposal.data[SIMetaData.nick].creator
+                };
+                scope.data.organization_info = {
+                    name: proposal.data[SIOrganizationInfo.nick].name
+                };
+                scope.data.finance = {
+                    requested_funding: proposal.data[SIFinancialPlanning.nick].requested_funding
+                };
+                scope.data.currentPhase = "participate";
+            });
+
+            /*scope.data  = {
+
+
                 commentCountTotal: 25,
                 currentPhase: "participate",
                 supporterCount: 33,
@@ -406,9 +422,9 @@ export var listItem = (
                     name: "winning"
                 },
                 introduction: {
-                    picture: "https://frontend.advocate-europe.eu/api/mercator/assets/0001799/0000001/"
+                    picture: ""
                 }
-            };
+            };*/
         }
     };
 };
