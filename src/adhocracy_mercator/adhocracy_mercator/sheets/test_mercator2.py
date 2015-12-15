@@ -1072,8 +1072,7 @@ class TestCommunitySchema:
         with raises(Invalid) as error:
             inst.deserialize(cstruct)
         assert error.value.asdict() == \
-            {'expected_feedback': 'Required',
-             'heard_froms': 'Required'}
+            {'heard_froms': 'Required'}
 
     def test_deserialize_with_required(self, inst, cstruct_required):
         assert inst.deserialize(cstruct_required) == cstruct_required
