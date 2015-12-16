@@ -62,6 +62,7 @@
                         data-du-scrollspy=""
                         title="{{ 'TR__MERCATOR_PROPOSAL_CRITERIA' | translate }}">4.</a></li>
                     <li><a
+                        data-ng-if="data.experience || data.heardFrom"
                         href="#mercator-proposal-community"
                         data-du-smooth-scroll=""
                         data-du-scrollspy=""
@@ -339,7 +340,7 @@
                     </section>
                 </section>
 
-                <section class="chapter" id="mercator-proposal-community">
+                <section class="chapter" id="mercator-proposal-community" data-ng-if="data.experience || data.heardFrom">
                     <h2 class="chapter-header m-counted"
                         data-du-scrollspy="mercator-proposal-community"
                         data-offset="50">{{ "TR__MERCATOR_PROPOSAL_COMMUNITY" | translate }}</h2>
