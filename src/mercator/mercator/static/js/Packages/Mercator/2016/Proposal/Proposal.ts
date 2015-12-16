@@ -396,8 +396,8 @@ var get = ($q : ng.IQService, adhHttp : AdhHttp.Service<any>) => (path : string)
                     budget: proposal.data[SIFinancialPlanning.nick].budget,
                     requestedFunding: proposal.data[SIFinancialPlanning.nick].requested_funding,
                     major: proposal.data[SIFinancialPlanning.nick].major_expenses,
-                    otherSources: proposal.data[SIExtraFunding.nick].other_sources,
-                    secured: proposal.data[SIExtraFunding.nick].secured
+                    otherSources: (proposal.data[SIExtraFunding.nick] || {}).other_sources,
+                    secured: (proposal.data[SIExtraFunding.nick] || {}).secured
                 },
                 experience: proposal.data[SICommunity.nick].expected_feedback,
                 heardFrom: proposal.data[SICommunity.nick].heard_from,
