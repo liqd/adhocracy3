@@ -18,7 +18,8 @@ def create_initial_content_for_item(context, registry, options):
     iresource = get_iresource(context)
     metadata = registry.content.resources_meta[iresource]
     create = registry.content.create
-    first_version = create(metadata.item_type.__identifier__, parent=context)
+    first_version = create(metadata.item_type.__identifier__, parent=context,
+                           **options)
     tags_sheet = get_sheet(context,
                            adhocracy_core.sheets.tags.ITags,
                            registry=registry)

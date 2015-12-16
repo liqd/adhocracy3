@@ -580,6 +580,11 @@ Fetch the first Document version, it is empty ::
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersionable'])
     {'followed_by': [], 'follows': []}
 
+but owned by the Document item creator::
+    >>> pprint(resp.json['data']['adhocracy_core.sheets.metadata.IMetadata']['creator'])
+    'http://localhost/principals/users/0000000/'
+
+
 Create a new version of the proposal that follows the first version ::
 
     >>> pvrs = {'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
