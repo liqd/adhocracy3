@@ -153,6 +153,20 @@ export var proposalListingColumnDirective = (
                             {key: "20000", name: "10000 - 20000 €"},
                             {key: "50000", name: "20000 - 50000 €"}
                         ]
+                    }, {
+                        key: "mercator_topic",
+                        name: "TR__MERCATOR_TOPIC",
+                        wide: true,
+                        items: [
+                            {key: "democracy_and_participation", name: "TR__MERCATOR_TOPIC_DEMOCRACY"},
+                            {key: "arts_and_cultural_activities", name: "TR__MERCATOR_TOPIC_CULTURE"},
+                            {key: "environment", name: "TR__MERCATOR_TOPIC_ENVIRONMENT"},
+                            {key: "environment", name: "TR__MERCATOR_TOPIC_ENVIRONMENT"},
+                            {key: "migration", name: "TR__MERCATOR_TOPIC_MIGRATION"},
+                            {key: "communities", name: "TR__MERCATOR_TOPIC_COMMUNITY"},
+                            {key: "urban_development", name: "TR__MERCATOR_TOPIC_URBAN"},
+                            {key: "education", name: "TR__MERCATOR_TOPIC_EDUCATION"}
+                        ]
                     }];
 
                     if (currentPhase === "result") {
