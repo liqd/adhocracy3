@@ -22,10 +22,7 @@
             data-delete="true"
             data-print="true"></adh-resource-actions>
 
-        <adh-document-create data-path="{{processUrl}}" data-has-map="true" data-has-image="true" data-polygon="polygon"></adh-document-create>
-        <adh-resource-wrapper>
-            <adh-mercator-2016-proposal-detail-view data-ng-if="proposalUrl" data-path="{{proposalUrl}}"></adh-mercator-2016-proposal-detail-view>
-        </adh-resource-wrapper>
+        <adh-mercator-2016-proposal-detail data-ng-if="proposalUrl" data-path="{{proposalUrl}}"></adh-mercator-2016-proposal-detail>
     </adh-recompile-on-change>
 
     <adh-report-abuse
