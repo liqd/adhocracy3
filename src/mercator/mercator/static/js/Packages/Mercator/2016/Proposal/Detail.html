@@ -258,10 +258,10 @@
                                 <li><i class="icon-map-pin"></i> {{ data.partners.partner3.country | adhCountryName | translate }}</li>
                             </ul>
 
-                            <h4>{{ "TR__MERCATOR_PROPOSAL_PARTNERS_OTHER" | translate }}</h4>
-                            <p data-ng-if="data.partners.otherText">
-                                {{ data.partners.otherText }}
-                            </p>
+                            <div data-ng-if="data.partners.otherText">
+                                <h4>{{ "TR__MERCATOR_PROPOSAL_PARTNERS_OTHER" | translate }}</h4>
+                                <p>{{ data.partners.otherText }}</p>
+                            </div>
                         </div>
                     </section>
                 </section>
