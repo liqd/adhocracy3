@@ -22,7 +22,7 @@
 
         <h1 class="section-jump-cover-header screen-only">{{ data.title }}
             <a class="mercator-proposal-cover-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments' }}">
-                <i class="icon-speechbubble-document"></i> {{ data.commentCount }}
+                <i class="icon-speechbubble-document"></i> {{ data.commentCounts.proposal }}
             </a>
         </h1>
         <div data-ng-if="selectedTopics">
@@ -77,7 +77,7 @@
                             data-offset="50">{{ "TR__MERCATOR_PROPOSAL_BRIEF" | translate }}</h2>
                         <p>{{ data.introduction.pitch }}</p>
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:pitch'}}">
-                            <i class="icon-speechbubble"></i> {{ data.introduction.commentCount }}
+                            <i class="icon-speechbubble"></i> {{ data.commentCounts.pitch }}
                         </a>
                     </section>
 
@@ -123,8 +123,8 @@
                     <section class="commentable-section {{subResourceSelectedState('duration')}}">
                         <h3>{{ "TR__MERCATOR_PROPOSAL_DURATION_LABEL" | translate }}</h3>
                         <p>{{ data.duration }} {{ "TR__MONTHS" | translate }}</p>
-                        <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:status'}}">
-                            <i class="icon-speechbubble"></i> {{ data.duration.commentCount }}
+                        <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:duration'}}">
+                            <i class="icon-speechbubble"></i> {{ data.commentCounts.duration }}
                         </a>
                     </section>
 
@@ -274,7 +274,7 @@
                         <h3>{{ "TR__MERCATOR_PROPOSAL_IMPACT_CHALLENGE_LABEL" | translate }}</h3>
                         <p>{{ data.impact.challenge }}</p>
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:challenge'}}">
-                            <i class="icon-speechbubble"></i> {{ data.storyChallengeCount }}
+                            <i class="icon-speechbubble"></i> {{ data.commentCounts.challenge }}
                         </a>
                     </section>
 
@@ -282,7 +282,7 @@
                         <h3>{{ "TR__MERCATOR_PROPOSAL_IMPACT_GOAL_LABEL" | translate }}</h3>
                         <p>{{ data.impact.goal }}</p>
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:goal'}}">
-                            <i class="icon-speechbubble"></i> {{ data.storyGoalCount }}
+                            <i class="icon-speechbubble"></i> {{ data.commentCounts.goal }}
                         </a>
                     </section>
 
@@ -290,7 +290,7 @@
                         <h3>{{ "TR__MERCATOR_PROPOSAL_IMPACT_PLAN_LABEL" | translate }}</h3>
                         <p>{{ data.impact.plan }}</p>
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:plan'}}">
-                            <i class="icon-speechbubble"></i> {{ data.storyPlanCount }}
+                            <i class="icon-speechbubble"></i> {{ data.commentCounts.plan }}
                         </a>
                     </section>
 
@@ -298,7 +298,7 @@
                         <h3>{{ "TR__MERCATOR_PROPOSAL_IMPACT_TARGETGROUP_LABEL" | translate }}</h3>
                         <p>{{ data.impact.target }}</p>
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:target'}}">
-                            <i class="icon-speechbubble"></i> {{ data.storyTargetCount }}
+                            <i class="icon-speechbubble"></i> {{ data.commentCounts.target }}
                         </a>
                     </section>
 
@@ -306,28 +306,28 @@
                         <h3>{{ "TR__MERCATOR_PROPOSAL_IMPACT_TEAM_LABEL" | translate }}</h3>
                         <p>{{ data.impact.team }}</p>
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:team'}}">
-                            <i class="icon-speechbubble"></i> {{ data.storyTeamCount }}
+                            <i class="icon-speechbubble"></i> {{ data.commentCounts.team }}
                         </a>
                     </section>
 
-                    <section class="commentable-section {{subResourceSelectedState('extraInfo')}}">
+                    <section class="commentable-section {{subResourceSelectedState('extrainfo')}}">
                         <h3>{{ "TR__MERCATOR_PROPOSAL_IMPACT_EXTRAINFO_LABEL" | translate }}</h3>
                         <p>{{ data.impact.extraInfo }}</p>
-                        <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:extraInfo'}}">
-                            <i class="icon-speechbubble"></i> {{ data.storyExtraInfoCount }}
+                        <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:extrainfo'}}">
+                            <i class="icon-speechbubble"></i> {{ data.commentCounts.extrainfo }}
                         </a>
                     </section>
                 </section>
 
                 <section class="chapter" id="mercator-proposal-criteria">
-                    <section class="commentable-section {{subResourceSelectedState('outcome')}}">
+                    <section class="commentable-section {{subResourceSelectedState('connectioncohesion')}}">
                         <h2 class="chapter-header m-counted"
                             data-du-scrollspy="mercator-proposal-criteria"
                             data-offset="50">{{ "TR__MERCATOR_PROPOSAL_CRITERIA" | translate }}</h2>
                         <h3>{{ "TR__MERCATOR_PROPOSAL_STRENGTHEN_LABEL" | translate }}</h3>
                         <p>{{ data.criteria.strengthen }}</p>
-                        <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:strengthen'}}">
-                            <i class="icon-speechbubble"></i> {{ data.strengthenCommentCount }}
+                        <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:connectioncohesion'}}">
+                            <i class="icon-speechbubble"></i> {{ data.commentCounts.connectioncohesion }}
                         </a>
                     </section>
 
@@ -335,15 +335,15 @@
                         <h3>{{ "TR__MERCATOR_PROPOSAL_DIFFERENCE_LABEL" | translate }}</h3>
                         <p>{{ data.criteria.difference }}</p>
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:difference'}}">
-                            <i class="icon-speechbubble"></i> {{ data.storyDifferenceCount }}
+                            <i class="icon-speechbubble"></i> {{ data.commentCounts.difference }}
                         </a>
                     </section>
 
-                    <section class="commentable-section {{subResourceSelectedState('practical')}}">
+                    <section class="commentable-section {{subResourceSelectedState('practicalrelevance')}}">
                         <h3>{{ "TR__MERCATOR_PROPOSAL_PRACTICAL_LABEL" | translate }}</h3>
                         <p>{{ data.criteria.practical }}</p>
-                        <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:practical'}}">
-                            <i class="icon-speechbubble"></i> {{ data.storyPracticalCount }}
+                        <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:practicalrelevance'}}">
+                            <i class="icon-speechbubble"></i> {{ data.commentCounts.practicalrelevance }}
                         </a>
                     </section>
                 </section>
