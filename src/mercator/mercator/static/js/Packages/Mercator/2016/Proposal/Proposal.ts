@@ -334,23 +334,107 @@ var create = (adhHttp : AdhHttp.Service<any>) => (scope, adhPreliminaryNames) =>
     });
 };
 
-var get = (adhHttp : AdhHttp.Service<any>) => (path : string) : ng.IPromise<IData> => {
+var get = ($q : ng.IQService, adhHttp : AdhHttp.Service<any>) => (path : string) : ng.IPromise<IData> => {
     return adhHttp.get(path).then((proposal) => {
-        return {
-            title: proposal.data[SITitle.nick].title,
-            user_info: {
-                first_name: proposal.data[SIMercatorUserInfo.nick].first_name,
-                last_name: proposal.data[SIMercatorUserInfo.nick].last_name,
-                item_creation_date: proposal.data[SIMetaData.nick].item_creation_date,
-                path: proposal.data[SIMetaData.nick].creator
-            },
-            organization_info: {
-                name: proposal.data[SIOrganizationInfo.nick].name
-            },
-            finance: {
-                requested_funding: proposal.data[SIFinancialPlanning.nick].requested_funding
-            }
-        };
+        var subs : {
+            pitch : RIPitch;
+            partners : RIPartners;
+            duration : RIDuration;
+            challenge : RIChallenge;
+            goal : RIGoal;
+            plan : RIPlan;
+            target : RITarget;
+            team : RITeam;
+            extrainfo : RIExtraInfo;
+            connectioncohesion : RIConnectionCohesion;
+            difference : RIDifference;
+            practicalrelevance : RIPracticalRelevance;
+        } = <any>{};
+
+        return $q.all(_.map(proposal.data[SIMercatorSubResources.nick], (path, key) => {
+            return adhHttp.get(<string>path).then((subresource) => {
+                subs[key] = subresource;
+            });
+        })).then(() : IData => {
+            return {
+                userInfo: {
+                    firstName: proposal.data[SIMercatorUserInfo.nick].first_name,
+                    lastName: proposal.data[SIMercatorUserInfo.nick].last_name,
+                    item_creation_date: proposal.data[SIMetaData.nick].item_creation_date,
+                    path: proposal.data[SIMetaData.nick].creator
+                },
+                organizationInfo: {
+                    name: proposal.data[SIOrganizationInfo.nick].name,
+                    city: proposal.data[SIOrganizationInfo.nick].city,
+                    country: proposal.data[SIOrganizationInfo.nick].country,
+                    helpRequest: proposal.data[SIOrganizationInfo.nick].help_request,
+                    registrationDate: proposal.data[SIOrganizationInfo.nick].registration_date,
+                    website: proposal.data[SIOrganizationInfo.nick].website,
+                    email: proposal.data[SIOrganizationInfo.nick].contact_email,
+                    status: proposal.data[SIOrganizationInfo.nick].status,
+                    otherText: proposal.data[SIOrganizationInfo.nick].status_other
+                },
+                topic: null,
+                title: proposal.data[SITitle.nick].title,
+                location: {
+                    location_is_specific: !!proposal.data[SILocation.nick].location,
+                    location_specific: proposal.data[SILocation.nick].location,
+                    location_is_online: proposal.data[SILocation.nick].is_online,
+                    location_is_linked_to_ruhr: proposal.data[SILocation.nick].has_link_to_ruhr,
+                    location_is_linked_to_ruhr_text: proposal.data[SILocation.nick].link_to_ruhr
+                },
+                status: proposal.data[SIStatus.nick].status,
+                finance: {
+                    budget: proposal.data[SIFinancialPlanning.nick].budget,
+                    requestedFunding: proposal.data[SIFinancialPlanning.nick].requested_funding,
+                    major: proposal.data[SIFinancialPlanning.nick].major_expenses,
+                    otherSources: proposal.data[SIExtraFunding.nick].other_sources,
+                    secured: proposal.data[SIExtraFunding.nick].secured
+                },
+                experience: proposal.data[SICommunity.nick].expected_feedback,
+                heardFrom: proposal.data[SICommunity.nick].heard_from,
+                introduction: {
+                    pitch: subs.pitch.data[SIPitch.nick].pitch,
+                    imageUpload: null,
+                    picture: null
+                },
+                partners: {
+                    hasPartners: subs.partners.data[SIPartners.nick].has_partners,
+                    partner1: {
+                        name: subs.partners.data[SIPartners.nick].partner1_name,
+                        website: subs.partners.data[SIPartners.nick].partner1_website,
+                        country: subs.partners.data[SIPartners.nick].partner1_country
+                    },
+                    partner2: {
+                        name: subs.partners.data[SIPartners.nick].partner2_name,
+                        website: subs.partners.data[SIPartners.nick].partner2_website,
+                        country: subs.partners.data[SIPartners.nick].partner2_country
+                    },
+                    partner3: {
+                        name: subs.partners.data[SIPartners.nick].partner3_name,
+                        website: subs.partners.data[SIPartners.nick].partner3_website,
+                        country: subs.partners.data[SIPartners.nick].partner3_country
+                    },
+                    hasOther: !!subs.partners.data[SIPartners.nick].other_partners,
+                    otherText: subs.partners.data[SIPartners.nick].other_partners
+                },
+                duration: subs.duration.data[SIDuration.nick].duration,
+                impact: {
+                    challenge: subs.challenge.data[SIChallenge.nick].challenge,
+                    goal: subs.goal.data[SIGoal.nick].goal,
+                    plan: subs.plan.data[SIPlan.nick].plan,
+                    target: subs.target.data[SITarget.nick].target,
+                    team: subs.team.data[SITeam.nick].team,
+                    extraInfo: subs.extrainfo.data[SIExtraInfo.nick].extrainfo
+                },
+                criteria: {
+                    strengthen: subs.connectioncohesion.data[SIConnectionCohesion.nick].connection_cohesion,
+                    difference: subs.difference.data[SIDifference.nick].difference,
+                    practical: subs.practicalrelevance.data[SIPracticalRelevance.nick].practicalrelevance
+                },
+                acceptDisclaimer: null
+            };
+        });
     });
 };
 
@@ -408,7 +492,7 @@ export var listItem = (
         },
         link: (scope, element) => {
 
-            get(scope.path).then((data) => {
+            get($q, adhHttp)(scope.path).then((data) => {
                 scope.data = data;
             });
 
