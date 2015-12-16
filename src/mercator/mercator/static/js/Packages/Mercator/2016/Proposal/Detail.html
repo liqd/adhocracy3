@@ -20,15 +20,14 @@
             </li>
         </ul>
 
-        <div data-ng-if="data.topic">
-            <span class="topic" data-ng-repeat="(topic, topicSelected) in data.topic" data-ng-if="topicSelected">{{ topicTrString(topic) | translate }}{{$last ? '' : ', '}}</span>
-        </div>
-
         <h1 class="section-jump-cover-header screen-only">{{ data.title }}
             <a class="mercator-proposal-cover-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments' }}">
                 <i class="icon-speechbubble-document"></i> {{ data.commentCount }}
             </a>
         </h1>
+        <div data-ng-if="data.topic">
+            {{ "TR__MERCATOR_TOPIC" | translate }}: <em><span class="topic" data-ng-repeat="topic in selectedTopics">{{ topic | translate }}{{$last ? '' : ', '}}</span></em>
+        </div>
     </div>
 
     <div class="mercator-proposal-detail-view">
@@ -72,11 +71,10 @@
 
             <div class="section-jump-main chapter-wrapper" data-du-spy-context="">
                 <section class="chapter" id="mercator-proposal-introduction">
-                    <h2 class="chapter-header m-counted"
-                        data-du-scrollspy="mercator-proposal-introduction"
-                        data-offset="50">{{ "TR__MERCATOR_PROPOSAL_BRIEF" | translate }}</h2>
-
                     <section class="commentable-section {{subResourceSelectedState('pitch')}}">
+                        <h2 class="chapter-header m-counted"
+                            data-du-scrollspy="mercator-proposal-introduction"
+                            data-offset="50">{{ "TR__MERCATOR_PROPOSAL_BRIEF" | translate }}</h2>
                         <p>{{ data.introduction.pitch }}</p>
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:pitch'}}">
                             <i class="icon-speechbubble"></i> {{ data.introduction.commentCount }}
@@ -94,26 +92,14 @@
                                 <strong>{{ data.finance.budget | number }} &euro;</strong>
                                 {{ "TR__MERCATOR_PROPOSAL_TOTAL_BUDGET" | translate }}
                             </div>
-                            <div class="mercator-proposal-budget-col" data-ng-if="data.finance.secured">
+                            <div class="mercator-proposal-budget-col" data-ng-if="data.finance.secured && isModerator">
                                 <span>
                                     <strong class="color-highlight-valid">{{ "TR__MERCATOR_PROPOSAL_FINANCE_SECURED" | translate }}</strong>
                                     {{ "TR__MERCATOR_PROPOSAL_FINANCE_OTHERS_SOURCES" | translate }}
                                 </span>
                             </div>
                         </div>
-                        <p>{{data.finance.major}}</p>
-                        <p>{{data.finance.otherSources}}</p>
 
-                    </section>
-                    <section class="commentable-section {{subResourceSelectedState('duration')}}">
-                        <h3>{{ "TR__MERCATOR_PROPOSAL_DURATION_LABEL" | translate }}</h3>
-                        <p>{{ data.duration }}</p>
-                        <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:status'}}">
-                            <i class="icon-speechbubble"></i> {{ data.duration.commentCount }}
-                        </a>
-                    </section>
-
-                    <section class="non-commentable-section">
                         <div class="mercator-proposal-location">
                             <h3>{{ "TR__MERCATOR_PROPOSAL_LOCATION_LABEL" | translate }}:</h3>
                             <ul class="inline-boxes">
@@ -125,6 +111,22 @@
                                 <li data-ng-if="data.finance.other_sources">{{ data.finance.otherSources }}</li>
                             </ul>
                         </div>
+                    </section>
+                    <section class="non-commentable-section">
+
+                        <h3>{{ "TR__MERCATOR_PROPOSAL_MAJOR_EXPENSES_LABEL" | translate }}:</h3>
+                        <p>{{data.finance.major}}</p>
+
+                        <h3>{{ "TR__MERCATOR_PROPOSAL_FINANCE_OTHERS_SOURCES" | translate }}:</h3>
+                        <p>{{data.finance.otherSources}}</p>
+
+                    </section>
+                    <section class="commentable-section {{subResourceSelectedState('duration')}}">
+                        <h3>{{ "TR__MERCATOR_PROPOSAL_DURATION_LABEL" | translate }}</h3>
+                        <p>{{ data.duration }} {{ "TR__MONTHS" | translate }}</p>
+                        <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:status'}}">
+                            <i class="icon-speechbubble"></i> {{ data.duration.commentCount }}
+                        </a>
                     </section>
                     <section class="commentable-section">
                         <h3>{{ "TR__MERCATOR_PROPOSAL_STATUS_LABEL" | translate }}</h3>
@@ -219,7 +221,7 @@
 
                         <div data-ng-if="data.partners.hasPartners" class="partners-list">
                             <h3>{{ "TR__MERCATOR_PROPOSAL_PARTNERS" | translate }}</h3>
-                            <ul data-ng-if="data.partners.partner1" class="mercator-proposal-detail-orgs-columns">
+                            <ul data-ng-if="data.partners.partner1" class="mercator-proposal-detail-orgs-columns partner-columns">
                                 <li>
                                     <a
                                         class="m-print-href"
@@ -231,7 +233,7 @@
                                 </li>
                                 <li><i class="icon-map-pin"></i> {{ data.partners.partner1.country | adhCountryName | translate }}</li>
                             </ul>
-                            <ul data-ng-if="data.partners.partner2" class="mercator-proposal-detail-orgs-columns">
+                            <ul data-ng-if="data.partners.partner2" class="mercator-proposal-detail-orgs-columns partner-columns">
                                 <li>
                                     <a
                                         class="m-print-href"
@@ -243,7 +245,7 @@
                                 </li>
                                 <li><i class="icon-map-pin"></i> {{ data.partners.partner2.country | adhCountryName | translate }}</li>
                             </ul>
-                            <ul data-ng-if="data.partners.partner3" class="mercator-proposal-detail-orgs-columns">
+                            <ul data-ng-if="data.partners.partner3" class="mercator-proposal-detail-orgs-columns partner-columns">
                                 <li>
                                     <a
                                         class="m-print-href"

@@ -67,7 +67,7 @@ States:
     @include rem(padding, 1rem 48px 30px 1rem);
     position: relative;
 
-    > p {
+    > p:last-of-type {
         margin-bottom: 0;
     }
 
