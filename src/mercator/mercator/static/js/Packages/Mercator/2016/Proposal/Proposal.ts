@@ -50,26 +50,26 @@ import RITeam from "../../../../Resources_/adhocracy_mercator/resources/mercator
 var pkgLocation = "/Mercator/2016/Proposal";
 
 var topics = [
-    "democracy",
-    "culture",
+    "democracy_and_participation",
+    "arts_and_cultural_activities",
     "environment",
-    "social",
+    "social_inclusion",
     "migration",
-    "community",
-    "urban",
+    "communities",
+    "urban_development",
     "education",
     "other",
 ];
 
 var topicTrString = (topic : string) : string => {
     var topicTranslations = {
-        democracy: "TR__MERCATOR_TOPIC_DEMOCRACY",
-        culture: "TR__MERCATOR_TOPIC_CULTURE",
+        democracy_and_participation: "TR__MERCATOR_TOPIC_DEMOCRACY",
+        arts_and_cultural_activities: "TR__MERCATOR_TOPIC_CULTURE",
         environment: "TR__MERCATOR_TOPIC_ENVIRONMENT",
-        social: "TR__MERCATOR_TOPIC_SOCIAL",
+        social_inclusion: "TR__MERCATOR_TOPIC_SOCIAL",
         migration: "TR__MERCATOR_TOPIC_MIGRATION",
-        community: "TR__MERCATOR_TOPIC_COMMUNITY",
-        urban: "TR__MERCATOR_TOPIC_URBAN",
+        communities: "TR__MERCATOR_TOPIC_COMMUNITY",
+        urban_development: "TR__MERCATOR_TOPIC_URBAN",
         education: "TR__MERCATOR_TOPIC_EDUCATION",
         other: "TR__MERCATOR_TOPIC_OTHER"
     };
@@ -120,13 +120,13 @@ export interface IData {
         otherText : string;
     };
     topic : {
-        democracy : boolean;
-        culture : boolean;
+        democracy_and_participation : boolean;
+        arts_and_cultural_activities : boolean;
         environment : boolean;
-        social : boolean;
+        social_inclusion : boolean;
         migration : boolean;
-        community : boolean;
-        urban : boolean;
+        communities : boolean;
+        urban_development : boolean;
         education : boolean;
         other : boolean;
         otherText : string;
@@ -671,21 +671,18 @@ export var detailDirective = (
             // FIXME, waa
             scope.isModerator = scope.options.PUT;
 
-            scope.path = "http://localhost:6541/organisation/advocate-europe2/proposal_0000000/";
-
-            scope.selectedTopics = [];
-
-            _.forEach(scope.data.topic, function(isSelected, key) {
-                if (isSelected === true) {
-                    scope.selectedTopics.push(topicTrString(key));
-                }
-            });
-
             get($q, adhHttp)(scope.path).then((data) => {
                 scope.data = data;
+
+                scope.selectedTopics = [];
+
+                _.forEach(scope.data.topic, function(isSelected, key) {
+                    if (isSelected === true) {
+                        scope.selectedTopics.push(topicTrString(key));
+                    }
+                });
             });
 
-            scope.topicTrString = topicTrString;
         }
     };
 };
