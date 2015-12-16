@@ -737,6 +737,7 @@
                         <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_DURATION_LABEL" | translate }} *</span>
                         <input
                             type="number"
+                            min="0"
                             data-ng-model="data.duration"
                             name="introduction-duration"
                             required="required" />
@@ -745,6 +746,10 @@
                             class="input-error"
                             data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-duration'], 'required')">
                             {{ "TR__ERROR_REQUIRED_DURATION" | translate }}</span>
+                        <span
+                            class="input-error"
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-duration'], 'min')">
+                            {{ "TR__ERROR_MIN_NUMBER_0" | translate }}</span>
                     </label>
                 </div>
 
@@ -1133,6 +1138,7 @@
                             data-ng-model="data.finance.budget"
                             name="finance-budget"
                             placeholder="{{ 'TR__MERCATOR_PROPOSAL_TOTAL_BUDGET_PLACEHOLDER' | translate }}"
+                            min="0"
                             required="required" />
 
                         <span
@@ -1143,6 +1149,10 @@
                             class="input-error"
                             data-ng-if="showError(mercatorProposalForm, mercatorProposalFinanceForm['finance-budget'], 'number')">
                             {{ "TR__ERROR_MUST_BE_A_NUMBER" | translate }}</span>
+                        <span
+                            class="input-error"
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalFinanceForm['finance-budget'], 'min')">
+                            {{ "TR__ERROR_MIN_NUMBER_0" | translate }}</span>
                     </label>
                 </div><!--/.annotated-section-body -->
 
