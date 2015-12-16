@@ -35,85 +35,75 @@ class TestValidateLinearHistoryNoMerge:
 class TestValidateLinearHistoryNoFork:
 
     @fixture
-    def tag(self):
-        return testing.DummyResource()
-
-    @fixture
-    def context(self, tag):
-        from adhocracy_core.interfaces import IItem
-        context = testing.DummyResource(__provides__=IItem)
-        context['LAST'] = tag
-        return context
-
-    @fixture
-    def last_version(self, context):
-        context['last_version'] = testing.DummyResource()
-        return context['last_version']
-
-    @fixture
-    def request(self, registry_with_content, changelog):
-        registry_with_content.changelog = changelog
-        request = testing.DummyResource(registry=registry_with_content,
-                                        validated={})
-        return request
-
-    @fixture
-    def node(self, context, request):
+    def node(self, context, request_, registry):
         node = testing.DummyResource(bindings={})
         node.bindings['context'] = context
-        node.bindings['request'] = request
+        node.bindings['request'] = request_
+        node.bindings['registry'] = registry
         return node
 
     @fixture
-    def mock_tag_sheet(self, tag, mock_sheet, registry_with_content):
-        from adhocracy_core.testing import register_sheet
-        from .tags import ITag
-        mock_sheet.meta = mock_sheet.meta._replace(isheet=ITag)
-        register_sheet(tag, mock_sheet, registry_with_content)
+    def mock_sheet(self, mock_sheet, registry_with_content):
+        registry_with_content.content.get_sheet.return_value = mock_sheet
         return mock_sheet
+
+    @fixture
+    def last(self, context):
+        last = testing.DummyResource()
+        context['last_version'] = last
+        return last
+
+    @fixture
+    def other(self, context):
+        other = testing.DummyResource()
+        context['other_version'] = other
+        return other
 
     def call_fut(self, node, value):
         from .versions import validate_linear_history_no_fork
         return validate_linear_history_no_fork(node, value)
 
-    def test_value_last_version_is_last_version(
-            self, node, last_version, mock_tag_sheet):
-        mock_tag_sheet.get.return_value = {'elements': [last_version]}
-        assert self.call_fut(node, [last_version]) is None
+    def test_ignore_if_value_is_last_version(
+            self, node, last, mock_sheet):
+        mock_sheet.get.return_value = {'LAST': last}
+        assert self.call_fut(node, [last]) is None
 
-    def test_value_last_versions_is_not_last_version(
-            self, node, last_version, mock_tag_sheet):
-        mock_tag_sheet.get.return_value = {'elements': [last_version]}
-        other_version = object()
+    def test_raise_if_value_is_not_last_last_version(
+            self, node, last, other, mock_sheet):
+        mock_sheet.get.return_value = {'LAST': last}
         with raises(colander.Invalid) as err:
-            self.call_fut(node, [other_version])
+            self.call_fut(node, [other])
         assert err.value.msg == 'No fork allowed - valid follows resources '\
                                 'are: /last_version'
 
-    def test_batchmode_value_last_version_is_last_version(
-            self, node, last_version, mock_tag_sheet, request):
+    def test_batchmode_ignore_if_value_is_last(
+            self, node, last, other, mock_sheet, changelog, request_):
         from adhocracy_core.utils import set_batchmode
-        set_batchmode(request)
-        mock_tag_sheet.get.return_value = {'elements': [last_version]}
-        assert self.call_fut(node, [last_version]) is None
+        request_.registry.changelog = changelog
+        set_batchmode(request_)
+        mock_sheet.get.return_value = {'LAST': last}
+        assert self.call_fut(node, [last]) is None
 
-    def test_batchmode_value_last_versions_is_not_last_version(
-            self, node, last_version, mock_tag_sheet, request):
+    def test_batchmode_raise_if_value_is_not_last_last_version(
+            self, node, last, other, mock_sheet, changelog, request_):
         from adhocracy_core.utils import set_batchmode
-        set_batchmode(request)
-        mock_tag_sheet.get.return_value = {'elements': [last_version]}
-        other_version = object()
-        with raises(colander.Invalid):
-            self.call_fut(node, [other_version])
+        request_.registry.changelog = changelog
+        set_batchmode(request_)
+        mock_sheet.get.return_value = {'LAST': last}
+        with raises(colander.Invalid) as err:
+            self.call_fut(node, [other])
+        assert err.value.msg == 'No fork allowed - valid follows resources '\
+                                'are: /last_version'
 
-    def test_batchmode_value_last_versions_is_not_last_version_but_last_new_version_exists(
-            self, node, last_version, mock_tag_sheet, registry, changelog, request):
+    def test_batchmode_ingnore_if_last_version_created_in_transaction(
+            self, node, last, other, mock_sheet, changelog, request_):
         from adhocracy_core.utils import set_batchmode
-        set_batchmode(request)
-        mock_tag_sheet.get.return_value = {'elements': [last_version]}
-        other_version = object()
-        registry.changelog['/'] = changelog['/']._replace(last_version=other_version)
-        self.call_fut(node, [other_version])
+        request_.registry.changelog = changelog
+        set_batchmode(request_)
+        mock_sheet.get.return_value = {'LAST': last}
+        request_.registry.changelog['/last_version'] =\
+            changelog['/last_version']._replace(created=True)
+        assert self.call_fut(node, [other]) is None
 
 
 class TestVersionsSchema:

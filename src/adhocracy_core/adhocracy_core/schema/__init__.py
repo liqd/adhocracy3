@@ -343,7 +343,10 @@ def get_sheet_cstructs(context: IResource, request) -> dict:
     cstructs = {}
     for sheet in sheets:
         appstruct = sheet.get()
-        schema = sheet.schema.bind(context=context, request=request)
+        workflow = request.registry.content.get_workflow(context)
+        schema = sheet.schema.bind(context=context,
+                                   request=request,
+                                   workflow=workflow)
         cstruct = schema.serialize(appstruct)
         name = sheet.meta.isheet.__identifier__
         cstructs[name] = cstruct
@@ -432,8 +435,10 @@ class ResourceObject(colander.SchemaType):
         if self.serialization_form == 'content':
             assert 'request' in node.bindings
             request = node.bindings['request']
+            workflow = request.registry.content.get_workflow(value)
             schema = ResourcePathAndContentSchema().bind(request=request,
-                                                         context=value)
+                                                         context=value,
+                                                         workflow=workflow)
             cstruct = schema.serialize({'path': value})
             sheet_cstructs = get_sheet_cstructs(value, request)
             cstruct['data'] = sheet_cstructs

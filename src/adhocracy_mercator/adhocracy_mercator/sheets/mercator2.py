@@ -95,7 +95,7 @@ class IPitch(ISheet):
 
 class PitchSchema(colander.MappingSchema):
     pitch = Text(missing=colander.required,
-                 validator=colander.Length(min=3, max=100))
+                 validator=colander.Length(min=3, max=500))
 
 
 pitch_meta = sheet_meta._replace(
@@ -453,7 +453,7 @@ class HeardFromEnums(AdhocracySequenceNode):
 
 
 class CommunitySchema(colander.MappingSchema):
-    expected_feedback = Text(missing=colander.required)
+    expected_feedback = Text(missing=colander.drop)
     heard_froms = HeardFromEnums(validator=colander.Length(min=1))
     heard_from_other = Text()
 
@@ -587,7 +587,7 @@ class PracticalRelevanceReference(SheetToSheet):
     """Reference to practical relevance."""
 
     source_isheet = IMercatorSubResources
-    source_isheet_field = 'difference'
+    source_isheet_field = 'practicalrelevance'
     target_isheet = IPracticalRelevance
 
 
