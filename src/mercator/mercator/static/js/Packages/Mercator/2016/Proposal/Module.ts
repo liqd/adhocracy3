@@ -82,5 +82,6 @@ export var register = (angular) => {
         .directive("adhMercator2016ProposalDetail", [
             "adhConfig",
             "flowFactory",
+            "adhPermissions",
             Proposal.detailDirective]);
 };
