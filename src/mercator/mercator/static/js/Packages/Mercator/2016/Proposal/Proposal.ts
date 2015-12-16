@@ -17,6 +17,7 @@ import * as SIExtraInfo from "../../../../Resources_/adhocracy_mercator/sheets/m
 import * as SIFinancialPlanning from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IFinancialPlanning";
 import * as SIGoal from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IGoal";
 import * as SILocation from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ILocation";
+import * as SIMetaData from "../../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 import * as SIMercatorSubResources from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IMercatorSubResources";
 import * as SIOrganizationInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IOrganizationInfo";
 import * as SIPartners from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IPartners";
@@ -30,6 +31,7 @@ import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITi
 import * as SITopic from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITopic";
 import * as SIUserInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IUserInfo";
 import * as SIWinnerInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IWinnerInfo";
+import * as SIMercatorUserInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IUserInfo";
 import RIChallenge from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IChallenge";
 import RIConnectionCohesion from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IConnectionCohesion";
 import RIDifference from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IDifference";
@@ -143,11 +145,11 @@ export interface IData {
         budget : number;
         requestedFunding : number;
         major : string;
-        otherSources : string;
-        secured : boolean;
+        otherSources? : string;
+        secured? : boolean;
     };
     experience : string;
-    heardFrom : {
+    heardFrom? : {
         facebook : boolean;
         newsletter : boolean;
         other : boolean;
@@ -156,11 +158,22 @@ export interface IData {
         twitter : boolean;
         website : boolean;
     };
+}
+
+export interface IDetailData extends IData {
+    // commentCountTotal : number;
+    // currentPhase : string;
+    // supporterCount : number;
+    creationDate : string;
+    creator : string;
+}
+
+export interface IFormData extends IData {
     acceptDisclaimer : boolean;
 }
 
 
-var fill = (data : IData, resource) => {
+var fill = (data : IFormData, resource) => {
     switch (resource.content_type) {
         case RIMercatorProposal.content_type:
             resource.data[SIUserInfo.nick] = new SIUserInfo.Sheet({
@@ -297,7 +310,7 @@ var fill = (data : IData, resource) => {
 };
 
 var create = (adhHttp : AdhHttp.Service<any>) => (scope, adhPreliminaryNames) => {
-    var data : IData = scope.data;
+    var data : IFormData = scope.data;
     return adhHttp.withTransaction((transaction) => {
         var proposal = new RIMercatorProposal({preliminaryNames: adhPreliminaryNames});
         fill(data, proposal);
@@ -329,6 +342,109 @@ var create = (adhHttp : AdhHttp.Service<any>) => (scope, adhPreliminaryNames) =>
         transaction.put(proposalRequest.path, proposal2);
 
         return transaction.commit();
+    });
+};
+
+var get = ($q : ng.IQService, adhHttp : AdhHttp.Service<any>) => (path : string) : ng.IPromise<IDetailData> => {
+    return adhHttp.get(path).then((proposal) => {
+        var subs : {
+            pitch : RIPitch;
+            partners : RIPartners;
+            duration : RIDuration;
+            challenge : RIChallenge;
+            goal : RIGoal;
+            plan : RIPlan;
+            target : RITarget;
+            team : RITeam;
+            extrainfo : RIExtraInfo;
+            connectioncohesion : RIConnectionCohesion;
+            difference : RIDifference;
+            practicalrelevance : RIPracticalRelevance;
+        } = <any>{};
+
+        return $q.all(_.map(proposal.data[SIMercatorSubResources.nick], (path, key) => {
+            return adhHttp.get(<string>path).then((subresource) => {
+                subs[key] = subresource;
+            });
+        })).then(() : IDetailData => {
+            return {
+                creationDate: proposal.data[SIMetaData.nick].item_creation_date,
+                creator: proposal.data[SIMetaData.nick].creator,
+                userInfo: {
+                    firstName: proposal.data[SIMercatorUserInfo.nick].first_name,
+                    lastName: proposal.data[SIMercatorUserInfo.nick].last_name
+                },
+                organizationInfo: {
+                    name: proposal.data[SIOrganizationInfo.nick].name,
+                    city: proposal.data[SIOrganizationInfo.nick].city,
+                    country: proposal.data[SIOrganizationInfo.nick].country,
+                    helpRequest: proposal.data[SIOrganizationInfo.nick].help_request,
+                    registrationDate: proposal.data[SIOrganizationInfo.nick].registration_date,
+                    website: proposal.data[SIOrganizationInfo.nick].website,
+                    email: proposal.data[SIOrganizationInfo.nick].contact_email,
+                    status: proposal.data[SIOrganizationInfo.nick].status,
+                    otherText: proposal.data[SIOrganizationInfo.nick].status_other
+                },
+                topic: null,
+                title: proposal.data[SITitle.nick].title,
+                location: {
+                    location_is_specific: !!proposal.data[SILocation.nick].location,
+                    location_specific: proposal.data[SILocation.nick].location,
+                    location_is_online: proposal.data[SILocation.nick].is_online,
+                    location_is_linked_to_ruhr: proposal.data[SILocation.nick].has_link_to_ruhr,
+                    location_is_linked_to_ruhr_text: proposal.data[SILocation.nick].link_to_ruhr
+                },
+                status: proposal.data[SIStatus.nick].status,
+                finance: {
+                    budget: proposal.data[SIFinancialPlanning.nick].budget,
+                    requestedFunding: proposal.data[SIFinancialPlanning.nick].requested_funding,
+                    major: proposal.data[SIFinancialPlanning.nick].major_expenses,
+                    otherSources: (proposal.data[SIExtraFunding.nick] || {}).other_sources,
+                    secured: (proposal.data[SIExtraFunding.nick] || {}).secured
+                },
+                experience: proposal.data[SICommunity.nick].expected_feedback,
+                heardFrom: proposal.data[SICommunity.nick].heard_from,
+                introduction: {
+                    pitch: subs.pitch.data[SIPitch.nick].pitch,
+                    imageUpload: null,
+                    picture: null
+                },
+                partners: {
+                    hasPartners: subs.partners.data[SIPartners.nick].has_partners,
+                    partner1: {
+                        name: subs.partners.data[SIPartners.nick].partner1_name,
+                        website: subs.partners.data[SIPartners.nick].partner1_website,
+                        country: subs.partners.data[SIPartners.nick].partner1_country
+                    },
+                    partner2: {
+                        name: subs.partners.data[SIPartners.nick].partner2_name,
+                        website: subs.partners.data[SIPartners.nick].partner2_website,
+                        country: subs.partners.data[SIPartners.nick].partner2_country
+                    },
+                    partner3: {
+                        name: subs.partners.data[SIPartners.nick].partner3_name,
+                        website: subs.partners.data[SIPartners.nick].partner3_website,
+                        country: subs.partners.data[SIPartners.nick].partner3_country
+                    },
+                    hasOther: !!subs.partners.data[SIPartners.nick].other_partners,
+                    otherText: subs.partners.data[SIPartners.nick].other_partners
+                },
+                duration: subs.duration.data[SIDuration.nick].duration,
+                impact: {
+                    challenge: subs.challenge.data[SIChallenge.nick].challenge,
+                    goal: subs.goal.data[SIGoal.nick].goal,
+                    plan: subs.plan.data[SIPlan.nick].plan,
+                    target: subs.target.data[SITarget.nick].target,
+                    team: subs.team.data[SITeam.nick].team,
+                    extraInfo: subs.extrainfo.data[SIExtraInfo.nick].extrainfo
+                },
+                criteria: {
+                    strengthen: subs.connectioncohesion.data[SIConnectionCohesion.nick].connection_cohesion,
+                    difference: subs.difference.data[SIDifference.nick].difference,
+                    practical: subs.practicalrelevance.data[SIPracticalRelevance.nick].practicalrelevance
+                }
+            };
+        });
     });
 };
 
@@ -382,33 +498,12 @@ export var listItem = (
         retrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/../../2015/Proposal/ListItem.html",
         scope: {
-
+            path: "@"
         },
         link: (scope, element) => {
-            scope.data  = {
-                title: {
-                    title: "Super"
-                },
-                user_info: {
-                    first_name: "Magda",
-                    createtime: "2015-12-10T11:12:04.291510+00:00"
-                },
-                organization_info: {
-                    name: "Liquid Democracy e.V."
-                },
-                commentCountTotal: 25,
-                currentPhase: "participate",
-                supporterCount: 33,
-                finance: {
-                    requested_funding: 50000
-                },
-                winnerBadgeAssignment: {
-                    name: "winning"
-                },
-                introduction: {
-                    picture: "https://frontend.advocate-europe.eu/api/mercator/assets/0001799/0000001/"
-                }
-            };
+            get($q, adhHttp)(scope.path).then((data) => {
+                scope.data = data;
+            });
         }
     };
 };
@@ -526,116 +621,20 @@ export var mercatorProposalFormController2016 = (
 };
 
 export var detailDirective = (
-    adhConfig : AdhConfig.IService
+    $q : ng.IQService,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
-        scope: {},
+        scope: {
+            path: "@"
+        },
         link: (scope) => {
-            // FIXME : Dummy data
-            var dummyData : IData = {
-                userInfo: {
-                    firstName: "Caroline",
-                    lastName: "Clifford"
-                },
-                organizationInfo: {
-                    name: "Liqd",
-                    email: "caroline@liqd.net",
-                    website: "http://www.liqd.net",
-                    city: "Berlin",
-                    country: "DE",
-                    status: "registered_nonprofit",
-                    otherText: "Something else",
-                    registrationDate: "2015",
-                    helpRequest: "Can;t think of a logo"
-                },
-                title: "Caroline's amazing project",
-                introduction: {
-                    pitch: "Lorem ipsum Cillum proident dolor culpa commodo minim ea amet esse nisi aliquip consequat",
-                    imageUpload: "",
-                    picture: "http://localhost:6541/mercator/assets/0000000/0000000/"
-                },
-                partners: {
-                    hasPartners: true,
-                    partner1: {
-                        name: "Magda",
-                        country: "DE",
-                        website: "www.magda.de"
-                    },
-                    partner2: {
-                        name: "Robin",
-                        country: "DE",
-                        website: "www.robin.de"
-                    },
-                    partner3: {
-                        name: "Robin2",
-                        country: "DE",
-                        website: "www.robin.de2"
-                    },
-                    hasOther: true,
-                    otherText: "Tobi"
-                },
-                topic: {
-                    democracy : true,
-                    culture : false,
-                    environment : false,
-                    social : true,
-                    migration : false,
-                    community : false,
-                    urban : false,
-                    education : false,
-                    other : false,
-                    otherText : ""
-                },
-                duration: 12,
-                location: {
-                    location_is_linked_to_ruhr : true,
-                    location_is_linked_to_ruhr_text : "sdfsdfsd",
-                    location_is_online : false,
-                    location_is_specific : false,
-                    location_specific : "Berlin"
-                },
-                status: "starting",
-                impact: {
-                    challenge : "challenge",
-                    goal : "goal",
-                    plan : "plan",
-                    target : "tagrget",
-                    team : "team",
-                    extraInfo : "extraInfo"
-                },
-                criteria : {
-                    strengthen : "strengthen",
-                    difference : "Difference",
-                    practical : "practical"
-                },
-                finance : {
-                    budget : 50000,
-                    requestedFunding : 5000,
-                    major : "major something",
-                    otherSources : "other sources",
-                    secured : true
-                },
-                experience : "experience",
-                heardFrom : {
-                    facebook : true,
-                    newsletter : false,
-                    other : true,
-                    otherText : "other heard from",
-                    personal_contact : false,
-                    twitter : true,
-                    website : true
-                },
-                acceptDisclaimer : true
-            };
-            scope.data = dummyData;
-            scope.data.commentCountTotal = 34;
-            scope.data.commentCount = 12;
-            scope.data.currentPhase = "participate";
-            scope.path = "http://localhost:6541/mercator/proposal_0000000/VERSION_0000000/";
-            // Dummy data end
-
+            get($q, adhHttp)(scope.path).then((data) => {
+                scope.data = data;
+            });
             scope.topicTrString = topicTrString;
         }
     };
