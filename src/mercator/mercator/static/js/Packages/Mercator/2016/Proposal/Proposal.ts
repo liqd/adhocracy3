@@ -502,7 +502,28 @@ export var listItem = (
         },
         link: (scope, element) => {
             get($q, adhHttp)(scope.path).then((data) => {
-                scope.data = data;
+                scope.data = {
+                    title: data.title,
+                    user_info: {
+                        first_name: data.userInfo.firstName,
+                        last_name: data.userInfo.lastName,
+                        item_creation_date: data.creationDate,
+                        path: data.creator
+                    },
+                    organization_info: data.organizationInfo,
+                    finance: {
+                        requested_funding: data.finance.requestedFunding
+                    },
+                    introduction: data.introduction,
+
+                    // FIXME: dummy
+                    commentCountTotal: 25,
+                    currentPhase: "participate",
+                    supporterCount: 33,
+                    winnerBadgeAssignment: {
+                        name: "winning"
+                    }
+                };
             });
         }
     };
