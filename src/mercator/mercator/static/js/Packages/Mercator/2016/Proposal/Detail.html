@@ -100,6 +100,14 @@
                             </div>
                         </div>
 
+                        <h3>{{ "TR__MERCATOR_PROPOSAL_MAJOR_EXPENSES_LABEL" | translate }}:</h3>
+                        <p>{{data.finance.major}}</p>
+
+                        <h3>{{ "TR__MERCATOR_PROPOSAL_FINANCE_OTHERS_SOURCES" | translate }}:</h3>
+                        <p>{{data.finance.otherSources}}</p>
+                    </section>
+
+                    <section class="non-commentable-section">
                         <div class="mercator-proposal-location">
                             <h3>{{ "TR__MERCATOR_PROPOSAL_LOCATION_LABEL" | translate }}:</h3>
                             <ul class="inline-boxes">
@@ -112,15 +120,7 @@
                             </ul>
                         </div>
                     </section>
-                    <section class="non-commentable-section">
 
-                        <h3>{{ "TR__MERCATOR_PROPOSAL_MAJOR_EXPENSES_LABEL" | translate }}:</h3>
-                        <p>{{data.finance.major}}</p>
-
-                        <h3>{{ "TR__MERCATOR_PROPOSAL_FINANCE_OTHERS_SOURCES" | translate }}:</h3>
-                        <p>{{data.finance.otherSources}}</p>
-
-                    </section>
                     <section class="commentable-section {{subResourceSelectedState('duration')}}">
                         <h3>{{ "TR__MERCATOR_PROPOSAL_DURATION_LABEL" | translate }}</h3>
                         <p>{{ data.duration }} {{ "TR__MONTHS" | translate }}</p>
