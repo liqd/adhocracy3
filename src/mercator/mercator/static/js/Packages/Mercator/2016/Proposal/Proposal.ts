@@ -399,7 +399,10 @@ var get = ($q : ng.IQService, adhHttp : AdhHttp.Service<any>) => (path : string)
                     status: proposal.data[SIOrganizationInfo.nick].status,
                     otherText: proposal.data[SIOrganizationInfo.nick].status_other
                 },
-                topic: null,
+                topic: <any>_.reduce(<any>topics, (result, key : string) => {
+                    result[key] = _.indexOf(proposal.data[SITopic.nick].topic, key) !== -1;
+                    return result;
+                }, {}),
                 title: proposal.data[SITitle.nick].title,
                 location: {
                     location_is_specific: !!proposal.data[SILocation.nick].location,

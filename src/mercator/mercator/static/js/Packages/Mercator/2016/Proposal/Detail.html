@@ -25,7 +25,7 @@
                 <i class="icon-speechbubble-document"></i> {{ data.commentCount }}
             </a>
         </h1>
-        <div data-ng-if="data.topic">
+        <div data-ng-if="selectedTopics">
             {{ "TR__MERCATOR_TOPIC" | translate }}: <em><span class="topic" data-ng-repeat="topic in selectedTopics">{{ topic | translate }}{{$last ? '' : ', '}}</span></em>
         </div>
     </div>
