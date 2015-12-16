@@ -145,11 +145,11 @@ export interface IData {
         budget : number;
         requestedFunding : number;
         major : string;
-        otherSources : string;
-        secured : boolean;
+        otherSources? : string;
+        secured? : boolean;
     };
     experience : string;
-    heardFrom : {
+    heardFrom? : {
         facebook : boolean;
         newsletter : boolean;
         other : boolean;
@@ -158,11 +158,19 @@ export interface IData {
         twitter : boolean;
         website : boolean;
     };
+}
+
+export interface IDetailData extends IData {
+    creationDate : string;
+    creator : string;
+}
+
+export interface IFormData extends IData {
     acceptDisclaimer : boolean;
 }
 
 
-var fill = (data : IData, resource) => {
+var fill = (data : IFormData, resource) => {
     switch (resource.content_type) {
         case RIMercatorProposal.content_type:
             resource.data[SIUserInfo.nick] = new SIUserInfo.Sheet({
@@ -299,7 +307,7 @@ var fill = (data : IData, resource) => {
 };
 
 var create = (adhHttp : AdhHttp.Service<any>) => (scope, adhPreliminaryNames) => {
-    var data : IData = scope.data;
+    var data : IFormData = scope.data;
     return adhHttp.withTransaction((transaction) => {
         var proposal = new RIMercatorProposal({preliminaryNames: adhPreliminaryNames});
         fill(data, proposal);
@@ -334,7 +342,7 @@ var create = (adhHttp : AdhHttp.Service<any>) => (scope, adhPreliminaryNames) =>
     });
 };
 
-var get = ($q : ng.IQService, adhHttp : AdhHttp.Service<any>) => (path : string) : ng.IPromise<IData> => {
+var get = ($q : ng.IQService, adhHttp : AdhHttp.Service<any>) => (path : string) : ng.IPromise<IDetailData> => {
     return adhHttp.get(path).then((proposal) => {
         var subs : {
             pitch : RIPitch;
@@ -355,13 +363,13 @@ var get = ($q : ng.IQService, adhHttp : AdhHttp.Service<any>) => (path : string)
             return adhHttp.get(<string>path).then((subresource) => {
                 subs[key] = subresource;
             });
-        })).then(() : IData => {
+        })).then(() : IDetailData => {
             return {
+                creationDate: proposal.data[SIMetaData.nick].item_creation_date,
+                creator: proposal.data[SIMetaData.nick].creator,
                 userInfo: {
                     firstName: proposal.data[SIMercatorUserInfo.nick].first_name,
-                    lastName: proposal.data[SIMercatorUserInfo.nick].last_name,
-                    item_creation_date: proposal.data[SIMetaData.nick].item_creation_date,
-                    path: proposal.data[SIMetaData.nick].creator
+                    lastName: proposal.data[SIMercatorUserInfo.nick].last_name
                 },
                 organizationInfo: {
                     name: proposal.data[SIOrganizationInfo.nick].name,
@@ -431,8 +439,7 @@ var get = ($q : ng.IQService, adhHttp : AdhHttp.Service<any>) => (path : string)
                     strengthen: subs.connectioncohesion.data[SIConnectionCohesion.nick].connection_cohesion,
                     difference: subs.difference.data[SIDifference.nick].difference,
                     practical: subs.practicalrelevance.data[SIPracticalRelevance.nick].practicalrelevance
-                },
-                acceptDisclaimer: null
+                }
             };
         });
     });
@@ -637,7 +644,9 @@ export var detailDirective = (
         scope: {},
         link: (scope) => {
             // FIXME : Dummy data
-            var dummyData : IData = {
+            var dummyData : IDetailData = {
+                creationDate: null,
+                creator: null,
                 userInfo: {
                     firstName: "Caroline",
                     lastName: "Clifford"
@@ -729,8 +738,7 @@ export var detailDirective = (
                     personal_contact : false,
                     twitter : true,
                     website : true
-                },
-                acceptDisclaimer : true
+                }
             };
             scope.data = dummyData;
             scope.data.commentCountTotal = 34;
