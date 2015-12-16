@@ -317,6 +317,8 @@ class ISimple(IResource):
 class ITag(ISimple):
     """Tag to link specific versions."""
 
+deprecated('ITag', 'Use adhocarcy_core.sheets.tags.ITags instead.')
+
 
 class IItemVersion(IResource):
     """Versionable resource, created during a Participation Process."""

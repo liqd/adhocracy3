@@ -170,11 +170,9 @@ class TestAutoupdateVersionableHasNewVersion:
 
     @fixture
     def mock_get_last_version(self, monkeypatch):
-        import adhocracy_core.resources.subscriber
-        mock = Mock(spec=adhocracy_core.utils.get_last_version)
-        monkeypatch.setattr(adhocracy_core.resources.subscriber,
-                            'get_last_version',
-                            mock)
+        from . import subscriber
+        mock = Mock(spec=subscriber._get_last_version)
+        monkeypatch.setattr(subscriber, '_get_last_version', mock)
         return mock
 
     @fixture
@@ -336,41 +334,6 @@ class TestAutoupdateNoneVersionableHasNewVersion:
         assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}
 
 
-class TestAutoupdateTagHasNewVersion:
-
-    @fixture
-    def mock_sheet(self, mock_sheet):
-        from adhocracy_core.sheets.tags import ITag
-        mock_sheet.meta = mock_sheet.meta._replace(isheet=ITag)
-        mock_sheet.get.return_value = {'elements': []}
-        return mock_sheet
-
-    def call_fut(self, event):
-        from adhocracy_core.resources.subscriber import \
-            autoupdate_tag_has_new_version
-        return autoupdate_tag_has_new_version(event)
-
-    def test_multiple_elements(self, version, registry, mock_sheet):
-        """Update version (sheet field is list) """
-        event = create_new_reference_event(version, registry, old_version=2,
-                                           new_version=3,
-                                           isheet_field='elements')
-        register_sheet(version, mock_sheet, registry)
-        mock_sheet.get.return_value = {'elements': [1, 2]}
-        self.call_fut(event)
-        assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}
-
-    def test_tag_name_is_first(self, version, registry, mock_sheet):
-        """Don`t update the "first" tag."""
-        version.__name__ = 'FIRST'
-        event = create_new_reference_event(version, registry, old_version=2,
-                                           new_version=3,
-                                           isheet_field='elements')
-        register_sheet(version, mock_sheet, registry)
-        self.call_fut(event)
-        assert mock_sheet.set.called is False
-
-
 class TestAddDefaultGroupToUserSubscriber:
 
     @fixture
@@ -525,19 +488,12 @@ class TestSendAcitvationMail:
         assert mock_messenger.send_registration_mail.called is False
 
 
-@fixture()
-def integration(config):
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.resources.subscriber')
-
-
 @mark.usefixtures('integration')
 def test_register_subscriber(registry):
     from adhocracy_core.resources import subscriber
     handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
     assert subscriber.autoupdate_non_versionable_has_new_version.__name__ in handlers
     assert subscriber.autoupdate_versionable_has_new_version.__name__ in handlers
-    assert subscriber.autoupdate_tag_has_new_version.__name__ in handlers
     assert subscriber.add_default_group_to_user.__name__ in handlers
     assert subscriber.update_modification_date_modified_by.__name__ in handlers
     assert subscriber.send_password_reset_mail.__name__ in handlers
