@@ -11,6 +11,7 @@ from substanced.catalog import CatalogsService
 from substanced.objectmap import find_objectmap
 from hypatia.interfaces import IIndex
 from hypatia.interfaces import IResultSet
+from hypatia.query import Query
 from hypatia.util import ResultSet
 from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.interfaces import FieldComparator
@@ -71,7 +72,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
         elements = (objectmap.object_for(e) for e in elements)
         return elements
 
-    def _get_interfaces_index_query(self, query):
+    def _get_interfaces_index_query(self, query) -> Query:
         interfaces_value = self._get_query_value(query.interfaces)
         if not interfaces_value and query.references:
             # do not search for all IResource and then intersect with
@@ -90,7 +91,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
             index_query = index_comparator(interfaces_value)
         return index_query
 
-    def _get_path_index_query(self, query):
+    def _get_path_index_query(self, query) -> Query:
         if query.root is None:
             return None
         depth = query.depth or None
@@ -99,7 +100,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
                              depth=depth,
                              include_origin=False)
 
-    def _get_indexes_index_query(self, query):
+    def _get_indexes_index_query(self, query) -> [Query]:
         if not query.indexes:
             return []
         indexes = []
@@ -114,25 +115,25 @@ class CatalogsServiceAdhocracy(CatalogsService):
                 indexes.append(index_comparator(index_value))
         return indexes
 
-    def _get_private_visibility_index_query(self, query):
+    def _get_private_visibility_index_query(self, query) -> Query:
         if not query.only_visible:
             return None
         visibility_index = self.get_index('private_visibility')
         return visibility_index.eq('visible')
 
-    def _get_allowed_index_query(self, query):
+    def _get_allowed_index_query(self, query) -> Query:
         if not query.allows:
             return None
         allowed_index = self.get_index('allowed')
         principals, permission = query.allows
         return allowed_index.allows(principals, permission)
 
-    def _combine_indexes(self, query, *list_of_indexes):
+    def _combine_indexes(self, query, *list_of_indexes) -> [Query]:
         maybes_indexes = chain.from_iterable(list_of_indexes)
         indexes = [idx for idx in maybes_indexes if idx is not None]
         return indexes
 
-    def _execute_query(self, indexes):
+    def _execute_query(self, indexes) -> IResultSet:
         if len(indexes) > 0:
             index_query = indexes[0]
             for idx in indexes[1:]:
@@ -143,7 +144,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
             elements = ResultSet(set(), 0, None)
         return elements
 
-    def _search_references(self, query, resolver):
+    def _search_references(self, query, resolver) -> IResultSet:
         if not query.references:
             res = ResultSet(set(), 0, None)
             res.resolver = resolver
@@ -158,7 +159,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
             accumulated_refs = found.intersect(accumulated_refs)
         return accumulated_refs
 
-    def _combine_results(self, query, elements, references):
+    def _combine_results(self, query, elements, references) -> IResultSet:
         if not query.references:
             return elements
         if query.interfaces:
