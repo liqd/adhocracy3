@@ -4,6 +4,7 @@
 import * as AdhBadge from "../../../Badge/Badge";
 import * as AdhConfig from "../../../Config/Config";
 import * as AdhHttp from "../../../Http/Http";
+import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
 import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 
@@ -46,20 +47,31 @@ import RITeam from "../../../../Resources_/adhocracy_mercator/resources/mercator
 
 var pkgLocation = "/Mercator/2016/Proposal";
 
+var topics = [
+    "democracy",
+    "culture",
+    "environment",
+    "social",
+    "migration",
+    "community",
+    "urban",
+    "education",
+    "other",
+];
 
 var topicTrString = (topic : string) : string => {
-    var topics = {
-        democracy_and_participation: "TR__MERCATOR_TOPIC_DEMOCRACY",
-        arts_and_cultural_activities: "TR__MERCATOR_TOPIC_CULTURE",
+    var topicTranslations = {
+        democracy: "TR__MERCATOR_TOPIC_DEMOCRACY",
+        culture: "TR__MERCATOR_TOPIC_CULTURE",
         environment: "TR__MERCATOR_TOPIC_ENVIRONMENT",
-        social_inclusion: "TR__MERCATOR_TOPIC_SOCIAL",
+        social: "TR__MERCATOR_TOPIC_SOCIAL",
         migration: "TR__MERCATOR_TOPIC_MIGRATION",
-        communities: "TR__MERCATOR_TOPIC_COMMUNITY",
-        urban_development: "TR__MERCATOR_TOPIC_URBAN",
+        community: "TR__MERCATOR_TOPIC_COMMUNITY",
+        urban: "TR__MERCATOR_TOPIC_URBAN",
         education: "TR__MERCATOR_TOPIC_EDUCATION",
         other: "TR__MERCATOR_TOPIC_OTHER"
     };
-    return topics[topic];
+    return topicTranslations[topic];
 };
 
 
@@ -442,17 +454,7 @@ export var mercatorProposalFormController2016 = (
 
     var topicTotal = 0;
 
-    $scope.topics = [
-        "democracy_and_participation",
-        "arts_and_cultural_activities",
-        "environment",
-        "social_inclusion",
-        "migration",
-        "communities",
-        "urban_development",
-        "education",
-        "other",
-    ];
+    $scope.topics = topics;
 
     var heardFromCheckboxes = [
         "heard-from-personal",
@@ -526,7 +528,9 @@ export var mercatorProposalFormController2016 = (
 };
 
 export var detailDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    flowFactory,
+    adhPermissions : AdhPermissions.Service
 ) => {
     return {
         restrict: "E",
@@ -635,6 +639,18 @@ export var detailDirective = (
             scope.data.currentPhase = "participate";
             scope.path = "http://localhost:6541/mercator/proposal_0000000/VERSION_0000000/";
             // Dummy data end
+
+            adhPermissions.bindScope(scope, () => scope.path);
+            // FIXME, waa
+            scope.isModerator = scope.options.PUT;
+
+            scope.selectedTopics = [];
+
+            _.forEach(scope.data.topic, function(isSelected, key) {
+                if (isSelected === true) {
+                    scope.selectedTopics.push(topicTrString(key));
+                }
+            });
 
             scope.topicTrString = topicTrString;
         }
