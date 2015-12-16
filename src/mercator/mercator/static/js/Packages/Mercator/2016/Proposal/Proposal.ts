@@ -341,7 +341,9 @@ var create = (adhHttp : AdhHttp.Service<any>) => (scope, adhPreliminaryNames) =>
         proposal2.data[SIMercatorSubResources.nick] = subResourcesSheet;
         transaction.put(proposalRequest.path, proposal2);
 
-        return transaction.commit();
+        return transaction.commit().then((responses) => {
+            return responses[0].path;
+        });
     });
 };
 
@@ -533,10 +535,13 @@ export var mercatorProposalFormController2016 = (
     $scope,
     $element,
     $window,
+    $location,
     adhShowError,
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
-    adhSubmitIfValid
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhSubmitIfValid,
+    adhResourceUrl
 ) => {
 
     $scope.data = {
@@ -635,10 +640,15 @@ export var mercatorProposalFormController2016 = (
 
     $scope.submitIfValid = () => {
         adhSubmitIfValid($scope, $element, $scope.mercatorProposalForm, () => {
-            return create(adhHttp)($scope, adhPreliminaryNames);
+            return create(adhHttp)($scope, adhPreliminaryNames).then((proposalPath) => {
+                $location.url(adhResourceUrl(proposalPath));
+            });
         });
     };
 
+    $scope.cancel = () => {
+        adhTopLevelState.goToCameFrom(adhResourceUrl(adhTopLevelState.get("processUrl")));
+    };
 };
 
 export var detailDirective = (

@@ -72,10 +72,13 @@ export var register = (angular) => {
             "$scope",
             "$element",
             "$window",
+            "$location",
             "adhShowError",
             "adhHttp",
             "adhPreliminaryNames",
+            "adhTopLevelState",
             "adhSubmitIfValid",
+            "adhResourceUrlFilter",
             Proposal.mercatorProposalFormController2016])
         .directive("adhMercator2016ProposalDetail", ["$q", "adhConfig", "adhHttp", Proposal.detailDirective]);
 };
