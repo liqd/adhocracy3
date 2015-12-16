@@ -639,6 +639,11 @@ export var mercatorProposalFormController2016 = (
         return showCheckboxGroupError($scope.mercatorProposalCommunityForm, heardFromCheckboxes);
     };
 
+    $scope.dateChange = (date) => {
+        // FIXME: this is quite hacky dates need proper validation EG not so much in the past or future too
+        $scope.data.organizationInfo.registrationDate = date + "-01";
+    };
+
     $scope.showError = adhShowError;
 
     // FIXME !

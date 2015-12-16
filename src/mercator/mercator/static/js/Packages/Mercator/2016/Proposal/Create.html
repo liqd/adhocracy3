@@ -249,16 +249,18 @@
                                 <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_DATE_PLANNED_NONPROFIT_2016" | translate }} *</span>
                                 <input
                                     type="text"
-                                    data-ng-model="data.organizationInfo.registrationDate"
+                                    data-ng-model="data.organizationInfo.registrationDateField"
                                     name="organization-info-registration-date"
-                                    data-ng-pattern="/(1[0-2]|0[1-9])-([0-9]{4})$/"
-                                    placeholder="mm-yyyy"
+                                    data-ng-pattern="/([0-9]{4})-(1[0-2]|0[1-9])$/"
+                                    placeholder="yyyy-mm"
+                                    data-ng-change="dateChange(data.organizationInfo.registrationDateField)"
                                     required="required" />
+                                <input type="hidden" ng-model="data.organizationInfo.registrationDate">
                                 <span
                                     class="input-error"
                                     data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-registration-date'],
                                     'pattern')">
-                                    {{ "TR__ERROR_INVALID_DATE" | translate }}</span>
+                                    {{ "TR__ERROR_INVALID_MERCATOR_PROPOSAL_ORGANIZATION_DATE_OF_FORESEEN_REGISTRATION_2016" | translate }}</span>
                                 <span
                                     class="input-error"
                                     data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-registration-date'],
