@@ -176,6 +176,21 @@ export interface IData {
 
 export interface IDetailData extends IData {
     commentCountTotal : number;
+    commentCounts: {
+        proposal : number;
+        pitch : number;
+        partners : number;
+        duration : number;
+        challenge : number;
+        goal : number;
+        plan : number;
+        target : number;
+        team : number;
+        extrainfo : number;
+        connectioncohesion : number;
+        difference : number;
+        practicalrelevance : number;
+    };
     currentPhase : string;
     supporterCount : number;
     creationDate : string;
@@ -473,6 +488,25 @@ var get = (
                     strengthen: subs.connectioncohesion.data[SIConnectionCohesion.nick].connection_cohesion,
                     difference: subs.difference.data[SIDifference.nick].difference,
                     practical: subs.practicalrelevance.data[SIPracticalRelevance.nick].practicalrelevance
+                },
+
+                // FIXME: It is not currently possible to get the
+                // recursive comment count of a subresource. Will be
+                // fixed in the backend.
+                commentCounts: {
+                    proposal: 0,
+                    pitch: 0,
+                    partners: 0,
+                    duration: 0,
+                    challenge: 0,
+                    goal: 0,
+                    plan: 0,
+                    target: 0,
+                    team: 0,
+                    extrainfo: 0,
+                    connectioncohesion: 0,
+                    difference: 0,
+                    practicalrelevance: 0
                 }
             };
         });
