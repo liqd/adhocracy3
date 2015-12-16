@@ -48,6 +48,18 @@ import RITeam from "../../../../Resources_/adhocracy_mercator/resources/mercator
 
 var pkgLocation = "/Mercator/2016/Proposal";
 
+var topics = [
+    "democracy_and_participation",
+    "arts_and_cultural_activities",
+    "environment",
+    "social_inclusion",
+    "migration",
+    "communities",
+    "urban_development",
+    "education",
+    "other",
+];
+
 
 var topicTrString = (topic : string) : string => {
     var topics = {
@@ -563,17 +575,7 @@ export var mercatorProposalFormController2016 = (
 
     var topicTotal = 0;
 
-    $scope.topics = [
-        "democracy_and_participation",
-        "arts_and_cultural_activities",
-        "environment",
-        "social_inclusion",
-        "migration",
-        "communities",
-        "urban_development",
-        "education",
-        "other",
-    ];
+    $scope.topics = topics;
 
     var heardFromCheckboxes = [
         "heard-from-personal",
@@ -615,6 +617,10 @@ export var mercatorProposalFormController2016 = (
     var showCheckboxGroupError = (form, names : string[]) : boolean => {
         var dirty = $scope.mercatorProposalForm.$submitted || _.some(names, (name) => form[name].$dirty);
         return !updateCheckBoxGroupValidity(form, names) && dirty;
+    };
+
+    $scope.showTopicsError = () : boolean => {
+        return ((topicTotal < 1) || (topicTotal > 2)) && $scope.mercatorProposalForm.$submitted;
     };
 
     $scope.showLocationError = () : boolean => {

@@ -701,7 +701,7 @@
                 <div class="annotated-section-body">
                     <span class="label-text">{{ "TR__MERCATOR_TOPIC_LABEL" | translate }}</span>
                     <div
-                        data-ng-class="{ 'ng-invalid': mercatorProposalForm.mercatorProposalBriefForm['introduction-topics'].$invalid }">
+                        data-ng-class="{ 'ng-invalid': showTopicsError() }">
                         <label data-ng-repeat="topic in topics" class="label-text">
                             <input type="checkbox" name="introduction-topic-{{topic}}" data-ng-change="topicChange(data.topic[topic])" data-ng-model="data.topic[topic]"/>
                             {{ topicTrString(topic) | translate }}
@@ -722,7 +722,7 @@
                             data-ng-model="data.topics" />
                         <span
                             class="input-error"
-                            data-ng-if="mercatorProposalForm.mercatorProposalBriefForm['introduction-topics'].$error.enoughTopics">
+                            data-ng-if="showTopicsError()">
                             {{ "TR__ERROR_ENOUGH_TOPICS" | translate }}</span>
                     </div>
                 </div><!-- /.annotated-section-body -->
