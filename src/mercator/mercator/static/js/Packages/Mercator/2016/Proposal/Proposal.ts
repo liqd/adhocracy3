@@ -19,8 +19,10 @@ import * as SIExtraFunding from "../../../../Resources_/adhocracy_mercator/sheet
 import * as SIExtraInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IExtraInfo";
 import * as SIFinancialPlanning from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IFinancialPlanning";
 import * as SIGoal from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IGoal";
+import * as SIImageReference from "../../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SILocation from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ILocation";
 import * as SIMetaData from "../../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SIMercatorIntroImageMetadata from "../../../../Resources_/adhocracy_mercator/sheets/mercator/IIntroImageMetadata";
 import * as SIMercatorSubResources from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IMercatorSubResources";
 import * as SIOrganizationInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IOrganizationInfo";
 import * as SIPartners from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IPartners";
@@ -41,6 +43,7 @@ import RIDifference from "../../../../Resources_/adhocracy_mercator/resources/me
 import RIDuration from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IDuration";
 import RIExtraInfo from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IExtraInfo";
 import RIGoal from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IGoal";
+import RIMercatorIntroImage from "../../../../Resources_/adhocracy_mercator/resources/mercator/IIntroImage";
 import RIMercatorProposal from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IMercatorProposal";
 import RIPartners from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IPartners";
 import RIPitch from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IPitch";
@@ -98,8 +101,7 @@ export interface IData {
     title : string;
     introduction : {
         pitch : string;
-        imageUpload : any;
-        picture : any;
+        picture : string;
     };
     partners : {
         hasPartners : boolean;
@@ -259,6 +261,9 @@ var fill = (data : IFormData, resource) => {
                     return result;
                 }, []),
                 heard_from_other: data.heardFrom.otherText
+            });
+            resource.data[SIImageReference.nick] = new SIImageReference.Sheet({
+                picture: data.introduction.picture
             });
             resource.data[SIWinnerInfo.nick] = new SIWinnerInfo.Sheet({
                 explanation: null,  // FIXME
@@ -452,8 +457,7 @@ var get = (
                 heardFrom: proposal.data[SICommunity.nick].heard_from,
                 introduction: {
                     pitch: subs.pitch.data[SIPitch.nick].pitch,
-                    imageUpload: null,
-                    picture: null
+                    picture: proposal.data[SIImageReference.nick].picture
                 },
                 partners: {
                     hasPartners: subs.partners.data[SIPartners.nick].has_partners,
@@ -514,18 +518,12 @@ var get = (
 };
 
 
-export var createDirective = (
-    adhConfig : AdhConfig.IService,
-    flowFactory
-) => {
+export var createDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
             poolPath: "@"
-        },
-        link: (scope) => {
-            scope.$flow = flowFactory.create();
         }
     };
 };
@@ -599,8 +597,11 @@ export var mercatorProposalFormController2016 = (
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhSubmitIfValid,
-    adhResourceUrl
+    adhResourceUrl,
+    adhUploadImage,
+    flowFactory
 ) => {
+    $scope.$flow = flowFactory.create();
 
     $scope.data = {
         user_info: {},
@@ -697,9 +698,23 @@ export var mercatorProposalFormController2016 = (
 
     $scope.submitIfValid = () => {
         adhSubmitIfValid($scope, $element, $scope.mercatorProposalForm, () => {
-            return create(adhHttp)($scope, adhPreliminaryNames).then((proposalPath) => {
+            var post = () => create(adhHttp)($scope, adhPreliminaryNames).then((proposalPath) => {
                 $location.url(adhResourceUrl(proposalPath));
             });
+
+            if ($scope.$flow && $scope.$flow.support && $scope.$flow.files.length > 0) {
+                return adhUploadImage(
+                    adhTopLevelState.get("processUrl"),
+                    $scope.$flow,
+                    RIMercatorIntroImage.content_type,
+                    SIMercatorIntroImageMetadata.nick
+                ).then((imageUrl : string) => {
+                    $scope.data.introduction.picture = imageUrl;
+                    return post();
+                });
+            } else {
+                return post();
+            }
         });
     };
 
