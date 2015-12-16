@@ -8,8 +8,15 @@
     }
 
     .facet {
-        @include gallery(6 of 12);
-        @include rem(margin-bottom, 1rem);
+        &:not(.m-wide) {
+            @include gallery(6 of 12);
+            @include rem(margin-bottom, 1rem);
+        }
+
+        &.m-wide {
+            @include clearfix;
+            clear: both;
+        }
     }
 }
 

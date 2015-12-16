@@ -1,5 +1,5 @@
 <div class="facets">
-    <div data-ng-repeat="facet in facets" class="facet facet-{{facet.key}}">
+    <div data-ng-repeat="facet in facets" class="facet facet-{{facet.key}}" data-ng-class="{'m-wide': facet.wide}">
         <h3 class="facet-header">{{ facet.name | translate }}</h3>
         <div class="facet-buttons">
             <a
