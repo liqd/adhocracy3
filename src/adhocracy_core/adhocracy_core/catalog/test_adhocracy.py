@@ -213,27 +213,42 @@ def test_includeme_register_index_rates(registry):
                                     name='adhocracy|rates')
 
 
-def test_index_tag_with_tags(context, mock_graph):
-    from .adhocracy import index_tag
-    context.__graph__ = mock_graph
-    tag = testing.DummyResource(__name__='tag')
-    mock_graph.get_back_reference_sources.return_value = [tag]
-    assert index_tag(context, 'default') == ['tag']
+class TestIndexTag:
 
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
 
-def test_index_tag_without_tags(context, mock_graph):
-    from .adhocracy import index_tag
-    context.__graph__ = mock_graph
-    mock_graph.get_back_reference_sources.return_value = []
-    assert index_tag(context, 'default') == 'default'
+    @fixture
+    def mock_tags_sheet(self, registry, mock_sheet):
+        registry.content.get_sheet.return_value = mock_sheet
+        return mock_sheet
 
+    @fixture
+    def version(self, item):
+        item['version'] = testing.DummyResource()
+        return item['version']
 
-@mark.usefixtures('integration')
-def test_includeme_register_index_rates(registry):
-    from adhocracy_core.sheets.versions import IVersionable
-    from substanced.interfaces import IIndexView
-    assert registry.adapters.lookup((IVersionable,), IIndexView,
-                                    name='adhocracy|tag')
+    def call_fut(self, *args):
+        from .adhocracy import index_tag
+        return index_tag(*args)
+
+    def test_index_version_with_tags(self, version, mock_tags_sheet, registry):
+        other = testing.DummyResource()
+        mock_tags_sheet.get.return_value = {'LAST': version,
+                                            'FIRST': other}
+        assert self.call_fut(version, 'default') == ['LAST']
+
+    def test_index_version_without_tags(self, version, mock_tags_sheet, registry):
+        mock_tags_sheet.get.return_value = {}
+        assert self.call_fut(version, 'default') == 'default'
+
+    @mark.usefixtures('integration')
+    def test_includeme_register(self, registry):
+        from adhocracy_core.sheets.versions import IVersionable
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IVersionable,), IIndexView,
+                                        name='adhocracy|tag')
 
 
 class TestIndexBadge:

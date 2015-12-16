@@ -9,9 +9,9 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.pool import PoolSheet
 from adhocracy_core.schema import UniqueReferences
-from adhocracy_core.utils import get_last_version
-from adhocracy_core.utils import get_last_new_version
+from adhocracy_core.utils import is_created_in_current_transaction
 from adhocracy_core.utils import is_batchmode
+from adhocracy_core.utils import get_sheet_field
 
 
 class IVersionable(ISheet):
@@ -43,23 +43,23 @@ def validate_linear_history_no_fork(node: colander.SchemaNode, value: list):
 
     :raises colander.Invalid: if value does not reference the last version.
     """
+    from adhocracy_core.sheets.tags import ITags  # prevent circle dependencies
     context = node.bindings['context']
     request = node.bindings['request']
-    if is_batchmode(request):
-        last_new_version = get_last_new_version(request.registry, context)
-        if last_new_version is not None:
-            # Store ths last new version created in this transaction
-            # so :func:`adhocracy_core.rest.views.ItemPoolView.post`
-            # can do an put instead of post action in batch requests.
-            request.validated['_last_new_version_in_transaction'] =\
-                last_new_version
-            return
-    last = get_last_version(context, request.registry)
-    _assert_follows_eq_last_version(node, value, last)
+    registry = node.bindings['registry']
+    batchmode = is_batchmode(request)
+    last = get_sheet_field(context, ITags, 'LAST', registry=registry)
+    if batchmode and is_created_in_current_transaction(last, registry):
+        # In batchmode there is only one new last version created that is
+        # updated by the following versions. See
+        # func:`adhocracy_core.rest.views.IItemRestView.post` and
+        # func:`adhocracy_core.resource.subscriber` for more information.
+        return
+    _assert_follows_last_version(node, value, last)
 
 
-def _assert_follows_eq_last_version(node: colander.SchemaNode, value: list,
-                                    last: object):
+def _assert_follows_last_version(node: colander.SchemaNode, value: list,
+                                 last: object):
     follows = value[0]
     if follows is not last:
         last_path = resource_path(last)

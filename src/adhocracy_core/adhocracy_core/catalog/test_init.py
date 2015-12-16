@@ -275,61 +275,63 @@ class TestCatalogsServiceAdhocracy:
         assert missing_tag in result_elenments
 
     def test_search_with_references(self, registry, pool, inst, query):
-        from adhocracy_core.interfaces import ITag
+        from adhocracy_core.interfaces import IItem
         from adhocracy_core.interfaces import Reference
         from adhocracy_core import sheets
         from adhocracy_core.utils import get_sheet
         referenced = pool
-        referencing = self._make_resource(registry, parent=pool, iresource=ITag)
-        sheet = get_sheet(referencing, sheets.tags.ITag)
-        sheet.set({'elements': [referenced]})
-        reference = Reference(None, sheets.tags.ITag, 'elements', referenced)
+        referencing = self._make_resource(registry, parent=pool,
+                                          iresource=IItem)
+        sheet = get_sheet(referencing, sheets.tags.ITags)
+        sheet.set({'FIRST': referenced})
+        reference = Reference(None, sheets.tags.ITags, 'FIRST', referenced)
         result = inst.search(query._replace(references=[reference]))
         assert list(result.elements) == [referencing]
 
     def test_search_with_references_include_isheet_subtypes(
             self, registry, pool, inst, query):
         from adhocracy_core.interfaces import ISheet
-        from adhocracy_core.interfaces import ITag
+        from adhocracy_core.interfaces import IItem
         from adhocracy_core.interfaces import Reference
         from adhocracy_core import sheets
         from adhocracy_core.utils import get_sheet
         referenced = pool
         referencing = self._make_resource(registry, parent=pool,
-                                          iresource=ITag)
-        sheet = get_sheet(referencing, sheets.tags.ITag)
-        sheet.set({'elements': [referenced]})
-        reference = Reference(None, ISheet, 'elements', referenced)
+                                          iresource=IItem)
+        sheet = get_sheet(referencing, sheets.tags.ITags)
+        sheet.set({'FIRST': referenced})
+        reference = Reference(None, ISheet, 'FIRST', referenced)
         result = inst.search(query._replace(references=[reference]))
         assert list(result.elements) == [referencing]
 
     def test_search_with_references_ignore_field_name_if_empty(
             self, registry, pool, inst, query):
-        from adhocracy_core.interfaces import ITag
+        from adhocracy_core.interfaces import IItem
         from adhocracy_core.interfaces import Reference
         from adhocracy_core import sheets
         from adhocracy_core.utils import get_sheet
         referenced = pool
         referencing = self._make_resource(registry, parent=pool,
-                                          iresource=ITag)
-        sheet = get_sheet(referencing, sheets.tags.ITag)
-        sheet.set({'elements': [referenced]})
-        reference = Reference(None, sheets.tags.ITag, '', referenced)
+                                          iresource=IItem)
+        sheet = get_sheet(referencing, sheets.tags.ITags)
+        sheet.set({'FIRST': referenced})
+        reference = Reference(None, sheets.tags.ITags, '', referenced)
         result = inst.search(query._replace(references=[reference]))
         assert list(result.elements) == [referencing]
 
     def test_search_with_back_references(self, registry, pool, inst, query):
-        from adhocracy_core.interfaces import ITag
+        from adhocracy_core.interfaces import IItem
         from adhocracy_core.interfaces import Reference
         from adhocracy_core import sheets
         from adhocracy_core.utils import get_sheet
         referenced1 = self._make_resource(registry, parent=pool)
         referenced2 = self._make_resource(registry, parent=pool)
         referenced3 = self._make_resource(registry, parent=pool)
-        referencing = self._make_resource(registry, parent=pool, iresource=ITag)
-        sheet = get_sheet(referencing, sheets.tags.ITag)
-        sheet.set({'elements': [referenced3, referenced1, referenced2]})
-        reference = Reference(referencing, sheets.tags.ITag, 'elements', None)
+        referencing = self._make_resource(registry, parent=pool,
+                                          iresource=IItem)
+        sheet = get_sheet(referencing, sheets.tags.ITags)
+        sheet.set({'LAST': [referenced3, referenced1, referenced2]})
+        reference = Reference(referencing, sheets.tags.ITags, 'LAST', None)
         result = inst.search(query._replace(references=[reference]))
         assert list(result.elements) == [referenced3, referenced1, referenced2]
 
