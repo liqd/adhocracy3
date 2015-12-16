@@ -334,6 +334,26 @@ var create = (adhHttp : AdhHttp.Service<any>) => (scope, adhPreliminaryNames) =>
     });
 };
 
+var get = (adhHttp : AdhHttp.Service<any>) => (path : string) : ng.IPromise<IData> => {
+    return adhHttp.get(path).then((proposal) => {
+        return {
+            title: proposal.data[SITitle.nick].title,
+            user_info: {
+                first_name: proposal.data[SIMercatorUserInfo.nick].first_name,
+                last_name: proposal.data[SIMercatorUserInfo.nick].last_name,
+                item_creation_date: proposal.data[SIMetaData.nick].item_creation_date,
+                path: proposal.data[SIMetaData.nick].creator
+            },
+            organization_info: {
+                name: proposal.data[SIOrganizationInfo.nick].name
+            },
+            finance: {
+                requested_funding: proposal.data[SIFinancialPlanning.nick].requested_funding
+            }
+        };
+    });
+};
+
 
 export var createDirective = (
     adhConfig : AdhConfig.IService,
@@ -388,25 +408,8 @@ export var listItem = (
         },
         link: (scope, element) => {
 
-            scope.data = {};
-
-            adhHttp.get(scope.path).then((proposal) => {
-                scope.data.title = {
-                    title: proposal.data[SITitle.nick].title
-                };
-                scope.data.user_info = {
-                    first_name: proposal.data[SIMercatorUserInfo.nick].first_name,
-                    last_name: proposal.data[SIMercatorUserInfo.nick].last_name,
-                    item_creation_date: proposal.data[SIMetaData.nick].item_creation_date,
-                    path: proposal.data[SIMetaData.nick].creator
-                };
-                scope.data.organization_info = {
-                    name: proposal.data[SIOrganizationInfo.nick].name
-                };
-                scope.data.finance = {
-                    requested_funding: proposal.data[SIFinancialPlanning.nick].requested_funding
-                };
-                scope.data.currentPhase = "participate";
+            get(scope.path).then((data) => {
+                scope.data = data;
             });
 
             /*scope.data  = {
