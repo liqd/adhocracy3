@@ -8,6 +8,8 @@ import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
 import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 
+import * as AdhMercator2015Proposal from "../../2015/Proposal/Proposal";
+
 import * as SIChallenge from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IChallenge";
 import * as SICommunity from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ICommunity";
 import * as SIConnectionCohesion from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IConnectionCohesion";
@@ -173,9 +175,9 @@ export interface IData {
 }
 
 export interface IDetailData extends IData {
-    // commentCountTotal : number;
-    // currentPhase : string;
-    // supporterCount : number;
+    commentCountTotal : number;
+    currentPhase : string;
+    supporterCount : number;
     creationDate : string;
     creator : string;
 }
@@ -359,7 +361,11 @@ var create = (adhHttp : AdhHttp.Service<any>) => (scope, adhPreliminaryNames) =>
     });
 };
 
-var get = ($q : ng.IQService, adhHttp : AdhHttp.Service<any>) => (path : string) : ng.IPromise<IDetailData> => {
+var get = (
+    $q : ng.IQService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service
+) => (path : string) : ng.IPromise<IDetailData> => {
     return adhHttp.get(path).then((proposal) => {
         var subs : {
             pitch : RIPitch;
@@ -380,8 +386,16 @@ var get = ($q : ng.IQService, adhHttp : AdhHttp.Service<any>) => (path : string)
             return adhHttp.get(<string>path).then((subresource) => {
                 subs[key] = subresource;
             });
-        })).then(() : IDetailData => {
+        })).then(() => $q.all([
+            AdhMercator2015Proposal.getWorkflowState(adhHttp, adhTopLevelState, $q)(),
+            AdhMercator2015Proposal.countSupporters(adhHttp, path + "rates/", path),
+            AdhMercator2015Proposal.countComments(adhHttp, path),
+        ])).then((args : any[]) : IDetailData => {
             return {
+                currentPhase: args[0],
+                supporterCount: args[1],
+                commentCountTotal: args[2],
+
                 creationDate: proposal.data[SIMetaData.nick].item_creation_date,
                 creator: proposal.data[SIMetaData.nick].creator,
                 userInfo: {
@@ -518,7 +532,7 @@ export var listItem = (
             path: "@"
         },
         link: (scope, element) => {
-            get($q, adhHttp)(scope.path).then((data) => {
+            get($q, adhHttp, adhTopLevelState)(scope.path).then((data) => {
                 scope.data = {
                     title: data.title,
                     user_info: {
@@ -532,14 +546,9 @@ export var listItem = (
                         requested_funding: data.finance.requestedFunding
                     },
                     introduction: data.introduction,
-
-                    // FIXME: dummy
-                    commentCountTotal: 25,
-                    currentPhase: "participate",
-                    supporterCount: 33,
-                    winnerBadgeAssignment: {
-                        name: "winning"
-                    }
+                    commentCountTotal: data.commentCountTotal,
+                    currentPhase: data.currentPhase,
+                    supporterCount: data.supporterCount
                 };
             });
         }
@@ -660,6 +669,7 @@ export var detailDirective = (
     $q : ng.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service,
     adhPermissions : AdhPermissions.Service
 ) => {
     return {
@@ -669,12 +679,11 @@ export var detailDirective = (
             path: "@"
         },
         link: (scope) => {
-
             adhPermissions.bindScope(scope, () => scope.path);
             // FIXME, waa
             scope.isModerator = scope.options.PUT;
 
-            get($q, adhHttp)(scope.path).then((data) => {
+            get($q, adhHttp, adhTopLevelState)(scope.path).then((data) => {
                 scope.data = data;
 
                 scope.selectedTopics = [];
@@ -685,7 +694,6 @@ export var detailDirective = (
                     }
                 });
             });
-
         }
     };
 };
