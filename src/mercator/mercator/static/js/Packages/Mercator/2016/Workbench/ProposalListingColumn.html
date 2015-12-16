@@ -3,7 +3,7 @@
         <i class="icon-list-filled moving-column-icon"></i>
     </div>
 
-    <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ platformUrl | adhResourceUrl:undefined:{proposalUrl: proposalUrl, movingColumns: 'is-show-show-hide'} }}">
+    <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ processUrl | adhResourceUrl:undefined:{proposalUrl: proposalUrl, movingColumns: 'is-show-show-hide'} }}">
         <div class="moving-column-tab">
             <i class="icon-list-filled moving-column-icon"></i>
         </div>
@@ -11,7 +11,7 @@
 
     <adh-mercator-2016-proposal-listing
         data-ng-switch-when="body"
-        data-path="{{platformUrl}}"
+        data-path="{{processUrl}}"
         data-content-type="{{contentType}}"
         data-update="shared.update"
         data-facets="shared.facets"

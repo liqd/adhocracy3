@@ -3,7 +3,7 @@
         <i class="icon-document moving-column-icon"></i>
 
         <div class="moving-column-menu-nav">
-            <a class="moving-column-menu-nav-button" data-ng-href="{{ platformUrl | adhResourceUrl }}" title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
+            <a class="moving-column-menu-nav-button" data-ng-href="{{ processUrl | adhResourceUrl }}" title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
         </div>
     </div>
 
@@ -16,16 +16,13 @@
     <adh-recompile-on-change data-ng-switch-when="body" data-value="{{proposalUrl}}">
         <adh-resource-actions
             data-resource-path="{{proposalUrl}}"
-            data-edit="true"
+            data-edit="false"
             data-report="true"
             data-share="true"
-            data-delete="true"
+            data-delete="false"
             data-print="true"></adh-resource-actions>
 
-        <adh-document-create data-path="{{processUrl}}" data-has-map="true" data-has-image="true" data-polygon="polygon"></adh-document-create>
-        <adh-resource-wrapper>
-            <adh-mercator-2016-proposal-detail-view data-ng-if="proposalUrl" data-path="{{proposalUrl}}"></adh-mercator-2016-proposal-detail-view>
-        </adh-resource-wrapper>
+        <adh-mercator-2016-proposal-detail data-ng-if="proposalUrl" data-path="{{proposalUrl}}"></adh-mercator-2016-proposal-detail>
     </adh-recompile-on-change>
 
     <adh-report-abuse

@@ -341,7 +341,9 @@ var create = (adhHttp : AdhHttp.Service<any>) => (scope, adhPreliminaryNames) =>
         proposal2.data[SIMercatorSubResources.nick] = subResourcesSheet;
         transaction.put(proposalRequest.path, proposal2);
 
-        return transaction.commit();
+        return transaction.commit().then((responses) => {
+            return responses[0].path;
+        });
     });
 };
 
@@ -502,7 +504,28 @@ export var listItem = (
         },
         link: (scope, element) => {
             get($q, adhHttp)(scope.path).then((data) => {
-                scope.data = data;
+                scope.data = {
+                    title: data.title,
+                    user_info: {
+                        first_name: data.userInfo.firstName,
+                        last_name: data.userInfo.lastName,
+                        item_creation_date: data.creationDate,
+                        path: data.creator
+                    },
+                    organization_info: data.organizationInfo,
+                    finance: {
+                        requested_funding: data.finance.requestedFunding
+                    },
+                    introduction: data.introduction,
+
+                    // FIXME: dummy
+                    commentCountTotal: 25,
+                    currentPhase: "participate",
+                    supporterCount: 33,
+                    winnerBadgeAssignment: {
+                        name: "winning"
+                    }
+                };
             });
         }
     };
@@ -512,10 +535,13 @@ export var mercatorProposalFormController2016 = (
     $scope,
     $element,
     $window,
+    $location,
     adhShowError,
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
-    adhSubmitIfValid
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhSubmitIfValid,
+    adhResourceUrl
 ) => {
 
     $scope.data = {
@@ -614,10 +640,15 @@ export var mercatorProposalFormController2016 = (
 
     $scope.submitIfValid = () => {
         adhSubmitIfValid($scope, $element, $scope.mercatorProposalForm, () => {
-            return create(adhHttp)($scope, adhPreliminaryNames);
+            return create(adhHttp)($scope, adhPreliminaryNames).then((proposalPath) => {
+                $location.url(adhResourceUrl(proposalPath));
+            });
         });
     };
 
+    $scope.cancel = () => {
+        adhTopLevelState.goToCameFrom(adhResourceUrl(adhTopLevelState.get("processUrl")));
+    };
 };
 
 export var detailDirective = (

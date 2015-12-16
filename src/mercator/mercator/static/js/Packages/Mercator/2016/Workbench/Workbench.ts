@@ -61,7 +61,7 @@ export var proposalCreateColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalCreateColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["platformUrl"]);
+            column.bindVariablesAndClear(scope, ["processUrl"]);
             bindRedirectsToScope(scope, adhConfig, adhResourceUrlFilter, $location);
         }
     };
@@ -79,7 +79,7 @@ export var proposalDetailColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalDetailColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["platformUrl", "proposalUrl"]);
+            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
 
             scope.delete = () => {
@@ -106,7 +106,7 @@ export var proposalEditColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalEditColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["platformUrl", "proposalUrl"]);
+            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
             bindRedirectsToScope(scope, adhConfig, adhResourceUrlFilter, $location);
         }
     };
@@ -123,7 +123,7 @@ export var proposalListingColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalListingColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["platformUrl", "proposalUrl"]);
+            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
             scope.contentType = RIProposal.content_type;
 
             scope.sorts = {
