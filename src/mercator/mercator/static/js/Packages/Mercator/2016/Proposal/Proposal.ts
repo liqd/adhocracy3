@@ -621,117 +621,20 @@ export var mercatorProposalFormController2016 = (
 };
 
 export var detailDirective = (
-    adhConfig : AdhConfig.IService
+    $q : ng.IQService,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
-        scope: {},
+        scope: {
+            path: "@"
+        },
         link: (scope) => {
-            // FIXME : Dummy data
-            var dummyData : IDetailData = {
-                creationDate: null,
-                creator: null,
-                userInfo: {
-                    firstName: "Caroline",
-                    lastName: "Clifford"
-                },
-                organizationInfo: {
-                    name: "Liqd",
-                    email: "caroline@liqd.net",
-                    website: "http://www.liqd.net",
-                    city: "Berlin",
-                    country: "DE",
-                    status: "registered_nonprofit",
-                    otherText: "Something else",
-                    registrationDate: "2015",
-                    helpRequest: "Can;t think of a logo"
-                },
-                title: "Caroline's amazing project",
-                introduction: {
-                    pitch: "Lorem ipsum Cillum proident dolor culpa commodo minim ea amet esse nisi aliquip consequat",
-                    imageUpload: "",
-                    picture: "http://localhost:6541/mercator/assets/0000000/0000000/"
-                },
-                partners: {
-                    hasPartners: true,
-                    partner1: {
-                        name: "Magda",
-                        country: "DE",
-                        website: "www.magda.de"
-                    },
-                    partner2: {
-                        name: "Robin",
-                        country: "DE",
-                        website: "www.robin.de"
-                    },
-                    partner3: {
-                        name: "Robin2",
-                        country: "DE",
-                        website: "www.robin.de2"
-                    },
-                    hasOther: true,
-                    otherText: "Tobi"
-                },
-                topic: {
-                    democracy : true,
-                    culture : false,
-                    environment : false,
-                    social : true,
-                    migration : false,
-                    community : false,
-                    urban : false,
-                    education : false,
-                    other : false,
-                    otherText : ""
-                },
-                duration: 12,
-                location: {
-                    location_is_linked_to_ruhr : true,
-                    location_is_linked_to_ruhr_text : "sdfsdfsd",
-                    location_is_online : false,
-                    location_is_specific : false,
-                    location_specific : "Berlin"
-                },
-                status: "starting",
-                impact: {
-                    challenge : "challenge",
-                    goal : "goal",
-                    plan : "plan",
-                    target : "tagrget",
-                    team : "team",
-                    extraInfo : "extraInfo"
-                },
-                criteria : {
-                    strengthen : "strengthen",
-                    difference : "Difference",
-                    practical : "practical"
-                },
-                finance : {
-                    budget : 50000,
-                    requestedFunding : 5000,
-                    major : "major something",
-                    otherSources : "other sources",
-                    secured : true
-                },
-                experience : "experience",
-                heardFrom : {
-                    facebook : true,
-                    newsletter : false,
-                    other : true,
-                    otherText : "other heard from",
-                    personal_contact : false,
-                    twitter : true,
-                    website : true
-                }
-            };
-            scope.data = dummyData;
-            scope.data.commentCountTotal = 34;
-            scope.data.commentCount = 12;
-            scope.data.currentPhase = "participate";
-            scope.path = "http://localhost:6541/mercator/proposal_0000000/VERSION_0000000/";
-            // Dummy data end
-
+            get($q, adhHttp)(scope.path).then((data) => {
+                scope.data = data;
+            });
             scope.topicTrString = topicTrString;
         }
     };
