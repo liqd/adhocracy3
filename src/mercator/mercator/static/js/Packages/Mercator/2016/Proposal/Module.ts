@@ -80,5 +80,5 @@ export var register = (angular) => {
             "adhSubmitIfValid",
             "adhResourceUrlFilter",
             Proposal.mercatorProposalFormController2016])
-        .directive("adhMercator2016ProposalDetail", ["$q", "adhConfig", "adhHttp", Proposal.detailDirective]);
+        .directive("adhMercator2016ProposalDetail", ["$q", "adhConfig", "adhHttp", "adhPermissions", Proposal.detailDirective]);
 };
