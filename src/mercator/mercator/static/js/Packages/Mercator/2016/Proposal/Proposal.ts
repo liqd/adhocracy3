@@ -161,6 +161,9 @@ export interface IData {
 }
 
 export interface IDetailData extends IData {
+    // commentCountTotal : number;
+    // currentPhase : string;
+    // supporterCount : number;
     creationDate : string;
     creator : string;
 }
@@ -498,27 +501,9 @@ export var listItem = (
             path: "@"
         },
         link: (scope, element) => {
-
             get($q, adhHttp)(scope.path).then((data) => {
                 scope.data = data;
             });
-
-            /*scope.data  = {
-
-
-                commentCountTotal: 25,
-                currentPhase: "participate",
-                supporterCount: 33,
-                finance: {
-                    requested_funding: 50000
-                },
-                winnerBadgeAssignment: {
-                    name: "winning"
-                },
-                introduction: {
-                    picture: ""
-                }
-            };*/
         }
     };
 };
