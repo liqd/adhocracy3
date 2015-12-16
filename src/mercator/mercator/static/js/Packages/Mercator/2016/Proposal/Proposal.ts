@@ -4,6 +4,7 @@
 import * as AdhBadge from "../../../Badge/Badge";
 import * as AdhConfig from "../../../Config/Config";
 import * as AdhHttp from "../../../Http/Http";
+import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
 import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 
@@ -60,9 +61,8 @@ var topics = [
     "other",
 ];
 
-
 var topicTrString = (topic : string) : string => {
-    var topics = {
+    var topicTranslations = {
         democracy_and_participation: "TR__MERCATOR_TOPIC_DEMOCRACY",
         arts_and_cultural_activities: "TR__MERCATOR_TOPIC_CULTURE",
         environment: "TR__MERCATOR_TOPIC_ENVIRONMENT",
@@ -73,7 +73,7 @@ var topicTrString = (topic : string) : string => {
         education: "TR__MERCATOR_TOPIC_EDUCATION",
         other: "TR__MERCATOR_TOPIC_OTHER"
     };
-    return topics[topic];
+    return topicTranslations[topic];
 };
 
 
@@ -120,13 +120,13 @@ export interface IData {
         otherText : string;
     };
     topic : {
-        democracy : boolean;
-        culture : boolean;
+        democracy_and_participation : boolean;
+        arts_and_cultural_activities : boolean;
         environment : boolean;
-        social : boolean;
+        social_inclusion : boolean;
         migration : boolean;
-        community : boolean;
-        urban : boolean;
+        communities : boolean;
+        urban_development : boolean;
         education : boolean;
         other : boolean;
         otherText : string;
@@ -399,7 +399,10 @@ var get = ($q : ng.IQService, adhHttp : AdhHttp.Service<any>) => (path : string)
                     status: proposal.data[SIOrganizationInfo.nick].status,
                     otherText: proposal.data[SIOrganizationInfo.nick].status_other
                 },
-                topic: null,
+                topic: <any>_.reduce(<any>topics, (result, key : string) => {
+                    result[key] = _.indexOf(proposal.data[SITopic.nick].topic, key) !== -1;
+                    return result;
+                }, {}),
                 title: proposal.data[SITitle.nick].title,
                 location: {
                     location_is_specific: !!proposal.data[SILocation.nick].location,
@@ -665,7 +668,8 @@ export var mercatorProposalFormController2016 = (
 export var detailDirective = (
     $q : ng.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service
 ) => {
     return {
         restrict: "E",
@@ -674,10 +678,23 @@ export var detailDirective = (
             path: "@"
         },
         link: (scope) => {
+
+            adhPermissions.bindScope(scope, () => scope.path);
+            // FIXME, waa
+            scope.isModerator = scope.options.PUT;
+
             get($q, adhHttp)(scope.path).then((data) => {
                 scope.data = data;
+
+                scope.selectedTopics = [];
+
+                _.forEach(scope.data.topic, function(isSelected, key) {
+                    if (isSelected === true) {
+                        scope.selectedTopics.push(topicTrString(key));
+                    }
+                });
             });
-            scope.topicTrString = topicTrString;
+
         }
     };
 };

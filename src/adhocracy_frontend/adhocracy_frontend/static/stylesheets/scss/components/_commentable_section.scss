@@ -43,6 +43,8 @@ category: Widgets
 A section of any content with a link to the respective comments, typically
 displayed as a button in a second column.
 
+Some sections are not commentable within a form and these can be marked too.
+
 States:
 
 -   is-selected
@@ -53,14 +55,19 @@ States:
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</p>
     <a class="commentable-section-show-comments"><i class="icon-speechbubble"></i>Comments</a>
 </div>
+
+<div class="non-commentable-section">
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</p>
+</div>
 ```
 */
 
-.commentable-section {
+.commentable-section,
+.non-commentable-section {
     @include rem(padding, 1rem 48px 30px 1rem);
     position: relative;
 
-    > p {
+    > p:last-of-type {
         margin-bottom: 0;
     }
 
