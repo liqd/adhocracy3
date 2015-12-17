@@ -640,6 +640,44 @@ class TestPoolRESTView:
                                         'removed': []}}
         assert wanted == response
 
+    def test_post_proposal_version_valid(self, request_, context):
+        from adhocracy_core.resources.proposal import IProposalVersion
+        request_.root = context
+        child = testing.DummyResource(__provides__=IProposalVersion)
+        child.__parent__ = context
+        child.__name__ = 'child'
+        request_.registry.content.create.return_value = child
+        request_.validated = {'content_type': IProposalVersion, 'data': {}}
+        inst = self.make_one(context, request_)
+        response = inst.post()
+
+        wanted = {'path': request_.application_url + '/child/',
+                  'content_type': IProposalVersion.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                                        'created': [],
+                                        'modified': [],
+                                        'removed': []}}
+        assert wanted == response
+
+    def test_post_rate_version_valid(self, request_, context):
+        from adhocracy_core.resources.rate import IRateVersion
+        request_.root = context
+        child = testing.DummyResource(__provides__=IRateVersion)
+        child.__parent__ = context
+        child.__name__ = 'child'
+        request_.registry.content.create.return_value = child
+        request_.validated = {'content_type': IRateVersion, 'data': {}}
+        inst = self.make_one(context, request_)
+        response = inst.post()
+
+        wanted = {'path': request_.application_url + '/child/',
+                  'content_type': IRateVersion.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                                        'created': [],
+                                        'modified': [],
+                                        'removed': []}}
+        assert wanted == response
+
     def test_put_valid_no_sheets(self, request_, context, mock_sheet):
         request_.registry.content.get_sheets_edit.return_value = [mock_sheet]
         request_.validated = {"content_type": "X", "data": {}}
