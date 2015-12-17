@@ -736,6 +736,17 @@ class TestUsersRESTView:
 
 class TestItemRESTView:
 
+    @fixture
+    def mock_versionable_sheet(self) -> Mock:
+        from adhocracy_core.sheets import sheet_meta
+        from adhocracy_core.sheets.versions import IVersionable
+        sheet = Mock()
+        sheet.meta = sheet_meta._replace(isheet=IVersionable,
+                                        schema_class=colander.MappingSchema)
+        sheet.schema = colander.MappingSchema()
+        sheet.get.return_value = {}
+        return sheet
+
     def make_one(self, context, request_):
         from adhocracy_core.rest.views import ItemRESTView
         return ItemRESTView(context, request_)
@@ -856,7 +867,7 @@ class TestItemRESTView:
         assert wanted == response
 
     def test_post_valid_itemversion_batchmode_last_version_in_transaction_exists(
-            self, request_, context, mock_sheet):
+            self, request_, context, mock_sheet, mock_versionable_sheet):
         from copy import deepcopy
         from adhocracy_core.interfaces import IItemVersion
         context['last_new_version'] = testing.DummyResource(__provides__=
@@ -870,7 +881,8 @@ class TestItemRESTView:
         versions_sheet = deepcopy(mock_sheet)
         versions_sheet.get.return_value = {'follows': []}
         request_.registry.content.get_sheet.return_value = versions_sheet
-        request_.registry.content.get_sheets_create.return_value = [mock_sheet]
+        request_.registry.content.get_sheets_create.return_value = \
+            [mock_versionable_sheet, mock_sheet]
         inst = self.make_one(context, request_)
         response = inst.post()
 
