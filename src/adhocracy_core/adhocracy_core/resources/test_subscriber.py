@@ -525,6 +525,34 @@ class TestSendAcitvationMail:
         assert mock_messenger.send_registration_mail.called is False
 
 
+class TestUpdateDownload:
+
+    def call_fut(self, event):
+        from .subscriber import update_asset_download
+        return update_asset_download(event)
+
+    def test_call(self, monkeypatch, event, context, registry):
+        from . import subscriber
+        mock = Mock()
+        monkeypatch.setattr(subscriber, 'add_metadata', mock)
+        self.call_fut(event)
+        mock.assert_called_with(event.object, event.registry)
+
+
+class TestUpdateImageDownload:
+
+    def call_fut(self, event):
+        from .subscriber import update_image_downloads
+        return update_image_downloads(event)
+
+    def test_call(self, monkeypatch, event, context, registry):
+        from . import subscriber
+        mock = Mock()
+        monkeypatch.setattr(subscriber, 'add_image_size_downloads', mock)
+        self.call_fut(event)
+        mock.assert_called_with(event.object, event.registry)
+
+
 @fixture()
 def integration(config):
     config.include('adhocracy_core.events')
