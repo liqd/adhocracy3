@@ -8,6 +8,7 @@ from collections.abc import Iterable
 from substanced import catalog
 from substanced.interfaces import IIndexingActionProcessor
 from substanced.catalog import CatalogsService
+from substanced.catalog.indexes import AllowsComparator
 from substanced.objectmap import find_objectmap
 from hypatia.interfaces import IIndex
 from hypatia.interfaces import IResultSet
@@ -134,7 +135,10 @@ class CatalogsServiceAdhocracy(CatalogsService):
         return indexes
 
     def _execute_query(self, indexes) -> IResultSet:
-        if len(indexes) > 0:
+        has_indexes = len(indexes) > 0
+        is_starting_with_allows = has_indexes and isinstance(indexes[0],
+                                                             AllowsComparator)
+        if has_indexes and not is_starting_with_allows:
             index_query = indexes[0]
             for idx in indexes[1:]:
                 index_query &= idx
