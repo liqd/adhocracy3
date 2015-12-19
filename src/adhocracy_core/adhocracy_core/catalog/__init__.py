@@ -130,6 +130,12 @@ class CatalogsServiceAdhocracy(CatalogsService):
         return indexes
 
     def _execute_query(self, indexes) -> IResultSet:
+        """Combine all query `indexes` with `&` and execute the query.
+
+        If `indexes` is empty or it starts with a query from the `allows`
+        index an empty result is returned. The allows index can only be used
+        as a filter so you need a query that returns a search result first.
+        """
         has_indexes = len(indexes) > 0
         is_starting_with_allows = has_indexes and isinstance(indexes[0],
                                                              AllowsComparator)
@@ -286,7 +292,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
 def add_catalogs_system_and_adhocracy(context: ICatalogsService,
                                       registry: Registry,
                                       options: dict):
-    """Add catalogs 'system' and 'adhocracy'."""
+    """Add catalogs `system` and `adhocracy`."""
     context.add_catalog('system')
     context.add_catalog('adhocracy')
 

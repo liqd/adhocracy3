@@ -1,10 +1,11 @@
-import unittest
 from unittest.mock import Mock
 
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
 from pytest import raises
+
+from adhocracy_core.interfaces import IPool
 
 
 def test_create_adhocracy_catalog_indexes():
@@ -78,12 +79,9 @@ class TestCatalogsServiceAdhocracy:
     def pool(self, pool_graph):
         return pool_graph
 
-    def _make_resource(self, registry, parent=None, iresource=None):
+    def _make_resource(self, registry, parent=None, iresource=IPool):
         from datetime import datetime
-        from adhocracy_core.interfaces import IPool
         from adhocracy_core.sheets.name import IName
-        if iresource is None:
-            iresource = IPool
         appstructs = {}
         if IName in registry.content.resources_meta[iresource].basic_sheets:
             name = datetime.now().isoformat()
@@ -158,27 +156,28 @@ class TestCatalogsServiceAdhocracy:
         from adhocracy_core.interfaces import IItemVersion
         missing_iresource = self._make_resource(registry, parent=pool)
         has_iresource = self._make_resource(registry, parent=pool,
-                                             iresource=IItemVersion)
+                                            iresource=IItemVersion)
         result = inst.search(query._replace(interfaces=('noteq', IItemVersion)))
-        result_list = list(result.elements)
-        assert has_iresource not in result_list
-        assert missing_iresource in result_list
+        elements = list(result.elements)
+        assert has_iresource not in elements
+        assert missing_iresource in elements
 
     def test_search_with_interfaces_and_notany(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import ISimple
         from adhocracy_core.interfaces import IItemVersion
         from adhocracy_core.sheets.versions import IVersionable
         has_isheet = self._make_resource(registry, parent=pool,
-                                             iresource=ISimple)
+                                         iresource=ISimple)
         has_iresource = self._make_resource(registry, parent=pool,
-                                             iresource=IItemVersion)
+                                            iresource=IItemVersion)
         missing_iresource = self._make_resource(registry, parent=pool)
-        result = inst.search(query._replace(
-            interfaces=('notany', (IVersionable, ISimple))))
-        result_elemets = list(result.elements)
-        assert has_isheet not in result_elemets
-        assert has_iresource not in result_elemets
-        assert missing_iresource in result_elemets
+        result = inst.search(query._replace(interfaces=('notany',
+                                                        (IVersionable,
+                                                         ISimple))))
+        elements = list(result.elements)
+        assert has_isheet not in elements
+        assert has_iresource not in elements
+        assert missing_iresource in elements
 
     def test_search_with_interfaces_raise_if_wrong_keyword_index_comparator(
             self, registry, pool, inst, query):
@@ -216,7 +215,7 @@ class TestCatalogsServiceAdhocracy:
 
     def test_search_with_resolve(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import IPool
-        child = self._make_resource(registry, parent=pool, iresource=IPool )
+        child = self._make_resource(registry, parent=pool)
         result = inst.search(query._replace(interfaces=IPool,
                                             resolve=True))
         assert result.elements == [child]
@@ -248,9 +247,9 @@ class TestCatalogsServiceAdhocracy:
         missing_tag = item
         result = inst.search(query._replace(
             indexes={'tag': ('noteq', 'FIRST')}))
-        result_elements = list(result.elements)
-        assert has_tag not in result_elements
-        assert missing_tag in result_elements
+        elements = list(result.elements)
+        assert has_tag not in elements
+        assert missing_tag in elements
 
     def test_search_with_indexes_and_any(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import IItem
@@ -259,9 +258,9 @@ class TestCatalogsServiceAdhocracy:
         missing_tag = item
         result = inst.search(query._replace(
             indexes={'tag': ('any', ('FIRST', 'LAST'))}))
-        result_elements = list(result.elements)
-        assert has_tag in result_elements
-        assert missing_tag not in result_elements
+        elements = list(result.elements)
+        assert has_tag in elements
+        assert missing_tag not in elements
 
     def test_search_with_indexes_and_any(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import IItem
@@ -270,9 +269,9 @@ class TestCatalogsServiceAdhocracy:
         missing_tag = item
         result = inst.search(query._replace(
             indexes={'tag': ('notany', ('FIRST', 'LAST'))}))
-        result_elenments = list(result.elements)
-        assert has_tag not in result_elenments
-        assert missing_tag in result_elenments
+        elements = list(result.elements)
+        assert has_tag not in elements
+        assert missing_tag in elements
 
     def test_search_with_references(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import IItem
@@ -433,7 +432,7 @@ class TestCatalogsServiceAdhocracy:
         from adhocracy_core.interfaces import IPool
         from pyramid.authorization import Deny
         from adhocracy_core.authorization import set_acl
-        child = self._make_resource(registry, parent=pool, iresource=IPool)
+        child = self._make_resource(registry, parent=pool)
         set_acl(pool, [(Deny, 'principal', 'view')], registry=registry)
         inst['system']['allowed'].reindex_resource(child)
         result = inst.search(query._replace(interfaces=IPool,
@@ -445,7 +444,7 @@ class TestCatalogsServiceAdhocracy:
         from adhocracy_core.interfaces import IPool
         from pyramid.authorization import Allow
         from adhocracy_core.authorization import set_acl
-        child = self._make_resource(registry, parent=pool, iresource=IPool)
+        child = self._make_resource(registry, parent=pool)
         set_acl(pool, [(Allow, 'principal', 'view')], registry=registry)
         inst['system']['allowed'].reindex_resource(child)
         result = inst.search(query._replace(interfaces=IPool,
