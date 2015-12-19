@@ -60,15 +60,18 @@ class TestCatalogsServiceAdhocracy:
         return catalogs_service_meta
 
     @fixture
-    def inst(self, registry, meta, pool_graph):
+    def inst(self, registry, meta, pool):
         from substanced.interfaces import MODE_IMMEDIATE
         inst = registry.content.create(meta.iresource.__identifier__,
-                                       parent=pool_graph)
-        inst['system']['name'].action_mode = MODE_IMMEDIATE
-        inst['system']['interfaces'].action_mode = MODE_IMMEDIATE
-        inst['system']['allowed'].action_mode = MODE_IMMEDIATE
-        inst['adhocracy']['tag'].action_mode = MODE_IMMEDIATE
-        inst['adhocracy']['badge'].action_mode = MODE_IMMEDIATE
+                                       parent=pool)
+        system = inst['system']
+        system.action_mode = MODE_IMMEDIATE
+        for index in system.values():
+            index.action_mode = MODE_IMMEDIATE
+        adhocracy = inst['adhocracy']
+        adhocracy.action_mode = MODE_IMMEDIATE
+        for index in adhocracy.values():
+            index.action_mode = MODE_IMMEDIATE
         return inst
 
     @fixture
@@ -91,7 +94,6 @@ class TestCatalogsServiceAdhocracy:
 
     def test_meta(self, meta):
         from substanced.catalog import CatalogsService
-        from adhocracy_core.interfaces import IServicePool
         from . import ICatalogsService
         from . import CatalogsServiceAdhocracy
         assert meta.iresource is ICatalogsService
@@ -128,21 +130,16 @@ class TestCatalogsServiceAdhocracy:
         with raises(KeyError):
             inst.reindex_index(child, 'WRONG')
 
-    def test_search_default_query(self, registry, pool, inst, query):
+    def test_search_default_query_is_empty(self, registry, pool, inst, query):
         child = self._make_resource(registry, parent=pool)
         result = inst.search(query)
-        assert list(result.elements) == [child]
-
-    def test_search_count_result_elements(self, registry, pool, inst, query):
-        child = self._make_resource(registry, parent=pool)
-        result = inst.search(query)
-        assert result.count == 1
+        assert list(result.elements) == []
 
     def test_search_with_interface(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import IItemVersion
         missing_iresource = self._make_resource(registry, parent=pool)
         has_iresource = self._make_resource(registry, parent=pool,
-                                    iresource=IItemVersion)
+                                            iresource=IItemVersion)
         result = inst.search(query._replace(interfaces=IItemVersion))
         assert list(result.elements) == [has_iresource]
 
@@ -204,33 +201,38 @@ class TestCatalogsServiceAdhocracy:
         grandchild = self._make_resource(registry, parent=child)
         result = inst.search(query._replace(root=pool,
                                             depth=1))
-        assert list(result.elements) == [child]
+        elements = list(result.elements)
+        assert child in elements
+        assert grandchild not in elements
 
     def test_search_with_root_and_depth2(self, registry, pool, inst, query):
         child = self._make_resource(registry, parent=pool)
         grandchild = self._make_resource(registry, parent=child)
         result = inst.search(query._replace(root=pool,
                                             depth=2))
-        assert list(result.elements) == [child, grandchild]
+        elements = list(result.elements)
+        assert child in elements
+        assert grandchild in elements
 
     def test_search_with_resolve(self, registry, pool, inst, query):
-        child = self._make_resource(registry, parent=pool)
-        result = inst.search(query._replace(resolve=True))
+        from adhocracy_core.interfaces import IPool
+        child = self._make_resource(registry, parent=pool, iresource=IPool )
+        result = inst.search(query._replace(interfaces=IPool,
+                                            resolve=True))
         assert result.elements == [child]
 
     def test_search_with_only_visible(self, registry, pool, inst, query):
-        child = self._make_resource(registry, parent=pool)
-        child.hidden = True
-        inst['adhocracy']['private_visibility'].reindex_resource(child)
+        from adhocracy_core.sheets.metadata import IMetadata
+        child_hidden = self._make_resource(registry, parent=pool)
+        meta_sheet = registry.content.get_sheet(child_hidden, IMetadata)
+        meta_sheet.set({'hidden': True})
+        child_visible = self._make_resource(registry, parent=pool)
+        meta_sheet = registry.content.get_sheet(child_visible, IMetadata)
+        meta_sheet.set({'hidden': False})
         result = inst.search(query._replace(only_visible=True))
-        assert list(result.elements) == []
-
-    def test_search_with_only_visible_false(self, registry, pool, inst, query):
-        child = self._make_resource(registry, parent=pool)
-        child.hidden = True
-        inst['adhocracy']['private_visibility'].reindex_resource(child)
-        result = inst.search(query._replace(only_visible=False))
-        assert list(result.elements) == [child]
+        elements = list(result.elements)
+        assert child_visible in elements
+        assert child_hidden not in elements
 
     def test_search_with_indexes(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import IItem
@@ -354,15 +356,19 @@ class TestCatalogsServiceAdhocracy:
         assert list(result.elements) == [referenced3, referenced1, referenced2]
 
     def test_search_with_sort_by(self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import IPool
         child = self._make_resource(registry, parent=pool)
         child2 = self._make_resource(registry, parent=pool)
-        result = inst.search(query._replace(sort_by='name'))
+        result = inst.search(query._replace(interfaces=IPool,
+                                            sort_by='name'))
         assert list(result.elements) == [child, child2]
 
     def test_search_with_sort_by_and_reverse(self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import IPool
         child = self._make_resource(registry, parent=pool)
         child2 = self._make_resource(registry, parent=pool)
-        result = inst.search(query._replace(sort_by='name',
+        result = inst.search(query._replace(interfaces=IPool,
+                                            sort_by='name',
                                             reverse=True))
         assert list(result.elements) == [child2, child]
 
@@ -373,64 +379,76 @@ class TestCatalogsServiceAdhocracy:
             inst.search(query._replace(sort_by='interfaces'))
 
     def test_search_with_limit(self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import IPool
         child = self._make_resource(registry, parent=pool)
         child2 = self._make_resource(registry, parent=pool)
-        result = inst.search(query._replace(limit=1))
+        result = inst.search(query._replace(interfaces=IPool,
+                                            limit=1))
         assert list(result.elements) == [child]
 
     def test_search_with_limit_and_offset(self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import IPool
         child = self._make_resource(registry, parent=pool)
         child2 = self._make_resource(registry, parent=pool)
-        result = inst.search(query._replace(limit=2,
+        result = inst.search(query._replace(interfaces=IPool,
+                                            limit=2,
                                             offset=1))
         assert list(result.elements) == [child2]
 
     def test_search_with_frequency_of(self, registry, pool, inst, query):
-        from adhocracy_core.interfaces import ISimple
-        child = self._make_resource(registry, parent=pool, iresource=ISimple)
-        result = inst.search(query._replace(frequency_of='interfaces'))
-        assert result.frequency_of[ISimple] == 1
+        from adhocracy_core.interfaces import IResource
+        child = self._make_resource(registry, parent=pool)
+        result = inst.search(query._replace(interfaces=IResource,
+                                            frequency_of='interfaces'))
+        assert result.frequency_of[IResource] == 1
 
     def test_search_with_group_by(self, registry, pool, inst, query):
-        from adhocracy_core.interfaces import ISimple
-        child = self._make_resource(registry, parent=pool, iresource=ISimple)
-        result = inst.search(query._replace(group_by='interfaces',
+        from adhocracy_core.interfaces import IPool
+        child = self._make_resource(registry, parent=pool)
+        result = inst.search(query._replace(interfaces=IPool,
+                                            group_by='interfaces',
                                             resolve=True))
-        assert list(result.group_by[ISimple]) == [child]
+        assert list(result.group_by[IPool]) == [child]
 
     def test_search_with_group_by_and_resolve_false(self, registry, pool, inst,
                                                     query):
-        from adhocracy_core.interfaces import ISimple
+        from adhocracy_core.interfaces import IPool
         from collections.abc import Iterable
-        child = self._make_resource(registry, parent=pool, iresource=ISimple)
-        result = inst.search(query._replace(group_by='interfaces',
+        child = self._make_resource(registry, parent=pool)
+        result = inst.search(query._replace(interfaces=IPool,
+                                            group_by='interfaces',
                                             resolve=False))
-        assert isinstance(result.group_by[ISimple], Iterable)
+        assert isinstance(result.group_by[IPool], Iterable)
 
     def test_search_with_group_by_and_sort_by(self, registry, pool, inst, query):
-        from adhocracy_core.interfaces import ISimple
-        child = self._make_resource(registry, parent=pool, iresource=ISimple)
-        child2 = self._make_resource(registry, parent=pool, iresource=ISimple)
-        result = inst.search(query._replace(group_by='interfaces',
+        from adhocracy_core.interfaces import IPool
+        child = self._make_resource(registry, parent=pool)
+        child2 = self._make_resource(registry, parent=pool)
+        result = inst.search(query._replace(interfaces=IPool,
+                                            group_by='interfaces',
                                             sort_by='name'))
-        assert list(result.group_by[ISimple]) == [child, child2]
+        assert list(result.group_by[IPool]) == [child, child2]
 
     def test_search_with_allows_no_permission(self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import IPool
         from pyramid.authorization import Deny
         from adhocracy_core.authorization import set_acl
-        child = self._make_resource(registry, parent=pool)
+        child = self._make_resource(registry, parent=pool, iresource=IPool)
         set_acl(pool, [(Deny, 'principal', 'view')], registry=registry)
         inst['system']['allowed'].reindex_resource(child)
-        result = inst.search(query._replace(allows=(['principal'], 'view')))
+        result = inst.search(query._replace(interfaces=IPool,
+                                            allows=(['principal'], 'view')))
         assert list(result.elements) == []
 
     def test_search_with_allows_has_permission(self, registry, pool, inst,
                                                query):
+        from adhocracy_core.interfaces import IPool
         from pyramid.authorization import Allow
         from adhocracy_core.authorization import set_acl
-        child = self._make_resource(registry, parent=pool)
+        child = self._make_resource(registry, parent=pool, iresource=IPool)
         set_acl(pool, [(Allow, 'principal', 'view')], registry=registry)
         inst['system']['allowed'].reindex_resource(child)
-        result = inst.search(query._replace(allows=(['principal'], 'view')))
+        result = inst.search(query._replace(interfaces=IPool,
+                                            allows=(['principal'], 'view')))
         assert list(result.elements) == [child]
 

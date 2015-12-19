@@ -75,13 +75,8 @@ class CatalogsServiceAdhocracy(CatalogsService):
 
     def _get_interfaces_index_query(self, query) -> Query:
         interfaces_value = self._get_query_value(query.interfaces)
-        if not interfaces_value and query.references:
-            # do not search for all IResource and then intersect with
-            # the references when searching for references with
-            # non-specified interfaces
-            return None
         if not interfaces_value:
-            interfaces_value = (IResource,)
+            return None
         interfaces_comparator = self._get_query_comparator(query.interfaces)
         interfaces_index = self.get_index('interfaces')
         if interfaces_comparator is None:
@@ -171,8 +166,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
         return references
 
     def _search_elements(self, query) -> IResultSet:
-        interfaces_index = self.get_index('interfaces')
-        if interfaces_index is None:  # pragma: no branch
+        if not self.values():  # child catalogs/indexes are not created yet
             return ResultSet(set(), 0, None)
         indexes = self._combine_indexes(
             query,
