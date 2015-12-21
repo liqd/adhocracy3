@@ -487,6 +487,11 @@ class TestSendAcitvationMail:
         assert event.object.activate.called
         assert mock_messenger.send_registration_mail.called is False
 
+    def test_activation_if_messenger_is_none(self, registry, event, mock_messenger):
+        registry.messenger = None
+        self.call_fut(event)
+        assert mock_messenger.send_registration_mail.called is False
+
 
 class TestUpdateDownload:
 
