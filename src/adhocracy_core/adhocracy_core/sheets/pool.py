@@ -1,6 +1,7 @@
 """List, search and filter child resources."""
 from copy import deepcopy
 from pyramid.request import Request
+from pyramid.settings import asbool
 import colander
 
 from adhocracy_core.interfaces import ISheet
@@ -94,12 +95,12 @@ class PoolSheet(AnnotationRessourceSheet):
             add 'aggregateby` field. defaults to False.
         """
         params = params or {}
-        filter_view_permission = self.registry.settings.get(
-            'adhocracy.filter_by_view_permission', True)
+        filter_view_permission = asbool(self.registry.settings.get(
+            'adhocracy.filter_by_view_permission', True))
         if filter_view_permission:
             params['allows'] = (request.effective_principals, 'view')
-        filter_visible = self.registry.settings.get(
-            'adhocracy.filter_by_visible', True)
+        filter_visible = asbool(self.registry.settings.get(
+            'adhocracy.filter_by_visible', True))
         if filter_visible:
             params['only_visible'] = True
         params_query = remove_keys_from_dict(params, self._additional_params)
