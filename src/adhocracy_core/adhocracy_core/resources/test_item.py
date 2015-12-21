@@ -64,54 +64,46 @@ class TestItem:
     def context(self, pool_with_catalogs):
         return pool_with_catalogs
 
-    def make_one(self, context, registry, name='name'):
-        from adhocracy_core.sheets.name import IName
+    @fixture
+    def creator(self, context, registry):
+        from adhocracy_core.resources.principal import IUser
+        creator = registry.content.create(IUser.__identifier__,
+                                          appstructs={},
+                                          parent=context,
+                                          send_event=False)
+        return creator
+
+    def make_one(self, context, registry, name='name', creator=None):
         inst = registry.content.create(IItem.__identifier__,
                                        appstructs={},
-                                       parent=context)
+                                       parent=context,
+                                       creator=creator,
+                                       )
         return inst
 
-    def test_create(self, context, registry):
-        from adhocracy_core.sheets.tags import ITag as ITagS
-
-        item = self.make_one(context, registry)
+    def test_create(self, context, registry, creator):
+        from adhocracy_core.sheets.metadata import IMetadata
+        from adhocracy_core.sheets.tags import ITags
+        item = self.make_one(context, registry, creator=creator)
 
         version0 = item['VERSION_0000000']
         assert IItemVersion.providedBy(version0)
-        first_tag = item['FIRST']
-        assert ITag.providedBy(first_tag)
-        last_tag = item['LAST']
-        assert ITag.providedBy(last_tag)
-        first_targets = context.__graph__.get_references_for_isheet(first_tag, ITagS)['elements']
-        assert first_targets == [version0]
-        last_targets = context.__graph__.get_references_for_isheet(last_tag, ITagS)['elements']
-        assert last_targets == [version0]
+        tags_sheet = registry.content.get_sheet(item, ITags)
+        first = tags_sheet.get()['FIRST']
+        last = tags_sheet.get()['LAST']
+        assert first == version0
+        assert last == version0
+        meta_sheet = registry.content.get_sheet(version0, IMetadata)
+        assert creator == meta_sheet.get()['creator']
 
     def test_update_last_tag(self, context, registry):
         """Test that LAST tag is updated correctly."""
-        from adhocracy_core.sheets.tags import ITag as ITagS
+        from adhocracy_core.sheets.tags import ITags
         item = self.make_one(context, registry)
         version0 = item['VERSION_0000000']
 
         version1 = make_itemversion(parent=item, follows=[version0])
 
-        last_tag = item['LAST']
-        last_targets = context.__graph__.get_references_for_isheet(last_tag, ITagS)['elements']
-        assert last_targets == [version1]
-
-    @mark.xfail(reason="Forkables resources are not yet supported")
-    def test_update_last_tag_two_versions_with_forkable(self, context, registry):
-        """Test branching off two versions from the same version,
-        using forkable versionables.
-        """
-        from adhocracy_core.sheets.tags import ITag as ITagS
-        item = self.make_one(context, registry)
-        version0 = item['VERSION_0000000']
-
-        version1 = make_forkable_itemversion(parent=item, follows=[version0])
-        version2 = make_forkable_itemversion(parent=item, follows=[version0])
-
-        last_tag = item['LAST']
-        last_targets = context.__graph__.get_references_for_isheet(last_tag,
-                                                                   ITagS)['elements']
-        assert last_targets == [version1, version2]
+        tags_sheet = registry.content.get_sheet(item, ITags)
+        last = tags_sheet.get()['LAST']
+        assert last == version1

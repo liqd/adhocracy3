@@ -21,17 +21,9 @@ def test_paragraph_meta():
     from .paragraph import IParagraph
     from .comment import add_commentsservice
 
-    from .tag import ITag
-    from adhocracy_core import sheets
     meta = paragraph_meta
     assert meta.iresource is IParagraph
-    assert meta.element_types == (ITag, IParagraphVersion)
     assert meta.item_type == IParagraphVersion
-    assert meta.basic_sheets == (sheets.tags.ITags,
-                                 sheets.versions.IVersions,
-                                 sheets.pool.IPool,
-                                 sheets.metadata.IMetadata,
-                                 )
     assert meta.permission_create == 'edit_document'
     assert meta.use_autonaming
     assert meta.autonaming_prefix == 'PARAGRAPH_'

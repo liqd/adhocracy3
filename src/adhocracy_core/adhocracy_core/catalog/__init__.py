@@ -1,4 +1,6 @@
 """Configure search catalogs."""
+from itertools import chain
+
 from zope.interface import Interface
 from pyramid.registry import Registry
 from itertools import islice
@@ -6,8 +8,10 @@ from collections.abc import Iterable
 from substanced import catalog
 from substanced.interfaces import IIndexingActionProcessor
 from substanced.catalog import CatalogsService
+from substanced.objectmap import find_objectmap
 from hypatia.interfaces import IIndex
 from hypatia.interfaces import IResultSet
+from hypatia.query import Query
 from hypatia.util import ResultSet
 from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.interfaces import FieldComparator
@@ -60,28 +64,47 @@ class CatalogsServiceAdhocracy(CatalogsService):
                                         frequency_of=frequency_of)
         return result
 
-    def _search_elements(self, query) -> IResultSet:
-        interfaces_index = self.get_index('interfaces')
-        if interfaces_index is None:  # pragma: no branch
-            return ResultSet(set(), 0, None)
+    def _resolve_oids(self, elements: Iterable) -> Iterable:
+        objectmap = find_objectmap(self)
+        if isinstance(elements, ResultSet):
+            elements.resolver = objectmap.object_for
+            return elements.all()
+        elements = (objectmap.object_for(e) for e in elements)
+        return elements
+
+    def _get_interfaces_index_query(self, query) -> Query:
         interfaces_value = self._get_query_value(query.interfaces)
+        if not interfaces_value and query.references:
+            # do not search for all IResource and then intersect with
+            # the references when searching for references with
+            # non-specified interfaces
+            return None
         if not interfaces_value:
             interfaces_value = (IResource,)
         interfaces_comparator = self._get_query_comparator(query.interfaces)
+        interfaces_index = self.get_index('interfaces')
         if interfaces_comparator is None:
             interfaces_value = normalize_to_tuple(interfaces_value)
             index_query = interfaces_index.all(interfaces_value)
         else:
             index_comparator = getattr(interfaces_index, interfaces_comparator)
             index_query = index_comparator(interfaces_value)
-        if query.root is not None:
-            depth = query.depth or None
-            path_index = self.get_index('path')
-            index_query &= path_index.eq(query.root,
-                                         depth=depth,
-                                         include_origin=False)
-        if query.indexes:
-            for index_name, value in query.indexes.items():
+        return index_query
+
+    def _get_path_index_query(self, query) -> Query:
+        if query.root is None:
+            return None
+        depth = query.depth or None
+        path_index = self.get_index('path')
+        return path_index.eq(query.root,
+                             depth=depth,
+                             include_origin=False)
+
+    def _get_indexes_index_query(self, query) -> [Query]:
+        if not query.indexes:
+            return []
+        indexes = []
+        for index_name, value in query.indexes.items():
                 index = self.get_index(index_name)
                 comparator = self._get_query_comparator(value)
                 if comparator is None:
@@ -89,22 +112,75 @@ class CatalogsServiceAdhocracy(CatalogsService):
                 else:
                     index_comparator = getattr(index, comparator)
                 index_value = self._get_query_value(value)
-                index_query &= index_comparator(index_value)
-        if query.only_visible:
-            visibility_index = self.get_index('private_visibility')
-            index_query &= visibility_index.eq('visible')
-        if query.allows:
-            allowed_index = self.get_index('allowed')
-            principals, permission = query.allows
-            index_query &= allowed_index.allows(principals, permission)
-        elements = index_query.execute(resolver=None)
-        if query.references:
-            index = self.get_index('reference')
-            for reference in query.references:
-                referencence_elements = index.search_with_order(reference)
-                referencence_elements.resolver = elements.resolver
-                elements = referencence_elements.intersect(elements)
+                indexes.append(index_comparator(index_value))
+        return indexes
+
+    def _get_private_visibility_index_query(self, query) -> Query:
+        if not query.only_visible:
+            return None
+        visibility_index = self.get_index('private_visibility')
+        return visibility_index.eq('visible')
+
+    def _get_allowed_index_query(self, query) -> Query:
+        if not query.allows:
+            return None
+        allowed_index = self.get_index('allowed')
+        principals, permission = query.allows
+        return allowed_index.allows(principals, permission)
+
+    def _combine_indexes(self, query, *list_of_indexes) -> [Query]:
+        maybes_indexes = chain.from_iterable(list_of_indexes)
+        indexes = [idx for idx in maybes_indexes if idx is not None]
+        return indexes
+
+    def _execute_query(self, indexes) -> IResultSet:
+        if len(indexes) > 0:
+            index_query = indexes[0]
+            for idx in indexes[1:]:
+                index_query &= idx
+            no_resolver = lambda x: x
+            elements = index_query.execute(resolver=no_resolver)
+        else:
+            elements = ResultSet(set(), 0, None)
         return elements
+
+    def _search_references(self, query, resolver) -> IResultSet:
+        if not query.references:
+            res = ResultSet(set(), 0, None)
+            res.resolver = resolver
+            return res
+        index = self.get_index('reference')
+        accumulated_refs = ResultSet(set(), 0, None)
+        accumulated_refs = index.search_with_order(query.references[0])
+        accumulated_refs.resolver = resolver
+        for reference in query.references[1:]:
+            found = index.search_with_order(reference)
+            found.resolver = resolver
+            accumulated_refs = found.intersect(accumulated_refs)
+        return accumulated_refs
+
+    def _combine_results(self, query, elements, references) -> IResultSet:
+        if not query.references:
+            return elements
+        if query.interfaces:
+            return elements.intersect(references)
+        return references
+
+    def _search_elements(self, query) -> IResultSet:
+        interfaces_index = self.get_index('interfaces')
+        if interfaces_index is None:  # pragma: no branch
+            return ResultSet(set(), 0, None)
+        indexes = self._combine_indexes(
+            query,
+            [self._get_interfaces_index_query(query)],
+            [self._get_path_index_query(query)],
+            self._get_indexes_index_query(query),
+            [self._get_private_visibility_index_query(query)],
+            [self._get_allowed_index_query(query)],)
+        elements = self._execute_query(indexes)
+        references = self._search_references(query, elements.resolver)
+        result = self._combine_results(query, elements, references)
+        return result
 
     def _get_frequency_of(self, elements: IResultSet,
                           query: SearchQuery) -> dict:
@@ -143,6 +219,8 @@ class CatalogsServiceAdhocracy(CatalogsService):
             for key, intersect in group_by.items():
                 intersect_resolved = [x for x in intersect]
                 group_by[key] = intersect_resolved
+        for k in group_by.keys():
+            group_by[k] = self._resolve_oids(group_by[k])
         return group_by
 
     def _sort_elements(self, elements: IResultSet,
@@ -157,20 +235,20 @@ class CatalogsServiceAdhocracy(CatalogsService):
                                      limit=query.limit or None)
         return elements
 
-    def _get_slice(self, elements: IResultSet, query: IResultSet) -> Iterable:
+    def _get_slice(self, elements: Iterable, query: IResultSet) -> Iterable:
         """Get slice defined by `query.limit` and `query.offset`.
 
-        :returns: IResultSet if not `query.limit`, else [IResource]
+        :returns: Iterable or IResultSet if limit is not specified
         """
         elements_slice = elements
         if query.limit:
-            docids_slice = islice(elements.all(resolve=None),
-                                  query.offset,
-                                  query.offset + query.limit)
-            elements_slice = [elements.resolver(x) for x in docids_slice]
+            elements_slice = islice(elements.all(resolve=None),
+                                    query.offset,
+                                    query.offset + query.limit)
         return elements_slice
 
     def _resolve(self, elements: Iterable, query: SearchQuery) -> Iterable:
+        elements = self._resolve_oids(elements)
         if query.resolve:
             elements = [x for x in elements]
         return elements

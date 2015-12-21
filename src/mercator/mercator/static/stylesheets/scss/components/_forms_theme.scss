@@ -49,6 +49,7 @@ textarea,
     div,
     select,
     textarea,
+    date,
     country-select {
         &.ng-invalid {
             @extend %error-spacing;

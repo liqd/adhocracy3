@@ -247,18 +247,20 @@
                             </label>
                             <label>
                                 <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_ORGANIZATION_DATE_PLANNED_NONPROFIT_2016" | translate }} *</span>
+                                <input type="hidden" ng-model="data.organizationInfo.registrationDate">
                                 <input
                                     type="text"
-                                    data-ng-model="data.organizationInfo.registrationDate"
+                                    data-ng-model="data.organizationInfo.registrationDateField"
                                     name="organization-info-registration-date"
-                                    data-ng-pattern="/(1[0-2]|0[1-9])-([0-9]{4})$/"
-                                    placeholder="mm-yyyy"
+                                    data-ng-pattern="/([0-9]{4})-(1[0-2]|0[1-9])$/"
+                                    placeholder="yyyy-mm"
+                                    data-ng-change="dateChange(data.organizationInfo.registrationDateField)"
                                     required="required" />
                                 <span
                                     class="input-error"
                                     data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-registration-date'],
                                     'pattern')">
-                                    {{ "TR__ERROR_INVALID_DATE" | translate }}</span>
+                                    {{ "TR__ERROR_INVALID_MERCATOR_PROPOSAL_ORGANIZATION_DATE_OF_FORESEEN_REGISTRATION_2016" | translate }}</span>
                                 <span
                                     class="input-error"
                                     data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-registration-date'],
@@ -701,9 +703,9 @@
                 <div class="annotated-section-body">
                     <span class="label-text">{{ "TR__MERCATOR_TOPIC_LABEL" | translate }}</span>
                     <div
-                        data-ng-class="{ 'ng-invalid': mercatorProposalForm.mercatorProposalBriefForm['introduction-topics'].$invalid }">
+                        data-ng-class="{ 'ng-invalid': showTopicsError() }">
                         <label data-ng-repeat="topic in topics" class="label-text">
-                            <input type="checkbox" name="introduction-topic-{{topic}}" data-ng-change="topicChange(data.topic[topic])" data-ng-model="data.topic[topic]"/>
+                            <input type="checkbox" name="introduction-topic-{{topic}}" data-ng-change="topicChange(data.topic[topic])" data-ng-model="data.topic[topic]" value="{{topic}}" />
                             {{ topicTrString(topic) | translate }}
                         </label>
 
@@ -722,7 +724,7 @@
                             data-ng-model="data.topics" />
                         <span
                             class="input-error"
-                            data-ng-if="mercatorProposalForm.mercatorProposalBriefForm['introduction-topics'].$error.enoughTopics">
+                            data-ng-if="showTopicsError()">
                             {{ "TR__ERROR_ENOUGH_TOPICS" | translate }}</span>
                     </div>
                 </div><!-- /.annotated-section-body -->
@@ -737,6 +739,7 @@
                         <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_DURATION_LABEL" | translate }} *</span>
                         <input
                             type="number"
+                            min="0"
                             data-ng-model="data.duration"
                             name="introduction-duration"
                             required="required" />
@@ -745,6 +748,10 @@
                             class="input-error"
                             data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-duration'], 'required')">
                             {{ "TR__ERROR_REQUIRED_DURATION" | translate }}</span>
+                        <span
+                            class="input-error"
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-duration'], 'min')">
+                            {{ "TR__ERROR_MIN_NUMBER_0" | translate }}</span>
                     </label>
                 </div>
 
@@ -775,6 +782,10 @@
                                 name="location-location-specific"
                                 placeholder="{{ 'TR__MERCATOR_PROPOSAL_LOCATION_FORMAT' | translate }}"
                                 data-ng-required="data.location.location_is_specific" />
+                            <span
+                                class="input-error"
+                                data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['location-location-specific'], 'required')">
+                                {{ "TR__ERROR_REQUIRED_SELECTION" | translate }}</span>
                         </div>
 
                         <label class="label-text">
@@ -1133,6 +1144,7 @@
                             data-ng-model="data.finance.budget"
                             name="finance-budget"
                             placeholder="{{ 'TR__MERCATOR_PROPOSAL_TOTAL_BUDGET_PLACEHOLDER' | translate }}"
+                            min="0"
                             required="required" />
 
                         <span
@@ -1143,6 +1155,10 @@
                             class="input-error"
                             data-ng-if="showError(mercatorProposalForm, mercatorProposalFinanceForm['finance-budget'], 'number')">
                             {{ "TR__ERROR_MUST_BE_A_NUMBER" | translate }}</span>
+                        <span
+                            class="input-error"
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalFinanceForm['finance-budget'], 'min')">
+                            {{ "TR__ERROR_MIN_NUMBER_0" | translate }}</span>
                     </label>
                 </div><!--/.annotated-section-body -->
 

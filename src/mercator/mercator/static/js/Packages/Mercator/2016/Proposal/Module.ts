@@ -63,24 +63,25 @@ export var register = (angular) => {
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerDirective("mercator-2016-proposal-create");
             adhEmbedProvider.registerDirective("mercator-2016-proposal-detail");
+            adhEmbedProvider.registerDirective("mercator-2016-proposal-listitem");
         }])
-        .directive("adhMercator2016ProposalCreate", [
-            "adhConfig",
-            "flowFactory",
-            Proposal.createDirective])
+        .directive("adhMercator2016ProposalCreate", ["adhConfig", Proposal.createDirective])
         .directive("adhMercator2016ProposalListing", ["adhConfig", Proposal.listing])
-        .directive("adhMercator2016Listitem", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", "adhGetBadges", Proposal.listItem])
+        .directive("adhMercator2016ProposalListitem", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", "adhGetBadges", Proposal.listItem])
         .controller("mercatorProposalFormController2016", [
             "$scope",
             "$element",
             "$window",
+            "$location",
             "adhShowError",
             "adhHttp",
             "adhPreliminaryNames",
+            "adhTopLevelState",
             "adhSubmitIfValid",
+            "adhResourceUrlFilter",
+            "adhUploadImage",
+            "flowFactory",
             Proposal.mercatorProposalFormController2016])
         .directive("adhMercator2016ProposalDetail", [
-            "adhConfig",
-            "flowFactory",
-            Proposal.detailDirective]);
+            "$q", "adhConfig", "adhHttp", "adhTopLevelState", "adhPermissions", Proposal.detailDirective]);
 };

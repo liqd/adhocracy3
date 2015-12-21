@@ -726,26 +726,24 @@ class TestUsersRESTView:
                                         'created': [],
                                         'modified': [],
                                         'removed': []}}
-        request_.registry.content.create.assert_called_with(IResourceX.__identifier__, context,
-                                       creator=None,
-                                       appstructs={},
-                                       request=request_,
-                                       )
+        request_.registry.content.create.assert_called_with(
+                IResourceX.__identifier__,
+                parent=context,
+                creator=None,
+                appstructs={},
+                root_versions=[],
+                request=request_,
+                is_batchmode=False,
+        )
         assert wanted == response
 
 
 class TestItemRESTView:
 
     @fixture
-    def mock_versionable_sheet(self) -> Mock:
-        from adhocracy_core.sheets import sheet_meta
-        from adhocracy_core.sheets.versions import IVersionable
-        sheet = Mock()
-        sheet.meta = sheet_meta._replace(isheet=IVersionable,
-                                        schema_class=colander.MappingSchema)
-        sheet.schema = colander.MappingSchema()
-        sheet.get.return_value = {}
-        return sheet
+    def mock_tags_sheet(self, registry, mock_sheet):
+        registry.content.get_sheet.return_value = mock_sheet
+        return mock_sheet
 
     def make_one(self, context, request_):
         from adhocracy_core.rest.views import ItemRESTView
@@ -763,26 +761,23 @@ class TestItemRESTView:
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
 
-    def test_get_item_with_first_version(self, request_, context):
-        from zope.interface import directlyProvides
+    def test_get_item_with_first_version(self, request_, item,
+                                         mock_tags_sheet):
         from adhocracy_core.interfaces import IItem
-        from adhocracy_core.interfaces import IItemVersion
-        directlyProvides(context, IItem)
-        context['first'] = testing.DummyResource(__provides__=IItemVersion)
-
-        inst = self.make_one(context, request_)
+        item['version0'] = testing.DummyResource()
+        mock_tags_sheet.get.return_value = {'FIRST': item['version0']}
+        inst = self.make_one(item, request_)
 
         wanted = {'path': request_.application_url + '/',  'data': {},
                   'content_type': IItem.__identifier__,
-                  'first_version_path': request_.application_url + '/first/'}
+                  'first_version_path': request_.application_url + '/version0/'}
         assert inst.get() == wanted
 
-    def test_get_item_without_first_version(self, request_, context):
+    def test_get_item_without_first_version(self, request_, item,
+                                            mock_tags_sheet):
         from adhocracy_core.interfaces import IItem
-        context = testing.DummyResource(__provides__=IItem)
-        context['non_first'] = testing.DummyResource()
-
-        inst = self.make_one(context, request_)
+        mock_tags_sheet.get.return_value = {'FIRST': None}
+        inst = self.make_one(item, request_)
 
         wanted = {'path': request_.application_url + '/',  'data': {},
                   'content_type': IItem.__identifier__,
@@ -811,32 +806,34 @@ class TestItemRESTView:
                                         'created': [],
                                         'modified': [],
                                         'removed': []}}
-        request_.registry.content.create.assert_called_with(IResourceX.__identifier__, context,
-                                       creator=None,
-                                       appstructs={},
-                                       root_versions=[],
-                                       request=request_,
-                                       is_batchmode=True)
+        request_.registry.content.create.assert_called_with(
+                IResourceX.__identifier__,
+                parent=context,
+                creator=None,
+                appstructs={},
+                root_versions=[],
+                request=request_,
+                is_batchmode=True)
         assert wanted == response
 
-    def test_post_valid_item(self, request_, context):
+    def test_post_valid_item(self, request_, context, mock_tags_sheet):
         from adhocracy_core.interfaces import IItem
         from adhocracy_core.interfaces import IItemVersion
         request_.root = context
         child = testing.DummyResource(__provides__=IItem,
                                       __parent__=context,
                                       __name__='child')
-        first = testing.DummyResource(__provides__=IItemVersion)
-        child['first'] = first
+        child['version0'] = testing.DummyResource()
+        mock_tags_sheet.get.return_value={'FIRST': child['version0']}
         request_.registry.content.create.return_value = child
         request_.validated = {'content_type': IItemVersion,
-                             'data': {}}
+                              'data': {}}
         inst = self.make_one(context, request_)
         response = inst.post()
 
         wanted = {'path': request_.application_url + '/child/',
                   'content_type': IItem.__identifier__,
-                  'first_version_path': request_.application_url + '/child/first/',
+                  'first_version_path': request_.application_url + '/child/version0/',
                   'updated_resources': {'changed_descendants': [],
                                         'created': [],
                                         'modified': [],
@@ -867,28 +864,33 @@ class TestItemRESTView:
         assert wanted == response
 
     def test_post_valid_itemversion_batchmode_last_version_in_transaction_exists(
-            self, request_, context, mock_sheet, mock_versionable_sheet):
+            self, request_, context, mock_sheet, changelog_meta):
         from copy import deepcopy
         from adhocracy_core.interfaces import IItemVersion
-        context['last_new_version'] = testing.DummyResource(__provides__=
-                                                            IItemVersion)
+        from adhocracy_core.utils import set_batchmode
+        context['last_version'] = testing.DummyResource(__provides__=IItemVersion)
+        mock_tags_sheet = deepcopy(mock_sheet)
+        mock_tags_sheet.get.return_value = {'LAST': context['last_version'],
+                                            'FIRST': None}
+        set_batchmode(request_, True)
         request_.root = context
         request_.validated = {'content_type': IItemVersion,
-                             'data': {ISheet.__identifier__: {'x':'y'}},
-                             'root_versions': [],
-                             '_last_new_version_in_transaction':\
-                                 context['last_new_version']}
-        versions_sheet = deepcopy(mock_sheet)
-        versions_sheet.get.return_value = {'follows': []}
-        request_.registry.content.get_sheet.return_value = versions_sheet
-        request_.registry.content.get_sheets_create.return_value = \
-            [mock_versionable_sheet, mock_sheet]
+                              'data': {ISheet.__identifier__: {'x': 'y'}},
+                              'root_versions': []}
+        mock_versions_sheet = deepcopy(mock_sheet)
+        mock_other_sheet = deepcopy(mock_sheet)
+        mock_other_sheet.get.return_value = {'x': 'y'}
+        request_.registry.content.get_sheet.side_effect = [mock_tags_sheet,
+                                                           mock_tags_sheet,
+                                                           mock_other_sheet]
+        request_.registry.changelog['/last_version'] = changelog_meta._replace(created=True)
+        request_.registry.content.get_sheets_create.return_value = [mock_versions_sheet,
+                                                                    mock_other_sheet]
         inst = self.make_one(context, request_)
         response = inst.post()
 
-        mock_sheet.set.assert_called_with({'x':'y'},
-                                          request=request_)
-        wanted = {'path': request_.application_url + '/last_new_version/',
+        mock_other_sheet.set.assert_called_with({'x': 'y'}, request=request_)
+        wanted = {'path': request_.application_url + '/last_version/',
                   'content_type': IItemVersion.__identifier__,
                   'updated_resources': {'changed_descendants': [],
                                         'created': [],
