@@ -704,6 +704,7 @@
                     <span class="label-text">{{ "TR__MERCATOR_TOPIC_LABEL" | translate }}</span>
                     <div
                         data-ng-class="{ 'ng-invalid': showTopicsError() }">
+
                         <label data-ng-repeat="topic in topics" class="label-text">
                             <input type="checkbox" name="introduction-topic-{{topic}}" data-ng-change="topicChange(data.topic[topic])" data-ng-model="data.topic[topic]" value="{{topic}}" />
                             {{ topicTrString(topic) | translate }}
