@@ -286,10 +286,8 @@ class TestCatalogsServiceAdhocracy:
         result = inst.search(query._replace(references=[reference]))
         assert list(result.elements) == [referencing]
 
-
     def test_search_with_two_references(self, registry, pool, service, inst, query):
         from copy import deepcopy
-        from adhocracy_core.interfaces import ITag
         from adhocracy_core.interfaces import Reference
         from adhocracy_core.resources.principal import IUser
         from adhocracy_core import sheets
@@ -298,7 +296,7 @@ class TestCatalogsServiceAdhocracy:
         pool['principals']['groups'] = deepcopy(service)
         referenced = pool
         user = self._make_resource(registry, parent=pool, iresource=IUser)
-        referencing = self._make_resource(registry, parent=pool, iresource=ITag)
+        referencing = self._make_resource(registry, parent=pool)
         sheet = get_sheet(referencing, sheets.metadata.IMetadata)
         sheet.set({'creator': [user]})
         reference = Reference(None, sheets.metadata.IMetadata,

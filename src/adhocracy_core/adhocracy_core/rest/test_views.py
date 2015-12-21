@@ -863,6 +863,27 @@ class TestItemRESTView:
         assert request_.registry.content.create.call_args[1]['root_versions'] == [root]
         assert wanted == response
 
+    def test_post_valid_itemversion_batchmode_last_version_in_transaction_not_exists(
+            self, request_, context, mock_tags_sheet):
+        from adhocracy_core.interfaces import IItemVersion
+        from adhocracy_core.utils import set_batchmode
+        request_.root = context
+        child = testing.DummyResource(__provides__=IItemVersion,
+                                      __parent__=context,
+                                      __name__='child')
+        mock_tags_sheet.get.return_value = {'LAST': child,
+                                            'FIRST': None}
+        root = testing.DummyResource(__provides__=IItemVersion)
+        request_.registry.content.create.return_value = child
+        request_.validated = {'content_type': IItemVersion,
+                              'data': {},
+                              'root_versions': [root]}
+        request_.registry.content.get_sheet.return_value = mock_tags_sheet
+        set_batchmode(request_, True)
+        inst = self.make_one(context, request_)
+        response = inst.post()
+        assert response['path'] == request_.application_url + '/child/'
+
     def test_post_valid_itemversion_batchmode_last_version_in_transaction_exists(
             self, request_, context, mock_sheet, changelog_meta):
         from copy import deepcopy
