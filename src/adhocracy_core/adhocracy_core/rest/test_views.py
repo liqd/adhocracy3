@@ -59,8 +59,14 @@ def mock_password_sheet(registry, sheet_meta):
     return sheet
 
 
-class TestValidateRequest:
+def make_resource(parent, name, iresource):
+        resource = testing.DummyResource(__provides__=iresource,
+                                         __parent__=parent,
+                                         __name__=name)
+        return resource
 
+
+class TestValidateRequest:
 
     def call_fut(self, context, request_, **kw):
         from adhocracy_core.rest.views import validate_request_data
@@ -314,13 +320,50 @@ class TestValidatePOSTRootVersions:
         assert request_.validated == {'root_versions': []}
 
 
+class TestRespondIfBlocked:
+
+    @fixture
+    def mock_reason_if_blocked(self, mocker):
+        from . import views
+        return mocker.patch.object(views, 'get_reason_if_blocked', autospec=True)
+
+    def call_fut(self, *args):
+        from .views import respond_if_blocked
+        return respond_if_blocked(*args)
+
+    @mark.parametrize('method,expected', [('OPTIONS', None),
+                                          ('DELETE', None),
+                                          ('PUT', None),
+                                          ])
+    def test_ignore_if_method_options_delete_put(self, context, request_,
+                                                 method, expected):
+        request_.method = method
+        assert self.call_fut(context, request_) is expected
+
+    def test_ignore_if_get_reason_is_none(self, context, request_,
+                                          mock_reason_if_blocked):
+        request_.method = 'GET'
+        mock_reason_if_blocked.return_value = None
+        assert self.call_fut(context, request_) is None
+
+    def test_raise_if_get_reason(self, context, request_,
+                                 mock_reason_if_blocked):
+        from pyramid.httpexceptions import HTTPGone
+        request_.method = 'GET'
+        mock_reason_if_blocked.return_value = 'hidden'
+        with raises(HTTPGone):
+            self.call_fut(context, request_)
+
+
 class TestRESTView:
 
     def make_one(self, context, request):
         from adhocracy_core.rest.views import RESTView
         return RESTView(context, request)
 
-    def test_create_valid(self, request_, context):
+    def test_create(self, request_, context, mocker):
+        from . import views
+        block_mock = mocker.patch.object(views, 'respond_if_blocked')
         inst = self.make_one(context, request_)
         assert inst.validation_GET == (None, [])
         assert inst.validation_HEAD == (None, [])
@@ -331,22 +374,23 @@ class TestRESTView:
         assert inst.request is request_
         assert inst.request.errors == []
         assert inst.request.validated == {}
+        assert block_mock.called
 
-    def test__build_updated_resources_dict_empty(self, request_, context):
+    def test_build_updated_resources_dict_empty(self, request_, context):
         inst = self.make_one(context, request_)
         result = inst._build_updated_resources_dict()
         assert result == {}
 
-    def test__build_updated_resources_dict_one_resource(
+    def test_build_updated_resources_dict_one_resource(
             self, request_, context, changelog_meta):
         res = testing.DummyResource()
         request_.registry.changelog[res] = changelog_meta._replace(resource=res,
-                                                                  created=True)
+                                                                   created=True)
         inst = self.make_one(context, request_)
         result = inst._build_updated_resources_dict()
         assert result == {'created': [res]}
 
-    def test__build_updated_resources_dict_one_resource_two_events(
+    def test_build_updated_resources_dict_one_resource_two_events(
             self, request_, context, changelog_meta):
         res = testing.DummyResource()
         request_.registry.changelog[res] = changelog_meta._replace(
@@ -355,7 +399,7 @@ class TestRESTView:
         result = inst._build_updated_resources_dict()
         assert result == {'changed_descendants': [res], 'created': [res]}
 
-    def test__build_updated_resources_dict_two_resources(
+    def test_build_updated_resources_dict_two_resources(
             self, request_, context, changelog_meta):
         res1 = testing.DummyResource()
         res2 = testing.DummyResource()
@@ -375,40 +419,19 @@ class TestResourceRESTView:
         from adhocracy_core.rest.views import ResourceRESTView
         return ResourceRESTView(context, request_)
 
-    def test_create_valid(self, request_, context):
+    def test_create(self, request_, context):
         from adhocracy_core.rest.views import RESTView
         inst = self.make_one(context, request_)
         assert isinstance(inst, RESTView)
         assert inst.content is request_.registry.content
 
-    def test_create_method_get_and_resource_blocked(self, request_, context):
-        from pyramid.httpexceptions import HTTPGone
-        request_.method = 'GET'
-        context.hidden = True
-        with raises(HTTPGone):
-            self.make_one(context, request_)
-
-    def test_create_method_head_and_resource_blocked(self, request_, context):
-        from pyramid.httpexceptions import HTTPGone
-        request_.method = 'HEAD'
-        context.hidden = True
-        with raises(HTTPGone):
-            self.make_one(context, request_)
-
-    def test_create_method_post_and_resource_blocked(self, request_, context):
-        from pyramid.httpexceptions import HTTPGone
-        request_.method = 'POST'
-        context.deleted = True
-        with raises(HTTPGone):
-            self.make_one(context, request_)
-
-    def test_options_valid_with_sheets_and_addables(
+    def test_options_with_sheets_and_addables(
             self, request_, context, resource_meta, mock_sheet):
-        registry = request_.registry.content
-        registry.get_sheets_edit.return_value = [mock_sheet]
-        registry.get_sheets_read.return_value = [mock_sheet]
-        registry.get_resources_meta_addable.return_value = [resource_meta]
-        registry.get_sheets_create.return_value = [mock_sheet]
+        content = request_.registry.content
+        content.get_sheets_edit.return_value = [mock_sheet]
+        content.get_sheets_read.return_value = [mock_sheet]
+        content.get_resources_meta_addable.return_value = [resource_meta]
+        content.get_sheets_create.return_value = [mock_sheet]
         inst = self.make_one(context, request_)
 
         response = inst.options()
@@ -433,13 +456,13 @@ class TestResourceRESTView:
         assert wanted['HEAD'] == response['HEAD']
         assert wanted['OPTIONS'] == response['OPTIONS']
 
-    def test_options_valid_with_sheets_and_addables_but_no_permissons(
+    def test_options_with_sheets_and_addables_but_no_permissons(
             self, config, request_, context, resource_meta, mock_sheet):
-        registry = request_.registry.content
-        registry.get_sheets_edit.return_value = [mock_sheet]
-        registry.get_sheets_read.return_value = [mock_sheet]
-        registry.get_resources_meta_addable.return_value = [resource_meta]
-        registry.get_sheets_create.return_value = [mock_sheet]
+        content = request_.registry.content
+        content.get_sheets_edit.return_value = [mock_sheet]
+        content.get_sheets_read.return_value = [mock_sheet]
+        content.get_resources_meta_addable.return_value = [resource_meta]
+        content.get_sheets_create.return_value = [mock_sheet]
         inst = self.make_one(context, request_)
         config.testing_securitypolicy(userid='hank', permissive=False)
 
@@ -449,7 +472,7 @@ class TestResourceRESTView:
                   'OPTIONS': {}}
         assert wanted == response
 
-    def test_options_valid_without_sheets_and_addables(self, request_, context):
+    def test_options_without_sheets_and_addables(self, request_, context):
         inst = self.make_one(context, request_)
         response = inst.options()
         wanted = {'HEAD': {},
@@ -481,8 +504,8 @@ class TestResourceRESTView:
         assert d == {IMetadata.__identifier__: {'deleted': [True, False],
                                                 'hidden': [True, False]}}
 
-    def test_add_workflow_permissions_info(self, request_, context, mock_sheet,
-                                           mock_workflow):
+    def test_add_workflow_permissions_info(
+            self, request_, context, mock_sheet, mock_workflow):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
         mock_workflow.get_next_states.return_value = ['draft']
         mock_sheet.get.return_value = {'workflow': mock_workflow}
@@ -506,8 +529,7 @@ class TestResourceRESTView:
         assert d ==\
             {IWorkflowAssignment.__identifier__: {'workflow_state': []}}
 
-
-    def test_get_valid_no_sheets(self, request_, context):
+    def test_get_no_sheets(self, request_, context):
         from adhocracy_core.rest.schemas import GETResourceResponseSchema
 
         inst = self.make_one(context, request_)
@@ -519,7 +541,7 @@ class TestResourceRESTView:
         wanted['content_type'] = IResource.__identifier__
         assert wanted == response
 
-    def test_get_valid_with_sheets(self, request_, context, mock_sheet):
+    def test_get_with_sheets(self, request_, context, mock_sheet):
         mock_sheet.get_cstruct.return_value = {'name': '1'}
         mock_sheet.schema.add(colander.SchemaNode(colander.Int(), name='name'))
         request_.registry.content.get_sheets_read.return_value = [mock_sheet]
@@ -533,7 +555,7 @@ class TestSimpleRESTView:
         from adhocracy_core.rest.views import SimpleRESTView
         return SimpleRESTView(context, request)
 
-    def test_create_valid(self, context, request_):
+    def test_create(self, context, request_):
         from adhocracy_core.rest.views import ResourceRESTView
         from adhocracy_core.rest.schemas import PUTResourceRequestSchema
         inst = self.make_one(context, request_)
@@ -543,7 +565,7 @@ class TestSimpleRESTView:
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
 
-    def test_put_valid_no_sheets(self, request_, context, mock_sheet):
+    def test_put_no_sheets(self, request_, context, mock_sheet):
         request_.registry.content.get_sheets_edit.return_value = [mock_sheet]
         request_.validated = {"content_type": "X", "data": {}}
 
@@ -558,7 +580,7 @@ class TestSimpleRESTView:
                           'removed': []}}
         assert wanted == response
 
-    def test_put_valid_with_sheets(self, request_, context, mock_sheet):
+    def test_put_with_sheets(self, request_, context, mock_sheet):
         request_.registry.content.get_sheets_edit.return_value = [mock_sheet]
         data = {'content_type': 'X',
                 'data': {ISheet.__identifier__: {'x': 'y'}}}
@@ -566,14 +588,6 @@ class TestSimpleRESTView:
 
         inst = self.make_one(context, request_)
         response = inst.put()
-
-        wanted = {'path': request_.application_url + '/',
-                  'content_type': IResource.__identifier__,
-                  'updated_resources': {'changed_descendants': [],
-                                        'created': [],
-                                        'modified': [],
-                                        'removed': []}}
-        assert wanted == response
         assert mock_sheet.set.call_args[0][0] == {'x': 'y'}
 
 
@@ -593,7 +607,7 @@ class TestPoolRESTView:
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
 
-    def test_get_valid_no_sheets(self, request_, context):
+    def test_get_no_sheets(self, request_, context):
         from adhocracy_core.rest.schemas import GETResourceResponseSchema
 
         inst = self.make_one(context, request_)
@@ -605,7 +619,7 @@ class TestPoolRESTView:
         wanted['content_type'] = IResource.__identifier__
         assert wanted == response
 
-    def test_get_valid_pool_sheet_with_query_params(self, request_, context,
+    def test_get_pool_sheet_with_query_params(self, request_, context,
                                                     mock_sheet):
         from adhocracy_core.sheets.pool import IPool
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
@@ -622,14 +636,13 @@ class TestPoolRESTView:
                                                        'root': context,
                                                        }}
 
-    def test_post_valid(self, request_, context):
+    def test_post(self, request_, context):
         request_.root = context
-        child = testing.DummyResource(__provides__=IResourceX)
-        child.__parent__ = context
-        child.__name__ = 'child'
+        child = make_resource(context, 'child', IResourceX)
         request_.registry.content.create.return_value = child
         request_.validated = {'content_type': IResourceX, 'data': {}}
         inst = self.make_one(context, request_)
+        inst._get_post_metric_name = Mock()
         response = inst.post()
 
         wanted = {'path': request_.application_url + '/child/',
@@ -638,47 +651,27 @@ class TestPoolRESTView:
                                         'created': [],
                                         'modified': [],
                                         'removed': []}}
+        assert inst._get_post_metric_name.called
         assert wanted == response
 
-    def test_post_proposal_version_valid(self, request_, context):
+    def test_get_post_metric_name(self, context, request_):
+        request_.validated['content_type'] = IResourceX
+        inst = self.make_one(context, request_)
+        assert inst._get_post_metric_name() == 'process.post'
+
+    def test_get_post_metric_name_proposalversion(self, context, request_):
         from adhocracy_core.resources.proposal import IProposalVersion
-        request_.root = context
-        child = testing.DummyResource(__provides__=IProposalVersion)
-        child.__parent__ = context
-        child.__name__ = 'child'
-        request_.registry.content.create.return_value = child
-        request_.validated = {'content_type': IProposalVersion, 'data': {}}
+        request_.validated['content_type'] = IProposalVersion
         inst = self.make_one(context, request_)
-        response = inst.post()
+        assert inst._get_post_metric_name() == 'process.post.proposalversion'
 
-        wanted = {'path': request_.application_url + '/child/',
-                  'content_type': IProposalVersion.__identifier__,
-                  'updated_resources': {'changed_descendants': [],
-                                        'created': [],
-                                        'modified': [],
-                                        'removed': []}}
-        assert wanted == response
-
-    def test_post_rate_version_valid(self, request_, context):
+    def test_get_post_metric_name_rateversion(self, context, request_):
         from adhocracy_core.resources.rate import IRateVersion
-        request_.root = context
-        child = testing.DummyResource(__provides__=IRateVersion)
-        child.__parent__ = context
-        child.__name__ = 'child'
-        request_.registry.content.create.return_value = child
-        request_.validated = {'content_type': IRateVersion, 'data': {}}
+        request_.validated['content_type'] = IRateVersion
         inst = self.make_one(context, request_)
-        response = inst.post()
+        assert inst._get_post_metric_name() == 'process.post.rateversion'
 
-        wanted = {'path': request_.application_url + '/child/',
-                  'content_type': IRateVersion.__identifier__,
-                  'updated_resources': {'changed_descendants': [],
-                                        'created': [],
-                                        'modified': [],
-                                        'removed': []}}
-        assert wanted == response
-
-    def test_put_valid_no_sheets(self, request_, context, mock_sheet):
+    def test_put_no_sheets(self, request_, context, mock_sheet):
         request_.registry.content.get_sheets_edit.return_value = [mock_sheet]
         request_.validated = {"content_type": "X", "data": {}}
         inst = self.make_one(context, request_)
@@ -706,17 +699,11 @@ class TestUsersRESTView:
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
 
-    def test_post_valid(self, request_, context):
-        request_.root = context
-        # Little cheat to prevent the POST validator from kicking in --
-        # we're working with already-validated data here
-        request_.method = 'OPTIONS'
-        child = testing.DummyResource(__provides__=IResourceX,
-                                      __parent__=context,
-                                      __name__='child')
+    def test_post(self, request_, context):
+        child = make_resource(context, 'child', IResourceX)
         request_.registry.content.create.return_value = child
         request_.validated = {'content_type': IResourceX,
-                             'data': {}}
+                              'data': {}}
         inst = self.make_one(context, request_)
         response = inst.post()
 
@@ -784,19 +771,13 @@ class TestItemRESTView:
                   'first_version_path': None}
         assert inst.get() == wanted
 
-    def test_post_valid(self, request_, context):
+    def test_post(self, request_, context):
         from adhocracy_core.utils import set_batchmode
-        set_batchmode(request_)
-        request_.root = context
-        # Little cheat to prevent the POST validator from kicking in --
-        # we're working with already-validated data here
-        request_.method = 'OPTIONS'
-        child = testing.DummyResource(__provides__=IResourceX,
-                                      __parent__=context,
-                                      __name__='child')
+        set_batchmode(request_, True)
+        child = make_resource(context, 'child', IResourceX)
         request_.registry.content.create.return_value = child
         request_.validated = {'content_type': IResourceX,
-                             'data': {}}
+                              'data': {}}
         inst = self.make_one(context, request_)
         response = inst.post()
 
@@ -816,61 +797,60 @@ class TestItemRESTView:
                 is_batchmode=True)
         assert wanted == response
 
-    def test_post_valid_item(self, request_, context, mock_tags_sheet):
+    def test_post_item(self, request_, context, mock_tags_sheet):
         from adhocracy_core.interfaces import IItem
         from adhocracy_core.interfaces import IItemVersion
-        request_.root = context
-        child = testing.DummyResource(__provides__=IItem,
-                                      __parent__=context,
-                                      __name__='child')
+        child = make_resource(context, 'child', IItem)
         child['version0'] = testing.DummyResource()
-        mock_tags_sheet.get.return_value={'FIRST': child['version0']}
         request_.registry.content.create.return_value = child
         request_.validated = {'content_type': IItemVersion,
                               'data': {}}
+        mock_tags_sheet.get.return_value = {'FIRST': child['version0']}
         inst = self.make_one(context, request_)
         response = inst.post()
 
-        wanted = {'path': request_.application_url + '/child/',
-                  'content_type': IItem.__identifier__,
-                  'first_version_path': request_.application_url + '/child/version0/',
-                  'updated_resources': {'changed_descendants': [],
-                                        'created': [],
-                                        'modified': [],
-                                        'removed': []}}
-        assert wanted == response
+        first_version_path = request_.application_url + '/child/version0/'
+        assert response['path'] == request_.application_url + '/child/'
+        assert response['first_version_path'] == first_version_path
 
-    def test_post_valid_itemversion(self, request_, context):
+    def test_post_itemversion(self, request_, context):
         from adhocracy_core.interfaces import IItemVersion
-        request_.root = context
-        child = testing.DummyResource(__provides__=IItemVersion,
-                                      __parent__=context,
-                                      __name__='child')
+        child = make_resource(context, 'child', IItemVersion)
+        request_.registry.content.create.return_value = child
         root = testing.DummyResource(__provides__=IItemVersion)
+        request_.validated = {'content_type': IItemVersion,
+                              'data': {},
+                              'root_versions': [root]}
+        inst = self.make_one(context, request_)
+        response = inst.post()
+        assert response['path'] == request_.application_url + '/child/'
+        assert request_.registry.content \
+            .create.call_args[1]['root_versions'] == [root]
+
+    def test_post_itemversion_batchmode_no_last_version_in_transaction(
+            self, request_, context, mock_tags_sheet):
+        from adhocracy_core.interfaces import IItemVersion
+        from adhocracy_core.utils import set_batchmode
+        child = make_resource(context, 'child', IItemVersion)
+        mock_tags_sheet.get.return_value = {'LAST': child,
+                                            'FIRST': None}
         request_.registry.content.create.return_value = child
         request_.validated = {'content_type': IItemVersion,
-                             'data': {},
-                             'root_versions': [root]}
+                              'data': {}}
+        request_.registry.content.get_sheet.return_value = mock_tags_sheet
+        set_batchmode(request_, True)
         inst = self.make_one(context, request_)
         response = inst.post()
+        assert response['path'] == request_.application_url + '/child/'
 
-        wanted = {'path': request_.application_url + '/child/',
-                  'content_type': IItemVersion.__identifier__,
-                  'updated_resources': {'changed_descendants': [],
-                                        'created': [],
-                                        'modified': [],
-                                        'removed': []}}
-        assert request_.registry.content.create.call_args[1]['root_versions'] == [root]
-        assert wanted == response
-
-    def test_post_valid_itemversion_batchmode_last_version_in_transaction_exists(
+    def test_valid_itemversion_batchmode_last_version_in_transaction(
             self, request_, context, mock_sheet, changelog_meta):
         from copy import deepcopy
         from adhocracy_core.interfaces import IItemVersion
         from adhocracy_core.utils import set_batchmode
-        context['last_version'] = testing.DummyResource(__provides__=IItemVersion)
+        child = make_resource(context, 'last_version', IItemVersion)
         mock_tags_sheet = deepcopy(mock_sheet)
-        mock_tags_sheet.get.return_value = {'LAST': context['last_version'],
+        mock_tags_sheet.get.return_value = {'LAST': child,
                                             'FIRST': None}
         set_batchmode(request_, True)
         request_.root = context
@@ -883,31 +863,27 @@ class TestItemRESTView:
         request_.registry.content.get_sheet.side_effect = [mock_tags_sheet,
                                                            mock_tags_sheet,
                                                            mock_other_sheet]
-        request_.registry.changelog['/last_version'] = changelog_meta._replace(created=True)
-        request_.registry.content.get_sheets_create.return_value = [mock_versions_sheet,
-                                                                    mock_other_sheet]
+        request_.registry.changelog['/last_version'] =\
+            changelog_meta._replace(created=True)
+        request_.registry.content.get_sheets_create.return_value =\
+            [mock_versions_sheet,
+             mock_other_sheet]
         inst = self.make_one(context, request_)
         response = inst.post()
 
         mock_other_sheet.set.assert_called_with({'x': 'y'}, request=request_)
-        wanted = {'path': request_.application_url + '/last_version/',
-                  'content_type': IItemVersion.__identifier__,
-                  'updated_resources': {'changed_descendants': [],
-                                        'created': [],
-                                        'modified': [],
-                                        'removed': []}}
-        assert wanted == response
+        assert response['path'] == request_.application_url + '/last_version/'
 
-    def test_post_valid_itemversion_batchmode_first_and_last_version_in_transaction_exists(
+    def test_post_itemversion_batchmode_first_and_last_version_in_transaction(
             self, request_, context, mock_sheet, changelog_meta, sheet_meta):
         from copy import deepcopy
         from adhocracy_core.interfaces import IItemVersion
         from adhocracy_core.sheets.versions import IVersionable
         from adhocracy_core.utils import set_batchmode
-        context['last_version'] = testing.DummyResource(__provides__=IItemVersion)
+        child = make_resource(context, 'last_version', IItemVersion)
         mock_tags_sheet = deepcopy(mock_sheet)
-        mock_tags_sheet.get.return_value = {'LAST': context['last_version'],
-                                            'FIRST': context['last_version']}
+        mock_tags_sheet.get.return_value = {'LAST': child,
+                                            'FIRST': child}
         set_batchmode(request_, True)
         request_.root = context
         request_.validated = {'content_type': IItemVersion,
@@ -920,22 +896,18 @@ class TestItemRESTView:
         request_.registry.content.get_sheet.side_effect = [mock_tags_sheet,
                                                            mock_tags_sheet,
                                                            mock_other_sheet]
-        request_.registry.changelog['/last_version'] = changelog_meta._replace(created=True)
-        request_.registry.content.get_sheets_create.return_value = [mock_versions_sheet,
-                                                                    mock_other_sheet]
+        request_.registry.changelog['/last_version'] =\
+            changelog_meta._replace(created=True)
+        request_.registry.content.get_sheets_create.return_value = \
+            [mock_versions_sheet,
+             mock_other_sheet]
         inst = self.make_one(context, request_)
         response = inst.post()
 
         mock_other_sheet.set.assert_called_with({'x': 'y'}, request=request_)
-        wanted = {'path': request_.application_url + '/last_version/',
-                  'content_type': IItemVersion.__identifier__,
-                  'updated_resources': {'changed_descendants': [],
-                                        'created': [],
-                                        'modified': [],
-                                        'removed': []}}
-        assert wanted == response
+        assert response['path'] == request_.application_url + '/last_version/'
 
-    def test_put_valid_no_sheets(self, request_, context, mock_sheet):
+    def test_put_no_sheets(self, request_, context, mock_sheet):
         request_.registry.content.get_sheets_edit.return_value = [mock_sheet]
         request_.validated = {"content_type": "X", "data": {}}
         inst = self.make_one(context, request_)

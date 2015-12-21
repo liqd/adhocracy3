@@ -73,6 +73,7 @@ from adhocracy_core.sheets.tags import ITags
 from adhocracy_core.utils import extract_events_from_changelog_metadata
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
+from adhocracy_core.utils import get_reason_if_blocked
 from adhocracy_core.utils import get_user
 from adhocracy_core.utils import is_batchmode
 from adhocracy_core.utils import strip_optional_prefix
@@ -92,7 +93,6 @@ def respond_if_blocked(context, request):
 
     Otherwise or it request method is 'options' or 'put' return None
     """
-    from adhocracy_core.utils import get_reason_if_blocked
     if request.method not in ['HEAD', 'GET', 'POST']:
         return
     block_reason = get_reason_if_blocked(context)

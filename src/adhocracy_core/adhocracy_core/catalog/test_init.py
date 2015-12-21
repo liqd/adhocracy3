@@ -291,15 +291,13 @@ class TestCatalogsServiceAdhocracy:
                                         query):
         from copy import deepcopy
         from adhocracy_core.interfaces import Reference
-        from adhocracy_core.interfaces import IItem
         from adhocracy_core.resources.principal import IUser
         from adhocracy_core import sheets
         from adhocracy_core.utils import get_sheet
         pool['principals'] = service
         pool['principals']['groups'] = deepcopy(service)
         user = self._make_resource(registry, parent=pool, iresource=IUser)
-        referencing = self._make_resource(registry, parent=pool,
-                                          iresource=IItem)
+        referencing = self._make_resource(registry, parent=pool)
         sheet = get_sheet(referencing, sheets.metadata.IMetadata)
         sheet.set({'creator': [user]})
         reference = Reference(None, sheets.metadata.IMetadata,
