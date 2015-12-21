@@ -169,10 +169,10 @@ class TestAutoupdateVersionableHasNewVersion:
         assert registry.content.create.called is False
 
     @fixture
-    def mock_get_last_version(self, monkeypatch):
+    def mock_get_last_version(self, mocker):
         from . import subscriber
-        mock = Mock(spec=subscriber._get_last_version)
-        monkeypatch.setattr(subscriber, '_get_last_version', mock)
+        mock = mocker.patch.object(subscriber, '_get_last_version',
+                                   autospec=True)
         return mock
 
     @fixture
@@ -499,10 +499,9 @@ class TestUpdateDownload:
         from .subscriber import update_asset_download
         return update_asset_download(event)
 
-    def test_call(self, monkeypatch, event, context, registry):
+    def test_call(self, mocker, event, context, registry):
         from . import subscriber
-        mock = Mock()
-        monkeypatch.setattr(subscriber, 'add_metadata', mock)
+        mock = mocker.patch.object(subscriber, 'add_metadata', autspec=True)
         self.call_fut(event)
         mock.assert_called_with(event.object, event.registry)
 
@@ -513,10 +512,9 @@ class TestUpdateImageDownload:
         from .subscriber import update_image_downloads
         return update_image_downloads(event)
 
-    def test_call(self, monkeypatch, event, context, registry):
+    def test_call(self, mocker, event, context, registry):
         from . import subscriber
-        mock = Mock()
-        monkeypatch.setattr(subscriber, 'add_image_size_downloads', mock)
+        mock = mocker.patch.object(subscriber, 'add_image_size_downloads')
         self.call_fut(event)
         mock.assert_called_with(event.object, event.registry)
 
