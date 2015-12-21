@@ -64,6 +64,16 @@ class TestImageDownload:
         response = inst.get_response(registry)
         assert response is inst._get_response.return_value
 
+    def test_get_response_return_file_response(self,
+                                               monkeypatch,
+                                               inst,
+                                               registry):
+        from substanced.file import File
+        file_response_mock = Mock(return_value='FileResponse')
+        monkeypatch.setattr(File, 'get_response', lambda x: file_response_mock);
+        response = inst._get_response()
+        assert response is file_response_mock
+
     def test_is_resized_return_true_if_blob_has_size(self, inst):
         inst.get_size = Mock(return_value=100)
         assert inst._is_resized()
