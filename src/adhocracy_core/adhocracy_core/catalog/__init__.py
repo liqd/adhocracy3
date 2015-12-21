@@ -9,7 +9,7 @@ from substanced import catalog
 from substanced.interfaces import IIndexingActionProcessor
 from substanced.catalog import CatalogsService
 from substanced.catalog.indexes import AllowsComparator
-from substanced.objectmap import find_objectmap
+from substanced.util import find_objectmap
 from hypatia.interfaces import IIndex
 from hypatia.interfaces import IResultSet
 from hypatia.query import Query
@@ -65,14 +65,6 @@ class CatalogsServiceAdhocracy(CatalogsService):
                                         frequency_of=frequency_of)
         return result
 
-    def _resolve_oids(self, elements: Iterable) -> Iterable:
-        objectmap = find_objectmap(self)
-        if isinstance(elements, ResultSet):
-            elements.resolver = objectmap.object_for
-            return elements.all()
-        elements = (objectmap.object_for(e) for e in elements)
-        return elements
-
     def _get_interfaces_index_query(self, query) -> Query:
         interfaces_value = self._get_query_value(query.interfaces)
         if not interfaces_value:
@@ -109,6 +101,13 @@ class CatalogsServiceAdhocracy(CatalogsService):
                     index_comparator = getattr(index, comparator)
                 index_value = self._get_query_value(value)
                 indexes.append(index_comparator(index_value))
+        return indexes
+
+    def _get_references_index_query(self, query) -> [Query]:
+        indexes = []
+        index = self.get_index('reference')
+        for reference in query.references:
+            indexes.append(index.eq(reference))
         return indexes
 
     def _get_private_visibility_index_query(self, query) -> Query:
@@ -149,42 +148,19 @@ class CatalogsServiceAdhocracy(CatalogsService):
             elements = ResultSet(set(), 0, None)
         return elements
 
-    def _search_references(self, query, resolver) -> IResultSet:
-        if not query.references:
-            res = ResultSet(set(), 0, None)
-            res.resolver = resolver
-            return res
-        index = self.get_index('reference')
-        accumulated_refs = ResultSet(set(), 0, None)
-        accumulated_refs = index.search_with_order(query.references[0])
-        accumulated_refs.resolver = resolver
-        for reference in query.references[1:]:
-            found = index.search_with_order(reference)
-            found.resolver = resolver
-            accumulated_refs = found.intersect(accumulated_refs)
-        return accumulated_refs
-
-    def _combine_results(self, query, elements, references) -> IResultSet:
-        if not query.references:
-            return elements
-        if query.interfaces:
-            return elements.intersect(references)
-        return references
-
     def _search_elements(self, query) -> IResultSet:
         if not self.values():  # child catalogs/indexes are not created yet
             return ResultSet(set(), 0, None)
         indexes = self._combine_indexes(
             query,
-            [self._get_interfaces_index_query(query)],
+            self._get_references_index_query(query),
             [self._get_path_index_query(query)],
+            [self._get_interfaces_index_query(query)],
             self._get_indexes_index_query(query),
             [self._get_private_visibility_index_query(query)],
             [self._get_allowed_index_query(query)],)
         elements = self._execute_query(indexes)
-        references = self._search_references(query, elements.resolver)
-        result = self._combine_results(query, elements, references)
-        return result
+        return elements
 
     def _get_frequency_of(self, elements: IResultSet,
                           query: SearchQuery) -> dict:
@@ -213,24 +189,34 @@ class CatalogsServiceAdhocracy(CatalogsService):
                     continue
                 group_by[value] = intersect
         sort_index = self.get_index(query.sort_by)
-        if sort_index is not None:
+        if sort_index is not None and query.sort_by != 'reference':
             for key, intersect in group_by.items():
                 intersect_sorted = intersect.sort(sort_index,
                                                   reverse=query.reverse,
                                                   limit=query.limit or None)
                 group_by[key] = intersect_sorted
-        if query.resolve:
-            for key, intersect in group_by.items():
-                intersect_resolved = [x for x in intersect]
-                group_by[key] = intersect_resolved
-        for k in group_by.keys():
-            group_by[k] = self._resolve_oids(group_by[k])
+        for key, intersect in group_by.items():
+            group_by[key] = self._resolve(intersect.all(), query)
         return group_by
 
     def _sort_elements(self, elements: IResultSet,
                        query: SearchQuery) -> IResultSet:
-        sort_index = self.get_index(query.sort_by)
-        if sort_index is not None:
+        if query.sort_by == '':
+            pass
+        elif query.sort_by == 'reference':
+            if query.reverse:
+                raise NotImplementedError()
+            if query.limit:
+                raise NotImplementedError()
+            references = [x for x in query.references if x[0] is not None]
+            if not references:  # we need at least one reference
+                return elements
+            reference = references[0]
+            references_index = self.get_index('reference')
+            elements_sorted = references_index.search_with_order(reference)
+            elements = elements_sorted.intersect(elements)
+        else:
+            sort_index = self.get_index(query.sort_by)
             # TODO: We should assert the IIndexSort interface here, but
             # hypatia.field.FieldIndex is missing this interface.
             assert 'sort' in sort_index.__dir__()
@@ -251,8 +237,10 @@ class CatalogsServiceAdhocracy(CatalogsService):
                                     query.offset + query.limit)
         return elements_slice
 
-    def _resolve(self, elements: Iterable, query: SearchQuery) -> Iterable:
-        elements = self._resolve_oids(elements)
+    def _resolve(self, elements: [int], query: SearchQuery) -> Iterable:
+        """Resolve oids from `elements`, convert to list if `query.resolve`."""
+        objectmap = find_objectmap(self)
+        elements = (objectmap.object_for(e) for e in elements)
         if query.resolve:
             elements = [x for x in elements]
         return elements

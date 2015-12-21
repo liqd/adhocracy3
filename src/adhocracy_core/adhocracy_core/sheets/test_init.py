@@ -207,8 +207,29 @@ class TestBaseResourceSheet:
         query = search_query._replace(references=[reference],
                                       resolve=True,
                                       )
-        sheet_catalogs.search.call_args[0] == query
+        assert sheet_catalogs.search.call_args[0][0] == query
         assert appstruct['reference'] == target
+
+    def test_get_references(self, inst, context, sheet_catalogs,
+                            mock_node_unique_references):
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import search_result
+        from adhocracy_core.interfaces import search_query
+        from adhocracy_core.interfaces import Reference
+        node = mock_node_unique_references
+        inst.schema.children.append(node)
+        target = testing.DummyResource()
+        result = search_result._replace(elements=[target])
+        sheet_catalogs.search.return_value = result
+
+        appstruct = inst.get()
+
+        reference = Reference(context, ISheet, 'references', None)
+        query = search_query._replace(references=[reference],
+                                      resolve=True,
+                                      sort_by='reference'
+                                      )
+        assert sheet_catalogs.search.call_args[0][0] == query
 
     def test_get_back_reference(self, inst, context, sheet_catalogs,
                                 mock_node_single_reference):

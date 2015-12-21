@@ -305,7 +305,8 @@ class TestCatalogsServiceAdhocracy:
         reference = Reference(None, sheets.metadata.IMetadata,
                               'creator', user)
         result = inst.search(query._replace(references=[reference, reference]))
-        assert list(result.elements) == [user]
+        elements = list(result.elements)
+        assert elements == [user]
 
     def test_search_with_references_include_isheet_subtypes(
             self, registry, pool, inst, query):
@@ -352,7 +353,11 @@ class TestCatalogsServiceAdhocracy:
         sheet.set({'LAST': [referenced3, referenced1, referenced2]})
         reference = Reference(referencing, sheets.tags.ITags, 'LAST', None)
         result = inst.search(query._replace(references=[reference]))
-        assert list(result.elements) == [referenced3, referenced1, referenced2]
+        elements = list(result.elements)
+        assert len(elements) == 3  # search for back references is not ordered
+        assert referenced1 in elements
+        assert referenced2 in elements
+        assert referenced3 in elements
 
     def test_search_with_sort_by(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import IPool
@@ -400,6 +405,61 @@ class TestCatalogsServiceAdhocracy:
         result = inst.search(query._replace(interfaces=IResource,
                                             frequency_of='interfaces'))
         assert result.frequency_of[IResource] == 1
+
+    def test_search_with_sort_by_reference_ignore_if_no_references(
+            self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import IPool
+        child = self._make_resource(registry, parent=pool)
+        child2 = self._make_resource(registry, parent=pool)
+        result = inst.search(query._replace(interfaces=IPool,
+                                            sort_by='reference'))
+        assert list(result.elements) == [child, child2]
+
+    def test_search_with_sort_by_references(self, registry, pool, inst, query):
+        """Use the first reference (not back reference) to sort."""
+        from hypatia.util import ResultSet
+        from adhocracy_core.interfaces import Reference
+        from adhocracy_core.interfaces import ISheet
+        child = self._make_resource(registry, parent=pool)
+        child2 = self._make_resource(registry, parent=pool)
+        search_result = ResultSet((child.__oid__, child2.__oid__), 2, None)
+        inst._search_elements = Mock(return_value=search_result)
+        references_result = ResultSet((child2.__oid__, child.__oid__), 2, None)
+        reference_index = inst['adhocracy']['reference']
+        reference_index.search_with_order = Mock(return_value=
+                                                 references_result)
+        reference = Reference(child, ISheet, 'field', None)
+        back_reference = Reference(None, ISheet, 'field', child2)
+        result = inst.search(query._replace(interfaces=IPool,
+                                            references=(back_reference,
+                                                        reference),
+                                            sort_by='reference'))
+        reference_index.search_with_order.assert_called_once_with(reference)
+        assert list(result.elements) == [child2, child]
+
+    def test_search_with_sort_by_references_and_reverse(self, registry, pool,
+                                                        inst, query):
+        from adhocracy_core.interfaces import Reference
+        from adhocracy_core.interfaces import ISheet
+        child = self._make_resource(registry, parent=pool)
+        reference = Reference(child, ISheet, 'field', None)
+        with raises(NotImplementedError):
+            inst.search(query._replace(interfaces=IPool,
+                                       references=(reference,),
+                                       sort_by='reference',
+                                       reverse=True))
+
+    def test_search_with_sort_by_references_and_limit(self, registry, pool,
+                                                      inst, query):
+        from adhocracy_core.interfaces import Reference
+        from adhocracy_core.interfaces import ISheet
+        child = self._make_resource(registry, parent=pool)
+        reference = Reference(child, ISheet, 'field', None)
+        with raises(NotImplementedError):
+            inst.search(query._replace(interfaces=IPool,
+                                       references=(reference,),
+                                       sort_by='reference',
+                                       limit=10))
 
     def test_search_with_group_by(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import IPool
