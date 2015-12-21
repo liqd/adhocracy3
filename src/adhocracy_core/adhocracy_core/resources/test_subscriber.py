@@ -169,10 +169,10 @@ class TestAutoupdateVersionableHasNewVersion:
         assert registry.content.create.called is False
 
     @fixture
-    def mock_get_last_version(self, monkeypatch):
+    def mock_get_last_version(self, mocker):
         from . import subscriber
-        mock = Mock(spec=subscriber._get_last_version)
-        monkeypatch.setattr(subscriber, '_get_last_version', mock)
+        mock = mocker.patch.object(subscriber, '_get_last_version',
+                                   autospec=True)
         return mock
 
     @fixture
@@ -486,6 +486,43 @@ class TestSendAcitvationMail:
         self.call_fut(event)
         assert event.object.activate.called
         assert mock_messenger.send_registration_mail.called is False
+
+    def test_activation_if_messenger_is_none(self, registry, event, mock_messenger):
+        registry.messenger = None
+        self.call_fut(event)
+        assert mock_messenger.send_registration_mail.called is False
+
+
+class TestUpdateDownload:
+
+    def call_fut(self, event):
+        from .subscriber import update_asset_download
+        return update_asset_download(event)
+
+    def test_call(self, mocker, event, context, registry):
+        from . import subscriber
+        mock = mocker.patch.object(subscriber, 'add_metadata', autspec=True)
+        self.call_fut(event)
+        mock.assert_called_with(event.object, event.registry)
+
+
+class TestUpdateImageDownload:
+
+    def call_fut(self, event):
+        from .subscriber import update_image_downloads
+        return update_image_downloads(event)
+
+    def test_call(self, mocker, event, context, registry):
+        from . import subscriber
+        mock = mocker.patch.object(subscriber, 'add_image_size_downloads')
+        self.call_fut(event)
+        mock.assert_called_with(event.object, event.registry)
+
+
+@fixture()
+def integration(config):
+    config.include('adhocracy_core.events')
+    config.include('adhocracy_core.resources.subscriber')
 
 
 @mark.usefixtures('integration')

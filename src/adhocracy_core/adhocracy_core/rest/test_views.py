@@ -640,6 +640,44 @@ class TestPoolRESTView:
                                         'removed': []}}
         assert wanted == response
 
+    def test_post_proposal_version_valid(self, request_, context):
+        from adhocracy_core.resources.proposal import IProposalVersion
+        request_.root = context
+        child = testing.DummyResource(__provides__=IProposalVersion)
+        child.__parent__ = context
+        child.__name__ = 'child'
+        request_.registry.content.create.return_value = child
+        request_.validated = {'content_type': IProposalVersion, 'data': {}}
+        inst = self.make_one(context, request_)
+        response = inst.post()
+
+        wanted = {'path': request_.application_url + '/child/',
+                  'content_type': IProposalVersion.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                                        'created': [],
+                                        'modified': [],
+                                        'removed': []}}
+        assert wanted == response
+
+    def test_post_rate_version_valid(self, request_, context):
+        from adhocracy_core.resources.rate import IRateVersion
+        request_.root = context
+        child = testing.DummyResource(__provides__=IRateVersion)
+        child.__parent__ = context
+        child.__name__ = 'child'
+        request_.registry.content.create.return_value = child
+        request_.validated = {'content_type': IRateVersion, 'data': {}}
+        inst = self.make_one(context, request_)
+        response = inst.post()
+
+        wanted = {'path': request_.application_url + '/child/',
+                  'content_type': IRateVersion.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                                        'created': [],
+                                        'modified': [],
+                                        'removed': []}}
+        assert wanted == response
+
     def test_put_valid_no_sheets(self, request_, context, mock_sheet):
         request_.registry.content.get_sheets_edit.return_value = [mock_sheet]
         request_.validated = {"content_type": "X", "data": {}}
@@ -840,6 +878,43 @@ class TestItemRESTView:
                               'data': {ISheet.__identifier__: {'x': 'y'}},
                               'root_versions': []}
         mock_versions_sheet = deepcopy(mock_sheet)
+        mock_other_sheet = deepcopy(mock_sheet)
+        mock_other_sheet.get.return_value = {'x': 'y'}
+        request_.registry.content.get_sheet.side_effect = [mock_tags_sheet,
+                                                           mock_tags_sheet,
+                                                           mock_other_sheet]
+        request_.registry.changelog['/last_version'] = changelog_meta._replace(created=True)
+        request_.registry.content.get_sheets_create.return_value = [mock_versions_sheet,
+                                                                    mock_other_sheet]
+        inst = self.make_one(context, request_)
+        response = inst.post()
+
+        mock_other_sheet.set.assert_called_with({'x': 'y'}, request=request_)
+        wanted = {'path': request_.application_url + '/last_version/',
+                  'content_type': IItemVersion.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                                        'created': [],
+                                        'modified': [],
+                                        'removed': []}}
+        assert wanted == response
+
+    def test_post_valid_itemversion_batchmode_first_and_last_version_in_transaction_exists(
+            self, request_, context, mock_sheet, changelog_meta, sheet_meta):
+        from copy import deepcopy
+        from adhocracy_core.interfaces import IItemVersion
+        from adhocracy_core.sheets.versions import IVersionable
+        from adhocracy_core.utils import set_batchmode
+        context['last_version'] = testing.DummyResource(__provides__=IItemVersion)
+        mock_tags_sheet = deepcopy(mock_sheet)
+        mock_tags_sheet.get.return_value = {'LAST': context['last_version'],
+                                            'FIRST': context['last_version']}
+        set_batchmode(request_, True)
+        request_.root = context
+        request_.validated = {'content_type': IItemVersion,
+                              'data': {ISheet.__identifier__: {'x': 'y'}},
+                              'root_versions': []}
+        mock_versions_sheet = deepcopy(mock_sheet)
+        mock_versions_sheet.meta = sheet_meta._replace(isheet=IVersionable)
         mock_other_sheet = deepcopy(mock_sheet)
         mock_other_sheet.get.return_value = {'x': 'y'}
         request_.registry.content.get_sheet.side_effect = [mock_tags_sheet,
