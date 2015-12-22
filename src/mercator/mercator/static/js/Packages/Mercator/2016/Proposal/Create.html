@@ -704,6 +704,7 @@
                     <span class="label-text">{{ "TR__MERCATOR_TOPIC_LABEL" | translate }}</span>
                     <div
                         data-ng-class="{ 'ng-invalid': showTopicsError() }">
+
                         <label data-ng-repeat="topic in topics" class="label-text">
                             <input type="checkbox" name="introduction-topic-{{topic}}" data-ng-change="topicChange(data.topic[topic])" data-ng-model="data.topic[topic]" value="{{topic}}" />
                             {{ topicTrString(topic) | translate }}
@@ -838,41 +839,41 @@
                         data-ng-class="{ 'ng-invalid': mercatorProposalBriefForm['status'].$invalid
                             && mercatorProposalForm.$submitted }">
                         <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_LABEL" | translate }}<br/>{{ "TR__MERCATOR_PROPOSAL_STATUS_LABEL_SUB" | translate }} *</span>
-                        <label>
+                        <label class="label-text">
                             <input
                                 type="radio"
                                 name="status"
                                 value="starting"
                                 required="required"
                                 data-ng-model="data.status"/>
-                            <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_STARTING" | translate }}</span>
+                            <span>{{ "TR__MERCATOR_PROPOSAL_STATUS_STARTING" | translate }}</span>
                         </label>
-                        <label>
+                        <label class="label-text">
                             <input
                                 type="radio"
                                 name="status"
                                 value="developing"
                                 required="required"
                                 data-ng-model="data.status"/>
-                            <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_DEVELOPING" | translate }}</span>
+                            <span>{{ "TR__MERCATOR_PROPOSAL_STATUS_DEVELOPING" | translate }}</span>
                         </label>
-                        <label>
+                        <label class="label-text">
                             <input
                                 type="radio"
                                 name="status"
                                 value="scaling"
                                 required="required"
                                 data-ng-model="data.status"/>
-                            <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_SCALING" | translate }}</span>
+                            <span>{{ "TR__MERCATOR_PROPOSAL_STATUS_SCALING" | translate }}</span>
                         </label>
-                        <label>
+                        <label class="label-text">
                             <input
                                 type="radio"
                                 name="status"
                                 value="other"
                                 required="required"
                                 data-ng-model="data.status"/>
-                            <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STATUS_OTHER" | translate }}</span>
+                            <span>{{ "TR__MERCATOR_PROPOSAL_STATUS_OTHER" | translate }}</span>
                         </label>
                     </div>
                     <span
@@ -1363,7 +1364,7 @@
                         </div><!-- /.ng-invalid -->
                     </div>
 
-                    <label class="label-text" data-ng-class="{ 'ng-invalid': mercatorProposalCommunityForm['accept-disclaimer'].$invalid && mercatorProposalForm.$submitted }">
+                    <label class="label-text input-disclaimer" data-ng-class="{ 'ng-invalid': mercatorProposalCommunityForm['accept-disclaimer'].$invalid && mercatorProposalForm.$submitted }">
                         <input
                             type="checkbox"
                             data-ng-model="data.acceptDisclaimer"
