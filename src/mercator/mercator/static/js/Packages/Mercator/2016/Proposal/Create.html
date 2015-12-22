@@ -594,11 +594,16 @@
                     <fieldset data-ng-if="data.partners.hasPartners === 'true'">
                         <div>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNER_NAME_LABEL_2016" | translate }} 1:</span>
+                                <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNER_NAME_LABEL_2016" | translate }} 1: *</span>
                                 <input
                                     type="text"
                                     data-ng-model="data.partners.partner1.name"
-                                    name="introduction-partner1-name"/>
+                                    name="introduction-partner1-name"
+                                    required="required"/>
+                                    <span
+                                    class="input-error"
+                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-partner1-name'], 'url')">
+                                    {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
                                 <span class="label-text">{{ "TR__WEBSITE" | translate }}</span>
