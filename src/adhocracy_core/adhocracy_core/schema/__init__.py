@@ -378,9 +378,15 @@ class ISOCountryCode(AdhocracySchemaNode):
     """
 
     schema_type = colander.String
-    default = 'DE'
+    default = ''
     missing = colander.drop
-    validator = colander.Regex(r'^[A-Z][A-Z]$')
+    validator = colander.Regex(r'^[A-Z][A-Z]$|^$')
+
+    def deserialize(self, cstruct=colander.null):
+        """Deserialize the :term:`cstruct` into an :term:`appstruct`."""
+        if cstruct == '':
+            return cstruct
+        return super().deserialize(cstruct)
 
 
 class ResourceObject(colander.SchemaType):
