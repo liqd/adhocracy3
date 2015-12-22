@@ -14,7 +14,7 @@ class TestPitch:
         import adhocracy_core.sheets
         from adhocracy_mercator.resources import mercator2
         assert meta.iresource == mercator2.IPitch
-        assert meta.permission_create == 'create_proposal'
+        assert meta.permission_create == 'edit_proposal'
         assert meta.autonaming_prefix == 'pitch'
         assert meta.extended_sheets == \
             (adhocracy_mercator.sheets.mercator2.IPitch,
@@ -41,7 +41,7 @@ class TestPartners:
         import adhocracy_core.sheets
         from adhocracy_mercator.resources import mercator2
         assert meta.iresource == mercator2.IPartners
-        assert meta.permission_create == 'create_proposal'
+        assert meta.permission_create == 'edit_proposal'
         assert meta.autonaming_prefix == 'partners'
         assert meta.extended_sheets == \
             (adhocracy_mercator.sheets.mercator2.IPartners,
@@ -67,7 +67,7 @@ class TestDuration:
         import adhocracy_core.sheets
         from adhocracy_mercator.resources import mercator2
         assert meta.iresource == mercator2.IDuration
-        assert meta.permission_create == 'create_proposal'
+        assert meta.permission_create == 'edit_proposal'
         assert meta.autonaming_prefix == 'duration'
         assert meta.extended_sheets == \
             (adhocracy_mercator.sheets.mercator2.IDuration,
@@ -93,7 +93,7 @@ class TestChallenge:
         import adhocracy_core.sheets
         from adhocracy_mercator.resources import mercator2
         assert meta.iresource == mercator2.IChallenge
-        assert meta.permission_create == 'create_proposal'
+        assert meta.permission_create == 'edit_proposal'
         assert meta.autonaming_prefix == 'challenge'
         assert meta.extended_sheets == \
             (adhocracy_mercator.sheets.mercator2.IChallenge,
@@ -119,7 +119,7 @@ class TestGoal:
         import adhocracy_core.sheets
         from adhocracy_mercator.resources import mercator2
         assert meta.iresource == mercator2.IGoal
-        assert meta.permission_create == 'create_proposal'
+        assert meta.permission_create == 'edit_proposal'
         assert meta.autonaming_prefix == 'goal'
         assert meta.extended_sheets == \
             (adhocracy_mercator.sheets.mercator2.IGoal,
@@ -145,7 +145,7 @@ class TestPlan:
         import adhocracy_core.sheets
         from adhocracy_mercator.resources import mercator2
         assert meta.iresource == mercator2.IPlan
-        assert meta.permission_create == 'create_proposal'
+        assert meta.permission_create == 'edit_proposal'
         assert meta.autonaming_prefix == 'plan'
         assert meta.extended_sheets == \
             (adhocracy_mercator.sheets.mercator2.IPlan,
@@ -171,7 +171,7 @@ class TestTarget:
         import adhocracy_core.sheets
         from adhocracy_mercator.resources import mercator2
         assert meta.iresource == mercator2.ITarget
-        assert meta.permission_create == 'create_proposal'
+        assert meta.permission_create == 'edit_proposal'
         assert meta.autonaming_prefix == 'target'
         assert meta.extended_sheets == \
             (adhocracy_mercator.sheets.mercator2.ITarget,
@@ -197,7 +197,7 @@ class TestTeam:
         import adhocracy_core.sheets
         from adhocracy_mercator.resources import mercator2
         assert meta.iresource == mercator2.ITeam
-        assert meta.permission_create == 'create_proposal'
+        assert meta.permission_create == 'edit_proposal'
         assert meta.autonaming_prefix == 'team'
         assert meta.extended_sheets == \
             (adhocracy_mercator.sheets.mercator2.ITeam,
@@ -223,7 +223,7 @@ class TestExtrainfo:
         import adhocracy_core.sheets
         from adhocracy_mercator.resources import mercator2
         assert meta.iresource == mercator2.IExtraInfo
-        assert meta.permission_create == 'create_proposal'
+        assert meta.permission_create == 'edit_proposal'
         assert meta.autonaming_prefix == 'extrainfo'
         assert meta.extended_sheets == \
             (adhocracy_mercator.sheets.mercator2.IExtraInfo,
@@ -249,7 +249,7 @@ class TestConnectionCohesion:
         import adhocracy_core.sheets
         from adhocracy_mercator.resources import mercator2
         assert meta.iresource == mercator2.IConnectionCohesion
-        assert meta.permission_create == 'create_proposal'
+        assert meta.permission_create == 'edit_proposal'
         assert meta.autonaming_prefix == 'connectioncohesion'
         assert meta.extended_sheets == \
             (adhocracy_mercator.sheets.mercator2.IConnectionCohesion,
@@ -275,7 +275,7 @@ class TestDifference:
         import adhocracy_core.sheets
         from adhocracy_mercator.resources import mercator2
         assert meta.iresource == mercator2.IDifference
-        assert meta.permission_create == 'create_proposal'
+        assert meta.permission_create == 'edit_proposal'
         assert meta.autonaming_prefix == 'difference'
         assert meta.extended_sheets == \
             (adhocracy_mercator.sheets.mercator2.IDifference,
@@ -301,7 +301,7 @@ class TestPracticalrelevance:
         import adhocracy_core.sheets
         from adhocracy_mercator.resources import mercator2
         assert meta.iresource == mercator2.IPracticalRelevance
-        assert meta.permission_create == 'create_proposal'
+        assert meta.permission_create == 'edit_proposal'
         assert meta.autonaming_prefix == 'practicalrelevance'
         assert meta.extended_sheets == \
             (adhocracy_mercator.sheets.mercator2.IPracticalRelevance,
@@ -313,57 +313,6 @@ class TestPracticalrelevance:
                                       parent=pool,
                                       )
         assert meta.iresource.providedBy(res)
-
-# class TestRoadToImpact:
-
-#     @fixture
-#     def meta(self):
-#         from .mercator2 import road_to_impact_meta
-#         return road_to_impact_meta
-
-#     def test_meta(self, meta):
-#         import adhocracy_mercator.sheets.mercator2
-#         import adhocracy_core.sheets
-#         from adhocracy_mercator.resources import mercator2
-#         assert meta.iresource == mercator2.IRoadToImpact
-#         assert meta.permission_create == 'create_proposal'
-#         assert meta.autonaming_prefix == 'road_to_impact'
-#         assert meta.extended_sheets == \
-#             (adhocracy_mercator.sheets.mercator2.IRoadToImpact,
-#              adhocracy_core.sheets.comment.ICommentable,)
-
-#     @mark.usefixtures('integration')
-#     def test_create(self, pool, meta, registry):
-#         res = registry.content.create(meta.iresource.__identifier__,
-#                                       parent=pool,
-#                                       )
-#         assert meta.iresource.providedBy(res)
-
-
-# class TestSelectionCriteria:
-
-#     @fixture
-#     def meta(self):
-#         from .mercator2 import selection_criteria_meta
-#         return selection_criteria_meta
-
-#     def test_meta(self, meta):
-#         import adhocracy_mercator.sheets.mercator2
-#         import adhocracy_core.sheets
-#         from adhocracy_mercator.resources import mercator2
-#         assert meta.iresource == mercator2.ISelectionCriteria
-#         assert meta.permission_create == 'create_proposal'
-#         assert meta.autonaming_prefix == 'selection_criteria'
-#         assert meta.extended_sheets == \
-#             (adhocracy_mercator.sheets.mercator2.ISelectionCriteria,
-#              adhocracy_core.sheets.comment.ICommentable,)
-
-#     @mark.usefixtures('integration')
-#     def test_create(self, pool, meta, registry):
-#         res = registry.content.create(meta.iresource.__identifier__,
-#                                       parent=pool,
-#                                       )
-#         assert meta.iresource.providedBy(res)
 
 
 class TestMercatorProposal:
