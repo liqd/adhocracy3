@@ -154,7 +154,7 @@ def includeme(config):
                          catalog_name='adhocracy',
                          index_name='mercator_budget',
                          context=sheets.mercator2.IFinancialPlanning)
-    config.add_indexview(mercator2_index_budget,
+    config.add_indexview(mercator2_index_topic,
                          catalog_name='adhocracy',
                          index_name='mercator_topic',
                          context=sheets.mercator2.ITopic)
