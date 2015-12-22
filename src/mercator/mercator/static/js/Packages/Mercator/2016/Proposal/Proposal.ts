@@ -565,8 +565,11 @@ export var listItem = (
         },
         link: (scope, element) => {
             get($q, adhHttp, adhTopLevelState)(scope.path).then((data) => {
+
                 scope.data = {
-                    title: data.title,
+                    title: {
+                        title: data.title
+                    },
                     user_info: {
                         first_name: data.userInfo.firstName,
                         last_name: data.userInfo.lastName,
