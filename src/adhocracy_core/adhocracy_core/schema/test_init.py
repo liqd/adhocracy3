@@ -842,17 +842,21 @@ class TestISOCountryCode:
         from adhocracy_core.schema import ISOCountryCode
         return ISOCountryCode()
 
-    def test_deserialize_valid_empty(self, inst):
+    def test_deserialize_valid_missing(self, inst):
         assert inst.deserialize() == colander.drop
 
     def test_serialize_valid_empty(self, inst):
-        assert inst.serialize() == 'DE'
+        assert inst.serialize() == ''
+
+    def test_serialize_valid(self, inst):
+        assert inst.serialize('US') == 'US'
 
     def test_deserialize_valid(self, inst):
         assert inst.deserialize('US') == 'US'
 
-    def test_serialize_valid(self, inst):
-        assert inst.serialize('US') == 'US'
+    def test_deserialize_valid_empty(self, inst):
+        import ipdb;ipdb.set_trace()
+        assert inst.deserialize('') == ''
 
     def test_deserialize_invalid_too_long(self, inst):
         with raises(colander.Invalid):
