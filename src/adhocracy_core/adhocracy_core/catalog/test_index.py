@@ -27,7 +27,6 @@ class TestField:
         assert [x for x in inst.sort([0, 3, 1])] == [0, 1, 3]
 
 
-
 class TestReference:
 
     @fixture
@@ -198,7 +197,6 @@ class TestReference:
         import BTrees
         from adhocracy_core.interfaces import ISheet
         from adhocracy_core.interfaces import Reference
-        from adhocracy_core.graph import ObjectMap
         mock_objectmap.sourceids.return_value = set()
         inst = self.make_one()
         inst._mock_objectmap = mock_objectmap

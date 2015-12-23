@@ -19,33 +19,31 @@ class TestCommentableSheet:
         return commentable_meta
 
     @fixture
-    def context(self, pool, service, mock_graph):
+    def context(self, pool, service):
         pool['comments'] = service
-        pool.__graph__ = mock_graph
         return pool
+
+    @fixture
+    def inst(self, meta, context):
+        return meta.sheet_class(meta, context)
 
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        from adhocracy_core.sheets.comment import ICommentable
-        from adhocracy_core.sheets.comment import CommentableSchema
+        from . import comment
         inst = meta.sheet_class(meta, context)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
-        assert inst.meta.isheet == ICommentable
-        assert inst.meta.schema_class == CommentableSchema
+        assert inst.meta.isheet == comment.ICommentable
+        assert inst.meta.schema_class == comment.CommentableSchema
+        assert inst.meta.sheet_class == comment.CommentableSheet
 
-    def test_get_empty(self, meta, context, mock_graph):
-        inst = meta.sheet_class(meta, context)
-        mock_graph.get_references_for_isheet.return_value = {}
-        mock_graph.get_back_references_for_isheet.return_value = {}
+    def test_get_empty(self, inst):
         data = inst.get()
         assert list(data['comments']) == []
 
-    def test_get_with_comments(self, meta, context, sheet_catalogs,
-                               search_result):
+    def test_get_with_comments(self, inst, sheet_catalogs, search_result):
         comment = testing.DummyResource()
-        inst = meta.sheet_class(meta, context)
         sheet_catalogs.search.return_value =\
             search_result._replace(elements=[comment])
         data = inst.get()
