@@ -855,7 +855,6 @@ class TestISOCountryCode:
         assert inst.deserialize('US') == 'US'
 
     def test_deserialize_valid_empty(self, inst):
-        import ipdb;ipdb.set_trace()
         assert inst.deserialize('') == ''
 
     def test_deserialize_invalid_too_long(self, inst):
