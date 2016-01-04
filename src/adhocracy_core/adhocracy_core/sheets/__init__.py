@@ -139,7 +139,13 @@ class BaseResourceSheet:
             return iter([])  # ease testing
         for field, node in fields:
             reference = create_ref(node)
-            query_field = query._replace(references=[reference])
+            is_references_node = isinstance(node, schema.UniqueReferences)\
+                and not getattr(node, 'backref', False)
+            if is_references_node:  # search references and preserve order
+                query_field = query._replace(references=[reference],
+                                             sort_by='reference')
+            else:  # search single reference or back references
+                query_field = query._replace(references=[reference])
             elements = self._catalogs.search(query_field).elements
             if len(elements) == 0:
                 continue

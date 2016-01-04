@@ -79,9 +79,21 @@ class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
         return hypatia.query.Eq(self, query)
 
     def apply(self, query: dict) -> BTrees.family64.IF.TreeSet:
-        """Apply query parameters·{reference: Reference} and return result."""
+        """Apply `query` ({reference: Reference}) and return result."""
         reference = query['reference']
         return self._search(reference)
+
+    def applyAll(self, queries: [dict]) -> BTrees.family64.IF.TreeSet:  # noqa
+        """Apply multiple `queries` ({reference: Reference}) and return result.
+
+        The result sets are combined with `intersection`.
+        """
+        references = [q['reference'] for q in queries]
+        result_all = set(self._search(references[0]))
+        for reference in references[1:]:
+            result = set(self._search(reference))
+            result_all = result_all.intersection(result)
+        return result_all
 
     applyEq = apply
     """Read apply docsting."""

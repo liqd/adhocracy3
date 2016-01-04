@@ -217,3 +217,16 @@ class TestReference:
         reference = Reference(None, ISheet, '', target)
         result = inst.eq(reference)
         assert result._value == {'reference': reference}
+
+    def test_apply_all(self):
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import Reference
+        import BTrees
+        inst = self.make_one()
+        query = {'reference': Reference(None, ISheet, '', object())}
+        result_query = BTrees.family64.IF.TreeSet((1, 2, 3))
+        query2 = {'reference': Reference(object(), ISheet, '',  None)}
+        result_query2 = BTrees.family64.IF.TreeSet((2, 3, 4))
+        inst._search = Mock(side_effect=[result_query, result_query2])
+        result = inst.applyAll([query, query2])
+        assert list(result) == [2, 3]
