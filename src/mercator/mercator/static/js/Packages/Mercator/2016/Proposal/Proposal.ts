@@ -277,7 +277,7 @@ var fill = (data : IFormData, resource) => {
             break;
         case RIPartners.content_type:
             resource.data[SIPartners.nick] = new SIPartners.Sheet({
-                has_partners: !!data.partners.hasPartners,
+                has_partners: (<any>data.partners.hasPartners === "true" ? true : false),
                 partner1_name: data.partners.partner1.name,
                 partner1_website: data.partners.partner1.website,
                 partner1_country: data.partners.partner1.country,
@@ -565,8 +565,11 @@ export var listItem = (
         },
         link: (scope, element) => {
             get($q, adhHttp, adhTopLevelState)(scope.path).then((data) => {
+
                 scope.data = {
-                    title: data.title,
+                    title: {
+                        title: data.title
+                    },
                     user_info: {
                         first_name: data.userInfo.firstName,
                         last_name: data.userInfo.lastName,
