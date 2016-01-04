@@ -102,8 +102,10 @@
                         <h3>{{ "TR__MERCATOR_PROPOSAL_MAJOR_EXPENSES_LABEL" | translate }}:</h3>
                         <p>{{data.finance.major}}</p>
 
-                        <h3>{{ "TR__MERCATOR_PROPOSAL_FINANCE_OTHERS_SOURCES" | translate }}:</h3>
-                        <p>{{data.finance.otherSources}}</p>
+                        <div data-ng-if="data.finance.otherSources">
+                            <h3>{{ "TR__MERCATOR_PROPOSAL_FINANCE_OTHERS_SOURCES" | translate }}:</h3>
+                            <p>{{data.finance.otherSources}}</p>
+                        </div>
                     </section>
 
                     <section class="non-commentable-section">
