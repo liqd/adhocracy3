@@ -1024,7 +1024,7 @@
             <div class="annotated-section">
                 <div class="annotated-section-body">
                     <label>
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_IMPACT_EXTRAINFO_LABEL" | translate }}</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_IMPACT_EXTRAINFO_LABEL" | translate }} *</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.impact.extraInfo"
@@ -1309,7 +1309,7 @@
                     </label>
 
                     <div data-ng-if="create === 'true'">
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_HEARD_FROM_LABEL" | translate }}</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_HEARD_FROM_LABEL" | translate }} *</span>
 
                         <div data-ng-class="{ 'ng-invalid': showHeardFromError() }">
 
@@ -1375,7 +1375,7 @@
                             data-ng-model="data.acceptDisclaimer"
                             name="accept-disclaimer"
                             required="required"/>
-                        {{ "TR__MERCATOR_PROPOSAL_ACCEPT_PUBLISH" | translate }}
+                        {{ "TR__MERCATOR_PROPOSAL_ACCEPT_PUBLISH" | translate }} *
                     </label>
                 </div><!--/.annotated-section-body -->
 
