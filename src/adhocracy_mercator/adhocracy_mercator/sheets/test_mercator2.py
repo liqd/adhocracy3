@@ -1141,8 +1141,7 @@ class TestWinnerInfoSchema:
 
     @fixture
     def cstruct_required(self):
-        return {'explanation': 'Relevant project',
-                'funding': '10000'}
+        return {'funding': '10000'}
 
     def test_deserialize_empty(self, inst):
         cstruct = {}
@@ -1150,8 +1149,7 @@ class TestWinnerInfoSchema:
 
     def test_deserialize_with_required(self, inst, cstruct_required):
         assert inst.deserialize(cstruct_required) == \
-            {'explanation': 'Relevant project',
-             'funding': 10000}
+            {'funding': 10000}
 
 
 class TestWinnerInfoSheet:

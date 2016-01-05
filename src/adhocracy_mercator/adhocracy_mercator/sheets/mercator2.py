@@ -480,7 +480,6 @@ class IWinnerInfo(ISheet):
 
 
 class WinnerInfoSchema(colander.MappingSchema):
-    explanation = Text()
     funding = Integer()
 
 winnerinfo_meta = sheet_meta._replace(
