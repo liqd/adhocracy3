@@ -2,7 +2,9 @@
     <div data-ng-switch-when="menu">
         <i class="icon-document moving-column-icon"></i>
     </div>
-
+    <adh-resource-actions
+            data-resource-path="{{processUrl}}"
+            data-cancel="true"></adh-resource-actions>
     <adh-mercator-2016-proposal-create
         data-ng-switch-when="body"
         data-pool-path="{{processUrl}}">
