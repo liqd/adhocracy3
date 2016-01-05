@@ -24,7 +24,7 @@ export var resourceActionsDirective = (
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceActions.html",
         link: (scope, element) => {
-            adhPermissions.bindScope(scope, () => scope.resourcePath && AdhUtil.parentPath(scope.resourcePath), "proposalItemOptions");
+            adhPermissions.bindScope(scope, scope.resourcePath, "proposalItemOptions");
         }
     };
 };
