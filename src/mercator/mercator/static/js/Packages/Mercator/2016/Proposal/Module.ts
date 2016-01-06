@@ -81,7 +81,8 @@ export var register = (angular) => {
             "adhResourceUrlFilter",
             "adhUploadImage",
             "flowFactory",
+            "$translate",
             Proposal.mercatorProposalFormController2016])
         .directive("adhMercator2016ProposalDetail", [
-            "$q", "adhConfig", "adhHttp", "adhTopLevelState", "adhPermissions", Proposal.detailDirective]);
+            "$q", "adhConfig", "adhHttp", "adhTopLevelState", "adhPermissions", "$translate", Proposal.detailDirective]);
 };

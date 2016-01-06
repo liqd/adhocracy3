@@ -58,7 +58,7 @@ class TestOrganizationInfoSheet:
         inst = meta.sheet_class(meta, context)
         wanted = {'name': '',
                   'city': '',
-                  'country': 'DE',
+                  'country': '',
                   'help_request': '',
                   'registration_date': None,
                   'website': '',
@@ -234,13 +234,13 @@ class TestPartnersSheet:
         inst = meta.sheet_class(meta, context)
         wanted = {'partner1_name': '',
                   'partner1_website': '',
-                  'partner1_country': 'DE',
+                  'partner1_country': '',
                   'partner2_name': '',
                   'partner2_website': '',
-                  'partner2_country': 'DE',
+                  'partner2_country': '',
                   'partner3_name': '',
                   'partner3_website': '',
-                  'partner3_country': 'DE',
+                  'partner3_country': '',
                   'other_partners': '',
                   'has_partners': False}
         assert inst.get() == wanted
@@ -265,7 +265,7 @@ class TestTopicSchema:
 
     def test_serialize_empty(self, inst):
         assert inst.bind().serialize() == {'topic': [],
-                                           'other': ''}
+                                           'topic_other': ''}
 
     def test_deserialize_empty(self, inst):
         from colander import Invalid
@@ -299,7 +299,7 @@ class TestTopicSchema:
         cstruct['topic'] = ['other', 'urban_development']
         with raises(Invalid) as error:
             inst.deserialize(cstruct)
-        assert error.value.asdict() == {'other':
+        assert error.value.asdict() == {'topic_other':
                                         'Required if "other" in topic'}
 
 
@@ -307,10 +307,10 @@ class TestTopicSchema:
             self, inst, cstruct_required):
         cstruct = cstruct_required
         cstruct['topic'] = ['other', 'urban_development']
-        cstruct['other'] = 'Blabla'
+        cstruct['topic_other'] = 'Blabla'
         assert inst.deserialize(cstruct_required) == \
             {'topic': ['other', 'urban_development'],
-             'other': 'Blabla'}
+             'topic_other': 'Blabla'}
 
 
 class TestTopicSheet:
@@ -1141,8 +1141,7 @@ class TestWinnerInfoSchema:
 
     @fixture
     def cstruct_required(self):
-        return {'explanation': 'Relevant project',
-                'funding': '10000'}
+        return {'funding': '10000'}
 
     def test_deserialize_empty(self, inst):
         cstruct = {}
@@ -1150,8 +1149,7 @@ class TestWinnerInfoSchema:
 
     def test_deserialize_with_required(self, inst, cstruct_required):
         assert inst.deserialize(cstruct_required) == \
-            {'explanation': 'Relevant project',
-             'funding': 10000}
+            {'funding': 10000}
 
 
 class TestWinnerInfoSheet:
