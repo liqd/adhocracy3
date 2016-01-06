@@ -94,7 +94,8 @@ def migrate_new_sheet(context: IPool,
     registry = get_current_registry(context)
     catalogs = find_service(context, 'catalogs')
     interfaces = isheet_old and (isheet_old, iresource) or iresource
-    query = search_query._replace(interfaces=interfaces)
+    query = search_query._replace(interfaces=interfaces,
+                                  resolve=True)
     resources = catalogs.search(query).elements
     count = len(resources)
     logger.info('Migrating {0} {1} to new sheet {2}'.format(count, iresource,
@@ -138,7 +139,7 @@ def _get_resource_meta(context: IResource,
 
 def _search_for_interfaces(catalogs: ICatalogsService,
                            interfaces: (IInterface)) -> [IResource]:
-    query = search_query._replace(interfaces=interfaces)
+    query = search_query._replace(interfaces=interfaces, resolve=True)
     resources = catalogs.search(query).elements
     return resources
 
@@ -420,7 +421,7 @@ def move_sheet_annotation_data_to_attributes(root):  # pragma: no cover
     Instead add private attributes for every sheet data annotation to resource.
     """
     catalogs = find_service(root, 'catalogs')
-    query = search_query._replace(interfaces=(IResource,))
+    query = search_query._replace(interfaces=(IResource,), resolve=True)
     resources = catalogs.search(query).elements
     count = len(resources)
     for index, resource in enumerate(resources):
