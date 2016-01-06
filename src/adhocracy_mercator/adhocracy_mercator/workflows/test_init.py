@@ -165,8 +165,10 @@ class TestMercatorWorkflow:
         assert IMercatorProposal not in app_participant.get_postable_types('/')
 
     def test_result_participant_cannot_edit_proposal(self, app_participant):
-        postable_types =  app_participant.get_postable_types('/proposal_0000000')
-        assert postable_types == []
+        from adhocracy_mercator.resources import mercator
+        possible_types = mercator.mercator_proposal_meta.element_types
+        postable_types = app_participant.get_postable_types('/proposal_0000000')
+        assert set(postable_types) == set(possible_types)
 
     def test_result_participant_can_create_logbook_documents(self,
                                                              app_participant):
