@@ -101,7 +101,8 @@ class TestMigrateNewSheet:
             elements=[context])
         self.call_fut(context, IResource, ISheetA)
         assert ISheetA.providedBy(context)
-        search_query = query._replace(interfaces=(IResource))
+        search_query = query._replace(interfaces=(IResource),
+                                      resolve=True)
         assert mock_catalogs.search.call_args[0][0] == search_query
 
     def test_remove_old_isheet(self, context, mock_catalogs, search_result):
@@ -177,7 +178,8 @@ class TestChangeIResource:
         self.call_fut(context, IResource, IResourceA)
         assert [x for x in old.__provides__] == [IResourceA, ISheetA]
         assert mock_catalogs.search.call_args[0][0] == \
-               query._replace(interfaces=IResource)
+               query._replace(interfaces=IResource,
+                              resolve=True)
         assert mock_catalogs.reindex_index.call_args[0] == (old, 'interfaces')
 
 
@@ -274,7 +276,8 @@ class TestMigrateToAttributeStorageSheet:
             self, context, mock_catalogs, search_result, registry, query):
         mock_catalogs.search.return_value = search_result._replace(elements=[])
         self.call_fut(context, ISheet)
-        search_query = query._replace(interfaces=ISheet)
+        search_query = query._replace(interfaces=ISheet,
+                                      resolve=True)
         assert mock_catalogs.search.call_args[0][0] == search_query
 
     def test_ignore_if_resources_with_sheet_but_no_annotation_data(
