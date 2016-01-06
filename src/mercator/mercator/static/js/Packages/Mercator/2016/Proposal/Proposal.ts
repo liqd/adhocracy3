@@ -135,6 +135,7 @@ export interface IData {
         other : boolean;
         otherText : string;
     };
+    topic_other : string;
     duration : number;
     location : {
         location_is_linked_to_ruhr : boolean;
@@ -224,12 +225,12 @@ var fill = (data : IFormData, resource) => {
             });
             resource.data[SITopic.nick] = new SITopic.Sheet({
                 topic: _.reduce(<any>data.topic, (result, include, topic) => {
-                    if (include) {
+                    if (include && (topic !== "otherText")) {
                         result.push(topic);
                     }
                     return result;
                 }, []),
-                other: data.topic.otherText
+                topic_other: data.topic.otherText
             });
             resource.data[SITitle.nick] = new SITitle.Sheet({
                 title: data.title
@@ -437,6 +438,7 @@ var get = (
                     result[key] = _.indexOf(proposal.data[SITopic.nick].topic, key) !== -1;
                     return result;
                 }, {}),
+                topic_other: proposal.data[SITopic.nick].topic_other,
                 title: proposal.data[SITitle.nick].title,
                 location: {
                     location_is_specific: !!proposal.data[SILocation.nick].location,
@@ -751,7 +753,7 @@ export var detailDirective = (
                 scope.selectedTopics = [];
 
                 _.forEach(scope.data.topic, function(isSelected, key) {
-                    if (isSelected === true) {
+                    if ((isSelected === true) && (key !== "other")) {
                         scope.selectedTopics.push(topicTrString(key));
                     }
                 });
