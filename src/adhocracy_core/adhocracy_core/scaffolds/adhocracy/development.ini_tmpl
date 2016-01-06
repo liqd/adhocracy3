@@ -44,6 +44,14 @@ adhocracy.initial_group_name = gods
 adhocracy.use_mail_queue = true
 # Email address receiving abuse complaints
 adhocracy.abuse_handler_mail = abuse_handler@unconfigured.domain
+# Only accept registration requests with valid captcha solutions
+adhocracy.thentos_captcha.enabled = false
+# Where the frontend sends captcha traffic
+adhocracy.thentos_captcha.backend_url = http://localhost:6542/
+# Where the backend sends captcha traffic (in development mode, this
+# is the same as captcha backend; if nginx is dispatching inbound
+# requests, this is just the frontend url)
+adhocracy.thentos_captcha.frontend_url = http://localhost:6542/
 # If true, new user accounts are activated immediately without email verification
 adhocracy.skip_registration_mail = false
 # Mode to set http cache headers for resources, valid entries: no_cache, without_proxy_cache, with_proxy_cache

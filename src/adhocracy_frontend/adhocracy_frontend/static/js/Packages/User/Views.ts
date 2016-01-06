@@ -104,6 +104,7 @@ export interface IScopeRegister extends angular.IScope {
     userName : string;
     siteName : string;
     termsUrl : string;
+    captchaUrl : string;
     errors : string[];
     supportEmail : string;
     success : boolean;
@@ -231,6 +232,7 @@ export var registerDirective = (
         link: (scope : IScopeRegister) => {
             scope.siteName = adhConfig.site_name;
             scope.termsUrl = adhConfig.terms_url;
+            scope.captchaUrl = adhConfig.captcha_enabled ? adhConfig.captcha_url : null;
             scope.showError = adhShowError;
 
             scope.logOut = () => {
