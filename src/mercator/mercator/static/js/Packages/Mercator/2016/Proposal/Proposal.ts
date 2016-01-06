@@ -266,7 +266,6 @@ var fill = (data : IFormData, resource) => {
                 picture: data.introduction.picture
             });
             resource.data[SIWinnerInfo.nick] = new SIWinnerInfo.Sheet({
-                explanation: null,  // FIXME
                 funding: null  // FIXME
             });
             break;
