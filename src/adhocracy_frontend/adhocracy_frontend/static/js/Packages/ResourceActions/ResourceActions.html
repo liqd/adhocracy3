@@ -1,7 +1,6 @@
 <div class="action-bar">
-    <!-- FIXME : proposalItemOptions.POST showing false -->
     <adh-edit-action
-        data-ng-if="edit && resourcePath"
+        data-ng-if="edit && resourcePath && proposalItemOptions.PUT"
         data-class="action-bar-item"
         data-parent-path="parentPath"
         data-resource-path="{{resourcePath}}"></adh-edit-action>
@@ -12,7 +11,7 @@
         data-ng-if="share"
         data-class="action-bar-item"></adh-share-action>
     <adh-delete-action
-        data-ng-if="delete && resourcePath"
+        data-ng-if="delete && resourcePath && proposalItemOptions.hide"
         data-class="action-bar-item"
         data-parent-path="parentPath"
         data-resource-path="{{resourcePath}}"></adh-delete-action>
