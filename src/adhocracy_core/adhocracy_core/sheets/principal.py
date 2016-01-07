@@ -1,8 +1,12 @@
 """Sheets for :term:`principal`s."""
 import colander
+import requests
+
 from cryptacular.bcrypt import BCRYPTPasswordManager
+from pyramid.settings import asbool
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
+from urllib.parse import urljoin
 
 from adhocracy_core.interfaces import ISheet
 from substanced.interfaces import IUserLocator
@@ -165,6 +169,31 @@ class CaptchaSchema(colander.MappingSchema):
 
     id = SingleLine(missing=colander.required)
     solution = SingleLine(missing=colander.required)
+
+    def validator(self, node, value):
+        """
+        Validate the captcha.
+
+        If 'adhocracy.thentos_captcha.enabled' is true, we ask the
+        thentos-captcha service whether the given solution is correct.
+        If captchas are not enabled, this validator will always pass.
+        """
+        request = node.bindings['request']
+        settings = request.registry.settings
+        captcha_enabled = asbool(settings.get(
+            'adhocracy.thentos_captcha.enabled', False))
+        if captcha_enabled and not self._captcha_is_correct(settings, value):
+            err = colander.Invalid(node)
+            err['solution'] = 'Captcha solution is wrong'
+            raise err
+
+    def _captcha_is_correct(self, settings, value) -> bool:
+        """Ask the captcha service whether the captcha was solved correctly."""
+        captcha_service = settings.get('adhocracy.thentos_captcha.backend_url',
+                                       'http://localhost:6542/')
+        resp = requests.post(urljoin(captcha_service, 'solve_captcha'),
+                             json=value)
+        return resp.json()['data']
 
 
 captcha_meta = sheet_meta._replace(
