@@ -16,7 +16,6 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import AttributeResourceSheet
 from adhocracy_core.schema import Integer
 from adhocracy_core.schema import Reference as ReferenceSchema
-from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import PostPool
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.utils import get_user
@@ -196,9 +195,6 @@ class RateableSchema(colander.MappingSchema):
     `post_pool`: Pool to post new :class:`adhocracy_sample.resource.IRate`.
     """
 
-    rates = UniqueReferences(readonly=True,
-                             backref=True,
-                             reftype=RateObjectReference)
     post_pool = PostPool(iresource_or_service_name='rates')
 
 
