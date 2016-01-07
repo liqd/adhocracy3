@@ -31,7 +31,8 @@ mercator2_meta = standard_meta \
                  .transform(('states', 'result', 'acm'),
                             {'principals':                    ['participant', 'moderator', 'creator', 'initiator'],
                              'permissions':
-                             [['edit',                          None,          None,       'Deny',     None],
+                             [['edit',                          None,          None,       'Allow',    None],
+                              ['edit_proposal',                 None,          None,       'Allow',    None],
                               ['view_mercator2_extra_funding', 'Deny',        'Allow',      None,      None],
                               ['view_mercator2_winnerinfo',    'Allow',       'Allow',      None,      None],
                               ['edit_mercator2_winnerinfo',    'Deny',        'Allow',      None,      None],
