@@ -267,8 +267,7 @@ var fill = (data : IFormData, resource) => {
                 picture: data.introduction.picture
             });
             resource.data[SIWinnerInfo.nick] = new SIWinnerInfo.Sheet({
-                funding: null,  // FIXME,
-                explanation: null
+                funding: null  // FIXME,
             });
             break;
         case RIPitch.content_type:
