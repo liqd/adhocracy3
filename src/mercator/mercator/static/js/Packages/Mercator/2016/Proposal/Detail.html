@@ -113,7 +113,7 @@
                             <h3>{{ "TR__MERCATOR_PROPOSAL_LOCATION_LABEL" | translate }}:</h3>
                             <ul class="inline-boxes">
                                 <li data-ng-if="data.location.location_is_online" class="inline-box-online">{{ "TR__ONLINE" | translate }}</li>
-                                <li data-ng-if="data.location.location_is_specific">{{ data.location.location_is_specific }}</li>
+                                <li data-ng-if="data.location.location_is_specific">{{ data.location.location_specific }}</li>
                                 <li data-ng-if="data.location.location_is_linked_to_ruhr">{{ "TR__MERCATOR_PROPOSAL_RUHR" | translate }}</li>
                                 <li data-ng-if="data.finance.other_sources">{{ data.finance.otherSources }}</li>
                             </ul>
