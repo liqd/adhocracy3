@@ -5,7 +5,6 @@ from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Reference
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.schema import Text
@@ -46,13 +45,9 @@ comment_meta = sheet_meta._replace(isheet=IComment,
 class CommentableSchema(colander.MappingSchema):
     """Commentable sheet data structure.
 
-    `comments`: list of comments (not stored)
     `post_pool`: Pool to post new :class:`adhocracy_sample.resource.IComment`.
     """
 
-    comments = UniqueReferences(readonly=True,
-                                backref=True,
-                                reftype=CommentRefersToReference)
     post_pool = PostPool(iresource_or_service_name='comments')
 
 
