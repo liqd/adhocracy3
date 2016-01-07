@@ -750,7 +750,6 @@ export var detailDirective = (
         },
         link: (scope) => {
             $translate.use("en");
-
             adhPermissions.bindScope(scope, () => scope.path);
             // FIXME, waa
             scope.isModerator = scope.options.PUT;
