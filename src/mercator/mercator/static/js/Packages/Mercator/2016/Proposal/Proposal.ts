@@ -608,6 +608,9 @@ export var mercatorProposalFormController2016 = (
 
     $scope.$flow = flowFactory.create();
 
+    $scope.selection_criteria_link = "/en/idea-space/selection-criteria/";
+    $scope.financial_plan_link = "/en/idea-space/financial-plan/";
+
     $scope.data = {
         user_info: {},
         organization_info: {},

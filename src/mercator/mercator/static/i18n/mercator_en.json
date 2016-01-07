@@ -83,12 +83,13 @@
     "TR__MERCATOR_PROPOSAL_LOCATION_LINKAGE_TO_RUHR": "with linkage to Ruhr area",
     "TR__MERCATOR_PROPOSAL_LOCATION_RUHR_CONNECTION_SPECIFY": "Please specify",
     "TR__MERCATOR_PROPOSAL_LOCATION_SPECIFIC": "City, Country or Region",
-    "TR__MERCATOR_PROPOSAL_MAJOR_EXPENSES_ANNOTATION": "Which are the major expenses and cost categories you foresee for the implementation of your idea? Please share a rough estimate (e.g. office expenses 1000 EUR, traveland accommodation costs 3000 EUR, public relations 2000 EUR, personnel costs etc.)",
+    "TR__MERCATOR_PROPOSAL_MAJOR_EXPENSES_ANNOTATION": "Which are the major expenses and cost categories you foresee for the implementation of your idea? Please share a rough estimate (e.g. office expenses 1000 EUR, travel and accommodation costs 3000 EUR, public relations 2000 EUR, personnel costs etc.)",
     "TR__MERCATOR_PROPOSAL_MAJOR_EXPENSES_LABEL": "Major expenses",
     "TR__MERCATOR_PROPOSAL_MOTIVATION": "Motivation",
     "TR__MERCATOR_PROPOSAL_NGO": "NGO",
     "TR__MERCATOR_PROPOSAL_NON_PROFIT": "Non Profit",
     "TR__MERCATOR_PROPOSAL_NO_INFLUENCE": "Your answer to this question does not influence the selection process. It simply helps us to better understand your idea.",
+    "TR__MERCATOR_PROPOSAL_TOPIC_ANNOTATION": "Your answer to this question does not influence the selection process. It helps us to get a better overview of the proposals we receive.",
     "TR__MERCATOR_PROPOSAL_ORGANISATION_INFO": "organisation info",
     "TR__MERCATOR_PROPOSAL_ORGANISATION_INFO_2016": "Organisation Information (select from the 4 options below)",
     "TR__MERCATOR_PROPOSAL_ORGANISATION_INFO_ANNOTATION_2016": "This will be visible along with other details about your  proposal.",
@@ -135,7 +136,7 @@
     "TR__MERCATOR_PROPOSAL_PRACTICAL_LABEL": "What is the practical relevance of your idea to the everyday lives of people in Europe?",
     "TR__MERCATOR_PROPOSAL_REQUESTED": "requested",
     "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING": "Funding requested from Advocate Europe",
-    "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING_ANNOTATION": "Funding requested from “Advocate Europe” can range between 1 and 50,000 EUR. Depending on your planning this amount can be the same as the “total budget” above.",
+    "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING_ANNOTATION": "Funding requested from “Advocate Europe” can range between 1 and 50000 EUR. Depending on your planning this amount can be the same as the “total budget” above.",
     "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING_PLACEHOLDER": "e.g. 5000",
     "TR__MERCATOR_PROPOSAL_RUHR": "Ruhr Gebiet, Germany",
     "TR__MERCATOR_PROPOSAL_SHARE_EXPERIENCE_ANNOTATION": "What kind of advice, comments, or lessons do you wish to receive from others on the platform regarding your idea or project proposal?",
@@ -188,5 +189,6 @@
     "TR__PROPOSAL_ADD": "Add proposal",
     "TR__PROPOSAL_EMPTY_TEXT": "No proposals yet.",
     "TR__TWITTER": "twitter",
-    "TR__USERS_PROPOSALS": "{name}'s proposals"
+    "TR__USERS_PROPOSALS": "{name}'s proposals",
+    "TR__MERCATOR_PROPOSAL_2016_SUBMISSION_DEADLINE": "Applications may be submitted in English only until March 8,2016. After submitting your proposal can also edit all the fields of your application until that time!"
 }
