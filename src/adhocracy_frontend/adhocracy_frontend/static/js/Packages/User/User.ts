@@ -91,7 +91,8 @@ export class Service {
         this.adhCredentials.deleteToken();
     }
 
-    public register(username : string, email : string, password : string, passwordRepeat : string) : angular.IPromise<IRegisterResponse> {
+    public register(username : string, email : string, password : string, passwordRepeat : string,
+                    captchaId : string, captchaGuess : string) : angular.IPromise<IRegisterResponse> {
         var _self : Service = this;
 
         var resource = {
