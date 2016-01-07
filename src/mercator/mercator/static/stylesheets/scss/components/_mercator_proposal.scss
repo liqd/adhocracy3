@@ -125,6 +125,11 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     @include rem(padding, 0 1rem);
 }
 
+.mercator-proposal-form-section-info {
+    @include rem(padding, 0.5rem 1rem);
+    background: $color-background-base-introvert;
+}
+
 .mercator-proposal-form-footer {
     @include rem(padding, 1rem);
     border-top: 2px solid $color-structure-normal;
