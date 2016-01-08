@@ -19,6 +19,7 @@ from adhocracy_core.interfaces import FieldComparator
 from adhocracy_core.interfaces import FieldSequenceComparator
 from adhocracy_core.interfaces import KeywordComparator
 from adhocracy_core.interfaces import KeywordSequenceComparator
+from adhocracy_core.interfaces import ReferenceComparator
 from adhocracy_core.interfaces import SearchResult
 from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.interfaces import search_result
@@ -106,8 +107,14 @@ class CatalogsServiceAdhocracy(CatalogsService):
     def _get_references_index_query(self, query) -> [Query]:
         indexes = []
         index = self.get_index('reference')
-        for reference in query.references:
-            indexes.append(index.eq(reference))
+        for value in query.references:
+            index_comparator = self._get_query_comparator(value)
+            traverse = False
+            if index_comparator == ReferenceComparator.traverse.value:
+                traverse = True
+            index_value = self._get_query_value(value)
+            indexes.append(index.eq({'reference': index_value,
+                                     'traverse': traverse}))
         return indexes
 
     def _get_private_visibility_index_query(self, query) -> Query:
@@ -211,7 +218,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
             references = [x for x in query.references if x[0] is not None]
             if not references:  # we need at least one reference
                 return elements
-            reference = references[0]
+            reference = self._get_query_value(references[0])
             references_index = self.get_index('reference')
             elements_sorted = references_index.search_with_order(reference)
             elements = elements_sorted.intersect(elements)
@@ -270,11 +277,14 @@ class CatalogsServiceAdhocracy(CatalogsService):
             return False
         elif parameter[0] in self._comparators:
             return True
+        else:
+            return False
 
     _comparators = set(FieldComparator.__members__) \
         .union(KeywordComparator.__members__) \
         .union(KeywordSequenceComparator.__members__) \
-        .union(FieldSequenceComparator.__members__)
+        .union(FieldSequenceComparator.__members__) \
+        .union(ReferenceComparator.__members__)
 
 
 def add_catalogs_system_and_adhocracy(context: ICatalogsService,

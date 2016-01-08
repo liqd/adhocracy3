@@ -561,12 +561,6 @@ class Comparator(Enum):
     """Comparators for search query parameters."""
 
 
-class ReferenceComparator(Comparator):
-    """Comparators for :class:`adhocracy_core.catalog.index.ReferenceIndex`."""
-
-    eq = 'eq'
-
-
 class FieldComparator(Comparator):
     """Comparators for :class:`hypatia.field.FieldIndex` search index."""
 
@@ -605,6 +599,16 @@ class KeywordSequenceComparator(Comparator):
     notany = 'notany'
 
 
+class ReferenceComparator(Comparator):
+    """Comparators for :class:`adhocracy_core.catalog.index.Reference` index.
+
+    These comparators need to be combined with a
+    :class:`adhocracy_core.interfaces.Reference`. value
+    """
+
+    traverse = 'traverse'
+
+
 class SearchQuery(namedtuple('Query', ['interfaces',
                                        'indexes',
                                        'references',
@@ -636,12 +640,15 @@ class SearchQuery(namedtuple('Query', ['interfaces',
         Available indexes are defined in
         :class:`adhocracy_core.catalog.adhocracy`
         Available :class:`SearchComparator`s depend on the index type.
-    references (Reference):
+    references (Reference or (ReferenceComparator.traverse, Reference)):
         References with (source, isheet, isheet_field, target).
         If `source` is None search for resources referencing target
         (back references).
         If `target` is None search for resources referenced by source
         (reference).
+        If the tuple (ReferenceComparator.traverse, Reference) is given,
+        the resource graph is traversed following all references with the same
+        type as the given Reference)
     root (IResource):
        root resource to start searching  in descendants
     depth (int):
