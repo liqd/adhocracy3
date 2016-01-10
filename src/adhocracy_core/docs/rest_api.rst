@@ -1303,11 +1303,28 @@ any), but not for any further failed requests. The backend stops processing
 encoded requests once the first of them has failed, since further processing
 would probably only lead to further errors.
 
-Filtering Pools
----------------
 
-It's possible to filter and aggregate the information collected in pools by
-adding suitable GET parameters. For example, we can only retrieve children
+Filtering Pools / Search
+------------------------
+
+By default resources with IPool sheets do not list the child elements but
+only the `count`:
+
+    >>> resp_data = testapp.get('/Documents/document_0000000/comments/').json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
+    {'count': '3', 'elements': []}
+
+To list child elements you have to do a search query with `elements=paths`
+ (see below for more detailed examples):
+
+    >>> resp_data = testapp.get('/Documents/document_0000000/comments',
+    ...     params={'elements': 'paths'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
+    {'count': '3',
+     'elements': ['http://localhost...]}
+
+It's possible to filter and aggregate the elements listed in the IPool sheet
+by additional GET parameters. For example, we can only retrieve children
 that have specific resource type (*content_type'):
 
     >>> resp_data = testapp.get('/Documents/document_0000000',
@@ -1644,3 +1661,25 @@ will be 1 or higher. ::
     ...             'depth': 'all', 'aggregateby': 'tag'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['aggregateby'])
     {'tag': {'FIRST': 3, 'LAST': 3}}
+
+Service Pools
+-------------
+
+A :term:`service` pool is used to add many child resources, for example
+the :term:`post_pool` for comments or rates.
+By default it does not list the child elements but only the result_count:
+
+    >>> resp_data = testapp.get('/Documents/document_0000000/comments/').json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
+    {'count': '3', 'elements': []}
+
+To list child elements you have to do search query and limit the number of
+listet result elements::
+
+    >>> resp_data = testapp.get('/Documents/document_0000000/comments',
+    ...     params={'limit': 10,
+    ...             'offset': 0,
+    ...             'elements': 'paths'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
+    {'elements': ['http://localhost...]}
+

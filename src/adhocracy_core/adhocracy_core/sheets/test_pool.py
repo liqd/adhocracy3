@@ -94,15 +94,20 @@ class TestFilteringPoolSheet:
     def test_get_cstruct(self, inst, request_):
         inst.get = Mock()
         child = testing.DummyResource()
-        inst.get.return_value = {'elements': [child]}
-        cstruct = inst.get_cstruct(request_)
-        assert cstruct == {'elements': ['http://example.com/']}
+        inst.get.return_value = {'elements': [child],
+                                 'count': 1}
+        cstruct = inst.get_cstruct(request_, params={'root': inst.context,
+                                                     'depth': 1})
+        assert cstruct == {'elements': [],
+                           'count': '1'}
 
     def test_get_cstruct_with_params(self, inst, request_):
         inst.get = Mock()
-        inst.get.return_value = {'elements': []}
+        child = testing.DummyResource()
+        inst.get.return_value = {'elements': [child],
+                                 'count': 1}
         cstruct = inst.get_cstruct(request_, params={'name': 'child'})
-        assert 'name' in inst.get.call_args[1]['params']
+        assert cstruct == {'elements': ['http://example.com/']}
 
     def test_get_cstruct_filter_by_view_permission(self, inst, request_):
         inst.get = Mock()
