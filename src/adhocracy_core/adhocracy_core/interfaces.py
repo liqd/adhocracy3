@@ -130,13 +130,15 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
             omit=(),
             send_event=True,
             request=None,
+            send_reference_event=True,
             omit_readonly=True) -> bool:
         """Store ``appstruct`` dictionary data.
 
-        :param send_event: throw edit event.
+        :param send_event: raise resource sheet edited event.
         :param request: the current pyramid request for additional permission
                         checks, may be None.
         :param omit_readonly: do not store readonly ``appstruct`` data.
+        :param send_reference_event: raise backreference added/removed events.
         """
 
     def get(params: dict={}, add_back_references=True) -> dict:
