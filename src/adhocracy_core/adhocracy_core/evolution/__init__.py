@@ -555,6 +555,23 @@ def remove_tag_resources(root):  # pragma: no cover
                         'FIRST': item[first_version]})
 
 
+@log_migration
+def set_comment_count(root):  # pragma: no cover
+    """Set comment_count for all ICommentables."""
+    from adhocracy_core.resources.subscriber import _update_comments_count
+    registry = get_current_registry(root)
+    catalogs = find_service(root, 'catalogs')
+    query = search_query._replace(interfaces=ICommentVersion,
+                                  only_visible=True,
+                                  resolve=True)
+    comment_versions = catalogs.search(query).elements
+    count = len(comment_versions)
+    for index, comment in enumerate(comment_versions):
+        logger.info('Set comment_count for resource {0} of {1}'
+                    .format(index + 1, count))
+        _update_comments_count(comment, 1, registry)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -579,3 +596,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(update_asset_download_children)
     config.add_evolution_step(recreate_all_image_size_downloads)
     config.add_evolution_step(remove_tag_resources)
+    config.add_evolution_step(set_comment_count)
