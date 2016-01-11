@@ -458,7 +458,10 @@ var get = (
                     secured: (proposal.data[SIExtraFunding.nick] || {}).secured
                 },
                 experience: proposal.data[SICommunity.nick].expected_feedback,
-                heardFrom: proposal.data[SICommunity.nick].heard_from,
+                heardFrom: _.reduce(proposal.data[SICommunity.nick].heard_froms, (result, item : string) => {
+                    result[item] = true;
+                    return result;
+                }, {}),
                 introduction: {
                     pitch: subs.pitch.data[SIPitch.nick].pitch,
                     picture: proposal.data[SIImageReference.nick].picture
