@@ -198,6 +198,7 @@ export interface IDetailData extends IData {
     supporterCount : number;
     creationDate : string;
     creator : string;
+    selectedTopics : string[];
 }
 
 export interface IFormData extends IData {
@@ -477,6 +478,7 @@ var get = (
                     result[key] = _.indexOf(proposal.data[SITopic.nick].topic, key) !== -1;
                     return result;
                 }, {}),
+                selectedTopics: proposal.data[SITopic.nick].topic,
                 topic_other: proposal.data[SITopic.nick].topic_other,
                 title: proposal.data[SITitle.nick].title,
                 location: {
@@ -637,13 +639,6 @@ export var editDirective = (
 
             get($q, adhHttp, adhTopLevelState)(scope.path).then((data) => {
                 scope.data = data;
-                scope.selectedTopics = [];
-
-                _.forEach(scope.data.topic, (isSelected, key) => {
-                    if (isSelected) {
-                        scope.selectedTopics.push(topicTrString(key));
-                    }
-                });
             });
 
             scope.submit = () => edit(adhHttp, adhPreliminaryNames)(scope).then(() => {
@@ -852,14 +847,6 @@ export var detailDirective = (
 
             get($q, adhHttp, adhTopLevelState)(scope.path).then((data) => {
                 scope.data = data;
-
-                scope.selectedTopics = [];
-
-                _.forEach(scope.data.topic, function(isSelected, key) {
-                    if ((isSelected === true) && (key !== "other")) {
-                        scope.selectedTopics.push(topicTrString(key));
-                    }
-                });
             });
         }
     };
