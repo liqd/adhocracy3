@@ -198,6 +198,7 @@ export interface IDetailData extends IData {
     supporterCount : number;
     creationDate : string;
     creator : string;
+    selectedTopics : string[];
 }
 
 export interface IFormData extends IData {
@@ -343,7 +344,10 @@ var fill = (data : IFormData, resource) => {
     }
 };
 
-var create = (adhHttp : AdhHttp.Service<any>) => (scope, adhPreliminaryNames) => {
+var create = (
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service
+) => (scope) => {
     var data : IFormData = scope.data;
     return adhHttp.withTransaction((transaction) => {
         var proposal = new RIMercatorProposal({preliminaryNames: adhPreliminaryNames});
@@ -377,6 +381,43 @@ var create = (adhHttp : AdhHttp.Service<any>) => (scope, adhPreliminaryNames) =>
 
         return transaction.commit().then((responses) => {
             return responses[0].path;
+        });
+    });
+};
+
+var edit = (
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service
+) => (scope) => {
+    var data : IFormData = scope.data;
+    return adhHttp.get(scope.path).then((oldProposal) => {
+        var subResourcesSheet : SIMercatorSubResources.Sheet = oldProposal.data[SIMercatorSubResources.nick];
+
+        return adhHttp.withTransaction((transaction) => {
+            var proposal = new RIMercatorProposal({preliminaryNames: adhPreliminaryNames});
+            fill(data, proposal);
+            transaction.put(oldProposal.path, proposal);
+
+            _.forEach({
+                pitch: RIPitch,
+                partners: RIPartners,
+                duration: RIDuration,
+                challenge: RIChallenge,
+                goal: RIGoal,
+                plan: RIPlan,
+                target: RITarget,
+                team: RITeam,
+                extrainfo: RIExtraInfo,
+                connectioncohesion: RIConnectionCohesion,
+                difference: RIDifference,
+                practicalrelevance: RIPracticalRelevance
+            }, (cls, subresourceKey : string) => {
+                var resource = new cls({preliminaryNames: adhPreliminaryNames});
+                fill(data, resource);
+                transaction.put(subResourcesSheet[subresourceKey], resource);
+            });
+
+            return transaction.commit();
         });
     });
 };
@@ -437,6 +478,7 @@ var get = (
                     result[key] = _.indexOf(proposal.data[SITopic.nick].topic, key) !== -1;
                     return result;
                 }, {}),
+                selectedTopics: proposal.data[SITopic.nick].topic,
                 topic_other: proposal.data[SITopic.nick].topic_other,
                 title: proposal.data[SITitle.nick].title,
                 location: {
@@ -455,7 +497,10 @@ var get = (
                     secured: (proposal.data[SIExtraFunding.nick] || {}).secured
                 },
                 experience: proposal.data[SICommunity.nick].expected_feedback,
-                heardFrom: proposal.data[SICommunity.nick].heard_from,
+                heardFrom: _.reduce(proposal.data[SICommunity.nick].heard_froms, (result, item : string) => {
+                    result[item] = true;
+                    return result;
+                }, {}),
                 introduction: {
                     pitch: subs.pitch.data[SIPitch.nick].pitch,
                     picture: proposal.data[SIImageReference.nick].picture
@@ -519,12 +564,86 @@ var get = (
 };
 
 
-export var createDirective = (adhConfig : AdhConfig.IService) => {
+export var createDirective = (
+    $location : angular.ILocationService,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhResourceUrl
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
             poolPath: "@"
+        },
+        link: (scope) => {
+            scope.create = true;
+
+            scope.data = {
+                user_info: {},
+                organization_info: {},
+                introduction: {},
+                partners: {
+                    partner1: {},
+                    partner2: {},
+                    partner3: {}
+                },
+                topic: {},
+                location: {},
+                impact: {},
+                criteria: {},
+                finance: {},
+                heardFrom: {}
+            };
+
+            scope.submit = () => create(adhHttp, adhPreliminaryNames)(scope).then((proposalPath) => {
+                $location.url(adhResourceUrl(proposalPath));
+            });
+        }
+    };
+};
+
+export var editDirective = (
+    $q : angular.IQService,
+    $location : angular.ILocationService,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhResourceUrl
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope) => {
+            scope.data = {
+                user_info: {},
+                organization_info: {},
+                introduction: {},
+                partners: {
+                    partner1: {},
+                    partner2: {},
+                    partner3: {}
+                },
+                topic: {},
+                location: {},
+                impact: {},
+                criteria: {},
+                finance: {},
+                heardFrom: {}
+            };
+
+            get($q, adhHttp, adhTopLevelState)(scope.path).then((data) => {
+                scope.data = data;
+            });
+
+            scope.submit = () => edit(adhHttp, adhPreliminaryNames)(scope).then(() => {
+                $location.url(adhResourceUrl(scope.path));
+            });
         }
     };
 };
@@ -594,11 +713,7 @@ export var listItem = (
 export var mercatorProposalFormController2016 = (
     $scope,
     $element,
-    $window,
-    $location,
     adhShowError,
-    adhHttp : AdhHttp.Service<any>,
-    adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhSubmitIfValid,
     adhResourceUrl,
@@ -613,24 +728,15 @@ export var mercatorProposalFormController2016 = (
     $scope.selection_criteria_link = "/en/idea-space/selection-criteria/";
     $scope.financial_plan_link = "/en/idea-space/financial-plan/";
 
-    $scope.data = {
-        user_info: {},
-        organization_info: {},
-        introduction: {},
-        partners: {
-            partner1: {},
-            partner2: {},
-            partner3: {}
-        },
-        topic: {},
-        location: {},
-        impact: {},
-        criteria: {},
-        finance: {},
-        heardFrom: {}
+    var topicTotal = () => {
+        return _.reduce($scope.data.topic, (result, include, topic : string) => {
+            if (include && (topic !== "otherText")) {
+                return result + 1;
+            } else {
+                return result;
+            }
+        }, 0);
     };
-
-    var topicTotal = 0;
 
     $scope.topics = topics;
 
@@ -651,8 +757,7 @@ export var mercatorProposalFormController2016 = (
 
     $scope.topicChange = (isChecked) => {
         if ($scope.data.topic) {
-            topicTotal = isChecked ? (topicTotal + 1) : (topicTotal - 1);
-            var validity = topicTotal > 0 && topicTotal < 3;
+            var validity = topicTotal() > 0 && topicTotal() < 3;
             $scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$setValidity("enoughTopics", validity);
             $scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$setDirty();
         } else {
@@ -677,7 +782,7 @@ export var mercatorProposalFormController2016 = (
     };
 
     $scope.showTopicsError = () : boolean => {
-        return ((topicTotal < 1) || (topicTotal > 2)) &&
+        return ((topicTotal() < 1) || (topicTotal() > 2)) &&
             $scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$dirty;
     };
 
@@ -704,15 +809,8 @@ export var mercatorProposalFormController2016 = (
 
     $scope.showError = adhShowError;
 
-    // FIXME !
-    $scope.create = "true";
-
     $scope.submitIfValid = () => {
         adhSubmitIfValid($scope, $element, $scope.mercatorProposalForm, () => {
-            var post = () => create(adhHttp)($scope, adhPreliminaryNames).then((proposalPath) => {
-                $location.url(adhResourceUrl(proposalPath));
-            });
-
             if ($scope.$flow && $scope.$flow.support && $scope.$flow.files.length > 0) {
                 return adhUploadImage(
                     adhTopLevelState.get("processUrl"),
@@ -721,10 +819,10 @@ export var mercatorProposalFormController2016 = (
                     SIMercatorIntroImageMetadata.nick
                 ).then((imageUrl : string) => {
                     $scope.data.introduction.picture = imageUrl;
-                    return post();
+                    return $scope.submit();
                 });
             } else {
-                return post();
+                return $scope.submit();
             }
         });
     };
@@ -756,14 +854,6 @@ export var detailDirective = (
 
             get($q, adhHttp, adhTopLevelState)(scope.path).then((data) => {
                 scope.data = data;
-
-                scope.selectedTopics = [];
-
-                _.forEach(scope.data.topic, function(isSelected, key) {
-                    if ((isSelected === true) && (key !== "other")) {
-                        scope.selectedTopics.push(topicTrString(key));
-                    }
-                });
             });
         }
     };

@@ -19,7 +19,7 @@
         <div class="form-error" data-ng-repeat="error in errors track by $index">
             <p>{{ error | adhFormatError | translate }}</p>
         </div>
-        <section class="mercator-proposal-form-section mercator-proposal-form-section-info">
+        <section class="mercator-proposal-form-section mercator-proposal-form-section-info" data-ng-if="create">
             {{ "TR__MERCATOR_PROPOSAL_2016_SUBMISSION_DEADLINE" | translate }}
         </section>
 
@@ -1313,7 +1313,7 @@
                             placeholder="{{ 'TR__MAX_CHARS_500' | translate }}"></textarea>
                     </label>
 
-                    <div data-ng-if="create === 'true'">
+                    <div data-ng-if="create">
                         <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_HEARD_FROM_LABEL" | translate }} *</span>
 
                         <div data-ng-class="{ 'ng-invalid': showHeardFromError() }">
