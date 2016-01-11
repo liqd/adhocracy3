@@ -534,16 +534,67 @@ export var createDirective = (adhConfig : AdhConfig.IService) => {
         },
         link: (scope) => {
             scope.create = true;
+
+            scope.data = {
+                user_info: {},
+                organization_info: {},
+                introduction: {},
+                partners: {
+                    partner1: {},
+                    partner2: {},
+                    partner3: {}
+                },
+                topic: {},
+                location: {},
+                impact: {},
+                criteria: {},
+                finance: {},
+                heardFrom: {}
+            };
         }
     };
 };
 
-export var editDirective = (adhConfig : AdhConfig.IService) => {
+export var editDirective = (
+    $q : angular.IQService,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
             path: "@"
+        },
+        link: (scope) => {
+            scope.data = {
+                user_info: {},
+                organization_info: {},
+                introduction: {},
+                partners: {
+                    partner1: {},
+                    partner2: {},
+                    partner3: {}
+                },
+                topic: {},
+                location: {},
+                impact: {},
+                criteria: {},
+                finance: {},
+                heardFrom: {}
+            };
+
+            get($q, adhHttp, adhTopLevelState)(scope.path).then((data) => {
+                scope.data = data;
+                scope.selectedTopics = [];
+
+                _.forEach(scope.data.topic, (isSelected, key) => {
+                    if (isSelected) {
+                        scope.selectedTopics.push(topicTrString(key));
+                    }
+                });
+            });
         }
     };
 };
@@ -631,23 +682,6 @@ export var mercatorProposalFormController2016 = (
 
     $scope.selection_criteria_link = "/en/idea-space/selection-criteria/";
     $scope.financial_plan_link = "/en/idea-space/financial-plan/";
-
-    $scope.data = {
-        user_info: {},
-        organization_info: {},
-        introduction: {},
-        partners: {
-            partner1: {},
-            partner2: {},
-            partner3: {}
-        },
-        topic: {},
-        location: {},
-        impact: {},
-        criteria: {},
-        finance: {},
-        heardFrom: {}
-    };
 
     var topicTotal = 0;
 
