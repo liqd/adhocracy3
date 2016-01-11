@@ -558,7 +558,7 @@ def remove_tag_resources(root):  # pragma: no cover
 @log_migration
 def set_comment_count(root):  # pragma: no cover
     """Set comment_count for all ICommentables."""
-    from adhocracy_core.resources.subscriber import _update_comments_count
+    from adhocracy_core.resources.subscriber import update_comments_count
     registry = get_current_registry(root)
     catalogs = find_service(root, 'catalogs')
     query = search_query._replace(interfaces=ICommentVersion,
@@ -569,7 +569,7 @@ def set_comment_count(root):  # pragma: no cover
     for index, comment in enumerate(comment_versions):
         logger.info('Set comment_count for resource {0} of {1}'
                     .format(index + 1, count))
-        _update_comments_count(comment, 1, registry)
+        update_comments_count(comment, 1, registry)
 
 
 def includeme(config):  # pragma: no cover
