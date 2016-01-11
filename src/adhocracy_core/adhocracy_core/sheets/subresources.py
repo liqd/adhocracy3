@@ -8,5 +8,5 @@ class ISubResources(ISheet, ISheetReferenceAutoUpdateMarker):
 
     For example references to document parts or form fields.
     These are :term:``essence`` references, if the referenced Resource
-    has a new Version the referecing resource is also updated.
+    has a new Version the referencing resource is also updated.
     """
