@@ -65,18 +65,15 @@ export var register = (angular) => {
             adhEmbedProvider.registerDirective("mercator-2016-proposal-detail");
             adhEmbedProvider.registerDirective("mercator-2016-proposal-listitem");
         }])
-        .directive("adhMercator2016ProposalCreate", ["adhConfig", Proposal.createDirective])
+        .directive("adhMercator2016ProposalCreate", [
+            "$location", "adhConfig", "adhHttp", "adhPreliminaryNames", "adhResourceUrlFilter", Proposal.createDirective])
         .directive("adhMercator2016ProposalEdit", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", Proposal.editDirective])
         .directive("adhMercator2016ProposalListing", ["adhConfig", Proposal.listing])
         .directive("adhMercator2016ProposalListitem", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", "adhGetBadges", Proposal.listItem])
         .controller("mercatorProposalFormController2016", [
             "$scope",
             "$element",
-            "$window",
-            "$location",
             "adhShowError",
-            "adhHttp",
-            "adhPreliminaryNames",
             "adhTopLevelState",
             "adhSubmitIfValid",
             "adhResourceUrlFilter",

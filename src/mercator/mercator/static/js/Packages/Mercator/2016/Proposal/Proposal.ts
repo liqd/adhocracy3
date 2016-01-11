@@ -525,7 +525,13 @@ var get = (
 };
 
 
-export var createDirective = (adhConfig : AdhConfig.IService) => {
+export var createDirective = (
+    $location : angular.ILocationService,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhResourceUrl
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
@@ -551,6 +557,10 @@ export var createDirective = (adhConfig : AdhConfig.IService) => {
                 finance: {},
                 heardFrom: {}
             };
+
+            scope.submit = () => create(adhHttp, adhPreliminaryNames)(scope).then((proposalPath) => {
+                $location.url(adhResourceUrl(proposalPath));
+            });
         }
     };
 };
@@ -595,6 +605,10 @@ export var editDirective = (
                     }
                 });
             });
+
+            scope.submit = () => {
+                console.log(scope);
+            };
         }
     };
 };
@@ -664,11 +678,7 @@ export var listItem = (
 export var mercatorProposalFormController2016 = (
     $scope,
     $element,
-    $window,
-    $location,
     adhShowError,
-    adhHttp : AdhHttp.Service<any>,
-    adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhSubmitIfValid,
     adhResourceUrl,
@@ -759,10 +769,6 @@ export var mercatorProposalFormController2016 = (
 
     $scope.submitIfValid = () => {
         adhSubmitIfValid($scope, $element, $scope.mercatorProposalForm, () => {
-            var post = () => create(adhHttp, adhPreliminaryNames)($scope).then((proposalPath) => {
-                $location.url(adhResourceUrl(proposalPath));
-            });
-
             if ($scope.$flow && $scope.$flow.support && $scope.$flow.files.length > 0) {
                 return adhUploadImage(
                     adhTopLevelState.get("processUrl"),
@@ -771,10 +777,10 @@ export var mercatorProposalFormController2016 = (
                     SIMercatorIntroImageMetadata.nick
                 ).then((imageUrl : string) => {
                     $scope.data.introduction.picture = imageUrl;
-                    return post();
+                    return $scope.submit();
                 });
             } else {
-                return post();
+                return $scope.submit();
             }
         });
     };
