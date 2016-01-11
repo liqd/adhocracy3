@@ -343,7 +343,10 @@ var fill = (data : IFormData, resource) => {
     }
 };
 
-var create = (adhHttp : AdhHttp.Service<any>) => (scope, adhPreliminaryNames) => {
+var create = (
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service
+) => (scope) => {
     var data : IFormData = scope.data;
     return adhHttp.withTransaction((transaction) => {
         var proposal = new RIMercatorProposal({preliminaryNames: adhPreliminaryNames});
@@ -709,7 +712,7 @@ export var mercatorProposalFormController2016 = (
 
     $scope.submitIfValid = () => {
         adhSubmitIfValid($scope, $element, $scope.mercatorProposalForm, () => {
-            var post = () => create(adhHttp)($scope, adhPreliminaryNames).then((proposalPath) => {
+            var post = () => create(adhHttp, adhPreliminaryNames)($scope).then((proposalPath) => {
                 $location.url(adhResourceUrl(proposalPath));
             });
 
