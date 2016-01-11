@@ -131,7 +131,7 @@ def validate_user_creation(context, request: Request):
     captcha_enabled = asbool(request.registry.settings.get(
         'adhocracy.thentos_captcha.enabled', False))
     sheet_name = 'adhocracy_core.sheets.principal.ICaptcha'
-    sheet_data = request.validated.pop(sheet_name, None)
+    sheet_data = request.validated['data'].pop(sheet_name, None)
     if captcha_enabled and sheet_data is None:
         request.errors.append(error_entry('body',
                                           'data.{}'.format(sheet_name),
