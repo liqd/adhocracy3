@@ -535,6 +535,16 @@ export var createDirective = (adhConfig : AdhConfig.IService) => {
     };
 };
 
+export var editDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
+        scope: {
+            path: "@"
+        }
+    };
+};
+
 export var listing = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
