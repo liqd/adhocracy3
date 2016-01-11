@@ -728,7 +728,15 @@ export var mercatorProposalFormController2016 = (
     $scope.selection_criteria_link = "/en/idea-space/selection-criteria/";
     $scope.financial_plan_link = "/en/idea-space/financial-plan/";
 
-    var topicTotal = 0;
+    var topicTotal = () => {
+        return _.reduce($scope.data.topic, (result, include, topic : string) => {
+            if (include && (topic !== "otherText")) {
+                return result + 1;
+            } else {
+                return result;
+            }
+        }, 0);
+    };
 
     $scope.topics = topics;
 
@@ -749,8 +757,7 @@ export var mercatorProposalFormController2016 = (
 
     $scope.topicChange = (isChecked) => {
         if ($scope.data.topic) {
-            topicTotal = isChecked ? (topicTotal + 1) : (topicTotal - 1);
-            var validity = topicTotal > 0 && topicTotal < 3;
+            var validity = topicTotal() > 0 && topicTotal() < 3;
             $scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$setValidity("enoughTopics", validity);
             $scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$setDirty();
         } else {
@@ -775,7 +782,7 @@ export var mercatorProposalFormController2016 = (
     };
 
     $scope.showTopicsError = () : boolean => {
-        return ((topicTotal < 1) || (topicTotal > 2)) &&
+        return ((topicTotal() < 1) || (topicTotal() > 2)) &&
             $scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$dirty;
     };
 
