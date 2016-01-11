@@ -600,7 +600,7 @@ class TestUpdateCommentsCount:
         assert self._get_comments_count(comment2) == 1
         assert self._get_comments_count(comment3) == 2
         assert self._get_comments_count(sub_commentable) == 3
-        assert self._get_comments_count(main_commentable) == 3
+        assert self._get_comments_count(main_commentable) == 0
 
 
 class TestUpdateCommentsCountAfterVisibilityChange:

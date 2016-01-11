@@ -51,7 +51,6 @@ from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.asset import IAssetData
 from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.sheets.versions import IVersions
-from adhocracy_core.sheets.subresources import ISubResources
 from adhocracy_core import sheets
 
 logger = getLogger(__name__)
@@ -336,20 +335,7 @@ def update_comments_count(resource: ICommentVersion,
         resolve=True,
     )
     commentables = catalogs.search(query).elements
-    main_resources = []
-    maybe_subresources = [x for x in commentables
-                          if not ICommentVersion.providedBy(x)]
-    for maybe_subresource in maybe_subresources:
-        query = search_query._replace(
-            only_visible=True,
-            references=((traverse,
-                         (None, ISubResources, '', maybe_subresource)),
-                        ),
-            interfaces=ICommentable,
-            resolve=True,
-        )
-        main_resources = catalogs.search(query).elements
-    for commentable in commentables + main_resources:
+    for commentable in commentables:
         commentable_sheet = registry.content.get_sheet(commentable,
                                                        ICommentable)
         old_count = commentable_sheet.get()['comments_count']
