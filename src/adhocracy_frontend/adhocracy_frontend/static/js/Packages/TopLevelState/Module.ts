@@ -18,6 +18,5 @@ export var register = (angular) => {
         .directive("adhPageWrapper", ["adhConfig", AdhTopLevelState.pageWrapperDirective])
         .directive("adhRoutingError", ["adhConfig", AdhTopLevelState.routingErrorDirective])
         .directive("adhSpace", ["adhTopLevelState", AdhTopLevelState.spaceDirective])
-        .directive("adhSpaceSwitch", ["adhTopLevelState", "adhConfig", AdhTopLevelState.spaceSwitch])
         .directive("adhView", ["adhTopLevelState", "$compile", AdhTopLevelState.viewFactory]);
 };
