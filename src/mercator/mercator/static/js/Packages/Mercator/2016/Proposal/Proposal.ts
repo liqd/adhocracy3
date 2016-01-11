@@ -493,12 +493,8 @@ var get = (
                     difference: subs.difference.data[SIDifference.nick].difference,
                     practical: subs.practicalrelevance.data[SIPracticalRelevance.nick].practicalrelevance
                 },
-
-                // FIXME: It is not currently possible to get the
-                // recursive comment count of a subresource. Will be
-                // fixed in the backend.
                 commentCounts: {
-                    proposal: 0,
+                    proposal: proposal.data[SICommentable.nick].comments_count,
                     pitch: subs.pitch.data[SICommentable.nick].comments_count,
                     partners: subs.partners.data[SICommentable.nick].comments_count,
                     duration: subs.duration.data[SICommentable.nick].comments_count,
