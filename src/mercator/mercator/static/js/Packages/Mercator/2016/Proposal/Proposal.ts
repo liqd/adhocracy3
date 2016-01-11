@@ -531,6 +531,9 @@ export var createDirective = (adhConfig : AdhConfig.IService) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
             poolPath: "@"
+        },
+        link: (scope) => {
+            scope.create = true;
         }
     };
 };
@@ -719,9 +722,6 @@ export var mercatorProposalFormController2016 = (
     };
 
     $scope.showError = adhShowError;
-
-    // FIXME !
-    $scope.create = "true";
 
     $scope.submitIfValid = () => {
         adhSubmitIfValid($scope, $element, $scope.mercatorProposalForm, () => {
