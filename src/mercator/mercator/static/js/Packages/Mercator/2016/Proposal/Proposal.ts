@@ -384,6 +384,43 @@ var create = (
     });
 };
 
+var edit = (
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service
+) => (scope) => {
+    var data : IFormData = scope.data;
+    return adhHttp.get(scope.path).then((oldProposal) => {
+        var subResourcesSheet : SIMercatorSubResources.Sheet = oldProposal.data[SIMercatorSubResources.nick];
+
+        return adhHttp.withTransaction((transaction) => {
+            var proposal = new RIMercatorProposal({preliminaryNames: adhPreliminaryNames});
+            fill(data, proposal);
+            transaction.put(oldProposal.path, proposal);
+
+            _.forEach({
+                pitch: RIPitch,
+                partners: RIPartners,
+                duration: RIDuration,
+                challenge: RIChallenge,
+                goal: RIGoal,
+                plan: RIPlan,
+                target: RITarget,
+                team: RITeam,
+                extrainfo: RIExtraInfo,
+                connectioncohesion: RIConnectionCohesion,
+                difference: RIDifference,
+                practicalrelevance: RIPracticalRelevance
+            }, (cls, subresourceKey : string) => {
+                var resource = new cls({preliminaryNames: adhPreliminaryNames});
+                fill(data, resource);
+                transaction.put(subResourcesSheet[subresourceKey], resource);
+            });
+
+            return transaction.commit();
+        });
+    });
+};
+
 var get = (
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>,
@@ -567,9 +604,12 @@ export var createDirective = (
 
 export var editDirective = (
     $q : angular.IQService,
+    $location : angular.ILocationService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhResourceUrl
 ) => {
     return {
         restrict: "E",
@@ -606,9 +646,9 @@ export var editDirective = (
                 });
             });
 
-            scope.submit = () => {
-                console.log(scope);
-            };
+            scope.submit = () => edit(adhHttp, adhPreliminaryNames)(scope).then(() => {
+                $location.url(adhResourceUrl(scope.path));
+            });
         }
     };
 };
