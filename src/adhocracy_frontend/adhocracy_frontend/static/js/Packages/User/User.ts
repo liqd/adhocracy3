@@ -8,6 +8,7 @@ import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
 import * as SIPasswordAuthentication from "../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication";
 import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
 import * as SIUserExtended from "../../Resources_/adhocracy_core/sheets/principal/IUserExtended";
+import * as SICaptcha from "../../Resources_/adhocracy_core/sheets/principal/ICaptcha";
 
 
 export interface IUserBasic {
@@ -107,6 +108,10 @@ export class Service {
         };
         resource.data[SIPasswordAuthentication.nick] = {
             "password": password
+        };
+        resource.data[SICaptcha.nick] = {
+            "id": captchaId,
+            "solution": captchaGuess
         };
 
         return _self.adhHttp.post("/principals/users/", resource);
