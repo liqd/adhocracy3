@@ -647,10 +647,10 @@ class SearchQuery(namedtuple('Query', ['interfaces',
         If `source` is None search for resources referencing target
         (back references).
         If `target` is None search for resources referenced by source
-        (reference).
+        (Reference).
         If the tuple (ReferenceComparator.traverse, Reference) is given,
         the resource graph is traversed following all references with the same
-        type as the given Reference)
+        type as the given reference.
     root (IResource):
        root resource to start searching  in descendants
     depth (int):

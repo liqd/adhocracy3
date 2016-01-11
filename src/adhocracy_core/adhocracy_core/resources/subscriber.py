@@ -298,7 +298,7 @@ def decrease_comments_count(event):
 
 
 def update_comments_count_after_visiblity_change(event):
-    """Update comments_count in lineage after visiblity change."""
+    """Update comments_count in lineage after visibility change."""
     visibility = get_visibility_change(event)
     if visibility == VisibilityChange.concealed:
         delta = -1
@@ -323,7 +323,7 @@ def update_comments_count(resource: ICommentVersion,
 
     Example reference structure that is traversed:
 
-    Main -ISubResources-> Sub <-IComment- Comment <- IComment- SubComment
+    comment <-IComment- comment <-IComment- comment
     """
     catalogs = find_service(resource, 'catalogs')
     traverse = ReferenceComparator.traverse.value
