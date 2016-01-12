@@ -462,13 +462,6 @@ export class Service {
         this.setCameFrom();
         this.$location.url(url);
     }
-
-    public goToSpaceHome(space) : void {
-        // FIXME : This only works in resource area, needs to be refactored
-        var spaceDefaults = this.provider.getSpaceDefaults(space);
-        var area = this.getArea();
-        this.$location.url("/" + area.prefix + spaceDefaults["resourceUrl"]);
-    }
 }
 
 
@@ -490,27 +483,6 @@ export var spaceDirective = (adhTopLevelState : Service) => {
         template: "<adh-wait data-condition=\"currentSpace === key\" data-ng-show=\"currentSpace === key\">" +
             "    <adh-inject></adh-inject>" +
             "</adh-wait>"
-    };
-};
-
-
-export var spaceSwitch = (
-    adhTopLevelState : Service,
-    adhConfig  : AdhConfig.IService
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + "SpaceSwitch.html",
-        link: (scope) => {
-            scope.$on("$destroy", adhTopLevelState.bind("space", scope, "currentSpace"));
-            scope.setSpace = (space : string) => {
-                if (scope.currentSpace === space) {
-                    adhTopLevelState.goToSpaceHome(space);
-                } else {
-                    adhTopLevelState.set("space", space);
-                }
-            };
-        }
     };
 };
 
