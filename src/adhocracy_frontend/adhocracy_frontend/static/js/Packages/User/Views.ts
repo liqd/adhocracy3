@@ -373,7 +373,9 @@ export var registerDirective = (
                 imageData: "",
                 audioData: ""
             };
-            fetchCaptchaImage(adhConfig, $sce, $http, scope);
+            if (scope.captcha.enabled) {
+                fetchCaptchaImage(adhConfig, $sce, $http, scope);
+            }
 
             scope.showError = adhShowError;
 
