@@ -415,7 +415,16 @@ export var registerDirective = (
                     .then((response) => {
                         scope.errors = [];
                         scope.success = true;
-                    }, (errors) => bindServerErrors(scope, errors));
+                    }, (errors) => {
+                        if (scope.captcha.enabled) {
+                            if (scope.captcha.audioEnabled) {
+                                fetchCaptchaAudio(adhConfig, $sce, $http, scope);
+                            } else {
+                                fetchCaptchaImage(adhConfig, $sce, $http, scope);
+                            }
+                        }
+                        return bindServerErrors(scope, errors);
+                    });
             };
         }
     };
