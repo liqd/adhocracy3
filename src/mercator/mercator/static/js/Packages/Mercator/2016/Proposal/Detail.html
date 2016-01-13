@@ -223,7 +223,7 @@
 
                         <div data-ng-if="data.partners.hasPartners" class="partners-list">
                             <h3>{{ "TR__MERCATOR_PROPOSAL_PARTNERS" | translate }}</h3>
-                            <ul data-ng-if="data.partners.partner1" class="mercator-proposal-detail-orgs-columns partner-columns">
+                            <ul data-ng-if="data.partners.partner1 && data.partners.partner1.name" class="mercator-proposal-detail-orgs-columns partner-columns">
                                 <li>
                                     <a
                                         class="m-print-href"
@@ -235,7 +235,7 @@
                                 </li>
                                 <li><i data-ng-if="data.partners.partner1.country" class="icon-map-pin"></i> {{ data.partners.partner1.country | adhCountryName | translate }}</li>
                             </ul>
-                            <ul data-ng-if="data.partners.partner2" class="mercator-proposal-detail-orgs-columns partner-columns">
+                            <ul data-ng-if="data.partners.partner2 && data.partners.partner2.name" class="mercator-proposal-detail-orgs-columns partner-columns">
                                 <li>
                                     <a
                                         class="m-print-href"
@@ -247,7 +247,7 @@
                                 </li>
                                 <li><i data-ng-if="data.partners.partner2.country" class="icon-map-pin"></i> {{ data.partners.partner2.country | adhCountryName | translate }}</li>
                             </ul>
-                            <ul data-ng-if="data.partners.partner3" class="mercator-proposal-detail-orgs-columns partner-columns">
+                            <ul data-ng-if="data.partners.partner3 && data.partners.partner3.name" class="mercator-proposal-detail-orgs-columns partner-columns">
                                 <li>
                                     <a
                                         class="m-print-href"
