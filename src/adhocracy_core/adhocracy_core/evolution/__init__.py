@@ -569,6 +569,21 @@ def add_description_sheet_to_processes(root):  # pragma: no cover
     migrate_new_sheet(root, IProcess, IDescription)
 
 
+@log_migration
+def add_image_reference_to_organisations(root):  # pragma: no cover
+    """Add image reference to organisations and add assets service."""
+    registry = get_current_registry(root)
+    catalogs = find_service(root, 'catalogs')
+    query = search_query._replace(interfaces=(IOrganisation,), resolve=True)
+    organisations = catalogs.search(query).elements
+    for organisation in organisations:
+        if not IHasAssetPool.providedBy(organisation):
+            logger.info('Add assets service to {0}'.format(organisation))
+            add_assets_service(organisation, registry, {})
+    migrate_new_sheet(root, IOrganisation, IHasAssetPool)
+    migrate_new_sheet(root, IOrganisation, IImageReference)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -595,3 +610,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(remove_tag_resources)
     config.add_evolution_step(add_description_sheet_to_organisations)
     config.add_evolution_step(add_description_sheet_to_processes)
+    config.add_evolution_step(add_image_reference_to_organisations)

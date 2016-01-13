@@ -28,7 +28,10 @@ class TestOrganisation:
                 adhocracy_core.sheets.metadata.IMetadata,
                 adhocracy_core.sheets.workflow.IWorkflowAssignment,
                 adhocracy_core.sheets.description.IDescription,
+                adhocracy_core.sheets.image.IImageReference,
                 )
+        assert meta.extended_sheets == \
+            (adhocracy_core.sheets.asset.IHasAssetPool,)
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):
