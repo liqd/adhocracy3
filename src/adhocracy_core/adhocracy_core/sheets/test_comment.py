@@ -41,7 +41,7 @@ class TestCommentableSheet:
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
 
-    def test_get_empty(self, inst):
+    def test_get_empty(self, inst, context):
         data = inst.get()
         assert data['post_pool'] == context['comments']
         assert data['comments_count'] == 0
