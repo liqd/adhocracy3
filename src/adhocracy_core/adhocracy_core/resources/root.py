@@ -184,8 +184,9 @@ def _add_initial_user_and_group(context, registry):
 
 root_meta = organisation_meta._replace(
     iresource=IRootPool,
-    after_creation=(create_initial_content_for_app_root,
-                    add_example_process),
+    after_creation=organisation_meta.after_creation +
+    (create_initial_content_for_app_root,
+     add_example_process,),
     is_implicit_addable=False,
 )
 

@@ -116,7 +116,7 @@ of the sheets implemented by the resource::
 
     >>> organisation_desc = resp_data['resources']['adhocracy_core.resources.organisation.IOrganisation']
     >>> sorted(organisation_desc['sheets'])
-    ['adhocracy_core.sheets.metadata.IMetadata', 'adhocracy_core.sheets.name.IName', 'adhocracy_core.sheets.pool.IPool'...]
+    ['adhocracy_core.sheets.asset.IHasAssetPool', 'adhocracy_core.sheets.description.IDescription'...]
 
 In addition we get the listing of resource super types (excluding IResource)::
 
@@ -282,6 +282,8 @@ to a array of stub views of allowed requests::
     ...                   'data': {'adhocracy_core.sheets.metadata.IMetadata': {},
     ...                            'adhocracy_core.sheets.title.ITitle': {},
     ...                            'adhocracy_core.sheets.name.IName': {},
+    ...                            'adhocracy_core.sheets.description.IDescription': {},
+    ...                            'adhocracy_core.sheets.image.IImageReference': {},
     ...                            'adhocracy_core.sheets.workflow.IWorkflowAssignment': {}}}
     >>> data_post_pool in resp_data["POST"]["request_body"]
     True
