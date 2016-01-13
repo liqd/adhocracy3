@@ -110,7 +110,7 @@ export interface IScopeRegister extends angular.IScope {
     captcha : {
         enabled : boolean;
         audioEnabled : boolean;
-        toggleAudio : () => void;
+        toggleAudio : (event : any) => void;
         id : string;
         imageData : string;
         audioData : string;
@@ -362,8 +362,8 @@ export var registerDirective = (
             scope.captcha = {
                 enabled: adhConfig.captcha_enabled,
                 audioEnabled: false,
-                toggleAudio: () => {
-                    if (!scope.captcha.audioEnabled) {
+                toggleAudio: (event) => {
+                    if (event.target.checked) {
                         fetchCaptchaAudio(adhConfig, $sce, $http, scope);
                     } else {
                         fetchCaptchaImage(adhConfig, $sce, $http, scope);
