@@ -1,14 +1,17 @@
 """Comment sheet."""
+from BTrees.Length import Length
 import colander
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.schema import Reference
-from adhocracy_core.sheets import sheet_meta
-from adhocracy_core.schema import Text
+from adhocracy_core.schema import Integer
 from adhocracy_core.schema import PostPool
+from adhocracy_core.schema import Reference
+from adhocracy_core.schema import Text
+from adhocracy_core.sheets import AnnotationRessourceSheet
+from adhocracy_core.sheets import sheet_meta
 
 
 class IComment(ISheet, ISheetReferenceAutoUpdateMarker):
@@ -48,12 +51,47 @@ class CommentableSchema(colander.MappingSchema):
     `post_pool`: Pool to post new :class:`adhocracy_sample.resource.IComment`.
     """
 
+    comments_count = Integer(readonly=True)
     post_pool = PostPool(iresource_or_service_name='comments')
 
+
+class CommentableSheet(AnnotationRessourceSheet):
+    """Resource Sheet that stores data in dictionary annotation."""
+
+    _count_field_name = 'comments_count'
+
+    def _get_data_appstruct(self) -> dict:
+        """Get data appstruct.
+
+        `comments_count` value is converted from :class:`Btrees.Length` to int.
+        """
+        appstruct = super()._get_data_appstruct()
+        if self._count_field_name in appstruct:
+            counter = appstruct[self._count_field_name]
+            appstruct[self._count_field_name] = counter.value
+        return appstruct
+
+    def _store_data(self, appstruct: dict):
+        """Store data appstruct.
+
+        `comments_count` value is converted from int to :class:`Btrees.Length`,
+        to support ZODB conflict resultion.
+        """
+        if self._count_field_name in appstruct:
+            data = getattr(self.context, self._annotation_key, {})
+            if self._count_field_name not in data:
+                counter = Length(0)
+            else:
+                counter = data[self._count_field_name]
+            count = appstruct[self._count_field_name]
+            counter.set(count)
+            appstruct[self._count_field_name] = counter
+        super()._store_data(appstruct)
 
 commentable_meta = sheet_meta._replace(
     isheet=ICommentable,
     schema_class=CommentableSchema,
+    sheet_class=CommentableSheet,
     editable=False,
     creatable=False,
 )

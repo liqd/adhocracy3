@@ -14,7 +14,6 @@ import RIComment from "../../Resources_/adhocracy_core/resources/comment/ICommen
 import RIProposal from "../../Resources_/adhocracy_core/resources/proposal/IProposal";
 import RIRate from "../../Resources_/adhocracy_core/resources/rate/IRate";
 import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
-import RIUsersService from "../../Resources_/adhocracy_core/resources/principal/IUsersService";
 import * as SIHasAssetPool from "../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
 import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
@@ -575,19 +574,6 @@ export var userDetailColumnDirective = (
 };
 
 
-export var userListingColumnDirective = (
-    adhConfig : AdhConfig.IService
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserListingColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["userUrl"]);
-        }
-    };
-};
-
 export var adhUserManagementHeaderDirective = (
     adhConfig : AdhConfig.IService
 ) => {
@@ -711,17 +697,11 @@ export var registerRoutes = (
     adhResourceAreaProvider
         .default(RIUser, "", "", context, {
             space: "user",
-            movingColumns: "is-show-show-hide"
+            movingColumns: "is-show-hide-hide"
         })
         .specific(RIUser, "", "", context, () => (resource : RIUser) => {
             return {
                 userUrl: resource.path
             };
-        })
-        .default(RIUsersService, "", "", context, {
-            space: "user",
-            movingColumns: "is-show-hide-hide",
-            userUrl: "",  // not used by default, but should be overridable
-            focus: "0"
         });
 };

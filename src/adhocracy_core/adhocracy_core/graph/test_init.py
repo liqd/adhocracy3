@@ -137,10 +137,10 @@ class TestGraphGetReftypes:
 
 class TestGraphSetReferences:
 
-    def call_fut(self, objectmap, *args):
+    def call_fut(self, objectmap, *args, **kwargs):
         from adhocracy_core.graph import Graph
         graph = Graph(objectmap.root)
-        return Graph.set_references(graph, *args)
+        return Graph.set_references(graph, *args, **kwargs)
 
     def test_reftype_not_sheetreferencetype(self, context, objectmap):
         from substanced.interfaces import ReferenceType
@@ -215,6 +215,16 @@ class TestGraphSetReferences:
         assert event.reference.source == source
         assert event.reference.target == target
         assert event.reference.isheet == ISheet
+
+    def test_targets_set_without_send_event(self, context, objectmap,
+                                            config, registry):
+        from adhocracy_core.testing import create_event_listener
+        from adhocracy_core.interfaces import ISheetBackReferenceAdded
+        source, target, target1 = create_dummy_resources(parent=context, count=3)
+        added_listener = create_event_listener(config, ISheetBackReferenceAdded)
+        self.call_fut(objectmap, source, {target}, SheetReference, registry,
+                      send_event=False)
+        assert len(added_listener) == 0
 
     def test_targets_set_remove_with_registry(self, context, objectmap, config, registry):
         from adhocracy_core.testing import create_event_listener
@@ -362,10 +372,12 @@ class TestGraphSetReferencesForIsheet:
             references = colander.SchemaNode(colander.Int, reftype=SheetReference)
         return sheet_meta._replace(schema_class=SchemaF)
 
-    def call_fut(self, graph, source, isheet, references, registry):
+    def call_fut(self, graph, source, isheet, references, registry,
+                 send_event=True):
         from adhocracy_core.graph import Graph
         return Graph.set_references_for_isheet(graph, source, isheet,
-                                               references, registry)
+                                               references, registry,
+                                               send_event=send_event)
 
     def test_with_empty_references(self, context, mock_graph, registry):
         references = {}
@@ -378,7 +390,19 @@ class TestGraphSetReferencesForIsheet:
         mock_graph.set_references.assert_called_with(context,
                                                      references['references'],
                                                      SheetReference,
-                                                     registry)
+                                                     registry,
+                                                     send_event=True)
+
+    def test_with_valid_references_without_send_event(self, context, mock_graph,
+                                                      registry):
+        references = {'references': [object()]}
+        self.call_fut(mock_graph, context, ISheet, references, registry,
+                      send_event=False)
+        mock_graph.set_references.assert_called_with(context,
+                                                     references['references'],
+                                                     SheetReference,
+                                                     registry,
+                                                     send_event=False)
 
     def test_with_invalid_references(self, context, mock_graph, registry):
         references = {'invalid': [object()]}
@@ -397,7 +421,8 @@ class TestGraphSetReferencesForIsheet:
         mock_graph.set_references.assert_called_with(context,
                                                      [references['references']],
                                                      SheetReference,
-                                                     registry)
+                                                     registry,
+                                                     send_event=True)
 
 
 class TestGraphGetBackReferencesForIsheet:

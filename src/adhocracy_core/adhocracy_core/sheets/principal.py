@@ -183,8 +183,8 @@ class PermissionsSchema(colander.MappingSchema):
 class PermissionsAttributeResourceSheet(AttributeResourceSheet):
     """Store the groups field references also as object attribute."""
 
-    def _store_references(self, appstruct, registry):
-        super()._store_references(appstruct, registry)
+    def _store_references(self, appstruct, registry, **kwargs):
+        super()._store_references(appstruct, registry, **kwargs)
         if 'groups' in appstruct:  # pragma: no branch
             groups = appstruct['groups']
             group_ids = [resource_path(g) for g in groups]

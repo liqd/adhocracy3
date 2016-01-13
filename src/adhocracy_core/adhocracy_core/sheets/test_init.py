@@ -140,7 +140,8 @@ class TestBaseResourceSheet:
         inst.set({'references': [target]})
 
         mock_graph.set_references_for_isheet.assert_called_with(
-            context, ISheet, {'references': [target]}, registry)
+            context, ISheet, {'references': [target]}, registry,
+            send_event=True)
 
     def test_get_valid_back_references(self, inst, context, sheet_catalogs,
                                        mock_node_unique_references):
@@ -184,10 +185,19 @@ class TestBaseResourceSheet:
         node = mock_node_single_reference
         inst.schema.children.append(node)
         target = testing.DummyResource()
-        mock_graph.get_references_for_isheet.return_value = {}
         inst.set({'reference': target})
         graph_set_args = mock_graph.set_references_for_isheet.call_args[0]
         assert graph_set_args == (context, ISheet, {'reference': target}, registry)
+
+    def test_set_reference_without_send_events(
+            self, inst, context, mock_graph, mock_node_single_reference,
+            registry):
+        node = mock_node_single_reference
+        inst.schema.children.append(node)
+        target = testing.DummyResource()
+        inst.set({'reference': target})
+        graph_set_kwargs = mock_graph.set_references_for_isheet.call_args[1]
+        assert graph_set_kwargs == {'send_event': True}
 
     def test_get_reference(self, inst, context, sheet_catalogs,
                            mock_node_single_reference):
