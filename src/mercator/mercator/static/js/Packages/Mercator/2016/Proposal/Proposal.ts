@@ -136,7 +136,6 @@ export interface IData {
         other : boolean;
         otherText : string;
     };
-    topic_other : string;
     duration : number;
     location : {
         location_is_linked_to_ruhr : boolean;
@@ -478,9 +477,10 @@ var get = (
                 topic: <any>_.reduce(<any>topics, (result, key : string) => {
                     result[key] = _.indexOf(proposal.data[SITopic.nick].topic, key) !== -1;
                     return result;
-                }, {}),
+                }, {
+                    otherText: proposal.data[SITopic.nick].topic_other
+                }),
                 selectedTopics: proposal.data[SITopic.nick].topic,
-                topic_other: proposal.data[SITopic.nick].topic_other,
                 title: proposal.data[SITitle.nick].title,
                 location: {
                     location_is_specific: !!proposal.data[SILocation.nick].location,

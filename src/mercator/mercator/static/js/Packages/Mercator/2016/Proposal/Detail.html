@@ -27,7 +27,6 @@
         </h1>
         <div data-ng-if="data.selectedTopics">
             {{ "TR__MERCATOR_TOPIC" | translate }}: <em><span class="topic" data-ng-repeat="topic in data.selectedTopics">{{ topic | translate }}{{$last ? '' : ', '}}</span>
-            <span data-ng-if="data.topic.other">, {{data.topic_other}}</span>
             </em>
         </div>
     </div>
