@@ -139,6 +139,7 @@ user_meta = pool_meta._replace(
     content_class=User,
     basic_sheets=(adhocracy_core.sheets.principal.IUserBasic,
                   adhocracy_core.sheets.principal.IUserExtended,
+                  adhocracy_core.sheets.principal.ICaptcha,
                   adhocracy_core.sheets.principal.IPermissions,
                   adhocracy_core.sheets.metadata.IMetadata,
                   adhocracy_core.sheets.pool.IPool,

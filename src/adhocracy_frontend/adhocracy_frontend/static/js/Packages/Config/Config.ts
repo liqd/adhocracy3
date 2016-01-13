@@ -18,6 +18,8 @@ export interface IService {
     trusted_domains : string[];
     locale : string;
     support_email : string;
+    captcha_enabled : boolean;
+    captcha_url : string;
     // the place for instance specific customizations
     // remember to parse (e.g. booleans) where they are used
     custom : {[key : string]: string};
