@@ -480,7 +480,13 @@ var get = (
                 }, {
                     otherText: proposal.data[SITopic.nick].topic_other
                 }),
-                selectedTopics: proposal.data[SITopic.nick].topic,
+                selectedTopics: _.map(proposal.data[SITopic.nick].topic, (topic : string) => {
+                    if (topic === "other") {
+                        return proposal.data[SITopic.nick].topic_other;
+                    } else {
+                        return topicTrString(topic);
+                    }
+                }),
                 title: proposal.data[SITitle.nick].title,
                 location: {
                     location_is_specific: !!proposal.data[SILocation.nick].location,
