@@ -616,8 +616,8 @@ class TestUpdateCommentsCountAfterVisibilityChange:
         return mocker.patch.object(subscriber, 'update_comments_count')
 
     def call_fut(self, *args):
-        from .subscriber import update_comments_count_after_visiblity_change
-        return update_comments_count_after_visiblity_change(*args)
+        from .subscriber import update_comments_count_after_visibility_change
+        return update_comments_count_after_visibility_change(*args)
 
     def test_ignore_if_visible(self, mocker, registry, event, mock_update):
         from adhocracy_core.interfaces import VisibilityChange
@@ -667,6 +667,6 @@ def test_register_subscriber(registry):
     assert subscriber.update_image_downloads.__name__ in handlers
     assert subscriber.decrease_comments_count.__name__ in handlers
     assert subscriber.increase_comments_count.__name__ in handlers
-    assert subscriber.update_comments_count_after_visiblity_change.__name__ in handlers
+    assert subscriber.update_comments_count_after_visibility_change.__name__ in handlers
 
 

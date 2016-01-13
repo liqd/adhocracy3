@@ -297,7 +297,7 @@ def decrease_comments_count(event):
     update_comments_count(comment_version, -1, event.registry)
 
 
-def update_comments_count_after_visiblity_change(event):
+def update_comments_count_after_visibility_change(event):
     """Update comments_count in lineage after visibility change."""
     visibility = get_visibility_change(event)
     if visibility == VisibilityChange.concealed:
@@ -383,7 +383,7 @@ def includeme(config):
     config.add_subscriber(decrease_comments_count,
                           ISheetBackReferenceRemoved,
                           event_isheet=ICommentable)
-    config.add_subscriber(update_comments_count_after_visiblity_change,
+    config.add_subscriber(update_comments_count_after_visibility_change,
                           IResourceSheetModified,
                           object_iface=IComment,
                           event_isheet=IMetadata)
