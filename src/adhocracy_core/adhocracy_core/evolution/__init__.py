@@ -563,6 +563,12 @@ def add_description_sheet_to_organisations(root):  # pragma: no cover
     migrate_new_sheet(root, IOrganisation, IDescription)
 
 
+@log_migration
+def add_description_sheet_to_processes(root):  # pragma: no cover
+    """Add description sheet to processes."""
+    migrate_new_sheet(root, IProcess, IDescription)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -588,3 +594,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(recreate_all_image_size_downloads)
     config.add_evolution_step(remove_tag_resources)
     config.add_evolution_step(add_description_sheet_to_organisations)
+    config.add_evolution_step(add_description_sheet_to_processes)
