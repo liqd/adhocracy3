@@ -1043,7 +1043,9 @@ multiple times::
     >>> resp_data['errors'][0]['name']
     'data.adhocracy_core.sheets.rate.IRate.object'
     >>> resp_data['errors'][0]['description']
-    'Another rate by the same user already exists'
+    '; Another rate by the same user already exists'
+
+ ...TODO: remove ';' suffix of error description, :mod:`colander` bug
 
 The *subject* of a rate must always be the user that is currently logged in --
 it's not possible to vote for other users::
@@ -1056,7 +1058,7 @@ it's not possible to vote for other users::
     >>> resp_data['errors'][0]['name']
     'data.adhocracy_core.sheets.rate.IRate.subject'
     >>> resp_data['errors'][0]['description']
-    'Must be the currently logged-in user'
+    '; Must be the currently logged-in user'
 
 
 Batch requests

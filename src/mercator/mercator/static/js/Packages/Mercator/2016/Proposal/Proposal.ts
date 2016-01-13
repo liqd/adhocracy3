@@ -10,6 +10,7 @@ import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 
 import * as AdhMercator2015Proposal from "../../2015/Proposal/Proposal";
 
+import * as SICommentable from "../../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIChallenge from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IChallenge";
 import * as SICommunity from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ICommunity";
 import * as SIConnectionCohesion from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IConnectionCohesion";
@@ -539,24 +540,20 @@ var get = (
                     difference: subs.difference.data[SIDifference.nick].difference,
                     practical: subs.practicalrelevance.data[SIPracticalRelevance.nick].practicalrelevance
                 },
-
-                // FIXME: It is not currently possible to get the
-                // recursive comment count of a subresource. Will be
-                // fixed in the backend.
                 commentCounts: {
-                    proposal: 0,
-                    pitch: 0,
-                    partners: 0,
-                    duration: 0,
-                    challenge: 0,
-                    goal: 0,
-                    plan: 0,
-                    target: 0,
-                    team: 0,
-                    extrainfo: 0,
-                    connectioncohesion: 0,
-                    difference: 0,
-                    practicalrelevance: 0
+                    proposal: proposal.data[SICommentable.nick].comments_count,
+                    pitch: subs.pitch.data[SICommentable.nick].comments_count,
+                    partners: subs.partners.data[SICommentable.nick].comments_count,
+                    duration: subs.duration.data[SICommentable.nick].comments_count,
+                    challenge: subs.challenge.data[SICommentable.nick].comments_count,
+                    goal: subs.goal.data[SICommentable.nick].comments_count,
+                    plan: subs.plan.data[SICommentable.nick].comments_count,
+                    target: subs.target.data[SICommentable.nick].comments_count,
+                    team: subs.team.data[SICommentable.nick].comments_count,
+                    extrainfo: subs.extrainfo.data[SICommentable.nick].comments_count,
+                    connectioncohesion: subs.connectioncohesion.data[SICommentable.nick].comments_count,
+                    difference: subs.difference.data[SICommentable.nick].comments_count,
+                    practicalrelevance: subs.practicalrelevance.data[SICommentable.nick].comments_count
                 }
             };
         });
