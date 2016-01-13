@@ -34,7 +34,7 @@
                     <div class="row">
                         <div class="cols-2">
                             <label>
-                                <span class="label-text">{{ "TR__FIRSTNAME" | translate }} *</span>
+                                <span class="label-text">{{ "TR__MERCATOR_FIRSTNAME" | translate }} *</span>
                                 <input
                                     type="text"
                                     data-ng-change="changefield()"
@@ -49,7 +49,7 @@
                         </div>
                         <div class="cols-2">
                             <label>
-                                <span class="label-text">{{ "TR__LASTNAME" | translate }} *</span>
+                                <span class="label-text">{{ "TR__MERCATOR_LASTNAME" | translate }} *</span>
                                 <input
                                     type="text"
                                     data-ng-model="data.userInfo.lastName"
@@ -397,7 +397,7 @@
                                 name="organization-info-status" value="other"
                                 required="required" />
 
-                            {{ "TR__OTHER" | translate }}<span data-ng-if="data.organizationInfo.status == 'other'">.
+                            {{ "TR__MERCATOR_16_OTHER" | translate }}<span data-ng-if="data.organizationInfo.status == 'other'">.
                                 {{ "TR__PLEASE_SPECIFY" | translate }} *</span>
                         </label>
 
@@ -609,7 +609,7 @@
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__WEBSITE" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_16_WEBSITE" | translate }}</span>
                                 <input
                                     type="url"
                                     data-ng-model="data.partners.partner1.website"
@@ -620,7 +620,7 @@
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__COUNTRY" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_16_COUNTRY" | translate }}</span>
                                 <country-select
                                     data-ng-model="data.partners.partner1.country"
                                     data-name="introduction-partner1-country"
@@ -636,7 +636,7 @@
                                     name="introduction-partner2-name" />
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__WEBSITE" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_16_WEBSITE" | translate }}</span>
                                 <input
                                     type="url"
                                     data-ng-model="data.partners.partner2.website"
@@ -647,7 +647,7 @@
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__COUNTRY" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_16_COUNTRY" | translate }}</span>
                                 <country-select
                                     data-ng-model="data.partners.partner2.country"
                                     data-name="introduction-partner2-country"
@@ -663,7 +663,7 @@
                                     name="introduction-partner3-name" />
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__WEBSITE" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_16_WEBSITE" | translate }}</span>
                                 <input
                                     type="url"
                                     data-ng-model="data.partners.partner3.website"
@@ -674,7 +674,7 @@
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__COUNTRY" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_16_COUNTRY" | translate }}</span>
                                 <country-select
                                     data-ng-model="data.partners.partner3.country"
                                     data-name="introduction-partner3-country"
@@ -803,7 +803,7 @@
                                 type="checkbox"
                                 data-ng-model="data.location.location_is_online"
                                 name="location-location-is-online" />
-                            {{ "TR__ONLINE" | translate }}
+                            {{ "TR__MERCATOR_16_ONLINE" | translate }}
                         </label>
                         <label class="label-text">
                             <input
@@ -1329,7 +1329,7 @@
                                     type="checkbox"
                                     data-ng-model="data.heardFrom.website"
                                     name="heard-from-website" />
-                                {{ "TR__WEBSITE" | translate }}
+                                {{ "TR__MERCATOR_16_WEBSITE" | translate }}
                             </label>
                             <label class="label-text">
                                 <input
@@ -1350,14 +1350,14 @@
                                     type="checkbox"
                                     data-ng-model="data.heardFrom.newsletter"
                                     name="heard-from-newsletter" />
-                                {{ "TR__NEWSLETTER" | translate }}
+                                {{ "TR__MERCATOR_16_NEWSLETTER" | translate }}
                             </label>
                             <label class="label-text">
                                 <input
                                     type="checkbox"
                                     data-ng-model="data.heardFrom.other"
                                     name="heard-from-other" />
-                                {{ "TR__OTHER" | translate }}<span data-ng-if="data.heardFrom.other">.
+                                {{ "TR__MERCATOR_16_OTHER" | translate }}<span data-ng-if="data.heardFrom.other">.
                                     {{ "TR__PLEASE_SPECIFY" | translate }}:</span>
                             </label>
                             <input
