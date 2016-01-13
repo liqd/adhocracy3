@@ -5,10 +5,11 @@
 
     <div data-ng-switch-when="body">
         <adh-resource-actions
-            data-resource-path="{{processUrl}}"
+            data-resource-path="{{proposalUrl}}"
             data-cancel="true"></adh-resource-actions>
-        <adh-mercator-2016-proposal-create
-            data-pool-path="{{processUrl}}">
-        </adh-mercator-2016-proposal-create>
+        <adh-mercator-2016-proposal-edit
+            data-ng-if="proposalUrl"
+            data-path="{{proposalUrl}}">
+        </adh-mercator-2016-proposal-edit>
     </div>
 </div>

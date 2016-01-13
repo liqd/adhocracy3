@@ -19,6 +19,9 @@
         <div class="form-error" data-ng-repeat="error in errors track by $index">
             <p>{{ error | adhFormatError | translate }}</p>
         </div>
+        <section class="mercator-proposal-form-section mercator-proposal-form-section-info" data-ng-if="create">
+            {{ "TR__MERCATOR_PROPOSAL_2016_SUBMISSION_DEADLINE" | translate }}
+        </section>
 
         <!-- SECTION 1 user info -->
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalAboutYouForm" id="mercator-proposal-about-you">
@@ -735,7 +738,7 @@
                     </div>
                 </div><!-- /.annotated-section-body -->
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
-                    {{ "TR__MERCATOR_PROPOSAL_NO_INFLUENCE" | translate }}
+                    {{ "TR__MERCATOR_PROPOSAL_TOPIC_ANNOTATION" | translate }}
                 </div>
             </div>
             <!-- duration -->
@@ -748,6 +751,7 @@
                             min="0"
                             data-ng-model="data.duration"
                             name="introduction-duration"
+                            maxlength="26"
                             required="required" />
 
                         <span
@@ -1071,7 +1075,7 @@
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     <span data-adh-html-translate="TR__MERCATOR_PROPOSAL_STRENGTHEN_ANNOTATION" data-translate-templates="{
-                    link: '&lt;a data-ng-href=&quot;&quot; target=&quot;_blank&quot;&gt;{{ content }}&lt;/a&gt;'
+                    link: '&lt;a data-ng-href=&quot;\\{\\{ selection_criteria_link \\}\\}&quot; target=&quot;_blank&quot;&gt;{{ content }}&lt;/a&gt;'
                     }"></span>
                 </div>
             </div><!-- /.annotated-section -->
@@ -1098,7 +1102,7 @@
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     <span data-adh-html-translate="TR__MERCATOR_PROPOSAL_DIFFERENCE_ANNOTATION" data-translate-templates="{
-                    link: '&lt;a data-ng-href=&quot;&quot; target=&quot;_blank&quot;&gt;{{ content }}&lt;/a&gt;'
+                    link: '&lt;a data-ng-href=&quot;\\{\\{ selection_criteria_link \\}\\}&quot; target=&quot;_blank&quot;&gt;{{ content }}&lt;/a&gt;'
                     }"></span>
                 </div><!-- /.annotated-section-annotation mercator-proposal-form-annotation -->
             </div><!-- /.annotated-section -->
@@ -1125,7 +1129,7 @@
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     <span data-adh-html-translate="TR__MERCATOR_PROPOSAL_PRACTICAL_ANNOTATION" data-translate-templates="{
-                    link: '&lt;a data-ng-href=&quot;&quot; target=&quot;_blank&quot;&gt;{{ content }}&lt;/a&gt;'
+                    link: '&lt;a data-ng-href=&quot;\\{\\{ selection_criteria_link \\}\\}&quot; target=&quot;_blank&quot;&gt;{{ content }}&lt;/a&gt;'
                     }"></span>
                 </div><!--/.annotated-section-annotation mercator-proposal-form-annotation -->
             </div><!-- /.annotated-section -->
@@ -1151,6 +1155,7 @@
                             name="finance-budget"
                             placeholder="{{ 'TR__MERCATOR_PROPOSAL_TOTAL_BUDGET_PLACEHOLDER' | translate }}"
                             min="0"
+                            maxlength="26"
                             required="required" />
 
                         <span
@@ -1170,7 +1175,7 @@
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     <span data-adh-html-translate="TR__MERCATOR_PROPOSAL_TOTAL_BUDGET_ANNOTATION_2016" data-translate-templates="{
-                    link: '&lt;a data-ng-href=&quot;&quot; target=&quot;_blank&quot;&gt;{{ content }}&lt;/a&gt;'
+                    link: '&lt;a data-ng-href=&quot;\\{\\{ financial_plan_link \\}\\}&quot; target=&quot;_blank&quot;&gt;{{ content }}&lt;/a&gt;'
                     }"></span>
                 </div><!--/.annotated-section-annotation -->
             </div><!--/.annotated-section -->
@@ -1308,7 +1313,7 @@
                             placeholder="{{ 'TR__MAX_CHARS_500' | translate }}"></textarea>
                     </label>
 
-                    <div data-ng-if="create === 'true'">
+                    <div data-ng-if="create">
                         <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_HEARD_FROM_LABEL" | translate }} *</span>
 
                         <div data-ng-class="{ 'ng-invalid': showHeardFromError() }">

@@ -25,8 +25,10 @@
                 <i class="icon-speechbubble-document"></i> {{ data.commentCounts.proposal }}
             </a>
         </h1>
-        <div data-ng-if="selectedTopics">
-            {{ "TR__MERCATOR_TOPIC" | translate }}: <em><span class="topic" data-ng-repeat="topic in selectedTopics">{{ topic | translate }}{{$last ? '' : ', '}}</span></em>
+        <div data-ng-if="data.selectedTopics">
+            {{ "TR__MERCATOR_TOPIC" | translate }}: <em><span class="topic" data-ng-repeat="topic in data.selectedTopics">{{ topic | translate }}{{$last ? '' : ', '}}</span>
+            <span data-ng-if="data.topic.other">, {{data.topic_other}}</span>
+            </em>
         </div>
     </div>
 
@@ -113,7 +115,7 @@
                             <h3>{{ "TR__MERCATOR_PROPOSAL_LOCATION_LABEL" | translate }}:</h3>
                             <ul class="inline-boxes">
                                 <li data-ng-if="data.location.location_is_online" class="inline-box-online">{{ "TR__ONLINE" | translate }}</li>
-                                <li data-ng-if="data.location.location_is_specific">{{ data.location.location_is_specific }}</li>
+                                <li data-ng-if="data.location.location_is_specific">{{ data.location.location_specific }}</li>
                                 <li data-ng-if="data.location.location_is_linked_to_ruhr">{{ "TR__MERCATOR_PROPOSAL_RUHR" | translate }}</li>
                                 <li data-ng-if="data.finance.other_sources">{{ data.finance.otherSources }}</li>
                             </ul>

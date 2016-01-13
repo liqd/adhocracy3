@@ -118,13 +118,6 @@ export var init = (config : AdhConfig.IService, metaApi) => {
                 return {
                     template: "<adh-page-wrapper><h1>404 - Not Found</h1></adh-page-wrapper>"
                 };
-            })
-            // FIXME: should be full urls. (but seems to work)
-            .space("user", {
-                resourceUrl: "/principals/users/"
-            })
-            .space("content", {
-                resourceUrl: "/mercator/"
             });
     }]);
     app.config(["$compileProvider", ($compileProvider) => {
