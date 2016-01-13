@@ -28,6 +28,7 @@ from adhocracy_core.resources.badge import IBadgeAssignmentsService
 from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.resources.comment import ICommentVersion
+from adhocracy_core.resources.organisation import IOrganisation
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IUsersService
@@ -38,6 +39,7 @@ from adhocracy_core.resources.relation import add_relationsservice
 from adhocracy_core.sheets.asset import IHasAssetPool
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.badge import IHasBadgesPool
+from adhocracy_core.sheets.description import IDescription
 from adhocracy_core.sheets.image import IImageReference
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.principal import IUserExtended
@@ -555,6 +557,12 @@ def remove_tag_resources(root):  # pragma: no cover
                         'FIRST': item[first_version]})
 
 
+@log_migration
+def add_description_sheet_to_organisations(root):  # pragma: no cover
+    """Add description sheet to organisations."""
+    migrate_new_sheet(root, IOrganisation, IDescription)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -579,3 +587,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(update_asset_download_children)
     config.add_evolution_step(recreate_all_image_size_downloads)
     config.add_evolution_step(remove_tag_resources)
+    config.add_evolution_step(add_description_sheet_to_organisations)

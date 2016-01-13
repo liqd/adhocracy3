@@ -3,6 +3,7 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.pool import pool_meta
 from adhocracy_core.resources.process import IProcess
+from adhocracy_core.sheets.description import IDescription
 
 
 class IOrganisation(IPool):
@@ -16,7 +17,7 @@ organisation_meta = pool_meta._replace(
     element_types=(IProcess,
                    IOrganisation,
                    ),
-)
+)._add(basic_sheets=(IDescription,))
 
 
 def includeme(config):
