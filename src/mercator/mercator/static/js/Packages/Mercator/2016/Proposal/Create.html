@@ -397,7 +397,7 @@
                                 name="organization-info-status" value="other"
                                 required="required" />
 
-                            {{ "TR__MERCATOR_16_OTHER" | translate }}<span data-ng-if="data.organizationInfo.status == 'other'">.
+                            {{ "TR__MERCATOR_2016_OTHER" | translate }}<span data-ng-if="data.organizationInfo.status == 'other'">.
                                 {{ "TR__PLEASE_SPECIFY" | translate }} *</span>
                         </label>
 
@@ -609,7 +609,7 @@
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_16_WEBSITE" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_2016_WEBSITE" | translate }}</span>
                                 <input
                                     type="url"
                                     data-ng-model="data.partners.partner1.website"
@@ -620,7 +620,7 @@
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_16_COUNTRY" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_2016_COUNTRY" | translate }}</span>
                                 <country-select
                                     data-ng-model="data.partners.partner1.country"
                                     data-name="introduction-partner1-country"
@@ -636,7 +636,7 @@
                                     name="introduction-partner2-name" />
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_16_WEBSITE" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_2016_WEBSITE" | translate }}</span>
                                 <input
                                     type="url"
                                     data-ng-model="data.partners.partner2.website"
@@ -647,7 +647,7 @@
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_16_COUNTRY" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_2016_COUNTRY" | translate }}</span>
                                 <country-select
                                     data-ng-model="data.partners.partner2.country"
                                     data-name="introduction-partner2-country"
@@ -663,7 +663,7 @@
                                     name="introduction-partner3-name" />
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_16_WEBSITE" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_2016_WEBSITE" | translate }}</span>
                                 <input
                                     type="url"
                                     data-ng-model="data.partners.partner3.website"
@@ -674,7 +674,7 @@
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
                             <label>
-                                <span class="label-text">{{ "TR__MERCATOR_16_COUNTRY" | translate }}</span>
+                                <span class="label-text">{{ "TR__MERCATOR_2016_COUNTRY" | translate }}</span>
                                 <country-select
                                     data-ng-model="data.partners.partner3.country"
                                     data-name="introduction-partner3-country"
@@ -687,9 +687,15 @@
                         </label>
                     </fieldset>
                 </div>
+                <div class="annotated-section-annotation mercator-proposal-form-annotation">
+                    {{ "TR__MERCATOR_2016_PARTNERS_ANNOTATION" | translate }}
+                </div>
+            </div>
+
+            <div data-ng-if="data.partners.hasOther" class="annotated-section">
                 <div class="annotated-section-body">
-                    <fieldset data-ng-if="data.partners.hasPartners === 'true'">
-                        <label data-ng-if="data.partners.hasOther">
+                    <fieldset>
+                        <label>
                             <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_PARTNERS_OTHER_SPECIFY" | translate }} *</span>
                             <textarea
                                 data-msd-elastic=""
@@ -701,7 +707,7 @@
                     </fieldset>
                 </div>
 
-                <div data-ng-if="data.partners.hasOther" class="annotated-section-annotation mercator-proposal-form-annotation">
+                <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     {{ "TR__MERCATOR_PROPOSAL_PARTNERS_OTHER_ANNOTATION" | translate }}
                 </div>
             </div><!-- /.annotated-section -->
@@ -803,7 +809,7 @@
                                 type="checkbox"
                                 data-ng-model="data.location.location_is_online"
                                 name="location-location-is-online" />
-                            {{ "TR__MERCATOR_16_ONLINE" | translate }}
+                            {{ "TR__MERCATOR_2016_ONLINE" | translate }}
                         </label>
                         <label class="label-text">
                             <input
@@ -1289,7 +1295,7 @@
                 </div><!--/.annotated-section-body -->
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
-                    {{ "TR__MERCATOR_PROPOSAL_FINANCE_GRANTED_ANNOTATION" | translate }}
+                    {{ "TR__MERCATOR_2016_PROPOSAL_FINANCE_GRANTED_ANNOTATION" | translate }}
                 </div><!--/.annotated-section-annotation mercator-proposal-form-annotation -->
             </div><!--/.annotated-section -->
         </section>
@@ -1329,7 +1335,7 @@
                                     type="checkbox"
                                     data-ng-model="data.heardFrom.website"
                                     name="heard-from-website" />
-                                {{ "TR__MERCATOR_16_WEBSITE" | translate }}
+                                {{ "TR__MERCATOR_2016_WEBSITE" | translate }}
                             </label>
                             <label class="label-text">
                                 <input
@@ -1350,14 +1356,14 @@
                                     type="checkbox"
                                     data-ng-model="data.heardFrom.newsletter"
                                     name="heard-from-newsletter" />
-                                {{ "TR__MERCATOR_16_NEWSLETTER" | translate }}
+                                {{ "TR__MERCATOR_2016_NEWSLETTER" | translate }}
                             </label>
                             <label class="label-text">
                                 <input
                                     type="checkbox"
                                     data-ng-model="data.heardFrom.other"
                                     name="heard-from-other" />
-                                {{ "TR__MERCATOR_16_OTHER" | translate }}<span data-ng-if="data.heardFrom.other">.
+                                {{ "TR__MERCATOR_2016_OTHER" | translate }}<span data-ng-if="data.heardFrom.other">.
                                     {{ "TR__PLEASE_SPECIFY" | translate }}:</span>
                             </label>
                             <input

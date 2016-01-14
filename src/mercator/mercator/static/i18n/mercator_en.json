@@ -193,9 +193,11 @@
     "TR__USERS_PROPOSALS": "{name}'s proposals",
     "TR__MERCATOR_FIRSTNAME": "First name",
     "TR__MERCATOR_LASTNAME": "Last name",
-    "TR__MERCATOR_16_OTHER": "Other",
-    "TR__MERCATOR_16_WEBSITE": "Website",
-    "TR__MERCATOR_16_COUNTRY": "Country",
-    "TR__MERCATOR_16_ONLINE": "Online",
-    "TR__MERCATOR_16_NEWSLETTER": "Newsletter"
+    "TR__MERCATOR_2016_OTHER": "Other",
+    "TR__MERCATOR_2016_WEBSITE": "Website",
+    "TR__MERCATOR_2016_COUNTRY": "Country",
+    "TR__MERCATOR_2016_ONLINE": "Online",
+    "TR__MERCATOR_2016_NEWSLETTER": "Newsletter",
+    "TR__MERCATOR_2016_PARTNERS_ANNOTATION": "Your answer to this question does not influence the selection process. It simply helps us to better understand your idea.",
+    "TR__MERCATOR_2016_PROPOSAL_FINANCE_GRANTED_ANNOTATION": "If yes, have these already been secured? "
 }
