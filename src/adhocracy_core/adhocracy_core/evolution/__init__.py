@@ -572,6 +572,23 @@ def set_comment_count(root):  # pragma: no cover
         update_comments_count(comment, 1, registry)
 
 
+def remove_duplicated_group_ids(root):  # pragma: no cover
+    """Remove duplicate group_ids from users."""
+    from adhocracy_core.resources.principal import IUser
+    catalogs = find_service(root, 'catalogs')
+    users = _search_for_interfaces(catalogs, IUser)
+    count = len(users)
+    for index, user in enumerate(users):
+        logger.info('Migrate user resource{0} of {1}'.format(index + 1, count))
+        group_ids = getattr(user, 'group_ids', [])
+        if not group_ids:
+            continue
+        unique_group_ids = list(set(group_ids))
+        if len(unique_group_ids) < len(group_ids):
+            logger.info('Remove duplicated groupd_ids for {0}'.format(user))
+            user.group_ids = unique_group_ids
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -597,3 +614,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(recreate_all_image_size_downloads)
     config.add_evolution_step(remove_tag_resources)
     config.add_evolution_step(set_comment_count)
+    config.add_evolution_step(remove_duplicated_group_ids)
