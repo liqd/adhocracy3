@@ -321,7 +321,7 @@ var encodeCaptchaAudio = (
     data : ArrayBuffer
 ) : string => {
     if (data) {
-        var result : string = "data:audio/l16;base64, ";
+        var result : string = "data:audio/wav;base64, ";
         result += arrayBufferToBase64(data);
         return $sce.trustAsResourceUrl(result);
     } else {
