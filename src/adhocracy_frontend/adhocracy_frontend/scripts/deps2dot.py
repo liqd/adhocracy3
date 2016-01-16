@@ -255,6 +255,8 @@ def print_dot(modules):
 def parse_args():
     """Parse command line argumants."""
     parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--input', default=None)
+
     parser.add_argument('--min-rank', type=int, default=0)
     parser.add_argument('--max-rank', type=int, default=None)
     parser.add_argument('-x', '--exclude', nargs='*', default=[])
@@ -276,14 +278,19 @@ def parse_args():
 def main():
     """Print module graph in DOT format to stdout."""
     args = parse_args()
-    modules = get_modules()
-    max_rank = add_rank(modules)
-    if args.max_rank is None:
-        args.max_rank = max_rank
-    _filter(modules, args)
-    add_counts(modules)
-    add_recursive_counts(modules)
-    add_category(modules)
+    if args.input is None:
+        modules = get_modules()
+
+        max_rank = add_rank(modules)
+        if args.max_rank is None:
+            args.max_rank = max_rank
+        _filter(modules, args)
+        add_counts(modules)
+        add_recursive_counts(modules)
+        add_category(modules)
+    else:
+        with open(args.input) as fh:
+            modules = json.load(fh)
 
     if args.matrix:
         m, names = adjacency_matrix(modules, direct=args.direct)
