@@ -133,12 +133,49 @@ def include(module, args):
     return True
 
 
+def adjacency_matrix(modules, direct=False):
+    keys = list(modules.keys())
+    keys.sort(key=lambda k: (-modules[k]['recursive_export_count'], k))
+    names = [modules[key]['name'] for key in keys]
+
+    m = []
+    for row_key in keys:
+        module = modules[row_key]
+        row = []
+        for column_key in keys:
+            if direct:
+                row.append(column_key in module['imports'])
+            else:
+                row.append(column_key in module['recursive_imports'])
+        m.append(row)
+
+    return m, names
+
+
+def draw_matrix(matrix, names):
+    density = sum([sum(row) for row in matrix]) / float(len(matrix) ** 2)
+    s = 'P1\n'
+    s += '# density: %f\n' % density
+    for name in names:
+        s += '# %s\n' % name
+    n = len(matrix)
+    s += '%i %i\n' % (n, n)
+    for row in matrix:
+        s += ' '.join([str(int(i)) for i in row]) + '\n'
+    return s
+
+
 def parse_args():
     """Parse command line argumants."""
     parser = argparse.ArgumentParser()
     parser.add_argument('--min-rank', type=int, default=0)
     parser.add_argument('--max-rank', type=int, default=None)
     parser.add_argument('-x', '--exclude', nargs='*', default=[])
+
+    parser.add_argument('--matrix', action='store_true', help='Output '
+        'dependency matrix as PBM. If you want to only include direct '
+        'dependencies, use the --direct switch')
+    parser.add_argument('--direct', action='store_true')
 
     return parser.parse_args()
 
@@ -151,30 +188,34 @@ def main():
     add_recursive_counts(modules)
     max_rank = add_rank(modules)
 
-    if args.max_rank is None:
-        args.max_rank = max_rank
+    if args.matrix:
+        m, names = adjacency_matrix(modules, direct=args.direct)
+        print(draw_matrix(m, names))
+    else:
+        if args.max_rank is None:
+            args.max_rank = max_rank
 
-    print('digraph adhocracy_frontend {')
-    print('  graph [splines=ortho];')
+        print('digraph adhocracy_frontend {')
+        print('  graph [splines=ortho];')
 
-    for rank in range(args.min_rank, args.max_rank):
-        print('  subgraph rank%i {' % rank)
-        print('    rank = same;')
-        for path, module in modules.items():
-            if include(module, args) and module['rank'] == rank:
-                print(render_module(module))
-        print('  }')
+        for rank in range(args.min_rank, args.max_rank):
+            print('  subgraph rank%i {' % rank)
+            print('    rank = same;')
+            for path, module in modules.items():
+                if include(module, args) and module['rank'] == rank:
+                    print(render_module(module))
+            print('  }')
 
-    for module in modules.values():
-        if include(module, args):
-            for imp in module['imports']:
-                if include(modules[imp], args):
-                    print('  %s->%s [color=%s];' % (
-                        modules[imp]['name'],
-                        module['name'],
-                        modules[imp]['color']))
+        for module in modules.values():
+            if include(module, args):
+                for imp in module['imports']:
+                    if include(modules[imp], args):
+                        print('  %s->%s [color=%s];' % (
+                            modules[imp]['name'],
+                            module['name'],
+                            modules[imp]['color']))
 
-    print('}')
+        print('}')
 
 
 if __name__ == '__main__':
