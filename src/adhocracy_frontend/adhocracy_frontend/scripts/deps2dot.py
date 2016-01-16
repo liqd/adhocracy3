@@ -220,6 +220,28 @@ def print_stats(modules, verbose=True):
     print('max rank: %i' % max((m['rank'] for m in modules.values())))
 
 
+def print_dot(modules, args):
+    print('digraph adhocracy_frontend {')
+    print('  graph [splines=ortho];')
+
+    for rank in range(args.min_rank, args.max_rank + 1):
+        print('  subgraph rank%i {' % rank)
+        print('    rank = same;')
+        for path, module in modules.items():
+            if module['rank'] == rank:
+                print(render_module(module))
+        print('  }')
+
+    for module in modules.values():
+        for imp in module['imports']:
+            print('  %s->%s [color=%s];' % (
+                modules[imp]['name'],
+                module['name'],
+                modules[imp]['color']))
+
+    print('}')
+
+
 def parse_args():
     """Parse command line argumants."""
     parser = argparse.ArgumentParser()
@@ -257,25 +279,7 @@ def main():
     elif args.stats:
         print_stats(modules, verbose=args.verbose)
     else:
-        print('digraph adhocracy_frontend {')
-        print('  graph [splines=ortho];')
-
-        for rank in range(args.min_rank, args.max_rank + 1):
-            print('  subgraph rank%i {' % rank)
-            print('    rank = same;')
-            for path, module in modules.items():
-                if module['rank'] == rank:
-                    print(render_module(module))
-            print('  }')
-
-        for module in modules.values():
-            for imp in module['imports']:
-                print('  %s->%s [color=%s];' % (
-                    modules[imp]['name'],
-                    module['name'],
-                    modules[imp]['color']))
-
-        print('}')
+        print_dot(modules, args)
 
 
 if __name__ == '__main__':
