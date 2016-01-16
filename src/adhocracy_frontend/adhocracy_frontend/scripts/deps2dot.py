@@ -7,8 +7,17 @@ import subprocess
 import os
 import re
 import argparse
+import json
 
 CATEGORIES = ['peripheral', 'control', 'shared', 'core']
+
+
+class SetEncoder(json.JSONEncoder):
+    # https://stackoverflow.com/questions/8230315
+    def default(self, obj):
+       if isinstance(obj, set):
+          return list(obj)
+       return json.JSONEncoder.default(self, obj)
 
 
 def normpath(path):
@@ -257,6 +266,8 @@ def parse_args():
         'some general stats')
     parser.add_argument('-v', '--verbose', action='store_true')
 
+    parser.add_argument('--dump', action='store_true')
+
     return parser.parse_args()
 
 
@@ -277,6 +288,8 @@ def main():
         print_matrix(m, names)
     elif args.stats:
         print_stats(modules, verbose=args.verbose)
+    elif args.dump:
+        print(json.dumps(modules, indent=2, separators=(',', ': '), sort_keys=True, ensure_ascii=False, cls=SetEncoder))
     else:
         print_dot(modules, args)
 
