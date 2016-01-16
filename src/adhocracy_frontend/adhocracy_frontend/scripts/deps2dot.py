@@ -51,8 +51,7 @@ def get_modules():
 
             modules[normpath(path)] = {
                 'name': name,
-                'imports': imports,
-                'color': color(name),
+                'imports': imports
             }
 
     return modules
@@ -155,7 +154,7 @@ def add_category(modules):
 
 def render_module(module):
     """Render a module to string."""
-    opts = ['color=%s' % module['color']]
+    opts = ['color=%s' % color(module['name'])]
 
     if module['import_count'] == 0:
         opts.append('shape=box')
@@ -237,7 +236,7 @@ def print_dot(modules, args):
             print('  %s->%s [color=%s];' % (
                 modules[imp]['name'],
                 module['name'],
-                modules[imp]['color']))
+                color(modules[imp]['name'])))
 
     print('}')
 
