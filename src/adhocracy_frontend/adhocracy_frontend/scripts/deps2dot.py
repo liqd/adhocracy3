@@ -8,6 +8,8 @@ import os
 import re
 import argparse
 
+CATEGORIES = ['peripheral', 'control', 'shared', 'core']
+
 
 def normpath(path):
     """Strip everything until 'Packages' from the beginning of the path."""
@@ -128,15 +130,13 @@ def add_category(modules):
     average_in = sum(m['fan_in'] for m in modules.values()) / float(n)
     average_out = sum(m['fan_out'] for m in modules.values()) / float(n)
 
-    categories = ['peripheral', 'control', 'shared', 'core']
-
     for module in modules.values():
         i = 0
         if module['fan_in'] > average_in:
             i += 1
         if module['fan_out'] > average_out:
             i += 2
-        module['category'] = categories[i]
+        module['category'] = CATEGORIES[i]
 
 
 def render_module(module):
@@ -180,9 +180,7 @@ def adjacency_matrix(modules, direct=False):
 
 
 def draw_matrix(matrix, names):
-    density = sum([sum(row) for row in matrix]) / float(len(matrix) ** 2)
     s = 'P1\n'
-    s += '# density: %f\n' % density
     for name in names:
         s += '# %s\n' % name
     n = len(matrix)
@@ -190,6 +188,23 @@ def draw_matrix(matrix, names):
     for row in matrix:
         s += ' '.join([str(int(i)) for i in row]) + '\n'
     return s
+
+
+def stats(modules, verbose=True):
+    n = len(modules)
+    print('total modules: %i' % n)
+    for category in CATEGORIES:
+        mods = [m for m in modules.values() if m['category'] == category]
+        k = len(mods)
+        names = sorted([m['name'] for m in mods])
+        print('%s modules: %i, %i%%' % (category, k, 100 * k / n))
+        if verbose:
+            for name in names:
+                print('  %s' % name)
+    matrix, _names = adjacency_matrix(modules)
+    propagation_cost = sum([sum(row) for row in matrix]) / n
+    print('propagation cost: %i, %i%%' % (propagation_cost, 100 * propagation_cost / n))
+    print('max rank: %i' % max((m['rank'] for m in modules.values())))
 
 
 def parse_args():
@@ -203,6 +218,10 @@ def parse_args():
         'dependency matrix as PBM. If you want to only include direct '
         'dependencies, use the --direct switch')
     parser.add_argument('--direct', action='store_true')
+
+    parser.add_argument('--stats', action='store_true', help='Output '
+        'some general stats')
+    parser.add_argument('-v', '--verbose', action='store_true')
 
     return parser.parse_args()
 
@@ -219,6 +238,8 @@ def main():
     if args.matrix:
         m, names = adjacency_matrix(modules, direct=args.direct)
         print(draw_matrix(m, names))
+    elif args.stats:
+        stats(modules, verbose=args.verbose)
     else:
         if args.max_rank is None:
             args.max_rank = max_rank
