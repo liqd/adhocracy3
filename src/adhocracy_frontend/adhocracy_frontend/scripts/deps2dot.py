@@ -228,11 +228,13 @@ def print_stats(modules, verbose=True):
     print('max rank: %i' % max((m['rank'] for m in modules.values())))
 
 
-def print_dot(modules, args):
+def print_dot(modules):
+    ranks = [m['rank'] for m in modules.values()]
+
     print('digraph adhocracy_frontend {')
     print('  graph [splines=ortho];')
 
-    for rank in range(args.min_rank, args.max_rank + 1):
+    for rank in range(min(ranks), max(ranks) + 1):
         print('  subgraph rank%i {' % rank)
         print('    rank = same;')
         for path, module in modules.items():
@@ -291,7 +293,7 @@ def main():
     elif args.dump:
         print(json.dumps(modules, indent=2, separators=(',', ': '), sort_keys=True, ensure_ascii=False, cls=SetEncoder))
     else:
-        print_dot(modules, args)
+        print_dot(modules)
 
 
 if __name__ == '__main__':
