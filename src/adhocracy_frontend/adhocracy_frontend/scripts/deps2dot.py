@@ -88,9 +88,9 @@ def add_recursive_counts(modules):
 
     for module in modules.values():
         set_recursive_imports(module)
-        module['recursive_import_count'] = len(module['recursive_imports'])
+        module['fan_in'] = len(module['recursive_imports'])
         set_recursive_exports(module)
-        module['recursive_export_count'] = len(module['recursive_exports'])
+        module['fan_out'] = len(module['recursive_exports'])
 
 
 def add_rank(modules):
@@ -135,7 +135,7 @@ def include(module, args):
 
 def adjacency_matrix(modules, direct=False):
     keys = list(modules.keys())
-    keys.sort(key=lambda k: (-modules[k]['recursive_export_count'], k))
+    keys.sort(key=lambda k: (-modules[k]['fan_out'], k))
     names = [modules[key]['name'] for key in keys]
 
     m = []
