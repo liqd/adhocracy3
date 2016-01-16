@@ -67,6 +67,32 @@ def add_counts(modules):
         module['export_count'] = len(module['exports'])
 
 
+def add_recursive_counts(modules):
+    def set_recursive_imports(module):
+        k = 'recursive_imports'
+        if k not in module:
+            module[k] = set(module['imports'])
+            for key in module['imports']:
+                imp = modules[key]
+                set_recursive_imports(imp)
+                module[k] = module[k].union(imp[k])
+
+    def set_recursive_exports(module):
+        k = 'recursive_exports'
+        if k not in module:
+            module[k] = set(module['exports'])
+            for key in module['exports']:
+                exp = modules[key]
+                set_recursive_exports(exp)
+                module[k] = module[k].union(exp[k])
+
+    for module in modules.values():
+        set_recursive_imports(module)
+        module['recursive_import_count'] = len(module['recursive_imports'])
+        set_recursive_exports(module)
+        module['recursive_export_count'] = len(module['recursive_exports'])
+
+
 def add_rank(modules):
     """Add rank to an existing dict of modules."""
     done = []
@@ -122,6 +148,7 @@ def main():
     args = parse_args()
     modules = get_modules()
     add_counts(modules)
+    add_recursive_counts(modules)
     max_rank = add_rank(modules)
 
     if args.max_rank is None:
