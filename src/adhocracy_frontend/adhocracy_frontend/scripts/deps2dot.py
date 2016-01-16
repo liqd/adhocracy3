@@ -193,18 +193,17 @@ def adjacency_matrix(modules, direct=False):
     return m, names
 
 
-def draw_matrix(matrix, names):
-    s = 'P1\n'
+def print_matrix(matrix, names):
+    print('P1')
     for name in names:
-        s += '# %s\n' % name
+        print('# %s' % name)
     n = len(matrix)
-    s += '%i %i\n' % (n, n)
+    print('%i %i' % (n, n))
     for row in matrix:
-        s += ' '.join([str(int(i)) for i in row]) + '\n'
-    return s
+        print(' '.join([str(int(i)) for i in row]))
 
 
-def stats(modules, verbose=True):
+def print_stats(modules, verbose=True):
     n = len(modules)
     print('total modules: %i' % n)
     for category in CATEGORIES:
@@ -254,9 +253,9 @@ def main():
 
     if args.matrix:
         m, names = adjacency_matrix(modules, direct=args.direct)
-        print(draw_matrix(m, names))
+        print_matrix(m, names)
     elif args.stats:
-        stats(modules, verbose=args.verbose)
+        print_stats(modules, verbose=args.verbose)
     else:
         print('digraph adhocracy_frontend {')
         print('  graph [splines=ortho];')
