@@ -1,4 +1,7 @@
-"""Extract graph of angular module dependencies in DOT format."""
+"""Extract informaton about angular module dependencies.
+
+For some of the concepts, see http://almossawi.com/firefox/
+"""
 
 import subprocess
 import os
@@ -68,6 +71,10 @@ def add_counts(modules):
 
 
 def add_recursive_counts(modules):
+    """Add fan_in/fan_out to an existing dict of modules.
+
+    These are like import_count/export_count, but recursive.
+    """
     def set_recursive_imports(module):
         k = 'recursive_imports'
         if k not in module:
@@ -94,7 +101,10 @@ def add_recursive_counts(modules):
 
 
 def add_rank(modules):
-    """Add rank to an existing dict of modules."""
+    """Add rank to an existing dict of modules.
+
+    The rank of a module is always greater that that of its dependencies.
+    """
     done = []
 
     while len(done) < len(modules):
@@ -113,6 +123,7 @@ def add_rank(modules):
 
 
 def add_category(modules):
+    """Mark a module as 'peripheral', 'control', 'shared', or 'core'."""
     n = len(modules)
     average_in = sum(m['fan_in'] for m in modules.values()) / float(n)
     average_out = sum(m['fan_out'] for m in modules.values()) / float(n)
