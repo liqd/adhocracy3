@@ -261,7 +261,7 @@ def main():
         print('digraph adhocracy_frontend {')
         print('  graph [splines=ortho];')
 
-        for rank in range(args.min_rank, args.max_rank):
+        for rank in range(args.min_rank, args.max_rank + 1):
             print('  subgraph rank%i {' % rank)
             print('    rank = same;')
             for path, module in modules.items():
