@@ -55,13 +55,16 @@ def get_modules():
 
 def add_counts(modules):
     """Add import_count/export_count to an existing dict of modules."""
-    for path, module in modules.items():
-        module['import_count'] = len(module['imports'])
-        module['export_count'] = 0
+    for module in modules.values():
+        module['exports'] = set()
 
     for path, module in modules.items():
         for imp in module['imports']:
-            modules[imp]['export_count'] += 1
+            modules[imp]['exports'].add(path)
+
+    for path, module in modules.items():
+        module['import_count'] = len(module['imports'])
+        module['export_count'] = len(module['exports'])
 
 
 def add_rank(modules):
