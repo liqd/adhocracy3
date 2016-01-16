@@ -124,6 +124,20 @@ def add_rank(modules):
     return max([m['rank'] for m in modules.values()])
 
 
+def _filter(modules, args):
+    """Remove some modules from the dict according to command line args."""
+    remove = set()
+    for key, module in modules.items():
+        if not include(module, args):
+            remove.add(key)
+
+    for key in remove:
+        del modules[key]
+
+    for module in modules.values():
+        module['imports'] = [i for i in module['imports'] if i in modules]
+
+
 def add_category(modules):
     """Mark a module as 'peripheral', 'control', 'shared', or 'core'."""
     n = len(modules)
@@ -230,9 +244,12 @@ def main():
     """Print module graph in DOT format to stdout."""
     args = parse_args()
     modules = get_modules()
+    max_rank = add_rank(modules)
+    if args.max_rank is None:
+        args.max_rank = max_rank
+    _filter(modules, args)
     add_counts(modules)
     add_recursive_counts(modules)
-    max_rank = add_rank(modules)
     add_category(modules)
 
     if args.matrix:
@@ -241,9 +258,6 @@ def main():
     elif args.stats:
         stats(modules, verbose=args.verbose)
     else:
-        if args.max_rank is None:
-            args.max_rank = max_rank
-
         print('digraph adhocracy_frontend {')
         print('  graph [splines=ortho];')
 
@@ -251,18 +265,16 @@ def main():
             print('  subgraph rank%i {' % rank)
             print('    rank = same;')
             for path, module in modules.items():
-                if include(module, args) and module['rank'] == rank:
+                if module['rank'] == rank:
                     print(render_module(module))
             print('  }')
 
         for module in modules.values():
-            if include(module, args):
-                for imp in module['imports']:
-                    if include(modules[imp], args):
-                        print('  %s->%s [color=%s];' % (
-                            modules[imp]['name'],
-                            module['name'],
-                            modules[imp]['color']))
+            for imp in module['imports']:
+                print('  %s->%s [color=%s];' % (
+                    modules[imp]['name'],
+                    module['name'],
+                    modules[imp]['color']))
 
         print('}')
 
