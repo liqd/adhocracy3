@@ -112,6 +112,22 @@ def add_rank(modules):
     return max([m['rank'] for m in modules.values()])
 
 
+def add_category(modules):
+    n = len(modules)
+    average_in = sum(m['fan_in'] for m in modules.values()) / float(n)
+    average_out = sum(m['fan_out'] for m in modules.values()) / float(n)
+
+    categories = ['peripheral', 'control', 'shared', 'core']
+
+    for module in modules.values():
+        i = 0
+        if module['fan_in'] > average_in:
+            i += 1
+        if module['fan_out'] > average_out:
+            i += 2
+        module['category'] = categories[i]
+
+
 def render_module(module):
     """Render a module to string."""
     opts = ['color=%s' % module['color']]
@@ -187,6 +203,7 @@ def main():
     add_counts(modules)
     add_recursive_counts(modules)
     max_rank = add_rank(modules)
+    add_category(modules)
 
     if args.matrix:
         m, names = adjacency_matrix(modules, direct=args.direct)
