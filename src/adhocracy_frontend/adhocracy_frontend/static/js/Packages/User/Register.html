@@ -72,12 +72,12 @@
         <div data-ng-if="captcha.enabled">
             <div>
                 <span>
-                    <img data-ng-src="{{ captcha.imageData }}">
+                    <img data-ng-src="{{ captcha.imageData }}" alt="TR__CAPTCHA_ALT" >
                 </span>
                 <span>
                     <input type="checkbox" name="audioCaptchaCheck" data-ng-click="captcha.toggleAudio($event)" />
                     <div data-ng-if="captcha.audioEnabled">
-                        <audio data-ng-src="{{ captcha.audioData }}" controls>
+                        <audio data-ng-src="{{ captcha.audioData }}" controls></audio>
                     </div>
                 </span>
             </div>

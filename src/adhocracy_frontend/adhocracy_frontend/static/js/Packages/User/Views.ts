@@ -252,6 +252,48 @@ var captchaImageAudioIcon : string
     + "zhLpbtFOaVIKifQFiL0QEZGsTueik8tF44RviySYzep0LpYDImXDbWl6In5SuUTTZS/p79x7C+q3"
     + "Vsfvea8s/z/CJ/kkn+STfJJP+sdIXwHavoZF/OPGkQAAAABJRU5ErkJggg==";
 
+var arrayBufferToBase64 = (data : ArrayBuffer) : string => {
+    var binary = "";
+    var buffer = new Uint8Array(data);
+    for (var i = 0; i < buffer.byteLength; i++) {
+        binary += String.fromCharCode(buffer[i]);
+    }
+    return btoa(binary);
+
+    // this variant with tail recursion causes stack to overflow:
+    // return btoa(String.fromCharCode.apply(null, new Uint8Array(data)));
+};
+
+var encodeCaptchaImage = (
+    audioEnabled : boolean,
+    data : ArrayBuffer
+) : string => {
+    var result : string = "data:image/png;base64, ";
+
+    if (audioEnabled) {
+        result += captchaImageAudioIcon;
+    } else if (!data) {
+        result += captchaImageEmpty;
+    } else {
+        result += arrayBufferToBase64(data);
+    }
+
+    return result;
+};
+
+var encodeCaptchaAudio = (
+    $sce : ng.ISCEService,
+    data : ArrayBuffer
+) : string => {
+    if (data) {
+        var result : string = "data:audio/wav;base64, ";
+        result += arrayBufferToBase64(data);
+        return $sce.trustAsResourceUrl(result);
+    } else {
+        return "";
+    }
+};
+
 var fetchCaptchaImage = (
     adhConfig : AdhConfig.IService,
     $sce : ng.ISCEService,
@@ -273,24 +315,7 @@ var fetchCaptchaImage = (
         (exception) => {
             console.log("failed to fetch captcha image");
         });
-}
-
-var encodeCaptchaImage = (
-    audioEnabled : boolean,
-    data : ArrayBuffer
-) : string => {
-    var result : string = "data:image/png;base64, ";
-
-    if (audioEnabled) {
-        result += captchaImageAudioIcon;
-    } else if (!data) {
-        result += captchaImageEmpty;
-    } else {
-        result += arrayBufferToBase64(data);
-    }
-
-    return result;
-}
+};
 
 var fetchCaptchaAudio = (
     adhConfig : AdhConfig.IService,
@@ -314,32 +339,7 @@ var fetchCaptchaAudio = (
         (exception) => {
             console.log("failed to fetch audio captcha");
         });
-}
-
-var encodeCaptchaAudio = (
-    $sce : ng.ISCEService,
-    data : ArrayBuffer
-) : string => {
-    if (data) {
-        var result : string = "data:audio/wav;base64, ";
-        result += arrayBufferToBase64(data);
-        return $sce.trustAsResourceUrl(result);
-    } else {
-        return "";
-    }
-}
-
-var arrayBufferToBase64 = (data : ArrayBuffer) : string => {
-    var binary = "";
-    var buffer = new Uint8Array(data);
-    for (var i = 0; i < buffer.byteLength; i++) {
-        binary += String.fromCharCode(buffer[i]);
-    }
-    return btoa(binary);
-
-    // this variant with tail recursion causes stack to overflow:
-    // return btoa(String.fromCharCode.apply(null, new Uint8Array(data)));
-}
+};
 
 
 export var registerDirective = (
