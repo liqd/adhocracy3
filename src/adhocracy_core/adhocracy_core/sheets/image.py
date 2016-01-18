@@ -2,17 +2,19 @@
 from colander import MappingSchema
 from colander import OneOf
 from colander import required
+
 from adhocracy_core.interfaces import Dimensions
-from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.sheets.asset import IAssetMetadata
-from adhocracy_core.sheets.asset import AssetMetadataSchema
-from adhocracy_core.sheets.asset import asset_metadata_meta
-from adhocracy_core.schema import Reference
-from adhocracy_core.schema import Resource
-from adhocracy_core.schema import SingleLine
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
+from adhocracy_core.schema import Reference
+from adhocracy_core.schema import Resource
+from adhocracy_core.schema import SingleLine
+from adhocracy_core.sheets import add_sheet_to_registry
+from adhocracy_core.sheets import sheet_meta
+from adhocracy_core.sheets.asset import AssetMetadataSchema
+from adhocracy_core.sheets.asset import IAssetMetadata
+from adhocracy_core.sheets.asset import asset_metadata_meta
 
 
 class IImageMetadata(IAssetMetadata):
@@ -61,7 +63,24 @@ image_reference_meta = asset_metadata_meta._replace(
 )
 
 
+class IImageDescription(ISheet):
+    """Marker interface for the image description."""
+
+
+class ImageDescriptionSchema(MappingSchema):
+    """Schema for the image description."""
+
+    description = SingleLine()
+
+
+image_description_meta = sheet_meta._replace(
+    isheet=IImageDescription,
+    schema_class=ImageDescriptionSchema,
+)
+
+
 def includeme(config):
     """Register sheets."""
     add_sheet_to_registry(image_metadata_meta, config.registry)
     add_sheet_to_registry(image_reference_meta, config.registry)
+    add_sheet_to_registry(image_description_meta, config.registry)

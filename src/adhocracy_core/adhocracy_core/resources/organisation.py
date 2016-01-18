@@ -6,6 +6,7 @@ from adhocracy_core.resources.pool import pool_meta
 from adhocracy_core.resources.process import IProcess
 from adhocracy_core.sheets.asset import IHasAssetPool
 from adhocracy_core.sheets.description import IDescription
+from adhocracy_core.sheets.image import IImageDescription
 from adhocracy_core.sheets.image import IImageReference
 
 
@@ -22,6 +23,7 @@ organisation_meta = pool_meta._replace(
                    ),
     after_creation=(add_assets_service,)
 )._add(basic_sheets=(IDescription,
+                     IImageDescription,
                      IImageReference,),
        extended_sheets=(IHasAssetPool,),)
 
