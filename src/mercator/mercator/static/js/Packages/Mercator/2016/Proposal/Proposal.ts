@@ -642,6 +642,9 @@ export var editDirective = (
 
             get($q, adhHttp, adhTopLevelState)(scope.path).then((data) => {
                 scope.data = data;
+
+                scope.data.partners.hasPartners = scope.data.partners.hasPartners ? "true" : "false";
+
                 if (scope.data.organizationInfo.status === "planned_nonprofit") {
                     scope.data.organizationInfo.registrationDateField = data.organizationInfo.registrationDate.substr(0, 7);
                 } else if (scope.data.organizationInfo.status === "registered_nonprofit") {
