@@ -191,7 +191,7 @@ export interface IControllerScope extends IScope {
 /**
  * promise supporters count.
  */
-var countSupporters = (adhHttp : AdhHttp.Service<any>, postPoolPath : string, objectPath : string) : angular.IPromise<number> => {
+export var countSupporters = (adhHttp : AdhHttp.Service<any>, postPoolPath : string, objectPath : string) : angular.IPromise<number> => {
     var query : any = {
         content_type: RIRateVersion.content_type,
         depth: "2",
@@ -211,7 +211,7 @@ var countSupporters = (adhHttp : AdhHttp.Service<any>, postPoolPath : string, ob
 /**
  * promise recursive comments count.
  */
-var countComments = (adhHttp : AdhHttp.Service<any>, postPoolPath : string) : angular.IPromise<number> => {
+export var countComments = (adhHttp : AdhHttp.Service<any>, postPoolPath : string) : angular.IPromise<number> => {
 
     var query : any = {
         content_type: RICommentVersion.content_type,

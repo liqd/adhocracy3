@@ -15,9 +15,10 @@ class TestBadge:
         from adhocracy_core import resources
         from adhocracy_core import sheets
         assert meta.iresource is resources.badge.IBadge
+        assert meta.use_autonaming is False
         assert meta.extended_sheets == (sheets.description.IDescription,
                                         sheets.badge.IBadge,
-                                        )
+                                        sheets.name.IName,)
         assert meta.permission_create == 'create_badge'
 
     @mark.usefixtures('integration')

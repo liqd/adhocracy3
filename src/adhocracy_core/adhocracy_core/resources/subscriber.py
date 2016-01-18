@@ -7,10 +7,12 @@ from os import urandom
 from pyramid.registry import Registry
 from pyramid.request import Request
 from pyramid.settings import asbool
+from pyramid.traversal import find_interface
 from pyramid.i18n import TranslationStringFactory
 from substanced.util import find_service
 
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ISimple
@@ -18,7 +20,12 @@ from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import ISheetReferenceNewVersion
+from adhocracy_core.interfaces import ISheetBackReferenceAdded
+from adhocracy_core.interfaces import ISheetBackReferenceRemoved
 from adhocracy_core.interfaces import IResourceSheetModified
+from adhocracy_core.interfaces import VisibilityChange
+from adhocracy_core.interfaces import search_query
+from adhocracy_core.interfaces import ReferenceComparator
 from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IPasswordReset
@@ -26,22 +33,25 @@ from adhocracy_core.resources.asset import add_metadata
 from adhocracy_core.resources.asset import IAsset
 from adhocracy_core.resources.image import add_image_size_downloads
 from adhocracy_core.resources.image import IImage
+from adhocracy_core.resources.comment import IComment
+from adhocracy_core.resources.comment import ICommentVersion
 from adhocracy_core.sheets.principal import IPermissions
+from adhocracy_core.sheets.tags import ITags
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
 from adhocracy_core.utils import find_graph
-from adhocracy_core.utils import get_following_new_version
-from adhocracy_core.utils import get_last_new_version
+from adhocracy_core.utils import get_changelog_metadata
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import get_iresource
-from adhocracy_core.utils import get_last_version
 from adhocracy_core.utils import get_modification_date
 from adhocracy_core.utils import get_user
+from adhocracy_core.utils import get_visibility_change
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_core.sheets.tags import ITag
 from adhocracy_core.sheets.asset import IAssetData
-
+from adhocracy_core.sheets.comment import ICommentable
+from adhocracy_core.sheets.versions import IVersions
+from adhocracy_core import sheets
 
 logger = getLogger(__name__)
 
@@ -142,9 +152,15 @@ def _get_updated_appstruct(event: ISheetReferenceNewVersion,
 def _get_last_version_created_in_transaction(event: ISheetReferenceNewVersion)\
         -> IItemVersion:
     if event.is_batchmode:
-        new_version = get_last_new_version(event.registry, event.object)
+        item = find_interface(event.object, IItem)
+        changelog = get_changelog_metadata(item, event.registry)
+        new_version = changelog.last_version
     else:
-        new_version = get_following_new_version(event.registry, event.object)
+        changelog = get_changelog_metadata(event.object, event.registry)
+        if changelog.created:
+            new_version = event.object
+        else:
+            new_version = changelog.followed_by
     return new_version
 
 
@@ -162,7 +178,7 @@ def _new_version_needed_and_not_forking(event: ISheetReferenceNewVersion)\
     throw an AutoUpdateNoForkAllowedError. This should only happen in batch
     requests.
     """
-    last = get_last_version(event.object, event.registry)
+    last = _get_last_version(event.object, event.registry)
     if last is None or last is event.object:
         return True
     value = get_sheet_field(event.object, event.isheet, event.isheet_field,
@@ -173,6 +189,14 @@ def _new_version_needed_and_not_forking(event: ISheetReferenceNewVersion)\
         return False
     else:
         raise AutoUpdateNoForkAllowedError(event.object, event)
+
+
+def _get_last_version(resource: IItemVersion,
+                      registry: Registry) -> IItemVersion:
+    """Get last version of  resource' according to the last tag."""
+    item = find_interface(resource, IItem)
+    last = get_sheet_field(item, ITags, 'LAST', registry=registry)
+    return last
 
 
 def _create_new_version(event, appstruct) -> IResource:
@@ -251,16 +275,6 @@ def _generate_activation_path() -> str:
     return '/activate/' + b64encode(random_bytes, altchars=b'+_').decode()
 
 
-def autoupdate_tag_has_new_version(event):
-    """Auto update last but not first tag if a reference has new version."""
-    name = event.object.__name__
-    if name and 'FIRST' in name:
-        return
-    sheet = get_sheet(event.object, event.isheet, event.registry)
-    appstruct = _get_updated_appstruct(event, sheet)
-    sheet.set(appstruct)
-
-
 def update_asset_download(event):
     """Update asset download."""
     add_metadata(event.object, event.registry)
@@ -269,6 +283,64 @@ def update_asset_download(event):
 def update_image_downloads(event):
     """Update image downloads."""
     add_image_size_downloads(event.object, event.registry)
+
+
+def increase_comments_count(event):
+    """Increase comments_count for commentables in :term:`lineage`."""
+    comment_version = event.reference.source
+    update_comments_count(comment_version, 1, event.registry)
+
+
+def decrease_comments_count(event):
+    """Decrease comments_count for commentables in :term:`lineage`."""
+    comment_version = event.reference.source
+    update_comments_count(comment_version, -1, event.registry)
+
+
+def update_comments_count_after_visibility_change(event):
+    """Update comments_count in lineage after visibility change."""
+    visibility = get_visibility_change(event)
+    if visibility == VisibilityChange.concealed:
+        delta = -1
+    elif visibility == VisibilityChange.revealed:
+        delta = 1
+    else:
+        delta = 0
+    if delta != 0:
+        versions = get_sheet_field(event.object, IVersions, 'elements',
+                                   registry=event.registry)
+        for version in versions:
+            update_comments_count(version, delta, event.registry)
+
+
+def update_comments_count(resource: ICommentVersion,
+                          delta: int,
+                          registry: Registry):
+    """Update all commentable resources related to `resource`.
+
+    Traverse all commentable resources that have a IComment or ISubresource
+    reference to `resource` and update the comment_count value with `delta`.
+
+    Example reference structure that is traversed:
+
+    comment <-IComment- comment <-IComment- comment
+    """
+    catalogs = find_service(resource, 'catalogs')
+    traverse = ReferenceComparator.traverse.value
+    query = search_query._replace(
+        only_visible=True,
+        references=((traverse,
+                     (resource, sheets.comment.IComment, '', None)),
+                    ),
+        resolve=True,
+    )
+    commentables = catalogs.search(query).elements
+    for commentable in commentables:
+        commentable_sheet = registry.content.get_sheet(commentable,
+                                                       ICommentable)
+        old_count = commentable_sheet.get()['comments_count']
+        commentable_sheet.set({'comments_count': old_count + delta},
+                              omit_readonly=False)
 
 
 def includeme(config):
@@ -285,9 +357,6 @@ def includeme(config):
                           ISheetReferenceNewVersion,
                           object_iface=ISimple,
                           event_isheet=ISheetReferenceAutoUpdateMarker)
-    config.add_subscriber(autoupdate_tag_has_new_version,
-                          ISheetReferenceNewVersion,
-                          event_isheet=ITag)
     config.add_subscriber(add_default_group_to_user,
                           IResourceCreatedAndAdded,
                           object_iface=IUser)
@@ -308,3 +377,13 @@ def includeme(config):
                           IResourceSheetModified,
                           object_iface=IImage,
                           event_isheet=IAssetData)
+    config.add_subscriber(increase_comments_count,
+                          ISheetBackReferenceAdded,
+                          event_isheet=ICommentable)
+    config.add_subscriber(decrease_comments_count,
+                          ISheetBackReferenceRemoved,
+                          event_isheet=ICommentable)
+    config.add_subscriber(update_comments_count_after_visibility_change,
+                          IResourceSheetModified,
+                          object_iface=IComment,
+                          event_isheet=IMetadata)

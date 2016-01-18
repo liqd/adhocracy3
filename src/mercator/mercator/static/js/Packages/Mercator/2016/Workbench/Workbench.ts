@@ -7,6 +7,7 @@ import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 import * as AdhUtil from "../../../Util/Util";
+import * as AdhUserViews from "../../../User/Views";
 
 import * as AdhMercator2015Workbench from "../../2015/Workbench/Workbench";
 
@@ -60,7 +61,7 @@ export var proposalCreateColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalCreateColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["platformUrl"]);
+            column.bindVariablesAndClear(scope, ["processUrl"]);
             bindRedirectsToScope(scope, adhConfig, adhResourceUrlFilter, $location);
         }
     };
@@ -78,7 +79,7 @@ export var proposalDetailColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalDetailColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["platformUrl", "proposalUrl"]);
+            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
 
             scope.delete = () => {
@@ -105,7 +106,7 @@ export var proposalEditColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalEditColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["platformUrl", "proposalUrl"]);
+            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
             bindRedirectsToScope(scope, adhConfig, adhResourceUrlFilter, $location);
         }
     };
@@ -122,7 +123,7 @@ export var proposalListingColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalListingColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["platformUrl", "proposalUrl"]);
+            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
             scope.contentType = RIProposal.content_type;
 
             scope.sorts = [{
@@ -158,6 +159,21 @@ export var proposalListingColumnDirective = (
                             {key: "10000", name: "5000 - 10000 €"},
                             {key: "20000", name: "10000 - 20000 €"},
                             {key: "50000", name: "20000 - 50000 €"}
+                        ]
+                    }, {
+                        key: "mercator_topic",
+                        name: "TR__MERCATOR_TOPIC",
+                        wide: true,
+                        items: [
+                            {key: "democracy_and_participation", name: "TR__MERCATOR_TOPIC_DEMOCRACY"},
+                            {key: "arts_and_cultural_activities", name: "TR__MERCATOR_TOPIC_CULTURE"},
+                            {key: "environment", name: "TR__MERCATOR_TOPIC_ENVIRONMENT"},
+                            {key: "social_inclusion", name: "TR__MERCATOR_TOPIC_SOCIAL"},
+                            {key: "migration", name: "TR__MERCATOR_TOPIC_MIGRATION"},
+                            {key: "communities", name: "TR__MERCATOR_TOPIC_COMMUNITY"},
+                            {key: "urban_development", name: "TR__MERCATOR_TOPIC_URBAN"},
+                            {key: "education", name: "TR__MERCATOR_TOPIC_EDUCATION"},
+                            {key: "other", name: "TR__MERCATOR_TOPIC_OTHER"}
                         ]
                     }];
 
@@ -319,4 +335,6 @@ export var registerRoutes = (
                 }
             );
     }).value();
+
+    AdhUserViews.registerRoutes(context)(adhResourceAreaProvider);
 };

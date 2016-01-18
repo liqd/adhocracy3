@@ -21,7 +21,6 @@ from zope.interface.interfaces import IInterface
 import colander
 import pytz
 
-from adhocracy_core.interfaces import ILocation
 from adhocracy_core.utils import normalize_to_tuple
 from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.utils import get_sheet
@@ -344,7 +343,10 @@ def get_sheet_cstructs(context: IResource, request) -> dict:
     cstructs = {}
     for sheet in sheets:
         appstruct = sheet.get()
-        schema = sheet.schema.bind(context=context, request=request)
+        workflow = request.registry.content.get_workflow(context)
+        schema = sheet.schema.bind(context=context,
+                                   request=request,
+                                   workflow=workflow)
         cstruct = schema.serialize(appstruct)
         name = sheet.meta.isheet.__identifier__
         cstructs[name] = cstruct
@@ -376,9 +378,15 @@ class ISOCountryCode(AdhocracySchemaNode):
     """
 
     schema_type = colander.String
-    default = 'DE'
+    default = ''
     missing = colander.drop
-    validator = colander.Regex(r'^[A-Z][A-Z]$')
+    validator = colander.Regex(r'^[A-Z][A-Z]$|^$')
+
+    def deserialize(self, cstruct=colander.null):
+        """Deserialize the :term:`cstruct` into an :term:`appstruct`."""
+        if cstruct == '':
+            return cstruct
+        return super().deserialize(cstruct)
 
 
 class ResourceObject(colander.SchemaType):
@@ -433,8 +441,10 @@ class ResourceObject(colander.SchemaType):
         if self.serialization_form == 'content':
             assert 'request' in node.bindings
             request = node.bindings['request']
+            workflow = request.registry.content.get_workflow(value)
             schema = ResourcePathAndContentSchema().bind(request=request,
-                                                         context=value)
+                                                         context=value,
+                                                         workflow=workflow)
             cstruct = schema.serialize({'path': value})
             sheet_cstructs = get_sheet_cstructs(value, request)
             cstruct['data'] = sheet_cstructs
@@ -511,7 +521,8 @@ class ResourcePathAndContentSchema(ResourcePathSchema):
                                default={})
 
 
-def _validate_reftype(node: colander.SchemaNode, value: ILocation):
+def validate_reftype(node: colander.SchemaNode, value: IResource):
+    """Raise if `value` doesn`t provide the ISheet set by `node.reftype`."""
     reftype = node.reftype
     isheet = reftype.getTaggedValue('target_isheet')
     if not isheet.providedBy(value):
@@ -538,7 +549,7 @@ class Reference(Resource):
 
     reftype = SheetReference
     backref = False
-    validator = colander.All(_validate_reftype)
+    validator = colander.All(validate_reftype)
 
 
 class Resources(AdhocracySequenceNode):
@@ -551,7 +562,7 @@ class Resources(AdhocracySequenceNode):
 
 def _validate_reftypes(node: colander.SchemaNode, value: Sequence):
     for resource in value:
-        _validate_reftype(node, resource)
+        validate_reftype(node, resource)
 
 
 class References(Resources):

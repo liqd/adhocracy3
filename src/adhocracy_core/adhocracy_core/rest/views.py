@@ -14,6 +14,7 @@ from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.httpexceptions import HTTPGone
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.request import Request
+from pyramid.settings import asbool
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.security import remember
@@ -69,14 +70,17 @@ from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.sheets.pool import IPool as IPoolSheet
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.sheets.tags import ITags
 from adhocracy_core.utils import extract_events_from_changelog_metadata
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
+from adhocracy_core.utils import get_reason_if_blocked
 from adhocracy_core.utils import get_user
 from adhocracy_core.utils import is_batchmode
 from adhocracy_core.utils import strip_optional_prefix
 from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import unflatten_multipart_request
+from adhocracy_core.utils import is_created_in_current_transaction
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.workflows.schemas import create_workflow_meta_schema
 
@@ -90,7 +94,6 @@ def respond_if_blocked(context, request):
 
     Otherwise or it request method is 'options' or 'put' return None
     """
-    from adhocracy_core.utils import get_reason_if_blocked
     if request.method not in ['HEAD', 'GET', 'POST']:
         return
     block_reason = get_reason_if_blocked(context)
@@ -101,7 +104,6 @@ def respond_if_blocked(context, request):
 def validate_post_root_versions(context, request: Request):
     """Check and transform the 'root_version' paths to resources."""
     # TODO: make this a colander validator and move to schema.py
-    # use the catalog to find IItemversions
     root_versions = request.validated.get('root_versions', [])
     valid_root_versions = []
     for root in root_versions:
@@ -113,6 +115,27 @@ def validate_post_root_versions(context, request: Request):
         valid_root_versions.append(root)
 
     request.validated['root_versions'] = valid_root_versions
+
+
+def validate_user_creation(context, request: Request):
+    """
+    Enforce presence of captcha sheet if captchas are enabled.
+
+    The sheet validator is automatically invoked, but only if the sheet is
+    there, and we cannot set the 'create_mandatory' flag since the sheet is not
+    required if captchas are disabled.
+
+    Also deletes the captcha sheet data from the validated request, as there
+    is no need to store it permanently.
+    """
+    captcha_enabled = asbool(request.registry.settings.get(
+        'adhocracy.thentos_captcha.enabled', False))
+    sheet_name = 'adhocracy_core.sheets.principal.ICaptcha'
+    sheet_data = request.validated['data'].pop(sheet_name, None)
+    if captcha_enabled and sheet_data is None:
+        request.errors.append(error_entry('body',
+                                          'data.{}'.format(sheet_name),
+                                          'Required'))
 
 
 def validate_request_data(context: ILocation, request: Request,
@@ -551,7 +574,9 @@ class PoolRESTView(SimpleRESTView):
         """Build response data structure for a POST request."""
         appstruct = {}
         if IItem.providedBy(resource):
-            appstruct['first_version_path'] = self._get_first_version(resource)
+            first = get_sheet_field(resource, ITags, 'FIRST',
+                                    registry=self.registry)
+            appstruct['first_version_path'] = first
             schema = ItemResponseSchema().bind(request=self.request,
                                                context=resource)
         else:
@@ -563,37 +588,37 @@ class PoolRESTView(SimpleRESTView):
                 'updated_resources'] = self._build_updated_resources_dict()
         return schema.serialize(appstruct)
 
-    def _get_first_version(self, item: IItem) -> IItemVersion:
-        for child in item.values():
-            if IItemVersion.providedBy(child):
-                return child
-
     @view_config(request_method='POST',
                  permission='create',
                  accept='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
-        iresource = self.request.validated['content_type']
-        resource_type = iresource.__identifier__
-        appstructs = self.request.validated.get('data', {})
-        creator = get_user(self.request)
-        metric = self._get_post_metric_name(iresource)
+        metric = self._get_post_metric_name()
         with statsd_timer(metric, rate=1, registry=self.registry):
-            resource = self.content.create(resource_type,
-                                           self.context,
-                                           creator=creator,
-                                           appstructs=appstructs,
-                                           request=self.request,
-                                           )
-        return self.build_post_response(resource)
+            resource = self._create()
+        cstruct = self.build_post_response(resource)
+        return cstruct
 
-    def _get_post_metric_name(self, iresource: IInterface) -> str:
+    def _get_post_metric_name(self) -> str:
+        iresource = self.request.validated['content_type']
         name = 'process.post'
         if iresource.isOrExtends(IProposalVersion):
             name = 'process.post.proposalversion'
         elif iresource.isOrExtends(IRateVersion):
             name = 'process.post.rateversion'
         return name
+
+    def _create(self) -> IResource:
+        validated = self.request.validated
+        kwargs = dict(parent=self.context,
+                      appstructs=validated.get('data', {}),
+                      creator=get_user(self.request),
+                      root_versions=validated.get('root_versions', []),
+                      request=self.request,
+                      is_batchmode=is_batchmode(self.request),
+                      )
+        iresource = validated['content_type']
+        return self.content.create(iresource.__identifier__, **kwargs)
 
     @view_config(request_method='PUT',
                  permission='edit_some',
@@ -620,7 +645,8 @@ class ItemRESTView(PoolRESTView):
             schema = GETItemResponseSchema().bind(request=self.request,
                                                   context=self.context)
             appstruct = {}
-            first_version = self._get_first_version(self.context)
+            first_version = get_sheet_field(self.context, ITags, 'FIRST',
+                                            registry=self.registry)
             if first_version is not None:
                 appstruct['first_version_path'] = first_version
             cstruct = schema.serialize(appstruct)
@@ -641,46 +667,38 @@ class ItemRESTView(PoolRESTView):
         This is needed to make :class:`adhocray_core.rest.batchview.BatchView`
         work.
         """
-        batchmode = is_batchmode(self.request)
-        validated = self.request.validated
-        iresource = validated['content_type']
-        resource_type = iresource.__identifier__
-        appstructs = validated.get('data', {})
-        creator = get_user(self.request)
-        root_versions = validated.get('root_versions', [])
-        last_new_version = validated.get('_last_new_version_in_transaction',
-                                         None)
-        metric = self._get_post_metric_name(iresource)
+        metric = self._get_post_metric_name()
         with statsd_timer(metric, rate=1, registry=self.registry):
-            if last_new_version is not None:  # only happens in batch requests
-                follows = get_sheet_field(last_new_version,
-                                          IVersionable,
-                                          'follows',
-                                          registry=self.request.registry)
-                is_first_version = follows == []
-                sheets = self.content.get_sheets_create(last_new_version,
-                                                        self.request)
-                appstructs = self.request.validated.get('data', {})
-                for sheet in sheets:
-                    isheet = sheet.meta.isheet
-                    is_version_sheet = IVersionable.isEqualOrExtendedBy(isheet)
-                    if is_first_version and is_version_sheet:
-                        continue
-                    isheet_name = isheet.__identifier__
-                    if isheet_name in appstructs:  # pragma: no branch
-                        sheet.set(appstructs[isheet.__identifier__],
-                                  request=self.request)
-                resource = last_new_version
+            if is_batchmode(self.request) and self._creating_new_version():
+                last = get_sheet_field(self.context, ITags, 'LAST',
+                                       registry=self.registry)
+                if is_created_in_current_transaction(last, self.registry):
+                    self._update_version(last)
+                    resource = last
+                else:
+                    resource = self._create()
             else:
-                resource = self.content.create(resource_type,
-                                               self.context,
-                                               appstructs=appstructs,
-                                               creator=creator,
-                                               root_versions=root_versions,
-                                               request=self.request,
-                                               is_batchmode=batchmode,
-                                               )
-        return self.build_post_response(resource)
+                resource = self._create()
+            cstruct = self.build_post_response(resource)
+        return cstruct
+
+    def _creating_new_version(self) -> bool:
+        iresource = self.request.validated['content_type']
+        return IItemVersion.isEqualOrExtendedBy(iresource)
+
+    def _update_version(self, resource: IVersionable):
+        create_sheets = self.content.get_sheets_create(resource, self.request)
+        is_first = get_sheet_field(self.context, ITags, 'FIRST') == resource
+        appstructs = self.request.validated.get('data', {})
+        for sheet in create_sheets:
+            isheet = sheet.meta.isheet
+            is_version_sheet = IVersionable.isEqualOrExtendedBy(isheet)
+            if is_version_sheet and is_first:
+                continue
+            isheet_name = isheet.__identifier__
+            if isheet_name in appstructs:  # pragma: no branch
+                sheet.set(appstructs[isheet.__identifier__],
+                          request=self.request)
 
 
 @view_defaults(
@@ -725,6 +743,8 @@ class BadgeAssignmentsRESTView(PoolRESTView):
 )
 class UsersRESTView(PoolRESTView):
     """View the IUsersService pool overwrites POST handling."""
+
+    validation_POST = (POSTResourceRequestSchema, [validate_user_creation])
 
     @view_config(request_method='POST',
                  permission='create_user',

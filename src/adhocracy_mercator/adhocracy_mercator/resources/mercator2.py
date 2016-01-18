@@ -12,7 +12,7 @@ from adhocracy_core.resources.proposal import IProposal
 from adhocracy_core.resources.simple import simple_meta
 from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.sheets.description import IDescription
-from adhocracy_core.sheets.rate import IRateable
+from adhocracy_core.sheets.rate import ILikeable
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.image import IImageReference
 from adhocracy_core.resources.comment import add_commentsservice
@@ -30,7 +30,7 @@ class IPitch(ISimple):
 pitch_meta = simple_meta._replace(
     content_name='Pitch',
     iresource=IPitch,
-    permission_create='create_proposal',
+    permission_create='edit_proposal',
     use_autonaming=True,
     autonaming_prefix='pitch',
     extended_sheets=(
@@ -47,7 +47,7 @@ class IPartners(ISimple):
 partners_meta = simple_meta._replace(
     content_name='Partners',
     iresource=IPartners,
-    permission_create='create_proposal',
+    permission_create='edit_proposal',
     use_autonaming=True,
     autonaming_prefix='partners',
     extended_sheets=(
@@ -62,7 +62,7 @@ class IDuration(ISimple):
 duration_meta = simple_meta._replace(
     content_name='duration',
     iresource=IDuration,
-    permission_create='create_proposal',
+    permission_create='edit_proposal',
     use_autonaming=True,
     autonaming_prefix='duration',
     extended_sheets=(
@@ -77,7 +77,7 @@ class IChallenge(ISimple):
 challenge_meta = simple_meta._replace(
     content_name='challenge',
     iresource=IChallenge,
-    permission_create='create_proposal',
+    permission_create='edit_proposal',
     use_autonaming=True,
     autonaming_prefix='challenge',
     extended_sheets=(
@@ -92,7 +92,7 @@ class IGoal(ISimple):
 goal_meta = simple_meta._replace(
     content_name='goal',
     iresource=IGoal,
-    permission_create='create_proposal',
+    permission_create='edit_proposal',
     use_autonaming=True,
     autonaming_prefix='goal',
     extended_sheets=(
@@ -107,7 +107,7 @@ class IPlan(ISimple):
 plan_meta = simple_meta._replace(
     content_name='plan',
     iresource=IPlan,
-    permission_create='create_proposal',
+    permission_create='edit_proposal',
     use_autonaming=True,
     autonaming_prefix='plan',
     extended_sheets=(
@@ -122,7 +122,7 @@ class ITarget(ISimple):
 target_meta = simple_meta._replace(
     content_name='target',
     iresource=ITarget,
-    permission_create='create_proposal',
+    permission_create='edit_proposal',
     use_autonaming=True,
     autonaming_prefix='target',
     extended_sheets=(
@@ -137,7 +137,7 @@ class ITeam(ISimple):
 team_meta = simple_meta._replace(
     content_name='team',
     iresource=ITeam,
-    permission_create='create_proposal',
+    permission_create='edit_proposal',
     use_autonaming=True,
     autonaming_prefix='team',
     extended_sheets=(
@@ -152,7 +152,7 @@ class IExtraInfo(ISimple):
 extrainfo_meta = simple_meta._replace(
     content_name='extrainfo',
     iresource=IExtraInfo,
-    permission_create='create_proposal',
+    permission_create='edit_proposal',
     use_autonaming=True,
     autonaming_prefix='extrainfo',
     extended_sheets=(
@@ -167,7 +167,7 @@ class IConnectionCohesion(ISimple):
 connectioncohesion_meta = simple_meta._replace(
     content_name='connectioncohesion',
     iresource=IConnectionCohesion,
-    permission_create='create_proposal',
+    permission_create='edit_proposal',
     use_autonaming=True,
     autonaming_prefix='connectioncohesion',
     extended_sheets=(
@@ -182,7 +182,7 @@ class IDifference(ISimple):
 difference_meta = simple_meta._replace(
     content_name='difference',
     iresource=IDifference,
-    permission_create='create_proposal',
+    permission_create='edit_proposal',
     use_autonaming=True,
     autonaming_prefix='difference',
     extended_sheets=(
@@ -197,7 +197,7 @@ class IPracticalRelevance(ISimple):
 practicalrelevance_meta = simple_meta._replace(
     content_name='practicalrelevance',
     iresource=IPracticalRelevance,
-    permission_create='create_proposal',
+    permission_create='edit_proposal',
     use_autonaming=True,
     autonaming_prefix='practicalrelevance',
     extended_sheets=(
@@ -234,7 +234,7 @@ proposal_meta = proposal.proposal_meta._replace(
        (ITitle,
         IDescription,
         ICommentable,
-        IRateable,
+        ILikeable,
         IImageReference,
         adhocracy_mercator.sheets.mercator2.IMercatorSubResources,
         adhocracy_mercator.sheets.mercator2.IUserInfo,

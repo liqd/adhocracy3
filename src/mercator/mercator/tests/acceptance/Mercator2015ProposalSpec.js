@@ -4,11 +4,11 @@ var fs = require("fs");
 var EC = protractor.ExpectedConditions;
 var shared = require("./core/shared.js");
 var _ = require("lodash");
-var MercatorProposalFormPage = require("./MercatorProposalFormPage.js");
-var MercatorProposalListing = require("./MercatorProposalListing.js");
-var MercatorProposalDetailPage = require("./MercatorProposalDetailPage.js");
+var MercatorProposalFormPage = require("./Mercator2015ProposalFormPage.js");
+var MercatorProposalListing = require("./Mercator2015ProposalListing.js");
+var MercatorProposalDetailPage = require("./Mercator2015ProposalDetailPage.js");
 
-describe("mercator proposal form", function() {
+describe("mercator 2015 proposal form", function() {
     afterEach(function() {
         shared.logout();
     });
@@ -54,7 +54,7 @@ describe("mercator proposal form", function() {
         expect(page.isValid()).toBe(true);
     });
 
-    it("is submitted properly", function() {
+   it("is submitted properly", function() {
         shared.loginParticipant();
 
         var page = new MercatorProposalFormPage().create();
@@ -188,6 +188,7 @@ describe("mercator proposal form", function() {
         var list = new MercatorProposalListing().get();
         browser.waitForAngular();
         var form = list.getDetailPage(0).getEditPage();
+        expect(form.form.isPresent()).toBe(true);
         form.userInfoLastName.clear();
         expect(form.isValid()).toBe(false);
         form.userInfoLastName.sendKeys("rasta");
@@ -201,15 +202,15 @@ describe("mercator proposal form", function() {
 
     it("disallows anonymous to edit existing proposals (depends on submit)", function() {
         var list = new MercatorProposalListing().get();
-        var editButton = list.getDetailPage(0).editButton;
-        expect(editButton.isPresent()).toBe(false);
+        var form = list.getDetailPage(0).getEditPage();
+        expect(form.form.isPresent()).toBe(false);
     });
 
     it("disallows other users to edit existing proposals (depends on submit)", function() {
         shared.loginOtherParticipant();
         var list = new MercatorProposalListing().get();
-        var editButton = list.getDetailPage(0).editButton;
-        expect(editButton.isPresent()).toBe(false);
+        var form = list.getDetailPage(0).getEditPage();
+        expect(form.form.isPresent()).toBe(false);
     });
 });
 
@@ -217,9 +218,10 @@ describe("column navigation (depends on created proposal)", function() {
     it("allows to navigate around", function() {
         var list = new MercatorProposalListing().get();
 
-        var column1 = list.columns.get(0).element(by.css(".moving-column"));
-        var column2 = list.columns.get(1).element(by.css(".moving-column"));
-        var column3 = list.columns.get(2).element(by.css(".moving-column"));
+        var columns = element.all(by.css(".moving-column"));
+        var column1 = columns.get(0);
+        var column2 = columns.get(1);
+        var column3 = columns.get(2);
 
         expect(shared.hasClass(column1, "is-show"));
         expect(shared.hasClass(column2, "is-hide"));
@@ -244,7 +246,7 @@ describe("column navigation (depends on created proposal)", function() {
         expect(shared.hasClass(column2, "is-show"));
         expect(shared.hasClass(column3, "is-hide"));
 
-        column2.all(by.css(".moving-column-menu-nav a")).last().click();
+        shared.waitAndClick(column2.all(by.css(".moving-column-menu-nav a")).last());
 
         expect(shared.hasClass(column1, "is-show"));
         expect(shared.hasClass(column2, "is-hide"));
@@ -255,8 +257,7 @@ describe("column navigation (depends on created proposal)", function() {
         var list = new MercatorProposalListing().get();
         var proposal = list.getDetailPage(0);
 
-        var leftColumn = element.all(by.css("adh-moving-column div.moving-column"))
-                         .first();
+        var leftColumn = element.all(by.css(".moving-column")).first();
 
         expect(shared.hasClass(leftColumn, "is-show"));
 
@@ -297,6 +298,7 @@ describe("abuse complaint", function() {
     it("can be sent and is received as email", function() {
         shared.loginParticipant();
 
+        var done = false;
         var mailsBeforeComplaint =
             fs.readdirSync(browser.params.mail.queue_path + "/new");
 
@@ -338,7 +340,13 @@ describe("abuse complaint", function() {
                 expect(mail.subject).toEqual("Adhocracy Abuse Complaint");
                 expect(mail.from[0].address).toContain("support@");
                 expect(mail.to[0].address).toContain("abuse_handler@");
+                done = true;
             });
         });
+
+        // Keep browser active until mail assertions are done.
+        browser.driver.wait(function() {
+            return done == true;
+        }, 1000)
     });
 });

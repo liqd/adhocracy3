@@ -22,11 +22,14 @@ class IBadge(ISimple):
 
 badge_meta = simple_meta._replace(
     iresource=IBadge,
+    use_autonaming=False,
     extended_sheets=(
         adhocracy_core.sheets.description.IDescription,
         adhocracy_core.sheets.badge.IBadge,
     ),
     permission_create='create_badge',
+)._add(
+    extended_sheets=(adhocracy_core.sheets.name.IName,)
 )
 
 
@@ -74,7 +77,7 @@ badge_assignment_meta = simple_meta._replace(
     basic_sheets=(
         adhocracy_core.sheets.metadata.IMetadata,
         adhocracy_core.sheets.badge.IBadgeAssignment,
-        adhocracy_core.sheets.description.IDescription
+        adhocracy_core.sheets.description.IDescription,
     ),
     autonaming_prefix='',
     use_autonaming=True,

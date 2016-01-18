@@ -11,6 +11,7 @@ import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
 import * as AdhCredentialsModule from "./CredentialsModule";
 import * as AdhUserModule from "./Module";
+import * as AdhImageModule from "../Image/Module";
 
 import * as AdhHttp from "../Http/Http";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
@@ -32,7 +33,8 @@ export var register = (angular) => {
             AdhHttpModule.moduleName,
             AdhTopLevelStateModule.moduleName,
             AdhResourceAreaModule.moduleName,
-            AdhUserModule.moduleName
+            AdhUserModule.moduleName,
+            AdhImageModule.moduleName
         ])
         .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
             adhTopLevelStateProvider
@@ -101,13 +103,14 @@ export var register = (angular) => {
             "adhShowError",
             AdhUserViews.createPasswordResetDirective])
         .directive("adhRegister", [
-            "adhConfig", "adhCredentials", "adhUser", "adhTopLevelState", "adhShowError", AdhUserViews.registerDirective])
+            "$sce", "$http", "adhConfig", "adhCredentials", "adhUser", "adhTopLevelState", "adhShowError", AdhUserViews.registerDirective])
         .directive("adhUserIndicator", [
             "adhConfig", "adhResourceArea", "adhTopLevelState", "adhPermissions", "$location", AdhUserViews.indicatorDirective])
         .directive("adhUserMeta", ["adhConfig", "adhResourceArea", "adhGetBadges", AdhUserViews.metaDirective])
         .directive("adhUserMessage", ["adhConfig", "adhHttp", AdhUserViews.userMessageDirective])
         .directive("adhUserDetailColumn", ["adhPermissions", "adhConfig", AdhUserViews.userDetailColumnDirective])
-        .directive("adhUserListingColumn", ["adhConfig", AdhUserViews.userListingColumnDirective])
+        .directive("adhUserProfileImage", ["adhHttp", "adhConfig", AdhUserViews.adhUserProfileImageDirective])
+        .directive("adhUserProfileImageEdit", ["adhHttp", "adhPermissions", "adhConfig", AdhUserViews.adhUserProfileImageEditDirective])
         .directive("adhUserManagementHeader", ["adhConfig", AdhUserViews.adhUserManagementHeaderDirective])
         .directive("adhUserActivityOverview", ["adhConfig", "adhHttp", AdhUserViews.adhUserActivityOverviewDirective]);
 };

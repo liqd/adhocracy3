@@ -69,6 +69,26 @@
             </span>
         </label>
 
+        <div data-ng-if="captcha.enabled">
+            <div>
+                <span>
+                    <img data-ng-src="{{ captcha.imageData }}" alt="TR__CAPTCHA_ALT" >
+                </span>
+                <span>
+                    <input type="checkbox" name="audioCaptchaCheck" data-ng-click="captcha.toggleAudio($event)" />
+                    <div data-ng-if="captcha.audioEnabled">
+                        <audio data-ng-src="{{ captcha.audioData }}" controls></audio>
+                    </div>
+                </span>
+            </div>
+            <div>
+                <input type="text" name="thentos_captcha_guess" required="required"
+                       data-ng-model="input.captchaGuess" />
+                <span class="input-error" data-ng-show="showError(registerForm, registerForm.thentos_captcha_guess, 'required')">
+                    {{ "TR__ERROR_REQUIRED_CAPTCHA" | translate }}
+                </span>
+            </div>
+        </div>
         <input
             type="submit"
             name="register"

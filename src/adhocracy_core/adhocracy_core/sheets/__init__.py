@@ -139,7 +139,13 @@ class BaseResourceSheet:
             return iter([])  # ease testing
         for field, node in fields:
             reference = create_ref(node)
-            query_field = query._replace(references=[reference])
+            is_references_node = isinstance(node, schema.UniqueReferences)\
+                and not getattr(node, 'backref', False)
+            if is_references_node:  # search references and preserve order
+                query_field = query._replace(references=[reference],
+                                             sort_by='reference')
+            else:  # search single reference or back references
+                query_field = query._replace(references=[reference])
             elements = self._catalogs.search(query_field).elements
             if len(elements) == 0:
                 continue
@@ -153,6 +159,7 @@ class BaseResourceSheet:
             omit=(),
             send_event=True,
             request: Request=None,
+            send_reference_event=True,
             omit_readonly: bool=True) -> bool:
         """Store appstruct."""
         appstruct_old = self.get(add_back_references=False)
@@ -160,7 +167,8 @@ class BaseResourceSheet:
         if omit_readonly:
             appstruct = self._omit_readonly_keys(appstruct)
         self._store_data(appstruct)
-        self._store_references(appstruct, self.registry)
+        self._store_references(appstruct, self.registry,
+                               send_event=send_reference_event)
         if send_event:
             event = ResourceSheetModified(self.context,
                                           self.meta.isheet,
@@ -184,14 +192,15 @@ class BaseResourceSheet:
         """Store data appstruct."""
         raise NotImplementedError
 
-    def _store_references(self, appstruct, registry):
+    def _store_references(self, appstruct, registry, send_event=True):
         """Might be overridden in subclasses."""
         if not self._graph:
             return  # ease testing
         self._graph.set_references_for_isheet(self.context,
                                               self.meta.isheet,
                                               appstruct,
-                                              registry)
+                                              registry,
+                                              send_event=send_event)
 
     def get_cstruct(self, request: Request, params: dict=None):
         """Return cstruct data.

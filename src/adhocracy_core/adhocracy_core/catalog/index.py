@@ -73,48 +73,76 @@ class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
         """Read interface."""
         return self._not_indexed
 
-    def eq(self, reference: Reference) -> hypatia.query.Eq:
-        """Eq operator to concatenate queries.."""
-        query = {'reference': reference}
+    def eq(self, query: dict) -> hypatia.query.Eq:
+        """Concatenate reference `query`.
+
+        :param query:
+
+            reference (Reference): reference with target or source
+            traverse (bool): traverse all references with same type, starting
+                             with the given target or source.
+        """
         return hypatia.query.Eq(self, query)
 
     def apply(self, query: dict) -> BTrees.family64.IF.TreeSet:
-        """Apply query parameters·{reference: Reference} and return result."""
-        reference = query['reference']
-        return self._search(reference)
+        """Apply reference `query`.
+
+        :param query:
+
+            reference (Reference): reference with target or source
+            traverse (bool): traverse all references with same type, starting
+                             with the given target or source.
+        """
+        if 'traverse' not in query:
+            query['traverse'] = False
+        return self._search(query)
+
+    def applyAll(self, queries: [dict]) -> BTrees.family64.IF.TreeSet:  # noqa
+        """Apply multiple reference `queries`.
+
+        The result sets are combined with `intersection`.
+        """
+        result_all = set(self._search(queries[0]))
+        for reference in queries[1:]:
+            result = set(self._search(reference))
+            result_all = result_all.intersection(result)
+        return result_all
 
     applyEq = apply
     """Read apply docsting."""
 
     def search_with_order(self, reference: Reference) -> ResultSet:
         """"Search target or source resources ids of `reference` with order."""
-        oids = [x for x in self._search_target_or_source_ids(reference)]
+        query = {'reference': reference,
+                 'traverse': False}
+        oids = [x for x in self._search_target_or_source_ids(query)]
         result = ResultSet(oids, len(oids), None)
         return result
 
-    def _search(self, reference: Reference) -> BTrees.LFBTree.TreeSet:
-        """"Search target or soruce resources of `reference` without order.
-
-        This helper function is to fullfill the IIndex interface.
-        """
-        oids = self._search_target_or_source_ids(reference)
+    def _search(self, query: dict) -> BTrees.LFBTree.TreeSet:
+        """"Search target or source resources of `reference` without order."""
+        oids = self._search_target_or_source_ids(query)
         result = self.family.IF.TreeSet(oids)
         return result
 
-    def _search_target_or_source_ids(self, reference) -> [int]:
-        source, isheet, isheet_field, target = reference
+    def _search_target_or_source_ids(self, query: dict) -> [int]:
+        source, isheet, isheet_field, target = query['reference']
         if source is None and target is None:
             raise ValueError('You have to add a source or target resource')
         elif source is not None and target is not None:
             raise ValueError('Either source or target has to be None')
+        traverse = query['traverse']
         if source is None:
-            oids = self._resource_ids(target, isheet, isheet_field, 'sources')
+            oids = self._resource_ids(target, isheet, isheet_field, 'sources',
+                                      traverse=traverse)
         else:
-            oids = self._resource_ids(source, isheet, isheet_field, 'targets')
+            oids = self._resource_ids(source, isheet, isheet_field, 'targets',
+                                      traverse=traverse)
         return oids
 
     def _resource_ids(self, resource, isheet=ISheet, isheet_field='',
-                      orientation='') -> set:
+                      orientation='',
+                      traverse=False) -> set:
         """Get OIDs from references with `orientation` targets or sources."""
         if orientation == 'sources':
             get_resources_ids = self._objectmap.sourceids
@@ -124,4 +152,10 @@ class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
             if isheet_field and field != isheet_field:
                 continue
             for oid in get_resources_ids(resource, reftype):
+                if traverse:
+                    yield from self._resource_ids(oid,
+                                                  isheet=isheet,
+                                                  isheet_field=isheet_field,
+                                                  orientation=orientation,
+                                                  traverse=traverse)
                 yield oid

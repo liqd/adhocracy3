@@ -1,10 +1,11 @@
-import unittest
 from unittest.mock import Mock
 
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
 from pytest import raises
+
+from adhocracy_core.interfaces import IPool
 
 
 def test_create_adhocracy_catalog_indexes():
@@ -60,27 +61,27 @@ class TestCatalogsServiceAdhocracy:
         return catalogs_service_meta
 
     @fixture
-    def inst(self, registry, meta, pool_graph):
+    def inst(self, registry, meta, pool):
         from substanced.interfaces import MODE_IMMEDIATE
         inst = registry.content.create(meta.iresource.__identifier__,
-                                       parent=pool_graph)
-        inst['system']['name'].action_mode = MODE_IMMEDIATE
-        inst['system']['interfaces'].action_mode = MODE_IMMEDIATE
-        inst['system']['allowed'].action_mode = MODE_IMMEDIATE
-        inst['adhocracy']['tag'].action_mode = MODE_IMMEDIATE
-        inst['adhocracy']['badge'].action_mode = MODE_IMMEDIATE
+                                       parent=pool)
+        system = inst['system']
+        system.action_mode = MODE_IMMEDIATE
+        for index in system.values():
+            index.action_mode = MODE_IMMEDIATE
+        adhocracy = inst['adhocracy']
+        adhocracy.action_mode = MODE_IMMEDIATE
+        for index in adhocracy.values():
+            index.action_mode = MODE_IMMEDIATE
         return inst
 
     @fixture
     def pool(self, pool_graph):
         return pool_graph
 
-    def _make_resource(self, registry, parent=None, iresource=None):
+    def _make_resource(self, registry, parent=None, iresource=IPool):
         from datetime import datetime
-        from adhocracy_core.interfaces import IPool
         from adhocracy_core.sheets.name import IName
-        if iresource is None:
-            iresource = IPool
         appstructs = {}
         if IName in registry.content.resources_meta[iresource].basic_sheets:
             name = datetime.now().isoformat()
@@ -91,7 +92,6 @@ class TestCatalogsServiceAdhocracy:
 
     def test_meta(self, meta):
         from substanced.catalog import CatalogsService
-        from adhocracy_core.interfaces import IServicePool
         from . import ICatalogsService
         from . import CatalogsServiceAdhocracy
         assert meta.iresource is ICatalogsService
@@ -128,23 +128,16 @@ class TestCatalogsServiceAdhocracy:
         with raises(KeyError):
             inst.reindex_index(child, 'WRONG')
 
-    def test_search_default_query(self, registry, pool, inst, query):
-        from hypatia.interfaces import IResultSet
+    def test_search_default_query_is_empty(self, registry, pool, inst, query):
         child = self._make_resource(registry, parent=pool)
         result = inst.search(query)
-        assert IResultSet.providedBy(result.elements)
-        assert list(result.elements) == [child]
-
-    def test_search_count_result_elements(self, registry, pool, inst, query):
-        child = self._make_resource(registry, parent=pool)
-        result = inst.search(query)
-        assert result.count == 1
+        assert list(result.elements) == []
 
     def test_search_with_interface(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import IItemVersion
         missing_iresource = self._make_resource(registry, parent=pool)
         has_iresource = self._make_resource(registry, parent=pool,
-                                    iresource=IItemVersion)
+                                            iresource=IItemVersion)
         result = inst.search(query._replace(interfaces=IItemVersion))
         assert list(result.elements) == [has_iresource]
 
@@ -163,27 +156,28 @@ class TestCatalogsServiceAdhocracy:
         from adhocracy_core.interfaces import IItemVersion
         missing_iresource = self._make_resource(registry, parent=pool)
         has_iresource = self._make_resource(registry, parent=pool,
-                                             iresource=IItemVersion)
+                                            iresource=IItemVersion)
         result = inst.search(query._replace(interfaces=('noteq', IItemVersion)))
-        result_list = list(result.elements)
-        assert has_iresource not in result_list
-        assert missing_iresource in result_list
+        elements = list(result.elements)
+        assert has_iresource not in elements
+        assert missing_iresource in elements
 
     def test_search_with_interfaces_and_notany(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import ISimple
         from adhocracy_core.interfaces import IItemVersion
         from adhocracy_core.sheets.versions import IVersionable
         has_isheet = self._make_resource(registry, parent=pool,
-                                             iresource=ISimple)
+                                         iresource=ISimple)
         has_iresource = self._make_resource(registry, parent=pool,
-                                             iresource=IItemVersion)
+                                            iresource=IItemVersion)
         missing_iresource = self._make_resource(registry, parent=pool)
-        result = inst.search(query._replace(
-            interfaces=('notany', (IVersionable, ISimple))))
-        result_elemets = list(result.elements)
-        assert has_isheet not in result_elemets
-        assert has_iresource not in result_elemets
-        assert missing_iresource in result_elemets
+        result = inst.search(query._replace(interfaces=('notany',
+                                                        (IVersionable,
+                                                         ISimple))))
+        elements = list(result.elements)
+        assert has_isheet not in elements
+        assert has_iresource not in elements
+        assert missing_iresource in elements
 
     def test_search_with_interfaces_raise_if_wrong_keyword_index_comparator(
             self, registry, pool, inst, query):
@@ -206,33 +200,38 @@ class TestCatalogsServiceAdhocracy:
         grandchild = self._make_resource(registry, parent=child)
         result = inst.search(query._replace(root=pool,
                                             depth=1))
-        assert list(result.elements) == [child]
+        elements = list(result.elements)
+        assert child in elements
+        assert grandchild not in elements
 
     def test_search_with_root_and_depth2(self, registry, pool, inst, query):
         child = self._make_resource(registry, parent=pool)
         grandchild = self._make_resource(registry, parent=child)
         result = inst.search(query._replace(root=pool,
                                             depth=2))
-        assert list(result.elements) == [child, grandchild]
+        elements = list(result.elements)
+        assert child in elements
+        assert grandchild in elements
 
     def test_search_with_resolve(self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import IPool
         child = self._make_resource(registry, parent=pool)
-        result = inst.search(query._replace(resolve=True))
+        result = inst.search(query._replace(interfaces=IPool,
+                                            resolve=True))
         assert result.elements == [child]
 
     def test_search_with_only_visible(self, registry, pool, inst, query):
-        child = self._make_resource(registry, parent=pool)
-        child.hidden = True
-        inst['adhocracy']['private_visibility'].reindex_resource(child)
+        from adhocracy_core.sheets.metadata import IMetadata
+        child_hidden = self._make_resource(registry, parent=pool)
+        meta_sheet = registry.content.get_sheet(child_hidden, IMetadata)
+        meta_sheet.set({'hidden': True})
+        child_visible = self._make_resource(registry, parent=pool)
+        meta_sheet = registry.content.get_sheet(child_visible, IMetadata)
+        meta_sheet.set({'hidden': False})
         result = inst.search(query._replace(only_visible=True))
-        assert list(result.elements) == []
-
-    def test_search_with_only_visible_false(self, registry, pool, inst, query):
-        child = self._make_resource(registry, parent=pool)
-        child.hidden = True
-        inst['adhocracy']['private_visibility'].reindex_resource(child)
-        result = inst.search(query._replace(only_visible=False))
-        assert list(result.elements) == [child]
+        elements = list(result.elements)
+        assert child_visible in elements
+        assert child_hidden not in elements
 
     def test_search_with_indexes(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import IItem
@@ -248,9 +247,9 @@ class TestCatalogsServiceAdhocracy:
         missing_tag = item
         result = inst.search(query._replace(
             indexes={'tag': ('noteq', 'FIRST')}))
-        result_elements = list(result.elements)
-        assert has_tag not in result_elements
-        assert missing_tag in result_elements
+        elements = list(result.elements)
+        assert has_tag not in elements
+        assert missing_tag in elements
 
     def test_search_with_indexes_and_any(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import IItem
@@ -259,9 +258,9 @@ class TestCatalogsServiceAdhocracy:
         missing_tag = item
         result = inst.search(query._replace(
             indexes={'tag': ('any', ('FIRST', 'LAST'))}))
-        result_elements = list(result.elements)
-        assert has_tag in result_elements
-        assert missing_tag not in result_elements
+        elements = list(result.elements)
+        assert has_tag in elements
+        assert missing_tag not in elements
 
     def test_search_with_indexes_and_any(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import IItem
@@ -270,79 +269,135 @@ class TestCatalogsServiceAdhocracy:
         missing_tag = item
         result = inst.search(query._replace(
             indexes={'tag': ('notany', ('FIRST', 'LAST'))}))
-        result_elenments = list(result.elements)
-        assert has_tag not in result_elenments
-        assert missing_tag in result_elenments
+        elements = list(result.elements)
+        assert has_tag not in elements
+        assert missing_tag in elements
 
     def test_search_with_references(self, registry, pool, inst, query):
-        from adhocracy_core.interfaces import ITag
-        from adhocracy_core.interfaces import Reference
-        from adhocracy_core import sheets
-        from adhocracy_core.utils import get_sheet
-        referenced = pool
-        referencing = self._make_resource(registry, parent=pool, iresource=ITag)
-        sheet = get_sheet(referencing, sheets.tags.ITag)
-        sheet.set({'elements': [referenced]})
-        reference = Reference(None, sheets.tags.ITag, 'elements', referenced)
-        result = inst.search(query._replace(references=[reference]))
-        assert list(result.elements) == [referencing]
-
-    def test_search_with_references_include_isheet_subtypes(
-            self, registry, pool, inst, query):
-        from adhocracy_core.interfaces import ISheet
-        from adhocracy_core.interfaces import ITag
+        from adhocracy_core.interfaces import IItem
         from adhocracy_core.interfaces import Reference
         from adhocracy_core import sheets
         from adhocracy_core.utils import get_sheet
         referenced = pool
         referencing = self._make_resource(registry, parent=pool,
-                                          iresource=ITag)
-        sheet = get_sheet(referencing, sheets.tags.ITag)
-        sheet.set({'elements': [referenced]})
-        reference = Reference(None, ISheet, 'elements', referenced)
+                                          iresource=IItem)
+        sheet = get_sheet(referencing, sheets.tags.ITags)
+        sheet.set({'FIRST': referenced})
+        reference = Reference(None, sheets.tags.ITags, 'FIRST', referenced)
+        result = inst.search(query._replace(references=[reference]))
+        assert list(result.elements) == [referencing]
+
+    def test_search_with_two_references(self, registry, pool, service, inst,
+                                        query):
+        from copy import deepcopy
+        from adhocracy_core.interfaces import Reference
+        from adhocracy_core.resources.principal import IUser
+        from adhocracy_core import sheets
+        from adhocracy_core.utils import get_sheet
+        pool['principals'] = service
+        pool['principals']['groups'] = deepcopy(service)
+        user = self._make_resource(registry, parent=pool, iresource=IUser)
+        referencing = self._make_resource(registry, parent=pool)
+        sheet = get_sheet(referencing, sheets.metadata.IMetadata)
+        sheet.set({'creator': [user]})
+        reference = Reference(None, sheets.metadata.IMetadata,
+                              'creator', user)
+        result = inst.search(query._replace(references=[reference, reference]))
+        elements = list(result.elements)
+        assert elements == [user]
+
+    def test_search_with_references_include_isheet_subtypes(
+            self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import IItem
+        from adhocracy_core.interfaces import Reference
+        from adhocracy_core import sheets
+        from adhocracy_core.utils import get_sheet
+        referenced = pool
+        referencing = self._make_resource(registry, parent=pool,
+                                          iresource=IItem)
+        sheet = get_sheet(referencing, sheets.tags.ITags)
+        sheet.set({'FIRST': referenced})
+        reference = Reference(None, ISheet, 'FIRST', referenced)
         result = inst.search(query._replace(references=[reference]))
         assert list(result.elements) == [referencing]
 
     def test_search_with_references_ignore_field_name_if_empty(
             self, registry, pool, inst, query):
-        from adhocracy_core.interfaces import ITag
+        from adhocracy_core.interfaces import IItem
         from adhocracy_core.interfaces import Reference
         from adhocracy_core import sheets
         from adhocracy_core.utils import get_sheet
         referenced = pool
         referencing = self._make_resource(registry, parent=pool,
-                                          iresource=ITag)
-        sheet = get_sheet(referencing, sheets.tags.ITag)
-        sheet.set({'elements': [referenced]})
-        reference = Reference(None, sheets.tags.ITag, '', referenced)
+                                          iresource=IItem)
+        sheet = get_sheet(referencing, sheets.tags.ITags)
+        sheet.set({'FIRST': referenced})
+        reference = Reference(None, sheets.tags.ITags, '', referenced)
         result = inst.search(query._replace(references=[reference]))
         assert list(result.elements) == [referencing]
 
     def test_search_with_back_references(self, registry, pool, inst, query):
-        from adhocracy_core.interfaces import ITag
+        from adhocracy_core.interfaces import IItem
         from adhocracy_core.interfaces import Reference
         from adhocracy_core import sheets
         from adhocracy_core.utils import get_sheet
         referenced1 = self._make_resource(registry, parent=pool)
         referenced2 = self._make_resource(registry, parent=pool)
         referenced3 = self._make_resource(registry, parent=pool)
-        referencing = self._make_resource(registry, parent=pool, iresource=ITag)
-        sheet = get_sheet(referencing, sheets.tags.ITag)
-        sheet.set({'elements': [referenced3, referenced1, referenced2]})
-        reference = Reference(referencing, sheets.tags.ITag, 'elements', None)
+        referencing = self._make_resource(registry, parent=pool,
+                                          iresource=IItem)
+        sheet = get_sheet(referencing, sheets.tags.ITags)
+        sheet.set({'LAST': [referenced3, referenced1, referenced2]})
+        reference = Reference(referencing, sheets.tags.ITags, 'LAST', None)
         result = inst.search(query._replace(references=[reference]))
-        assert list(result.elements) == [referenced3, referenced1, referenced2]
+        elements = list(result.elements)
+        assert len(elements) == 3  # search for back references is not ordered
+        assert referenced1 in elements
+        assert referenced2 in elements
+        assert referenced3 in elements
+
+    def test_search_with_back_reference_traverse(self, registry, pool, service,
+                                                 inst, query):
+        from adhocracy_core.interfaces import Reference
+        from adhocracy_core.interfaces import ReferenceComparator
+        from adhocracy_core.resources.comment import ICommentVersion
+        from adhocracy_core import sheets
+        from adhocracy_core.utils import get_sheet
+        pool['comments'] = service  # the IComment sheet needs a post pool
+        referencing = self._make_resource(registry, parent=pool,
+                                          iresource=ICommentVersion)
+        referenced1 = self._make_resource(registry, parent=pool,
+                                          iresource=ICommentVersion)
+        referenced2 = self._make_resource(registry, parent=pool,
+                                          iresource=ICommentVersion)
+        sheet = get_sheet(referencing, sheets.comment.IComment)
+        sheet.set({'refers_to': referenced1})
+        sheet = get_sheet(referenced1, sheets.comment.IComment)
+        sheet.set({'refers_to': referenced2})
+        reference = Reference(referencing, sheets.comment.IComment,
+                              'refers_to', None)
+        result = inst.search(query._replace(
+                references=[(ReferenceComparator.traverse.value, reference)]))
+        elements = list(result.elements)
+        assert len(elements) == 2  # search with traversal is not ordered
+        assert referenced1 in elements
+        assert referenced2 in elements
 
     def test_search_with_sort_by(self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import IPool
         child = self._make_resource(registry, parent=pool)
         child2 = self._make_resource(registry, parent=pool)
-        result = inst.search(query._replace(sort_by='name'))
+        result = inst.search(query._replace(interfaces=IPool,
+                                            sort_by='name'))
         assert list(result.elements) == [child, child2]
 
     def test_search_with_sort_by_and_reverse(self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import IPool
         child = self._make_resource(registry, parent=pool)
         child2 = self._make_resource(registry, parent=pool)
-        result = inst.search(query._replace(sort_by='name',
+        result = inst.search(query._replace(interfaces=IPool,
+                                            sort_by='name',
                                             reverse=True))
         assert list(result.elements) == [child2, child]
 
@@ -353,64 +408,131 @@ class TestCatalogsServiceAdhocracy:
             inst.search(query._replace(sort_by='interfaces'))
 
     def test_search_with_limit(self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import IPool
         child = self._make_resource(registry, parent=pool)
         child2 = self._make_resource(registry, parent=pool)
-        result = inst.search(query._replace(limit=1))
+        result = inst.search(query._replace(interfaces=IPool,
+                                            limit=1))
         assert list(result.elements) == [child]
 
     def test_search_with_limit_and_offset(self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import IPool
         child = self._make_resource(registry, parent=pool)
         child2 = self._make_resource(registry, parent=pool)
-        result = inst.search(query._replace(limit=2,
+        result = inst.search(query._replace(interfaces=IPool,
+                                            limit=2,
                                             offset=1))
         assert list(result.elements) == [child2]
 
     def test_search_with_frequency_of(self, registry, pool, inst, query):
-        from adhocracy_core.interfaces import ISimple
-        child = self._make_resource(registry, parent=pool, iresource=ISimple)
-        result = inst.search(query._replace(frequency_of='interfaces'))
-        assert result.frequency_of[ISimple] == 1
+        from adhocracy_core.interfaces import IResource
+        child = self._make_resource(registry, parent=pool)
+        result = inst.search(query._replace(interfaces=IResource,
+                                            frequency_of='interfaces'))
+        assert result.frequency_of[IResource] == 1
+
+    def test_search_with_sort_by_reference_ignore_if_no_references(
+            self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import IPool
+        child = self._make_resource(registry, parent=pool)
+        child2 = self._make_resource(registry, parent=pool)
+        result = inst.search(query._replace(interfaces=IPool,
+                                            sort_by='reference'))
+        assert list(result.elements) == [child, child2]
+
+    def test_search_with_sort_by_references(self, registry, pool, inst, query):
+        """Use the first reference (not back reference) to sort."""
+        from hypatia.util import ResultSet
+        from adhocracy_core.interfaces import Reference
+        from adhocracy_core.interfaces import ISheet
+        child = self._make_resource(registry, parent=pool)
+        child2 = self._make_resource(registry, parent=pool)
+        search_result = ResultSet((child.__oid__, child2.__oid__), 2, None)
+        inst._search_elements = Mock(return_value=search_result)
+        references_result = ResultSet((child2.__oid__, child.__oid__), 2, None)
+        reference_index = inst['adhocracy']['reference']
+        reference_index.search_with_order = Mock(return_value=
+                                                 references_result)
+        reference = Reference(child, ISheet, 'field', None)
+        back_reference = Reference(None, ISheet, 'field', child2)
+        result = inst.search(query._replace(interfaces=IPool,
+                                            references=(back_reference,
+                                                        reference),
+                                            sort_by='reference'))
+        reference_index.search_with_order.assert_called_once_with(reference)
+        assert list(result.elements) == [child2, child]
+
+    def test_search_with_sort_by_references_and_reverse(self, registry, pool,
+                                                        inst, query):
+        from adhocracy_core.interfaces import Reference
+        from adhocracy_core.interfaces import ISheet
+        child = self._make_resource(registry, parent=pool)
+        reference = Reference(child, ISheet, 'field', None)
+        with raises(NotImplementedError):
+            inst.search(query._replace(interfaces=IPool,
+                                       references=(reference,),
+                                       sort_by='reference',
+                                       reverse=True))
+
+    def test_search_with_sort_by_references_and_limit(self, registry, pool,
+                                                      inst, query):
+        from adhocracy_core.interfaces import Reference
+        from adhocracy_core.interfaces import ISheet
+        child = self._make_resource(registry, parent=pool)
+        reference = Reference(child, ISheet, 'field', None)
+        with raises(NotImplementedError):
+            inst.search(query._replace(interfaces=IPool,
+                                       references=(reference,),
+                                       sort_by='reference',
+                                       limit=10))
 
     def test_search_with_group_by(self, registry, pool, inst, query):
-        from adhocracy_core.interfaces import ISimple
-        child = self._make_resource(registry, parent=pool, iresource=ISimple)
-        result = inst.search(query._replace(group_by='interfaces',
+        from adhocracy_core.interfaces import IPool
+        child = self._make_resource(registry, parent=pool)
+        result = inst.search(query._replace(interfaces=IPool,
+                                            group_by='interfaces',
                                             resolve=True))
-        assert list(result.group_by[ISimple]) == [child]
+        assert list(result.group_by[IPool]) == [child]
 
     def test_search_with_group_by_and_resolve_false(self, registry, pool, inst,
                                                     query):
-        from adhocracy_core.interfaces import ISimple
-        from hypatia.interfaces import IResultSet
-        child = self._make_resource(registry, parent=pool, iresource=ISimple)
-        result = inst.search(query._replace(group_by='interfaces',
+        from adhocracy_core.interfaces import IPool
+        from collections.abc import Iterable
+        child = self._make_resource(registry, parent=pool)
+        result = inst.search(query._replace(interfaces=IPool,
+                                            group_by='interfaces',
                                             resolve=False))
-        assert IResultSet.providedBy(result.group_by[ISimple])
+        assert isinstance(result.group_by[IPool], Iterable)
 
     def test_search_with_group_by_and_sort_by(self, registry, pool, inst, query):
-        from adhocracy_core.interfaces import ISimple
-        child = self._make_resource(registry, parent=pool, iresource=ISimple)
-        child2 = self._make_resource(registry, parent=pool, iresource=ISimple)
-        result = inst.search(query._replace(group_by='interfaces',
+        from adhocracy_core.interfaces import IPool
+        child = self._make_resource(registry, parent=pool)
+        child2 = self._make_resource(registry, parent=pool)
+        result = inst.search(query._replace(interfaces=IPool,
+                                            group_by='interfaces',
                                             sort_by='name'))
-        assert list(result.group_by[ISimple]) == [child, child2]
+        assert list(result.group_by[IPool]) == [child, child2]
 
     def test_search_with_allows_no_permission(self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import IPool
         from pyramid.authorization import Deny
         from adhocracy_core.authorization import set_acl
         child = self._make_resource(registry, parent=pool)
         set_acl(pool, [(Deny, 'principal', 'view')], registry=registry)
         inst['system']['allowed'].reindex_resource(child)
-        result = inst.search(query._replace(allows=(['principal'], 'view')))
+        result = inst.search(query._replace(interfaces=IPool,
+                                            allows=(['principal'], 'view')))
         assert list(result.elements) == []
 
     def test_search_with_allows_has_permission(self, registry, pool, inst,
                                                query):
+        from adhocracy_core.interfaces import IPool
         from pyramid.authorization import Allow
         from adhocracy_core.authorization import set_acl
         child = self._make_resource(registry, parent=pool)
         set_acl(pool, [(Allow, 'principal', 'view')], registry=registry)
         inst['system']['allowed'].reindex_resource(child)
-        result = inst.search(query._replace(allows=(['principal'], 'view')))
+        result = inst.search(query._replace(interfaces=IPool,
+                                            allows=(['principal'], 'view')))
         assert list(result.elements) == [child]
 

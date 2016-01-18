@@ -1,3 +1,5 @@
+/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+
 import * as AdhBadge from "../Badge/Badge";
 import * as AdhConfig from "../Config/Config";
 import * as AdhHttp from "../Http/Http";
@@ -5,6 +7,7 @@ import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUtil from "../Util/Util";
 
 import * as AdhCredentials from "./Credentials";
 import * as AdhUser from "./User";
@@ -13,7 +16,8 @@ import RIComment from "../../Resources_/adhocracy_core/resources/comment/ICommen
 import RIProposal from "../../Resources_/adhocracy_core/resources/proposal/IProposal";
 import RIRate from "../../Resources_/adhocracy_core/resources/rate/IRate";
 import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
-import RIUsersService from "../../Resources_/adhocracy_core/resources/principal/IUsersService";
+import * as SIHasAssetPool from "../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
+import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
@@ -96,11 +100,20 @@ export interface IScopeRegister extends angular.IScope {
         email : string;
         password : string;
         passwordRepeat : string;
+        captchaGuess : string;
     };
     loggedIn : boolean;
     userName : string;
     siteName : string;
     termsUrl : string;
+    captcha : {
+        enabled : boolean;
+        audioEnabled : boolean;
+        toggleAudio : (event : any) => void;
+        id : string;
+        imageData : string;
+        audioData : string;
+    };
     errors : string[];
     supportEmail : string;
     success : boolean;
@@ -126,7 +139,6 @@ var bindServerErrors = (
         });
     }
 };
-
 
 export var activateArea = (
     adhConfig : AdhConfig.IService,
@@ -215,7 +227,124 @@ export var loginDirective = (
 };
 
 
+var captchaImageEmpty : string
+    = "iVBORw0KGgoAAAANSUhEUgAAAFcAAAAgCAAAAABChLvJAAAACXBIWXMAAAsTAAALEwEAmpwYAAAA"
+    + "B3RJTUUH4AEHCB0YmDQF2QAAAbJJREFUSMftlj9oFEEUxn9z2dld9e7wDynC5apc5CBoJWm0CNyh"
+    + "hQiCCIKgXVwLhUBIaW1hmoAWCjZ2NoJkj4gEoo0ICoJ/coqCiNEzSggkyF5APovdOyOaSyAk1b5m"
+    + "4Pve/Bjem3mMEVsSGVJuyk25KXdD3BvGbGyfacZrzV2tFsyRNc6b29R8m6usXYda/kSXHYcx1xTq"
+    + "AIy4mYElzlmTneJiuc/kp9jHru+xTDXjjJO4q0J/xfWcQo79GMzqMVc/lIqS9MDcnNl5/ikTb0tl"
+    + "BZyZHfR/iSiWQ44uVPJKXFUOJ6D/cSPdszrZJ82yIqlyULo7sfhE84eKCnzpp3koolgOiXTfU+L+"
+    + "4Tr/Fsl6uPC1F8rUD8CXEpymOfbcc3zYDTv8V9WWXLMeXeAn7vr3rGcO6uwHuj/DrWD02cuFU8Ai"
+    + "NKNyW06yW+763Mvvr3083usBl17cfjTS+ObueXNnBaKz74a8KjRiOcluuZ36ZqXQSqOWnteSpGGH"
+    + "/uVPe03uSuZC0F0gOykVmR926F8OrRR6StxOfescQbGj3eZu13xYMpuhFabb7zz9l6TcbeD+BrU7"
+    + "P37R2EAZAAAAAElFTkSuQmCC";
+
+var captchaImageAudioIcon : string
+    = "iVBORw0KGgoAAAANSUhEUgAAAGkAAAAnCAAAAAApuzn6AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA"
+    + "B3RJTUUH4AEHCCQB8tsgowAAAgRJREFUWMPtlj9oE2EYxn/f9ZI7c0mxSoaQZmoqAbE4iPhvUBJc"
+    + "XAQtCIKCQ4yDhWIJnZxFdAlWxJQO6aSjmFIRQV1qoaLgn8RSQcVqrVgKLSUplNfh7kov2ogiCnrP"
+    + "cvB8D8+P97vvPk4Jf0gaPskn/Uekq0p9u/5WMWz9qETV7edIcK0bV/vWmyny/a94d/7XhphON9u9"
+    + "EwEVHmUwDINhOKrrPTB2EfJBFa8C0BvUti44uTOpDtU6ymasz7ZNRtMvuy2NklUNRGScwqtkSoqW"
+    + "SNGSK6ow0YaUQvKQC6+TCRGRO+r6/dBJJ5fjWGWnuSLUbLvMwbl0q9si6b2yRl7S/JjM7ki4pO27"
+    + "RK4hpZAc7hCpsCwi6S6RmwUnlzNFltRdoWbbZWpyy3BbGki6Z0Az/9jQTXtW+HIA9gDwsR1SVLfB"
+    + "hyR0U3dyG2GD+Tzj2iMBgxZPy7rvqW/i2dwRG1OB6CQ8AiA2DVW2ANH3UMy5uXmo11KrdkNLM9Kn"
+    + "YNvL4WViSzemhiA7PvCkXwH0TF16c6jdAM4+HXrQO+PkqB2f3G9kYMa2vS1NT8S7TSpyXju90oVx"
+    + "zhLpbtFOaVIKifQFiL0QEZGsTueik8tF44RviySYzep0LpYDImXDbWl6In5SuUTTZS/p79x7C+q3"
+    + "Vsfvea8s/z/CJ/kkn+STfJJP+sdIXwHavoZF/OPGkQAAAABJRU5ErkJggg==";
+
+var arrayBufferToBase64 = (data : ArrayBuffer) : string => {
+    var binary = "";
+    var buffer = new Uint8Array(data);
+    for (var i = 0; i < buffer.byteLength; i++) {
+        binary += String.fromCharCode(buffer[i]);
+    }
+    return btoa(binary);
+
+    // this variant with tail recursion causes stack to overflow:
+    // return btoa(String.fromCharCode.apply(null, new Uint8Array(data)));
+};
+
+var encodeCaptchaImage = (
+    audioEnabled : boolean,
+    data : ArrayBuffer
+) : string => {
+    var result : string = "data:image/png;base64, ";
+
+    if (audioEnabled) {
+        result += captchaImageAudioIcon;
+    } else if (!data) {
+        result += captchaImageEmpty;
+    } else {
+        result += arrayBufferToBase64(data);
+    }
+
+    return result;
+};
+
+var encodeCaptchaAudio = (
+    $sce : ng.ISCEService,
+    data : ArrayBuffer
+) : string => {
+    if (data) {
+        var result : string = "data:audio/wav;base64, ";
+        result += arrayBufferToBase64(data);
+        return $sce.trustAsResourceUrl(result);
+    } else {
+        return "";
+    }
+};
+
+var fetchCaptchaImage = (
+    adhConfig : AdhConfig.IService,
+    $sce : ng.ISCEService,
+    $http : angular.IHttpService,
+    scope : IScopeRegister
+) => {
+    // remove old challenges
+    scope.captcha.imageData = encodeCaptchaImage(false, null);
+    scope.captcha.audioData = encodeCaptchaAudio($sce, null);
+    scope.captcha.audioEnabled = false;
+
+    // fetch new one
+    var cfg : any = { responseType: "arraybuffer", headers: { "Accept": "image/png" } };
+    $http.post(adhConfig.captcha_url + "captcha", null, cfg).then(
+        (response) => {
+            scope.captcha.id = response.headers("X-Thentos-Captcha-Id");
+            scope.captcha.imageData = encodeCaptchaImage(false, <ArrayBuffer>response.data);
+        },
+        (exception) => {
+            console.log("failed to fetch captcha image");
+        });
+};
+
+var fetchCaptchaAudio = (
+    adhConfig : AdhConfig.IService,
+    $sce : ng.ISCEService,
+    $http : angular.IHttpService,
+    scope : IScopeRegister
+) => {
+    // remove old challenges
+    scope.captcha.imageData = encodeCaptchaImage(true, null);
+    scope.captcha.audioData = encodeCaptchaAudio($sce, null);
+
+    // fetch new one
+    var cfg : any = { responseType: "arraybuffer", headers: { "Accept": "audio/l16" } };
+    var path : string = adhConfig.captcha_url + "audio_captcha/" + adhConfig.locale;
+    $http.post(path, null, cfg).then(
+        (response) => {
+            scope.captcha.id = response.headers("X-Thentos-Captcha-Id");
+            scope.captcha.audioData = encodeCaptchaAudio($sce, <ArrayBuffer>response.data);
+            scope.captcha.audioEnabled = true;
+        },
+        (exception) => {
+            console.log("failed to fetch audio captcha");
+        });
+};
+
+
 export var registerDirective = (
+    $sce : ng.ISCEService,
+    $http : angular.IHttpService,
     adhConfig : AdhConfig.IService,
     adhCredentials : AdhCredentials.Service,
     adhUser : AdhUser.Service,
@@ -229,6 +358,24 @@ export var registerDirective = (
         link: (scope : IScopeRegister) => {
             scope.siteName = adhConfig.site_name;
             scope.termsUrl = adhConfig.terms_url;
+            scope.captcha = {
+                enabled: adhConfig.captcha_enabled,
+                audioEnabled: false,
+                toggleAudio: (event) => {
+                    if (event.target.checked) {
+                        fetchCaptchaAudio(adhConfig, $sce, $http, scope);
+                    } else {
+                        fetchCaptchaImage(adhConfig, $sce, $http, scope);
+                    }
+                },
+                id: "",
+                imageData: "",
+                audioData: ""
+            };
+            if (scope.captcha.enabled) {
+                fetchCaptchaImage(adhConfig, $sce, $http, scope);
+            }
+
             scope.showError = adhShowError;
 
             scope.logOut = () => {
@@ -249,7 +396,8 @@ export var registerDirective = (
                 username: "",
                 email: "",
                 password: "",
-                passwordRepeat: ""
+                passwordRepeat: "",
+                captchaGuess: ""
             };
 
             scope.cancel = scope.goBack = () => {
@@ -261,11 +409,21 @@ export var registerDirective = (
             scope.supportEmail = adhConfig.support_email;
 
             scope.register = () : angular.IPromise<void> => {
-                return adhUser.register(scope.input.username, scope.input.email, scope.input.password, scope.input.passwordRepeat)
+                return adhUser.register(scope.input.username, scope.input.email, scope.input.password, scope.input.passwordRepeat,
+                                        scope.captcha.id, scope.input.captchaGuess)
                     .then((response) => {
                         scope.errors = [];
                         scope.success = true;
-                    }, (errors) => bindServerErrors(scope, errors));
+                    }, (errors) => {
+                        if (scope.captcha.enabled) {
+                            if (scope.captcha.audioEnabled) {
+                                fetchCaptchaAudio(adhConfig, $sce, $http, scope);
+                            } else {
+                                fetchCaptchaImage(adhConfig, $sce, $http, scope);
+                            }
+                        }
+                        return bindServerErrors(scope, errors);
+                    });
             };
         }
     };
@@ -571,19 +729,6 @@ export var userDetailColumnDirective = (
 };
 
 
-export var userListingColumnDirective = (
-    adhConfig : AdhConfig.IService
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserListingColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["userUrl"]);
-        }
-    };
-};
-
 export var adhUserManagementHeaderDirective = (
     adhConfig : AdhConfig.IService
 ) => {
@@ -638,6 +783,67 @@ export var adhUserActivityOverviewDirective = (
     };
 };
 
+export var adhUserProfileImageDirective = (
+    adhHttp: AdhHttp.Service<any>,
+    adhConfig: AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        scope: {
+            path: "@",
+            format: "@?", // thumbnail [default] or detail
+            didFailToLoadImage: "&?",
+            cssClass: "@?"
+        },
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfileImage.html",
+        link: (scope) => {
+            scope.didFailToLoadImage = scope.didFailToLoadImage || (() => null);
+
+            scope.config = adhConfig;
+            scope.$watch("path", (path) => {
+                if ( ! path) { return; }
+
+                adhHttp.get(scope.path).then((user) => {
+                    scope.assetPath = user.data[SIImageReference.nick].picture;
+                    scope.userName = user.data[SIUserBasic.nick].name;
+                    if ( ! scope.assetPath) {
+                        scope.didFailToLoadImage();
+                    }
+                }, scope.didFailToLoadImage);
+            });
+        }
+    };
+};
+
+export var adhUserProfileImageEditDirective = (
+    adhHttp: AdhHttp.Service<any>,
+    adhPermissions: AdhPermissions.Service,
+    adhConfig: AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        scope: {
+            path: "@"
+        },
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfileImageEdit.html",
+        link: (scope) => {
+            scope.config = adhConfig;
+            adhHttp.get(AdhUtil.parentPath(scope.path)).then((userPool) => {
+                scope.assetPool = userPool.data[SIHasAssetPool.nick].asset_pool;
+            });
+            scope.triggerUpload = () => {
+                scope.isUploading = true;
+            };
+            scope.didUpload = () => {
+               scope.isUploading = false;
+            };
+            scope.$watch("path", (path) => {
+                adhPermissions.bindScope(scope, () => scope.path, "userOptions");
+            });
+        }
+    };
+};
+
 export var registerRoutes = (
     context : string = ""
 ) => (
@@ -646,17 +852,11 @@ export var registerRoutes = (
     adhResourceAreaProvider
         .default(RIUser, "", "", context, {
             space: "user",
-            movingColumns: "is-show-show-hide"
+            movingColumns: "is-show-hide-hide"
         })
         .specific(RIUser, "", "", context, () => (resource : RIUser) => {
             return {
                 userUrl: resource.path
             };
-        })
-        .default(RIUsersService, "", "", context, {
-            space: "user",
-            movingColumns: "is-show-hide-hide",
-            userUrl: "",  // not used by default, but should be overridable
-            focus: "0"
         });
 };

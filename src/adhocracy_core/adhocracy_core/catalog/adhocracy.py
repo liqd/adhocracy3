@@ -14,7 +14,7 @@ from adhocracy_core.resources.comment import ICommentVersion
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.sheets.rate import IRateable
-from adhocracy_core.sheets.tags import TagElementsReference
+from adhocracy_core.sheets.tags import ITags
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.badge import IBadgeable
@@ -23,7 +23,7 @@ from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.utils import get_sheet_field
-from adhocracy_core.utils import find_graph
+from adhocracy_core.utils import get_sheet
 
 
 class Reference(IndexFactory):
@@ -138,9 +138,11 @@ def index_comments(resource, default) -> int:
 
 def index_tag(resource, default) -> [str]:
     """Return value for the tag index."""
-    graph = find_graph(resource)
-    tags = graph.get_back_reference_sources(resource, TagElementsReference)
-    tagnames = [tag.__name__ for tag in tags]
+    item = find_interface(resource, IItem)
+    if item is None:  # ease testing
+        return
+    tags_sheet = get_sheet(item, ITags)
+    tagnames = [f for f, v in tags_sheet.get().items() if v is resource]
     return tagnames if tagnames else default
 
 

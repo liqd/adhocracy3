@@ -2,7 +2,6 @@
 import colander
 
 from adhocracy_core.interfaces import ISheet
-from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import Boolean
@@ -15,8 +14,10 @@ from adhocracy_core.schema import Reference
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import URL
+from adhocracy_core.schema import AdhocracySequenceNode
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
+from adhocracy_core.sheets.subresources import ISubResources
 
 
 class IUserInfo(ISheet):
@@ -53,13 +54,13 @@ class OrganizationStatusEnum(AdhocracySchemaNode):
 class OrganizationInfoSchema(colander.MappingSchema):
     """Data structure for organizational information."""
 
-    name = SingleLine(missing=colander.required)
-    city = SingleLine(missing=colander.required)
-    country = ISOCountryCode(missing=colander.required)
+    name = SingleLine(missing=colander.drop)
+    city = SingleLine(missing=colander.drop)
+    country = ISOCountryCode(missing=colander.drop)
     help_request = Text(validator=colander.Length(max=300))
-    registration_date = DateTime(missing=colander.required, default=None)
+    registration_date = DateTime(missing=colander.drop, default=None)
     website = URL(missing=colander.drop)
-    contact_email = Email(missing=colander.required)
+    contact_email = Email(missing=colander.drop)
     status = OrganizationStatusEnum(missing=colander.required)
     status_other = Text(validator=colander.Length(max=300))
 
@@ -94,7 +95,7 @@ class IPitch(ISheet):
 
 class PitchSchema(colander.MappingSchema):
     pitch = Text(missing=colander.required,
-                 validator=colander.Length(min=3, max=100))
+                 validator=colander.Length(min=3, max=500))
 
 
 pitch_meta = sheet_meta._replace(
@@ -141,26 +142,36 @@ class TopicEnum(AdhocracySchemaNode):
                                 ])
 
 
+class TopicEnums(AdhocracySequenceNode):
+    """List of TopicEnums."""
+
+    missing = colander.required
+    topics = TopicEnum()
+
+
 class ITopic(ISheet):
     """Marker interface for the topic (ex: democracy, art, environment etc)."""
 
 
 class TopicSchema(colander.MappingSchema):
-    topic = TopicEnum(missing=colander.required)
-    other = Text()
+    topic = TopicEnums(validator=colander.Length(min=1, max=2))
+    topic_other = Text()
 
-    def validator(self, node, value):
-        """Extra validation depending on the status of the topic.
+    def validator(self, node: colander.SchemaNode, value: dict):
+        """Extra validation depending on the status of the topic."""
+        topics = value.get('topic', [])
+        if 'other' in topics:
+            if not value.get('topic_other', None):
+                raise colander.Invalid(node['topic_other'],
+                                       msg='Required if "other" in topic')
+        if _has_duplicates(topics):
+            raise colander.Invalid(node['topic'],
+                                   msg='Duplicates are not allowed')
 
-        Make `other` required if `topic` == `other`.
-        """
-        topic = value.get('topic', None)
-        if topic == 'other':
-            if not value.get('other', None):
-                other = node['other']
-                raise colander.Invalid(
-                    other,
-                    msg='Required iff topic == other')
+
+def _has_duplicates(iterable: list) -> bool:
+    return len(iterable) != len(set(iterable))
+
 
 topic_meta = sheet_meta._replace(
     isheet=ITopic,
@@ -185,7 +196,7 @@ class ILocation(ISheet):
 
 
 class LocationSchema(colander.MappingSchema):
-    location = SingleLine(missing=colander.required)
+    location = SingleLine()
     is_online = Boolean()
     has_link_to_ruhr = Boolean(missing=colander.required, default=False)
     link_to_ruhr = Text()
@@ -221,7 +232,7 @@ class ProjectStatusEnum(AdhocracySchemaNode):
     default = 'other'
     missing = colander.required
     validator = colander.OneOf(['starting',
-                                'developping',
+                                'developing',
                                 'scaling',
                                 'other',
                                 ])
@@ -434,11 +445,29 @@ class HeardFromEnum(AdhocracySchemaNode):
                                 ])
 
 
+class HeardFromEnums(AdhocracySequenceNode):
+    """List of HeardFromEnums."""
+
+    missing = colander.required
+    heard_froms = HeardFromEnum()
+
+
 class CommunitySchema(colander.MappingSchema):
-    expected_feedback = Text(missing=colander.required)
-    heard_from = HeardFromEnum(missing=colander.required)
+    expected_feedback = Text(missing=colander.drop)
+    heard_froms = HeardFromEnums(validator=colander.Length(min=1))
     heard_from_other = Text()
 
+    def validator(self, node: colander.SchemaNode, value: dict):
+        """Extra validation depending on the status of the heard froms."""
+        heard_froms = value.get('heard_froms', [])
+        if 'other' in heard_froms:
+            if not value.get('heard_from_other', None):
+                raise colander.Invalid(
+                    node['heard_from_other'],
+                    msg='Required if "other" in heard_froms')
+        if _has_duplicates(heard_froms):
+            raise colander.Invalid(node['heard_froms'],
+                                   msg='Duplicates are not allowed')
 
 community_meta = sheet_meta._replace(
     isheet=ICommunity,
@@ -451,7 +480,6 @@ class IWinnerInfo(ISheet):
 
 
 class WinnerInfoSchema(colander.MappingSchema):
-    explanation = Text()
     funding = Integer()
 
 winnerinfo_meta = sheet_meta._replace(
@@ -462,7 +490,7 @@ winnerinfo_meta = sheet_meta._replace(
 )
 
 
-class IMercatorSubResources(ISheet, ISheetReferenceAutoUpdateMarker):
+class IMercatorSubResources(ISubResources):
     """Marker interface for commentable subresources of MercatorProposal."""
 
 
@@ -558,7 +586,7 @@ class PracticalRelevanceReference(SheetToSheet):
     """Reference to practical relevance."""
 
     source_isheet = IMercatorSubResources
-    source_isheet_field = 'difference'
+    source_isheet_field = 'practicalrelevance'
     target_isheet = IPracticalRelevance
 
 

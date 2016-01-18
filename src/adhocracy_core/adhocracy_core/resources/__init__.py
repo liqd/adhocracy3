@@ -253,7 +253,6 @@ def includeme(config):
     config.include('.pool')
     config.include('.organisation')
     config.include('.root')
-    config.include('.tag')
     config.include('.comment')
     config.include('.external_resource')
     config.include('.principal')

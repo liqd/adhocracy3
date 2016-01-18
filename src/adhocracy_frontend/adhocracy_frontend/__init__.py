@@ -36,6 +36,10 @@ def config_view(request):
         settings.get('adhocracy.trusted_domains', []))
     config['support_email'] = settings.get('adhocracy.frontend.support_email',
                                            'support@unconfigured.domain')
+    config['captcha_enabled'] = asbool(settings.get(
+        'adhocracy.thentos_captcha.enabled', 'false'))
+    config['captcha_url'] = settings.get(
+        'adhocracy.thentos_captcha.frontend_url', 'http://localhost:6542/')
     config['locale'] = settings.get('adhocracy.frontend.locale', 'en')
     custom_keys = settings.get('adhocracy.custom', '').split()
     config['custom'] = {k: settings.get('adhocracy.custom.%s' % k)
@@ -52,6 +56,8 @@ def config_view(request):
         'adhocracy.frontend.piwik_use_cookies', 'false'))
     config['piwik_track_user_id'] = asbool(settings.get(
         'adhocracy.frontend.piwik_track_user_id', 'false'))
+    config['profile_images_enabled'] = asbool(settings.get(
+        'adhocracy.frontend.profile_images_enabled', 'true'))
     use_cachbust = asbool(settings.get('cachebust.enabled', 'false'))
     if not use_cachbust:  # ease testing
         return config

@@ -479,11 +479,11 @@ class ReferenceUnitTest(unittest.TestCase):
 
     def test_create(self):
         from adhocracy_core.interfaces import SheetReference
-        from adhocracy_core.schema import _validate_reftype
+        from adhocracy_core.schema import validate_reftype
         inst = self.make_one()
         assert inst.backref is False
         assert inst.reftype == SheetReference
-        assert inst.validator.validators == (_validate_reftype,)
+        assert inst.validator.validators == (validate_reftype,)
 
     def test_with_backref(self):
         inst = self.make_one(backref=True)
@@ -842,17 +842,20 @@ class TestISOCountryCode:
         from adhocracy_core.schema import ISOCountryCode
         return ISOCountryCode()
 
-    def test_deserialize_valid_empty(self, inst):
+    def test_deserialize_valid_missing(self, inst):
         assert inst.deserialize() == colander.drop
 
     def test_serialize_valid_empty(self, inst):
-        assert inst.serialize() == 'DE'
+        assert inst.serialize() == ''
+
+    def test_serialize_valid(self, inst):
+        assert inst.serialize('US') == 'US'
 
     def test_deserialize_valid(self, inst):
         assert inst.deserialize('US') == 'US'
 
-    def test_serialize_valid(self, inst):
-        assert inst.serialize('US') == 'US'
+    def test_deserialize_valid_empty(self, inst):
+        assert inst.deserialize('') == ''
 
     def test_deserialize_invalid_too_long(self, inst):
         with raises(colander.Invalid):

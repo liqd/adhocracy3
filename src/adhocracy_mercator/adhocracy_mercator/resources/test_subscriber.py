@@ -15,4 +15,3 @@ def test_set_root_acms(monkeypatch):
     set_root_acms(event)
     mock_set_acms.assert_called_with(event.app, (mercator_acm, root_acm))
 
-

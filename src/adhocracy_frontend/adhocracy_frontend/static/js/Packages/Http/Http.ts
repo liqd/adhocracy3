@@ -14,7 +14,7 @@ import * as AdhUtil from "../Util/Util";
 import * as ResourcesBase from "../../ResourcesBase";
 
 import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
-import * as SITag from "../../Resources_/adhocracy_core/sheets/tags/ITag";
+import * as SITags from "../../Resources_/adhocracy_core/sheets/tags/ITags";
 import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
 import * as AdhCache from "./Cache";
@@ -316,14 +316,10 @@ export class Service<Content extends ResourcesBase.Resource> {
      * there is a difference between the LAST tag and this function.)
      */
     public getNewestVersionPathNoFork(path : string, config : IHttpGetConfig = {}) : angular.IPromise<string> {
-        return this.get(path + "LAST/", undefined, config)
-            .then((tag) => {
-                var heads = tag.data[SITag.nick].elements;
-                if (heads.length !== 1) {
-                    throw ("Cannot handle this LAST tag: " + heads.toString());
-                } else {
-                    return heads[0];
-                }
+        return this.get(path, undefined, config)
+            .then((item) => {
+                var head = item.data[SITags.nick].LAST;
+                return head;
             });
     }
 

@@ -94,7 +94,8 @@ def migrate_new_sheet(context: IPool,
     registry = get_current_registry(context)
     catalogs = find_service(context, 'catalogs')
     interfaces = isheet_old and (isheet_old, iresource) or iresource
-    query = search_query._replace(interfaces=interfaces)
+    query = search_query._replace(interfaces=interfaces,
+                                  resolve=True)
     resources = catalogs.search(query).elements
     count = len(resources)
     logger.info('Migrating {0} {1} to new sheet {2}'.format(count, iresource,
@@ -138,7 +139,7 @@ def _get_resource_meta(context: IResource,
 
 def _search_for_interfaces(catalogs: ICatalogsService,
                            interfaces: (IInterface)) -> [IResource]:
-    query = search_query._replace(interfaces=interfaces)
+    query = search_query._replace(interfaces=interfaces, resolve=True)
     resources = catalogs.search(query).elements
     return resources
 
@@ -420,7 +421,7 @@ def move_sheet_annotation_data_to_attributes(root):  # pragma: no cover
     Instead add private attributes for every sheet data annotation to resource.
     """
     catalogs = find_service(root, 'catalogs')
-    query = search_query._replace(interfaces=(IResource,))
+    query = search_query._replace(interfaces=(IResource,), resolve=True)
     resources = catalogs.search(query).elements
     count = len(resources)
     for index, resource in enumerate(resources):
@@ -530,6 +531,64 @@ def recreate_all_image_size_downloads(root):  # pragma: no cover
         catalogs.reindex_index(image, 'interfaces')  # we missed reindexing
 
 
+@log_migration
+def remove_tag_resources(root):  # pragma: no cover
+    """Remove all ITag resources, create ITags sheet references instead."""
+    from adhocracy_core.sheets.tags import ITags
+    from adhocracy_core.interfaces import IItem
+    registry = get_current_registry(root)
+    catalogs = find_service(root, 'catalogs')
+    items = _search_for_interfaces(catalogs, IItem)
+    items_with_tags = [x for x in items if 'FIRST' in x]
+    count = len(items_with_tags)
+    for index, item in enumerate(items_with_tags):
+        logger.info('Migrate tag resource {0} of {1}'.format(index + 1, count))
+        del item['FIRST']
+        del item['LAST']
+        version_names = [x[0] for x in item.items()
+                         if IItemVersion.providedBy(x[1])]
+        version_names.sort()  # older version names are lower then younger ones
+        first_version = version_names[0]
+        last_version = version_names[-1]
+        tags_sheet = registry.content.get_sheet(item, ITags)
+        tags_sheet.set({'LAST': item[last_version],
+                        'FIRST': item[first_version]})
+
+
+@log_migration
+def set_comment_count(root):  # pragma: no cover
+    """Set comment_count for all ICommentables."""
+    from adhocracy_core.resources.subscriber import update_comments_count
+    registry = get_current_registry(root)
+    catalogs = find_service(root, 'catalogs')
+    query = search_query._replace(interfaces=ICommentVersion,
+                                  only_visible=True,
+                                  resolve=True)
+    comment_versions = catalogs.search(query).elements
+    count = len(comment_versions)
+    for index, comment in enumerate(comment_versions):
+        logger.info('Set comment_count for resource {0} of {1}'
+                    .format(index + 1, count))
+        update_comments_count(comment, 1, registry)
+
+
+def remove_duplicated_group_ids(root):  # pragma: no cover
+    """Remove duplicate group_ids from users."""
+    from adhocracy_core.resources.principal import IUser
+    catalogs = find_service(root, 'catalogs')
+    users = _search_for_interfaces(catalogs, IUser)
+    count = len(users)
+    for index, user in enumerate(users):
+        logger.info('Migrate user resource{0} of {1}'.format(index + 1, count))
+        group_ids = getattr(user, 'group_ids', [])
+        if not group_ids:
+            continue
+        unique_group_ids = list(set(group_ids))
+        if len(unique_group_ids) < len(group_ids):
+            logger.info('Remove duplicated groupd_ids for {0}'.format(user))
+            user.group_ids = unique_group_ids
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -553,3 +612,6 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_image_reference_to_users)
     config.add_evolution_step(update_asset_download_children)
     config.add_evolution_step(recreate_all_image_size_downloads)
+    config.add_evolution_step(remove_tag_resources)
+    config.add_evolution_step(set_comment_count)
+    config.add_evolution_step(remove_duplicated_group_ids)

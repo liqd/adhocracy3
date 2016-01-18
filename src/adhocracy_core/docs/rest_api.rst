@@ -43,17 +43,12 @@ There are 5 base types of resources:
 * `Pool`: folder in the resource hierarchy, can contain other Pools of any kind.
 
 * `Item`: container Pool for ItemVersions of a specific type that belong to the
-  same :term:`DAG` `Tag`s for these Versions and
+  same :term:`DAG`
   `Sub-Items` that are closely related (e.g. Sections within Documents)
 
 * `ItemVersion`: a specific version of an item (SectionVersion, DocumentVersion)
 
 * `Simple`: Anything that is neither versionable/item nor a pool.
-
-* `Tag`: a subtype of Simple, points to one (or sometimes zero or many)
-  ItemVersion, e.g. the current HEAD or the last APPROVED version of a
-  Document. Can be modified but doesn't have its own
-  version history, hence it's a Simple instead of an Item.
 
 To model the application domain we have some frequently use derived types with
 semantics::
@@ -76,11 +71,9 @@ Example resource hierarchy::
     Pool:         proposals
     Item:         proposals/proposal1
     ItemVersion:  proposals/proposal1/v1
-    Tag:          proposals/proposal1/head
 
     Item:         proposals/proposal1/document1
     ItemVersion:  proposals/proposal1/document1/v1
-    Tag:          proposals/proposal1/document1/head
 
 
 Meta-API
@@ -146,7 +139,7 @@ example, a pool can contain other pools; a document can contain tags. ::
     >>> organisation_desc['element_types']
     [...adhocracy_core.resources.process.IProcess...
     >>> sorted(document_desc['element_types'])
-    ['adhocracy_core.interfaces.ITag', ...'adhocracy_core.resources.paragraph.IParagraph']
+    [...'adhocracy_core.resources.paragraph.IParagraph']
 
 The "sheets" key points to an object whose keys are all the sheets
 implemented by any of the resources::
@@ -568,8 +561,11 @@ The Document has the IVersions and ITags interfaces to work with Versions::
     >>> resp.json['data']['adhocracy_core.sheets.versions.IVersions']['elements']
     ['.../Documents/document_0000000/VERSION_0000000/']
 
-    >>> resp.json['data']['adhocracy_core.sheets.tags.ITags']['elements']
-    ['.../Documents/document_0000000/FIRST/', '.../Documents/document_0000000/LAST/']
+    >>> resp.json['data']['adhocracy_core.sheets.tags.ITags']['LAST']
+    '.../Documents/document_0000000/VERSION_0000000/'
+
+    >>> resp.json['data']['adhocracy_core.sheets.tags.ITags']['FIRST']
+    '.../Documents/document_0000000/VERSION_0000000/'
 
 
 Update
@@ -583,6 +579,11 @@ Fetch the first Document version, it is empty ::
 
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersionable'])
     {'followed_by': [], 'follows': []}
+
+but owned by the Document item creator::
+    >>> pprint(resp.json['data']['adhocracy_core.sheets.metadata.IMetadata']['creator'])
+    'http://localhost/principals/users/0000000/'
+
 
 Create a new version of the proposal that follows the first version ::
 
@@ -768,27 +769,15 @@ Tags
 
 Each Versionable has a FIRST tag that points to the initial version::
 
-    >>> resp = testapp.get(rest_url + '/Documents/document_0000000/FIRST')
-    >>> pprint(resp.json)
-    {'content_type': 'adhocracy_core.interfaces.ITag',
-     'data': {...
-              'adhocracy_core.sheets.name.IName': {'name': 'FIRST'},
-              'adhocracy_core.sheets.tags.ITag': {'elements': ['.../Documents/document_0000000/VERSION_0000000/']}},
-     'path': '.../Documents/document_0000000/FIRST/'}
+    >>> resp = testapp.get(rest_url + '/Documents/document_0000000')
+    >>> pprint(resp.json['data']['adhocracy_core.sheets.tags.ITags']['FIRST'])
+    '.../Documents/document_0000000/VERSION_0000000/'
 
 It also has a LAST tag that points to the newest versions -- any versions
 that aren't 'followed_by' any later version::
 
-    >>> resp = testapp.get(rest_url + '/Documents/document_0000000/LAST')
-    >>> pprint(resp.json)
-    {'content_type': 'adhocracy_core.interfaces.ITag',
-     'data': {...
-              'adhocracy_core.sheets.name.IName': {'name': 'LAST'},
-              'adhocracy_core.sheets.tags.ITag': {'elements': ['.../Documents/document_0000000/VERSION_0000004/']}},
-     'path': '.../Documents/document_0000000/LAST/'}
-
-FIXME: the elements listing in the ITags interface is not very helpful, the
-tag names (like 'FIRST') are missing.
+    >>> pprint(resp.json['data']['adhocracy_core.sheets.tags.ITags']['LAST'])
+    '.../Documents/document_0000000/VERSION_0000004/'
 
 
 Forks and forkability
@@ -1054,7 +1043,9 @@ multiple times::
     >>> resp_data['errors'][0]['name']
     'data.adhocracy_core.sheets.rate.IRate.object'
     >>> resp_data['errors'][0]['description']
-    'Another rate by the same user already exists'
+    '; Another rate by the same user already exists'
+
+ ...TODO: remove ';' suffix of error description, :mod:`colander` bug
 
 The *subject* of a rate must always be the user that is currently logged in --
 it's not possible to vote for other users::
@@ -1067,7 +1058,7 @@ it's not possible to vote for other users::
     >>> resp_data['errors'][0]['name']
     'data.adhocracy_core.sheets.rate.IRate.subject'
     >>> resp_data['errors'][0]['description']
-    'Must be the currently logged-in user'
+    '; Must be the currently logged-in user'
 
 
 Batch requests
@@ -1246,9 +1237,9 @@ The follow reference points to None:
 
 The LAST tag should point to the last version we created within the batch request::
 
-    >>> resp_data = testapp.get(rest_url + "/Documents/document_0000000/PARAGRAPH_0000002/LAST").json
-    >>> resp_data['data']['adhocracy_core.sheets.tags.ITag']['elements']
-    ['.../Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/']
+    >>> resp_data = testapp.get(rest_url + "/Documents/document_0000000/PARAGRAPH_0000002").json
+    >>> resp_data['data']['adhocracy_core.sheets.tags.ITags']['LAST']
+    '.../Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/'
 
 All creation and modification dates are equal for one batch request:
 
@@ -1319,15 +1310,14 @@ Filtering Pools
 
 It's possible to filter and aggregate the information collected in pools by
 adding suitable GET parameters. For example, we can only retrieve children
-that implement a specific sheet:
-
-Or only children that implement a specific sheet::
+that have specific resource type (*content_type'):
 
     >>> resp_data = testapp.get('/Documents/document_0000000',
-    ...     params={'sheet': 'adhocracy_core.sheets.tags.ITag'}).json
+    ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraph'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/FIRST/',
-     'http://localhost/Documents/document_0000000/LAST/']
+    ['http://localhost/Documents/document_0000000/PARAGRAPH_0000000/',
+     'http://localhost/Documents/document_0000000/PARAGRAPH_0000001/',
+     'http://localhost/Documents/document_0000000/PARAGRAPH_0000002/']
 
 Note that multiple filters are combined by AND. If we specify a content_type
 filter and a sheet filter, only the elements matched by *both* filters will be
@@ -1339,15 +1329,14 @@ parameter value. The available comparators depend on the choosedn filter.
 *eq* 'equal to' is the default comparator we already used implicit::
 
     >>> resp_data = testapp.get('/Documents/document_0000000',
-    ...     params={'sheet': '["eq", "adhocracy_core.sheets.tags.ITag"]'}).json
+    ...     params={'content_type': '["eq", "adhocracy_core.resources.paragraph.IParagraph"]'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/FIRST/',
-     'http://localhost/Documents/document_0000000/LAST/']
+    ['http://localhost/Documents/document_0000000/PARAGRAPH_0000000/'...
 
 *noteq* not equal to::
 
     >>> resp_data = testapp.get('/Documents/document_0000000',
-    ...     params={'sheet': '["noteq", "adhocracy_core.sheets.tags.ITag"]'}).json
+    ...     params={'content_type': '["noteq", "adhocracy_core.resources.paragraph.IParagraph"]'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/Documents/document_0000000/VERSION_0000000/',...
 
@@ -1431,10 +1420,10 @@ To retrieve a count of the elements matching your query, specify
 be added to the returned IPool sheet::
 
     >>> resp_data = testapp.get('/Documents/document_0000000',
-    ...     params={'sheet': 'adhocracy_core.sheets.tags.ITag',
+    ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraph',
     ...             'count': 'true'}).json
     >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['count']
-    '2'
+    '3'
 
 *Note:* due to limitations of our (de)serialization library (Colander),
 the count is returned as a string, though it is actually a number.
@@ -1453,7 +1442,7 @@ sorting to sort the result::
     >>> resp_data = testapp.get('/Documents/document_0000000',
     ...     params={'sort': 'name'}).json
     >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
-    ['http://localhost/Documents/document_0000000/FIRST/', ...
+    ['http://localhost/Documents/document_0000000/PARAGRAPH_0000000/',...
 
 *Note* All resource in the result set must have a value in the chosen sort
 filter. For example if you use *rates* you have to limit the result to resources
@@ -1472,14 +1461,14 @@ If *reverse* is set to ``True`` the sorting will be reversed::
     >>> resp_data = testapp.get('/Documents/document_0000000',
     ...     params={'sort': 'name', 'reverse': True}).json
     >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
-    [... 'http://localhost/Documents/document_0000000/FIRST/']
+    ['http://localhost/Documents/document_0000000/rates/',...
 
 You can also specifiy a *limit* and an *offset* for pagination::
 
     >>> resp_data = testapp.get('/Documents/document_0000000',
     ...     params={'sort': 'name', 'limit': 1, 'offset': 0}).json
     >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
-    ['http://localhost/Documents/document_0000000/FIRST/']
+    ['http://localhost/Documents/document_0000000/PARAGRAPH_0000000/']
 
 The *count* is not affected by *limit*::
 
@@ -1493,41 +1482,38 @@ returned. By default, 'elements' in the IPool sheet contains a list of paths.
 This corresponds to setting *elements=paths*.
 
     >>> resp_data = testapp.get('/Documents/document_0000000',
-    ...     params={'sheet': 'adhocracy_core.sheets.tags.ITag',
+    ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
     ...             'elements': 'paths'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/FIRST/',
-     'http://localhost/Documents/document_0000000/LAST/']
+    ['http://localhost/Documents/document_0000000/VERSION_0000000/',...
 
 Setting *elements=omit* will yield a response with an empty 'elements' listing.
 This makes only sense if you ask for something else instead, e.g. a count of
 elements::
 
     >>> resp_data = testapp.get('/Documents/document_0000000',
-    ...     params={'sheet': 'adhocracy_core.sheets.tags.ITag',
+    ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
     ...             'elements': 'omit', 'count': 'true'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
-    {'count': '2', 'elements': []}
+    {'count': '5', 'elements': []}
 
 Setting *elements=content* will instead return the complete contents of all
 matching elements -- what you would get by making a GET request on each of
 their paths::
 
     >>> resp_data = testapp.get('/Documents/document_0000000',
-    ...     params={'sheet': 'adhocracy_core.sheets.tags.ITag',
+    ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
     ...             'elements': 'content'}).json
-    >>> tag = resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'][0]
-    >>> pprint(tag)
-    {'content_type': 'adhocracy_core.interfaces.ITag',...'path': 'http://localhost/Documents/document_0000000/FIRST/'...
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
+    {'elements': [{'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
+                   'data': ...
 
-*content_type* filter resources with a specific content type::
+*sheet* filter resources with a specific sheet type::
 
     >>> resp_data = testapp.get('/Documents/document_0000000',
-    ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraph'}).json
+    ...     params={'content_type': 'adhocracy_core.sheets.document.IDocument'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/PARAGRAPH_0000000/',
-     'http://localhost/Documents/document_0000000/PARAGRAPH_0000001/',
-     'http://localhost/Documents/document_0000000/PARAGRAPH_0000002/']
+    ['http://localhost/Documents/document_0000000/VERSION_0000000/',...
 
 Valid query comparables: 'eq', 'noteq', 'lt', 'le', 'gt', 'ge', 'any', 'notany'
 

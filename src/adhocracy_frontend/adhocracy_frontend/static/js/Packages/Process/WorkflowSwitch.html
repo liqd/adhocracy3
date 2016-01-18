@@ -1,0 +1,6 @@
+<div class="workflow-switch" data-ng-class="{ 'has-switch': availableStates }">
+    <div class="workflow-switch-transcluded" data-ng-transclude=""></div>
+    <div class="workflow-switch-container" data-ng-if="availableStates.length">
+        <a class="button m-menu-action" href="" data-ng-click="switchState(newState)" data-ng-repeat="newState in availableStates">{{ "TR__SWITCH_STATE_TO" | translate:{newState:newState} }}</a>
+    </div>
+</div>

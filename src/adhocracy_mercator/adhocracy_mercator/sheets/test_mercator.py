@@ -148,7 +148,7 @@ class TestUserInfoSheet:
         inst = meta.sheet_class(meta, context)
         wanted = {'family_name': '',
                   'personal_name': '',
-                  'country': 'DE'}
+                  'country': ''}
         assert inst.get() == wanted
 
 
@@ -177,7 +177,7 @@ class TestOrganizationInfoSheet:
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
-        wanted = {'country': 'DE',
+        wanted = {'country': '',
                   'help_request': '',
                   'name': '',
                   'planned_date': None,
