@@ -325,9 +325,7 @@ export var adhCommentListing = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
         scope: {
-            path: "@",
-            frontendOrderReverse: "=?",
-            frontendOrderPredicate: "=?"
+            path: "@"
         },
         link: (scope) => {
             adhTopLevelState.setCameFrom($location.url());
