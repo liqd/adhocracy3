@@ -357,6 +357,33 @@ class TestCatalogsServiceAdhocracy:
         assert referenced2 in elements
         assert referenced3 in elements
 
+    def test_search_with_back_reference_traverse(self, registry, pool, service,
+                                                 inst, query):
+        from adhocracy_core.interfaces import Reference
+        from adhocracy_core.interfaces import ReferenceComparator
+        from adhocracy_core.resources.comment import ICommentVersion
+        from adhocracy_core import sheets
+        from adhocracy_core.utils import get_sheet
+        pool['comments'] = service  # the IComment sheet needs a post pool
+        referencing = self._make_resource(registry, parent=pool,
+                                          iresource=ICommentVersion)
+        referenced1 = self._make_resource(registry, parent=pool,
+                                          iresource=ICommentVersion)
+        referenced2 = self._make_resource(registry, parent=pool,
+                                          iresource=ICommentVersion)
+        sheet = get_sheet(referencing, sheets.comment.IComment)
+        sheet.set({'refers_to': referenced1})
+        sheet = get_sheet(referenced1, sheets.comment.IComment)
+        sheet.set({'refers_to': referenced2})
+        reference = Reference(referencing, sheets.comment.IComment,
+                              'refers_to', None)
+        result = inst.search(query._replace(
+                references=[(ReferenceComparator.traverse.value, reference)]))
+        elements = list(result.elements)
+        assert len(elements) == 2  # search with traversal is not ordered
+        assert referenced1 in elements
+        assert referenced2 in elements
+
     def test_search_with_sort_by(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import IPool
         child = self._make_resource(registry, parent=pool)

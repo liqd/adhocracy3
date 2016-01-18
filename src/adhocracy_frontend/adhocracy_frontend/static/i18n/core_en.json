@@ -55,6 +55,7 @@
     "TR__ERROR_REQUIRED_NEW_PASSWORD": "New Password is required.",
     "TR__ERROR_REQUIRED_PARAGRAPH": "Please enter some text.",
     "TR__ERROR_REQUIRED_PASSWORD": "Password is required.",
+    "TR__ERROR_REQUIRED_CAPTCHA": "Captcha solution is required.",
     "TR__ERROR_REQUIRED_RADIO": "Please select one",
     "TR__ERROR_REQUIRED_SUBJECT": "Please enter a subject",
     "TR__ERROR_REQUIRED_TERMS_AND_CONDITIONS": "You must agree to terms and conditions",

@@ -6,11 +6,12 @@ from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import add_sheet_to_registry
+from adhocracy_core.sheets.subresources import ISubResources
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Text
 
 
-class IDocument(ISheet, ISheetReferenceAutoUpdateMarker):
+class IDocument(ISubResources):
     """Marker interface for the document sheet."""
 
 

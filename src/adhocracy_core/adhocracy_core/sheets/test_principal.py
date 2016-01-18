@@ -62,7 +62,7 @@ class TestPasswordSheet:
         inst.set({'password': 'test'})
         assert not inst.check_plaintext_password('wrong')
 
-    def test_check_password_is_to_long(self, meta, context):
+    def test_check_password_is_too_long(self, meta, context):
         inst = meta.sheet_class(meta, context)
         password = 'x' * 40026
         with raises(ValueError):
@@ -78,7 +78,7 @@ def test_includeme_register_password_sheet(config):
     assert get_sheet(context, IPasswordAuthentication)
 
 
-class TestUserBasicSchemaSchema:
+class TestUserBasicSchema:
 
     def make_one(self):
         from adhocracy_core.sheets.principal import UserBasicSchema
@@ -108,7 +108,7 @@ class TestUserBasicSchemaSchema:
         assert isinstance(inst['name'].validator, colander.deferred)
 
 
-class TestUserExtendedSchemaSchema:
+class TestUserExtendedSchema:
 
     def make_one(self):
         from adhocracy_core.sheets.principal import UserExtendedSchema
@@ -133,6 +133,28 @@ class TestUserExtendedSchemaSchema:
     def test_email_has_deferred_validator(self):
         inst = self.make_one()
         assert isinstance(inst['email'].validator, colander.deferred)
+
+
+class TestCaptchaSchema:
+
+    def make_one(self):
+        from adhocracy_core.sheets.principal import CaptchaSchema
+        return CaptchaSchema()
+
+    def test_deserialize_all(self):
+        inst = self.make_one()
+        cstruct = {'id': 'captcha-id', 'solution': 'some test'}
+        assert inst.deserialize(cstruct) == cstruct
+
+    def test_deserialize_id_missing(self):
+        inst = self.make_one()
+        with raises(colander.Invalid):
+            inst.deserialize({'solution': 'some test'})
+
+    def test_deserialize_solution_missing(self):
+        inst = self.make_one()
+        with raises(colander.Invalid):
+            inst.deserialize({'id': 'captcha-id'})
 
 
 class TestDeferredValidateUserName:
@@ -247,6 +269,29 @@ class TestUserExtendedSheet:
         assert inst.get() == {'email': '', 'tzname': 'UTC'}
 
 
+class TestCaptchaSheet:
+
+    @fixture
+    def meta(self):
+        from adhocracy_core.sheets.principal import captcha_meta
+        return captcha_meta
+
+    def test_create(self, meta, context):
+        from adhocracy_core.sheets.principal import ICaptcha
+        from adhocracy_core.sheets.principal import CaptchaSchema
+        from adhocracy_core.sheets import AttributeResourceSheet
+        inst = meta.sheet_class(meta, context)
+        assert isinstance(inst, AttributeResourceSheet)
+        assert inst.meta.isheet == ICaptcha
+        assert inst.meta.schema_class == CaptchaSchema
+        assert inst.meta.permission_create == 'create_user'
+
+    def test_get_empty(self, meta, context):
+        # FIXME Sheet should not be stored, so this should be empty??
+        inst = meta.sheet_class(meta, context)
+        assert inst.get() == {'id': '', 'solution': ''}
+
+
 def test_includeme_register_userbasic_sheet(config):
     from adhocracy_core.sheets.principal import IUserBasic
     from adhocracy_core.utils import get_sheet
@@ -256,7 +301,7 @@ def test_includeme_register_userbasic_sheet(config):
     assert get_sheet(context, IUserBasic)
 
 
-class TestPermissionsSchemaSchema:
+class TestPermissionsSchema:
 
     @fixture
     def context(self, context):

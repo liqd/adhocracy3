@@ -8,7 +8,7 @@ Introduction
 from the backend. From the viewpoint of the backend, they are just "blobs"
 -- binary objects without any specific semantic.
 
-*Images* are a subtype of assets; they an be resized and cropped to
+*Images* are a subtype of assets; they can be resized and cropped to
 different target formats.
 
 To manage assets, the backend has the `adhocracy_core.resources.asset.IAsset`
@@ -29,7 +29,7 @@ sheets:
 
   :mime_type: the MIME type of the asset; must be specified by the frontend,
       but the backend will sanity-check the posted data and reject the asset
-      in case of an detectable mismatch (e.g. if the frontend posts a Word file
+      in case of a detectable mismatch (e.g. if the frontend posts a Word file
       but gives "image/jpeg" as MIME type). Not all mismatches will be
       detectable, e.g. different "text/" subtypes can be hard to distinguish.
 
