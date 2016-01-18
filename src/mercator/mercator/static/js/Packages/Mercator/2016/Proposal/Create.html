@@ -1034,19 +1034,13 @@
             <div class="annotated-section">
                 <div class="annotated-section-body">
                     <label>
-                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_IMPACT_EXTRAINFO_LABEL" | translate }} *</span>
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_IMPACT_EXTRAINFO_LABEL" | translate }}</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.impact.extraInfo"
                             name="impact-extrainfo"
                             maxlength="500"
-                            placeholder="{{ 'TR__MAX_CHARS_500' | translate }}"
-                            required="required"></textarea>
-
-                        <span
-                            class="input-error"
-                            data-ng-if="showError(mercatorProposalForm, mercatorProposalImpactForm['impact-extrainfo'], 'required')">
-                            {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
+                            placeholder="{{ 'TR__MAX_CHARS_500' | translate }}"></textarea>
                     </label>
                 </div><!-- /.annotated-section-body -->
             </div><!-- /.annotated-section -->
