@@ -409,7 +409,7 @@ class IExtraFunding(ISheet):
 
 
 class ExtraFundingSchema(colander.MappingSchema):
-    other_sources = Text()
+    other_sources = Text(missing='')
     secured = Boolean(default=False)
 
 

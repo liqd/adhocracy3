@@ -1027,6 +1027,12 @@ class TestExtraFundingSchema:
             {'other_sources': 'XYZ grant',
              'secured': False}
 
+    def test_deserialize_empty_other_sources(self, inst, cstruct_required):
+        assert inst.deserialize({'other_sources': '',
+                                 'secured': 'False'}) == \
+            {'other_sources': '',
+             'secured': False}
+
 
 class TestExtraFundingSheet:
 
