@@ -75,6 +75,7 @@ export var register = (angular) => {
             "adhTopLevelState",
             "adhPreliminaryNames",
             "adhResourceUrlFilter",
+            "adhGetBadges",
             Proposal.editDirective])
         .directive("adhMercator2016ProposalListing", ["adhConfig", Proposal.listing])
         .directive("adhMercator2016ProposalListitem", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", "adhGetBadges", Proposal.listItem])
@@ -90,5 +91,5 @@ export var register = (angular) => {
             "$translate",
             Proposal.mercatorProposalFormController2016])
         .directive("adhMercator2016ProposalDetail", [
-            "$q", "adhConfig", "adhHttp", "adhTopLevelState", "adhPermissions", "$translate", Proposal.detailDirective]);
+            "$q", "adhConfig", "adhHttp", "adhTopLevelState", "adhPermissions", "adhGetBadges", "$translate", Proposal.detailDirective]);
 };
