@@ -174,6 +174,9 @@ export interface IData {
         twitter : boolean;
         website : boolean;
     };
+    winner : {
+        funding : number;
+    };
 }
 
 export interface IDetailData extends IData {
@@ -264,9 +267,6 @@ var fill = (data : IFormData, resource) => {
             });
             resource.data[SIImageReference.nick] = new SIImageReference.Sheet({
                 picture: data.introduction.picture
-            });
-            resource.data[SIWinnerInfo.nick] = new SIWinnerInfo.Sheet({
-                funding: null  // FIXME,
             });
             break;
         case RIPitch.content_type:
@@ -519,6 +519,9 @@ var get = (
                     result[item] = true;
                     return result;
                 }, {}),
+                winner: {
+                    funding: (proposal.data[SIWinnerInfo.nick] || {}).funding
+                },
                 introduction: {
                     pitch: subs.pitch.data[SIPitch.nick].pitch,
                     picture: proposal.data[SIImageReference.nick].picture
@@ -595,7 +598,8 @@ export var createDirective = (
                 impact: {},
                 criteria: {},
                 finance: {},
-                heardFrom: {}
+                heardFrom: {},
+                winner: {}
             };
 
             scope.submit = () => create(adhHttp, adhPreliminaryNames)(scope).then((proposalPath) => {
@@ -635,7 +639,8 @@ export var editDirective = (
                 impact: {},
                 criteria: {},
                 finance: {},
-                heardFrom: {}
+                heardFrom: {},
+                winner: {}
             };
 
             get($q, adhHttp, adhTopLevelState)(scope.path).then((data) => {
