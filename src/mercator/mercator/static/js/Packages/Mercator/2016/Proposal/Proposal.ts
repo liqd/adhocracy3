@@ -642,6 +642,14 @@ export var editDirective = (
 
             get($q, adhHttp, adhTopLevelState)(scope.path).then((data) => {
                 scope.data = data;
+
+                scope.data.partners.hasPartners = scope.data.partners.hasPartners ? "true" : "false";
+
+                if (scope.data.organizationInfo.status === "planned_nonprofit") {
+                    scope.data.organizationInfo.registrationDateField = data.organizationInfo.registrationDate.substr(0, 7);
+                } else if (scope.data.organizationInfo.status === "registered_nonprofit") {
+                    scope.data.organizationInfo.registrationDateField = data.organizationInfo.registrationDate.substr(0, 4);
+                }
             });
 
             scope.submit = () => edit(adhHttp, adhPreliminaryNames)(scope).then(() => {
@@ -807,7 +815,11 @@ export var mercatorProposalFormController2016 = (
 
     $scope.dateChange = (date) => {
         // FIXME: this is quite hacky dates need proper validation EG not so much in the past or future too
-        $scope.data.organizationInfo.registrationDate = date + "-01";
+        if ($scope.data.organizationInfo.status === "planned_nonprofit") {
+            $scope.data.organizationInfo.registrationDate = $scope.data.organizationInfo.registrationDateField + "-01";
+        } else {
+            $scope.data.organizationInfo.registrationDate = $scope.data.organizationInfo.registrationDateField + "-01-01";
+        }
     };
 
     $scope.showError = adhShowError;
