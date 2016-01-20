@@ -81,13 +81,13 @@
                     data-ng-src="{{ captcha.audioData }}"
                     class="captcha-audio" controls></audio>
                 <div class="captcha-buttons">
-                    <a href="" class="captcha-button" title="{{ 'TR__AUDIO' | translate }}" data-ng-click="captcha.toggleAudio()"><i class="icon-volume"></i></a>
+                    <a href="" class="captcha-button" title="{{ 'TR__TOGGLE_AUDIO' | translate }}" data-ng-click="captcha.toggleAudio()"><i class="icon-volume"></i></a>
                     <a href="" class="captcha-button" title="{{ 'TR__NEW_CAPTCHA' | translate }}" data-ng-click="captcha.refreshCaptcha()"><i class="icon-refresh"></i></a>
                 </div>
 
             </div>
             <label>
-                <span class="label-text">{{ "TR__CAPTCHA_GUESS" | translate }}</span>
+                <span class="label-text">{{ "TR__ENTER_CAPTCHA" | translate }}</span>
                 <input type="text" name="thentos_captcha_guess" required="required"
                        data-ng-model="input.captchaGuess" />
                 <span class="input-error" data-ng-show="showError(registerForm, registerForm.thentos_captcha_guess, 'required')">
