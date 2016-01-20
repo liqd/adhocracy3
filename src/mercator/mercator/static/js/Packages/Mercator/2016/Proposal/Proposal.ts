@@ -90,7 +90,6 @@ export interface IData {
     };
     organizationInfo : {
         name : string;
-        email : string;
         website : string;
         city : string;
         country : string;
@@ -220,7 +219,6 @@ var fill = (data : IFormData, resource) => {
                 help_request: data.organizationInfo.helpRequest,
                 registration_date: data.organizationInfo.registrationDate,
                 website: data.organizationInfo.website,
-                contact_email: data.organizationInfo.email,
                 status: data.organizationInfo.status,
                 status_other: data.organizationInfo.otherText
             });
@@ -470,7 +468,6 @@ var get = (
                     helpRequest: proposal.data[SIOrganizationInfo.nick].help_request,
                     registrationDate: proposal.data[SIOrganizationInfo.nick].registration_date,
                     website: proposal.data[SIOrganizationInfo.nick].website,
-                    email: proposal.data[SIOrganizationInfo.nick].contact_email,
                     status: proposal.data[SIOrganizationInfo.nick].status,
                     otherText: proposal.data[SIOrganizationInfo.nick].status_other
                 },
