@@ -5,7 +5,7 @@
 -->
 <svg xmlns="http://www.w3.org/2000/svg">
 <metadata>
-Created by FontForge 20120731 at Wed Jan 20 16:01:45 2016
+Created by FontForge 20120731 at Wed Jan 20 16:35:46 2016
  By Caroline Clifford,,,
 Created by Caroline Clifford,,, with FontForge 2.0 (http://fontforge.sf.net)
 </metadata>
@@ -22,7 +22,7 @@ Created by Caroline Clifford,,, with FontForge 2.0 (http://fontforge.sf.net)
     bbox="-0.75 -65 515 449"
     underline-thickness="25.6"
     underline-position="-51.2"
-    unicode-range="U+F100-F123"
+    unicode-range="U+F100-F124"
   />
     <missing-glyph />
     <glyph glyph-name="uniF103" unicode="&#xf103;" horiz-adv-x="511" 
@@ -109,6 +109,10 @@ d="M480 355h-330v-30h330v30zM511 385v-88h-390v88h390zM59 355h-30v-30h30v30zM90 3
 v30zM480 237h31v-89h-390v89h359z" />
     <glyph glyph-name="uniF11C" unicode="&#xf11c;" 
 d="M0 448h512v-512h-512v512zM256 397l-216 -374h432z" />
+    <glyph glyph-name="uniF124" unicode="&#xf124;" horiz-adv-x="439" 
+d="M432 146c0 -1 -1 -2 -1 -2c-12 -51 -37 -92 -76 -124s-85 -47 -137 -47c-28 0 -54 5 -80 15s-50 26 -70 45l-37 -37c-4 -4 -8 -5 -13 -5s-9 1 -13 5s-5 8 -5 13v128c0 5 1 9 5 13s8 5 13 5h128c5 0 9 -1 13 -5s6 -8 6 -13s-2 -9 -6 -13l-39 -39c14 -13 29 -22 46 -29
+s35 -10 53 -10c26 0 50 6 72 18s40 29 53 51c2 3 7 15 15 34c2 4 5 6 9 6h55c2 0 4 0 6 -2s3 -5 3 -7zM439 375v-128c0 -5 -2 -9 -6 -13s-7 -5 -12 -5h-128c-5 0 -9 1 -13 5s-6 8 -6 13s2 9 6 13l39 39c-28 26 -62 39 -100 39c-26 0 -49 -6 -71 -18s-40 -29 -53 -51
+c-2 -3 -7 -15 -15 -34c-2 -4 -5 -6 -9 -6h-57c-2 0 -4 0 -6 2s-3 5 -3 7v2c12 51 38 92 77 124s85 47 137 47c28 0 56 -4 82 -15s50 -26 70 -45l37 37c4 4 8 5 13 5s8 -1 12 -5s6 -8 6 -13z" />
     <glyph glyph-name="uniF109" unicode="&#xf109;" horiz-adv-x="509" 
 d="M509 385v-88h-388v88h388zM89 385v-88h-89v88h89zM89 237v-89h-89v89h89zM89 87v-88h-89v88h89zM509 87v-88h-388v88h388zM479 237h30v-89h-388v89h358z" />
     <glyph glyph-name="uniF11D" unicode="&#xf11d;" horiz-adv-x="506" 
