@@ -160,10 +160,6 @@
                                             target="_new">
                                             {{ data.organizationInfo.name }}</a>
                                         <span data-ng-if="!data.organizationInfo.website">{{ data.organizationInfo.name }}</span>
-                                        <a
-                                            data-ng-if="data.organizationInfo.email"
-                                            data-ng-href="mailto:{{ data.organizationInfo.email }}">
-                                            {{ "TR__EMAIL" | translate }}</a>
                                     </li>
                                     <li><i class="icon-map-pin"></i> {{ data.organizationInfo.country | adhCountryName | translate }}</li>
                                     <li>{{ "TR__MERCATOR_PROPOSAL_NON_PROFIT" | translate }}</li>
@@ -179,11 +175,6 @@
                                             target="_new">
                                             {{ data.organizationInfo.name }}</a>
                                         <span data-ng-if="!data.organizationInfo.website">{{ data.organizationInfo.name }}</span>
-                                        <a
-                                            class="m-print-href"
-                                            data-ng-if="data.organizationInfo.email"
-                                            data-ng-href="mailto:{{ data.organizationInfo.email }}">
-                                            {{ "TR__EMAIL" | translate }}</a>
                                     </li>
                                     <li><i class="icon-map-pin"></i> {{ data.organizationInfo.country | adhCountryName | translate }}</li>
                                     <li>
@@ -202,11 +193,6 @@
                                             target="_new">
                                             {{ data.organizationInfo.name }}</a>
                                         <span data-ng-if="!data.organizationInfo.website">{{ data.organizationInfo.name }}</span>
-                                        <a
-                                            class="m-print-href"
-                                            data-ng-if="data.organizationInfo.email"
-                                            data-ng-href="mailto:{{ data.organizationInfo.email }}">
-                                            {{ "TR__EMAIL" | translate }}</a>
                                     </li>
                                     <li><i class="icon-map-pin"></i> {{ data.organizationInfo.country | adhCountryName | translate }}</li>
                                     <li>
