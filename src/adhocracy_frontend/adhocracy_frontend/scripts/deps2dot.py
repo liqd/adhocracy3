@@ -1,9 +1,23 @@
-"""Extract graph of angular module dependencies in DOT format."""
+"""Extract informaton about angular module dependencies.
+
+For some of the concepts, see http://almossawi.com/firefox/
+"""
 
 import subprocess
 import os
 import re
 import argparse
+import json
+
+CATEGORIES = ['peripheral', 'control', 'shared', 'core']
+
+
+class SetEncoder(json.JSONEncoder):
+    # https://stackoverflow.com/questions/8230315
+    def default(self, obj):
+       if isinstance(obj, set):
+          return list(obj)
+       return json.JSONEncoder.default(self, obj)
 
 
 def normpath(path):
@@ -46,8 +60,7 @@ def get_modules():
 
             modules[normpath(path)] = {
                 'name': name,
-                'imports': imports,
-                'color': color(name),
+                'imports': imports
             }
 
     return modules
@@ -55,17 +68,53 @@ def get_modules():
 
 def add_counts(modules):
     """Add import_count/export_count to an existing dict of modules."""
-    for path, module in modules.items():
-        module['import_count'] = len(module['imports'])
-        module['export_count'] = 0
+    for module in modules.values():
+        module['exports'] = set()
 
     for path, module in modules.items():
         for imp in module['imports']:
-            modules[imp]['export_count'] += 1
+            modules[imp]['exports'].add(path)
+
+    for path, module in modules.items():
+        module['import_count'] = len(module['imports'])
+        module['export_count'] = len(module['exports'])
+
+
+def add_recursive_counts(modules):
+    """Add fan_in/fan_out to an existing dict of modules.
+
+    These are like import_count/export_count, but recursive.
+    """
+    def set_recursive_imports(module):
+        k = 'recursive_imports'
+        if k not in module:
+            module[k] = set(module['imports'])
+            for key in module['imports']:
+                imp = modules[key]
+                set_recursive_imports(imp)
+                module[k] = module[k].union(imp[k])
+
+    def set_recursive_exports(module):
+        k = 'recursive_exports'
+        if k not in module:
+            module[k] = set(module['exports'])
+            for key in module['exports']:
+                exp = modules[key]
+                set_recursive_exports(exp)
+                module[k] = module[k].union(exp[k])
+
+    for module in modules.values():
+        set_recursive_imports(module)
+        module['fan_in'] = len(module['recursive_imports'])
+        set_recursive_exports(module)
+        module['fan_out'] = len(module['recursive_exports'])
 
 
 def add_rank(modules):
-    """Add rank to an existing dict of modules."""
+    """Add rank to an existing dict of modules.
+
+    The rank of a module is always greater that that of its dependencies.
+    """
     done = []
 
     while len(done) < len(modules):
@@ -83,9 +132,38 @@ def add_rank(modules):
     return max([m['rank'] for m in modules.values()])
 
 
+def _filter(modules, args):
+    """Remove some modules from the dict according to command line args."""
+    remove = set()
+    for key, module in modules.items():
+        if not include(module, args):
+            remove.add(key)
+
+    for key in remove:
+        del modules[key]
+
+    for module in modules.values():
+        module['imports'] = [i for i in module['imports'] if i in modules]
+
+
+def add_category(modules):
+    """Mark a module as 'peripheral', 'control', 'shared', or 'core'."""
+    n = len(modules)
+    average_in = sum(m['fan_in'] for m in modules.values()) / float(n)
+    average_out = sum(m['fan_out'] for m in modules.values()) / float(n)
+
+    for module in modules.values():
+        i = 0
+        if module['fan_in'] > average_in:
+            i += 1
+        if module['fan_out'] > average_out:
+            i += 2
+        module['category'] = CATEGORIES[i]
+
+
 def render_module(module):
     """Render a module to string."""
-    opts = ['color=%s' % module['color']]
+    opts = ['color=%s' % color(module['name'])]
 
     if module['import_count'] == 0:
         opts.append('shape=box')
@@ -104,12 +182,95 @@ def include(module, args):
     return True
 
 
+def adjacency_matrix(modules, direct=False):
+    keys = list(modules.keys())
+    keys.sort(key=lambda k: (-modules[k]['fan_out'], k))
+    names = [modules[key]['name'] for key in keys]
+
+    m = []
+    for row_key in keys:
+        module = modules[row_key]
+        row = []
+        for column_key in keys:
+            if direct:
+                row.append(column_key in module['imports'])
+            else:
+                row.append(column_key in module['recursive_imports'])
+        m.append(row)
+
+    return m, names
+
+
+def print_matrix(matrix, names):
+    print('P1')
+    for name in names:
+        print('# %s' % name)
+    n = len(matrix)
+    print('%i %i' % (n, n))
+    for row in matrix:
+        print(' '.join([str(int(i)) for i in row]))
+
+
+def print_stats(modules, verbose=True):
+    n = len(modules)
+    print('total modules: %i' % n)
+    for category in CATEGORIES:
+        mods = [m for m in modules.values() if m['category'] == category]
+        k = len(mods)
+        names = sorted([m['name'] for m in mods])
+        print('%s modules: %i, %i%%' % (category, k, 100 * k / n))
+        if verbose:
+            for name in names:
+                print('  %s' % name)
+    matrix, _names = adjacency_matrix(modules)
+    propagation_cost = sum([sum(row) for row in matrix]) / n
+    print('propagation cost: %i, %i%%' % (propagation_cost, 100 * propagation_cost / n))
+    print('max rank: %i' % max((m['rank'] for m in modules.values())))
+
+
+def print_dot(modules):
+    ranks = [m['rank'] for m in modules.values()]
+
+    print('digraph adhocracy_frontend {')
+    print('  graph [splines=ortho];')
+
+    for rank in range(min(ranks), max(ranks) + 1):
+        print('  subgraph rank%i {' % rank)
+        print('    rank = same;')
+        for path, module in modules.items():
+            if module['rank'] == rank:
+                print(render_module(module))
+        print('  }')
+
+    for module in modules.values():
+        for imp in module['imports']:
+            print('  %s->%s [color=%s];' % (
+                modules[imp]['name'],
+                module['name'],
+                color(modules[imp]['name'])))
+
+    print('}')
+
+
 def parse_args():
     """Parse command line argumants."""
     parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--input', default=None)
+
     parser.add_argument('--min-rank', type=int, default=0)
     parser.add_argument('--max-rank', type=int, default=None)
     parser.add_argument('-x', '--exclude', nargs='*', default=[])
+
+    parser.add_argument('--matrix', action='store_true', help='Output '
+        'dependency matrix as PBM. If you want to only include direct '
+        'dependencies, use the --direct switch')
+    parser.add_argument('--direct', action='store_true')
+
+    parser.add_argument('--stats', action='store_true', help='Output '
+        'some general stats')
+    parser.add_argument('-v', '--verbose', action='store_true')
+
+    parser.add_argument('--dump', action='store_true')
 
     return parser.parse_args()
 
@@ -117,34 +278,29 @@ def parse_args():
 def main():
     """Print module graph in DOT format to stdout."""
     args = parse_args()
-    modules = get_modules()
-    add_counts(modules)
-    max_rank = add_rank(modules)
+    if args.input is None:
+        modules = get_modules()
 
-    if args.max_rank is None:
-        args.max_rank = max_rank
+        max_rank = add_rank(modules)
+        if args.max_rank is None:
+            args.max_rank = max_rank
+        _filter(modules, args)
+        add_counts(modules)
+        add_recursive_counts(modules)
+        add_category(modules)
+    else:
+        with open(args.input) as fh:
+            modules = json.load(fh)
 
-    print('digraph adhocracy_frontend {')
-    print('  graph [splines=ortho];')
-
-    for rank in range(args.min_rank, args.max_rank):
-        print('  subgraph rank%i {' % rank)
-        print('    rank = same;')
-        for path, module in modules.items():
-            if include(module, args) and module['rank'] == rank:
-                print(render_module(module))
-        print('  }')
-
-    for module in modules.values():
-        if include(module, args):
-            for imp in module['imports']:
-                if include(modules[imp], args):
-                    print('  %s->%s [color=%s];' % (
-                        modules[imp]['name'],
-                        module['name'],
-                        modules[imp]['color']))
-
-    print('}')
+    if args.matrix:
+        m, names = adjacency_matrix(modules, direct=args.direct)
+        print_matrix(m, names)
+    elif args.stats:
+        print_stats(modules, verbose=args.verbose)
+    elif args.dump:
+        print(json.dumps(modules, indent=2, separators=(',', ': '), sort_keys=True, ensure_ascii=False, cls=SetEncoder))
+    else:
+        print_dot(modules)
 
 
 if __name__ == '__main__':
