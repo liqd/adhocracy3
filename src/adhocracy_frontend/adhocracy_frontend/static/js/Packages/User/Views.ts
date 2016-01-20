@@ -109,7 +109,8 @@ export interface IScopeRegister extends angular.IScope {
     captcha : {
         enabled : boolean;
         audioEnabled : boolean;
-        toggleAudio : (event : any) => void;
+        toggleAudio : () => void;
+        refreshCaptcha : () => void;
         id : string;
         imageData : string;
         audioData : string;
@@ -239,19 +240,6 @@ var captchaImageEmpty : string
     + "/uVPe03uSuZC0F0gOykVmR926F8OrRR6StxOfescQbGj3eZu13xYMpuhFabb7zz9l6TcbeD+BrU7"
     + "P37R2EAZAAAAAElFTkSuQmCC";
 
-var captchaImageAudioIcon : string
-    = "iVBORw0KGgoAAAANSUhEUgAAAGkAAAAnCAAAAAApuzn6AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA"
-    + "B3RJTUUH4AEHCCQB8tsgowAAAgRJREFUWMPtlj9oE2EYxn/f9ZI7c0mxSoaQZmoqAbE4iPhvUBJc"
-    + "XAQtCIKCQ4yDhWIJnZxFdAlWxJQO6aSjmFIRQV1qoaLgn8RSQcVqrVgKLSUplNfh7kov2ogiCnrP"
-    + "cvB8D8+P97vvPk4Jf0gaPskn/Uekq0p9u/5WMWz9qETV7edIcK0bV/vWmyny/a94d/7XhphON9u9"
-    + "EwEVHmUwDINhOKrrPTB2EfJBFa8C0BvUti44uTOpDtU6ymasz7ZNRtMvuy2NklUNRGScwqtkSoqW"
-    + "SNGSK6ow0YaUQvKQC6+TCRGRO+r6/dBJJ5fjWGWnuSLUbLvMwbl0q9si6b2yRl7S/JjM7ki4pO27"
-    + "RK4hpZAc7hCpsCwi6S6RmwUnlzNFltRdoWbbZWpyy3BbGki6Z0Az/9jQTXtW+HIA9gDwsR1SVLfB"
-    + "hyR0U3dyG2GD+Tzj2iMBgxZPy7rvqW/i2dwRG1OB6CQ8AiA2DVW2ANH3UMy5uXmo11KrdkNLM9Kn"
-    + "YNvL4WViSzemhiA7PvCkXwH0TF16c6jdAM4+HXrQO+PkqB2f3G9kYMa2vS1NT8S7TSpyXju90oVx"
-    + "zhLpbtFOaVIKifQFiL0QEZGsTueik8tF44RviySYzep0LpYDImXDbWl6In5SuUTTZS/p79x7C+q3"
-    + "Vsfvea8s/z/CJ/kkn+STfJJP+sdIXwHavoZF/OPGkQAAAABJRU5ErkJggg==";
-
 var arrayBufferToBase64 = (data : ArrayBuffer) : string => {
     var binary = "";
     var buffer = new Uint8Array(data);
@@ -270,9 +258,7 @@ var encodeCaptchaImage = (
 ) : string => {
     var result : string = "data:image/png;base64, ";
 
-    if (audioEnabled) {
-        result += captchaImageAudioIcon;
-    } else if (!data) {
+    if (audioEnabled || !data) {
         result += captchaImageEmpty;
     } else {
         result += arrayBufferToBase64(data);
@@ -361,12 +347,20 @@ export var registerDirective = (
             scope.captcha = {
                 enabled: adhConfig.captcha_enabled,
                 audioEnabled: false,
-                toggleAudio: (event) => {
-                    if (event.target.checked) {
-                        fetchCaptchaAudio(adhConfig, $sce, $http, scope);
-                    } else {
+                refreshCaptcha: () => {
+                    if (scope.captcha.audioEnabled === false) {
                         fetchCaptchaImage(adhConfig, $sce, $http, scope);
+                    } else {
+                        fetchCaptchaAudio(adhConfig, $sce, $http, scope);
                     }
+                },
+                toggleAudio: () => {
+                    if (scope.captcha.audioEnabled === false) {
+                        scope.captcha.audioEnabled = true;
+                    } else {
+                        scope.captcha.audioEnabled = false;
+                    }
+                    scope.captcha.refreshCaptcha();
                 },
                 id: "",
                 imageData: "",
