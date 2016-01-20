@@ -67,6 +67,16 @@ export var register = (angular) => {
         }])
         .directive("adhMercator2016ProposalCreate", [
             "$location", "adhConfig", "adhHttp", "adhPreliminaryNames", "adhResourceUrlFilter", Proposal.createDirective])
+        .directive("adhMercator2016ProposalModerate", [
+            "$q",
+            "$location",
+            "adhConfig",
+            "adhHttp",
+            "adhTopLevelState",
+            "adhPreliminaryNames",
+            "adhResourceUrlFilter",
+            "adhGetBadges",
+            Proposal.moderateDirective])
         .directive("adhMercator2016ProposalEdit", [
             "$q",
             "$location",

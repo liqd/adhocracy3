@@ -422,6 +422,19 @@ var edit = (
     });
 };
 
+var moderate = (
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service
+) => (scope) => {
+    return adhHttp.get(scope.path).then((oldProposal) => {
+        var clone = _.cloneDeep(oldProposal);
+        clone.data[SIWinnerInfo.nick] = new SIWinnerInfo.Sheet({
+            funding: scope.data.winner.funding
+        });
+        return adhHttp.put(scope.path, clone);
+    });
+};
+
 var get = (
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>,
@@ -668,6 +681,52 @@ export var editDirective = (
             });
 
             scope.submit = () => edit(adhHttp, adhPreliminaryNames)(scope).then(() => {
+                $location.url(adhResourceUrl(scope.path));
+            });
+        }
+    };
+};
+
+export var moderateDirective = (
+    $q : angular.IQService,
+    $location : angular.ILocationService,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhResourceUrl,
+    adhGetBadges : AdhBadge.IGetBadges
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Moderate.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope) => {
+            scope.data = {
+                user_info: {},
+                organization_info: {},
+                introduction: {},
+                partners: {
+                    partner1: {},
+                    partner2: {},
+                    partner3: {}
+                },
+                topic: {},
+                location: {},
+                impact: {},
+                criteria: {},
+                finance: {},
+                heardFrom: {},
+                winner: {}
+            };
+
+            get($q, adhHttp, adhTopLevelState, adhGetBadges)(scope.path).then((data) => {
+                scope.data = data;
+            });
+
+            scope.submit = () => moderate(adhHttp, adhPreliminaryNames)(scope).then(() => {
                 $location.url(adhResourceUrl(scope.path));
             });
         }
