@@ -734,7 +734,7 @@ export var mercatorProposalFormController2016 = (
     $scope.$flow = flowFactory.create();
 
     $scope.selection_criteria_link = "/en/idea-space/selection-criteria/";
-    $scope.financial_plan_link = "/en/idea-space/financial-plan/";
+    $scope.financial_plan_link = "/de/media/advocate-europe_project-financial-plan.xlsx";
 
     var topicTotal = () => {
         return _.reduce($scope.data.topic, (result, include, topic : string) => {
