@@ -344,16 +344,6 @@
                             <h3>{{ "TR__MERCATOR_PROPOSAL_SHARE_EXPERIENCE_LABEL" | translate }}</h3>
                             <p>{{ data.experience }}</p>
                         </div>
-                        <div data-ng-if="data.heardFrom">
-                            <h3>{{ "TR__MERCATOR_PROPOSAL_HEARD_FROM_LABEL" | translate }}</h3>
-                            <p>
-                                <span data-ng-if="data.heardFrom.colleague">{{ "TR__COLLEAGUE" | translate }}</span>
-                                <span data-ng-if="data.heardFrom.website">{{ "TR__WEBSITE" | translate }}</span>
-                                <span data-ng-if="data.heardFrom.newsletter">{{ "TR__NEWSLETTER" | translate }}</span>
-                                <span data-ng-if="data.heardFrom.facebook">{{ "TR__FACEBOOK" | translate }}</span>
-                                <span data-ng-if="data.heardFrom.other">{{ "TR__OTHER" | translate }}: {{ data.heardFrom.otherText }}</span>
-                            </p>
-                        </div>
                     </section>
                 </section>
 
