@@ -255,7 +255,7 @@ var fill = (data : IFormData, resource) => {
             resource.data[SICommunity.nick] = new SICommunity.Sheet({
                 expected_feedback: data.experience,
                 heard_froms: _.reduce(<any>data.heardFrom, (result, include, item) => {
-                    if (include) {
+                    if (include && item !== "otherText" ) {
                         result.push(item);
                     }
                     return result;
