@@ -791,7 +791,8 @@ export var mercatorProposalFormController2016 = (
 
     $scope.showTopicsError = () : boolean => {
         return ((topicTotal() < 1) || (topicTotal() > 2)) &&
-            $scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$dirty;
+            ($scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$dirty ||
+                $scope.mercatorProposalForm.$submitted);
     };
 
     $scope.showLocationError = () : boolean => {
