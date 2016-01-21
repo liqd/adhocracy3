@@ -270,7 +270,7 @@
                         </a>
                     </section>
 
-                    <section class="commentable-section {{subResourceSelectedState('extrainfo')}}">
+                    <section data-ng-if="data.impact.extraInfo" class="commentable-section {{subResourceSelectedState('extrainfo')}}">
                         <h3>{{ "TR__MERCATOR_PROPOSAL_IMPACT_EXTRAINFO_LABEL" | translate }}</h3>
                         <p>{{ data.impact.extraInfo }}</p>
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:extrainfo'}}">
