@@ -42,6 +42,7 @@
     "TR__ERROR_HTTP_NOT_FOUND": "Not Found",
     "TR__ERROR_INVALID_DATE": "Please enter a valid date (yyyy-mm-dd).",
     "TR__ERROR_INVALID_URL": "Please enter a valid URL (starting with https:// or http://)",
+    "TR__ERROR_LARGE_NUMBER": "Number is too large",
     "TR__ERROR_MATCH_PASSWORD": "Passwords do not match.",
     "TR__ERROR_MIN_NUMBER_0": "Please insert a number higher than 0",
     "TR__ERROR_MUST_BE_A_NUMBER": "Value must be a number",
