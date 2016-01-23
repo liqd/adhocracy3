@@ -29,9 +29,8 @@ export var register = () => {
                 locationMock = jasmine.createSpyObj("locationMock", ["absUrl", "url", "search", "path", "replace"]);
                 rootScopeMock = jasmine.createSpyObj("rootScopeMock", ["$watch"]);
 
-                providerMock = jasmine.createSpyObj("providerMock", ["getArea", "getSpaceDefaults"]);
+                providerMock = jasmine.createSpyObj("providerMock", ["getArea"]);
                 providerMock.getArea.and.callThrough();
-                providerMock.getSpaceDefaults.and.callThrough();
 
                 adhTrackingMock = jasmine.createSpyObj("adhTrackingMock", ["trackPageView", "setUserId"]);
 

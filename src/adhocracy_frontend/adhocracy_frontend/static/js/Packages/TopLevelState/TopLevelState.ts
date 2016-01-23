@@ -12,12 +12,6 @@
  * The application can interact with this service via the functions
  * get(), set(), and on().
  *
- * There is a special key called "space" which can be used to create
- * states that you can later jump back to.  The only perceivable
- * difference is that you can set() a space which will load the
- * complete state you left the space in (but without triggering on()
- * callbacks). The default space is "".
- *
  * This service very much resembles ngRoute, especially in the way
  * the areas are configured.  It differs from ngRoute in that it can
  * change paths without a reload and in being more flexibel.
@@ -81,7 +75,6 @@ export interface IRoutingError {
 export class Provider {
     public areas : {[key : string]: any};
     public default : any;
-    public spaceDefaults : {[space : string]: {[key : string]: string}};
     public $get;
 
     constructor() {
@@ -93,7 +86,6 @@ export class Provider {
                 template: "<h1>404 Not Found</h1>"
             };
         };
-        this.spaceDefaults = {};
 
         this.$get = [
             "adhEventManagerClass", "adhTracking", "adhCredentials",
@@ -119,17 +111,8 @@ export class Provider {
         return this;
     }
 
-    public space(space : string, data : {[key : string]: string}) : Provider {
-        this.spaceDefaults[space] = data;
-        return this;
-    }
-
     public getArea(prefix : string) : any {
         return this.areas.hasOwnProperty(prefix) ? this.areas[prefix] : this.default;
-    }
-
-    public getSpaceDefaults(name : string) : {[key : string]: string} {
-        return _.clone(this.spaceDefaults[name]);
     }
 }
 
@@ -137,12 +120,11 @@ export class Provider {
 export class Service {
     private eventManager : AdhEventManager.EventManager;
     private area : IArea;
-    private currentSpace : string;
     private blockTemplate : boolean;
     private lock : boolean;
 
     // NOTE: data and on could be replaced by a scope and $watch, respectively.
-    private data : {[space : string]: {[key : string] : string}};
+    private data : {[key : string] : string};
 
     constructor(
         private provider : Provider,
@@ -158,8 +140,7 @@ export class Service {
         var self : Service = this;
 
         this.eventManager = new adhEventManagerClass();
-        this.currentSpace = "";
-        this.data = {"": <any>{}};
+        this.data = {};
 
         this.lock = false;
 
@@ -246,10 +227,7 @@ export class Service {
                         return this.fromLocation();
                     }
 
-                    this._set("space", data["space"] || "");
-                    delete data["space"];
-
-                    for (var key in this.data[this.currentSpace]) {
+                    for (var key in this.data) {
                         if (!data.hasOwnProperty(key)) {
                             this._set(key, undefined);
                         }
@@ -260,7 +238,7 @@ export class Service {
                         }
                     }
 
-                    if (this.currentSpace !== "error") {
+                    if (data["space"] !== "error") {
                         // normalize location
                         this.$location.replace();
                         this.toLocation();
@@ -336,7 +314,7 @@ export class Service {
     private toLocation() : void {
         var area = this.getArea();
         var search = this.$location.search();
-        var ret = area.reverse(this.data[this.currentSpace]);
+        var ret = area.reverse(this.data);
 
         this.$location.path("/" + area.prefix + ret.path);
 
@@ -355,18 +333,12 @@ export class Service {
 
     private _set(key : string, value) : boolean {
         if (this.get(key) !== value) {
-            if (key === "space") {
-                this.currentSpace = value;
-                this.data[this.currentSpace] = this.data[this.currentSpace] || this.provider.getSpaceDefaults(this.currentSpace) || {};
-                this.eventManager.trigger(key, value);
+            if (typeof value === "undefined") {
+                delete this.data[key];
             } else {
-                if (typeof value === "undefined") {
-                    delete this.data[this.currentSpace][key];
-                } else {
-                    this.data[this.currentSpace][key] = value;
-                }
-                this.eventManager.trigger(this.currentSpace + ":" + key, value);
+                this.data[key] = value;
             }
+            this.eventManager.trigger(key, value);
             return true;
         } else {
             return false;
@@ -380,34 +352,20 @@ export class Service {
         }
     }
 
-    public get(key : string, space? : string) {
-        if (key === "space") {
-            return this.currentSpace;
-        } else if (typeof space !== "undefined") {
-            this.data[space] = this.data[space] || this.provider.getSpaceDefaults(space) || {};
-            return this.data[space][key];
-        } else {
-            return this.data[this.currentSpace][key];
-        }
+    public get(key : string) {
+        return this.data[key];
     }
 
-    public on(key : string, fn, space? : string) : () => void {
+    public on(key : string, fn) : () => void {
         // initially trigger callback
-        fn(this.get(key, space));
-
-        if (key === "space") {
-            return this.eventManager.on(key, fn);
-        } else if (typeof space !== "undefined") {
-            return this.eventManager.on(space + ":" + key, fn);
-        } else {
-            return this.eventManager.on(this.currentSpace + ":" + key, fn);
-        }
+        fn(this.get(key));
+        return this.eventManager.on(key, fn);
     }
 
-    public bind(key : string, context : {[k : string]: any}, keyInContext? : string, space? : string) : Function {
+    public bind(key : string, context : {[k : string]: any}, keyInContext? : string) : Function {
         return this.on(key, (value : string) => {
             context[keyInContext || key] = value;
-        }, space);
+        });
     }
 
     // FIXME: There currently is no real concept for cameFrom
@@ -465,11 +423,6 @@ export class Service {
 }
 
 
-/**
- * adhTopLevelState.on() refers to the current space. So directives
- * that call adhTopLevelState.on() in their initialization should only be
- * rendered when the space they are on is currently active.
- */
 export var spaceDirective = (adhTopLevelState : Service) => {
     return {
         restrict: "E",
@@ -480,9 +433,9 @@ export var spaceDirective = (adhTopLevelState : Service) => {
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("space", scope, "currentSpace"));
         },
-        template: "<adh-wait data-condition=\"currentSpace === key\" data-ng-show=\"currentSpace === key\">" +
+        template: "<div data-ng-if=\"currentSpace === key\">" +
             "    <adh-inject></adh-inject>" +
-            "</adh-wait>"
+            "</div>"
     };
 };
 
