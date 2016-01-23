@@ -15,9 +15,9 @@ CATEGORIES = ['peripheral', 'control', 'shared', 'core']
 class SetEncoder(json.JSONEncoder):
     # https://stackoverflow.com/questions/8230315
     def default(self, obj):
-       if isinstance(obj, set):
-          return list(obj)
-       return json.JSONEncoder.default(self, obj)
+        if isinstance(obj, set):
+            return list(obj)
+        return json.JSONEncoder.default(self, obj)
 
 
 def normpath(path):
@@ -183,6 +183,7 @@ def include(module, args):
 
 
 def adjacency_matrix(modules, direct=False):
+    """Create adjacency matrix for a dict of modules."""
     keys = list(modules.keys())
     keys.sort(key=lambda k: (-modules[k]['fan_out'], k))
     names = [modules[key]['name'] for key in keys]
@@ -202,6 +203,7 @@ def adjacency_matrix(modules, direct=False):
 
 
 def print_matrix(matrix, names):
+    """Print a matrix as generated with adjacency_matrix as PBM."""
     print('P1')
     for name in names:
         print('# %s' % name)
@@ -212,6 +214,7 @@ def print_matrix(matrix, names):
 
 
 def print_stats(modules, verbose=True):
+    """Print some general stats."""
     n = len(modules)
     print('total modules: %i' % n)
     for category in CATEGORIES:
@@ -224,11 +227,13 @@ def print_stats(modules, verbose=True):
                 print('  %s' % name)
     matrix, _names = adjacency_matrix(modules)
     propagation_cost = sum([sum(row) for row in matrix]) / n
-    print('propagation cost: %i, %i%%' % (propagation_cost, 100 * propagation_cost / n))
+    print('propagation cost: %i, %i%%' % (
+        propagation_cost, 100 * propagation_cost / n))
     print('max rank: %i' % max((m['rank'] for m in modules.values())))
 
 
 def print_dot(modules):
+    """Print dependency graph as DOT."""
     ranks = [m['rank'] for m in modules.values()]
 
     print('digraph adhocracy_frontend {')
@@ -262,12 +267,13 @@ def parse_args():
     parser.add_argument('-x', '--exclude', nargs='*', default=[])
 
     parser.add_argument('--matrix', action='store_true', help='Output '
-        'dependency matrix as PBM. If you want to only include direct '
-        'dependencies, use the --direct switch')
+                        'dependency matrix as PBM. If you want to only '
+                        'include direct dependencies, use the --direct '
+                        'switch')
     parser.add_argument('--direct', action='store_true')
 
     parser.add_argument('--stats', action='store_true', help='Output '
-        'some general stats')
+                        'some general stats')
     parser.add_argument('-v', '--verbose', action='store_true')
 
     parser.add_argument('--dump', action='store_true')
@@ -298,7 +304,13 @@ def main():
     elif args.stats:
         print_stats(modules, verbose=args.verbose)
     elif args.dump:
-        print(json.dumps(modules, indent=2, separators=(',', ': '), sort_keys=True, ensure_ascii=False, cls=SetEncoder))
+        print(json.dumps(
+            modules,
+            indent=2,
+            separators=(',', ': '),
+            sort_keys=True,
+            ensure_ascii=False,
+            cls=SetEncoder))
     else:
         print_dot(modules)
 
