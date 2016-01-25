@@ -49,45 +49,6 @@ frontend unit tests:
                xdg-open http://localhost:6551/static/test-no-blanket.html
 
 
-frontend integration tests (jsint):
-
-    Frontend integration tests behave like unit tests in the sense
-    that they are driven by jasmine and can access all exports of all
-    typescript modules; they behave like end-to-end tests in that they
-    can talk to a running backend, angular runtime, etc..
-
-    This makes it possible to write integration tests that reproduce
-    any possible bug once it is reported (even though it may sometimes
-    be better to write a unit or an acceptance test).
-
-    For instance, one can write
-    a test that registers and injects the AdhHttp service, renders
-    some directive into the DOM, sends some keys to some input fields
-    and clicks "save", and, once the object has been saved to the
-    database, gets it from the backend and compares it to the one
-    rendered in the directive.
-
-    Integration tests do not support nodejs.  They can only be run in
-    browser manually or via py.test.
-
-    A.  Integrated with py.test::
-
-           bin/polytester jsint
-
-    B.  In browser::
-
-            make -C ./parts/static/js/ compile_tests_browser
-            xdg-open http://localhost:6551/static/igtest.html
-
-        .. note::
-
-           As with the unit tests (see above), when running
-           integration tests in the browser manually, you are
-           responsible for making sure the backend is running.  In
-           contrast to unit tests, debugging works smoothly without
-           any tricks, because we don't run blanket for test coverage
-           reporting.
-
 protractor acceptance tests::
 
     bin/polytester acceptance
