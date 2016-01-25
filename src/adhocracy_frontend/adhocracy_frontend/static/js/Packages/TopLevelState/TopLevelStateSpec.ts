@@ -29,9 +29,8 @@ export var register = () => {
                 locationMock = jasmine.createSpyObj("locationMock", ["absUrl", "url", "search", "path", "replace"]);
                 rootScopeMock = jasmine.createSpyObj("rootScopeMock", ["$watch"]);
 
-                providerMock = jasmine.createSpyObj("providerMock", ["getArea", "getSpaceDefaults"]);
+                providerMock = jasmine.createSpyObj("providerMock", ["getArea"]);
                 providerMock.getArea.and.callThrough();
-                providerMock.getSpaceDefaults.and.callThrough();
 
                 adhTrackingMock = jasmine.createSpyObj("adhTrackingMock", ["trackPageView", "setUserId"]);
 
@@ -126,10 +125,10 @@ export var register = () => {
                     var areaPath = "/foo/bar";
 
                     beforeEach(() => {
-                        adhTopLevelStateWithPrivates.data = {"": {mykey : "myValue", mykey2: "myValue2"}};
+                        adhTopLevelStateWithPrivates.data = {mykey : "myValue", mykey2: "myValue2"};
                         areaMock.reverse.and.returnValue({
                             path: areaMock._basePath + areaPath,
-                            search: adhTopLevelStateWithPrivates.data[""]
+                            search: adhTopLevelStateWithPrivates.data
                         });
                         adhTopLevelStateWithPrivates.toLocation.and.callThrough();
                         locationMock.search.and.callFake((key?, value?) => {
@@ -142,13 +141,13 @@ export var register = () => {
 
                     it("adds parameters to location path", () => {
                         adhTopLevelStateWithPrivates.toLocation();
-                        expect(searchData).toEqual(adhTopLevelStateWithPrivates.data[""]);
+                        expect(searchData).toEqual(adhTopLevelStateWithPrivates.data);
                     });
 
                     it("updates parameters in location path", () => {
                         searchData["mykey"] = "oldvalue";
 
-                        adhTopLevelStateWithPrivates.data[""]["mykey"] = "newvalue";
+                        adhTopLevelStateWithPrivates.data["mykey"] = "newvalue";
                         adhTopLevelStateWithPrivates.toLocation();
 
                         expect(searchData["mykey"]).toBe("newvalue");
@@ -164,7 +163,7 @@ export var register = () => {
                     it("updates parameters in location path", () => {
                         searchData["mykey"] = "oldvalue";
 
-                        adhTopLevelStateWithPrivates.data[""]["mykey"] = "newvalue";
+                        adhTopLevelStateWithPrivates.data["mykey"] = "newvalue";
                         adhTopLevelStateWithPrivates.toLocation();
 
                         expect(searchData["mykey"]).toBe("newvalue");
@@ -217,12 +216,12 @@ export var register = () => {
                         areaMock._data = data;
 
                         _.forOwn(data, (value, key) => {
-                            expect(adhTopLevelStateWithPrivates.data[""][key]).toBeUndefined();
+                            expect(adhTopLevelStateWithPrivates.data[key]).toBeUndefined();
                         });
 
                         adhTopLevelStateWithPrivates.fromLocation().then(() => {
                             _.forOwn(data, (value, key) => {
-                                expect(adhTopLevelStateWithPrivates.data[""][key]).toBe(data[key]);
+                                expect(adhTopLevelStateWithPrivates.data[key]).toBe(data[key]);
                             });
                             done();
                         });
@@ -232,12 +231,12 @@ export var register = () => {
                         var data = {};
                         areaMock._data = data;
 
-                        adhTopLevelStateWithPrivates.data = {"": {mykey: "myvalue"}};
-                        var old = _.clone(adhTopLevelStateWithPrivates.data[""]);
+                        adhTopLevelStateWithPrivates.data = {mykey: "myvalue"};
+                        var old = _.clone(adhTopLevelStateWithPrivates.data);
 
                         adhTopLevelStateWithPrivates.fromLocation().then(() => {
                             _.forOwn(old, (value, key) => {
-                                expect(adhTopLevelStateWithPrivates.data[""][key]).toBeUndefined();
+                                expect(adhTopLevelStateWithPrivates.data[key]).toBeUndefined();
 
                             });
                             done();
@@ -245,17 +244,17 @@ export var register = () => {
                     });
 
                     it("updates parameters in TopLevelState", (done) => {
-                        adhTopLevelStateWithPrivates.data = {"": {mykey: "otherValue"}};
+                        adhTopLevelStateWithPrivates.data = {mykey: "otherValue"};
                         var data = { mykey: "myvalue"};
                         areaMock._data = data;
 
                         _.forOwn(data, (value, key) => {
-                            expect(adhTopLevelStateWithPrivates.data[""][key]).not.toEqual(value);
+                            expect(adhTopLevelStateWithPrivates.data[key]).not.toEqual(value);
                         });
 
                         adhTopLevelStateWithPrivates.fromLocation().then(() => {
                             _.forOwn(data, (value, key) => {
-                                expect(adhTopLevelStateWithPrivates.data[""][key]).toBe(data[key]);
+                                expect(adhTopLevelStateWithPrivates.data[key]).toBe(data[key]);
                             });
                             done();
                         });
@@ -265,13 +264,13 @@ export var register = () => {
 
             it("dispatches calls to set() to eventManager", () => {
                 adhTopLevelState.set("content2Url", "some/path");
-                expect(trigger).toHaveBeenCalledWith(":content2Url", "some/path");
+                expect(trigger).toHaveBeenCalledWith("content2Url", "some/path");
             });
 
             it("dispatches calls to on() to eventManager", () => {
                 var callback = (url) => undefined;
                 adhTopLevelState.on("content2Url", callback);
-                expect(on).toHaveBeenCalledWith(":content2Url", callback);
+                expect(on).toHaveBeenCalledWith("content2Url", callback);
             });
 
             describe("cameFrom", () => {
