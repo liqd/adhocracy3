@@ -766,9 +766,8 @@ class TestExtraInfoSchema:
     def test_deserialize_empty(self, inst):
         from colander import Invalid
         cstruct = {}
-        with raises(Invalid) as error:
-            inst.deserialize(cstruct)
-        assert error.value.asdict() == {'extrainfo': 'Required'}
+        inst.deserialize(cstruct) == {'extrainfo': ''}
+
 
     def test_deserialize_with_required(self, inst, cstruct_required):
         wanted = cstruct_required

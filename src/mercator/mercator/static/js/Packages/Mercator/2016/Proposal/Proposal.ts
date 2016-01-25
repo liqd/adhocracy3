@@ -255,7 +255,7 @@ var fill = (data : IFormData, resource) => {
             resource.data[SICommunity.nick] = new SICommunity.Sheet({
                 expected_feedback: data.experience,
                 heard_froms: _.reduce(<any>data.heardFrom, (result, include, item) => {
-                    if (include) {
+                    if (include && item !== "otherText" ) {
                         result.push(item);
                     }
                     return result;
@@ -734,7 +734,7 @@ export var mercatorProposalFormController2016 = (
     $scope.$flow = flowFactory.create();
 
     $scope.selection_criteria_link = "/en/idea-space/selection-criteria/";
-    $scope.financial_plan_link = "/en/idea-space/financial-plan/";
+    $scope.financial_plan_link = "/de/media/advocate-europe_project-financial-plan.xlsx";
 
     var topicTotal = () => {
         return _.reduce($scope.data.topic, (result, include, topic : string) => {
@@ -791,7 +791,8 @@ export var mercatorProposalFormController2016 = (
 
     $scope.showTopicsError = () : boolean => {
         return ((topicTotal() < 1) || (topicTotal() > 2)) &&
-            $scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$dirty;
+            ($scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$dirty ||
+                $scope.mercatorProposalForm.$submitted);
     };
 
     $scope.showLocationError = () : boolean => {

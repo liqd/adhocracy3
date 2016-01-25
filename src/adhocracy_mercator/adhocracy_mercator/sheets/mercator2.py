@@ -331,9 +331,9 @@ class IExtraInfo(ISheet):
 
 
 class ExtraInfoSchema(colander.MappingSchema):
-    """Datastruct for the challenge field."""
+    """Datastruct for the extra info field."""
 
-    extrainfo = Text(missing=colander.required,
+    extrainfo = Text(missing=colander.drop,
                      validator=colander.Length(min=3, max=500))
 
 extrainfo_meta = sheet_meta._replace(

@@ -262,22 +262,6 @@
                                     data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-website'], 'url')">
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
                             </label>
-                            <label>
-                                <span class="label-text">{{ "TR__EMAIL_2016" | translate }} *</span>
-                                <input
-                                    type="email"
-                                    data-ng-model="data.organizationInfo.email"
-                                    name="organization-info-email"
-                                    required="required" />
-                                <span
-                                    class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-email'], 'required')">
-                                    {{ "TR__ERROR_REQUIRED_EMAIL_2016" | translate }}</span>
-                                <span
-                                    class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-email'], 'email')">
-                                    {{ "TR__ERROR_INVALID_EMAIL_2016" | translate }}</span>
-                            </label>
                         </fieldset>
                         <label class="label-text">
                             <input
@@ -351,22 +335,6 @@
                                     class="input-error"
                                     data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-website'], 'url')">
                                     {{ "TR__ERROR_INVALID_URL" | translate }}</span>
-                            </label>
-                            <label>
-                                <span class="label-text">{{ "TR__EMAIL_2016" | translate }} *</span>
-                                <input
-                                    type="email"
-                                    data-ng-model="data.organizationInfo.email"
-                                    name="organization-info-email"
-                                    required="required" />
-                                <span
-                                    class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-email'], 'required')">
-                                    {{ "TR__ERROR_REQUIRED_EMAIL_2016" | translate }}</span>
-                                 <span
-                                    class="input-error"
-                                    data-ng-if="showError(mercatorProposalForm, mercatorProposalAboutYouForm['organization-info-email'], 'email')">
-                                    {{ "TR__ERROR_INVALID_EMAIL_2016" | translate }}</span>
                             </label>
 
                         </fieldset>
@@ -738,7 +706,7 @@
                             min="0"
                             data-ng-model="data.duration"
                             name="introduction-duration"
-                            maxlength="26"
+                            max="9999999999999999999999999"
                             required="required" />
 
                         <span
@@ -749,6 +717,10 @@
                             class="input-error"
                             data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-duration'], 'min')">
                             {{ "TR__ERROR_MIN_NUMBER_0" | translate }}</span>
+                        <span
+                            class="input-error"
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalBriefForm['introduction-duration'], 'max')">
+                            {{ "TR__ERROR_LARGE_NUMBER" | translate }}</span>
                     </label>
                 </div>
 
@@ -1136,7 +1108,7 @@
                             name="finance-budget"
                             placeholder="{{ 'TR__MERCATOR_PROPOSAL_TOTAL_BUDGET_PLACEHOLDER' | translate }}"
                             min="0"
-                            maxlength="26"
+                            max="9999999999999999999999999"
                             required="required" />
 
                         <span
@@ -1151,6 +1123,10 @@
                             class="input-error"
                             data-ng-if="showError(mercatorProposalForm, mercatorProposalFinanceForm['finance-budget'], 'min')">
                             {{ "TR__ERROR_MIN_NUMBER_0" | translate }}</span>
+                        <span
+                            class="input-error"
+                            data-ng-if="showError(mercatorProposalForm, mercatorProposalFinanceForm['finance-budget'], 'max')">
+                            {{ "TR__ERROR_LARGE_NUMBER" | translate }}</span>
                     </label>
                 </div><!--/.annotated-section-body -->
 
