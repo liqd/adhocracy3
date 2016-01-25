@@ -4,7 +4,7 @@
     <div class="l-header-left">
         <a
             class="button button-cta m-add"
-            data-ng-if="processOptions.POST || (!processOptions.loggedIn && participate)"
+            data-ng-if="(processOptions.POST || (!processOptions.loggedIn && participate)) && processUrl !== '/'"
             data-ng-href="{{ processUrl | adhResourceUrl:'create_proposal' }}">{{ "TR__PROPOSAL_ADD" | translate }}</a>
     </div>
     <div class="l-header-right">
