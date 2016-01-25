@@ -110,7 +110,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         adhTopLevelStateProvider
             .when("", ["$location", ($location) : AdhTopLevelState.IAreaInput => {
                 $location.replace();
-                $location.path("/r/digital_leben/");
+                $location.path(config.redirect_url);
                 return {
                     skip: true
                 };

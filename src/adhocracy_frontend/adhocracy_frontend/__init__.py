@@ -26,6 +26,7 @@ def config_view(request):
                                       'http://localhost:6541')
     config['canonical_url'] = settings.get('adhocracy.canonical_url',
                                            'http://localhost:6551')
+    config['redirect_url'] = settings.get('adhocracy.redirect_url', '/')
     config['rest_platform_path'] = settings.get('adhocracy.rest_platform_path',
                                                 '/adhocracy/')
     config['netiquette_url'] = settings.get(

@@ -69,6 +69,9 @@ adhocracy.frontend.profile_images_enabled = ${adhocracy:frontend.profile_images_
 # #!.
 adhocracy.canonical_url = http://localhost:6551/static/embed.html#!
 
+# Redirect URL - e.g. if there are different processes on one port, this will tell you which url is the current process.
+adhocracy.redirect_url = ${adhocracy:redirect_url}
+
 # If the Adhocracy frontend is embedded in a website from a trusted domain,
 # Adhocracy may pass user authentication token to the embedding website.
 adhocracy.trusted_domains =
