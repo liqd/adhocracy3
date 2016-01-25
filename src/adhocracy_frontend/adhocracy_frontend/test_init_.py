@@ -50,8 +50,8 @@ class ConfigViewTest(unittest.TestCase):
         
     def test_redirect_url_with_redirect_url_settings(self):
         request = testing.DummyRequest(scheme='http')
-        request.registry.settings = {'adhocracy.redirect_url': 'ws://l.x'}
-        assert self.call_fut(request)['redirect_url'] == 'ws://l.x'
+        request.registry.settings = {'adhocracy.redirect_url': '/r/example/'}
+        assert self.call_fut(request)['redirect_url'] == '/r/example/'
 
     def test_pkg_path_with_pkg_path_settings(self):
         request = testing.DummyRequest(scheme='http')

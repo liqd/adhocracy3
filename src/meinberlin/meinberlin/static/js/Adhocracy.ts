@@ -111,8 +111,10 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     app.config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
         adhTopLevelStateProvider
             .when("", ["$location", ($location) : AdhTopLevelState.IAreaInput => {
-                $location.replace();
-                $location.path(config.redirect_url);
+                if (config.redirect_url !== "/") {
+                    $location.replace();
+                    $location.path(config.redirect_url);
+                }
                 return {
                     skip: true
                 };
