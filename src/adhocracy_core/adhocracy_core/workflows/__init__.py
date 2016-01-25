@@ -108,4 +108,5 @@ def includeme(config):  # pragma: no cover
     """Include workflows."""
     config.include('.sample')
     config.include('.standard')
+    config.include('.debate')
     config.include('.subscriber')
