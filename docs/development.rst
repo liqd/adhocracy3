@@ -25,28 +25,23 @@ Running the Testsuite
 
 frontend unit tests:
 
-    A.  Integrated with py.test::
+A.  In node::
 
-           bin/polytester jsunit
+       bin/polytester jsunit
 
-    B.  In browser::
+B.  In browser::
 
-            make -C ./parts/static/js/ compile_tests_browser
-            xdg-open http://localhost:6551/static/test.html
+       bin/supervisorctl start adhocracy:frontend
+       xdg-open http://localhost:6551/static/test.html
 
-        Make sure backend is running (or some means of delivering html
-        and js to the browser).
+    .. note::
 
-        This is the best way to develop, as it lets you run tests
-        indiviually and repeatedly and enter the debugger.
+       For debugging, it helps to disable blanket.
 
-        .. note::
+    .. note::
 
-           In the debugger, it helps to disable the script tag about
-           blanket in test.html.  You can do this thusly::
-
-               make -C ./parts/static/js/ compile_tests_browser test-no-blanket
-               xdg-open http://localhost:6551/static/test-no-blanket.html
+       Running JS unit test in the browser with blanket enabled is
+       currently broken.
 
 
 protractor acceptance tests::
