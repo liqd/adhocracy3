@@ -118,7 +118,7 @@ export var register = () => {
                 adhTopLevelStateMock = jasmine.createSpyObj("adhTopLevelStateMock", ["goToCameFrom"]);
 
                 directive = AdhUserViews.registerDirective(
-                    null, null, adhConfigMock, null, adhUserMock, adhTopLevelStateMock, "adhShowError", "$translate");
+                    null, null, adhConfigMock, null, adhUserMock, adhTopLevelStateMock, "adhShowError");
             });
 
             describe("link", () => {
