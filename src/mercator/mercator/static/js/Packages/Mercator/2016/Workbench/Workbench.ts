@@ -82,10 +82,13 @@ export var proposalDetailColumnDirective = (
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
+            adhPermissions.bindScope(scope, () => scope.proposalUrl, "proposalOptions");
 
             scope.delete = () => {
                 column.$broadcast("triggerDelete", scope.proposalUrl);
             };
+
+            scope.canModerate = () => scope.proposalOptions.canPut(SIWinnerInfo.nick);
 
             scope.print = () => {
                 // only the focused column is printed
