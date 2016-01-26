@@ -69,7 +69,9 @@ adhocracy.frontend.profile_images_enabled = ${adhocracy:frontend.profile_images_
 # #!.
 adhocracy.canonical_url = http://localhost:6551/static/embed.html#!
 
-# Redirect URL - This is the path you get redirected to when visiting /. This is especially relevant for cases in which cameFrom is not set, e.g. account activation.
+# Redirect URL - This is the path you get redirected to when visiting /.
+# This is especially relevant for cases in which cameFrom is not set,
+# e.g. account activation.
 adhocracy.redirect_url = ${adhocracy:redirect_url}
 
 # If the Adhocracy frontend is embedded in a website from a trusted domain,
