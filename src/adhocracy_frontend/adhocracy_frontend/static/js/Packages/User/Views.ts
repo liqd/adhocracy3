@@ -335,7 +335,8 @@ export var registerDirective = (
     adhCredentials : AdhCredentials.Service,
     adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhShowError
+    adhShowError,
+    $translate
 ) => {
     return {
         restrict: "E",
@@ -343,7 +344,8 @@ export var registerDirective = (
         scope: {},
         link: (scope : IScopeRegister) => {
             scope.siteName = adhConfig.site_name;
-            scope.termsUrl = adhConfig.terms_url;
+            console.log(adhConfig);
+            scope.termsUrl = adhConfig.terms_url[$translate.use()];
             scope.captcha = {
                 enabled: adhConfig.captcha_enabled,
                 audioEnabled: false,

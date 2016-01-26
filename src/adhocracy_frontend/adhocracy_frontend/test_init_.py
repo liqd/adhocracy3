@@ -35,7 +35,10 @@ class ConfigViewTest(unittest.TestCase):
              'profile_images_enabled': True,
              'captcha_enabled': False,
              'captcha_url': 'http://localhost:6542/',
-             'terms_url': None}
+             'terms_url': [
+                'de' : None,
+                'en' : None
+             ]}
 
     def test_ws_url_without_ws_url_settings_scheme_https(self):
         request = testing.DummyRequest(scheme='https')
