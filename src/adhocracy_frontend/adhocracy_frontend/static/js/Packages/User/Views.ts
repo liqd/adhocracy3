@@ -343,7 +343,6 @@ export var registerDirective = (
         scope: {},
         link: (scope : IScopeRegister) => {
             scope.siteName = adhConfig.site_name;
-            console.log(adhConfig);
             scope.termsUrl = adhConfig.terms_url[adhConfig.locale];
             scope.captcha = {
                 enabled: adhConfig.captcha_enabled,
