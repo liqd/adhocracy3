@@ -133,7 +133,7 @@
     "TR__RATE_VOTE_DOWN": "vote down",
     "TR__RATE_VOTE_UP": "vote up",
     "TR__REGISTER": "register",
-    "TR__REGISTER_SUCCESS": "Thank you for your registration. We sent you an email with an activation link. In case you do not recieve that email, please also check your spam folder.",
+    "TR__REGISTER_SUCCESS": "Thank you for your registration. We sent you an email with an activation link. In case you do not receive that email, please also check your spam folder.",
     "TR__REGISTRATION_ALREADY_LOGGED_IN": "You are already logged in, you must [[link:logout]] to create a new account.",
     "TR__REGISTRATION_CALL_FOR_ACTIVATION": "Once you have clicked on the activation link you can proceed using {{siteName}}.",
     "TR__REGISTRATION_LOGIN_INSTEAD": "I already have an account. Log in [[link:here]].",
