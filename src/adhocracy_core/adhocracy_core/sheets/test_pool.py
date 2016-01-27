@@ -107,7 +107,8 @@ class TestFilteringPoolSheet:
         inst.get.return_value = {'elements': [child],
                                  'count': 1}
         cstruct = inst.get_cstruct(request_, params={'name': 'child'})
-        assert cstruct == {'elements': ['http://example.com/']}
+        assert cstruct == {'elements': ['http://example.com/'],
+                           'count': '1'}
 
     def test_get_cstruct_filter_by_view_permission(self, inst, request_):
         inst.get = Mock()

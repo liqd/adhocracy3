@@ -6,7 +6,6 @@ import colander
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
-from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.sheets import AnnotationRessourceSheet
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import add_sheet_to_registry
@@ -91,7 +90,7 @@ class PoolSheet(AnnotationRessourceSheet):
             list, `url` the resource urls, `content` all resource data.
             Defaults to `path`.
         show_count (bool):
-            add 'count` field, defaults to False.
+            add 'count` field, defaults to True.
         show_frequency (bool):
             add 'aggregateby` field. defaults to False.
         """
@@ -130,7 +129,7 @@ class PoolSheet(AnnotationRessourceSheet):
             typ_copy = deepcopy(elements.children[0].typ)
             typ_copy.serialization_form = 'content'
             elements.children[0].typ = typ_copy
-        if params.get('show_count', False):
+        if params.get('show_count', True):
             child = colander.SchemaNode(colander.Integer(),
                                         default=0,
                                         missing=colander.drop,

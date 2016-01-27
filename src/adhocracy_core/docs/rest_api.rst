@@ -691,7 +691,8 @@ version is automatically created along with the updated Section version::
 
     >>> resp = testapp.get(pdag_path)
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersions'])
-    {'elements': ['.../Documents/document_0000000/VERSION_0000000/',
+    {'count': '4',
+     'elements': ['.../Documents/document_0000000/VERSION_0000000/',
                   '.../Documents/document_0000000/VERSION_0000001/',
                   '.../Documents/document_0000000/VERSION_0000002/',
                   '.../Documents/document_0000000/VERSION_0000003/']}
@@ -740,7 +741,8 @@ a new version is automatically created only for pvrs3, not for pvrs2::
 
     >>> resp = testapp.get(pdag_path)
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersions'])
-    {'elements': ['.../Documents/document_0000000/VERSION_0000000/',
+    {'count': '5',
+     'elements': ['.../Documents/document_0000000/VERSION_0000000/',
                   '.../Documents/document_0000000/VERSION_0000001/',
                   '.../Documents/document_0000000/VERSION_0000002/',
                   '.../Documents/document_0000000/VERSION_0000003/',
@@ -1314,6 +1316,9 @@ only the `count`:
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
     {'count': '3', 'elements': []}
 
+*Note:* due to limitations of our (de)serialization library (Colander),
+-the count is returned as a string, though it is actually a number.
+
 To list child elements you have to do a search query with `elements=paths`
  (see below for more detailed examples):
 
@@ -1430,27 +1435,6 @@ wouldn't have found anything, since they are children of children of the pool::
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     []
 
-To retrieve a count of the elements matching your query, specify
-*count=true* or just *count*. If you do so, an additional *count* field will
-be added to the returned IPool sheet::
-
-    >>> resp_data = testapp.get('/Documents/document_0000000',
-    ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraph',
-    ...             'count': 'true'}).json
-    >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['count']
-    '3'
-
-*Note:* due to limitations of our (de)serialization library (Colander),
-the count is returned as a string, though it is actually a number.
-
-If you specify *count* without any other query parameters,
-you'll get the number of children in the pool::
-
-    >>> resp_data = testapp.get('/Documents/document_0000000',
-    ...     params={'count': 'true'}).json
-    >>> child_count = resp_data['data']['adhocracy_core.sheets.pool.IPool']['count']
-    >>> assert int(child_count) >= 10
-
 If you specify *sort* you can set a *<custom>* filter (see below) that supports
 sorting to sort the result::
 
@@ -1493,24 +1477,22 @@ The *count* is not affected by *limit*::
     >>> assert int(child_count) >= 10
 
 The *elements* parameter allows controlling how matching element are
-returned. By default, 'elements' in the IPool sheet contains a list of paths.
-This corresponds to setting *elements=paths*.
+returned. By default, 'elements' in the IPool sheet contains nothing.
+This corresponds to setting *elements=omit*
+
+    >>> resp_data = testapp.get('/Documents/document_0000000',
+    ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
+    ...             'elements': 'omit'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
+    []
+
+Setting *elements=paths* will yield a response with a listing of resource paths.
 
     >>> resp_data = testapp.get('/Documents/document_0000000',
     ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
     ...             'elements': 'paths'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/Documents/document_0000000/VERSION_0000000/',...
-
-Setting *elements=omit* will yield a response with an empty 'elements' listing.
-This makes only sense if you ask for something else instead, e.g. a count of
-elements::
-
-    >>> resp_data = testapp.get('/Documents/document_0000000',
-    ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
-    ...             'elements': 'omit', 'count': 'true'}).json
-    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
-    {'count': '5', 'elements': []}
 
 Setting *elements=content* will instead return the complete contents of all
 matching elements -- what you would get by making a GET request on each of
@@ -1520,7 +1502,8 @@ their paths::
     ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
     ...             'elements': 'content'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
-    {'elements': [{'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
+    {'count': '5',
+     'elements': [{'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
                    'data': ...
 
 *sheet* filter resources with a specific sheet type::
@@ -1661,25 +1644,4 @@ will be 1 or higher. ::
     ...             'depth': 'all', 'aggregateby': 'tag'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['aggregateby'])
     {'tag': {'FIRST': 3, 'LAST': 3}}
-
-Service Pools
--------------
-
-A :term:`service` pool is used to add many child resources, for example
-the :term:`post_pool` for comments or rates.
-By default it does not list the child elements but only the result_count:
-
-    >>> resp_data = testapp.get('/Documents/document_0000000/comments/').json
-    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
-    {'count': '3', 'elements': []}
-
-To list child elements you have to do search query and limit the number of
-listet result elements::
-
-    >>> resp_data = testapp.get('/Documents/document_0000000/comments',
-    ...     params={'limit': 10,
-    ...             'offset': 0,
-    ...             'elements': 'paths'}).json
-    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
-    {'elements': ['http://localhost...]}
 
