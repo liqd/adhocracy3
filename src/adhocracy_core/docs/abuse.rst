@@ -14,8 +14,8 @@ Some imports to work with rest api calls::
 Start Adhocracy testapp::
 
     >>> from webtest import TestApp
-    >>> app = getfixture('app')
-    >>> testapp = TestApp(app)
+    >>> app_router = getfixture('app_router')
+    >>> testapp = TestApp(app_router)
     >>> rest_url = 'http://localhost'
     >>> log = getfixture('log')
 

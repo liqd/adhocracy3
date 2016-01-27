@@ -29,10 +29,9 @@ class TestDigitalLebenWorkflow:
                               registry,
                               datadir,
                               process_url,
-                              app,
                               app_admin):
         json_file = str(datadir.join('resources.json'))
-        add_resources(app, json_file)
+        add_resources(app_admin.app_router, json_file)
         resp = app_admin.get(process_url)
         assert resp.status_code == 200
 

@@ -86,10 +86,9 @@ class TestBPlanWorkflow:
     def test_create_resources(self,
                               registry,
                               datadir,
-                              app,
                               app_admin):
         json_file = str(datadir.join('resources.json'))
-        add_resources(app, json_file)
+        add_resources(app_admin.app_router, json_file)
         resp = app_admin.get('/bplan')
         assert resp.status_code == 200
 
