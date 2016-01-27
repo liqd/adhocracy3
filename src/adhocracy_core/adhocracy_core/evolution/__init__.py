@@ -40,7 +40,6 @@ from adhocracy_core.sheets.asset import IHasAssetPool
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.badge import IHasBadgesPool
 from adhocracy_core.sheets.description import IDescription
-from adhocracy_core.sheets.image import IImageDescription
 from adhocracy_core.sheets.image import IImageReference
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.principal import IUserExtended
@@ -585,12 +584,6 @@ def add_image_reference_to_organisations(root):  # pragma: no cover
     migrate_new_sheet(root, IOrganisation, IImageReference)
 
 
-@log_migration
-def add_image_description_to_organisations(root):  # pragma: no cover
-    """Add image description to organisations."""
-    migrate_new_sheet(root, IOrganisation, IImageDescription)
-
-
 def set_comment_count(root):  # pragma: no cover
     """Set comment_count for all ICommentables."""
     from adhocracy_core.resources.subscriber import update_comments_count
@@ -651,6 +644,5 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_description_sheet_to_organisations)
     config.add_evolution_step(add_description_sheet_to_processes)
     config.add_evolution_step(add_image_reference_to_organisations)
-    config.add_evolution_step(add_image_description_to_organisations)
     config.add_evolution_step(set_comment_count)
     config.add_evolution_step(remove_duplicated_group_ids)
