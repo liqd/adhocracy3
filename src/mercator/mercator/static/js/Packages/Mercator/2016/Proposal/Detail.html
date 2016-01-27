@@ -83,33 +83,6 @@
                     </section>
 
                     <section class="non-commentable-section">
-                        <div class="mercator-proposal-budget-row">
-                            <div class="mercator-proposal-budget-col requested">
-                                <strong>{{ data.finance.requestedFunding | number }} &euro;</strong>
-                                {{ "TR__MERCATOR_PROPOSAL_REQUESTED" | translate }}
-                            </div>
-                            <div class="mercator-proposal-budget-col">
-                                <strong>{{ data.finance.budget | number }} &euro;</strong>
-                                {{ "TR__MERCATOR_PROPOSAL_TOTAL_BUDGET" | translate }}
-                            </div>
-                            <div class="mercator-proposal-budget-col" data-ng-if="data.finance.secured && isModerator">
-                                <span>
-                                    <strong class="color-highlight-valid">{{ "TR__MERCATOR_PROPOSAL_FINANCE_SECURED" | translate }}</strong>
-                                    {{ "TR__MERCATOR_PROPOSAL_FINANCE_OTHERS_SOURCES" | translate }}
-                                </span>
-                            </div>
-                        </div>
-
-                        <h3>{{ "TR__MERCATOR_PROPOSAL_MAJOR_EXPENSES_LABEL" | translate }}:</h3>
-                        <p>{{data.finance.major}}</p>
-
-                        <div data-ng-if="data.finance.otherSources">
-                            <h3>{{ "TR__MERCATOR_PROPOSAL_FINANCE_OTHERS_SOURCES" | translate }}:</h3>
-                            <p>{{data.finance.otherSources}}</p>
-                        </div>
-                    </section>
-
-                    <section class="non-commentable-section">
                         <div class="mercator-proposal-location">
                             <h3>{{ "TR__MERCATOR_PROPOSAL_LOCATION_LABEL" | translate }}:</h3>
                             <ul class="inline-boxes">
@@ -144,7 +117,7 @@
                         <div class="mercator-proposal-detail-username">
                             <adh-user-meta
                                 data-ng-if="data.userInfo"
-                                data-path="{{data.userInfo.path}}"
+                                data-path="{{data.creator}}"
                                 data-name="{{data.userInfo.firstName}} {{data.userInfo.lastName}}">
                             </adh-user-meta>
                         </div>
@@ -297,12 +270,39 @@
                         </a>
                     </section>
 
-                    <section class="commentable-section {{subResourceSelectedState('extrainfo')}}">
+                    <section data-ng-if="data.impact.extraInfo" class="commentable-section {{subResourceSelectedState('extrainfo')}}">
                         <h3>{{ "TR__MERCATOR_PROPOSAL_IMPACT_EXTRAINFO_LABEL" | translate }}</h3>
                         <p>{{ data.impact.extraInfo }}</p>
                         <a class="commentable-section-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments:extrainfo'}}">
                             <i class="icon-speechbubble"></i> {{ data.commentCounts.extrainfo }}
                         </a>
+                    </section>
+
+                    <section class="non-commentable-section">
+                        <div class="mercator-proposal-budget-row">
+                            <div class="mercator-proposal-budget-col requested">
+                                <strong>{{ data.finance.requestedFunding | number }} &euro;</strong>
+                                {{ "TR__MERCATOR_PROPOSAL_REQUESTED" | translate }}
+                            </div>
+                            <div class="mercator-proposal-budget-col">
+                                <strong>{{ data.finance.budget | number }} &euro;</strong>
+                                {{ "TR__MERCATOR_PROPOSAL_TOTAL_BUDGET" | translate }}
+                            </div>
+                            <div class="mercator-proposal-budget-col" data-ng-if="data.finance.secured && isModerator">
+                                <span>
+                                    <strong class="color-highlight-valid">{{ "TR__MERCATOR_PROPOSAL_FINANCE_SECURED" | translate }}</strong>
+                                    {{ "TR__MERCATOR_PROPOSAL_FINANCE_OTHERS_SOURCES" | translate }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <h3>{{ "TR__MERCATOR_PROPOSAL_MAJOR_EXPENSES_LABEL" | translate }}:</h3>
+                        <p>{{data.finance.major}}</p>
+
+                        <div data-ng-if="data.finance.otherSources">
+                            <h3>{{ "TR__MERCATOR_PROPOSAL_FINANCE_OTHERS_SOURCES" | translate }}:</h3>
+                            <p>{{data.finance.otherSources}}</p>
+                        </div>
                     </section>
                 </section>
 
@@ -343,16 +343,6 @@
                         <div data-ng-if="data.experience">
                             <h3>{{ "TR__MERCATOR_PROPOSAL_SHARE_EXPERIENCE_LABEL" | translate }}</h3>
                             <p>{{ data.experience }}</p>
-                        </div>
-                        <div data-ng-if="data.heardFrom">
-                            <h3>{{ "TR__MERCATOR_PROPOSAL_HEARD_FROM_LABEL" | translate }}</h3>
-                            <p>
-                                <span data-ng-if="data.heardFrom.colleague">{{ "TR__COLLEAGUE" | translate }}</span>
-                                <span data-ng-if="data.heardFrom.website">{{ "TR__WEBSITE" | translate }}</span>
-                                <span data-ng-if="data.heardFrom.newsletter">{{ "TR__NEWSLETTER" | translate }}</span>
-                                <span data-ng-if="data.heardFrom.facebook">{{ "TR__FACEBOOK" | translate }}</span>
-                                <span data-ng-if="data.heardFrom.other">{{ "TR__OTHER" | translate }}: {{ data.heardFrom.otherText }}</span>
-                            </p>
                         </div>
                     </section>
                 </section>

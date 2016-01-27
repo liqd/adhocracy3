@@ -33,6 +33,8 @@ class ConfigViewTest(unittest.TestCase):
              'piwik_track_user_id': False,
              'piwik_use_cookies': False,
              'profile_images_enabled': True,
+             'captcha_enabled': False,
+             'captcha_url': 'http://localhost:6542/',
              'terms_url': None}
 
     def test_ws_url_without_ws_url_settings_scheme_https(self):
