@@ -74,7 +74,7 @@
         </nav>
 
         <div class="section-jump-main chapter-wrapper" data-du-spy-context="">
-            <section data-ng-repeat="paragraph in data.paragraphs" id="section-jump-chapter-{{$index}}">
+            <section class="commentable-section chapter" data-ng-repeat="paragraph in data.paragraphs" data-ng-if="!paragraph.deleted" id="section-jump-chapter-{{$index}}">
                 <label>
                     <textarea
                         data-msd-elastic=""
@@ -82,11 +82,15 @@
                         name="paragraph-{{ $index }}"
                         placeholder="{{ 'TR__PARAGRAPH_PLACEHOLDER' | translate }}"
                         required="required"></textarea>
+                    <a class="commentable-section-show-comments" data-ng-click="deleteParagraph($index)">
+                        <i class="button icon-x"></i>
+                    </a>                    
 
                     <span class="input-error" data-ng-show="showError(documentForm, documentForm['paragraph-' + $index], 'required')">
                         {{ "TR__ERROR_REQUIRED_PARAGRAPH" | translate }}
                     </span>
                 </label>
+
             </section>
             <footer class="form-footer">
                 <a href="" class="button-cta-secondary m-add document-form-add-paragraph-button" data-ng-click="addParagraph()">{{ "TR__ADD_PARAGRAPH" | translate }}</a>

@@ -29,6 +29,7 @@ var pkgLocation = "/Document";
 
 export interface IParagraph {
     body : string;
+    deleted : boolean;
     commentCount? : number;
     path? : string;
     selectedState? : string;
@@ -72,6 +73,7 @@ export interface IScope extends angular.IScope {
 export interface IFormScope extends IScope {
     showError;
     addParagraph() : void;
+    deleteParagraph(number) : void;
     submit() : angular.IPromise<any>;
     cancel() : void;
     documentForm : any;
@@ -128,6 +130,7 @@ export var bindPath = (
                         var commentCount : number = args[1];
                         return {
                             body: paragraphVersion.data[SIParagraph.nick].text,
+                            deleted: false,
                             commentCount: commentCount,
                             path: paragraphVersion.path
                         };
@@ -262,7 +265,8 @@ export var postEdit = (
     var paragraphVersion : RIParagraphVersion;
 
     _.forEach(scope.data.paragraphs, (paragraph : IParagraph, index : number) => {
-        if (index >= oldParagraphVersions.length) {
+        // currently, if a paragraph has been deleted, it doesn't get posted at all.
+        if (index >= oldParagraphVersions.length && !paragraph.deleted) {
             var item = new RIParagraph({preliminaryNames: adhPreliminaryNames});
             item.parent = documentPath;
 
@@ -279,7 +283,7 @@ export var postEdit = (
             paragraphItems.push(item);
             paragraphVersions.push(paragraphVersion);
             paragraphRefs.push(paragraphVersion.path);
-        } else {
+        } else if (!paragraph.deleted) {
             var oldParagraphVersion = oldParagraphVersions[index];
 
             if (paragraph.body !== oldParagraphVersion.data[SIParagraph.nick].text) {
@@ -464,7 +468,8 @@ export var createDirective = (
             scope.data = {
                 title: "",
                 paragraphs: [{
-                    body: ""
+                    body: "",
+                    deleted: false
                 }],
                 coordinates: []
             };
@@ -472,7 +477,8 @@ export var createDirective = (
 
             scope.addParagraph = () => {
                 scope.data.paragraphs.push({
-                    body: ""
+                    body: "",
+                    deleted: false
                 });
             };
 
@@ -523,8 +529,13 @@ export var editDirective = (
 
             scope.addParagraph = () => {
                 scope.data.paragraphs.push({
-                    body: ""
+                    body: "",
+                    deleted: false
                 });
+            };
+
+            scope.deleteParagraph = (index) => {
+                scope.data.paragraphs[index].deleted = true;
             };
 
             bindPath($q, adhHttp)(scope, undefined, scope.hasMap);
