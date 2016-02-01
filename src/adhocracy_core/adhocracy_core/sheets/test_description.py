@@ -22,7 +22,9 @@ class TestDescriptionSheet:
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
-        assert inst.get() == {'description': ''}
+        assert inst.get() == {'short_description': '',
+                              'description': ''
+                              }
 
 
 def test_includeme_register_description_sheet(config):
