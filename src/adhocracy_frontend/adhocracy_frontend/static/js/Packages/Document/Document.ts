@@ -73,7 +73,7 @@ export interface IScope extends angular.IScope {
 export interface IFormScope extends IScope {
     showError;
     addParagraph() : void;
-    deleteParagraph(number) : void;
+    deleteParagraph(index : number) : void;
     submit() : angular.IPromise<any>;
     cancel() : void;
     documentForm : any;
@@ -266,41 +266,45 @@ export var postEdit = (
 
     _.forEach(scope.data.paragraphs, (paragraph : IParagraph, index : number) => {
         // currently, if a paragraph has been deleted, it doesn't get posted at all.
-        if (index >= oldParagraphVersions.length && !paragraph.deleted) {
-            var item = new RIParagraph({preliminaryNames: adhPreliminaryNames});
-            item.parent = documentPath;
+        if (!paragraph.deleted) {
 
-            paragraphVersion = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
-            paragraphVersion.parent = item.path;
-            paragraphVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
-                follows: [item.first_version_path]
-            });
-            paragraphVersion.data[SIParagraph.nick] = new SIParagraph.Sheet({
-                text: paragraph.body
-            });
-            paragraphVersion.root_versions = [oldVersion.path];
+            if (index >= oldParagraphVersions.length) {
+                var item = new RIParagraph({preliminaryNames: adhPreliminaryNames});
+                item.parent = documentPath;
 
-            paragraphItems.push(item);
-            paragraphVersions.push(paragraphVersion);
-            paragraphRefs.push(paragraphVersion.path);
-        } else if (!paragraph.deleted) {
-            var oldParagraphVersion = oldParagraphVersions[index];
-
-            if (paragraph.body !== oldParagraphVersion.data[SIParagraph.nick].text) {
                 paragraphVersion = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
-                paragraphVersion.parent = AdhUtil.parentPath(oldParagraphVersion.path);
+                paragraphVersion.parent = item.path;
                 paragraphVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
-                    follows: [oldParagraphVersion.path]
+                    follows: [item.first_version_path]
                 });
                 paragraphVersion.data[SIParagraph.nick] = new SIParagraph.Sheet({
                     text: paragraph.body
                 });
                 paragraphVersion.root_versions = [oldVersion.path];
 
+                paragraphItems.push(item);
                 paragraphVersions.push(paragraphVersion);
                 paragraphRefs.push(paragraphVersion.path);
+
             } else {
-                paragraphRefs.push(oldParagraphVersion.path);
+                var oldParagraphVersion = oldParagraphVersions[index];
+
+                if (paragraph.body !== oldParagraphVersion.data[SIParagraph.nick].text) {
+                    paragraphVersion = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
+                    paragraphVersion.parent = AdhUtil.parentPath(oldParagraphVersion.path);
+                    paragraphVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+                        follows: [oldParagraphVersion.path]
+                    });
+                    paragraphVersion.data[SIParagraph.nick] = new SIParagraph.Sheet({
+                        text: paragraph.body
+                    });
+                    paragraphVersion.root_versions = [oldVersion.path];
+
+                    paragraphVersions.push(paragraphVersion);
+                    paragraphRefs.push(paragraphVersion.path);
+                } else {
+                    paragraphRefs.push(oldParagraphVersion.path);
+                }
             }
         }
     });
