@@ -82,9 +82,9 @@
                         name="paragraph-{{ $index }}"
                         placeholder="{{ 'TR__PARAGRAPH_PLACEHOLDER' | translate }}"
                         required="required"></textarea>
-                    <a class="commentable-section-show-comments" data-ng-click="deleteParagraph($index)">
+                    <a data-ng-if="$index > 0" class="commentable-section-show-comments" data-ng-click="deleteParagraph($index)">
                         <i class="button icon-x"></i>
-                    </a>                    
+                    </a>
 
                     <span class="input-error" data-ng-show="showError(documentForm, documentForm['paragraph-' + $index], 'required')">
                         {{ "TR__ERROR_REQUIRED_PARAGRAPH" | translate }}
