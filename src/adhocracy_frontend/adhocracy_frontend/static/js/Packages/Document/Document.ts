@@ -190,20 +190,22 @@ export var postCreate = (
     var paragraphVersions = [];
 
     _.forEach(scope.data.paragraphs, (paragraph) => {
-        var item = new RIParagraph({preliminaryNames: adhPreliminaryNames});
-        item.parent = doc.path;
+        if (!paragraph.deleted) {
+            var item = new RIParagraph({preliminaryNames: adhPreliminaryNames});
+            item.parent = doc.path;
 
-        var version = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
-        version.parent = item.path;
-        version.data[SIVersionable.nick] = new SIVersionable.Sheet({
-            follows: [item.first_version_path]
-        });
-        version.data[SIParagraph.nick] = new SIParagraph.Sheet({
-            text: paragraph.body
-        });
+            var version = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
+            version.parent = item.path;
+            version.data[SIVersionable.nick] = new SIVersionable.Sheet({
+                follows: [item.first_version_path]
+            });
+            version.data[SIParagraph.nick] = new SIParagraph.Sheet({
+                text: paragraph.body
+            });
 
-        paragraphItems.push(item);
-        paragraphVersions.push(version);
+            paragraphItems.push(item);
+            paragraphVersions.push(version);
+        }
     });
 
     var documentVersion = new documentVersionClass({preliminaryNames: adhPreliminaryNames});
@@ -484,6 +486,10 @@ export var createDirective = (
                     body: "",
                     deleted: false
                 });
+            };
+
+            scope.deleteParagraph = (index) => {
+                scope.data.paragraphs[index].deleted = true;
             };
 
             scope.cancel = () => {
