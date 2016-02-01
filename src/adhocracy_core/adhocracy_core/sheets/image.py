@@ -53,6 +53,7 @@ class ImageReferenceSchema(MappingSchema):
     """Data structure for the image reference sheet."""
 
     picture = Reference(reftype=ImageReference)
+    picture_description = SingleLine()
 
 
 image_reference_meta = asset_metadata_meta._replace(
