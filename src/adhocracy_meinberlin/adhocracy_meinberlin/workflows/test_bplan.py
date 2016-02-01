@@ -154,7 +154,7 @@ class TestBPlanWorkflow:
                                                          mailer):
         msg = mailer.outbox[-1]
         assert msg.subject.startswith('Ihre Stellungnahme')
-        assert msg.recipients == ['sysadmin@test.de']
+        assert msg.recipients == ['officeworkername@example.com']
 
     def test_participate_anonymous_cannot_edit_proposal_version1(self,
                                                                  registry,

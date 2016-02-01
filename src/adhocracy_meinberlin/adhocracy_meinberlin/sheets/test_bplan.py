@@ -102,7 +102,7 @@ class TestProcessSettingsSheet:
     @mark.usefixtures('integration')
     def test_get_empty(self, meta, context, registry):
         inst = meta.sheet_class(meta, context)
-        wanted = {'office_worker': None,
+        wanted = {'office_worker_email': '',
                   'plan_number': '',
                   'participation_kind': '',
                   'participation_start_date': None,

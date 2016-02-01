@@ -27,7 +27,7 @@ def send_bplan_submission_confirmation_email(event):
     appstruct = _get_appstruct(proposal_version)
     process_settings = _get_process_settings(proposal_version)
     if process_settings['plan_number'] == 0 or \
-            process_settings['office_worker'] is None:
+            process_settings['office_worker_email'] is None:
         return
     templates_values = _get_templates_values(process_settings, appstruct)
     subject = 'Ihre Stellungnahme zum Bebauungsplan {plan_number}, ' \
@@ -41,7 +41,7 @@ def send_bplan_submission_confirmation_email(event):
                                'bplan_submission_confirmation.txt.mako',
                                templates_values))
     messenger.send_mail(subject,
-                        [process_settings['office_worker'].email],
+                        [process_settings['office_worker_email']],
                         'noreply@mein.berlin.de',
                         render('adhocracy_meinberlin:templates/'
                                'bplan_submission_confirmation.txt.mako',

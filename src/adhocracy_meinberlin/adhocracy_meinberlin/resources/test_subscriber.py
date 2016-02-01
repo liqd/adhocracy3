@@ -30,31 +30,16 @@ def integration(integration):
 class TestBplanSubmissionConfirmationEmailSubscriber:
 
     @fixture
-    def process_settings_appstruct(self, registry, pool_with_catalogs):
-        from adhocracy_core.resources.principal import IUser
-        from adhocracy_core.resources.principal import IPrincipalsService
-        import adhocracy_core.sheets.principal
-        context = pool_with_catalogs
-        registry.content.create(IPrincipalsService.__identifier__,
-                                parent=context)
-        user_appstructs = {adhocracy_core.sheets.principal.IUserExtended.__identifier__:
-                           {'email': 'officeworkername@example.org'}}
-        office_worker = registry.content.create(IUser.__identifier__,
-                                                appstructs=user_appstructs,
-                                                parent=context['principals']['users'])
-        return {'office_worker': office_worker,
+    def process_settings_appstruct(self):
+        return {'office_worker_email': 'officeworkername@example.org',
                 'plan_number': '112233-ba',
                 'participation_kind': 'öffentliche Auslegung',
                 'participation_start_date': datetime.date(2015, 5, 5),
                 'participation_end_date': datetime.date(2015, 6, 11)}
 
     @fixture
-    def process_settings_no_office_worker_appstruct(self, registry, pool_with_catalogs):
-        from adhocracy_core.resources.principal import IPrincipalsService
-        context = pool_with_catalogs
-        registry.content.create(IPrincipalsService.__identifier__,
-                                parent=context)
-        return {'office_worker': None,
+    def process_settings_no_office_worker_appstruct(self):
+        return {'office_worker_email': None,
                 'plan_number': '112233-ba',
                 'participation_start_date': datetime.date(2015, 5, 5),
                 'participation_end_date': datetime.date(2015, 6, 11)}
