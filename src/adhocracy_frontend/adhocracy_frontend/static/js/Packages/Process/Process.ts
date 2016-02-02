@@ -115,7 +115,7 @@ export var processViewDirective = (
             var childScope : angular.IScope;
 
             adhTopLevelState.on("processType", (processType) => {
-                if (typeof processType !== "undefined") {
+                if (processType) {
                     adhProcess.getTemplate(processType).then((template) => {
                         if (childScope) {
                             childScope.$destroy();

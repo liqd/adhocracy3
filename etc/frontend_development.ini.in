@@ -47,7 +47,8 @@ adhocracy.frontend.debug = true
 adhocracy.site_name = Adhocracy Test Site
 
 # URL to terms and services
-adhocracy.frontend.terms_url =
+adhocracy.frontend.terms_url.en = ${adhocracy:frontend.terms_url.en}
+adhocracy.frontend.terms_url.de = ${adhocracy:frontend.terms_url.de}
 
 # Netiquitte URL - currently only used in mercator
 adhocracy.frontend.netiquette_url = https://advocate-europe.eu/de/netiquette

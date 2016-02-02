@@ -8,19 +8,18 @@ import * as AdhUtil from "../Util/Util";
 
 import * as ResourcesBase from "../ResourcesBase";
 
-import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RIDocument from "../../Resources_/adhocracy_core/resources/document/IDocument";
 import RIDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
 import RIGeoDocument from "../../Resources_/adhocracy_core/resources/document/IGeoDocument";
 import RIGeoDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion";
 import RIParagraph from "../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
 import RIParagraphVersion from "../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion";
+import * as SICommentable from "../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIDocument from "../../Resources_/adhocracy_core/sheets/document/IDocument";
 import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 import * as SIParagraph from "../../Resources_/adhocracy_core/sheets/document/IParagraph";
 import * as SIPoint from "../../Resources_/adhocracy_core/sheets/geo/IPoint";
-import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
@@ -113,31 +112,21 @@ export var bindPath = (
             adhHttp.get(path).then((documentVersion : RIDocumentVersion) => {
                 var paragraphPaths : string[] = documentVersion.data[SIDocument.nick].elements;
                 var paragraphPromises = _.map(paragraphPaths, (path) => {
-                    return $q.all([
-                        adhHttp.get(path),
-                        adhHttp.get(AdhUtil.parentPath(path), {
-                            content_type: RICommentVersion.content_type,
-                            depth: "all",
-                            tag: "LAST",
-                            count: true
-                        }).then((pool) => pool.data[SIPool.nick].count)
-                    ]);
+                    return adhHttp.get(path);
                 });
 
-                return $q.all(paragraphPromises).then((argss : any[][]) => {
-                    var paragraphs = _.map(argss, (args) => {
-                        var paragraphVersion : RIParagraphVersion = args[0];
-                        var commentCount : number = args[1];
+                return $q.all(paragraphPromises).then((paragraphVersions : RIParagraphVersion[]) => {
+                    var paragraphs = _.map(paragraphVersions, (paragraphVersion) => {
                         return {
                             body: paragraphVersion.data[SIParagraph.nick].text,
                             deleted: false,
-                            commentCount: commentCount,
+                            commentCount: paragraphVersion.data[SICommentable.nick].comments_count,
                             path: paragraphVersion.path
                         };
                     });
 
                     scope.documentVersion = documentVersion;
-                    scope.paragraphVersions = _.map(argss, (args) => args[0]);
+                    scope.paragraphVersions = paragraphVersions;
 
                     scope.data = {
                         title: documentVersion.data[SITitle.nick].title,

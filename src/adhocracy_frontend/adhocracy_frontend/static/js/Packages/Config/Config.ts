@@ -29,7 +29,10 @@ export interface IService {
     cachebust : boolean;
     cachebust_suffix : string;
     debug : boolean;
-    terms_url : string;
+    terms_url : {
+        en : string;
+        de : string;
+    };
     piwik_enabled : string;
     piwik_host : string;
     piwik_site_id : string;
