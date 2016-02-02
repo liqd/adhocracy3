@@ -45,7 +45,7 @@ def _post_document_item(app_user, path='') -> TestResponse:
 
 
 @mark.functional
-class TestDebagteWorkflow:
+class TestDebateWorkflow:
 
     @fixture(scope='class')
     def app_router(self, app_settings):
