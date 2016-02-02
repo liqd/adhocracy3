@@ -182,13 +182,6 @@ class TestVersionableSheet:
         inst = meta.sheet_class(meta, context)
         data = inst.get()
         assert list(data['follows']) == []
-        assert list(data['followed_by']) == []
-
-    def test_set_with_followed_by(self, meta, context):
-        inst = meta.sheet_class(meta, context)
-        inst.set({'followed_by': iter([])})
-        appstruct = getattr(context, inst._annotation_key)
-        assert not 'followed_by' in appstruct
 
 
 def test_includeme_register_versionable_sheet(config):

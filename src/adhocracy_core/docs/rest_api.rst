@@ -578,7 +578,7 @@ Fetch the first Document version, it is empty ::
     {'elements': []}
 
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersionable'])
-    {'followed_by': [], 'follows': []}
+    {'follows': []}
 
 but owned by the Document item creator::
     >>> pprint(resp.json['data']['adhocracy_core.sheets.metadata.IMetadata']['creator'])
@@ -608,14 +608,6 @@ to work ::
     >>> vers_fields = resp.json['sheets']['adhocracy_core.sheets.versions.IVersionable']['fields']
     >>> pprint(sorted(vers_fields, key=itemgetter('name')))
     [{'containertype': 'list',
-      'creatable': False,
-      'create_mandatory': False,
-      'editable': False,
-      'name': 'followed_by',
-      'readable': True,
-      'targetsheet': 'adhocracy_core.sheets.versions.IVersionable',
-      'valuetype': 'adhocracy_core.schema.AbsolutePath'},
-     {'containertype': 'list',
       'creatable': True,
       'create_mandatory': False,
       'editable': True,
@@ -625,10 +617,7 @@ to work ::
       'valuetype': 'adhocracy_core.schema.AbsolutePath'}]
 
 The 'follows' element must be set by the client when it creates a new
-version that is the successor of one or several earlier versions. The
-'followed_by' element is automatically populated by the server by
-"reversing" any 'follows' links pointing to the version in question.
-Therefore 'followed_by' is read-only, while 'follows' is writable.
+version that is the successor of one or several earlier versions.
 
 Create a Section item inside the Document item ::
 
@@ -736,7 +725,7 @@ But if we set the `root_version` to the last  Document version (pvrs3)::
     ...         }
     >>> resp = testapp.post_json(s2dag_path, svrs, headers=god_header)
 
-a new version is automatically created only for pvrs3, not for pvrs2::
+a new version pvrs4 is automatically created following only pvrs3, not pvrs2::
 
     >>> resp = testapp.get(pdag_path)
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersions'])
@@ -746,15 +735,14 @@ a new version is automatically created only for pvrs3, not for pvrs2::
                   '.../Documents/document_0000000/VERSION_0000003/',
                   '.../Documents/document_0000000/VERSION_0000004/']}
 
-    >>> resp = testapp.get(rest_url + '/Documents/document_0000000/VERSION_0000003')
-    >>> pvrs4_path = resp.json['path']
-    >>> resp = testapp.get(rest_url + '/Documents/document_0000000/VERSION_0000003')
-    >>> len(resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by'])
-    1
-
     >>> resp = testapp.get(rest_url + '/Documents/document_0000000/VERSION_0000004')
-    >>> len(resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by'])
-    0
+    >>> pvrs4_path = resp.json['path']
+    >>> resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['follows']
+    [.../Documents/document_0000000/VERSION_0000003/']
+
+    >>> resp = testapp.get(rest_url + '/Documents/document_0000000/VERSION_0000003')
+    >>> resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['follows']
+    [.../Documents/document_0000000/VERSION_0000002/']
 
 
 
