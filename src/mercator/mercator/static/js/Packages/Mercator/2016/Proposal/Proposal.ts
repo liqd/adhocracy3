@@ -10,8 +10,8 @@ import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 
 import * as AdhMercator2015Proposal from "../../2015/Proposal/Proposal";
 
-import * as SICommentable from "../../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIChallenge from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IChallenge";
+import * as SICommentable from "../../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SICommunity from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ICommunity";
 import * as SIConnectionCohesion from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IConnectionCohesion";
 import * as SIDifference from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IDifference";
@@ -22,9 +22,10 @@ import * as SIFinancialPlanning from "../../../../Resources_/adhocracy_mercator/
 import * as SIGoal from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IGoal";
 import * as SIImageReference from "../../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SILocation from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ILocation";
-import * as SIMetaData from "../../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 import * as SIMercatorIntroImageMetadata from "../../../../Resources_/adhocracy_mercator/sheets/mercator/IIntroImageMetadata";
 import * as SIMercatorSubResources from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IMercatorSubResources";
+import * as SIMercatorUserInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IUserInfo";
+import * as SIMetaData from "../../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 import * as SIOrganizationInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IOrganizationInfo";
 import * as SIPartners from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IPartners";
 import * as SIPitch from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IPitch";
@@ -37,7 +38,6 @@ import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITi
 import * as SITopic from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITopic";
 import * as SIUserInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IUserInfo";
 import * as SIWinnerInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IWinnerInfo";
-import * as SIMercatorUserInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IUserInfo";
 import RIChallenge from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IChallenge";
 import RIConnectionCohesion from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IConnectionCohesion";
 import RIDifference from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IDifference";
