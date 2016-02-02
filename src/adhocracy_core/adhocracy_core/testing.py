@@ -675,10 +675,21 @@ def app_router(app_settings) -> Router:
 
 def make_configurator(app_settings: dict, package) -> Configurator:
     """Make the pyramid configurator."""
+    from pyramid.events import ApplicationCreated
+    from adhocracy_core.authorization import set_acms_for_app_root
+    from adhocracy_core.resources.root import root_acm
     configurator = Configurator(settings=app_settings,
                                 root_factory=package.root_factory)
     configurator.include(package)
     add_create_test_users_subscriber(configurator)
+    # TODO
+    # The following subscriber is a workaround to prevent ComponentLookupError:
+    # (<InterfaceClass substanced.interfaces.ICatalogFactory>, 'system')
+    # in functional tests.
+
+    def set_acm_subscriber(event):
+        set_acms_for_app_root(event.app, (root_acm,))
+    configurator.add_subscriber(set_acm_subscriber, ApplicationCreated)
     return configurator
 
 

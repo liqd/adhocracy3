@@ -55,7 +55,6 @@ class TestDebateWorkflow:
         from adhocracy_core.resources.process import process_meta
         import adhocracy_core
         configurator = make_configurator(app_settings, adhocracy_core)
-        configurator.include('adhocracy_spd.resources.subscriber')  # FIXME
         debate_process_meta = process_meta._replace(workflow_name='debate')
         add_resource_type_to_registry(debate_process_meta, configurator)
         app_router = configurator.make_wsgi_app()
