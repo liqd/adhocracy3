@@ -16,7 +16,7 @@ import * as SIRateable from "../../../../Resources_/adhocracy_core/sheets/rate/I
 import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIVersionable from "../../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
-import RIProposal from "../../../../Resources_/adhocracy_core/resources/proposal/IProposal";
+import RIPoll from "../../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IPoll";
 import RIProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
 
 var pkgLocation = "/Meinberlin/Stadtforum/Proposal";
@@ -124,7 +124,7 @@ var postCreate = (
     scope : IScope,
     poolPath : string
 ) => {
-    var proposal = new RIProposal({preliminaryNames: adhPreliminaryNames});
+    var proposal = new RIPoll({preliminaryNames: adhPreliminaryNames});
     proposal.parent = poolPath;
     var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
 
