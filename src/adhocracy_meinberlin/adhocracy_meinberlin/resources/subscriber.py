@@ -25,7 +25,7 @@ def send_bplan_submission_confirmation_email(event):
     if not _is_proposal_creation_finished(proposal_version):
         return
     appstruct = _get_appstruct(proposal_version)
-    process_settings = _get_process_settings(proposal_version)
+    process_settings = _get_all_process_settings(proposal_version)
     if process_settings['plan_number'] == 0 or \
             process_settings['office_worker_email'] is None:
         return
@@ -54,10 +54,15 @@ def _get_templates_values(process_settings, appstruct):
     return templates_values
 
 
-def _get_process_settings(proposal_version):
+def _get_all_process_settings(proposal_version):
     process = find_interface(proposal_version, resources.bplan.IProcess)
     process_settings = get_sheet(process, sheets.bplan.IProcessSettings).get()
-    return process_settings
+    process_private_settings = get_sheet(
+        process,
+        sheets.bplan.IProcessPrivateSettings).get()
+    all_process_settings = process_settings.copy()
+    all_process_settings.update(process_private_settings)
+    return all_process_settings
 
 
 def _get_appstruct(proposal_version):
