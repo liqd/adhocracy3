@@ -6,14 +6,11 @@
     "TR__COLLEAGUE": "colleague",
     "TR__DESCRIPTION": "Description",
     "TR__DISCLAIMER": "disclaimer",
-    "TR__EMAIL_2016": "Contact email",
     "TR__ERROR_ENOUGH_TOPICS": "Please pick up to 2 topics",
-    "TR__ERROR_INVALID_EMAIL_2016": "Please enter a valid email address",
     "TR__ERROR_INVALID_MERCATOR_PROPOSAL_ORGANIZATION_DATE_OF_FORESEEN_REGISTRATION_2016": "Please enter a valid organization date of registration (yyyy-mm).",
     "TR__ERROR_INVALID_MERCATOR_PROPOSAL_ORGANIZATION_DATE_OF_REGISTRATION_2016": "Please enter a valid organisation date of registration (yyyy).",
     "TR__ERROR_MAX_EURO_50000": "Not more than 50,000€ are allowed",
     "TR__ERROR_REQUIRED_DURATION": "Please enter a number",
-    "TR__ERROR_REQUIRED_EMAIL_2016": "Please enter an organization email address",
     "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_FINANCE_GRANTED": "Please select one",
     "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_FINANCE_SECURED": "If yes, have these already been secured?",
     "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_CITY": "Please enter your organization city",
@@ -65,6 +62,7 @@
     "TR__MERCATOR_PROPOSAL_FINANCE_GRANTED_ANNOTATION": "If you are planning to include other sources of funding, are these already granted?",
     "TR__MERCATOR_PROPOSAL_FINANCE_OTHERS_SOURCES": "Other sources of income",
     "TR__MERCATOR_PROPOSAL_FINANCE_SECURED": "Secured?",
+    "TR__MERCATOR_PROPOSAL_FUNDING": "Funding",
     "TR__MERCATOR_PROPOSAL_GRANTED": "Granted",
     "TR__MERCATOR_PROPOSAL_HEARD_FROM_LABEL": "Last, but not least ... How did you hear about “Advocate Europe”?",
     "TR__MERCATOR_PROPOSAL_IMAGE_ANNOTATION_1": "Upload a photo, icon, or illustration that visually supports or explains your idea. Make sure that you have the property rights to share this picture publically.",
@@ -182,6 +180,7 @@
     "TR__MERCATOR_PROPOSAL_VALUE_ANNOTATION": "What value does your idea add to Europe? What makes it different from others? Could you imagine transferring this idea to other countries, sectors or organisations? (max. 800 characters)",
     "TR__MERCATOR_PROPOSAL_VALUE_LABEL": "Why does Europe need your idea?",
     "TR__MERCATOR_PROPOSAL_WHO_BEHIND": "Who is behind it?",
+    "TR__MERCATOR_PROPOSAL_WINNER_DESCRIPTION": "Jury statement",
     "TR__MERCATOR_TOPIC": "Topics",
     "TR__MERCATOR_TOPIC_COMMUNITY": "Communities",
     "TR__MERCATOR_TOPIC_CULTURE": "Arts and (inter-)cultural activities",
@@ -198,6 +197,5 @@
     "TR__PERSONAL_CONTACT": "Personal contact",
     "TR__PROPOSAL_ADD": "Add proposal",
     "TR__PROPOSAL_EMPTY_TEXT": "No proposals yet.",
-    "TR__TWITTER": "Twitter",
-    "TR__USERS_PROPOSALS": "{name}'s proposals"
+    "TR__TWITTER": "Twitter"
 }
