@@ -10,7 +10,6 @@ var _ = require("lodash");
 describe("user page", function() {
     it("displays the correct name for each user", function() {
         var annotatorPage = new UserPages.UserPage().get("0000001");
-
         expect(annotatorPage.getUserName()).toBe("participant");
 
         var contributorPage = new UserPages.UserPage().get("0000002");
