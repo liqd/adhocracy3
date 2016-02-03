@@ -298,7 +298,6 @@ export var listingDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
         scope: {
             facets: "=?",
-            update: "=?",
             sort: "=?",
             reverse: "=?",
             state: "@?",
