@@ -299,6 +299,7 @@ export var listingDirective = (
         scope: {
             facets: "=?",
             sort: "=?",
+            sorts: "=?",
             state: "@?",
             decisionDate: "@?",
             creator: "@?"
