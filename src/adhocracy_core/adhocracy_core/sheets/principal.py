@@ -11,6 +11,7 @@ from urllib.parse import urljoin
 from adhocracy_core.interfaces import ISheet
 from substanced.interfaces import IUserLocator
 from adhocracy_core.interfaces import SheetToSheet
+from adhocracy_core.sheets import BaseResourceSheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import AnnotationRessourceSheet
@@ -180,9 +181,7 @@ class CaptchaSchema(colander.MappingSchema):
         """
         request = node.bindings['request']
         settings = request.registry.settings
-        captcha_enabled = asbool(settings.get(
-            'adhocracy.thentos_captcha.enabled', False))
-        if captcha_enabled and not self._captcha_is_correct(settings, value):
+        if not self._captcha_is_correct(settings, value):
             err = colander.Invalid(node)
             err['solution'] = 'Captcha solution is wrong'
             raise err
@@ -196,12 +195,25 @@ class CaptchaSchema(colander.MappingSchema):
         return resp.json()['data']
 
 
+class CaptchaSheet(BaseResourceSheet):
+    """Dummy sheet that does not store any data."""
+
+    def _store_data(self, appstruct):
+        """Dummy store data appstruct."""
+
+    def _get_data_appstruct(self):
+        """Dummy get data appstruct."""
+        return {}
+
+
 captcha_meta = sheet_meta._replace(
     isheet=ICaptcha,
     schema_class=CaptchaSchema,
-    sheet_class=AttributeResourceSheet,
+    sheet_class=CaptchaSheet,
     readable=False,
     editable=False,
+    creatable=False,
+    create_mandatory=False,  # enabled if captchas enabled in configuration
     permission_create='create_user',
 )
 
@@ -323,7 +335,14 @@ def includeme(config):
     """Register sheets and activate catalog factory."""
     add_sheet_to_registry(userbasic_meta, config.registry)
     add_sheet_to_registry(userextended_meta, config.registry)
-    add_sheet_to_registry(captcha_meta, config.registry)
+    captcha_enabled = asbool(config.registry.settings.get(
+        'adhocracy.thentos_captcha.enabled', False))
+    if captcha_enabled:
+        add_sheet_to_registry(captcha_meta._replace(creatable=True,
+                                                    create_mandatory=True),
+                              config.registry)
+    else:
+        add_sheet_to_registry(captcha_meta, config.registry)
     add_sheet_to_registry(password_meta, config.registry)
     add_sheet_to_registry(group_meta, config.registry)
     add_sheet_to_registry(permissions_meta, config.registry)

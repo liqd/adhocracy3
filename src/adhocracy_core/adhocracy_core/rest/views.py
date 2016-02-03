@@ -14,7 +14,6 @@ from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.httpexceptions import HTTPGone
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.request import Request
-from pyramid.settings import asbool
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.security import remember
@@ -115,27 +114,6 @@ def validate_post_root_versions(context, request: Request):
         valid_root_versions.append(root)
 
     request.validated['root_versions'] = valid_root_versions
-
-
-def validate_user_creation(context, request: Request):
-    """
-    Enforce presence of captcha sheet if captchas are enabled.
-
-    The sheet validator is automatically invoked, but only if the sheet is
-    there, and we cannot set the 'create_mandatory' flag since the sheet is not
-    required if captchas are disabled.
-
-    Also deletes the captcha sheet data from the validated request, as there
-    is no need to store it permanently.
-    """
-    captcha_enabled = asbool(request.registry.settings.get(
-        'adhocracy.thentos_captcha.enabled', False))
-    sheet_name = 'adhocracy_core.sheets.principal.ICaptcha'
-    sheet_data = request.validated['data'].pop(sheet_name, None)
-    if captcha_enabled and sheet_data is None:
-        request.errors.append(error_entry('body',
-                                          'data.{}'.format(sheet_name),
-                                          'Required'))
 
 
 def validate_request_data(context: ILocation, request: Request,
@@ -744,7 +722,7 @@ class BadgeAssignmentsRESTView(PoolRESTView):
 class UsersRESTView(PoolRESTView):
     """View the IUsersService pool overwrites POST handling."""
 
-    validation_POST = (POSTResourceRequestSchema, [validate_user_creation])
+    validation_POST = (POSTResourceRequestSchema, [])
 
     @view_config(request_method='POST',
                  permission='create_user',
