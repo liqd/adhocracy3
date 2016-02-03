@@ -650,6 +650,7 @@ export var createDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
     adhResourceUrl
 ) => {
     return {
@@ -682,6 +683,10 @@ export var createDirective = (
             scope.submit = () => create(adhHttp, adhPreliminaryNames)(scope).then((proposalPath) => {
                 $location.url(adhResourceUrl(proposalPath));
             });
+
+            scope.cancel = () => {
+                adhTopLevelState.goToCameFrom(adhResourceUrl(adhTopLevelState.get("processUrl")));
+            };
         }
     };
 };
@@ -736,6 +741,10 @@ export var editDirective = (
             scope.submit = () => edit(adhHttp, adhPreliminaryNames)(scope).then(() => {
                 $location.url(adhResourceUrl(scope.path));
             });
+
+            scope.cancel = () => {
+                adhTopLevelState.goToCameFrom(adhResourceUrl(scope.path));
+            };
         }
     };
 };
@@ -784,6 +793,10 @@ export var moderateDirective = (
             scope.submit = () => moderate($q, adhHttp, adhPreliminaryNames, adhCredentials, adhTopLevelState)(scope).then(() => {
                 $location.url(adhResourceUrl(scope.path));
             });
+
+            scope.cancel = () => {
+                adhTopLevelState.goToCameFrom(adhResourceUrl(scope.path));
+            };
         }
     };
 };
@@ -969,10 +982,6 @@ export var mercatorProposalFormController2016 = (
                 return $scope.submit();
             }
         });
-    };
-
-    $scope.cancel = () => {
-        adhTopLevelState.goToCameFrom(adhResourceUrl(adhTopLevelState.get("processUrl")));
     };
 };
 
