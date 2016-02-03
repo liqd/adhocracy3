@@ -137,22 +137,29 @@ class TestUserExtendedSchema:
 
 class TestCaptchaSchema:
 
-    def make_one(self):
-        from adhocracy_core.sheets.principal import CaptchaSchema
-        return CaptchaSchema()
+    @fixture
+    def request(self, context, registry):
+        request = testing.DummyRequest()
+        request.registry = registry
+        request.root = context
+        return request
 
-    def test_deserialize_all(self):
-        inst = self.make_one()
+    def make_one(self, request):
+        from adhocracy_core.sheets.principal import CaptchaSchema
+        return CaptchaSchema().bind(request=request)
+
+    def test_deserialize_all(self, request):
+        inst = self.make_one(request)
         cstruct = {'id': 'captcha-id', 'solution': 'some test'}
         assert inst.deserialize(cstruct) == cstruct
 
-    def test_deserialize_id_missing(self):
-        inst = self.make_one()
+    def test_deserialize_id_missing(self, request):
+        inst = self.make_one(request)
         with raises(colander.Invalid):
             inst.deserialize({'solution': 'some test'})
 
-    def test_deserialize_solution_missing(self):
-        inst = self.make_one()
+    def test_deserialize_solution_missing(self, request):
+        inst = self.make_one(request)
         with raises(colander.Invalid):
             inst.deserialize({'id': 'captcha-id'})
 

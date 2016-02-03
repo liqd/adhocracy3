@@ -3,6 +3,7 @@
 /// <reference path="../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 /// <reference path="../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
 /// <reference path="../lib/DefinitelyTyped/moment/moment.d.ts"/>
+/// <reference path="../lib/DefinitelyTyped/leaflet/leaflet.d.ts"/>
 /// <reference path="./_all.d.ts"/>
 
 import * as angular from "angular";
@@ -20,6 +21,7 @@ import * as angularFlow from "angularFlow";  if (angularFlow) { ; };
 import * as markdownit from "markdownit";
 import * as modernizr from "modernizr";
 import * as moment from "moment";
+import * as leaflet from "leaflet";
 import * as webshim from "polyfiller";
 
 import * as AdhAbuseModule from "./Packages/Abuse/Module";
@@ -107,8 +109,10 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     app.config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
         adhTopLevelStateProvider
             .when("", ["$location", ($location) : AdhTopLevelState.IAreaInput => {
-                $location.replace();
-                $location.path("/r/digital_leben/");
+                if (config.redirect_url !== "/") {
+                    $location.replace();
+                    $location.path(config.redirect_url);
+                }
                 return {
                     skip: true
                 };
@@ -153,6 +157,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     app.value("angular", angular);
     app.value("modernizr", modernizr);
     app.value("moment", moment);
+    app.value("leaflet", leaflet);
 
     // register our modules
     app.value("adhConfig", config);

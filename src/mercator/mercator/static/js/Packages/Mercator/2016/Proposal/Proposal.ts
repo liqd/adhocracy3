@@ -90,7 +90,6 @@ export interface IData {
     };
     organizationInfo : {
         name : string;
-        email : string;
         website : string;
         city : string;
         country : string;
@@ -220,7 +219,6 @@ var fill = (data : IFormData, resource) => {
                 help_request: data.organizationInfo.helpRequest,
                 registration_date: data.organizationInfo.registrationDate,
                 website: data.organizationInfo.website,
-                contact_email: data.organizationInfo.email,
                 status: data.organizationInfo.status,
                 status_other: data.organizationInfo.otherText
             });
@@ -257,7 +255,7 @@ var fill = (data : IFormData, resource) => {
             resource.data[SICommunity.nick] = new SICommunity.Sheet({
                 expected_feedback: data.experience,
                 heard_froms: _.reduce(<any>data.heardFrom, (result, include, item) => {
-                    if (include) {
+                    if (include && item !== "otherText" ) {
                         result.push(item);
                     }
                     return result;
@@ -450,12 +448,26 @@ var get = (
         })).then(() => $q.all([
             AdhMercator2015Proposal.getWorkflowState(adhHttp, adhTopLevelState, $q)(),
             AdhMercator2015Proposal.countSupporters(adhHttp, path + "rates/", path),
-            AdhMercator2015Proposal.countComments(adhHttp, path),
         ])).then((args : any[]) : IDetailData => {
+            var commentCounts = {
+                proposal: proposal.data[SICommentable.nick].comments_count,
+                pitch: subs.pitch.data[SICommentable.nick].comments_count,
+                partners: subs.partners.data[SICommentable.nick].comments_count,
+                duration: subs.duration.data[SICommentable.nick].comments_count,
+                challenge: subs.challenge.data[SICommentable.nick].comments_count,
+                goal: subs.goal.data[SICommentable.nick].comments_count,
+                plan: subs.plan.data[SICommentable.nick].comments_count,
+                target: subs.target.data[SICommentable.nick].comments_count,
+                team: subs.team.data[SICommentable.nick].comments_count,
+                extrainfo: subs.extrainfo.data[SICommentable.nick].comments_count,
+                connectioncohesion: subs.connectioncohesion.data[SICommentable.nick].comments_count,
+                difference: subs.difference.data[SICommentable.nick].comments_count,
+                practicalrelevance: subs.practicalrelevance.data[SICommentable.nick].comments_count
+            };
+
             return {
                 currentPhase: args[0],
                 supporterCount: args[1],
-                commentCountTotal: args[2],
 
                 creationDate: proposal.data[SIMetaData.nick].item_creation_date,
                 creator: proposal.data[SIMetaData.nick].creator,
@@ -470,7 +482,6 @@ var get = (
                     helpRequest: proposal.data[SIOrganizationInfo.nick].help_request,
                     registrationDate: proposal.data[SIOrganizationInfo.nick].registration_date,
                     website: proposal.data[SIOrganizationInfo.nick].website,
-                    email: proposal.data[SIOrganizationInfo.nick].contact_email,
                     status: proposal.data[SIOrganizationInfo.nick].status,
                     otherText: proposal.data[SIOrganizationInfo.nick].status_other
                 },
@@ -546,21 +557,8 @@ var get = (
                     difference: subs.difference.data[SIDifference.nick].difference,
                     practical: subs.practicalrelevance.data[SIPracticalRelevance.nick].practicalrelevance
                 },
-                commentCounts: {
-                    proposal: proposal.data[SICommentable.nick].comments_count,
-                    pitch: subs.pitch.data[SICommentable.nick].comments_count,
-                    partners: subs.partners.data[SICommentable.nick].comments_count,
-                    duration: subs.duration.data[SICommentable.nick].comments_count,
-                    challenge: subs.challenge.data[SICommentable.nick].comments_count,
-                    goal: subs.goal.data[SICommentable.nick].comments_count,
-                    plan: subs.plan.data[SICommentable.nick].comments_count,
-                    target: subs.target.data[SICommentable.nick].comments_count,
-                    team: subs.team.data[SICommentable.nick].comments_count,
-                    extrainfo: subs.extrainfo.data[SICommentable.nick].comments_count,
-                    connectioncohesion: subs.connectioncohesion.data[SICommentable.nick].comments_count,
-                    difference: subs.difference.data[SICommentable.nick].comments_count,
-                    practicalrelevance: subs.practicalrelevance.data[SICommentable.nick].comments_count
-                }
+                commentCounts: commentCounts,
+                commentCountTotal: _.sum(<any>commentCounts)
             };
         });
     });
@@ -642,6 +640,14 @@ export var editDirective = (
 
             get($q, adhHttp, adhTopLevelState)(scope.path).then((data) => {
                 scope.data = data;
+
+                scope.data.partners.hasPartners = scope.data.partners.hasPartners ? "true" : "false";
+
+                if (scope.data.organizationInfo.status === "planned_nonprofit") {
+                    scope.data.organizationInfo.registrationDateField = data.organizationInfo.registrationDate.substr(0, 7);
+                } else if (scope.data.organizationInfo.status === "registered_nonprofit") {
+                    scope.data.organizationInfo.registrationDateField = data.organizationInfo.registrationDate.substr(0, 4);
+                }
             });
 
             scope.submit = () => edit(adhHttp, adhPreliminaryNames)(scope).then(() => {
@@ -725,8 +731,10 @@ export var mercatorProposalFormController2016 = (
 
     $scope.$flow = flowFactory.create();
 
-    $scope.selection_criteria_link = "/en/idea-space/selection-criteria/";
-    $scope.financial_plan_link = "/en/idea-space/financial-plan/";
+    // Fixme: These links are not used currently due to them not working on production/staging
+    // See https://github.com/liqd/adhocracy3/issues/2011
+    $scope.selection_criteria_link = "http://advocate-europe.eu/en/idea-space/selection-criteria/";
+    $scope.financial_plan_link = "http://advocate-europe.eu/de/media/advocate-europe_project-financial-plan.xlsx";
 
     var topicTotal = () => {
         return _.reduce($scope.data.topic, (result, include, topic : string) => {
@@ -783,7 +791,8 @@ export var mercatorProposalFormController2016 = (
 
     $scope.showTopicsError = () : boolean => {
         return ((topicTotal() < 1) || (topicTotal() > 2)) &&
-            $scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$dirty;
+            ($scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$dirty ||
+                $scope.mercatorProposalForm.$submitted);
     };
 
     $scope.showLocationError = () : boolean => {
@@ -804,7 +813,11 @@ export var mercatorProposalFormController2016 = (
 
     $scope.dateChange = (date) => {
         // FIXME: this is quite hacky dates need proper validation EG not so much in the past or future too
-        $scope.data.organizationInfo.registrationDate = date + "-01";
+        if ($scope.data.organizationInfo.status === "planned_nonprofit") {
+            $scope.data.organizationInfo.registrationDate = $scope.data.organizationInfo.registrationDateField + "-01";
+        } else {
+            $scope.data.organizationInfo.registrationDate = $scope.data.organizationInfo.registrationDateField + "-01-01";
+        }
     };
 
     $scope.showError = adhShowError;

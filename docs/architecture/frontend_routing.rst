@@ -91,20 +91,6 @@ will be discussed later in this document.
 ``/r/some/path/@edit`` might point to a form where the resource
 can be edited.  Note that the view is prefixed with an ``@``.
 
-Spaces
-++++++
-
-``adhTopLevelState`` can store multiple state objects at the same time.
-These are called *spaces*.  They allow to easily switch between multiple
-application states.
-
-This is backed by the ``adhSpace`` directive which will only show its
-contents if the passed key is that of the current space.  This way not
-only the top level state object, but also the complete DOM is preserved.
-
-Currently, only the resource area makes use of spaces.  It divides its
-pages into a "user" and a "content" space.
-
 Process
 -------
 
@@ -136,11 +122,9 @@ So here is a rough overview of what happens when I enter
     processing it.  From the first part of the URL (``/r/``) it knows
     that it has to use the resource area.
 3.  The resource area converts the URL to a flat state object.
-    This object contains information about space and process type.
+    This object contains information about the process type.
 4.  ``adhView`` renders the area template.
-5.  The ``adhSpace`` directive for the content space renders its
-    contents, while all other spaces are being hidden.
-6.  ``adhProcessView`` renders the process template.
+5.  ``adhProcessView`` renders the process template.
 
 Note that everything except for the first step also happens when I click
 on a link within Adhocracy.

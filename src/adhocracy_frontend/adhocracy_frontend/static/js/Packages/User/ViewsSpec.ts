@@ -139,7 +139,8 @@ export var register = () => {
                         username: "",
                         email: "",
                         password: "",
-                        passwordRepeat: ""
+                        passwordRepeat: "",
+                        captchaGuess: ""
                     });
                 });
 
@@ -151,7 +152,7 @@ export var register = () => {
                         scopeMock.input.passwordRepeat = "passwordRepeat";
 
                         scopeMock.register().then(() => {
-                            expect(adhUserMock.register).toHaveBeenCalledWith("username", "email", "password", "passwordRepeat");
+                            expect(adhUserMock.register).toHaveBeenCalledWith("username", "email", "password", "passwordRepeat", "", "");
                             done();
                         });
                     });

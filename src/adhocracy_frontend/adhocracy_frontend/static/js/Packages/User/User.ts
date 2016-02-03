@@ -109,10 +109,12 @@ export class Service {
         resource.data[SIPasswordAuthentication.nick] = {
             "password": password
         };
-        resource.data[SICaptcha.nick] = {
-            "id": captchaId,
-            "solution": captchaGuess
-        };
+        if (captchaId && captchaGuess) {
+            resource.data[SICaptcha.nick] = {
+                "id": captchaId,
+                "solution": captchaGuess
+            };
+        }
 
         return _self.adhHttp.post("/principals/users/", resource);
     }
