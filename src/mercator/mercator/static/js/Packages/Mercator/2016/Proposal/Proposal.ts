@@ -3,6 +3,7 @@
 
 import * as AdhBadge from "../../../Badge/Badge";
 import * as AdhConfig from "../../../Config/Config";
+import * as AdhCredentials from "../../../User/Credentials";
 import * as AdhHttp from "../../../Http/Http";
 import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
@@ -10,10 +11,13 @@ import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 
 import * as AdhMercator2015Proposal from "../../2015/Proposal/Proposal";
 
+import * as SIBadgeable from "../../../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
+import * as SIBadgeAssignment from "../../../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment";
 import * as SIChallenge from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IChallenge";
 import * as SICommentable from "../../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SICommunity from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ICommunity";
 import * as SIConnectionCohesion from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IConnectionCohesion";
+import * as SIDescription from "../../../../Resources_/adhocracy_core/sheets/description/IDescription";
 import * as SIDifference from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IDifference";
 import * as SIDuration from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IDuration";
 import * as SIExtraFunding from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IExtraFunding";
@@ -38,6 +42,7 @@ import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITi
 import * as SITopic from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ITopic";
 import * as SIUserInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IUserInfo";
 import * as SIWinnerInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IWinnerInfo";
+import RIBadgeAssignment from "../../../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment";
 import RIChallenge from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IChallenge";
 import RIConnectionCohesion from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IConnectionCohesion";
 import RIDifference from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IDifference";
@@ -423,15 +428,63 @@ var edit = (
 };
 
 var moderate = (
+    $q : angular.IQService,
     adhHttp : AdhHttp.Service<any>,
-    adhPreliminaryNames : AdhPreliminaryNames.Service
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhCredentials : AdhCredentials.Service,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => (scope) => {
+    var badges = {
+        winning: adhTopLevelState.get("processUrl") + "badges/winning/",
+        community: adhTopLevelState.get("processUrl") + "badges/community/"
+    };
+
     return adhHttp.get(scope.path).then((oldProposal) => {
         var clone = _.cloneDeep(oldProposal);
         clone.data[SIWinnerInfo.nick] = new SIWinnerInfo.Sheet({
             funding: scope.data.winner.funding
         });
-        return adhHttp.put(scope.path, clone);
+        var resourcePromise = adhHttp.put(scope.path, clone);
+
+        var badgePoolPath = oldProposal.data[SIBadgeable.nick].post_pool;
+        var assignmentRequests = _.map(oldProposal.data[SIBadgeable.nick].assignments, (p : string) => adhHttp.get(p));
+        var badgePromise = $q.all(assignmentRequests).then((assignments) => {
+            var communityAssignment = <any>_.find(assignments, (a : any) => {
+                return a.data[SIBadgeAssignment.nick].badge === badges.community;
+            });
+            var winningAssignment = <any>_.find(assignments, (a : any) => {
+                return a.data[SIBadgeAssignment.nick].badge === badges.winning;
+            });
+            var badgeAssignment = communityAssignment || winningAssignment;
+
+            var postdata : any;
+            if (badgeAssignment) {
+                postdata = {
+                    content_type: RIBadgeAssignment.content_type,
+                    data: {}
+                };
+                postdata.data[SIDescription.nick] = {
+                    description: scope.data.winner.description
+                };
+                return adhHttp.put(badgeAssignment.path, postdata);
+            } else {
+                postdata = {
+                    content_type: RIBadgeAssignment.content_type,
+                    data: {}
+                };
+                postdata.data[SIDescription.nick] = {
+                    description: scope.data.winner.description
+                };
+                postdata.data[SIBadgeAssignment.nick] = {
+                    badge: badges[scope.data.winner.name],
+                    object: scope.path,
+                    subject: adhCredentials.userPath
+                };
+                return adhHttp.post(badgePoolPath, postdata);
+            }
+        });
+
+        return $q.all([resourcePromise, badgePromise]);
     });
 };
 
@@ -695,7 +748,8 @@ export var moderateDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhResourceUrl,
-    adhGetBadges : AdhBadge.IGetBadges
+    adhGetBadges : AdhBadge.IGetBadges,
+    adhCredentials : AdhCredentials.Service
 ) => {
     return {
         restrict: "E",
@@ -724,9 +778,10 @@ export var moderateDirective = (
 
             get($q, adhHttp, adhTopLevelState, adhGetBadges)(scope.path).then((data) => {
                 scope.data = data;
+                scope.create = !data.winner.name;
             });
 
-            scope.submit = () => moderate(adhHttp, adhPreliminaryNames)(scope).then(() => {
+            scope.submit = () => moderate($q, adhHttp, adhPreliminaryNames, adhCredentials, adhTopLevelState)(scope).then(() => {
                 $location.url(adhResourceUrl(scope.path));
             });
         }

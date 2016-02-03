@@ -76,6 +76,7 @@ export var register = (angular) => {
             "adhPreliminaryNames",
             "adhResourceUrlFilter",
             "adhGetBadges",
+            "adhCredentials",
             Proposal.moderateDirective])
         .directive("adhMercator2016ProposalEdit", [
             "$q",
