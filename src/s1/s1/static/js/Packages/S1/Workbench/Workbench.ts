@@ -64,7 +64,6 @@ export var s1CurrentColumnDirective = (
             });
 
             scope.shared.sort = "rates";
-            scope.shared.reverse = true;
             scope.shared.setSort = (sort : string) => {
                 scope.shared.sort = sort;
             };
@@ -98,7 +97,6 @@ export var s1NextColumnDirective = (
             });
 
             scope.shared.sort = "rates";
-            scope.shared.reverse = true;
             scope.shared.setSort = (sort : string) => {
                 scope.shared.sort = sort;
             };
@@ -142,7 +140,6 @@ export var s1ArchiveColumnDirective = (
             }];
 
             scope.shared.sort = "rates";
-            scope.shared.reverse = true;
             scope.shared.setSort = (sort : string) => {
                 scope.shared.sort = sort;
             };
