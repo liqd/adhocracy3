@@ -39,9 +39,7 @@ class TestRateableSheet:
 
     def test_get_empty(self, inst):
         post_pool = inst.context['rates']
-        assert inst.get() == {'post_pool': post_pool,
-                              'rates': [],
-                              }
+        assert inst.get() == {'post_pool': post_pool}
 
 
 class TestRateSheet:
