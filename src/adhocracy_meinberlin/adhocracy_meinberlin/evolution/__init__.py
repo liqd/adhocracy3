@@ -1,5 +1,11 @@
 """Scripts to migrate legacy objects in existing databases."""
 import logging  # pragma: no cover
+
+from substanced.util import find_service
+from zope.interface import alsoProvides
+from zope.interface import directlyProvides
+
+from adhocracy_core.interfaces import search_query
 from adhocracy_core.evolution import log_migration
 from adhocracy_core.evolution import migrate_new_sheet
 from adhocracy_meinberlin.resources.kiezkassen import IProposalVersion
@@ -61,8 +67,32 @@ def remove_meinberlin_workflow_assignment_sheets(root):  # pragma: no cover
                       )
 
 
+@log_migration
+def migrate_stadtforum_proposals_to_ipolls(root):  # pragma: no cover
+    """Migrate stadtforum proposals to ipolls."""
+    from adhocracy_core.resources.proposal import IProposal
+    from adhocracy_meinberlin.resources.stadtforum import IProcess
+    from adhocracy_meinberlin.resources.stadtforum import IPoll
+    from adhocracy_meinberlin.resources.stadtforum import poll_meta
+    catalogs = find_service(root, 'catalogs')
+    query = search_query._replace(interfaces=(IProcess,),
+                                  resolve=True)
+    stadtforums = catalogs.search(query).elements
+    for stadtforum in stadtforums:
+        proposals_query = search_query._replace(interfaces=(IProposal,),
+                                                root=stadtforum,
+                                                resolve=True)
+        proposals = catalogs.search(proposals_query).elements
+        for proposal in proposals:
+            directlyProvides(proposal, IPoll)
+            for sheet in poll_meta.basic_sheets + poll_meta.extended_sheets:
+                alsoProvides(proposal, sheet)
+            catalogs.reindex_index(proposal, 'interfaces')
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(use_adhocracy_core_title_sheet)
     config.add_evolution_step(use_adhocracy_core_description_sheet)
     config.add_evolution_step(remove_meinberlin_workflow_assignment_sheets)
+    config.add_evolution_step(migrate_stadtforum_proposals_to_ipolls)
