@@ -20,6 +20,11 @@ category: Variables
         <td>For secondary text</td>
     </tr>
     <tr>
+        <td><div class="example-color color-text-extrovert"></div></td>
+        <td><code>color-text-extrovert</code></td>
+        <td></td>
+    </tr>
+    <tr>
         <td><div class="example-color color-text-inverted"></div></td>
         <td><code>color-text-inverted</code></td>
         <td>Used as either foreground or background with
@@ -122,6 +127,11 @@ category: Variables
         <td>For neutral (neither valid nor invalid) content</td>
     </tr>
     <tr>
+        <td><div class="example-color color-function-animation-enter"></div></td>
+        <td><code>color-function-animation-enter</code></td>
+        <td>For flashing elements that appear.</td>
+    </tr>
+    <tr>
         <td colspan="3"><strong>Structural colors</strong></td>
     </tr>
     <tr>
@@ -140,6 +150,16 @@ category: Variables
         <td>border color for active or filled elements</td>
     </tr>
     <tr>
+        <td><div class="example-color color-structure-border"></div></td>
+        <td><code>color-structure-border</code></td>
+        <td>border color</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-structure-transparent"></div></td>
+        <td><code>color-structure-transparent</code></td>
+        <td></td>
+    </tr>
+    <tr>
         <td colspan="3"><strong>Background colors</strong></td>
     </tr>
     <tr>
@@ -151,6 +171,11 @@ category: Variables
         <td><div class="example-color color-background-base-introvert"></div></td>
         <td><code>color-background-base-introvert</code></td>
         <td></td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-background-mask"></div></td>
+        <td><code>color-background-mask</code></td>
+        <td>Mask behind an overlay</td>
     </tr>
     <tr>
         <td colspan="3"><strong>Button colors</strong></td>
@@ -219,14 +244,17 @@ category: Variables
 .color-function-valid {background-color: $color-function-valid;}
 .color-function-invalid {background-color: $color-function-invalid;}
 .color-function-neutral {background-color: $color-function-neutral;}
+.color-function-animation-enter {background-color: $color-function-animation-enter;}
 
 .color-background-base {background-color: $color-background-base;}
 .color-background-base-introvert {background-color: $color-background-base-introvert;}
+.color-background-mask {background-color: $color-background-mask;}
 
 .color-structure-normal {background-color: $color-structure-normal;}
 .color-structure-introvert {background-color: $color-structure-introvert;}
 .color-structure-extrovert {background-color: $color-structure-extrovert;}
 .color-structure-border {background-color: $color-structure-border;}
+.color-structure-transparent {background-color: $color-structure-transparent;}
 
 .color-button-text {background-color: $color-button-text;}
 .color-button-text-hover {background-color: $color-button-text-hover;}
