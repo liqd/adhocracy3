@@ -105,7 +105,7 @@ textarea {
     @include rem(padding, 0.25rem 1rem);
     display: block;
     width: 100%;
-    border: 1px solid $color-structure-border;
+    border: 1px solid $color-structure-introvert;
     color: $color-text-normal;
     background-color: $color-background-base;
 
@@ -293,8 +293,8 @@ This error concerns the whole form.
 .form-error {
     @include rem(margin, 1rem 0);
     @include rem(padding, 0 1rem);
-    border-top: 1px solid $color-structure-border;
-    border-bottom: 1px solid $color-structure-border;
+    border-top: 1px solid $color-structure-introvert;
+    border-bottom: 1px solid $color-structure-introvert;
     background: $color-structure-introvert;
 }
 
