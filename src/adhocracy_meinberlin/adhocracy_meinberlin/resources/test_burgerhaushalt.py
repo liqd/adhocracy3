@@ -61,7 +61,6 @@ class TestProcess:
     def test_meta(self, meta):
         import adhocracy_core.resources.process
         import adhocracy_core.sheets.image
-        import adhocracy_core.sheets.description
         from adhocracy_core.resources.asset import add_assets_service
         from .burgerhaushalt import IProcess
         assert meta.iresource is IProcess
@@ -69,7 +68,6 @@ class TestProcess:
         assert meta.is_implicit_addable is True
         assert meta.permission_create == 'create_process'
         assert meta.extended_sheets == (
-            adhocracy_core.sheets.description.IDescription,
             adhocracy_core.sheets.geo.ILocationReference,
             adhocracy_core.sheets.image.IImageReference,
         )

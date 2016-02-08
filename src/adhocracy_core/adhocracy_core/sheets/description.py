@@ -15,9 +15,11 @@ class IDescription(ISheet, ISheetReferenceAutoUpdateMarker):
 class DescriptionSchema(colander.MappingSchema):
     """Description sheet data structure.
 
-    `description`: a description
+    `short_description`: teaser text for listings, html description etc.
+    `description`: a full description
     """
 
+    short_description = Text()
     description = Text()
 
 
