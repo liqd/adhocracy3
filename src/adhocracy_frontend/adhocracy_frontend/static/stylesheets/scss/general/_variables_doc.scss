@@ -110,11 +110,6 @@ category: Variables
         <td>Secondary background color</td>
     </tr>
     <tr>
-        <td><div class="example-color color-structure-extrovert"></div></td>
-        <td><code>color-structure-extrovert</code></td>
-        <td>border color for active or filled elements</td>
-    </tr>
-    <tr>
         <td><div class="example-color color-structure-border"></div></td>
         <td><code>color-structure-border</code></td>
         <td>border color</td>
@@ -210,7 +205,6 @@ category: Variables
 
 .color-structure-normal {background-color: $color-structure-normal;}
 .color-structure-introvert {background-color: $color-structure-introvert;}
-.color-structure-extrovert {background-color: $color-structure-extrovert;}
 .color-structure-border {background-color: $color-structure-border;}
 .color-structure-transparent {background-color: $color-structure-transparent;}
 
