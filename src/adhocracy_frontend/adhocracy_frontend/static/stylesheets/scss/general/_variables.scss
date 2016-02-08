@@ -1,12 +1,12 @@
 /* documentation is in variables_doc */
 
 // Text colors
-$color-text-normal: #575756;
-$color-text-introvert: #808080;
-$color-text-extrovert: #1c1c1b;
-$color-text-highlight-normal: #26a9e0;
-$color-text-highlight-introvert: #808080;
-$color-text-highlight-extrovert: #333;
+$color-text-normal: #444;
+$color-text-introvert: lighten($color-text-normal, 15%);
+$color-text-extrovert: darken($color-text-normal, 10%);
+$color-text-highlight-normal: #026dca;
+$color-text-highlight-introvert: darken($color-text-highlight-normal, 10%);
+$color-text-highlight-extrovert: lighten($color-text-highlight-normal, 10%);
 $color-text-inverted: white;
 
 // Function colors
