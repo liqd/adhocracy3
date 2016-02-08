@@ -94,21 +94,6 @@ category: Variables
         <td>Brand color 3 extroverted style</td>
     </tr>
     <tr>
-        <td><div class="example-color color-brand-four-normal"></div></td>
-        <td><code>color-brand-four-normal</code></td>
-        <td>Brand color 4</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-brand-four-introvert"></div></td>
-        <td><code>color-brand-four-introvert</code></td>
-        <td>Brand color 4 introverted style</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-brand-four-extrovert"></div></td>
-        <td><code>color-brand-four-extrovert</code></td>
-        <td>Brand color 4 extroverted style</td>
-    </tr>
-    <tr>
         <td colspan="3"><strong>Functional colors</strong></td>
     </tr>
     <tr>
@@ -229,9 +214,6 @@ category: Variables
 .color-brand-three-normal {background-color: $color-brand-three-normal;}
 .color-brand-three-introvert {background-color: $color-brand-three-introvert;}
 .color-brand-three-extrovert {background-color: $color-brand-three-extrovert;}
-.color-brand-four-normal {background-color: $color-brand-four-normal;}
-.color-brand-four-introvert {background-color: $color-brand-four-introvert;}
-.color-brand-four-extrovert {background-color: $color-brand-four-extrovert;}
 
 .color-text-normal {background-color: $color-text-normal;}
 .color-text-introvert {background-color: $color-text-introvert;}
