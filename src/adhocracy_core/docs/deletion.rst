@@ -233,9 +233,11 @@ the child of the pool2 is now hidden too::
 
 Only the pool1 is still visible in the pool::
 
-    >>> resp = anonymous.get("/").json
-    >>> resp['data']['adhocracy_core.sheets.pool.IPool']['elements']
-    ['.../pool1/']
+    >>> resp = anonymous.get("/", params={'elements': 'paths'}).json
+    >>> 'http://localhost/pool1/' in resp['data']['adhocracy_core.sheets.pool.IPool']['elements']
+    True
+    >>> 'http://localhost/pool2/' in resp['data']['adhocracy_core.sheets.pool.IPool']['elements']
+    False
 
 Sanity check: internally, the backend uses a *private_visibility* index to keep
 track of the visibility/deletion status of resources. But this filter is
