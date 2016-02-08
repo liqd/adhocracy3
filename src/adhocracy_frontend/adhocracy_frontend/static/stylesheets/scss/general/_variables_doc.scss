@@ -214,6 +214,8 @@ category: Variables
 @include check-contrast($color-text-normal, $color-structure-introvert);
 @include check-contrast($color-text-extrovert, $color-background-base);
 @include check-contrast($color-text-extrovert, $color-structure-introvert);
-@include check-contrast($color-text-highlight-normal, $color-text-inverted);
+@include check-contrast($color-text-introvert, $color-background-base);
+@include check-contrast($color-text-introvert, $color-structure-introvert, 3);
+@include check-contrast($color-text-inverted, $color-text-highlight-normal);
 @include check-contrast($color-text-highlight-normal, $color-background-base);
-@include check-contrast($color-text-highlight-normal, $color-structure-introvert);
+@include check-contrast($color-text-highlight-normal, $color-background-base-introvert);
