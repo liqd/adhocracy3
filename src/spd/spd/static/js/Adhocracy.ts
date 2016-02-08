@@ -50,7 +50,7 @@ import * as AdhRateModule from "./Packages/Rate/Module";
 import * as AdhResourceAreaModule from "./Packages/ResourceArea/Module";
 import * as AdhResourceWidgetsModule from "./Packages/ResourceWidgets/Module";
 import * as AdhShareSocialModule from "./Packages/ShareSocial/Module";
-import * as AdhSPDWorkbenchModule from "./Packages/spdWorkbench/Module";
+import * as AdhDebateWorkbenchModule from "./Packages/DebateWorkbench/Module";
 import * as AdhStickyModule from "./Packages/Sticky/Module";
 import * as AdhTopLevelStateModule from "./Packages/TopLevelState/Module";
 import * as AdhTrackingModule from "./Packages/Tracking/Module";
@@ -95,7 +95,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         AdhCrossWindowMessagingModule.moduleName,
         AdhEmbedModule.moduleName,
         AdhResourceAreaModule.moduleName,
-        AdhSPDWorkbenchModule.moduleName,
+        AdhDebateWorkbenchModule.moduleName,
         AdhTrackingModule.moduleName,
         AdhUserViewsModule.moduleName
     ];
@@ -166,7 +166,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhCommentModule.register(angular);
     AdhCrossWindowMessagingModule.register(angular, config.trusted_domains !== []);
     AdhDateTimeModule.register(angular);
-    AdhSPDWorkbenchModule.register(angular);
+    AdhDebateWorkbenchModule.register(angular);
     AdhDoneModule.register(angular);
     AdhEmbedModule.register(angular);
     AdhEventManagerModule.register(angular);

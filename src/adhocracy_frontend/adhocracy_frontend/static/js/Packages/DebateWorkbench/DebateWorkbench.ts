@@ -18,10 +18,10 @@ import RIParagraphVersion from "../../Resources_/adhocracy_core/resources/paragr
 import * as SIComment from "../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SIParagraph from "../../Resources_/adhocracy_core/sheets/document/IParagraph";
 
-var pkgLocation = "/spdWorkbench";
+var pkgLocation = "/DebateWorkbench";
 
 
-export var spdWorkbenchDirective = (
+export var debateWorkbenchDirective = (
     adhConfig : AdhConfig.IService,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {

@@ -12,10 +12,10 @@ import * as AdhProcess from "../Process/Process";
 
 import RIDigitalLebenProcess from "../../Resources_/adhocracy_spd/resources/digital_leben/IProcess";
 
-import * as SpdWorkbench from "./spdWorkbench";
+import * as DebateWorkbench from "./DebateWorkbench";
 
 
-export var moduleName = "adhSPDWorkbench";
+export var moduleName = "adhDebateWorkbench";
 
 export var register = (angular) => {
     var processType = RIDigitalLebenProcess.content_type;
@@ -34,14 +34,14 @@ export var register = (angular) => {
         ])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-spd-workbench></adh-spd-workbench>");
+                return $q.when("<adh-debate-workbench></adh-debate-workbench>");
             }];
         }])
-        .config(["adhResourceAreaProvider", SpdWorkbench.registerRoutes(processType)])
-        .directive("adhSpdWorkbench", ["adhConfig", "adhTopLevelState", SpdWorkbench.spdWorkbenchDirective])
-        .directive("adhDocumentDetailColumn", ["adhConfig", "adhPermissions", SpdWorkbench.documentDetailColumnDirective])
-        .directive("adhDocumentCreateColumn", ["adhConfig", SpdWorkbench.documentCreateColumnDirective])
-        .directive("adhDocumentEditColumn", ["adhConfig", SpdWorkbench.documentEditColumnDirective])
-        .directive("adhSpdProcessDetailColumn", ["adhConfig", "adhPermissions", SpdWorkbench.processDetailColumnDirective])
-        .directive("adhSpdProcessDetailAnnounceColumn", ["adhConfig", SpdWorkbench.processDetailAnnounceColumnDirective]);
+        .config(["adhResourceAreaProvider", DebateWorkbench.registerRoutes(processType)])
+        .directive("adhDebateWorkbench", ["adhConfig", "adhTopLevelState", DebateWorkbench.debateWorkbenchDirective])
+        .directive("adhDocumentDetailColumn", ["adhConfig", "adhPermissions", DebateWorkbench.documentDetailColumnDirective])
+        .directive("adhDocumentCreateColumn", ["adhConfig", DebateWorkbench.documentCreateColumnDirective])
+        .directive("adhDocumentEditColumn", ["adhConfig", DebateWorkbench.documentEditColumnDirective])
+        .directive("adhDebateProcessDetailColumn", ["adhConfig", "adhPermissions", DebateWorkbench.processDetailColumnDirective])
+        .directive("adhDebateProcessDetailAnnounceColumn", ["adhConfig", DebateWorkbench.processDetailAnnounceColumnDirective]);
 };
