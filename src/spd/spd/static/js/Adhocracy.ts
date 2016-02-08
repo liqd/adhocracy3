@@ -160,13 +160,12 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     }]);
 
     // register workbench
-    var processType = RIDigitalLebenProcess.content_type;
     app.config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-        adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {
+        adhProcessProvider.templateFactories[RIDigitalLebenProcess.content_type] = ["$q", ($q : angular.IQService) => {
             return $q.when("<adh-debate-workbench></adh-debate-workbench>");
         }];
     }]);
-    app.config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(processType)]);
+    app.config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RIDigitalLebenProcess)]);
 
     app.value("markdownit", markdownit);
     app.value("angular", angular);
