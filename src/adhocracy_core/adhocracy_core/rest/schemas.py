@@ -1,50 +1,79 @@
 """Data structures / validation specific to rest api requests."""
 from datetime import datetime
+
+import colander
+from colander import SchemaNode
+from colander import Invalid
 from hypatia.interfaces import IIndexSort
+from multipledispatch import dispatch
+from pyramid.registry import Registry
 from pyramid.request import Request
 from pyramid.util import DottedNameResolver
 from substanced.catalog.indexes import SDIndex
 from substanced.util import find_catalog
-from colander import SchemaNode
-import colander
-
+from substanced.util import find_service
+from hypatia.field import FieldIndex
+from hypatia.keyword import KeywordIndex
+from zope import interface
+from adhocracy_core.interfaces import FieldComparator
+from adhocracy_core.interfaces import FieldSequenceComparator
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.interfaces import SheetToSheet
-from adhocracy_core.interfaces import SearchQuery
+from adhocracy_core.interfaces import IUserLocator
+from adhocracy_core.interfaces import KeywordComparator
+from adhocracy_core.interfaces import KeywordSequenceComparator
 from adhocracy_core.interfaces import Reference as ReferenceTuple
+from adhocracy_core.interfaces import SearchQuery
+from adhocracy_core.interfaces import SheetToSheet
+from adhocracy_core.resources.principal import IPasswordReset
+from adhocracy_core.resources.base import Base
+from adhocracy_core.sheets.asset import IAssetData
+from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import AdhocracySchemaNode
-from adhocracy_core.schema import Email
+from adhocracy_core.schema import Boolean
+from adhocracy_core.schema import Booleans
 from adhocracy_core.schema import ContentType
 from adhocracy_core.schema import DateTime
+from adhocracy_core.schema import DateTimes
+from adhocracy_core.schema import Email
 from adhocracy_core.schema import Integer
+from adhocracy_core.schema import Integers
 from adhocracy_core.schema import Interface
+from adhocracy_core.schema import Interfaces
 from adhocracy_core.schema import Password
-from adhocracy_core.schema import Resource
-from adhocracy_core.schema import Resources
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import References
-from adhocracy_core.schema import ResourcePathSchema
+from adhocracy_core.schema import Resource
 from adhocracy_core.schema import ResourcePathAndContentSchema
+from adhocracy_core.schema import ResourcePathSchema
+from adhocracy_core.schema import Resources
 from adhocracy_core.schema import SingleLine
+from adhocracy_core.schema import SingleLines
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import URL
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_core.utils import raise_colander_style_error
-from adhocracy_core.utils import unflatten_multipart_request
+from adhocracy_core.sheets.principal import IPasswordAuthentication
+from adhocracy_core.sheets.principal import IUserExtended
+from adhocracy_core.catalog import ICatalogsService
+from adhocracy_core.catalog.index import ReferenceIndex
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import now
-from adhocracy_core.interfaces import IUserLocator
-from adhocracy_core.resources.principal import IPasswordReset
-from adhocracy_core.sheets.principal import IUserExtended
-from adhocracy_core.sheets.principal import IPasswordAuthentication
-
+from adhocracy_core.utils import raise_colander_style_error
+from adhocracy_core.utils import unflatten_multipart_request
 
 resolver = DottedNameResolver()
 
 
-class UpdatedResourcesSchema(colander.Schema):
+INDEX_EXAMPLE_VALUES = {
+    'default': 'str',
+    'reference': Base(),
+    'item_creation_date': datetime.now(),
+    'rate': 1,
+    'rates': 1,
+    'interfaces': interface.Interface,
+}
 
+class UpdatedResourcesSchema(colander.Schema):
     """List the resources affected by a transaction."""
 
     created = Resources()
@@ -54,26 +83,22 @@ class UpdatedResourcesSchema(colander.Schema):
 
 
 class ResourceResponseSchema(ResourcePathSchema):
-
     """Data structure for responses of Resource requests."""
 
     updated_resources = UpdatedResourcesSchema()
 
 
 class ItemResponseSchema(ResourceResponseSchema):
-
     """Data structure for responses of IItem requests."""
 
     first_version_path = Resource()
 
 
 class GETResourceResponseSchema(ResourcePathAndContentSchema):
-
     """Data structure for Resource GET requests."""
 
 
 class GETItemResponseSchema(ResourcePathAndContentSchema):
-
     """Data structure for responses of IItem requests."""
 
     first_version_path = Resource()
@@ -98,7 +123,6 @@ def add_put_data_subschemas(node: colander.Schema, kw: dict):
 
 
 class BlockExplanationResponseSchema(colander.Schema):
-
     """Data structure explaining a 410 Gone response."""
 
     reason = SingleLine()
@@ -107,7 +131,6 @@ class BlockExplanationResponseSchema(colander.Schema):
 
 
 class PUTResourceRequestSchema(colander.Schema):
-
     """Data structure for Resource PUT requests.
 
     The subschemas for the Resource Sheets
@@ -116,6 +139,41 @@ class PUTResourceRequestSchema(colander.Schema):
     data = SchemaNode(colander.Mapping(unknown='raise'),
                       after_bind=add_put_data_subschemas,
                       default={})
+
+
+def validate_claimed_asset_mime_type(self, node: SchemaNode, appstruct: dict):
+    """Validate claimed mime type for the uploaded asset file data."""
+    if not appstruct:
+        return
+    file = _get_sheet_field(appstruct, 'data')
+    if not file:
+        msg = 'Sheet {} and field {} is missing.'\
+            .format(IAssetData.__identifier__, 'data')
+        raise Invalid(node['data'], msg=msg)
+    claimed_type = _get_sheet_field(appstruct, 'mime_type')
+    if not claimed_type:
+         msg = 'Sheet {} and field {} is missing.'\
+            .format(IAssetMetadata.__identifier__, 'mime_type')
+         raise Invalid(node['data'], msg=msg)
+    detected_type = file.mimetype
+    if claimed_type != detected_type:
+        msg = 'Claimed MIME type is {} but file content seems to be {}'
+        raise colander.Invalid(node['data'],
+                               msg.format(claimed_type, detected_type))
+
+
+def _get_sheet_field(appstruct: dict, field: str) -> object:
+    for sheet_appstruct in appstruct['data'].values():
+        for key, value in sheet_appstruct.items():
+            if key == field:
+                return value
+
+
+class PUTAssetRequestSchema(PUTResourceRequestSchema):
+
+    """Data structure for Asset PUT requests."""
+
+    validator = validate_claimed_asset_mime_type
 
 
 def add_post_data_subschemas(node: SchemaNode, kw: dict):
@@ -137,7 +195,7 @@ def add_post_data_subschemas(node: SchemaNode, kw: dict):
         node.add(schema.bind(**kw))
 
 
-def _get_resource_type_based_on_request_type(request: Request):
+def _get_resource_type_based_on_request_type(request: Request) -> str:
     if request.content_type == 'application/json':
         return request.json_body.get('content_type')
     elif request.content_type == 'multipart/form-data':
@@ -159,7 +217,6 @@ def deferred_validate_post_content_type(node, kw):
 
 
 class POSTResourceRequestSchema(PUTResourceRequestSchema):
-
     """Data structure for Resource POST requests."""
 
     content_type = ContentType(validator=deferred_validate_post_content_type,
@@ -170,29 +227,31 @@ class POSTResourceRequestSchema(PUTResourceRequestSchema):
                       default={})
 
 
-class AbsolutePaths(colander.SequenceSchema):
+class POSTAssetRequestSchema(POSTResourceRequestSchema):
 
+    """Data structure for Asset POST requests."""
+
+    validator = validate_claimed_asset_mime_type
+
+class AbsolutePaths(colander.SequenceSchema):
     """List of resource paths."""
 
     path = AbsolutePath()
 
 
 class POSTItemRequestSchema(POSTResourceRequestSchema):
-
     """Data structure for Item and ItemVersion POST requests."""
 
     root_versions = Resources(missing=[])
 
 
 class POSTResourceRequestSchemaList(colander.List):
-
     """Overview of POST request/response data structure."""
 
     request_body = POSTResourceRequestSchema()
 
 
 class GETLocationMapping(colander.Schema):
-
     """Overview of GET request/response data structure."""
 
     request_querystring = SchemaNode(colander.Mapping(), default={})
@@ -201,7 +260,6 @@ class GETLocationMapping(colander.Schema):
 
 
 class PUTLocationMapping(colander.Schema):
-
     """Overview of PUT request/response data structure."""
 
     request_body = PUTResourceRequestSchema()
@@ -209,7 +267,6 @@ class PUTLocationMapping(colander.Schema):
 
 
 class POSTLocationMapping(colander.Schema):
-
     """Overview of POST request/response data structure."""
 
     request_body = SchemaNode(POSTResourceRequestSchemaList(), default=[])
@@ -217,7 +274,6 @@ class POSTLocationMapping(colander.Schema):
 
 
 class POSTLoginUsernameRequestSchema(colander.Schema):
-
     """Schema for login requests via username and password."""
 
     name = SchemaNode(colander.String(), missing=colander.required)
@@ -225,7 +281,6 @@ class POSTLoginUsernameRequestSchema(colander.Schema):
 
 
 class POSTActivateAccountViewRequestSchema(colander.Schema):
-
     """Schema for account activation."""
 
     path = SchemaNode(colander.String(),
@@ -234,7 +289,6 @@ class POSTActivateAccountViewRequestSchema(colander.Schema):
 
 
 class POSTLoginEmailRequestSchema(colander.Schema):
-
     """Schema for login requests via email and password."""
 
     email = Email(missing=colander.required)
@@ -242,7 +296,6 @@ class POSTLoginEmailRequestSchema(colander.Schema):
 
 
 class POSTReportAbuseViewRequestSchema(colander.Schema):
-
     """Schema for abuse reports."""
 
     url = URL(missing=colander.required)
@@ -250,14 +303,12 @@ class POSTReportAbuseViewRequestSchema(colander.Schema):
 
 
 class MessageUserReference(SheetToSheet):
-
     """Dummy reference to validate user resources."""
 
     target_isheet = IUserExtended
 
 
 class POSTMessageUserViewRequestSchema(colander.Schema):
-
     """Schema for messages to a user."""
 
     recipient = Reference(missing=colander.required,
@@ -267,7 +318,6 @@ class POSTMessageUserViewRequestSchema(colander.Schema):
 
 
 class BatchHTTPMethod(SchemaNode):
-
     """An HTTP method in a batch request."""
 
     schema_type = colander.String
@@ -276,7 +326,6 @@ class BatchHTTPMethod(SchemaNode):
 
 
 class BatchRequestPath(AdhocracySchemaNode):
-
     """A path in a batch request.
 
     Either a resource url or a preliminary resource path (a relative path
@@ -293,11 +342,10 @@ class BatchRequestPath(AdhocracySchemaNode):
     validator = colander.All(colander.Regex('^(' + colander.URL_REGEX + '|'
                                             + absolutpath + '|@'
                                             + preliminarypath + ')$'),
-                             colander.Length(min=1, max=200))
+                             colander.Length(min=1, max=8192))
 
 
 class POSTBatchRequestItem(colander.Schema):
-
     """A single item in a batch request, encoding a single request."""
 
     method = BatchHTTPMethod()
@@ -309,14 +357,12 @@ class POSTBatchRequestItem(colander.Schema):
 
 
 class POSTBatchRequestSchema(colander.SequenceSchema):
-
     """Schema for batch requests (list of POSTBatchRequestItem's)."""
 
     items = POSTBatchRequestItem()
 
 
 class PoolElementsForm(SchemaNode):
-
     """The form of the elements attribute returned by the pool sheet."""
 
     schema_type = colander.String
@@ -325,29 +371,28 @@ class PoolElementsForm(SchemaNode):
 
 
 class PoolQueryDepth(SchemaNode):
-
     """The nesting depth of descendants in a pool response.
 
     Either a positive number or the string 'all' to return descendants of
     arbitrary depth.
     """
 
-    schema_type = colander.String
-    validator = colander.Regex(r'^(\d+|all)$')
-    missing = '1'
+    schema_type = colander.Integer
+    missing = 1
+    validator = colander.Range(min=1)
 
 
 @colander.deferred
 def deferred_validate_aggregateby(node: SchemaNode, kw):
-    """Validate if `value` is an catalog index with `unique_values`."""
+    """Validate if `value` is an catalog index name`."""
     # TODO In the future we may have indexes where aggregateby doesn't make
     # sense, e.g. username or email. We should have a blacklist to prohibit
     # calling aggregateby on such indexes.
     context = kw['context']
     indexes = _get_indexes(context)
-    valid_indexes = [x.__name__ for x in indexes
-                     if 'unique_values' in x.__dir__()]
-    return colander.OneOf(valid_indexes)
+    index_names = [x.__name__ for x in indexes
+                   if hasattr(x, 'unique_values')]
+    return colander.OneOf(index_names)
 
 
 @colander.deferred
@@ -394,9 +439,7 @@ class GETPoolRequestSchema(colander.Schema):
     # Elements in this schema were multiple values should be allowed:
     # sheet, aggregateby, tag.
 
-    content_type = ContentType(missing=colander.drop)
-    sheet = SchemaNode(Interface(), missing=colander.drop)
-    depth = PoolQueryDepth(missing=colander.drop)
+    depth = PoolQueryDepth()
     elements = PoolElementsForm(missing=colander.drop)
     count = SchemaNode(colander.Boolean(), missing=colander.drop)
     sort = SchemaNode(colander.String(),
@@ -418,15 +461,17 @@ class GETPoolRequestSchema(colander.Schema):
         TODO: CHANGE API according to internal SearchQuery api.
              refactor to follow coding guideline better.
         """
+        depth_cstruct = cstruct.get('depth', None)
+        if depth_cstruct == 'all':
+            cstruct['depth'] = 100
         appstruct = super().deserialize(cstruct)
         search_query = {}
-        if appstruct:
+        if appstruct:  # pragma: no branch
             search_query['root'] = self.bindings['context']
-        if 'depth' in appstruct:
-            depth_bbb = appstruct['depth']
-            depth = None
-            if depth_bbb != 'all':
-                depth = int(depth_bbb)
+        if 'depth' in appstruct:  # pragma: no branch
+            depth = appstruct['depth']
+            if depth == 100:
+                depth = None
             search_query['depth'] = depth
         if 'elements' in appstruct:
             elements = appstruct.get('elements')
@@ -435,9 +480,7 @@ class GETPoolRequestSchema(colander.Schema):
                 search_query['resolve'] = False
         interfaces = ()
         if 'sheet' in appstruct:
-            interfaces += (appstruct['sheet'],)
-        if 'content_type' in appstruct:
-            interfaces += (appstruct['content_type'],)
+            interfaces = appstruct['sheet']
         if interfaces:
             search_query['interfaces'] = interfaces
         if 'aggregateby' in appstruct:
@@ -454,49 +497,57 @@ class GETPoolRequestSchema(colander.Schema):
         if 'count' in appstruct:
             search_query['show_count'] = appstruct['count']
         fields = tuple([x.name for x in GETPoolRequestSchema().children])
-        for key, value in appstruct.items():
-            if key in fields + SearchQuery._fields:
+        fields += ('sheet',)
+        for filter, query in appstruct.items():
+            if filter in fields + SearchQuery._fields:
                 continue
-            if ':' in key:
+            if ':' in filter:
                 if 'references' not in search_query:  # pragma: no branch
                     search_query['references'] = []
-                isheet_name, isheet_field = key.split(':')
+                isheet_name, isheet_field = filter.split(':')
                 isheet = resolver.resolve(isheet_name)
-                target = appstruct[key]
+                target = appstruct[filter]
                 reference = ReferenceTuple(None, isheet, isheet_field, target)
                 search_query['references'].append(reference)
             else:
                 if 'indexes' not in search_query:
                     search_query['indexes'] = {}
-                search_query['indexes'][key] = value
+                if filter == 'content_type':
+                    search_query['indexes'][
+                        'interfaces'] = appstruct['content_type']
+                    continue
+                search_query['indexes'][filter] = query
         return search_query
 
 
-def add_get_pool_request_extra_fields(cstruct: dict,
-                                      schema: GETPoolRequestSchema,
-                                      context: IResource,
-                                      registry) -> GETPoolRequestSchema:
-    """Validate arbitrary fields in GETPoolRequestSchema data."""
-    extra_fields = _get_unknown_fields(cstruct, schema)
-    if not extra_fields:
-        return schema
-    schema_extra = schema.clone()
-    for name in extra_fields:
-        if _maybe_reference_filter_node(name, registry):
-            _add_reference_filter_node(name, schema_extra)
+def add_arbitrary_filter_nodes(cstruct: dict,
+                               schema: GETPoolRequestSchema,
+                               context: IResource,
+                               registry) -> GETPoolRequestSchema:
+    """Add schema nodes for arbitrary/references filters to `schema`."""
+    extra_filters = [(k, v) for k, v in cstruct.items() if k not in schema]
+    if extra_filters:
+        schema = schema.clone()
+    catalogs = find_service(context, 'catalogs')
+    for filter_name, query in extra_filters:
+        if _is_reference_filter(filter_name, registry):
+            index_name = 'reference'
+        elif filter_name == 'sheet':
+            index_name = 'interfaces'
+        elif filter_name == 'content_type':
+            index_name = 'interfaces'
+        elif _is_arbitrary_filter(filter_name, catalogs):
+            index_name = filter_name
         else:
-            index = _find_index_if_arbitrary_filter_node(name, context)
-            if index is not None:
-                _add_arbitrary_filter_node(name, index, schema_extra)
-    return schema_extra
+            continue  # pragma: no cover
+        index = catalogs.get_index(index_name)
+        example_value = _get_index_example_value(index)
+        node = create_arbitrary_filter_node(index, example_value, query)
+        _add_node(schema, node, filter_name)
+    return schema
 
 
-def _get_unknown_fields(cstruct, schema):
-    unknown_fields = [key for key in cstruct if key not in schema]
-    return unknown_fields
-
-
-def _maybe_reference_filter_node(name, registry):
+def _is_reference_filter(name: str, registry: Registry) -> bool:
     """
     Check whether a name refers to a reference node in a sheet.
 
@@ -515,37 +566,318 @@ def _maybe_reference_filter_node(name, registry):
         raise_colander_style_error(None, name, 'Not a reference node')
 
 
-def _add_reference_filter_node(name, schema):
-    node = Resource(name=name).bind(**schema.bindings)
-    schema.add(node)
-
-
-def _find_index_if_arbitrary_filter_node(name: str,
-                                         context: IResource) -> SDIndex:
+def _is_arbitrary_filter(name: str, catalogs: ICatalogsService) -> bool:
     """
-    Find the referenced index if `name' refers to an arbitrary catalog index.
-
-    Throws an exception otherwise.
-    If there are no catalogs, `None` is returned to facilitate testing.
+    Return True if `name' refers to an public arbitrary catalog index.
     """
-    catalog = find_catalog(context, 'adhocracy')
-    if not catalog:
-        return None
-    if name in catalog and not name.startswith('private_'):
-        return catalog[name]
+
+    if name.startswith('private_'):
+        return False
     else:
-        raise_colander_style_error(None, name, 'No such catalog')
+        index = catalogs.get_index(name)
+        return index is not None
 
 
-def _add_arbitrary_filter_node(name, index: SDIndex, schema):
-    int_index = False
-    if 'unique_values' in index.__dir__():
-        indexed_values = index.unique_values()
-        if indexed_values and isinstance(indexed_values[0], int):
-            int_index = True
-    node = Integer(name=name) if int_index else SingleLine(name=name)
+def _get_index_example_value(index: SDIndex) -> object:
+    """Return example entry from `index` or None if `index` is None."""
+    if index is None:
+        return None
+    if index.__name__ in INDEX_EXAMPLE_VALUES:
+        return INDEX_EXAMPLE_VALUES[index.__name__]
+    else:
+        return INDEX_EXAMPLE_VALUES['default']
+
+
+def _add_node(schema: SchemaNode, node: SchemaNode, name: str):
     node = node.bind(**schema.bindings)
+    node.name = name
     schema.add(node)
+
+
+@dispatch((FieldIndex, KeywordIndex), str, str)  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
+    return SingleLine()
+
+
+@dispatch((FieldIndex, KeywordIndex), int, (int, str))  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
+    return Integer()
+
+
+@dispatch((FieldIndex, KeywordIndex), bool, (bool, str))  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
+    return Boolean()
+
+
+@dispatch(FieldIndex, bool, list)  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
+    if query[0] in FieldSequenceComparator.__members__:
+        return FieldComparableBooleans()
+    else:
+        return FieldComparableBoolean()
+
+
+@dispatch((FieldIndex, KeywordIndex), datetime, str)  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
+    return DateTime()
+
+
+@dispatch(FieldIndex, datetime, list)  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
+    if query[0] in FieldSequenceComparator.__members__:
+        return FieldComparableDateTimes()
+    else:
+        return FieldComparableDateTime()
+
+
+@dispatch(KeywordIndex, interface.interface.InterfaceClass, str)  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
+    return Interface()
+
+
+@dispatch(ReferenceIndex, object, str)  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
+    return Resource()
+
+
+@dispatch(KeywordIndex, int, list)  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
+    if query[0] in KeywordSequenceComparator.__members__:
+        return KeywordComparableIntegers()
+    else:
+        return KeywordComparableInteger()
+
+
+@dispatch(FieldIndex, int, list)  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
+    if query[0] in FieldSequenceComparator.__members__:
+        return FieldComparableIntegers()
+    else:
+        return FieldComparableInteger()
+
+
+@dispatch(KeywordIndex, str, list)  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
+    if query[0] in KeywordSequenceComparator.__members__:
+        return KeywordComparableSingleLines()
+    else:
+        return KeywordComparableSingleLine()
+
+
+@dispatch(FieldIndex, str, list)  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
+    if query[0] in FieldSequenceComparator.__members__:
+        return FieldComparableSingleLines()
+    else:
+        return FieldComparableSingleLine()
+
+
+@dispatch(KeywordIndex, interface.interface.InterfaceClass, list)  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
+    if query[0] in KeywordSequenceComparator.__members__:
+        return KeywordComparableInterfaces()
+    else:
+        return KeywordComparableInterface()
+
+
+class KeywordComparableSchema(SingleLine):
+    """SingleLine of KeywordComparable value."""
+
+    validator = colander.OneOf(
+        [x for x in KeywordComparator.__members__])
+
+
+class FieldComparableSchema(SingleLine):
+    """SingleLine of FieldComparable value."""
+
+    validator = colander.OneOf(
+        [x for x in FieldComparator.__members__])
+
+
+class KeywordSequenceComparableSchema(SingleLine):
+    """SingleLine of KeywordSequenceComparable value."""
+
+    validator = colander.OneOf(
+        [x for x in KeywordSequenceComparator.__members__])
+
+
+class FieldSequenceComparableSchema(SingleLine):
+    """SingleLine of FieldSequenceComparable value."""
+
+    validator = colander.OneOf(
+        [x for x in FieldSequenceComparator.__members__])
+
+
+class KeywordComparableSequenceBase(colander.TupleSchema):
+    """Tuple with value KeywordSequenceComparable."""
+
+    comparable = KeywordSequenceComparableSchema()
+
+
+class KeywordComparableIntegers(KeywordComparableSequenceBase):
+    """Tuple with values KeywordSequenceComparable and Integers."""
+
+    value = Integers()
+
+
+class KeywordComparableInterfaces(KeywordComparableSequenceBase):
+    """Tuple with values KeywordSequenceComparable and Interfaces."""
+
+    value = Interfaces()
+
+
+class KeywordComparableSingleLines(KeywordComparableSequenceBase):
+    """Tuple with values KeywordSequenceComparable and SingleLines."""
+
+    value = SingleLines()
+
+
+class KeywordComparableDateTimes(KeywordComparableSequenceBase):
+    """Tuple with values KeywordSequenceComparable and DateTimes."""
+
+    value = DateTimes()
+
+
+class KeywordComparableBooleans(KeywordComparableSequenceBase):
+    """Tuple with values KeywordSequenceComparable and Booleans."""
+
+    value = Booleans()
+
+
+class KeywordComparableBase(colander.TupleSchema):
+    """Tuple with value KeywordComparable."""
+
+    comparable = KeywordComparableSchema()
+
+
+class KeywordComparableInteger(KeywordComparableBase):
+    """Tuple with values KeywordComparable and Integer."""
+
+    value = Integer()
+
+
+class KeywordComparableInterface(KeywordComparableBase):
+    """Tuple with values KeywordComparable and Interface."""
+
+    value = Interface()
+
+
+class KeywordComparableSingleLine(KeywordComparableBase):
+    """Tuple with values KeywordComparable and SingleLine."""
+
+    value = SingleLine()
+
+
+class KeywordComparableBoolean(KeywordComparableBase):
+    """Tuple with values KeywordComparable and Boolean."""
+
+    value = Boolean()
+
+
+class KeywordComparableDateTime(KeywordComparableBase):
+    """Tuple with values KeywordComparable and DateTime."""
+
+    value = DateTime()
+
+
+class FieldComparableSchema(SingleLine):
+    """SingleLine of FieldComparable value."""
+
+    validator = colander.OneOf(
+        [x for x in FieldComparator.__members__])
+
+
+class FieldComparableSchema(SingleLine):
+    """SingleLine of FieldComparable value."""
+
+    validator = colander.OneOf(
+        [x for x in FieldComparator.__members__])
+
+
+class FieldSequenceComparableSchema(SingleLine):
+    """SingleLine of FieldSequenceComparable value."""
+
+    validator = colander.OneOf(
+        [x for x in FieldSequenceComparator.__members__])
+
+
+class FieldSequenceComparableSchema(SingleLine):
+    """SingleLine of FieldSequenceComparable value."""
+
+    validator = colander.OneOf(
+        [x for x in FieldSequenceComparator.__members__])
+
+
+class FieldComparableSequenceBase(colander.TupleSchema):
+    """Tuple with value FieldSequenceComparable."""
+
+    comparable = FieldSequenceComparableSchema()
+
+
+class FieldComparableIntegers(FieldComparableSequenceBase):
+    """Tuple with values FieldSequenceComparable and Integers."""
+
+    value = Integers()
+
+
+class FieldComparableInterfaces(FieldComparableSequenceBase):
+    """Tuple with values FieldSequenceComparable and Interfaces."""
+
+    value = Interfaces()
+
+
+class FieldComparableSingleLines(FieldComparableSequenceBase):
+    """Tuple with values FieldSequenceComparable and SingleLines."""
+
+    value = SingleLines()
+
+
+class FieldComparableDateTimes(FieldComparableSequenceBase):
+    """Tuple with values FieldSequenceComparable and DateTimes."""
+
+    value = DateTimes()
+
+
+class FieldComparableBooleans(FieldComparableSequenceBase):
+    """Tuple with values FieldSequenceComparable and Booleans."""
+
+    value = Booleans()
+
+
+class FieldComparableBase(colander.TupleSchema):
+    """Tuple with value FieldComparable."""
+
+    comparable = FieldComparableSchema()
+
+
+class FieldComparableInteger(FieldComparableBase):
+    """Tuple with values FieldComparable and Integer."""
+
+    value = Integer()
+
+
+class FieldComparableInterface(FieldComparableBase):
+    """Tuple with values FieldComparable and Interface."""
+
+    value = Interface()
+
+
+class FieldComparableSingleLine(FieldComparableBase):
+    """Tuple with values FieldComparable and SingleLine."""
+
+    value = SingleLine()
+
+
+class FieldComparableBoolean(FieldComparableBase):
+    """Tuple with values FieldComparable and Boolean."""
+
+    value = Boolean()
+
+
+class FieldComparableDateTime(FieldComparableBase):
+    """Tuple with values FieldComparable and DateTime."""
+
+    value = DateTime()
 
 
 options_resource_response_data_dict =\
@@ -630,7 +962,6 @@ def _raise_if_outdated(node: SchemaNode, value: IPasswordReset,
 
 
 class POSTPasswordResetRequestSchema(colander.Schema):
-
     """Schema to get a user password reset resource."""
 
     path = Resource(missing=colander.required,

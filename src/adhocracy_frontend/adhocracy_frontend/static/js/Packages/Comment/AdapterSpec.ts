@@ -1,71 +1,14 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import JasmineHelpers = require("../../JasmineHelpers");
+import * as JasmineHelpers from "../../JasmineHelpers";
 
-import AdhCommentAdapter = require("./Adapter");
+import * as AdhCommentAdapter from "./Adapter";
 
-import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
+import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 
 
 export var register = () => {
     describe("CommentAdapter", () => {
-        describe("ListingCommentableAdapter", () => {
-            var adapter;
-
-            beforeEach(() => {
-                adapter = new AdhCommentAdapter.ListingCommentableAdapter();
-            });
-
-            describe("elemRefs", () => {
-                var generateResource = () => {
-                    return {
-                        data: {
-                            "adhocracy_core.sheets.comment.ICommentable": {
-                                comments: [
-                                    "/asd/version2",
-                                    "/asd/version3",
-                                    "/foo/version1",
-                                    "/bar/version1",
-                                    "/asd/version1",
-                                    "/foo/version2"
-                                ]
-                            }
-                        }
-                    };
-
-                };
-
-                it("returns the refered comment items from the adhocracy_core.sheets.comment.ICommentable sheet", () => {
-                    jasmine.addMatchers(JasmineHelpers.customMatchers);
-
-                    var resource = generateResource();
-                    var result = adapter.elemRefs(resource);
-                    (<any>expect(result)).toSetEqual(["/asd", "/foo", "/bar"]);
-                });
-
-                it("does not modify the resource", () => {
-                    var resource = generateResource();
-                    adapter.elemRefs(resource);
-                    expect(resource).toEqual(generateResource());
-                });
-            });
-
-            describe("poolPath", () => {
-                it("returns the post_pool of the container path", () => {
-                    var resource = {
-                        path: "some/path/parent",
-                        data: {
-                            "adhocracy_core.sheets.comment.ICommentable": {
-                                post_pool: "some/path"
-                            }
-                        }
-                    };
-
-                    expect(adapter.poolPath(resource)).toEqual("some/path");
-                });
-            });
-        });
-
         describe("CommentAdapter", () => {
             var resource;
             var adapter;
@@ -168,16 +111,52 @@ export var register = () => {
                 });
             });
 
-            describe("commentCount", () => {
-                it("gets commentCount from adhocracy_core.sheets.comment.ICommentable", () => {
-                    expect(adapter.commentCount(resource)).toBe(2);
+            describe("elemRefs", () => {
+                var generateResource = () => {
+                    return {
+                        data: {
+                            "adhocracy_core.sheets.comment.ICommentable": {
+                                comments: [
+                                    "/asd/version2",
+                                    "/asd/version3",
+                                    "/foo/version1",
+                                    "/bar/version1",
+                                    "/asd/version1",
+                                    "/foo/version2"
+                                ]
+                            }
+                        }
+                    };
+
+                };
+
+                it("returns the refered comment items from the adhocracy_core.sheets.comment.ICommentable sheet", () => {
+                    jasmine.addMatchers(JasmineHelpers.customMatchers);
+
+                    var resource = generateResource();
+                    var result = adapter.elemRefs(resource);
+                    (<any>expect(result)).toSetEqual(["/asd", "/foo", "/bar"]);
                 });
-                it("does not count multiple versions of the same item", () => {
-                    resource.data["adhocracy_core.sheets.comment.ICommentable"].comments = [
-                        "foo/VERSION_0000001",
-                        "foo/VERSION_0000002"
-                    ];
-                    expect(adapter.commentCount(resource)).toBe(1);
+
+                it("does not modify the resource", () => {
+                    var resource = generateResource();
+                    adapter.elemRefs(resource);
+                    expect(resource).toEqual(generateResource());
+                });
+            });
+
+            describe("poolPath", () => {
+                it("returns the post_pool of the container path", () => {
+                    var resource = {
+                        path: "some/path/parent",
+                        data: {
+                            "adhocracy_core.sheets.comment.ICommentable": {
+                                post_pool: "some/path"
+                            }
+                        }
+                    };
+
+                    expect(adapter.poolPath(resource)).toEqual("some/path");
                 });
             });
         });

@@ -10,15 +10,14 @@ from adhocracy_core.schema import SingleLine
 
 
 class IProposal(ISheet):
-
     """Marker interface for Burgerhaushalt proposal sheet."""
 
 
 class ProposalSchema(colander.MappingSchema):
-
     """Data structure for the Burgerhaushalt information."""
 
-    budget = CurrencyAmount(missing=colander.required,
+    budget = CurrencyAmount(missing=colander.drop,
+                            default=None,
                             validator=colander.Range(min=0))
     location_text = SingleLine(validator=colander.Length(max=100))
 

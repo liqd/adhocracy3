@@ -14,7 +14,7 @@ category: Widgets
     .map-button-clear,
     .map-button-reset {
         @include inline-block;
-        padding: 0 (10px / $font-size-normal * 1em);
+        @include rem(padding, 0 10px);
     }
 }
 
@@ -40,10 +40,10 @@ time.
 ```
 */
 .map-info {
+    @include rem(font-size, $font-size-small);
+    @include rem(padding, 5px);
     background: $color-text-normal;
     color: $color-text-inverted;
-    font-size: $font-size-small;
-    padding: 0.5em;
     width: 100%;
 
     &:hover {
@@ -74,12 +74,13 @@ rather than in response to user action.
 ```
 */
 .map-info-persistent {
+    @include rem(font-size, $font-size-small);
+    @include rem(padding, 5px);
     background: $color-background-base-introvert;
-    font-size: $font-size-small;
-    padding: 0.5em;
 }
 
 .leaflet-marker-icon {
+    @include rem(font-size, 42px);
     @include text-shadow(
         -1px -1px 0 $color-text-inverted,
         1px -1px 0 $color-text-inverted,
@@ -87,7 +88,6 @@ rather than in response to user action.
         1px 1px 0 $color-text-inverted
     );
     color: $color-brand-two-normal;
-    font-size: 42px;
 
     &.is-active, &:hover, &:focus {
         color: $color-brand-one-introvert;
@@ -110,8 +110,8 @@ rather than in response to user action.
 }
 
 .map-list-navigate {
+    @include rem(font-size, $font-size-normal);
     font-weight: bold;
-    font-size: $font-size-normal;
 
     &:hover, &:focus {
         text-decoration: none;
@@ -119,33 +119,33 @@ rather than in response to user action.
 }
 
 .map-list-navigate-container {
+    @include rem(margin-top, -$font-size-normal);
+    @include rem(width, 30px);
     position: absolute;
     top: 50%;
-    margin-top: -$font-size-normal;
-    width: 30px / $font-size-normal * 1em;
 
     p {
-        line-height: 1em;
+        @include rem(line-height, 1rem);
     }
 }
 
 .map-list-navigate-container-prev {
-    left: 10px / $font-size-normal * 1em;
+    @include rem(left, 10px);
     text-align: left;
 }
 
 .map-list-navigate-container-next {
-    right: 10px / $font-size-normal * 1em;
+    @include rem(right, 10px);
     text-align: right;
 }
 
 .map-list-scroll-container {
-    padding: 0 (40px / $font-size-normal * 1em);
+    @include rem(padding, 0 40px);
 }
 
 .map-list-scroll-container-inner {
+    @include rem(margin, 15px 0 0);
     overflow: hidden;
-    margin: (15px / $font-size-normal * 1em) 0 0;
     padding: 0;
     vertical-align: top;
     white-space: nowrap;
@@ -163,5 +163,15 @@ rather than in response to user action.
     &.m-empty {
         font-weight: bold;
         text-align: center;
+    }
+}
+
+.map-switch {
+    .map-switch-item {
+        color: $color-text-normal;
+
+        &.is-selected {
+            color: $color-text-highlight-normal;
+        }
     }
 }

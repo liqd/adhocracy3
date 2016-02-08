@@ -19,7 +19,6 @@ import adhocracy_core.sheets.workflow
 
 
 class IDocumentVersion(IItemVersion):
-
     """Versionable item with Document propertysheet."""
 
 
@@ -37,7 +36,6 @@ document_version_meta = itemversion_meta._replace(
 
 
 class IDocument(IItem):
-
     """All versions of a Proposal."""
 
 
@@ -47,6 +45,8 @@ document_meta = item_meta._replace(
                    IParagraph,
                    IDocumentVersion,
                    ),
+    extended_sheets=(adhocracy_core.sheets.badge.IBadgeable,
+                     ),
     item_type=IDocumentVersion,
     permission_create='create_document',
     is_implicit_addable=True,
@@ -59,7 +59,6 @@ document_meta = item_meta._replace(
 
 
 class IGeoDocumentVersion(IDocumentVersion):
-
     """Versionable document with geo-location."""
 
 
@@ -71,12 +70,12 @@ geo_document_version_meta = document_version_meta._replace(
 
 
 class IGeoDocument(IDocument):
-
     """Geolocalisable document."""
 
 
 geo_document_meta = document_meta._replace(
     iresource=IGeoDocument,
+    item_type=IGeoDocumentVersion,
     element_types=(ITag,
                    IParagraph,
                    IGeoDocumentVersion)

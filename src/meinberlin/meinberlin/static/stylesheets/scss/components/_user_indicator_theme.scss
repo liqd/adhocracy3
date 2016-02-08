@@ -3,8 +3,8 @@
     .user-indicator-logout,
     .user-indicator-login,
     .user-indicator-register {
+        @include rem(font-size, $font-size-small);
         letter-spacing: 0;
-        font-size: $font-size-small;
     }
 
     .user-indicator-logout,

@@ -1,15 +1,15 @@
-Adhocracy with customizations for advocate-europe
-=================================================
+Adhocracy 3 with customizations for various projects
+====================================================
 
-.. image:: https://api.travis-ci.org/liqd/adhocracy3.mercator.png?branch=master
-    :target: http://travis-ci.org/liqd/adhocracy3.mercator
-.. image:: https://coveralls.io/repos/liqd/adhocracy3.mercator/badge.png?branch=master
-    :target: https://coveralls.io/r/liqd/adhocracy3.mercator
-.. image:: https://readthedocs.org/projects/adhocracy3mercator/badge/?version=latest
-    :target: https://adhocracy3mercator.readthedocs.org/
+.. image:: https://api.travis-ci.org/liqd/adhocracy3.png?branch=master
+    :target: http://travis-ci.org/liqd/adhocracy3
+.. image:: https://coveralls.io/repos/liqd/adhocracy3/badge.png?branch=master
+    :target: https://coveralls.io/r/liqd/adhocracy3
+.. image:: https://readthedocs.org/projects/adhocracy3/badge/?version=latest
+    :target: https://adhocracy3.readthedocs.org/
 
 This repository contains the source code of the Adhocracy 3 backend and
-frontend cores as well as customizations for the advocate-europe project.
+frontend cores as well as customizations for various projects.
 
 Note::
 
@@ -29,7 +29,7 @@ Softwarestack
 
 Server (backend):
 
-- `Python 3 <http://www.python.org>`_ (programming language)
+- `Python 3 <https://www.python.org>`_ (programming language)
 
 - `Pyramid <http://pylonsproject.org>`_  (web framework)
 
@@ -45,9 +45,6 @@ Server (backend):
 
 - `websocket-client <https://github.com/liris/websocket-client>`_ (websocket
   client)
-
-- `asyncio <https://pypi.python.org/pypi/asyncio>`_ (required in Python 3.3
-  for Autobahn; comes pre-packaged with Python 3.4)
 
 - `buildout <http://www.buildout.org/en/latest/>`_ (build system)
 
@@ -66,7 +63,7 @@ Client (frontend):
 
 - `Lodash <https://lodash.com/>`_ (functional javascript helper library)
 
-- `Splinter <http://splinter.cobrateam.info/>`_ (acceptance and frontend tests)
+- `Protractor <https://angular.github.io/protractor/>`_ (acceptance tests)
 
 - `Jasmine <https://jasmine.github.io/>`_ (unit tests)
 

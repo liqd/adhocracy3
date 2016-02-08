@@ -134,6 +134,7 @@ Start adhocracy app and log in some users::
     >>> participant = getfixture('app_participant')
     >>> moderator = getfixture('app_moderator')
     >>> admin = getfixture('app_admin')
+    >>> log = getfixture('log')
 
 Lets create some content::
 
@@ -244,7 +245,7 @@ private and cannot be directly queried from the frontend::
     >>> resp.status_code
     400
     >>> resp.json['errors'][0]['description']
-    'No such catalog'
+    'Unrecognized keys in mapping: "{\'private_visibility\': \'hidden\'}"'
 
 Lets hide an item with referenced resources. Prior to doing so, lets check
 that there actually is a listed version::

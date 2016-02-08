@@ -13,6 +13,7 @@ from pyramid.settings import asbool
 from zope.interface import implementer
 from zope.interface import Interface
 from zope.component import ComponentLookupError
+from substanced.stats import statsd_timer
 
 from adhocracy_core.interfaces import ITokenManger
 from adhocracy_core.interfaces import IRolesUserLocator
@@ -25,7 +26,6 @@ Anonymous = 'system.Anonymous'
 
 @implementer(ITokenManger)
 class TokenMangerAnnotationStorage:
-
     """Manage authentication tokens and use object annotation to store them.
 
     Constructor arguments:
@@ -92,7 +92,15 @@ class TokenMangerAnnotationStorage:
     def delete_token(self, token: str):
         """Delete authentication token."""
         if token in self.token_to_user_id_timestamp:
+
             del self.token_to_user_id_timestamp[token]
+
+    def delete_expired_tokens(self, timeout: float):
+        all = self.token_to_user_id_timestamp.items()
+        expired = [t for t, (u, date) in all if self._is_expired(date,
+                                                                 timeout)]
+        for token in expired:
+            self.delete_token(token)
 
 
 def get_tokenmanager(request: Request, **kwargs) -> ITokenManger:
@@ -145,7 +153,6 @@ def _get_x_user_headers(request: Request) -> tuple:
 
 @implementer(IAuthenticationPolicy)
 class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
-
     """A :term:`authentication policy` based on the the X-User-* header.
 
     To authenticate the client has to send http header with `X-User-Token`
@@ -199,8 +206,11 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         settings = request.registry.settings
         if not asbool(settings.get('adhocracy.validate_user_token', True)):
             return userid
-        authenticated_userid = tokenmanager.get_user_id(token,
-                                                        timeout=self.timeout)
+        if token is None:
+            raise KeyError
+        with statsd_timer('authentication.user', rate=.1):
+            authenticated_userid = \
+                tokenmanager.get_user_id(token, timeout=self.timeout)
         if authenticated_userid != userid:
             raise KeyError
         return authenticated_userid
@@ -242,6 +252,8 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         if cached_principals:
             return cached_principals
         if self.authenticated_userid(request) is None:
+            # FIXME this should go to principals.groups_and_roles_finder
+            # to make adhocracy work with other authentication polices.
             return [Everyone, Anonymous]
         principals = super().effective_principals(request)
         request.__cached_principals__ = principals

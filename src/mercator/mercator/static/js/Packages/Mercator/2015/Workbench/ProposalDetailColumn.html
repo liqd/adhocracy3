@@ -1,0 +1,42 @@
+<div data-ng-switch="transclusionId">
+    <div data-ng-switch-when="menu">
+        <i class="icon-document moving-column-icon"></i>
+
+        <div class="moving-column-menu-nav">
+            <a class="moving-column-menu-nav-button" data-ng-href="{{ platformUrl | adhResourceUrl }}" title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
+        </div>
+    </div>
+
+    <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ proposalUrl | adhResourceUrl }}">
+        <div class="moving-column-tab">
+            <i class="icon-document moving-column-icon"></i>
+        </div>
+    </a>
+
+    <adh-recompile-on-change data-ng-switch-when="body" data-value="{{proposalUrl}}">
+        <adh-resource-actions
+            data-resource-path="{{proposalUrl}}"
+            data-edit="true"
+            data-report="true"
+            data-share="true"
+            data-delete="true"
+            data-print="true"></adh-resource-actions>
+
+        <adh-document-create data-path="{{processUrl}}" data-has-map="true" data-has-image="true" data-polygon="polygon"></adh-document-create>
+        <adh-resource-wrapper>
+            <adh-mercator-2015-proposal-detail-view data-ng-if="proposalUrl" data-path="{{proposalUrl}}"></adh-mercator-2015-proposal-detail-view>
+        </adh-resource-wrapper>
+    </adh-recompile-on-change>
+
+    <adh-report-abuse
+        class="report-abuse"
+        data-ng-switch-when="overlays"
+        data-ng-if="overlay === 'abuse'"
+        data-url="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}">
+    </adh-report-abuse>
+
+    <div data-ng-switch-when="overlays" data-ng-if="overlay === 'share'">
+        <adh-social-share data-uri="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}"></adh-social-share>
+        <a href="" class="button" data-ng-click="ctrl.hideOverlay('share')">{{ "TR__CANCEL" | translate }}</a>
+    </div>
+</div>

@@ -7,6 +7,8 @@ import argparse
 import inspect
 import logging
 import json
+import string
+import os
 
 import transaction
 from pyramid.paster import bootstrap
@@ -21,8 +23,10 @@ from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.resources.badge import IBadge
 from adhocracy_core.resources.subscriber import _get_default_group
 from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import get_sheet_field
 from adhocracy_core import sheets
 from adhocracy_core.scripts.assign_badges import create_badge_assignment
+from adhocracy_core.sheets.name import IName
 
 
 logger = logging.getLogger(__name__)
@@ -62,7 +66,10 @@ def _import_users(context: IResource, registry: Registry, filename: str):
         if user_by_name or user_by_email:
             logger.info('Updating user {} ({})'.format(user_info['name'],
                                                        user_info['email']))
-            _update_user(user_by_name, user_by_email, user_info, groups)
+            _update_user(user_by_name,
+                         user_by_email,
+                         user_info,
+                         groups, registry)
         else:
             logger.info('Creating user {}'.format(user_info['name']))
             send_invitation = user_info.get('send_invitation_mail', False)
@@ -100,7 +107,8 @@ def _locate_user(user_info, context, registry):
 def _update_user(user_by_name: IUser,
                  user_by_email: IUser,
                  user_info: dict,
-                 groups: IResource):
+                 groups: IResource,
+                 registry: Registry):
     if user_by_name is not None\
             and user_by_email is not None\
             and user_by_name != user_by_email:
@@ -119,10 +127,26 @@ def _update_user(user_by_name: IUser,
     if user_by_email is None:
         userextended_sheet = get_sheet(user, sheets.principal.IUserExtended)
         userextended_sheet.set({'email': user_info['email']})
-    user_groups = _get_groups(user_info['groups'], groups)
+    groups_names = user_info.get('groups', [])
+    user_groups = _get_groups(groups_names, groups)
     permissions_sheet = get_sheet(user, sheets.principal.IPermissions)
-    permissions_sheet.set({'roles': user_info['roles'],
+    roles_names = user_info.get('roles', [])
+    permissions_sheet.set({'roles': roles_names,
                            'groups': user_groups})
+    badges_names = user_info.get('badges', [])
+    _update_badges_assignments(user, badges_names, registry)
+
+
+def _update_badges_assignments(user: IUser,
+                               badges_names: [str],
+                               registry: Registry) -> None:
+    _delete_badges_assignments(user)
+    badges = _create_badges(user, badges_names, registry)
+    normalized_badges_names = [_normalize_badge_name(b) for b in badges_names]
+    badges_to_assign = [b for b in badges
+                        if get_sheet_field(b, IName, 'name')
+                        in normalized_badges_names]
+    _assign_badges(user, badges_to_assign, registry)
 
 
 def _get_groups(groups_names: [str], groups: IResource) -> [IResource]:
@@ -132,17 +156,22 @@ def _get_groups(groups_names: [str], groups: IResource) -> [IResource]:
 
 def _create_user(user_info: dict, users: IResource, registry: Registry,
                  groups: IResource, activate=True) -> IUser:
-    default_groups = [_get_default_group(users)]
-    user_groups = default_groups + _get_groups(user_info['groups'], groups)
+    groups_names = user_info.get('groups', [])
+    groups = _get_groups(groups_names, groups)
+    if groups == []:
+        default = _get_default_group(users)
+        groups = [default]
+    roles_names = user_info.get('roles', [])
+    password = user_info.get('initial-password', _gen_password())
     appstruct = {sheets.principal.IUserBasic.__identifier__:
                  {'name': user_info['name']},
                  sheets.principal.IUserExtended.__identifier__:
                  {'email': user_info['email']},
                  sheets.principal.IPermissions.__identifier__:
-                 {'roles': user_info['roles'],
-                  'groups': user_groups},
+                 {'roles': roles_names,
+                  'groups': groups},
                  sheets.principal.IPasswordAuthentication.
-                 __identifier__: {'password': user_info['initial-password']},
+                 __identifier__: {'password': password},
                  }
     user = registry.content.create(IUser.__identifier__,
                                    users,
@@ -152,6 +181,12 @@ def _create_user(user_info: dict, users: IResource, registry: Registry,
     if activate:
         user.activate()
     return user
+
+
+def _gen_password():
+    chars = string.ascii_letters + string.digits + '+_'
+    pwd_len = 20
+    return ''.join(chars[int(c) % len(chars)] for c in os.urandom(pwd_len))
 
 
 def _send_invitation_mail(user: IUser, user_info: dict, registry: Registry):
@@ -202,3 +237,16 @@ def _normalize_badge_name(name: str) -> str:
 def _assign_badges(user: IUser, badges: [IBadge], registry: Registry):
     for badge in badges:
         create_badge_assignment(user, badge, user, '', registry)
+
+
+def _delete_badges_assignments(user: IUser) -> None:
+    assignments = find_service(user, 'badge_assignments')
+    to_delete = []
+    for assignment in assignments.values():
+        appstruct = get_sheet(assignment, sheets.badge.IBadgeAssignment).get()
+        subject, object = appstruct['subject'], appstruct['object']
+        is_user_assignment = subject == object == user
+        if is_user_assignment:  # pragma: no branch
+            to_delete.append(assignment.__name__)
+    for assignment_name in to_delete:
+        assignments.remove(assignment_name)

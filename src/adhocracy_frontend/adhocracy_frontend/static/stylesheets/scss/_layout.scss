@@ -157,8 +157,8 @@ depends on a lot of factors:
 ```
 */
 .main-header {
+    @include rem(line-height, 40px);
     position: relative;
-    line-height: 2.8571em;
 
     @media print {
         display: none;
@@ -173,7 +173,7 @@ depends on a lot of factors:
 
 .l-header,
 .l-header-center {
-    max-width: $moving-column-single-width-max;
+    @include rem(max-width, $moving-column-single-width-max);
 }
 
 .l-header-left {
@@ -204,7 +204,7 @@ depends on a lot of factors:
 }
 
 .l-center {
-    max-width: 30em;
-    margin: 5em auto 10em;
-    padding: 0.5em;
+    @include rem(max-width, 30rem);
+    @include rem(margin, 5rem auto 10rem);
+    @include rem(padding, 0.5rem);
 }

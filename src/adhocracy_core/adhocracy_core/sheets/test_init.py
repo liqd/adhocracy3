@@ -58,14 +58,10 @@ class TestBaseResourceSheet:
 
     @fixture
     def inst(self, sheet_meta, context, registry):
-        sheet_class = self.get_class()
-        class DummyStorage(sheet_class):
-
-            @property
-            def _data(self):
-                return context.__dict__
-
-        inst = DummyStorage(sheet_meta, context, registry=registry)
+        inst = self.get_class()(sheet_meta, context, registry=registry)
+        inst._get_data_appstruct = Mock(spec=inst._get_data_appstruct)
+        inst._get_data_appstruct.return_value = {}
+        inst._store_data = Mock(spec=inst._store_data)
         return inst
 
     def get_class(self):
@@ -94,7 +90,7 @@ class TestBaseResourceSheet:
         assert inst.get() == {'count': 0}
 
     def test_get_non_empty(self, inst):
-        inst._data['count'] = 11
+        inst._get_data_appstruct.return_value = {'count': 11}
         assert inst.get() == {'count': 11}
 
     def test_get_with_custom_query(self, inst, sheet_catalogs,
@@ -113,7 +109,7 @@ class TestBaseResourceSheet:
 
     def test_set(self, inst):
         assert inst.set({'count': 11}) is True
-        assert inst.get() == {'count': 11}
+        inst._store_data.assert_called_with({'count': 11})
 
     def test_set_empty(self, inst):
         assert inst.set({}) is False
@@ -144,7 +140,8 @@ class TestBaseResourceSheet:
         inst.set({'references': [target]})
 
         mock_graph.set_references_for_isheet.assert_called_with(
-            context, ISheet, {'references': [target]}, registry)
+            context, ISheet, {'references': [target]}, registry,
+            send_event=True)
 
     def test_get_valid_back_references(self, inst, context, sheet_catalogs,
                                        mock_node_unique_references):
@@ -188,10 +185,19 @@ class TestBaseResourceSheet:
         node = mock_node_single_reference
         inst.schema.children.append(node)
         target = testing.DummyResource()
-        mock_graph.get_references_for_isheet.return_value = {}
         inst.set({'reference': target})
         graph_set_args = mock_graph.set_references_for_isheet.call_args[0]
         assert graph_set_args == (context, ISheet, {'reference': target}, registry)
+
+    def test_set_reference_without_send_events(
+            self, inst, context, mock_graph, mock_node_single_reference,
+            registry):
+        node = mock_node_single_reference
+        inst.schema.children.append(node)
+        target = testing.DummyResource()
+        inst.set({'reference': target})
+        graph_set_kwargs = mock_graph.set_references_for_isheet.call_args[1]
+        assert graph_set_kwargs == {'send_event': True}
 
     def test_get_reference(self, inst, context, sheet_catalogs,
                            mock_node_single_reference):
@@ -211,8 +217,29 @@ class TestBaseResourceSheet:
         query = search_query._replace(references=[reference],
                                       resolve=True,
                                       )
-        sheet_catalogs.search.call_args[0] == query
+        assert sheet_catalogs.search.call_args[0][0] == query
         assert appstruct['reference'] == target
+
+    def test_get_references(self, inst, context, sheet_catalogs,
+                            mock_node_unique_references):
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import search_result
+        from adhocracy_core.interfaces import search_query
+        from adhocracy_core.interfaces import Reference
+        node = mock_node_unique_references
+        inst.schema.children.append(node)
+        target = testing.DummyResource()
+        result = search_result._replace(elements=[target])
+        sheet_catalogs.search.return_value = result
+
+        appstruct = inst.get()
+
+        reference = Reference(context, ISheet, 'references', None)
+        query = search_query._replace(references=[reference],
+                                      resolve=True,
+                                      sort_by='reference'
+                                      )
+        assert sheet_catalogs.search.call_args[0][0] == query
 
     def test_get_back_reference(self, inst, context, sheet_catalogs,
                                 mock_node_single_reference):
@@ -244,7 +271,7 @@ class TestBaseResourceSheet:
         assert events[0].new_appstruct == {'count': 2}
 
     def test_get_cstruct(self, inst, request_):
-        inst.set({'count': 2})
+        inst._get_data_appstruct.return_value = {'count': 2}
         assert inst.get_cstruct(request_) == {'count': '2'}
 
     def test_get_cstruct_with_params(self, inst, request_):
@@ -281,23 +308,21 @@ class TestBaseResourceSheet:
         cstruct = inst.get_cstruct(request_)
         assert 'only_visible' not in inst.get.call_args[1]['params']
 
-    def test_delete_field_values(self, inst):
-        inst._data['count'] = 2
-        inst.delete_field_values(['count'])
-        assert 'count' not in inst._data
-
-    def test_delete_field_values_ignore_if_wrong_field(self, inst):
-        inst._data['count'] = 2
-        inst.delete_field_values(['wrong'])
-        assert 'count' in inst._data
-
 
 class TestAnnotationRessourceSheet:
 
     @fixture
     def sheet_meta(self, sheet_meta):
         from . import AnnotationRessourceSheet
-        return sheet_meta._replace(sheet_class=AnnotationRessourceSheet)
+        class SheetASchema(colander.MappingSchema):
+            count = colander.SchemaNode(colander.Int(),
+                                        missing=colander.drop,
+                                        default=0)
+            other = colander.SchemaNode(colander.Int(),
+                                        missing=colander.drop,
+                                        default=0)
+        return sheet_meta._replace(sheet_class=AnnotationRessourceSheet,
+                                   schema_class=SheetASchema)
 
     @fixture
     def inst(self, sheet_meta, context):
@@ -313,6 +338,28 @@ class TestAnnotationRessourceSheet:
         assert inst.meta == sheet_meta
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
+
+    def test_delete_field_values(self, inst):
+        appstruct = {'count': 2, 'other': 3}
+        setattr(inst.context, inst._annotation_key, appstruct)
+        inst.delete_field_values(['count'])
+        assert 'other' in appstruct
+        assert 'count' not in appstruct
+
+    def test_delete_field_values_ignore_if_wrong_field(self, inst):
+        appstruct = {'count': 2}
+        setattr(inst.context, inst._annotation_key, appstruct)
+        inst.delete_field_values(['wrong'])
+        assert 'count' in appstruct
+
+    def test_delete_field_values_remove_data_dict_if_empty(self, inst):
+        appstruct = {'count': 2}
+        setattr(inst.context, inst._annotation_key, appstruct)
+        inst.delete_field_values(['count'])
+        assert not hasattr(inst.context, inst._annotation_key)
+
+    def test_delete_field_values_no_delete_key_if_key_absent(self, inst):
+        assert inst.delete_field_values(['count']) is None
 
     def test_set_with_other_sheet_name_conflicts(self, inst, sheet_meta,
                                                        context):
@@ -333,8 +380,8 @@ class TestAnnotationRessourceSheet:
         inst.set({'count': 1})
         inst_b.set({'count': 2})
 
-        assert inst.get() == {'count': 1}
-        assert inst_b.get() == {'count': 2}
+        assert inst.get() == {'count': 1, 'other': 0}
+        assert inst_b.get() == {'count': 2, 'other': 0}
 
     def test_set_with_subtype_and_name_conflicts(self, inst,  sheet_meta,
                                                        context):
@@ -347,14 +394,14 @@ class TestAnnotationRessourceSheet:
                 default=0)
 
         sheet_b_meta = sheet_meta._replace(isheet=ISheetB,
-                                             schema_class=SheetBSchema)
+                                           schema_class=SheetBSchema)
         inst_b = sheet_meta.sheet_class(sheet_b_meta, context)
 
-        inst.set({'count': 1})
+        inst.set({'count': 1, 'other': 0})
         inst_b.set({'count': 2})
 
-        assert inst.get() == {'count': 1}
-        assert inst_b.get() == {'count': 2}
+        assert inst.get() == {'count': 1, 'other': 0}
+        assert inst_b.get() == {'count': 2, 'other': 0}
 
 
 class TestAttributeResourceSheet:

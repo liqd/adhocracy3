@@ -21,7 +21,6 @@ logger = getLogger(__name__)
 
 
 class AuditLog(OOBTree):
-
     """An Auditlog composed of audit entries.
 
     This is a dictionary (:class:`collections.abc.Mapping`) with key
@@ -36,6 +35,7 @@ class AuditLog(OOBTree):
        audit = get_auditlog(context)
        audit.items(min=january, max=february)
        ...
+
     """
 
     def add(self,
@@ -43,7 +43,7 @@ class AuditLog(OOBTree):
             resource_path: str,
             user_name: str,
             user_path: str) -> None:
-        """ Add an auditlog entry to the audit log."""
+        """Add an auditlog entry to the audit log."""
         self[datetime.utcnow()] = AuditlogEntry(name,
                                                 resource_path,
                                                 user_name,

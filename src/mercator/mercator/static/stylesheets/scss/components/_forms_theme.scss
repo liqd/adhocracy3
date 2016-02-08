@@ -10,6 +10,10 @@ $error-line-height: $font-size-normal;
     }
 }
 
+.country-select {
+    display: block;
+}
+
 input[type="text"],
 input[type="url"],
 input[type="password"],
@@ -18,7 +22,8 @@ input[type="date"],
 input[type="time"],
 input[type="number"],
 select,
-textarea {
+textarea,
+.country-select {
     background: $color-structure-normal;
     border: 0;
     margin-bottom: $input-margin-bottom;
@@ -43,7 +48,9 @@ textarea {
     label,
     div,
     select,
-    textarea {
+    textarea,
+    date,
+    country-select {
         &.ng-invalid {
             @extend %error-spacing;
         }

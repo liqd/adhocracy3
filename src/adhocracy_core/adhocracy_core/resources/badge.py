@@ -17,22 +17,23 @@ import adhocracy_core.sheets.title
 
 
 class IBadge(ISimple):
-
     """A generic badge."""
 
 
 badge_meta = simple_meta._replace(
     iresource=IBadge,
+    use_autonaming=False,
     extended_sheets=(
         adhocracy_core.sheets.description.IDescription,
         adhocracy_core.sheets.badge.IBadge,
     ),
     permission_create='create_badge',
+)._add(
+    extended_sheets=(adhocracy_core.sheets.name.IName,)
 )
 
 
 class IBadgeGroup(IPool):
-
     """A generic badge group pool."""
 
 
@@ -49,7 +50,6 @@ badge_group_meta = pool_meta._replace(
 
 
 class IBadgesService(IServicePool):
-
     """The 'badges' ServicePool."""
 
 
@@ -64,11 +64,11 @@ badges_service_meta = service_meta._replace(
 
 def add_badges_service(context: IPool, registry: Registry, options: dict):
     """Add `badge` service to context."""
-    registry.content.create(IBadgesService.__identifier__, parent=context)
+    registry.content.create(IBadgesService.__identifier__, parent=context,
+                            registry=registry)
 
 
 class IBadgeAssignment(ISimple):
-
     """A generic badge assignment."""
 
 
@@ -77,7 +77,7 @@ badge_assignment_meta = simple_meta._replace(
     basic_sheets=(
         adhocracy_core.sheets.metadata.IMetadata,
         adhocracy_core.sheets.badge.IBadgeAssignment,
-        adhocracy_core.sheets.description.IDescription
+        adhocracy_core.sheets.description.IDescription,
     ),
     autonaming_prefix='',
     use_autonaming=True,
@@ -86,7 +86,6 @@ badge_assignment_meta = simple_meta._replace(
 
 
 class IBadgeAssignmentsService(IServicePool):
-
     """The 'badge_assignments' ServicePool."""
 
 
@@ -101,7 +100,7 @@ def add_badge_assignments_service(context: IPool, registry: Registry,
                                   options: dict):
     """Add `badge_assignments` service to context."""
     registry.content.create(IBadgeAssignmentsService.__identifier__,
-                            parent=context)
+                            parent=context, registry=registry)
 
 
 def includeme(config):

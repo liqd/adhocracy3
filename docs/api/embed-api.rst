@@ -141,7 +141,7 @@ Allowing a directive to be embedded
 Not every directive is allowed to be embedded.  You need to register it
 with the embed provider::
 
-    import AdhEmbed = require("../Embed/Embed");
+    import * as AdhEmbed from "../Embed/Embed";
 
     export var myDirective = () => {
         // your directive's code

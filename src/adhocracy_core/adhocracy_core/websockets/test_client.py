@@ -312,7 +312,7 @@ class TestFunctionalClient:
         from adhocracy_core.websockets.client import includeme
         from adhocracy_core.websockets.client import Client
         settings = config.registry.settings
-        settings['adhocracy.ws_url'] = 'ws://localhost:8080'
+        settings['adhocracy.ws_url'] = 'ws://localhost:6561'
         includeme(config)
         assert isinstance(config.registry.ws_client, Client)
 

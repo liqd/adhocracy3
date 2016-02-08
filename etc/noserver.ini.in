@@ -52,7 +52,7 @@ host = 0.0.0.0
 port = 6541
 
 [websockets]
-port = 8080
+port = 6561
 pid_file = var/WS_SERVER.pid
 
 # Begin logging configuration

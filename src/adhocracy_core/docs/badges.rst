@@ -20,6 +20,7 @@ Start adhocracy app and log in some users::
     >>> participant = getfixture('app_participant')
     >>> initiator = getfixture('app_initiator')
     >>> admin = getfixture('app_admin')
+    >>> log = getfixture('log')
 
 Create participation process structure/content to get started::
 
@@ -33,6 +34,7 @@ Create participation process structure/content to get started::
     >>> prop = {'content_type': 'adhocracy_core.resources.document.IDocument',
     ...         'data': {}}
     >>> resp = participant.post('/organisation/process', prop).json
+    >>> proposal_item = resp['path']
     >>> proposal_version = resp['first_version_path']
 
     >>> prop = {'content_type': 'adhocracy_core.resources.document.IDocument',
@@ -107,7 +109,7 @@ The user is typically the current logged in user::
 
     >>> user = initiator.header['X-User-Path']
 
-Now we can post the assignment::
+Now we can post the assignment to a proposal version::
 
     >>> prop = {'content_type': 'adhocracy_core.resources.badge.IBadgeAssignment',
     ...         'data': {'adhocracy_core.sheets.badge.IBadgeAssignment':
@@ -115,7 +117,21 @@ Now we can post the assignment::
     ...                       'badge': badge,
     ...                       'object': proposal_version}
     ...          }}
-    >>> resp = initiator.post(post_pool, prop).json
+    >>> resp = initiator.post(post_pool, prop)
+    >>> resp.status_code
+    200
+
+or proposal item::
+
+    >>> prop = {'content_type': 'adhocracy_core.resources.badge.IBadgeAssignment',
+    ...         'data': {'adhocracy_core.sheets.badge.IBadgeAssignment':
+    ...                      {'subject': user,
+    ...                       'badge': badge,
+    ...                       'object': proposal_item}
+    ...          }}
+    >>> resp = initiator.post(post_pool, prop)
+    >>> resp.status_code
+    200
 
 Now the badged content shows the back reference targeting the badge assignment::
 
@@ -141,7 +157,16 @@ We can also use the filtering pool api to search for content with specific badge
     ...         'depth': 'all'}
     >>> resp = initiator.get('/organisation/process', params=prop).json
     >>> resp['data']['adhocracy_core.sheets.pool.IPool']['elements']
-    ['...0/VERSION_0000000/']
+    ['...document_0000000/',...document_0000000/VERSION_0000000/']
+
+In addition we can search for versions that have an item with a specific badge::
+
+    >>> prop = {'item_badge': 'badge1',
+    ...         'depth': 'all'}
+    >>> resp = initiator.get('/organisation/process', params=prop).json
+    >>> resp['data']['adhocracy_core.sheets.pool.IPool']['elements']
+    ['...0/']
+
 
 
 PostPool and Assignable validation

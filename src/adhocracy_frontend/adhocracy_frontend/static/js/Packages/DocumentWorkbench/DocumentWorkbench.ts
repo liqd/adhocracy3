@@ -1,18 +1,10 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhComment = require("../Comment/Comment");
-import AdhConfig = require("../Config/Config");
-import AdhMovingColumns = require("../MovingColumns/MovingColumns");
-import AdhProcess = require("../Process/Process");
-import AdhResourceArea = require("../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUser = require("../User/User");
+import * as AdhConfig from "../Config/Config";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUser from "../User/User";
 
-import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBasicPool");
-import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
-import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
-import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
-import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
+import RIDocument from "../../Resources_/adhocracy_core/resources/document/IDocument";
 
 
 var pkgLocation = "/DocumentWorkbench";
@@ -44,48 +36,3 @@ export var documentWorkbench = (
     };
 };
 
-
-export var moduleName = "adhDocumentWorkbench";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhComment.moduleName,
-            AdhMovingColumns.moduleName,
-            AdhProcess.moduleName,
-            AdhResourceArea.moduleName,
-            AdhTopLevelState.moduleName,
-            AdhUser.moduleName
-        ])
-        .config(["adhProcessProvider", (adhProcessProvider) => {
-            adhProcessProvider.templateFactories[""] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-document-workbench></adh-document-workbench>");
-            }];
-        }])
-        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            adhResourceAreaProvider
-                .default(RIBasicPool, "", "", "", {
-                    space: "content",
-                    movingColumns: "is-show-show-hide",
-                    content2Url: ""
-                })
-                .default(RIDocumentVersion, "", "", "", {
-                    space: "content",
-                    movingColumns: "is-collapse-show-show"
-                })
-                .specific(RIDocumentVersion, "", "", "", () => (resource : RIDocumentVersion) => {
-                    return {
-                        content2Url: resource.path
-                    };
-                })
-                .default(RIUser, "", "", "", {
-                    space: "user",
-                    movingColumns: "is-show-show-hide"
-                })
-                .default(RIUsersService, "", "", "", {
-                    space: "user",
-                    movingColumns: "is-show-show-hide"
-                });
-        }])
-        .directive("adhDocumentWorkbench", ["adhConfig", "adhTopLevelState", "adhUser", documentWorkbench]);
-};

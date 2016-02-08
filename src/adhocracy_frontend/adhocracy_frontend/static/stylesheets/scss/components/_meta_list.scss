@@ -22,32 +22,63 @@ A Meta list of items, often with icons
         20,000 €
     </li>
 </ul>
+Vertical
+<ul class="meta-list m-vertical">
+    <li class="meta-list-item">
+        <i class="icon-speechbubbles"></i>
+        12 Comments
+    </li>
+    <li class="meta-list-item">
+        <i class="icon-calendar"></i>
+        3/6/2015
+    </li>
+    <li class="meta-list-item">
+        <i class="icon-pig"></i>
+        20,000 €
+    </li>
+</ul>
 ```
 */
 
 .meta-list {
     @include container;
+    @include rem(padding, 0 0 20px);
     margin: 0;
-    padding: 0 0 1.66666666em;
     list-style: none;
+
+    &.m-vertical {
+        .meta-list-item {
+            @include rem(margin-bottom, 15px);
+            float: none;
+
+            i {
+                @include inline-block;
+                @include rem(margin-right, 8px);
+                @include rem(min-width, 12px);
+            }
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
 }
 
 .meta-list-item {
+    @include rem(font-size, $font-size-small);
+    @include rem(margin-right, 10px);
     color: $color-text-introvert;
-    font-size: $font-size-small;
     float: left;
-    margin-right: 0.83333333em;
 
     i {
-        font-size: 140%;
         line-height: 1;
         margin-right: 1px;
         vertical-align: middle;
     }
 
     @media print {
+        @include rem(font-size, $font-size-normal);
         float: none;
-        font-size: $font-size-normal;
 
         i:not(.m-definition-before):not(.m-definition-after), &.meta-list-item-rate {
             display: none;

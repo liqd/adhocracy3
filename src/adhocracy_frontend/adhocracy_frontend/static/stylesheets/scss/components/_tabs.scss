@@ -32,11 +32,11 @@
         list-style: none;
 
         .tab-button {
+            @include rem(padding, 0.5rem 1rem);
             background: $color-structure-border;
             color: $color-text-inverted;
             display: block;
             margin-right: 1px;
-            padding: 0.5em 1em;
             position: relative;
             top: 1px;
         }
@@ -67,5 +67,5 @@
 }
 
 .tab-pane {
-    padding: 1em;
+    @include rem(padding, 1rem);
 }

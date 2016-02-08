@@ -18,7 +18,7 @@ logger = getLogger(__name__)
 
 
 def root_factory(request):
-    """ A function which can be used as a Pyramid ``root_factory``."""
+    """A function which can be used as a Pyramid ``root_factory``."""
     # Don't get the root object if the request already has one.
     # Workaround to make the subrequests in adhocracy_core.rest.batchview work.
     if getattr(request, 'root', False):
@@ -90,7 +90,6 @@ def includeme(config):
     """Setup basic adhocracy."""
     settings = config.registry.settings
     config.include('pyramid_zodbconn')
-    config.include('pyramid_exclog')
     config.include('pyramid_mako')
     config.hook_zca()  # global adapter lookup (used by adhocracy_core.utils)
     authz_policy = RoleACLAuthorizationPolicy()
@@ -116,13 +115,14 @@ def includeme(config):
     config.include('.workflows')
     config.include('.websockets')
     config.include('.rest')
+    config.include('.stats')
     if settings.get('adhocracy.add_test_users', False):
         from adhocracy_core.testing import add_create_test_users_subscriber
         add_create_test_users_subscriber(config)
 
 
 def main(global_config, **settings):
-    """ Return a Pyramid WSGI application. """
+    """Return a Pyramid WSGI application."""
     config = Configurator(settings=settings, root_factory=root_factory)
     includeme(config)
     app = config.make_wsgi_app()

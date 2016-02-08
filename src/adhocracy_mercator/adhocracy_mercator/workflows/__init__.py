@@ -26,7 +26,7 @@ mercator_meta = standard_meta \
                            {'principals':                      ['participant', 'moderator', 'creator', 'initiator'],
                             'permissions':
                             [['create_mercator_proposal',        None,          None,        None,      'Allow'],
-                             ['edit_mercator_proposal',          None,          None,        None,      'Allow'],
+                             ['edit_mercator_proposal',          None,          None,       'Allow',    'Allow'],
                              ['create_document',                 None,          None,       'Allow',    'Allow'],
                              ['edit_document',                   None,          None,       'Allow',    'Allow'],
                             ]})
@@ -35,3 +35,4 @@ mercator_meta = standard_meta \
 def includeme(config):
     """Add workflow."""
     add_workflow(config.registry, mercator_meta, 'mercator')
+    config.include('.mercator2')

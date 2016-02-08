@@ -31,7 +31,9 @@ standard_meta = freeze({
                                    ['edit_comment',                None,          None,       'Allow',    None],
                                    ['create_rate',                'Allow',        None,        None,      None],
                                    ['edit_rate',                   None,          None,       'Allow',    None],
-                                   ]},
+                                   ['create_relation',            'Allow',        None,        None,      None],
+                                   ['edit_relation',               None,          None,       'Allow',    None]
+                                  ]},
                         },
         'evaluate': {'title': 'Evaluate',
                      'description': '',

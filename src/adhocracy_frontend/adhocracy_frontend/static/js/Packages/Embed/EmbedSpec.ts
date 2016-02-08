@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhEmbed = require("./Embed");
+import * as AdhEmbed from "./Embed";
 
 export var register = () => {
     describe("Embed", () => {
@@ -30,24 +30,65 @@ export var register = () => {
                 provider = new AdhEmbed.Provider();
             });
 
-            describe("registerEmbeddableDirectives", () => {
-                it("appends the passed list to embeddableDirectives", () => {
-                    provider.registerEmbeddableDirectives(["foo", "bar"]);
-                    expect(provider.embeddableDirectives).toContain("foo");
-                    expect(provider.embeddableDirectives).toContain("bar");
+            describe("normalizeDirective", () => {
+                it("returns the original name", () => {
+                    provider.registerDirective("name1");
+                    expect(provider.normalizeDirective("name1")).toBe("name1");
+
+                    provider.registerDirective("name2", ["alias1", "alias2"]);
+                    expect(provider.normalizeDirective("name2")).toBe("name2");
                 });
+                it("resolves directive aliases", () => {
+                    provider.registerDirective("name", ["alias"]);
+                    expect(provider.normalizeDirective("alias")).toBe("name");
+                });
+                it("resolves more than one directive alias", () => {
+                    provider.registerDirective("name", ["alias1", "alias2"]);
+                    expect(provider.normalizeDirective("alias1")).toBe("name");
+                    expect(provider.normalizeDirective("alias2")).toBe("name");
+                });
+            });
 
-                it("does not create duplicates", () => {
-                    var initialLenth = provider.embeddableDirectives.length;
+            describe("hasDirective", () => {
+                it("returns whether a directive name has been registered", () => {
+                    provider.registerDirective("name1");
+                    expect(provider.hasDirective("name1")).toBe(true);
 
-                    provider.registerEmbeddableDirectives(["foo", "bar"]);
-                    expect(provider.embeddableDirectives.length).toBe(initialLenth + 2);
+                    provider.registerDirective("name2", ["alias"]);
+                    expect(provider.hasDirective("name2")).toBe(true);
 
-                    provider.registerEmbeddableDirectives(["foo", "bar"]);
-                    expect(provider.embeddableDirectives.length).toBe(initialLenth + 2);
+                    expect(provider.hasDirective("name3")).toBe(false);
+                });
+            });
 
-                    provider.registerEmbeddableDirectives(["baz", "baz"]);
-                    expect(provider.embeddableDirectives.length).toBe(initialLenth + 3);
+            describe("normalizeContext", () => {
+                it("returns the original name", () => {
+                    provider.registerContext("name1");
+                    expect(provider.normalizeContext("name1")).toBe("name1");
+
+                    provider.registerContext("name2", ["alias1", "alias2"]);
+                    expect(provider.normalizeContext("name2")).toBe("name2");
+                });
+                it("resolves directive aliases", () => {
+                    provider.registerContext("name", ["alias"]);
+                    expect(provider.normalizeContext("alias")).toBe("name");
+                });
+                it("resolves more than one directive alias", () => {
+                    provider.registerContext("name", ["alias1", "alias2"]);
+                    expect(provider.normalizeContext("alias1")).toBe("name");
+                    expect(provider.normalizeContext("alias2")).toBe("name");
+                });
+            });
+
+            describe("hasContext", () => {
+                it("returns whether a directive name has been registered", () => {
+                    provider.registerContext("name1");
+                    expect(provider.hasContext("name1")).toBe(true);
+
+                    provider.registerContext("name2", ["alias"]);
+                    expect(provider.hasContext("name2")).toBe(true);
+
+                    expect(provider.hasContext("name3")).toBe(false);
                 });
             });
 

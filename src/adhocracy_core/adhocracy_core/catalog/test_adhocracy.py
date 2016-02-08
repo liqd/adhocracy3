@@ -28,10 +28,14 @@ def test_create_adhocracy_catalog(pool_graph, registry):
     assert 'rates' in catalogs['adhocracy']
     assert 'creator' in catalogs['adhocracy']
     assert 'item_creation_date' in catalogs['adhocracy']
+    assert 'item_badge' in catalogs['adhocracy']
     assert 'private_visibility' in catalogs['adhocracy']
     assert 'badge' in catalogs['adhocracy']
     assert 'title' in catalogs['adhocracy']
     assert 'workflow_state' in catalogs['adhocracy']
+    assert 'user_name' in catalogs['adhocracy']
+    assert 'private_user_email' in catalogs['adhocracy']
+    assert 'private_user_activation_path' in catalogs['adhocracy']
 
 
 class TestIndexMetadata:
@@ -170,6 +174,29 @@ class TestIndexRate:
         assert index_rates(item['rateable'], None) == 0
 
 
+class TestIndexComments:
+
+    @fixture
+    def mock_catalogs(self, monkeypatch, mock_catalogs) -> Mock:
+        from . import adhocracy
+        monkeypatch.setattr(adhocracy, 'find_service',
+                            lambda x, y: mock_catalogs)
+        return mock_catalogs
+
+    def test_index_comments(self, item, mock_catalogs, query, search_result):
+        from .adhocracy import index_comments
+        from adhocracy_core.resources.comment import ICommentVersion
+        item['commentable'] = testing.DummyResource()
+        search_result = search_result._replace(count=5)
+        mock_catalogs.search.return_value = search_result
+        query = query._replace(root=item,
+                               interfaces=ICommentVersion,
+                               indexes={'tag': 'LAST'},
+                               )
+        assert index_comments(item['commentable'], None) == 5
+        assert mock_catalogs.search.call_args[0][0] == query
+
+
 @mark.usefixtures('integration')
 def test_includeme_register_index_rate(registry):
     from adhocracy_core.sheets.rate import IRate
@@ -186,27 +213,42 @@ def test_includeme_register_index_rates(registry):
                                     name='adhocracy|rates')
 
 
-def test_index_tag_with_tags(context, mock_graph):
-    from .adhocracy import index_tag
-    context.__graph__ = mock_graph
-    tag = testing.DummyResource(__name__='tag')
-    mock_graph.get_back_reference_sources.return_value = [tag]
-    assert index_tag(context, 'default') == ['tag']
+class TestIndexTag:
 
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
 
-def test_index_tag_without_tags(context, mock_graph):
-    from .adhocracy import index_tag
-    context.__graph__ = mock_graph
-    mock_graph.get_back_reference_sources.return_value = []
-    assert index_tag(context, 'default') == 'default'
+    @fixture
+    def mock_tags_sheet(self, registry, mock_sheet):
+        registry.content.get_sheet.return_value = mock_sheet
+        return mock_sheet
 
+    @fixture
+    def version(self, item):
+        item['version'] = testing.DummyResource()
+        return item['version']
 
-@mark.usefixtures('integration')
-def test_includeme_register_index_rates(registry):
-    from adhocracy_core.sheets.versions import IVersionable
-    from substanced.interfaces import IIndexView
-    assert registry.adapters.lookup((IVersionable,), IIndexView,
-                                    name='adhocracy|tag')
+    def call_fut(self, *args):
+        from .adhocracy import index_tag
+        return index_tag(*args)
+
+    def test_index_version_with_tags(self, version, mock_tags_sheet, registry):
+        other = testing.DummyResource()
+        mock_tags_sheet.get.return_value = {'LAST': version,
+                                            'FIRST': other}
+        assert self.call_fut(version, 'default') == ['LAST']
+
+    def test_index_version_without_tags(self, version, mock_tags_sheet, registry):
+        mock_tags_sheet.get.return_value = {}
+        assert self.call_fut(version, 'default') == 'default'
+
+    @mark.usefixtures('integration')
+    def test_includeme_register(self, registry):
+        from adhocracy_core.sheets.versions import IVersionable
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IVersionable,), IIndexView,
+                                        name='adhocracy|tag')
 
 
 class TestIndexBadge:
@@ -250,6 +292,54 @@ def test_includeme_register_index_badge(registry):
     from substanced.interfaces import IIndexView
     assert registry.adapters.lookup((IBadgeable,), IIndexView,
                                     name='adhocracy|badge')
+
+
+class TestIndexItemBadge:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    @fixture
+    def mock_catalogs(self, monkeypatch, mock_catalogs) -> Mock:
+        from . import adhocracy
+        monkeypatch.setattr(adhocracy, 'find_service',
+                            lambda x, y: mock_catalogs)
+        return mock_catalogs
+
+    def test_return_default_if_no_item_in_lineage(self, context):
+        from .adhocracy import index_item_badge
+        assert index_item_badge(context, 'default') == 'default'
+
+    def test_return_badge_name_of_item(
+            self, item, context, mock_catalogs, search_result, query):
+        from adhocracy_core.sheets.badge import IBadgeAssignment
+        from .adhocracy import index_item_badge
+
+        badge = testing.DummyResource(__name__='badge')
+        assignment = testing.DummyResource(__name__='assignement')
+        result_assignments = search_result._replace(elements=[assignment])
+        result_badges = search_result._replace(elements=[badge])
+        mock_catalogs.search.side_effect = [result_assignments, result_badges]
+        item['version'] = context
+
+        assert index_item_badge(item['version'], None) == ['badge']
+        search_calls = mock_catalogs.search.call_args_list
+        query_assignments = query._replace(references = [(None, IBadgeAssignment,
+                                                          'object', item)],
+                                           only_visible=True)
+        assert search_calls[0][0][0] == query_assignments
+        query_badges = query._replace(references = [(assignment, IBadgeAssignment,
+                                                     'badge', None)],
+                                            only_visible=True)
+        assert search_calls[1][0][0] == query_badges
+
+    @mark.usefixtures('integration')
+    def test_includeme_register_index_item_badge(self, registry):
+        from adhocracy_core.sheets.versions import IVersionable
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IVersionable,), IIndexView,
+                                        name='adhocracy|item_badge')
 
 
 class TestIndexTitle:
@@ -343,3 +433,71 @@ class TestIndexWorkflowStateOfItem:
         assert registry.adapters.lookup((IVersionable,), IIndexView,
                                         name='adhocracy|workflow_state')
 
+
+class TestIndexUserName:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    def call_fut(self, *args):
+        from .adhocracy import index_user_name
+        return index_user_name(*args)
+
+    def test_return_user_name(self, registry, context, mock_sheet):
+        registry.content.get_sheet.return_value = mock_sheet
+        mock_sheet.get.return_value = {'name': 'user_name'}
+        assert self.call_fut(context, 'default') == 'user_name'
+
+    @mark.usefixtures('integration')
+    def test_register(self, registry):
+        from adhocracy_core.sheets.principal import IUserBasic
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IUserBasic,), IIndexView,
+                                        name='adhocracy|user_name')
+
+
+
+class TestIndexUserEmail:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    def call_fut(self, *args):
+        from .adhocracy import index_user_email
+        return index_user_email(*args)
+
+    def test_return_user_name(self, registry, context, mock_sheet):
+        registry.content.get_sheet.return_value = mock_sheet
+        mock_sheet.get.return_value = {'email': 'test@test.de'}
+        assert self.call_fut(context, 'default') == 'test@test.de'
+
+    @mark.usefixtures('integration')
+    def test_register(self, registry):
+        from adhocracy_core.sheets.principal import IUserExtended
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IUserExtended,), IIndexView,
+                                        name='adhocracy|private_user_email')
+
+
+class TestIndexUserActivationPath:
+
+    def call_fut(self, *args):
+        from .adhocracy import index_user_activation_path
+        return index_user_activation_path(*args)
+
+    def test_return_user_activation_path(self, context):
+        context.activation_path = '/path'
+        assert self.call_fut(context, 'default') == '/path'
+
+    def test_return_default_if_activation_path_is_none(self, context):
+        context.activation_path = None
+        assert self.call_fut(context, 'default') == 'default'
+
+    @mark.usefixtures('integration')
+    def test_register(self, registry):
+        from adhocracy_core.sheets.principal import IUserBasic
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IUserBasic,), IIndexView,
+                                        name='adhocracy|private_user_activation_path')

@@ -117,6 +117,11 @@ category: Variables
         <td>For invalid content</td>
     </tr>
     <tr>
+        <td><div class="example-color color-function-neutral"></div></td>
+        <td><code>color-function-neutral</code></td>
+        <td>For neutral (neither valid nor invalid) content</td>
+    </tr>
+    <tr>
         <td colspan="3"><strong>Structural colors</strong></td>
     </tr>
     <tr>
@@ -185,8 +190,8 @@ category: Variables
 
 .example-color {
     @include inline-block;
-    height: 3em;
-    width: 3em;
+    height: 3rem;
+    width: 3rem;
     border: 1px solid $color-structure-border;
 }
 
@@ -213,6 +218,7 @@ category: Variables
 
 .color-function-valid {background-color: $color-function-valid;}
 .color-function-invalid {background-color: $color-function-invalid;}
+.color-function-neutral {background-color: $color-function-neutral;}
 
 .color-background-base {background-color: $color-background-base;}
 .color-background-base-introvert {background-color: $color-background-base-introvert;}
@@ -230,61 +236,10 @@ category: Variables
 .color-button-cta-active-background {background-color: $color-button-cta-active-background;}
 
 // some static contrast checks for a11y
-@include check-contrast($color-text-normal, $color-background-base);
+@include check-contrast($color-text-normal, $color-background-base, 7);
 @include check-contrast($color-text-normal, $color-structure-introvert);
 @include check-contrast($color-text-extrovert, $color-background-base);
 @include check-contrast($color-text-extrovert, $color-structure-introvert);
 @include check-contrast($color-text-highlight-normal, $color-text-inverted);
 @include check-contrast($color-text-highlight-normal, $color-background-base);
 @include check-contrast($color-text-highlight-normal, $color-structure-introvert);
-
-
-/*doc
----
-title: Text mixin
-name: mixin-text
-category: Type
----
-
-The text mixin can be used to set the general text style. The following styles
-are available:
-
-<table class="styleguide-colors">
-    <tr>
-        <td><code>header</code></td>
-        <td class="text-header">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td><code>running</code></td>
-        <td class="text-running">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
-        <td>For running text</td>
-    </tr>
-    <tr>
-        <td><code>introvert</code></td>
-        <td class="text-introvert">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
-        <td>For introverted text</td>
-    </tr>
-    <tr>
-        <td><code>functional</code></td>
-        <td class="text-functional">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td><code>functional-introvert</code></td>
-        <td class="text-functional-introvert">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td><code>meta</code></td>
-        <td class="text-meta">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
-        <td></td>
-    </tr>
-</table>
-*/
-.text-header {@include text(header);}
-.text-running {@include text(running);}
-.text-introvert {@include text(introvert);}
-.text-functional {@include text(functional);}
-.text-functional-introvert {@include text(functional-introvert);}
-.text-meta {@include text(meta);}

@@ -10,7 +10,6 @@ import adhocracy_meinberlin.sheets.burgerhaushalt
 
 
 class IProposalVersion(proposal.IProposalVersion):
-
     """Burgerhaushalt proposal version."""
 
 
@@ -21,7 +20,6 @@ proposal_version_meta = proposal.proposal_version_meta._replace(
 
 
 class IProposal(proposal.IProposal):
-
     """Burgerhaushalt proposal versions pool."""
 
 
@@ -33,7 +31,6 @@ proposal_meta = proposal.proposal_meta._replace(
 
 
 class IProcess(process.IProcess):
-
     """Burgerhaushalt participation process."""
 
 

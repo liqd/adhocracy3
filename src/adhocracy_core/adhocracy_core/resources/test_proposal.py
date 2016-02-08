@@ -10,9 +10,12 @@ class TestProposal:
         return proposal_meta
 
     def test_meta(self, meta):
+        from adhocracy_core import sheets
         from .proposal import IProposalVersion
         assert meta.element_types == (IProposalVersion,)
         assert meta.item_type == IProposalVersion
+        assert meta.extended_sheets == (sheets.badge.IBadgeable,
+                                        )
         assert meta.permission_create == 'create_proposal'
         assert meta.autonaming_prefix == 'proposal_'
         assert meta.use_autonaming
@@ -38,6 +41,7 @@ class TestProposalVersion:
                 adhocracy_core.sheets.description.IDescription,
                 adhocracy_core.sheets.comment.ICommentable,
                 adhocracy_core.sheets.rate.IRateable,
+                adhocracy_core.sheets.relation.IPolarizable,
                 )
         assert meta.permission_create == 'edit_proposal'
 
@@ -79,6 +83,7 @@ class TestGeoProposalVersion:
                 adhocracy_core.sheets.description.IDescription,
                 adhocracy_core.sheets.comment.ICommentable,
                 adhocracy_core.sheets.rate.IRateable,
+                adhocracy_core.sheets.relation.IPolarizable,
                 adhocracy_core.sheets.geo.IPoint,
                 )
         assert meta.permission_create == 'edit_proposal'

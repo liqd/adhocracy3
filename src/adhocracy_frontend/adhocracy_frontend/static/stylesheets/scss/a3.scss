@@ -16,9 +16,11 @@
 @import "general/normalize";
 
 @import "general/variables";
+@import "general/variables_theme";
 @import "general/variables_extra";
 @import "general/variables_doc";
 
+@import "general/mixins";
 @import "layout";
 
 @import "components/type";
@@ -27,18 +29,20 @@
 @import "components/button";
 @import "components/login";
 @import "components/navbar";
+@import "components/action_bar";
 @import "components/moving_columns";
 @import "components/meta_list";
+@import "components/map";
 @import "components/messaging";
 @import "components/listing";
 @import "components/user_indicator";
 @import "components/comment";
 @import "components/annotated_section";
-@import "components/commentable_section";
+@import "components/action_section";
 @import "components/chapter";
+@import "components/document";
 @import "components/jump_navigation";
 @import "components/section_jump";
-@import "components/space_switch";
 @import "components/user_list";
 @import "components/user_profile";
 @import "components/rate";
@@ -52,6 +56,7 @@
 @import "components/blog";
 @import "components/markdown";
 @import "components/image_upload";
+@import "components/workflow_switch";
 
 @import "third_party/social_share";
 
@@ -61,3 +66,5 @@
 @import "overwrite";
 
 @import "print";
+
+@import "theme";

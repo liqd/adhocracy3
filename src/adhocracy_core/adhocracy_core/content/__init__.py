@@ -13,8 +13,7 @@ from zope.interface.interfaces import IInterface
 
 from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.interfaces import ISheet
-from adhocracy_core.interfaces import IItemVersion
-from adhocracy_core.interfaces import IItem
+from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.utils import get_iresource
 
@@ -23,7 +22,6 @@ resolver = DottedNameResolver()
 
 
 class ResourceContentRegistry(ContentRegistry):
-
     """Extend substanced content registry to work with resources."""
 
     def __init__(self, registry):
@@ -59,36 +57,16 @@ class ResourceContentRegistry(ContentRegistry):
         addables = self.resources_meta_addable[iresource]
         addables_allowed = []
         for resource_meta in addables:
-            if self._can_add_resource(request, resource_meta, context):
+            if self.can_add_resource(request, resource_meta, context):
                 addables_allowed.append(resource_meta)
         return addables_allowed
 
-    def _can_add_resource(self, request, resource_meta, context):
-        allowed = False
-        if self._only_version_zero_exists(context, resource_meta):
-            allowed = self._can_add_version_one(request, context)
-        else:
-            permission = resource_meta.permission_create
-            allowed = request.has_permission(permission, context)
+    def can_add_resource(self, request: Request, meta: ResourceMetadata,
+                         context: IPool) -> bool:
+        """Check that the resource type in `meta` is addable to `context`."""
+        permission = meta.permission_create
+        allowed = request.has_permission(permission, context)
         return allowed
-
-    def _can_add_version_one(self, request, context):
-        iresource = get_iresource(context)
-        # since there is only version zero, the permission of
-        # the item is checked instead of the one from the itemversion
-        permission = self.resources_meta[iresource].permission_create
-        return request.has_permission(permission, context)
-
-    def _only_version_zero_exists(self, context: object, meta:
-                                  ResourceMetadata) -> bool:
-        only_first_version = False
-        is_item_version = meta.iresource.isOrExtends(IItemVersion)
-        has_item_parent = IItem.providedBy(context)
-        if has_item_parent and is_item_version:
-            children = context.values()
-            versions = [x for x in children if IItemVersion.providedBy(x)]
-            only_first_version = len(versions) == 1
-        return only_first_version
 
     @reify
     def resources_meta_addable(self):

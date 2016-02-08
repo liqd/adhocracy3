@@ -1,9 +1,9 @@
 /// <reference path="../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 /// <reference path="_all.d.ts"/>
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-export var customMatchers = {
+export var customMatchers : jasmine.CustomMatcherFactories = {
     toSetEqual: function(util, customEqualityTesters) {
 
         return {

@@ -15,12 +15,10 @@ from adhocracy_core.sheets.principal import IUserBasic
 
 
 class IProposal(ISheet):
-
     """Marker interface for the BPlan proposal sheet."""
 
 
 class ProposalSchema(colander.MappingSchema):
-
     """Data structure for plan stellungsname information."""
 
     name = SingleLine(missing=colander.required)
@@ -36,7 +34,6 @@ proposal_meta = sheet_meta._replace(isheet=IProposal,
 
 
 class IWorkflowAssignment(workflow.IWorkflowAssignment):
-
     """Marker interface for the bplan workflow assignment sheet."""
 
 
@@ -45,7 +42,6 @@ deprecated('IWorkflowAssignment',
 
 
 class IPrivateWorkflowAssignment(workflow.IWorkflowAssignment):
-
     """Marker interface for the bplan private workflow assignment sheet."""
 
 
@@ -54,12 +50,10 @@ deprecated('IPrivateWorkflowAssignment',
 
 
 class IProcessSettings(ISheet):
-
     """Marker interface for the ProcessSettings sheet."""
 
 
 class OfficeWorkerUserReference(SheetToSheet):
-
     """OfficeWorker sheet User reference."""
 
     source_isheet = IProcessSettings
@@ -68,7 +62,6 @@ class OfficeWorkerUserReference(SheetToSheet):
 
 
 class ProcessSettingsSchema(colander.MappingSchema):
-
     """Settings for the B-Plan process."""
 
     office_worker = Reference(reftype=OfficeWorkerUserReference)

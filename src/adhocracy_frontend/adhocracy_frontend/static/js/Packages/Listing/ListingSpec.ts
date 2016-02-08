@@ -1,13 +1,13 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
-import q = require("q");
+import * as q from "q";
 
 // This is only used at compile time and will be stripped by the compiler
-import AdhConfig = require("../Config/Config");
+import * as AdhConfig from "../Config/Config";
 
 // the module under test
-import AdhListing = require("./Listing");
+import * as AdhListing from "./Listing";
 
 
 var config : AdhConfig.IService = <any>{
@@ -94,7 +94,7 @@ export var register = () => {
                 adapter.poolPath.and.returnValue(poolPath);
 
                 var listing = new AdhListing.Listing(adapter);
-                var directive: angular.IDirective = listing.createDirective(config, adhWebSocketMock);
+                var directive : angular.IDirective = listing.createDirective(config, adhWebSocketMock);
 
                 registerDirectiveSpec(directive);
 
@@ -159,7 +159,7 @@ export var register = () => {
                         });
 
                         it("updates scope.container from server", () => {
-                            expect(adhHttpMock.get).toHaveBeenCalledWith(path, {count: "true"}, {warmupPoolCache: undefined});
+                            expect(adhHttpMock.get).toHaveBeenCalledWith(path, {count: "true"}, {warmupPoolCache: true});
                             expect(scope.container).toBe(container);
                         });
 
@@ -170,7 +170,7 @@ export var register = () => {
 
                         it("updates scope.elements using adapter from container", () => {
                             expect(adapter.elemRefs).toHaveBeenCalledWith(container);
-                            expect(scope.elements).toEqual(elements);
+                            expect(scope.elements).toEqual(["foo", "baz", "bar"]);
                         });
                     });
 
@@ -187,7 +187,7 @@ export var register = () => {
                             expect(adhHttpMock.get).toHaveBeenCalledWith(path, {
                                 content_type: "some_content_type",
                                 count: "true"
-                            }, {warmupPoolCache: undefined});
+                            }, {warmupPoolCache: true});
                             expect(scope.container).toBe(container);
                         });
                     });

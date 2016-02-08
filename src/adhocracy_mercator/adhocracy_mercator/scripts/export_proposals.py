@@ -11,18 +11,21 @@ import textwrap
 
 from pyramid.registry import Registry
 from pyramid.paster import bootstrap
+from substanced.util import find_service
 from adhocracy_core.utils import create_filename
 
 from adhocracy_core.catalog.adhocracy import index_rates
+from adhocracy_core.catalog.adhocracy import index_comments
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import get_sheet_field
-from adhocracy_core.sheets.pool import IPool
+from adhocracy_core.interfaces import search_query
 from adhocracy_core.utils import get_sheet
 
 from pyramid.traversal import resource_path
 
-from adhocracy_core.resources.comment import ICommentVersion
 from adhocracy_core.sheets.title import ITitle
+from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from adhocracy_mercator.sheets.mercator import IFinance
 from adhocracy_mercator.sheets.mercator import IMercatorSubResources
@@ -31,6 +34,7 @@ from adhocracy_mercator.sheets.mercator import IUserInfo
 from adhocracy_mercator.sheets.mercator import ILocation
 from adhocracy_mercator.sheets.mercator import IIntroduction
 from adhocracy_mercator.sheets.mercator import IDescription
+from adhocracy_mercator.sheets.mercator import IHeardFrom
 from adhocracy_mercator.sheets.mercator import IStory
 from adhocracy_mercator.sheets.mercator import IOutcome
 from adhocracy_mercator.sheets.mercator import IValue
@@ -39,20 +43,33 @@ from adhocracy_mercator.sheets.mercator import IExperience
 from adhocracy_mercator.sheets.mercator import ISteps
 
 
+def normalize_text(s: str) -> str:
+    """Normalize text to put it in CVS."""
+    return s.replace(';', '')
+
+
 def get_text_from_sheet(proposal, field, sheet):
-    """Get text from sheetfields and return it. """
+    """Get text from sheetfields and return it."""
     retrieved_field = get_sheet_field(proposal, IMercatorSubResources, field)
-    field_text = get_sheet_field(
-        retrieved_field,
-        sheet,
-        field).replace(
-        ';',
-        '')
-    return field_text
+    field_text = get_sheet_field(retrieved_field, sheet, field)
+    return normalize_text(field_text)
+
+
+def get_heard_from_text(heardfrom: dict) -> str:
+    """Return text for the 'heard from' field."""
+    def kv_to_text(k, v):
+        if k == 'heard_elsewhere':
+            return normalize_text(v)
+        return {'heard_from_colleague': 'colleague',
+                'heard_from_facebook': 'facebook',
+                'heard_from_newsletter': 'newsletter',
+                'heard_from_website': 'website'}[k]
+
+    return ','.join([kv_to_text(k, v) for (k, v) in heardfrom.items() if v])
 
 
 def export_proposals():
-    """Export all proposals from database and write them to csv file. """
+    """Export all proposals from database and write them to csv file."""
     doc = textwrap.dedent(inspect.getdoc(export_proposals))
     parser = argparse.ArgumentParser(description=doc)
     parser.add_argument('config')
@@ -62,16 +79,14 @@ def export_proposals():
 
     root = env['root']
     registry = env['registry']
-    pool = get_sheet(root, IPool)
-    params = {'depth': 3,
-              'interfaces': IMercatorProposalVersion,
-              'sort_by': 'rates',
-              'reverse': True,
-              'indexes': {'tag': 'LAST'},
-              'resolve': True,
-              }
-    results = pool.get(params)
-    proposals = results['elements']
+    catalogs = find_service(root, 'catalogs')
+    query = search_query._replace(interfaces=IMercatorProposalVersion,
+                                  sort_by='rates',
+                                  reverse=True,
+                                  indexes={'tag': 'LAST'},
+                                  resolve=True,
+                                  )
+    proposals = catalogs.search(query).elements
 
     filename = create_filename(directory='./var/export',
                                prefix='MercatorProposalExport',
@@ -107,7 +122,8 @@ def export_proposals():
                  'Outcome',
                  'Value',
                  'Partners',
-                 'Experience'])
+                 'Experience',
+                 'Heard from'])
 
     for proposal in proposals:
 
@@ -122,12 +138,18 @@ def export_proposals():
             'item_creation_date')
         date = creation_date.date().strftime('%d.%m.%Y')
         result.append(date)
-
         result.append(get_sheet_field(proposal, ITitle, 'title'))
-        result.append(get_sheet_field(proposal, IMetadata, 'creator').name)
+        creator = get_sheet_field(proposal, IMetadata, 'creator')
+        if creator is None:
+            name = ''
+            email = ''
+        else:
+            name = get_sheet_field(creator, IUserBasic, 'name')
+            email = get_sheet_field(creator, IUserExtended, 'email')
+        result.append(name)
         result.append(get_sheet_field(proposal, IUserInfo, 'personal_name'))
         result.append(get_sheet_field(proposal, IUserInfo, 'family_name'))
-        result.append(get_sheet_field(proposal, IMetadata, 'creator').email)
+        result.append(email)
         result.append(get_sheet_field(proposal, IUserInfo, 'country'))
 
         # Organisation
@@ -159,14 +181,8 @@ def export_proposals():
         result.append(rates)
 
         # Comments
-        query = {'interfaces': ICommentVersion,
-                 'depth': 'all',
-                 'indexes': {'tag': 'LAST'},
-                 'resolve': False}
-        proposal_item = proposal.__parent__
-        proposal_sheet = get_sheet(proposal_item, IPool)
-        query_result = proposal_sheet.get(query)
-        result.append(query_result['count'])
+        comments = index_comments(proposal, None)
+        result.append(comments)
 
         # requested funding
         finance = get_sheet_field(proposal,
@@ -260,6 +276,10 @@ def export_proposals():
         result.append(get_text_from_sheet(proposal, 'value', IValue))
         result.append(get_text_from_sheet(proposal, 'partners', IPartners))
         result.append(get_text_from_sheet(proposal, 'experience', IExperience))
+
+        # Heard from
+        heard_from = get_sheet(proposal, IHeardFrom)
+        result.append(get_heard_from_text(heard_from.get()))
 
         wr.writerow(result)
 

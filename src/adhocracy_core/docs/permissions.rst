@@ -151,7 +151,8 @@ Can create process content::
      'adhocracy_core.resources.document.IGeoDocument',
      'adhocracy_core.resources.external_resource.IExternalResource',
      'adhocracy_core.resources.proposal.IGeoProposal',
-     'adhocracy_core.resources.proposal.IProposal']
+     'adhocracy_core.resources.proposal.IProposal',
+     'adhocracy_core.resources.relation.IPolarization']
 
 Can edit his own process content::
 

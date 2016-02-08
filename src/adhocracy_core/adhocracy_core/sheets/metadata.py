@@ -15,18 +15,17 @@ from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Reference
 from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import now
 
 
 logger = getLogger(__name__)
 
 
 class IMetadata(ISheet):
-
     """Market interface for the metadata sheet."""
 
 
 class MetadataCreatorsReference(SheetToSheet):
-
     """Metadata sheet creators reference."""
 
     source_isheet = IMetadata
@@ -35,7 +34,6 @@ class MetadataCreatorsReference(SheetToSheet):
 
 
 class MetadataModifiedByReference(SheetToSheet):
-
     """Points to the last person who modified a resource."""
 
     source_isheet = IMetadata
@@ -58,7 +56,6 @@ def deferred_validate_hidden(node, kw):
 
 
 class MetadataSchema(colander.MappingSchema):
-
     """Metadata sheet data structure.
 
     `creation_date`: Creation date of this resource. defaults to now.
@@ -121,6 +118,12 @@ def view_blocked_by_metadata(resource: IResource, registry: Registry,
     result['modification_date'] = appstruct['modification_date']
     result['modified_by'] = appstruct['modified_by']
     return result
+
+
+def is_older_than(resource: IMetadata, days: int) -> bool:
+    """Check if the creation date of `context` is older than `days`."""
+    timedelta = now() - resource.creation_date
+    return timedelta.days > days
 
 
 def includeme(config):

@@ -2,14 +2,14 @@
     text-align: center;
 
     .user-profile-info-name {
-        font-size: $font-size-normal;
+        @include rem(margin, 80px 0 72px);
+        @include rem(padding, 0 1rem);
+        @include rem(font-size, $font-size-normal);
         font-weight: $font-weight-normal;
-        margin: (80px / $font-size-normal * 1em) 0 (72px / $font-size-normal * 1em);
-        padding: 0 1em;
     }
 
     .user-profile-info-name-text {
-        font-size: $font-size-huge;
+        @include rem(font-size, $font-size-huge);
     }
 
     .user-profile-info-button {
@@ -36,7 +36,7 @@
     }
 
     .user-profile-info-proposals {
-        margin-top: 64px / $font-size-normal * 1em;
+        @include rem(margin-top, 64px);
         text-align: left;
 
 
@@ -46,14 +46,103 @@
         }
 
         .listing-empty-text {
-            padding: 1em 0;
+            @include rem(padding, 1rem 0);
         }
 
         .mercator-user-profile-proposal-list-heading {
+            @include rem(padding, 32px 0);
             background: $color-structure-normal;
             font-weight: $font-weight-normal;
             margin: 0;
-            padding: 32px / $font-size-normal * 1em 0;
         }
     }
+}
+
+.user-profile-image-edit {
+    $image-base-size: 200px;
+
+    // position nicely on top of the username and center
+    @include rem(margin, 60px auto -60px);
+
+    @include rem(height, $image-base-size);
+    @include rem(width, $image-base-size);
+    position: relative;
+
+    .user-profile-image {
+        @include rem(height, $image-base-size);
+        @include rem(width, $image-base-size);
+    }
+
+    &.user-profile-image-edit-uploading {
+        @include rem(width, $image-base-size);
+        height: auto;
+    }
+
+    .user-profile-image-edit-button {
+        @include rem(width, $image-base-size);
+        @include rem(height, $image-base-size);
+        @include border-radius(50%);
+
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+
+        visibility: hidden;
+
+        > * {
+            // vertically centered
+            @include rem(height, $image-base-size);
+            @include rem(width, $image-base-size);
+            display: table-cell;
+            vertical-align: middle;
+            // We actually want the button text to wrap
+            white-space: normal;
+        }
+    }
+
+    &:hover .user-profile-image-edit-button {
+        visibility: visible;
+    }
+
+    .user-profile-image-edit-button.user-profile-image-edit-button-force-visible {
+        @extend .button:hover;
+        visibility: visible;
+    }
+}
+
+.user-activity-overview {
+    width: 100%;
+    padding-left: 12px; // is there a variable for this width? --MH
+    padding-right: 12px;
+
+    .user-activity-overview-wrapper {
+        display: table;
+        width: 100%;
+
+        border-top: 1px solid $color-structure-normal;
+        border-bottom: 1px solid $color-structure-normal;
+        color: $color-brand-one-normal;
+
+        // directives ordered this way to ensure rendering with
+        // less than three items will remove them in the order: middle, last, first
+        > * { 
+            display: table-cell;
+            text-align: center;
+        }
+        
+        > *:last-child { text-align: right; }
+        > *:first-child { text-align: left; }
+    }
+}
+
+.user-profile-image {
+    @include border-radius(50%);
+}
+
+.user-meta.user-profile-image {
+    @include rem(height, 35px);
+    @include rem(width, 35px);
+    @include rem(margin-right, 10px);
+    vertical-align: top;
 }

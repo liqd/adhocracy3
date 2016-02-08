@@ -126,6 +126,11 @@ var loginOtherParticipant = function() {
 
 var UserPage = function() {
 
+    this.get = function(usernumber) {
+        browser.get("/r/principals/users/" + usernumber);
+        return this;
+    };
+
     this.getUserName = function() {
         return element(by.css(".user-profile-info-name-text")).getText();
     };
@@ -138,34 +143,13 @@ var UserPage = function() {
     };
 };
 
-var UsersListing = function() {
-    this.listing = element(by.css(".user-list"));
-
-    this.get = function() {
-        browser.get("/r/principals/users/");
-        return this;
-    };
-
-    this.getUserPage = function(user) {
-        // ensures the list of users is visible
-        this.get();
-
-        var path = "(//a[span/text() = '" + user + "'])[1]";
-        var userItem = element(by.xpath(path));
-
-        userItem.click();
-        return new UserPage();
-    };
-};
-
-
 module.exports = {
     register: register,
     LoginPage: LoginPage,
     RegisterPage: RegisterPage,
     ResetPasswordCreatePage: ResetPasswordCreatePage,
     ResetPasswordPage: ResetPasswordPage,
-    UsersListing: UsersListing,
+    UserPage: UserPage,
     login: login,
     logout: logout,
     isLoggedIn: isLoggedIn,

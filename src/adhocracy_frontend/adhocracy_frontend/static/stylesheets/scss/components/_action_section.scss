@@ -1,0 +1,98 @@
+/*doc
+---
+title: Action section button mixin
+name: action-section-button-mixin
+category: Widgets
+---
+
+A mixin to style a button used with a section
+
+```html_example
+<a class="action-section-button"><i class="icon-speechbubble"></i>12</a>
+```
+*/
+
+@mixin action-section-button {
+    @include disguised-link;
+    @include rem(font-size, $font-size-small);
+    @include inline-block;
+    text-align: center;
+
+    i {
+        @include rem(font-size, 15px);
+        display: block;
+        line-height: 1;
+    }
+}
+
+.action-section-button {
+    @include action-section-button;
+
+    @media print {
+        display: none;
+    }
+}
+
+/*doc
+---
+title: Action section
+name: action-section
+category: Widgets
+---
+
+A section of any content with a corresponding 'action button' EG Show Comments
+or Delete Section
+
+Some sections have no action within a block of action sections, these can be
+marked for consistent styling and highlighting.
+
+States:
+
+-   is-selected
+-   is-not-selected
+
+```html_example
+<div class="action-section">
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</p>
+    <a class="action-section-button"><i class="icon-speechbubble"></i>Comments</a>
+</div>
+
+<div class="non-action-section">
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</p>
+</div>
+```
+*/
+
+.action-section,
+.non-action-section {
+    @include rem(padding, 1rem 48px 30px 1rem);
+    position: relative;
+
+    > p:last-of-type {
+        margin-bottom: 0;
+    }
+
+    p {
+        white-space: pre-line;
+    }
+
+    &.is-not-selected {
+        background: $color-background-base-introvert;
+    }
+
+    .action-section-button {
+        @include action-section-button;
+        @include rem(max-width, 36px);
+        @include rem(right, 1rem);
+        @include rem(top, 1rem);
+        position: absolute;
+    }
+
+    @media print {
+        @include rem(padding, 0 0 1rem);
+
+        .action-section-button {
+            display: none;
+        }
+    }
+}

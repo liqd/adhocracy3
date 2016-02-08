@@ -9,7 +9,6 @@ import adhocracy_core.sheets.metadata
 
 
 class IBasicService(IServicePool):
-
     """Basic :term:`service` resource type.
 
     The resource name is always set to the `content_name`.

@@ -46,8 +46,8 @@ A form for creating documents. This contains a <a href="#section-jump">section j
     padding: 0;
 
     .document-form-add-paragraph-button {
+        @include rem(margin-bottom, 45px);
         float: right;
-        margin-bottom: 45px / $font-size-normal * 1em;
     }
 
     .document-form-submit-button {
@@ -55,10 +55,7 @@ A form for creating documents. This contains a <a href="#section-jump">section j
     }
 
     .form-footer {
-        margin-top: 113px / $font-size-normal * 1em;
-    }
-
-    .section-jump-main {
-        padding: 1em;
+        @include rem(margin-top, 113px);
+        @include rem(padding, 0 1rem);
     }
 }

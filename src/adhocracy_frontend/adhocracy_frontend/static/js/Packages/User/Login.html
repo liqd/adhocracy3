@@ -23,9 +23,14 @@
                 type="password"
                 name="password"
                 required="required"
+                data-ng-minlength="6"
+                data-ng-maxlength="100"
                 data-ng-model="credentials.password" />
             <span class="input-error" data-ng-show="showError(loginForm, loginForm.password, 'required')">
                 {{ "TR__ERROR_REQUIRED_PASSWORD" | translate }}
+            </span>
+            <span class="input-error" data-ng-show="showError(loginForm, loginForm.password, 'minlength')">
+                {{ "TR__ERROR_TOO_SHORT_PASSWORD" | translate }}
             </span>
         </label>
 
@@ -39,9 +44,13 @@
             class="button-cta"
             data-ng-disabled="loginForm.$invalid" />
 
-        <div class="login-info" data-adh-html-translate="TR__OR_REGISTER_HERE" data-translate-templates="{
-            link: '&lt;a href=&quot;/register&quot;&gt;{{ content }}&lt;/a&gt;'
-        }"></div>
+        <div
+            data-ng-if="options.POST"
+            class="login-info"
+            data-adh-html-translate="TR__OR_REGISTER_HERE"
+            data-translate-templates="{
+                link: '&lt;a href=&quot;/register&quot;&gt;{{ content }}&lt;/a&gt;'
+            }"></div>
         <div class="login-info">
             {{ "TR__LOGIN_SUPPORT" | translate}} <br />
             <a data-ng-href="mailto:{{supportEmail}}?subject=Trouble%20with%20login">{{ supportEmail }}</a>

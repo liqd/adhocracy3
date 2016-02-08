@@ -1,4 +1,6 @@
 .facets {
+    @include container;
+
     ul {
         list-style-type: none;
         margin: 0;
@@ -6,36 +8,72 @@
     }
 
     .facet {
-        margin-bottom: 50px / $font-size-normal * 1em;
+        &:not(.m-wide) {
+            @include gallery(6 of 12);
+            @include rem(margin-bottom, 1rem);
+        }
+
+        &.m-wide {
+            @include clearfix;
+            clear: both;
+        }
+    }
+}
+
+.facet-header,
+.sort-header {
+    @include rem(font-size, $font-size-small);
+    @include rem(margin, 0 0 15px);
+    color: $color-text-introvert;
+    line-height: 1.15;
+}
+
+.sort-item,
+.facet-item {
+    @include rem(margin-bottom, 1rem);
+    @include rem(margin-right, 1rem);
+    min-width: 1px;
+
+    &.is-active {
+        @extend .button-cta-secondary:focus;
+    }
+}
+
+.sort-header, .sort-item {
+    margin-bottom: 0;
+}
+
+.sort-header {
+    @include inline-block;
+    margin-bottom: 0;
+}
+
+.listing-results {
+    @include rem(padding, 1rem);
+    border-bottom: 2px solid $color-structure-normal;
+}
+
+.facet-toggle {
+    @include ellipsis(12em);
+    @include inline-block;
+    @include rem(left, -18px);
+    @include rem(line-height, 20px);
+    @include rem(margin-right, 10px);
+    @include rem(padding, 0 10px);
+    background: $color-button-cta-base;
+    color: $color-button-cta-text;
+    padding-right: 1.5em;
+    position: relative;
+    text-decoration: none;
+
+    &:hover, &:focus {
+        background: $color-button-cta-hover-background;
+        color: $color-button-cta-text;
     }
 
-    .facet-header {
-        color: $color-text-introvert;
-        font-size: $font-size-small;
-        font-weight: $font-weight-normal;
-        line-height: 1.15;
-        margin: 0 0 (20px / $font-size-normal * 1em);
-    }
-
-    .facet-item {
-        display: block;
-        line-height: 1;
-        margin-bottom: 1em;
-        color: inherit;
-        text-decoration: inherit;
-
-        &:hover, &:focus {
-            color: $color-text-highlight-normal;
-        }
-
-        &.is-active, &:active {
-            color: $color-function-valid;
-        }
-
-        &.is-active:after, &:active:after {
-            content: "\2713";
-            font-size: 135%;
-            line-height: 0.5;
-        }
+    .facet-cancel {
+        text-transform: none;
+        position: absolute;
+        right: 0.5em;
     }
 }

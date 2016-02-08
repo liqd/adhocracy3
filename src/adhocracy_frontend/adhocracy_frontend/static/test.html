@@ -7,18 +7,30 @@
     <script type="text/javascript" src="/static/lib/requirejs/require.js"></script>
     <script type="text/javascript" src="/static/require-config.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="lib/jasmine/lib/jasmine-core/jasmine.css">
-    <script type="text/javascript" src="lib/jasmine/lib/jasmine-core/jasmine.js"></script>
-    <script type="text/javascript" src="lib/jasmine/lib/jasmine-core/jasmine-html.js"></script>
-    <script type="text/javascript" src="lib/jasmine/lib/jasmine-core/boot.js"></script>
+    <link rel="stylesheet" type="text/css" href="lib/jasmine-core/lib/jasmine-core/jasmine.css">
+    <script type="text/javascript" src="lib/jasmine-core/lib/jasmine-core/jasmine.js"></script>
+    <script type="text/javascript" src="lib/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
+    <script type="text/javascript" src="lib/jasmine-core/lib/jasmine-core/boot.js"></script>
 
     <script type="text/javascript" src="js/AdhocracySDK.js"></script>
+
+    <script>
+        // only execute jasmine once both require and blanket are ready
+        var originalJasmineExecute = jasmine.getEnv().execute;
+        var jasmineExecuteCalls = 0;
+        jasmine.getEnv().execute = function() {
+            if (jasmineExecuteCalls > 0) {
+                originalJasmineExecute();
+            }
+            jasmineExecuteCalls += 1;
+        };
+    </script>
 
     <script
         src="lib/blanket/dist/qunit/blanket.js"
         data-cover-adapter="lib/blanket/src/adapters/jasmine-2.x-blanket.js"
         data-cover-only="//js/[^.]/"
-        data-cover-never="//Spec.js$|js/Resources_//i"
+        data-cover-never="//Spec.js$|js/Resources_|js/Jasmine|require.js/i"
         data-cover-flags="branchTracking"
         type="text/javascript">
     </script>

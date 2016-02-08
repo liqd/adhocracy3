@@ -8,7 +8,7 @@ from webtest import TestResponse
 from mercator.tests.fixtures.fixturesMercatorProposals1 import _create_proposal
 from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposal_batch
 from mercator.tests.fixtures.fixturesMercatorProposals1 import update_proposal_batch
-
+from adhocracy_core.utils.testing import do_transition_to
 
 @fixture
 def integration(config):
@@ -86,14 +86,6 @@ def _batch_post_full_sample_proposal(app_user) -> TestResponse:
     return resp
 
 
-def _do_transition_to(app_user, path, state) -> TestResponse:
-    from adhocracy_core.sheets.workflow import IWorkflowAssignment
-    data = {'data': {IWorkflowAssignment.__identifier__:\
-                         {'workflow_state': state}}}
-    resp = app_user.put(path, data)
-    return resp
-
-
 @mark.functional
 class TestMercatorWorkflow:
 
@@ -109,7 +101,7 @@ class TestMercatorWorkflow:
 
     @mark.xfail(reason='state is currently set to participate when creating the mercator process')
     def test_change_state_to_announce(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/', 'announce')
+        resp = do_transition_to(app_initiator, '/', 'announce')
         assert resp.status_code == 200
 
     @mark.xfail(reason='state is currently set to participate when creating the mercator process')
@@ -119,7 +111,7 @@ class TestMercatorWorkflow:
 
     @mark.xfail(reason='state is currently set to participate when creating the mercator process')
     def test_change_state_to_participate(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/', 'participate')
+        resp = do_transition_to(app_initiator, '/', 'participate')
         assert resp.status_code == 200
 
     def test_participate_participant_can_create_proposal(self, app_participant):
@@ -142,8 +134,8 @@ class TestMercatorWorkflow:
         """
         resp = app_participant.batch(create_proposal_batch)
         resp = app_participant.batch(update_proposal_batch)
-        assert app_participant.get('/proposal_0000001/VERSION_0000002').json_body['data']['adhocracy_mercator.sheets.mercator.IUserInfo']['personal_name'] == 'pita Updated'
-        assert "VERSION_0000002" in app_participant.get('/proposal_0000001/VERSION_0000002').json_body['data']['adhocracy_mercator.sheets.mercator.IMercatorSubResources']['organization_info']
+        assert app_participant.get('/proposal_0000001/VERSION_0000001').json_body['data']['adhocracy_mercator.sheets.mercator.IUserInfo']['personal_name'] == 'pita Updated'
+        assert "VERSION_0000001" in app_participant.get('/proposal_0000001/VERSION_0000001').json_body['data']['adhocracy_mercator.sheets.mercator.IMercatorSubResources']['organization_info']
 
     def test_participate_cannot_edit_other_users_proposal(self, app_participant, app_god):
         resp = _post_proposal_item(app_god, path='/')
@@ -153,7 +145,7 @@ class TestMercatorWorkflow:
         assert postable_types == []
 
     def test_change_state_to_frozen(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/', 'evaluate')
+        resp = do_transition_to(app_initiator, '/', 'evaluate')
         assert resp.status_code == 200
 
     def test_frozen_participant_cannot_create_proposal_item(self, app_participant):
@@ -165,16 +157,18 @@ class TestMercatorWorkflow:
         assert postable_types == []
 
     def test_change_state_to_result(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/', 'result')
+        resp = do_transition_to(app_initiator, '/', 'result')
         assert resp.status_code == 200
 
     def test_result_participant_cannot_create_proposal_item(self, app_participant):
         from adhocracy_mercator.resources.mercator import IMercatorProposal
         assert IMercatorProposal not in app_participant.get_postable_types('/')
 
-    def test_result_participant_cannot_edit_proposal(self, app_participant):
-        postable_types =  app_participant.get_postable_types('/proposal_0000000')
-        assert postable_types == []
+    def test_result_participant_can_edit_proposal(self, app_participant):
+        from adhocracy_mercator.resources import mercator
+        possible_types = mercator.mercator_proposal_meta.element_types
+        postable_types = app_participant.get_postable_types('/proposal_0000000')
+        assert set(postable_types) == set(possible_types)
 
     def test_result_participant_can_create_logbook_documents(self,
                                                              app_participant):
@@ -190,5 +184,22 @@ class TestMercatorWorkflow:
         resp = _post_proposal_version(app_god, path=proposal)
         postable_types = app_participant.get_postable_types( proposal + 'logbook')
         assert postable_types == []
+
+    def test_result_participant_can_search_proposals(self, app_participant):
+        from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
+        from adhocracy_core.sheets.pool import IPool
+        params = dict(content_type=IMercatorProposalVersion.__identifier__,
+                      count=True,
+                      limit=50,
+                      mercator_requested_funding=5000,
+                      reverse=True,
+                      sort='item_creation_date',
+                      depth='all',
+                      tag='LAST',
+                      )
+        resp = app_participant.get('/', params=params).json
+        assert resp['data'][IPool.__identifier__]['elements'] == \
+            ['http://localhost/mercator/proposal_0000001/VERSION_0000001/']
+
 
 

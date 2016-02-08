@@ -12,18 +12,27 @@ export interface IService {
     rest_url : string;
     rest_platform_path : string;
     canonical_url : string;
+    redirect_url : string;
     pkg_path : string;
     ws_url : string;
     embedded : boolean;
     trusted_domains : string[];
     locale : string;
     support_email : string;
+    captcha_enabled : boolean;
+    captcha_url : string;
+    // the place for instance specific customizations
+    // remember to parse (e.g. booleans) where they are used
     custom : {[key : string]: string};
     site_name : string;
+    netiquette_url : string;
     cachebust : boolean;
     cachebust_suffix : string;
     debug : boolean;
-    terms_url : string;
+    terms_url : {
+        en : string;
+        de : string;
+    };
     piwik_enabled : string;
     piwik_host : string;
     piwik_site_id : string;

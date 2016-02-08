@@ -19,8 +19,7 @@ require.config({
         Adhocracy: "./Adhocracy",
         adhTemplates: "./templates",
 % endif
-        text: "../lib/requirejs-text/text",
-        jquery: "../lib/jquery/dist/jquery",
+        text: "../lib/text/text",
 % if minify:
         angular: "../lib/angular/angular.min",
 % else:
@@ -44,7 +43,6 @@ require.config({
         moment: "../lib/moment/min/moment-with-locales.min",
         sticky: "../lib/relatively-sticky/jquery.relatively-sticky.min",
         socialSharePrivacy: "../lib/jquery.socialshareprivacy/jquery.socialshareprivacy.min",
-        adhTemplates: "./templates",
         polyfiller: "../lib/webshim/js-webshim/minified/polyfiller"
     },
     shim: {

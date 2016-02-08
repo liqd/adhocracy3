@@ -1,7 +1,6 @@
 """Paragraph resource type."""
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
-from adhocracy_core.interfaces import ITag
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.itemversion import itemversion_meta
 from adhocracy_core.resources.item import item_meta
@@ -11,7 +10,6 @@ import adhocracy_core.sheets.document
 
 
 class IParagraphVersion(IItemVersion):
-
     """Document paragraph (a leaf in the paragraph tree)."""
 
 
@@ -26,20 +24,13 @@ paragraphversion_meta = itemversion_meta._replace(
 
 
 class IParagraph(IItem):
-
     """Paragraph Versions Pool."""
 
 
 paragraph_meta = item_meta._replace(
     content_name='Paragraph',
     iresource=IParagraph,
-    basic_sheets=(adhocracy_core.sheets.tags.ITags,
-                  adhocracy_core.sheets.versions.IVersions,
-                  adhocracy_core.sheets.pool.IPool,
-                  adhocracy_core.sheets.metadata.IMetadata,
-                  ),
-    element_types=(ITag,
-                   IParagraphVersion,
+    element_types=(IParagraphVersion,
                    ),
     item_type=IParagraphVersion,
     permission_create='edit_document',

@@ -33,18 +33,20 @@ combination with `.jump-navigation.m-narrow.m-unnumbered`.
 */
 
 .section-jump-cover-header {
-    @include text(header);
+    @include rem(font-size, $font-size-large);
+    color: $color-text-extrovert;
+    font-weight: $font-weight-normal;
     margin: 0;
 
     @media print {
-        margin-bottom: 1em;
+        @include rem(margin-bottom, $font-size-large);
     }
 }
 
 .section-jump-cover {
     @include span(full);
+    @include rem(padding, 15px 10px 10px);
     border-bottom: 2px solid $color-structure-normal;
-    padding: 1.07142857em 0.71428571em 0.71428571em;
 
     @media print {
         border: 0;
@@ -58,7 +60,7 @@ combination with `.jump-navigation.m-narrow.m-unnumbered`.
 }
 
 .section-jump-navigation {
-    padding-top: 1em;
+    @include rem(padding-top, 1rem);
     text-align: center;
     width: $section-jump-navigation-width;
     float: left;
@@ -69,9 +71,10 @@ combination with `.jump-navigation.m-narrow.m-unnumbered`.
 }
 
 .section-jump-main {
+    @include clearfix;
+    @include rem(margin-left, $section-jump-navigation-width);
     background-color: $color-background-base;
     border-left: 2px solid $color-structure-normal;
-    margin-left: $section-jump-navigation-width;
 
     @media print {
         border: 0;

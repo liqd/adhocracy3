@@ -5,8 +5,9 @@ var fs = require("fs");
 var _ = require("lodash");
 var shared = require("./shared");
 
-/*describe("user registration", function() {
-    xit("can register - broken due to issue #583 (duplicate tpc_begin)", function() {
+describe("user registration", function() {
+    it("can register", function() {
+        UserPages.logout();
         UserPages.register("u1", "u1@example.com", "password1");
         UserPages.logout();
         UserPages.login("u1", "password1");
@@ -14,11 +15,12 @@ var shared = require("./shared");
     });
 
     it("cannot register with wrong password repeat", function() {
+        UserPages.logout();
         var page = new UserPages.RegisterPage().get();
         page.fill("u2", "u2@example.com", "password2", "password3");
         expect(page.submitButton.isEnabled()).toBe(false);
     });
-});*/
+});
 
 describe("user login", function() {
     it("can login with username", function() {
@@ -47,18 +49,17 @@ describe("user login", function() {
         var page = new UserPages.LoginPage().get();
         page.loginInput.sendKeys("abc");
         page.passwordInput.sendKeys("abc");
-        page.submitButton.click();
-        expect(element(by.css(".form-error")).getText()).toContain("Short");
+        expect(page.submitButton.getAttribute("disabled")).toBe("true");
     });
 
-    /*it("login is persistent", function() {
+    it("login is persistent", function() {
         UserPages.login(UserPages.participantName, UserPages.participantPassword);
         expect(UserPages.isLoggedIn()).toBe(true);
         browser.refresh();
         browser.waitForAngular();
         expect(UserPages.isLoggedIn()).toBe(true);
         UserPages.logout();
-    });*/
+    });
 });
 
 describe("user password reset", function() {
@@ -79,6 +80,7 @@ describe("user password reset", function() {
     it("error displayed if the email is not associated to an user", function() {
         var page = new UserPages.ResetPasswordCreatePage().get();
         page.fill("abc@xy.de");
+        browser.wait(browser.isElementPresent(element(by.css(".form-error"))), 1000)
         expect(element(by.css(".form-error")).getText()).toContain("No user");
     });
 
@@ -105,7 +107,7 @@ describe("user password reset", function() {
 
         browser.driver.wait(function() {
             return resetUrl != "";
-        }).then(function() {
+        }, 1000).then(function() {
             var resetPage = new UserPages.ResetPasswordPage().get(resetUrl);
             resetPage.fill('new password');
 

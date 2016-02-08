@@ -14,6 +14,7 @@ class TestMercatorProposal:
         from adhocracy_core.resources.comment import add_commentsservice
         from adhocracy_core.resources.rate import add_ratesservice
         from adhocracy_core.resources.logbook import add_logbook_service
+        from adhocracy_core.sheets.badge import IBadgeable
         assert meta.iresource == mercator.IMercatorProposal
         assert meta.element_types == (mercator.IMercatorProposalVersion,
                                       mercator.IOrganizationInfo,
@@ -28,6 +29,7 @@ class TestMercatorProposal:
                                       mercator.IFinance,
                                       mercator.IExperience,
                                       )
+        assert meta.extended_sheets == (IBadgeable,)
         assert meta.is_implicit_addable
         assert meta.item_type == mercator.IMercatorProposalVersion
         assert add_ratesservice in meta.after_creation

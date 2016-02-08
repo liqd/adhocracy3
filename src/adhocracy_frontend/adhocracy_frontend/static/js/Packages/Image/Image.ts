@@ -1,13 +1,13 @@
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhEmbed = require("../Embed/Embed");
-import AdhHttp = require("../Http/Http");
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
 
-import RIImage = require("../../Resources_/adhocracy_core/resources/image/IImage");
-import SIHasAssetPool = require("../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool");
-import SIImageMetadata = require("../../Resources_/adhocracy_core/sheets/image/IImageMetadata");
-import SIImageReference = require("../../Resources_/adhocracy_core/sheets/image/IImageReference");
+import RIImage from "../../Resources_/adhocracy_core/resources/image/IImage";
+import * as SIHasAssetPool from "../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
+import * as SIImageMetadata from "../../Resources_/adhocracy_core/sheets/image/IImageMetadata";
+import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
+import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
 var pkgLocation = "/Image";
 
@@ -73,12 +73,21 @@ export var addImage = (
     resourcePath : string,
     imagePath : string
 ) => {
-    return adhHttp.get(resourcePath).then((version) => {
-        var newVersion = _.clone(version);
-        newVersion.data[SIImageReference.nick] = new SIImageReference.Sheet({
-            picture: imagePath
-        });
-        return adhHttp.postNewVersionNoFork(resourcePath, newVersion);
+    return adhHttp.get(resourcePath).then((resource) => {
+        var patch = {
+            data: {},
+            content_type: resource.content_type
+        };
+        patch.data[SIImageReference.nick] = new SIImageReference.Sheet({ picture: imagePath });
+
+        // Versioned resources are on the way out, so they get the special treatment
+        if (resource.data[SIVersionable.nick]) {
+            var newVersion = _.clone(resource);
+            _.merge(newVersion.data, patch.data);
+            return adhHttp.postNewVersionNoFork(resourcePath, newVersion);
+        } else {
+            return adhHttp.put(resourcePath, patch);
+        }
     });
 };
 
@@ -94,7 +103,9 @@ export var uploadImageDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Upload.html",
         scope: {
             poolPath: "@",
-            path: "@"
+            path: "@",
+            didCompleteUpload: "&?",
+            didCancelUpload: "&?"
         },
         link: (scope) => {
             scope.$flow = flowFactory.create();
@@ -106,35 +117,54 @@ export var uploadImageDirective = (
 
             scope.submit = () => {
                 return adhUploadImage(scope.poolPath, scope.$flow)
-                    .then((imagePath : string) => addImage(adhHttp)(scope.path, imagePath));
+                    .then((imagePath : string) => addImage(adhHttp)(scope.path, imagePath)
+                        .then(scope.didCompleteUpload));
             };
         }
     };
 };
 
-export var imageUriFilter = () => {
-    return (path? : string, format : string = "detail") : string => {
-        if (path) {
-            return path.replace(/\/$/, "") + "/" + format;
-        } else {
-            return "/static/fallback_" + format + ".jpg";
+export var showImageDirective = (
+    adhHttp : AdhHttp.Service<any>
+) => {
+    return {
+        restrict: "E",
+        template: "<img class=\"{{ cssClass }}\" data-ng-src=\"{{ imageUrl }}\" alt=\"{{alt}}\" />",
+        scope: {
+            path: "@", // of the attachment resource
+            cssClass: "@",
+            alt: "@?",
+            format: "@?", // defaults to "detail"
+            imageMetadataNick: "@?", // defaults to SIImageMetadata.nick
+            fallbackUrl: "@?", // defaults to "/static/fallback_$format.jpg";
+            didFailToLoadImage: "&?"
+        },
+        link: (scope) => {
+            scope.didFailToLoadImage = scope.didFailToLoadImage || (() => null);
+
+            var imageMetadataNick = () =>
+                scope.imageMetadataNick ? scope.imageMetadataNick : SIImageMetadata.nick;
+            var format = () => scope.format || "detail";
+            var fallbackUrl = () => scope.fallbackUrl || ("/static/fallback_" + format() + ".jpg");
+            scope.imageUrl = fallbackUrl(); // show fallback till real image is loaded
+
+            scope.$watch("path", (path) => {
+                // often instantiated before the path can be provided by the surrounding dom
+                if ( ! path) { return; }
+                adhHttp.get(scope.path).then(
+                    (asset) => {
+                        var imageUrl = asset.data[imageMetadataNick()][format()];
+                        if ( ! imageUrl) {
+                            console.log("Couldn't load image format <" + format() + ">"
+                                + " from asset: " + scope.path);
+                            scope.didFailToLoadImage();
+                            return; // don't override the fallback image path
+                        }
+                        scope.imageUrl = imageUrl;
+                    },
+                    scope.didFailToLoadImage
+                );
+            });
         }
     };
-};
-
-
-export var moduleName = "adhImage";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhEmbed.moduleName,
-            AdhHttp.moduleName
-        ])
-        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("upload-image");
-        }])
-        .factory("adhUploadImage", ["adhHttp", uploadImageFactory])
-        .directive("adhUploadImage", ["adhConfig", "adhHttp", "adhUploadImage", "flowFactory", uploadImageDirective])
-        .filter("adhImageUri", imageUriFilter);
 };

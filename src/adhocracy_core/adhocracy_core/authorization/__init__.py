@@ -11,6 +11,7 @@ from pyramid.request import Request
 from pyramid.router import Router
 from zope.interface import implementer
 from substanced.util import get_acl
+from substanced.stats import statsd_timer
 import substanced.util
 import transaction
 
@@ -18,6 +19,9 @@ from adhocracy_core.utils import get_root
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IRoleACLAuthorizationPolicy
 from adhocracy_core.events import LocalRolesModified
+from adhocracy_core.schema import ACEPrincipal
+from adhocracy_core.schema import ROLE_PRINCIPALS
+from adhocracy_core.schema import SYSTEM_PRINCIPALS
 
 
 CREATOR_ROLEID = 'role:creator'
@@ -27,7 +31,6 @@ god_all_permission_ace = (Allow, 'role:god', ALL_PERMISSIONS)
 
 @implementer(IRoleACLAuthorizationPolicy)
 class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
-
     """A :term:`authorization policy` supporting :term:`local role`.
 
     You can get/set local role mapping for an resource with
@@ -40,12 +43,13 @@ class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
                 principals: list,
                 permission: str) -> ACLPermitsResult:
         """Check `permission` for `context`. Read interface docstring."""
-        local_roles = get_local_roles_all(context)
-        principals_with_roles = set(principals)
-        for principal, roles in local_roles.items():
-            if principal in principals:
-                principals_with_roles.update(roles)
-        return super().permits(context, principals_with_roles, permission)
+        with statsd_timer('authorization', rate=.1):
+            local_roles = get_local_roles_all(context)
+            principals_with_roles = set(principals)
+            for principal, roles in local_roles.items():
+                if principal in principals:
+                    principals_with_roles.update(roles)
+            return super().permits(context, principals_with_roles, permission)
 
 
 def set_local_roles(resource, new_local_roles: dict, registry: Registry=None):
@@ -105,7 +109,17 @@ def acm_to_acl(acm: dict, registry: Registry) -> [str]:
     To avoid generating too many ACE, action which are None will not
     generate an ACE.
 
+    Permissions for principals with high priority are listed first and override
+    succeding permissions. The order is determined by
+    :var:`adhocracy_core.schema.ROLE_PRINCIPALS`. Pricipals with higher
+    index in this list have higer priority.
     """
+    acl = _migrate_acm_to_acl(acm)
+    _sort_by_principal_priority(acl)
+    return acl
+
+
+def _migrate_acm_to_acl(acm: dict) -> dict:
     acl = []
     idx = 0
     for principal in acm['principals']:
@@ -116,6 +130,16 @@ def acm_to_acl(acm: dict, registry: Registry) -> [str]:
                 ace = (action, principal, permission_name)
                 acl.append(ace)
         idx = idx + 1
+    return acl
+
+
+def _sort_by_principal_priority(acl: list) -> list:
+    roles = ROLE_PRINCIPALS.copy()
+    roles.reverse()
+    systems = SYSTEM_PRINCIPALS
+    schema = ACEPrincipal()
+    principals = [schema.deserialize(x) for x in roles + systems]
+    acl.sort(key=lambda x: principals.index(x[1]))
     return acl
 
 

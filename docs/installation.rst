@@ -1,24 +1,8 @@
 Installation
 ==============
 
-Installation with Vagrant virtual machine
------------------------------------------
-
-Requirements:
-
-1. virtualbox: https://virtualbox.org/wiki/Downloads
-2. vagrant: http://docs.vagrantup.com/v2/installation/index.html
-
-create virtual machine and login:
-
-    (LINUX:)    wget https://raw.githubusercontent.com/liqd/adhocracy3/master/Vagrantfile
-    (OSX:)      curl -O https://raw.githubusercontent.com/liqd/adhocracy3/master/Vagrantfile
-    vagrant up
-    vagrant ssh
-
-
-Installation (backend)
-----------------------
+Installation
+------------
 
 Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 
@@ -34,17 +18,22 @@ some basic dependencies to build PIL (python image library):
 
 6. libjpeg8-dev zlib1g-dev (http://pillow.readthedocs.org/en/latest/installation.html)
 
-create SSH key and upload to github ::
+Create SSH key and upload to GitHub ::
 
     ssh-keygen -t rsa -C "your_email@example.com"
 
-checkout source code ::
+Checkout source code ::
 
     git clone git@github.com:liqd/adhocracy3.git
     cd adhocracy3
     git submodule update --init
 
-compile python 3.4 and PIL ::
+Create virtualenv ::
+
+    virtualenv -p python3.4 .
+
+If you don't have python 3.4 on your system, you may compile python 3.4 and
+Pillow instead of creating a virtualenv ::
 
     cd python
     python ./bootstrap.py
@@ -52,12 +41,12 @@ compile python 3.4 and PIL ::
     ./bin/install-links
     cd ..
 
-install adhocracy ::
+Install adhocracy ::
 
-    ./bin/python ./bootstrap.py -v 2.3.1 --setuptools-version=12.1
+    ./bin/python ./bootstrap.py --buildout-version 2.4.4 --setuptools-version=18.3.2
     ./bin/buildout
 
-update your shell environment::
+Update your shell environment::
 
     source ./source_env
 
@@ -65,7 +54,7 @@ update your shell environment::
 Documentation
 -------------
 
-build sphinx documentation ::
+Build sphinx documentation ::
 
     bin/sphinx_build_adhocracy
     xdg-open docs/build/html/index.html  # (alternatively, cut & paste the url into your browser)
@@ -108,10 +97,19 @@ Shutdown everything nicely::
 Run test suites
 ---------------
 
-Run pytest suite::
+Run test suite::
 
-    bin/py.test_run_all
+    bin/polytester
 
-Run protractor acceptance tests::
+.. NOTE:: You need to have chrome/chromium installed in order to run the
+   acceptance tests.
 
-    bin/protractor etc/protractorConf.js
+
+Troubleshooting
+---------------
+If you encounter this error when starting adhocracy
+
+    Problem connecting to WebSocket server: ConnectionRefusedError: [Errno 111] Connection refused
+
+delete the `var/WS_SERVER.pid` file and retry again. This happens when
+the Websocket server is not shutdown properly.

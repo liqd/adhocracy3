@@ -1,12 +1,14 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhHttp = require("../Http/Http");
+import * as AdhHttp from "../Http/Http";
 
-import AdhCredentials = require("./Credentials");
+import * as AdhCredentials from "./Credentials";
 
-import SIPasswordAuthentication = require("../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication");
-import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
-import SIUserExtended = require("../../Resources_/adhocracy_core/sheets/principal/IUserExtended");
+import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
+import * as SIPasswordAuthentication from "../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication";
+import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
+import * as SIUserExtended from "../../Resources_/adhocracy_core/sheets/principal/IUserExtended";
+import * as SICaptcha from "../../Resources_/adhocracy_core/sheets/principal/ICaptcha";
 
 
 export interface IUserBasic {
@@ -20,20 +22,30 @@ export interface IRegisterResponse {}
 
 export class Service {
     public data : IUserBasic;
+    public ready : angular.IPromise<RIUser>;
 
     constructor(
         private adhHttp : AdhHttp.Service<any>,
         private adhCredentials : AdhCredentials.Service,
+        private $q : angular.IQService,
         private $rootScope : angular.IScope
     ) {
         var _self : Service = this;
 
-        _self.$rootScope.$watch(() => adhCredentials.userPath, (userPath) => {
-            if (userPath) {
-                _self.loadUser(userPath);
-            } else {
-                _self.data = undefined;
-            }
+        var deferred = _self.$q.defer();
+        _self.ready = deferred.promise;
+
+        _self.adhCredentials.ready.then(() => {
+            _self.$rootScope.$watch(() => _self.adhCredentials.userPath, ((userPath) => {
+                if (userPath) {
+                    _self.loadUser(userPath).then(() => {
+                        deferred.resolve(_self.data);
+                    });
+                } else {
+                    _self.data = undefined;
+                    deferred.resolve(null);
+                }
+            }));
         });
     }
 
@@ -80,7 +92,8 @@ export class Service {
         this.adhCredentials.deleteToken();
     }
 
-    public register(username : string, email : string, password : string, passwordRepeat : string) : angular.IPromise<IRegisterResponse> {
+    public register(username : string, email : string, password : string, passwordRepeat : string,
+                    captchaId : string, captchaGuess : string) : angular.IPromise<IRegisterResponse> {
         var _self : Service = this;
 
         var resource = {
@@ -96,6 +109,12 @@ export class Service {
         resource.data[SIPasswordAuthentication.nick] = {
             "password": password
         };
+        if (captchaId && captchaGuess) {
+            resource.data[SICaptcha.nick] = {
+                "id": captchaId,
+                "solution": captchaGuess
+            };
+        }
 
         return _self.adhHttp.post("/principals/users/", resource);
     }
@@ -124,17 +143,3 @@ export class Service {
         }).then(success, AdhHttp.logBackendError);
     }
 }
-
-
-export var moduleName = "adhUser";
-
-export var register = (angular) => {
-    AdhCredentials.register(angular);
-
-    angular
-        .module(moduleName, [
-            AdhCredentials.moduleName,
-            AdhHttp.moduleName
-        ])
-        .service("adhUser", ["adhHttp", "adhCredentials", "$rootScope", Service]);
-};

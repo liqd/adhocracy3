@@ -1,8 +1,8 @@
 .standalone-wrapper {
-    padding-top: 90px / $font-size-normal * 1em;
+    @include rem(padding-top, 90px);
 
     .login-cancel {
-        margin: (24px / $font-size-normal * 1em) 0 0;
+        @include rem(margin, 24px 0 0);
     }
 
     &:before {

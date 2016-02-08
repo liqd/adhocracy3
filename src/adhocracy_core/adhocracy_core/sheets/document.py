@@ -6,27 +6,24 @@ from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import add_sheet_to_registry
+from adhocracy_core.sheets.subresources import ISubResources
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Text
 
 
-class IDocument(ISheet, ISheetReferenceAutoUpdateMarker):
-
+class IDocument(ISubResources):
     """Marker interface for the document sheet."""
 
 
 class ISection(ISheet, ISheetReferenceAutoUpdateMarker):
-
     """Marker interface for the section sheet."""
 
 
 class IParagraph(ISection):
-
     """Marker interface for the paragraph sheet."""
 
 
 class DocumentElementsReference(SheetToSheet):
-
     """Document elements reference."""
 
     source_isheet = IDocument
@@ -35,7 +32,6 @@ class DocumentElementsReference(SheetToSheet):
 
 
 class DocumentSchema(colander.MappingSchema):
-
     """Document sheet data structure.
 
     `elements`: structural subelements like sections
@@ -50,7 +46,6 @@ document_meta = sheet_meta._replace(isheet=IDocument,
 
 
 class ParagraphSchema(colander.MappingSchema):
-
     """Paragraph Section sheet data structure.
 
     `content`:  Text

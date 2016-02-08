@@ -8,25 +8,25 @@ import adhocracy_core.sheets.name
 import adhocracy_core.sheets.tags
 import adhocracy_core.sheets.pool
 import adhocracy_core.sheets.versions
+import adhocracy_core.sheets.tags
 from adhocracy_core.utils import get_iresource
+from adhocracy_core.utils import get_sheet
 
 
 def create_initial_content_for_item(context, registry, options):
     """Add first version and the Tags LAST and FIRST."""
     iresource = get_iresource(context)
     metadata = registry.content.resources_meta[iresource]
-    item_type = metadata.item_type
     create = registry.content.create
-    first_version = create(item_type.__identifier__, parent=context)
-
-    tag_first_data = {'adhocracy_core.sheets.tags.ITag': {'elements':
-                                                          [first_version]},
-                      'adhocracy_core.sheets.name.IName': {'name': u'FIRST'}}
-    create(ITag.__identifier__, parent=context, appstructs=tag_first_data)
-    tag_last_data = {'adhocracy_core.sheets.tags.ITag': {'elements':
-                                                         [first_version]},
-                     'adhocracy_core.sheets.name.IName': {'name': u'LAST'}}
-    create(ITag.__identifier__, parent=context, appstructs=tag_last_data)
+    first_version = create(metadata.item_type.__identifier__, parent=context,
+                           **options)
+    tags_sheet = get_sheet(context,
+                           adhocracy_core.sheets.tags.ITags,
+                           registry=registry)
+    request = options.get('request', None)
+    tags_sheet.set({'FIRST': first_version,
+                    'LAST': first_version},
+                   request=request)
 
 
 item_meta = pool_meta._replace(
@@ -35,6 +35,7 @@ item_meta = pool_meta._replace(
                   adhocracy_core.sheets.versions.IVersions,
                   adhocracy_core.sheets.pool.IPool,
                   adhocracy_core.sheets.metadata.IMetadata,
+                  adhocracy_core.sheets.workflow.IWorkflowAssignment,
                   ),
     element_types=(IItemVersion,
                    ITag,

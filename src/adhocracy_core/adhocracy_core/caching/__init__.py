@@ -39,9 +39,6 @@ def set_cache_header(context: IResource, request: IRequest):
 
 
 def _get_cache_mode(registry) -> HTTPCacheMode:
-    setting = registry.settings
-    if setting is None:
-        return  # ease testing
     mode_name = registry.settings.get('adhocracy_core.caching.http.mode',
                                       HTTPCacheMode.no_cache.name)
     mode = HTTPCacheMode[mode_name]
@@ -75,7 +72,6 @@ def register_cache_strategy(strategy_adapter: IHTTPCacheStrategy,
 
 @implementer(IHTTPCacheStrategy)
 class HTTPCacheStrategyBaseAdapter:
-
     """Basic cache strategy adapter a to set http cache headers.
 
     You can register a cache strategy for a specific context and view with
@@ -239,7 +235,6 @@ def etag_blocked(context: IResource, request: IRequest) -> str:
 
 @implementer(IHTTPCacheStrategy)
 class HTTPCacheStrategyWeakAdapter(HTTPCacheStrategyBaseAdapter):
-
     """Weak strategy adapter to set http cache header.
 
     mode without-proxy-cache: browser cache 0 and force revalidate
@@ -256,18 +251,19 @@ class HTTPCacheStrategyWeakAdapter(HTTPCacheStrategyBaseAdapter):
 
 
 @implementer(IHTTPCacheStrategy)
-class HTTPCacheStrategyWeakAssetDownloadAdapter(HTTPCacheStrategyBaseAdapter):
+class HTTPCacheStrategyStrongAdapter(HTTPCacheStrategyBaseAdapter):
+    """Strong strategy adapter to set http cache header.
 
-    """Weak strategy adapter for :class:`IAssetDownload`."""
+    mode without-proxy-cache: browser cache forever
 
-    browser_max_age = 60 * 5
+    mode with-proxy-cache: browser cache forever, proxy cache forever but force
+                           revalidate
+    """
+
+    browser_max_age = 60 * 60 * 24 * 30 * 12
     proxy_max_age = 60 * 60 * 24 * 30 * 12
+    vary = ('Accept-Encoding', 'X-User-Path', 'X-User-Token')
     etags = (etag_modified, etag_userid, etag_blocked)
-
-    def __init__(self, context, request):
-        """Initialize self."""
-        parent = context.__parent__  # reuse parent cache header
-        super().__init__(parent, request)
 
 
 def purge_varnish_after_commit_hook(success: bool, registry: Registry,
@@ -313,11 +309,11 @@ def includeme(config):
                             IResource,
                             config.registry,
                             'HEAD')
-    register_cache_strategy(HTTPCacheStrategyWeakAssetDownloadAdapter,
+    register_cache_strategy(HTTPCacheStrategyStrongAdapter,
                             IAssetDownload,
                             config.registry,
                             'GET')
-    register_cache_strategy(HTTPCacheStrategyWeakAssetDownloadAdapter,
+    register_cache_strategy(HTTPCacheStrategyStrongAdapter,
                             IAssetDownload,
                             config.registry,
                             'HEAD')

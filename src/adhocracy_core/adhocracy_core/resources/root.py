@@ -30,42 +30,42 @@ import adhocracy_core.sheets.name
 # Every role should only have the permission for the specific actions it is
 # meant to enable.
 root_acm = ACM().deserialize(
-    {'principals':                                   ['anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin'],
+    {'principals':                                   ['anonymous', 'authenticated', 'participant', 'moderator',  'creator', 'initiator', 'admin'],
      'permissions': [  # general
-                     ['view',                          Allow,       Allow,         Allow,        Allow,     Allow,       Allow],
-                     ['create',                        None,        Allow,         Allow,        None,      Allow,       Allow],
-                     ['edit',                          None,        None,          None,         Allow,     None,        Allow],
-                     ['edit_some',                     None,        Allow,         Allow,        Allow,     Allow,       Allow],
-                     ['delete',                        None,        None,          Allow,        Allow,     None,        Allow],
-                     ['hide',                          None,        None,          Allow,        None,      Allow,       Allow],
-                     ['do_transition',                 None,        None,          None,         None,      Allow,       Allow],
-                     ['message_to_user',               None,        Allow,         Allow,        None,      Allow,       Allow],
+                     ['view',                          Allow,      Allow,          Allow,         Allow,        Allow,     Allow,       Allow],
+                     ['create',                        None,       None,           Allow,         Allow,        None,      Allow,       Allow],
+                     ['edit',                          None,       None,           None,          None,         Allow,     None,        Allow],
+                     ['edit_some',                     None,       None,           Allow,         Allow,        Allow,     Allow,       Allow],
+                     ['delete',                        None,       None,           None,          Allow,        Allow,     None,        Allow],
+                     ['hide',                          None,       None,           None,          Allow,        None,      Allow,       Allow],
+                     ['do_transition',                 None,       None,           None,          None,         None,      Allow,       Allow],
+                     ['message_to_user',               None,       None,           Allow,         Allow,        None,      Allow,       Allow],
                      # structure resources
-                     ['create_pool',                   None,        None,          None,         None,      None,        Allow],
-                     ['create_organisation',           None,        None,          None,         None,      None,        Allow],
-                     ['create_process',                None,        None,          None,         None,      Allow,       Allow],
+                     ['create_pool',                   None,       None,           None,          None,         None,      None,        Allow],
+                     ['create_organisation',           None,       None,           None,          None,         None,      None,        Allow],
+                     ['create_process',                None,       None,           None,          None,         None,      Allow,       Allow],
                      # simple content resources
-                     ['create_asset',                  None,        Allow,         None,         None,      None,        Allow],
-                     ['create_external',               None,        Allow,         None,         None,      None,        Allow],
-                     ['create_badge',                  None,        None,          Allow,        None,      Allow,       Allow],
-                     ['create_badge_assignment',       None,        None,          Allow,        None,      Allow,       Allow],
-                     ['create_badge_group',            None,        None,          Allow,        None,      Allow,       Allow],
-                     ['assign_badge',                  None,        None,          Allow,        None,      Allow,       Allow],
+                     ['create_asset',                  None,       None,           Allow,         None,         None,      None,        Allow],
+                     ['create_external',               None,       None,           Allow,         None,         None,      None,        Allow],
+                     ['create_badge',                  None,       None,           None,          Allow,        None,      Allow,       Allow],
+                     ['create_badge_assignment',       None,       None,           None,          Allow,        None,      Allow,       Allow],
+                     ['create_badge_group',            None,       None,           None,          Allow,        None,      Allow,       Allow],
+                     ['assign_badge',                  None,       None,           None,          Allow,        None,      Allow,       Allow],
                      # versioned content resources
-                     ['create_proposal',               None,        None,          None,         None,      None,        Allow],
-                     ['edit_proposal',                 None,        None,          None,         None,      None,        Allow],
-                     ['create_document',               None,        None,          None,         None,      None,        Allow],
-                     ['edit_document',                 None,        None,          None,         None,      None,        Allow],
-                     ['create_comment',                None,        None,          None,         None,      None,        Allow],
-                     ['edit_comment',                  None,        None,          None,         None,      None,        None],
-                     ['create_rate',                   None,        None,          None,         None,      None,        None],
-                     ['edit_rate',                     None,        None,          None,         None,      None,        None],
+                     ['create_proposal',               None,       None,           None,          None,         None,      None,        Allow],
+                     ['edit_proposal',                 None,       None,           None,          None,         None,      None,        Allow],
+                     ['create_document',               None,       None,           None,          None,         None,      None,        Allow],
+                     ['edit_document',                 None,       None,           None,          None,         None,      None,        Allow],
+                     ['create_comment',                None,       None,           None,          None,         None,      None,        Allow],
+                     ['edit_comment',                  None,       None,           None,          None,         None,      None,        None],
+                     ['create_rate',                   None,       None,           None,          None,         None,      None,        None],
+                     ['edit_rate',                     None,       None,           None,          None,         None,      None,        None],
                      # user, groups, permissions
-                     ['create_user',                   Allow,       None,          None,         None,      None,        Allow],
-                     ['edit_userextended',             None,        None,          None,         Allow,     None,        Allow],
-                     ['view_userextended',             None,        None,          None,         Allow,     None,        Allow],
-                     ['create_edit_sheet_permissions', None,        None,          None,         None,      None,        Allow],
-                     ['create_group',                  None,        None,          None,         None,      None,        Allow],
+                     ['create_user',                   Allow,      None,          None,          None,         None,      None,        Allow],
+                     ['edit_userextended',             None,       None,          None,          None,         Allow,     None,        Allow],
+                     ['view_userextended',             None,       None,          None,          None,         Allow,     None,        Allow],
+                     ['create_edit_sheet_permissions', None,       None,          None,          None,         None,      None,        Allow],
+                     ['create_group',                  None,       None,          None,          None,         None,      None,        Allow],
                      ]})
 
 
@@ -98,7 +98,8 @@ def _add_graph(context, registry):
 
 
 def _add_catalog_service(context, registry):
-    registry.content.create(ICatalogsService.__identifier__, parent=context)
+    registry.content.create(ICatalogsService.__identifier__, parent=context,
+                            registry=registry)
 
 
 def _add_principals_service(context, registry):
@@ -119,7 +120,8 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
                   {'name': 'adhocracy'}}
     registry.content.create(IProcess.__identifier__,
                             parent=context,
-                            appstructs=appstructs)
+                            appstructs=appstructs,
+                            registry=registry)
 
 
 def _add_default_group(context, registry):

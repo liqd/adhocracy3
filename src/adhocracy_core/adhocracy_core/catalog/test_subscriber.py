@@ -39,6 +39,25 @@ def test_reindex_rate_index(event, catalog):
     catalog.reindex_index.assert_called_with(event.object, 'rates')
 
 
+def test_reindex_user_name(event, catalog):
+    from .subscriber import reindex_user_name
+    reindex_user_name(event)
+    catalog.reindex_index.assert_called_with(event.object, 'user_name')
+
+
+def test_reindex_user_email(event, catalog):
+    from .subscriber import reindex_user_email
+    reindex_user_email(event)
+    catalog.reindex_index.assert_called_with(event.object, 'private_user_email')
+
+
+def test_reindex_user_activation_path(event, catalog):
+    from .subscriber import reindex_user_activation_path
+    reindex_user_activation_path(event)
+    catalog.reindex_index.assert_called_with(event.object,
+                                             'private_user_activation_path')
+
+
 def test_reindex_badge_index(event, catalog, mock_sheet, registry_with_content):
     from .subscriber import reindex_badge
     badgeable = testing.DummyResource()
@@ -47,6 +66,19 @@ def test_reindex_badge_index(event, catalog, mock_sheet, registry_with_content):
     event.registry = registry_with_content
     reindex_badge(event)
     catalog.reindex_index.assert_called_with(badgeable, 'badge')
+
+
+def test_reindex_item_badge(event, catalog):
+    from unittest.mock import call
+    from .subscriber import reindex_item_badge
+    from adhocracy_core.sheets.versions import IVersionable
+    event.object['version'] = testing.DummyResource(__provides__=IVersionable)
+    event.object['other'] = testing.DummyResource()
+    reindex_item_badge(event)
+
+    index_calls = catalog.reindex_index.call_args_list
+    assert call(event.object['version'], 'item_badge') in index_calls
+    assert call(event.object['other'], 'item_badge') not in index_calls
 
 
 @fixture
@@ -158,6 +190,9 @@ def test_register_subscriber(registry):
     assert subscriber.reindex_visibility.__name__ in handlers
     assert subscriber.reindex_rates.__name__ in handlers
     assert subscriber.reindex_badge.__name__ in handlers
+    assert subscriber.reindex_item_badge.__name__ in handlers
     assert subscriber.reindex_workflow_state.__name__ in handlers
+    assert subscriber.reindex_user_name.__name__ in handlers
+    assert subscriber.reindex_user_email.__name__ in handlers
 
 

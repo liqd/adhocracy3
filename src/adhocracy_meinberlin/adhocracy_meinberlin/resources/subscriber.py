@@ -4,9 +4,11 @@ from pyramid.traversal import find_interface
 from pyramid.renderers import render
 
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
+from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.authorization import set_acms_for_app_root
 from adhocracy_core.resources.root import root_acm
 from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import has_annotation_sheet_data
 from adhocracy_meinberlin.resources.root import meinberlin_acm
 from adhocracy_meinberlin.resources.bplan import IProposalVersion
 from adhocracy_meinberlin.resources.bplan import IProposal
@@ -14,7 +16,8 @@ from adhocracy_meinberlin import sheets
 from adhocracy_meinberlin import resources
 
 
-def _send_bplan_submission_confirmation_email_subscriber(event):
+def send_bplan_submission_confirmation_email(event):
+    """Notify office worker and creator about created bplan version."""
     if not hasattr(event.registry, 'messenger'):  # ease testing
         return
     messenger = event.registry.messenger
@@ -65,8 +68,10 @@ def _get_appstruct(proposal_version):
 
 def _is_proposal_creation_finished(proposal_version):
     proposal_item = find_interface(proposal_version, IProposal)
-    return len([version for version in proposal_item.values() if
-                IProposalVersion.providedBy(version)]) == 2
+    versions_with_data = [x for x in proposal_item.values()
+                          if IProposalVersion.providedBy(x)
+                          and has_annotation_sheet_data(x)]
+    return len(versions_with_data) == 1
 
 
 def set_root_acms(event):
@@ -77,6 +82,9 @@ def set_root_acms(event):
 def includeme(config):
     """Register subscribers."""
     config.add_subscriber(set_root_acms, ApplicationCreated)
-    config.add_subscriber(_send_bplan_submission_confirmation_email_subscriber,
+    config.add_subscriber(send_bplan_submission_confirmation_email,
                           IResourceCreatedAndAdded,
+                          object_iface=IProposalVersion)
+    config.add_subscriber(send_bplan_submission_confirmation_email,
+                          IResourceSheetModified,
                           object_iface=IProposalVersion)

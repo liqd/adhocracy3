@@ -22,14 +22,12 @@ from adhocracy_core.events import SheetBackReferenceAdded
 
 
 class SheetReftype(namedtuple('ISheetReftype', 'isheet field reftype')):
-
     """Fields: isheet field reftype."""
 
 
 @content('Graph',
          )
 class Graph(Persistent):
-
     """Utility to work with versions/references.
 
     This implementation depends on the :class:`substanced.objectmap.Objectmap`
@@ -72,7 +70,8 @@ class Graph(Persistent):
             yield SheetReftype(isheet, field, reftype)
 
     def set_references(self, source, targets: Iterable,
-                       reftype: SheetReference, registry: Registry=None):
+                       reftype: SheetReference, registry: Registry=None,
+                       send_event=True):
         """Set references of this source.
 
         :param targets: the reference targets, for Sequences the order
@@ -80,6 +79,7 @@ class Graph(Persistent):
         :param reftype: the reftype mapping to one isheet field.
         :param registry: pyramid registry to notify referenced resources.
                          Default value is None to ease testing.
+        :param send_event: send events to notify referenced resources
         """
         assert reftype.isOrExtends(SheetReference)
         multireference = self._create_multireference(source, targets, reftype)
@@ -89,10 +89,11 @@ class Graph(Persistent):
         if registry is None:
             return
         new = set(targets)
-        removed = old - new
-        self._notify_removed_targets(source, reftype, removed, registry)
-        added = new - old
-        self._notify_added_targets(source, reftype, added, registry)
+        if send_event:
+            removed = old - new
+            self._notify_removed_targets(source, reftype, removed, registry)
+            added = new - old
+            self._notify_added_targets(source, reftype, added, registry)
 
     def _create_multireference(self, source, targets, reftype):
         ordered = isinstance(targets, Sequence)
@@ -158,8 +159,9 @@ class Graph(Persistent):
             yield reference.source
 
     def set_references_for_isheet(self, source, isheet: ISheet,
-                                  references: dict, registry: Registry):
-        """ Set references of this source for one isheet.
+                                  references: dict, registry: Registry,
+                                  send_event=True):
+        """Set references of this source for one isheet.
 
         :param references: dictionary with the following content:
                            key - isheet field name
@@ -180,10 +182,11 @@ class Graph(Persistent):
                 continue
             if IResource.providedBy(targets):
                 targets = [targets]
-            self.set_references(source, targets, reftype, registry)
+            self.set_references(source, targets, reftype, registry,
+                                send_event=send_event)
 
     def get_references_for_isheet(self, source, isheet: ISheet) -> dict:
-        """ Get references of this source for one isheet only.
+        """Get references of this source for one isheet only.
 
         :returns: dictionary with the following content:
                   key - isheet field name
@@ -197,7 +200,7 @@ class Graph(Persistent):
                                                 orientation='targets')
 
     def get_back_references_for_isheet(self, target, isheet: ISheet) -> dict:
-        """ Get references that point to this target for one isheet only.
+        """Get references that point to this target for one isheet only.
 
         : return: dictionary with the following content:
                   key - isheet field name

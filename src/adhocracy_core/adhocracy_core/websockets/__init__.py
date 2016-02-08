@@ -2,7 +2,6 @@
 
 
 class WebSocketError(Exception):
-
     """An error that occurs during communication with a WebSocket client."""
 
     def __init__(self, error_type: str, details: str):

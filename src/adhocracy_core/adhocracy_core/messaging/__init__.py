@@ -25,7 +25,6 @@ _ = TranslationStringFactory('adhocracy')
 
 
 class Messenger:
-
     """Send messages to other people."""
 
     def __init__(self, registry: Registry):
@@ -115,7 +114,7 @@ class Messenger:
                    }
         subject = _('mail_abuse_complaint_subject',
                     mapping=mapping,
-                    default='[${site_name} Abuse Complaint')
+                    default='${site_name} Abuse Complaint')
         body = render('adhocracy_core:templates/abuse_complaint.txt.mako',
                       mapping)
         # FIXME For security reasons, we should check that the url starts
@@ -145,7 +144,7 @@ class Messenger:
                    'text': text}
         subject = _('mail_sent_message_to_user_subject',
                     mapping=mapping,
-                    default='[${site_name}] Message from ${sender_name}: '
+                    default='${site_name} Message from ${sender_name}: '
                             '${title}')
         body = _('mail_sent_message_to_user_body_txt',
                  mapping=mapping,
@@ -164,7 +163,7 @@ class Messenger:
     def _get_user_name(self, user: IResource) -> str:
         return get_sheet_field(user, IUserBasic, 'name', self.registry)
 
-    def _get_user_url(self, user: IResource)-> str:
+    def _get_user_url(self, user: IResource) -> str:
         sender_path = resource_path(user)
         return '%s/r%s/' % (self.frontend_url, sender_path)
 
@@ -182,7 +181,7 @@ class Messenger:
                             'Aktivierung Deines Nutzerkontos')
         body_txt = _('mail_account_verification_body_txt',
                      mapping=mapping,
-                     default='${activation_path}')
+                     default='${frontend_url}${activation_path}')
         self.send_mail(subject=subject,
                        recipients=[user.email],
                        body=body_txt,

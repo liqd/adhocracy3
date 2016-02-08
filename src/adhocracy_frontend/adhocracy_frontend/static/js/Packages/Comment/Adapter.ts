@@ -1,37 +1,17 @@
-import AdhComment = require("./Comment");
-import AdhListing = require("../Listing/Listing");
-import AdhUtil = require("../Util/Util");
+import * as AdhComment from "./Comment";
+import * as AdhUtil from "../Util/Util";
 
-import ResourcesBase = require("../../ResourcesBase");
+import * as ResourcesBase from "../../ResourcesBase";
 
-import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIComment = require("../../Resources_/adhocracy_core/resources/comment/IComment");
-import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
-import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
-import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
-import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
+import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIComment from "../../Resources_/adhocracy_core/resources/comment/IComment";
+import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import * as SICommentable from "../../Resources_/adhocracy_core/sheets/comment/ICommentable";
+import * as SIComment from "../../Resources_/adhocracy_core/sheets/comment/IComment";
+import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 
 
-export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
-    public elemRefs(container : ResourcesBase.Resource) {
-        return AdhUtil.eachItemOnce(container.data[SICommentable.nick].comments);
-    }
-
-    // NOTE: this is *not* a recursive comment count.
-    // "total" here means that it is not affected by any pagination
-    // which is not supported by this adapter anyway.
-    public totalCount(container : ResourcesBase.Resource) {
-        return this.elemRefs(container).length;
-    }
-
-    public poolPath(container : ResourcesBase.Resource) {
-        return container.data[SICommentable.nick].post_pool;
-    }
-
-    public canWarmup = false;
-}
-
-export class CommentAdapter extends ListingCommentableAdapter implements AdhComment.ICommentAdapter<RICommentVersion> {
+export class CommentAdapter implements AdhComment.ICommentAdapter<RICommentVersion> {
     contentType : string = RICommentVersion.content_type;
     itemContentType : string = RIComment.content_type;
 
@@ -98,7 +78,7 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
     }
 
     commentCount(resource : RICommentVersion) : number {
-        return AdhUtil.eachItemOnce(resource.data[SICommentable.nick].comments).length;
+        return resource.data[SICommentable.nick].comments_count;
     }
 
     edited(resource : RICommentVersion) : boolean {
@@ -106,5 +86,13 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
         // encoding changes.
         var meta = resource.data[SIMetadata.nick];
         return meta.modification_date > meta.item_creation_date;
+    }
+
+    elemRefs(container : ResourcesBase.Resource) {
+        return AdhUtil.eachItemOnce(container.data[SICommentable.nick].comments);
+    }
+
+    poolPath(container : ResourcesBase.Resource) {
+        return container.data[SICommentable.nick].post_pool;
     }
 }

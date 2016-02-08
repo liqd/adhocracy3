@@ -1,10 +1,10 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import q = require("q");
-import _ = require("lodash");
+import * as q from "q";
+import * as _ from "lodash";
 
-import AdhUser = require("./User");
-import AdhCredentials = require("./Credentials");
+import * as AdhUser from "./User";
+import * as AdhCredentials from "./Credentials";
 
 
 export var register = () => {
@@ -77,7 +77,7 @@ export var register = () => {
                     adhConfigMock, adhCacheMock, adhTrackingMock, modernizrMock, angularMock,
                     <any>q, httpMock, timeoutMock, rootScopeMock, windowMock);
 
-                adhUser = new AdhUser.Service(adhHttpMock, adhCredentials, rootScopeMock);
+                adhUser = new AdhUser.Service(adhHttpMock, adhCredentials, <any>q, rootScopeMock);
             });
 
             it("registers a handler on 'storage' DOM events", () => {

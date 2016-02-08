@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhMetaApi = require("./MetaApi");
+import * as AdhMetaApi from "./MetaApi";
 
 var sampleMetaApi : AdhMetaApi.IMetaApi = {
     "resources" : {

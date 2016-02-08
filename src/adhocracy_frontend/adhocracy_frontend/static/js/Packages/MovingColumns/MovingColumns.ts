@@ -1,8 +1,7 @@
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhShareSocial = require("../ShareSocial/ShareSocial");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import * as AdhConfig from "../Config/Config";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
 export var pkgLocation = "/MovingColumns";
 
@@ -18,14 +17,20 @@ export var movingColumns = (
     $window
 ) => {
     return {
-        link: (scope, element) => {
+        link: (scope, element, attrs) => {
             var cls : string;
             var fontSize : number = parseInt(element.css("font-size"), 10);
-
-            var maxShowWidth = 55 * fontSize;
+            var maxWidth = 55;
+            if (typeof attrs.maxWidth !== "undefined") {
+                maxWidth = parseInt(attrs.maxWidth, 10);
+            }
+            var maxShowWidth = maxWidth * fontSize;
             var minShowWidth = 35 * fontSize;
             var collapseWidth = 2 * fontSize;
             var spacing = Math.ceil(0.3 * fontSize);
+            if (typeof attrs.spacing !== "undefined") {
+                spacing = parseInt(attrs.spacing, 10);
+            }
 
             var clearStates = (element) => {
                 element.removeClass("is-show");
@@ -157,9 +162,9 @@ export var movingColumns = (
 /**
  * Moving Column directive
  *
- * Every moving column should be wrapped in an instance of this directive.
- * It provides common functionality, e.g. alerts, sidebar and overlays
- * via a controller that can be required by subelements.
+ * Every moving column should be wrapped in an instance of this
+ * directive.  It provides common functionality, e.g. alerts and
+ * overlays via a controller that can be required by subelements.
  *
  * Subelements can inject template code with the following transclusionIds
  * (see AdhInject):
@@ -167,7 +172,6 @@ export var movingColumns = (
  * -   body
  * -   menu
  * -   collapsed
- * -   sidebar
  * -   overlays
  */
 export interface IMovingColumnScope extends angular.IScope {
@@ -185,7 +189,6 @@ export interface IMovingColumnScope extends angular.IScope {
         message : string;
         mode : string;
     }};
-    _showSidebar : boolean;
 }
 
 export class MovingColumnController {
@@ -206,7 +209,6 @@ export class MovingColumnController {
     public clear() : void {
         this.$scope._alerts = {};
         this.$scope.overlay = undefined;
-        this.$scope._showSidebar = false;
     }
 
     public alert(message : string, mode : string = "info", duration : number = 3000) : void {
@@ -239,21 +241,6 @@ export class MovingColumnController {
         } else if (this.$scope.overlay === key) {
             this.$scope.overlay = undefined;
         }
-    }
-
-    public showSidebar() : void {
-        this.toggleSidebar(true);
-    }
-
-    public hideSidebar() : void {
-        this.toggleSidebar(false);
-    }
-
-    public toggleSidebar(condition? : boolean) : void {
-        if (typeof condition === "undefined") {
-            condition = !this.$scope._showSidebar;
-        }
-        this.$scope._showSidebar = condition;
     }
 
     public $broadcast(name : string, ...args : any[]) {
@@ -295,17 +282,4 @@ export var movingColumnDirective = (adhConfig : AdhConfig.IService) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MovingColumn.html",
         controller: ["adhTopLevelState", "$timeout", "$scope", MovingColumnController]
     };
-};
-
-
-export var moduleName = "adhMovingColumns";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhTopLevelState.moduleName,
-            AdhShareSocial.moduleName
-        ])
-        .directive("adhMovingColumn", ["adhConfig", movingColumnDirective])
-        .directive("adhMovingColumns", ["adhTopLevelState", "$timeout", "$window", movingColumns]);
 };

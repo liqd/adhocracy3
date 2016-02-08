@@ -5,4 +5,5 @@ def includeme(config):
     """Include resource types and subscribers."""
     config.include('.root')
     config.include('.mercator')
+    config.include('.mercator2')
     config.include('.subscriber')

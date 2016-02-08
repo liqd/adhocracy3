@@ -3,18 +3,17 @@
 /// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhHttp = require("../Http/Http");
-import AdhInject = require("../Inject/Inject");
-import AdhPermissions = require("../Permissions/Permissions");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhWebSocket = require("../WebSocket/WebSocket");
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
+import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
+import * as AdhWebSocket from "../WebSocket/WebSocket";
 
-import ResourcesBase = require("../../ResourcesBase");
+import * as ResourcesBase from "../../ResourcesBase";
 
-import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
+import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 
 var pkgLocation = "/Listing";
 
@@ -30,8 +29,6 @@ export interface IListingContainerAdapter {
 
     // The pool a new element should be posted to.
     poolPath(any) : string;
-
-    canWarmup : boolean;
 }
 
 export class ListingPoolAdapter implements IListingContainerAdapter {
@@ -46,8 +43,6 @@ export class ListingPoolAdapter implements IListingContainerAdapter {
     public poolPath(container : ResourcesBase.Resource) {
         return container.path;
     }
-
-    public canWarmup = true;
 }
 
 export interface IFacetItem {
@@ -63,32 +58,44 @@ export interface IFacet {
     items : IFacetItem[];
 }
 
-export type IPredicateItem = string | ((string) => string);
-export type IPredicate = IPredicateItem | IPredicateItem[];
+export interface ISortItem {
+    key : string;
+    name : string;
+    index : string;
+    reverse? : boolean;
+}
+
+export type IPredicate = string | {[key : string]: string}
 
 export interface ListingScope<Container> extends angular.IScope {
     path : string;
     contentType? : string;
     facets? : IFacet[];
     sort? : string;
-    reverse? : boolean;
+    sorts? : ISortItem[];
     initialLimit? : number;
     currentLimit? : number;
     totalCount? : number;
     params? : any;
     emptyText? : string;
+    showFilter : boolean;
+    showSort : boolean;
     container : Container;
     poolPath : string;
     poolOptions : AdhHttp.IOptions;
     createPath? : string;
     elements : string[];
-    frontendOrderPredicate : IPredicate;
-    frontendOrderReverse : boolean;
     update : (boolean?) => angular.IPromise<void>;
     loadMore : () => void;
     wsOff : () => void;
     clear : () => void;
     onCreate : () => void;
+    toggleFilter : () => void;
+    toggleSort : () => void;
+    enableItem : (facet : IFacet, item : IFacetItem) => void;
+    toggleItem : (facet : IFacet, item : IFacetItem, event) => void;
+    disableItem : (facet : IFacet, item : IFacetItem) => void;
+    setSort : (sort : string) => void;
 }
 
 export interface IFacetsScope extends angular.IScope {
@@ -126,12 +133,9 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 contentType: "@",
                 facets: "=?",
                 sort: "=?",
-                reverse: "=?",
+                sorts: "=?",
                 initialLimit: "=?",
-                frontendOrderPredicate: "=?",
-                frontendOrderReverse: "=?",
                 params: "=?",
-                update: "=?",
                 noCreateForm: "=?",
                 emptyText: "@"
             },
@@ -152,17 +156,19 @@ export class Listing<Container extends ResourcesBase.Resource> {
 
                 $scope.createPath = adhPreliminaryNames.nextPreliminary();
 
-                var getElements = (
-                    warmup? : boolean, count? : boolean, limit? : number, offset? : number
-                ) : angular.IPromise<Container> => {
-                    var params = <any>_.extend({}, $scope.params);
+                var getElements = (count? : boolean, limit? : number, offset? : number) : angular.IPromise<Container> => {
+                    var params = <any>{};
+
                     if (typeof $scope.contentType !== "undefined") {
                         params.content_type = $scope.contentType;
                         if (_.endsWith($scope.contentType, "Version")) {
-                            params.depth = 2;
+                            params.depth = params.depth || 2;
                             params.tag = "LAST";
                         }
                     }
+
+                    _.extend(params, $scope.params);
+
                     if ($scope.facets) {
                         $scope.facets.forEach((facet : IFacet) => {
                             facet.items.forEach((item : IFacetItem) => {
@@ -172,61 +178,102 @@ export class Listing<Container extends ResourcesBase.Resource> {
                             });
                         });
                     }
-                    if ($scope.sort) {
-                        params["sort"] = $scope.sort;
-                        if ($scope.reverse) {
-                            params["reverse"] = $scope.reverse;
+
+                    var sortItem;
+                    if ($scope.sorts && $scope.sorts.length > 0) {
+                        if ($scope.sort) {
+                            sortItem = _.find($scope.sorts, (sortItem) => {
+                                return sortItem.key === $scope.sort;
+                            });
+                            if (!sortItem) {
+                                console.log("Unknown listing sort '" + $scope.sort + "'. Switching to default.");
+                                sortItem = $scope.sorts[0];
+                                $scope.sort = sortItem.key;
+                            }
+                        } else {
+                            sortItem = $scope.sorts[0];
+                            $scope.sort = sortItem.key;
                         }
                     }
+                    if (sortItem) {
+                        params.sort = sortItem.index;
+                        params.reverse = !!sortItem.reverse;
+                    }
+
                     if (limit) {
-                        params["limit"] = limit;
+                        params.limit = limit;
                         if (offset) {
-                            params["offset"] = offset;
+                            params.offset = offset;
                         }
                     }
                     if (count) {
-                        params["count"] = "true";
+                        params.count = "true";
                     }
                     return adhHttp.get($scope.path, params, {
-                        warmupPoolCache: warmup
+                        warmupPoolCache: true
                     });
                 };
 
+                $scope.toggleFilter = () => {
+                    $scope.showSort = false;
+                    $scope.showFilter = !$scope.showFilter;
+                };
+
+                $scope.toggleSort = () => {
+                    $scope.showFilter = false;
+                    $scope.showSort = !$scope.showSort;
+                };
+
+                $scope.enableItem = (facet : IFacet, item : IFacetItem) => {
+                    if (!item.enabled) {
+                        facet.items.forEach((_item : IFacetItem) => {
+                            _item.enabled = (item === _item);
+                        });
+                        $scope.update();
+                    }
+                };
+                $scope.disableItem = (facet : IFacet, item : IFacetItem) => {
+                    if (item.enabled) {
+                        item.enabled = false;
+                        $scope.update();
+                    }
+                };
+                $scope.toggleItem = (facet : IFacet, item : IFacetItem, event) => {
+                    event.stopPropagation();
+                    if (item.enabled) {
+                        $scope.disableItem(facet, item);
+                    } else {
+                        $scope.enableItem(facet, item);
+                    }
+                };
+
                 $scope.update = (warmup? : boolean) : angular.IPromise<void> => {
+
                     if ($scope.initialLimit) {
                         if (!$scope.currentLimit) {
                             $scope.currentLimit = $scope.initialLimit;
                         }
                     }
-                    return getElements(warmup, true, $scope.currentLimit).then((container) => {
+                    return getElements(true, $scope.currentLimit).then((container) => {
                         $scope.container = container;
                         $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
                         $scope.totalCount = _self.containerAdapter.totalCount($scope.container);
 
-                        // FIXME: Sorting direction should be implemented in backend, working on a copy is used,
-                        // because otherwise sometimes the already reversed sorted list (from cache) would be
-                        // reversed again
-                        var elements = _.clone(_self.containerAdapter.elemRefs($scope.container));
+                        // avoid modifying the cached result
+                        $scope.elements = _.clone(_self.containerAdapter.elemRefs($scope.container));
 
-                        // trying to maintain compatible with builtin orderBy functionality, but
-                        // allow to not specify predicate or reverse.
-                        if ($scope.frontendOrderPredicate) {
-                            $scope.elements = $filter("orderBy")(
-                                elements,
-                                $scope.frontendOrderPredicate,
-                                $scope.frontendOrderReverse
-                            );
-                        } else if ($scope.frontendOrderReverse) {
-                            $scope.elements = elements.reverse();
-                        } else {
-                            $scope.elements = elements;
+                        if (!$scope.sorts || $scope.sorts.length === 0) {
+                            // If no backend based sorting is used, we
+                            // apply some sorting to get consistent
+                            // results across requests.
+                            $scope.elements = _.sortBy($scope.elements).reverse();
                         }
                     });
                 };
 
                 $scope.loadMore = () : void => {
                     if ($scope.currentLimit < $scope.totalCount) {
-                        getElements(true, false, $scope.initialLimit, $scope.currentLimit).then((container) => {
+                        getElements(false, $scope.initialLimit, $scope.currentLimit).then((container) => {
                             var elements = _.clone(_self.containerAdapter.elemRefs(container));
                             $scope.elements = $scope.elements.concat(elements);
                             $scope.currentLimit += $scope.initialLimit;
@@ -238,6 +285,10 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     $scope.container = undefined;
                     $scope.poolPath = undefined;
                     $scope.elements = [];
+                };
+
+                $scope.setSort = (sort : string) => {
+                    $scope.sort = sort;
                 };
 
                 $scope.onCreate = () : void => {
@@ -258,7 +309,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                         // order to not miss any messages in between. But in
                         // order to subscribe we already need the resource. So
                         // that is not possible.
-                        $scope.update(_self.containerAdapter.canWarmup).then(() => {
+                        $scope.update().then(() => {
                             try {
                                 $scope.wsOff = adhWebSocket.register($scope.poolPath, () => $scope.update());
                             } catch (e) {
@@ -281,50 +332,11 @@ export var facets = (adhConfig : AdhConfig.IService) => {
         restrict: "E",
         scope: {
             facets: "=",
-            update: "="
+            update: "=",
+            toggleItem: "=",
+            disableItem: "=",
+            enableItem: "="
         },
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Facets.html",
-        link: (scope : IFacetsScope) => {
-            scope.enableItem = (facet : IFacet, item : IFacetItem) => {
-                if (!item.enabled) {
-                    facet.items.forEach((_item : IFacetItem) => {
-                        _item.enabled = (item === _item);
-                    });
-                    scope.update();
-                }
-            };
-            scope.disableItem = (facet : IFacet, item : IFacetItem) => {
-                if (item.enabled) {
-                    item.enabled = false;
-                    scope.update();
-                }
-            };
-            scope.toggleItem = (facet : IFacet, item : IFacetItem, event) => {
-                event.stopPropagation();
-                if (item.enabled) {
-                    scope.disableItem(facet, item);
-                } else {
-                    scope.enableItem(facet, item);
-                }
-            };
-        }
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Facets.html"
     };
-};
-
-
-export var moduleName = "adhListing";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhHttp.moduleName,
-            AdhInject.moduleName,
-            AdhPermissions.moduleName,
-            AdhPreliminaryNames.moduleName,
-            AdhWebSocket.moduleName
-        ])
-        .directive("adhFacets", ["adhConfig", facets])
-        .directive("adhListing",
-            ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
-                new Listing(new ListingPoolAdapter()).createDirective(adhConfig, adhWebSocket)]);
 };

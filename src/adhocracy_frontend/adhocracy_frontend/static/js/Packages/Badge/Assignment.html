@@ -1,4 +1,3 @@
-<h2>Badge Assignment</h2>
 <form
     name="form"
     data-ng-if="badges"
@@ -7,24 +6,32 @@
     <select
         data-ng-model="data.badge"
         name="badges"
+        data-ng-options="badge.path as badge.title for badge in badges"
         required="required">
-        <option value="" data-selected="selected">Choose a badge</option>
-        <option value="{{ badge.path }}" data-ng-repeat="badge in badges">{{ badge.title }}</option>
+        <option value="">{{ "TR__CHOOSE_BADGE" | translate }}</option>
     </select>
     <span data-ng-show="form.$submitted || form.badges.$touched">
-        <span class="input-error" data-ng-show="form.badges.$error.required">Please choose a badge</span>
+        <span class="input-error" data-ng-show="form.badges.$error.required">{{ "TR__ERROR_REQUIRED_BADGE" | translate }}</span>
     </span>
+    <span class="input-error" data-ng-show="serverError">{{serverError}}</span>
 
     <textarea
+        data-ng-if="showDescription"
         data-ng-model="data.description"
         name="description">
     </textarea>
 
     <footer class="form-footer">
+        <a href="" class="button form-footer-button" data-ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
         <input
             type="submit"
             name="submit"
             value="{{ 'TR__PUBLISH' | translate }}"
             class="button-cta form-footer-button-cta" />
+        <a
+            href=""
+            data-ng-if="delete"
+            data-ng-click="delete()"
+            class="button-cta-secondary form-footer-button-cta">{{ "TR__DELETE" | translate }}</a>
     </footer>
 </form>

@@ -1,12 +1,12 @@
 """Tests for the principal package."""
-import unittest
-from unittest.mock import Mock
-
 from pyramid import testing
 from pytest import fixture
-from pytest import mark
-from pytest import mark
 from pytest import fixture
+from pytest import mark
+from pytest import mark
+from unittest.mock import Mock
+import pytest
+import unittest
 
 
 @fixture
@@ -16,6 +16,15 @@ def integration(integration):
     integration.include('adhocracy_core.changelog')
     integration.include('adhocracy_core.messaging')
     return integration
+
+
+@fixture
+def mock_is_older(monkeypatch):
+    from adhocracy_core.sheets.metadata import is_older_than
+    from . import principal
+    mock = Mock(spec=is_older_than)
+    monkeypatch.setattr(principal, 'is_older_than', mock)
+    return mock
 
 
 @fixture
@@ -53,7 +62,6 @@ class TestPrincipalsService:
     @mark.usefixtures('integration')
     def test_register_services(self, meta, registry, pool):
         from substanced.util import find_service
-        from . import principal
         registry.content.create(meta.iresource.__identifier__, parent=pool)
         assert find_service(pool, 'principals', 'users')
         assert find_service(pool, 'principals', 'groups')
@@ -68,13 +76,16 @@ class TestUsers:
         return users_meta
 
     def test_meta(self, meta):
-        from adhocracy_core import sheets
         from . import badge
+        from . import asset
         from . import principal
+        from adhocracy_core import sheets
         assert meta.iresource is principal.IUsersService
         assert meta.permission_create == 'create_service'
         assert meta.content_name == 'users'
+        assert sheets.asset.IHasAssetPool in meta.extended_sheets
         assert badge.add_badge_assignments_service in meta.after_creation
+        assert asset.add_assets_service in meta.after_creation
 
     @mark.usefixtures('integration')
     def test_create(self, meta, registry):
@@ -90,7 +101,6 @@ class TestUser:
         return user_meta
 
     def test_meta(self, meta):
-        from . import badge
         from . import principal
         import adhocracy_core.sheets
         assert meta.iresource is principal.IUser
@@ -99,6 +109,7 @@ class TestUser:
         assert meta.is_implicit_addable is False
         assert meta.basic_sheets == (adhocracy_core.sheets.principal.IUserBasic,
                                      adhocracy_core.sheets.principal.IUserExtended,
+                                     adhocracy_core.sheets.principal.ICaptcha,
                                      adhocracy_core.sheets.principal.IPermissions,
                                      adhocracy_core.sheets.metadata.IMetadata,
                                      adhocracy_core.sheets.pool.IPool,
@@ -108,6 +119,7 @@ class TestUser:
                 adhocracy_core.sheets.rate.ICanRate,
                 adhocracy_core.sheets.badge.ICanBadge,
                 adhocracy_core.sheets.badge.IBadgeable,
+                adhocracy_core.sheets.image.IImageReference,
             )
         assert meta.element_types == ()
         assert meta.use_autonaming is True
@@ -306,6 +318,13 @@ class TestPasswordReset:
 class TestUserLocatorAdapter:
 
     @fixture
+    def mock_catalogs(self, monkeypatch, mock_catalogs) -> Mock:
+        from . import principal
+        monkeypatch.setattr(principal, 'find_service',
+                            lambda x, y: mock_catalogs)
+        return mock_catalogs
+
+    @fixture
     def context(self, pool, service):
         from copy import deepcopy
         pool['principals'] = service
@@ -313,15 +332,15 @@ class TestUserLocatorAdapter:
         return pool
 
     @fixture
-    def request(self, context, registry_with_content):
+    def request_(self, context, registry_with_content):
         request = testing.DummyRequest(context=context)
         request.registry = registry_with_content
         return request
 
     @fixture
-    def inst(self, context, request):
+    def inst(self, context, request_):
         from .principal import UserLocatorAdapter
-        return UserLocatorAdapter(context, request)
+        return UserLocatorAdapter(context, request_)
 
     def test_create(self, inst):
         from adhocracy_core.interfaces import IRolesUserLocator
@@ -329,68 +348,92 @@ class TestUserLocatorAdapter:
         assert IRolesUserLocator.providedBy(inst)
         assert verifyObject(IRolesUserLocator, inst)
 
-    def test_get_user_by_email_user_exists(self, context, request, inst):
+    def test_get_users(self, inst, context):
         from .principal import IUser
-        user = testing.DummyResource(email='test@test.de', __provides__=IUser)
-        context['principals']['users']['User1'] = user
+        user = testing.DummyResource(__provides__=IUser)
+        context['principals']['users']['user'] = user
+        context['principals']['users']['other'] = testing.DummyResource()
+        result = inst.get_users()
+        assert list(result) == [user]
+
+    def test_get_user_by_email_user_exists(self, inst, mock_catalogs,
+                                           search_result, query):
+        user = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
         assert inst.get_user_by_email('test@test.de') is user
+        assert mock_catalogs.search.call_args[0][0] == query._replace(
+            indexes={'private_user_email': 'test@test.de'},
+            resolve=True,
+        )
 
-    def test_get_user_by_email_user_not_exists(self, context, request, inst):
-        from .principal import IUser
-        user = testing.DummyResource(email='', __provides__=IUser)
-        context['principals']['users']['User1'] = user
+    def test_get_user_by_email_two_identical_user_exists(self, inst, mock_catalogs,
+                                                         search_result, query):
+        user = testing.DummyResource()
+        user2 = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user, user2])
+        with pytest.raises(ValueError):
+            inst.get_user_by_email('test@test.de')
+
+    def test_get_user_by_email_user_not_exists(self, inst, mock_catalogs):
         assert inst.get_user_by_email('wrong@test.de') is None
+        assert mock_catalogs.search.called
 
-    def test_get_user_by_login_user_exists(self, context, request, inst):
-        from .principal import IUser
-        user = testing.DummyResource(name='login name', __provides__=IUser)
-        context['principals']['users']['User1'] = user
-        other = testing.DummyResource()
-        context['principals']['users']['other'] = other
+    def test_get_user_by_login_user_exists(self, inst, mock_catalogs,
+                                           search_result, query):
+        user = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
         assert inst.get_user_by_login('login name') is user
+        assert mock_catalogs.search.call_args[0][0] == query._replace(
+            indexes={'user_name': 'login name'},
+            resolve=True,
+        )
 
-    def test_get_user_by_login_user_not_exists(self, context, request, inst):
-        user = testing.DummyResource(name='')
-        context['principals']['users']['User1'] = user
+    def test_get_user_by_login_user_not_exists(self, inst, mock_catalogs):
         assert inst.get_user_by_login('wrong login name') is None
+        assert mock_catalogs.search.called
 
-    def test_get_user_by_activation_path_user_exists(self, context, request, inst):
-        from .principal import IUser
-        user = testing.DummyResource(activation_path='/activate/foo',
-                                     __provides__=IUser)
-        context['principals']['users']['User1'] = user
-        other = testing.DummyResource()
-        context['principals']['users']['other'] = other
+    def test_get_user_by_activation_path_user_exists(self, inst, mock_catalogs,
+                                                     search_result, query):
+        user = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
         assert inst.get_user_by_activation_path('/activate/foo') is user
-        
-    def test_get_user_by_activation_path_user_not_exists(self, context, request, inst):
-        user = testing.DummyResource(activation_path=None)
-        context['principals']['users']['User1'] = user
-        assert inst.get_user_by_activation_path('/activate/no_such_link') is None
+        assert mock_catalogs.search.call_args[0][0] == query._replace(
+            indexes={'private_user_activation_path': '/activate/foo'},
+            resolve=True,
+        )
 
-    def test_get_user_by_userid_user_exists(self, context, request, inst):
+    def test_get_user_by_activation_path_user_not_exists(self, inst,
+                                                         mock_catalogs):
+        assert inst.get_user_by_activation_path('/activate/no_such_link') is None
+        assert mock_catalogs.search.called
+
+    def test_get_user_by_userid_user_exists(self, context, inst):
         user = testing.DummyResource()
         context['principals']['users']['User1'] = user
         assert inst.get_user_by_userid('/principals/users/User1') is user
 
-    def test_get_user_by_userid_user_not_exists(self, context, request, inst):
+    def test_get_user_by_userid_user_not_exists(self, inst):
         assert inst.get_user_by_userid('/principals/users/User1') is None
 
-    def test_get_groupids_user_exists(self, context, mock_sheet, request, inst):
+    def test_get_groupids_user_exists(self, context, mock_sheet, request_, inst):
         from adhocracy_core.sheets.principal import IPermissions
         from adhocracy_core.testing import register_sheet
         group = testing.DummyResource(__name__='group1')
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
         mock_sheet.get.return_value = {'groups': [group]}
         user = testing.DummyResource()
-        register_sheet(user, mock_sheet, request.registry)
+        register_sheet(user, mock_sheet, request_.registry)
         context['principals']['users']['User1'] = user
         assert inst.get_groupids('/principals/users/User1') == ['group:group1']
 
-    def test_get_groupids_user_not_exists(self, context, request, inst):
+    def test_get_groupids_user_not_exists(self, inst):
         assert inst.get_groupids('/principals/users/User1') is None
 
-    def test_get_role_and_group_role_ids_user_exists(self, context, request, inst):
+    def test_get_role_and_group_role_ids_user_exists(self, context, inst):
         inst.get_user_by_userid = Mock()
         inst.get_user_by_userid.return_value = context
         inst.get_roleids = Mock()
@@ -400,10 +443,10 @@ class TestUserLocatorAdapter:
         assert inst.get_role_and_group_roleids('/principals/users/User1') ==\
                ['role:admin', 'role:reader']
 
-    def test_get_role_and_group_roleids_user_not_exists(self, context, request, inst):
+    def test_get_role_and_group_roleids_user_not_exists(self, inst):
         assert inst.get_role_and_group_roleids('/principals/users/User1') is None
 
-    def test_get_group_roleids_user_exists(self, inst, context, mock_sheet, request,
+    def test_get_group_roleids_user_exists(self, inst, context, mock_sheet, request_,
                                           ):
         from adhocracy_core.sheets.principal import IPermissions
         from adhocracy_core.testing import register_sheet
@@ -411,22 +454,22 @@ class TestUserLocatorAdapter:
         user = testing.DummyResource()
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
         mock_sheet.get.return_value = {'groups': [group]}
-        register_sheet(user, mock_sheet, request.registry)
+        register_sheet(user, mock_sheet, request_.registry)
         group.roles = ['role1']
         context['principals']['users']['User1'] = user
         assert inst.get_group_roleids('/principals/users/User1') == ['role:role1']
 
-    def test_get_group_roleids_user_not_exists(self, context, request, inst):
+    def test_get_group_roleids_user_not_exists(self, inst):
         assert inst.get_group_roleids('/principals/users/User1') is None
 
-    def test_get_roleids_user_exists(self, context, mock_sheet, request, inst):
+    def test_get_roleids_user_exists(self, context, mock_sheet, request_, inst):
         from adhocracy_core.testing import register_sheet
         user = testing.DummyResource(roles=['role1'])
-        register_sheet(user, mock_sheet, request.registry)
+        register_sheet(user, mock_sheet, request_.registry)
         context['principals']['users']['User1'] = user
         assert inst.get_roleids('/principals/users/User1') == ['role:role1']
 
-    def test_get_roleids_user_not_exists(self, context, request, inst):
+    def test_get_roleids_user_not_exists(self, inst):
         assert inst.get_roleids('/principals/users/User1') is None
 
 
@@ -472,3 +515,81 @@ class TestGroupsAndRolesFinder:
     def test_userid_with_groups_and_group_roles(self, request, mock_user_locator):
         mock_user_locator.get_role_and_group_roleids.return_value = ['group:Readers']
         assert self.call_fut('userid', request) == ['group:Readers']
+
+
+class TestDeleteNotActiveUsers:
+
+    @fixture
+    def request_(self, context, registry):
+        request = testing.DummyRequest(context=context)
+        request.registry = registry
+        return request
+
+    @fixture
+    def user(self):
+        user = testing.DummyResource(active=False, email='', name='')
+        return user
+
+    @fixture
+    def users(self, context, user):
+        context['user'] = user
+        return context
+
+    def call_fut(self, *args):
+        from .principal import delete_not_activated_users
+        return delete_not_activated_users(*args)
+
+    def test_delete_not_active_users_older_then_days(
+            self, users, user, request_, mock_is_older, mock_user_locator):
+        mock_is_older.return_value = True
+        mock_user_locator.get_users.return_value = [user]
+        self.call_fut(request_, 7)
+        mock_is_older.assert_called_with(user, 7)
+        assert 'user' not in users
+
+    def test_ignore_not_active_user_younger_then_days(
+            self, users, user, request_, mock_is_older, mock_user_locator):
+        mock_is_older.return_value = False
+        mock_user_locator.get_users.return_value = [user]
+        self.call_fut(request_, 7)
+        assert 'user' in users
+
+    def test_ignore_active_user(
+            self, users, user, request_, mock_user_locator):
+        user.active = True
+        mock_user_locator.get_users.return_value = [user]
+        self.call_fut(request_, 7)
+        assert 'user' in users
+
+
+class TestDeletePasswordResets:
+
+    @fixture
+    def reset(self):
+        reset = testing.DummyResource()
+        return reset
+
+    @fixture
+    def resets(self, reset, monkeypatch):
+        from . import principal
+        mock = testing.DummyResource()
+        mock['reset'] = reset
+        monkeypatch.setattr(principal, 'find_service', lambda x, y, z: mock)
+        return mock
+
+    def call_fut(self, *args):
+        from .principal import delete_password_resets
+        return delete_password_resets(*args)
+
+    def test_delete_resets_older_then_days(
+            self, resets, reset, request_, mock_is_older):
+        mock_is_older.return_value = True
+        self.call_fut(request_, 7)
+        mock_is_older.assert_called_with(reset, 7)
+        assert 'reset' not in resets
+
+    def test_ignore_resets_younger_then_days(
+            self, resets, reset, request_, mock_is_older):
+        mock_is_older.return_value = False
+        self.call_fut(request_, 7)
+        assert 'reset' in resets

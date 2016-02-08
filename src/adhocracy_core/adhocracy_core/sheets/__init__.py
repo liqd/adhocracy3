@@ -30,7 +30,6 @@ logger = getLogger(__name__)
 
 @implementer(IResourceSheet)
 class BaseResourceSheet:
-
     """Basic Resource sheet to get/set resource appstruct data.
 
     Subclasses have to implement the `_data` property to store appstruct data.
@@ -78,11 +77,6 @@ class BaseResourceSheet:
         catalogs = find_service(self.context, 'catalogs')
         return catalogs
 
-    @property
-    def _data(self):
-        """Return dictionary to store data."""
-        raise NotImplementedError
-
     def get(self, params: dict={}, add_back_references=True) -> dict:
         """Return appstruct data.
 
@@ -107,11 +101,9 @@ class BaseResourceSheet:
         items = [(n.name, n.default) for n in schema]
         return dict(items)
 
-    def _get_data_appstruct(self) -> iter:
-        """Might be overridden in subclasses."""
-        for key in self._fields['data']:
-            if key in self._data:
-                yield (key, self._data[key])
+    def _get_data_appstruct(self) -> dict:
+        """Get data appstruct."""
+        raise NotImplementedError
 
     def _get_references_query(self, params: dict) -> SearchQuery:
         """Might be overridden in subclasses."""
@@ -147,7 +139,13 @@ class BaseResourceSheet:
             return iter([])  # ease testing
         for field, node in fields:
             reference = create_ref(node)
-            query_field = query._replace(references=[reference])
+            is_references_node = isinstance(node, schema.UniqueReferences)\
+                and not getattr(node, 'backref', False)
+            if is_references_node:  # search references and preserve order
+                query_field = query._replace(references=[reference],
+                                             sort_by='reference')
+            else:  # search single reference or back references
+                query_field = query._replace(references=[reference])
             elements = self._catalogs.search(query_field).elements
             if len(elements) == 0:
                 continue
@@ -161,6 +159,7 @@ class BaseResourceSheet:
             omit=(),
             send_event=True,
             request: Request=None,
+            send_reference_event=True,
             omit_readonly: bool=True) -> bool:
         """Store appstruct."""
         appstruct_old = self.get(add_back_references=False)
@@ -168,7 +167,8 @@ class BaseResourceSheet:
         if omit_readonly:
             appstruct = self._omit_readonly_keys(appstruct)
         self._store_data(appstruct)
-        self._store_references(appstruct, self.registry)
+        self._store_references(appstruct, self.registry,
+                               send_event=send_reference_event)
         if send_event:
             event = ResourceSheetModified(self.context,
                                           self.meta.isheet,
@@ -189,19 +189,18 @@ class BaseResourceSheet:
         return remove_keys_from_dict(appstruct, keys_to_remove=omit_keys)
 
     def _store_data(self, appstruct):
-        """Might be overridden in subclasses."""
-        for key in self._fields['data']:
-            if key in appstruct:
-                self._data[key] = appstruct[key]
+        """Store data appstruct."""
+        raise NotImplementedError
 
-    def _store_references(self, appstruct, registry):
+    def _store_references(self, appstruct, registry, send_event=True):
         """Might be overridden in subclasses."""
         if not self._graph:
             return  # ease testing
         self._graph.set_references_for_isheet(self.context,
                                               self.meta.isheet,
                                               appstruct,
-                                              registry)
+                                              registry,
+                                              send_event=send_event)
 
     def get_cstruct(self, request: Request, params: dict=None):
         """Return cstruct data.
@@ -240,9 +239,7 @@ class BaseResourceSheet:
 
     def delete_field_values(self, fields: [str]):
         """Delete value for every field name in `fields`."""
-        for key in fields:
-            if key in self._data:
-                del self._data[key]
+        raise NotImplementedError
 
     def after_set(self, changed: bool):
         """Hook to run after setting data. Not used."""
@@ -251,39 +248,52 @@ class BaseResourceSheet:
 
 @implementer(IResourceSheet)
 class AnnotationRessourceSheet(BaseResourceSheet):
-
     """Resource Sheet that stores data in dictionary annotation."""
 
     def __init__(self, meta, context, registry=None):
         """Initialize self."""
         super().__init__(meta, context, registry)
-        self._data_key = self.meta.isheet.__identifier__
+        isheet_name = meta.isheet.__identifier__
+        self._annotation_key = '_sheet_' + isheet_name.replace('.', '_')
 
-    @property
-    def _data(self):
-        """Return dictionary to store data."""
-        sheets_data = getattr(self.context, '_sheets', None)
-        if sheets_data is None:
-            sheets_data = PersistentMapping()
-            setattr(self.context, '_sheets', sheets_data)
-        data = sheets_data.get(self._data_key, None)
+    def _get_data_appstruct(self) -> dict:
+        """Get data appstruct."""
+        data = getattr(self.context, self._annotation_key, {})
+        return {k: v for k, v in data.items() if k in self._fields['data']}
+
+    def _store_data(self, appstruct):
+        """Store data appstruct."""
+        data = getattr(self.context, self._annotation_key, None)
         if data is None:
             data = PersistentMapping()
-            sheets_data[self._data_key] = data
-        return data
+            setattr(self.context, self._annotation_key, data)
+        for key in self._fields['data']:
+            if key in appstruct:
+                data[key] = appstruct[key]
+
+    def delete_field_values(self, fields: [str]):
+        """Delete value for every field name in `fields`."""
+        if not hasattr(self.context, self._annotation_key):
+            return None
+        appstruct = getattr(self.context, self._annotation_key, {})
+        for key in fields:
+            if key in appstruct:
+                del appstruct[key]
+        if appstruct == {}:
+            delattr(self.context, self._annotation_key)
 
 
 @implementer(IResourceSheet)
 class AttributeResourceSheet(BaseResourceSheet):
-
     """Resource Sheet that stores data as context attributes."""
 
-    @property
-    def _data(self):
-        return self.context.__dict__
+    def _get_data_appstruct(self) -> dict:
+        """Get data appstruct."""
+        data = self.context.__dict__
+        return {k: v for k, v in data.items() if k in self._fields['data']}
 
     def _store_data(self, appstruct):
-        """Might be overridden in subclasses."""
+        """Store data appstruct."""
         for key in self._fields['data']:
             if key in appstruct:
                 setattr(self.context, key, appstruct[key])
@@ -305,8 +315,6 @@ sheet_meta = SheetMetadata(isheet=ISheet,
                            editable=True,
                            creatable=True,
                            create_mandatory=False,
-                           mime_type_validator=None,
-                           image_sizes=None,
                            )
 
 
@@ -350,6 +358,7 @@ def includeme(config):  # pragma: no cover
     config.include('.versions')
     config.include('.tags')
     config.include('.principal')
+    config.include('.relation')
     config.include('.metadata')
     config.include('.comment')
     config.include('.rate')

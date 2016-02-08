@@ -11,21 +11,28 @@ It is usually used in the header bar.
 
 .user-indicator {
     @include inline-block;
-    @include text(introvert);
     vertical-align: middle;
     white-space: nowrap;
+    color: $color-text-introvert;
+    font-weight: $font-weight-introvert;
 
     a {
         display: inline;
         text-decoration: none;
     }
 
+    .user-profile-image {
+        @include rem(height, 30px);
+        @include rem(width, 30px);
+        vertical-align: middle;
+    }
+
     .user-indicator-logout,
     .user-indicator-login,
     .user-indicator-register {
+        @include rem(font-size, $font-size-plus);
         color: $color-text-highlight-introvert;
         font-variant: small-caps;
-        font-size: $font-size-plus;
         text-transform: lowercase;
 
         &:hover, &:focus {

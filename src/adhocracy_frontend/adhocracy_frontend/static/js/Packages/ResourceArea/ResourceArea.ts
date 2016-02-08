@@ -1,16 +1,15 @@
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import ResourcesBase = require("../../ResourcesBase");
+import * as ResourcesBase from "../../ResourcesBase";
 
-import AdhConfig = require("../Config/Config");
-import AdhEmbed = require("../Embed/Embed");
-import AdhHttp = require("../Http/Http");
-import AdhProcess = require("../Process/Process");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUtil = require("../Util/Util");
+import * as AdhConfig from "../Config/Config";
+import * as AdhEmbed from "../Embed/Embed";
+import * as AdhHttp from "../Http/Http";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUtil from "../Util/Util";
 
-import RIProcess = require("../../Resources_/adhocracy_core/resources/process/IProcess");
-import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
+import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
 var pkgLocation = "/ResourceArea";
 
@@ -190,7 +189,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         return <Dict>_.extend({}, this.provider.defaults[key]);
     }
 
-    private getSpecifics(resource, view : string, processType : string, embedContext : string) : angular.IPromise<Dict> {
+    private getSpecifics(resource, view : string, processType : string, embedContext : string, process?) : angular.IPromise<Dict> {
         var key : string = resource.content_type + "@" + view + "@" + processType + "@" + embedContext;
         var specifics;
 
@@ -201,12 +200,12 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
             if (type === "version") {
                 specifics = this.adhHttp.get(AdhUtil.parentPath(resource.path)).then((item) => {
-                    return fn(item, resource, false);
+                    return fn(item, resource, false, process);
                 });
             } else if (type === "item") {
                 specifics = this.adhHttp.getNewestVersionPathNoFork(resource.path).then((versionPath) => {
                     return this.adhHttp.get(versionPath).then((version) => {
-                        return fn(resource, version, true);
+                        return fn(resource, version, true, process);
                     });
                 });
             } else {
@@ -228,7 +227,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
      *
      * If `fail` is false, it promises undefined instead of failing.
      */
-    private getProcess(resourceUrl : string, fail = true) : angular.IPromise<ResourcesBase.Resource> {
+    public getProcess(resourceUrl : string, fail = true) : angular.IPromise<ResourcesBase.Resource> {
         var paths = [];
 
         var path = resourceUrl.substr(this.adhConfig.rest_url.length);
@@ -239,7 +238,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
         return this.$q.all(_.map(paths, (path) => {
             return this.adhHttp.get(this.adhConfig.rest_url + path);
-        })).then((resources) => {
+        })).then((resources : ResourcesBase.Resource[]) => {
             for (var i = 0; i < resources.length; i++) {
                 if (resources[i].isInstanceOf(RIProcess.content_type)) {
                     return resources[i];
@@ -307,6 +306,10 @@ export class Service implements AdhTopLevelState.IAreaInput {
         var self : Service = this;
         var segs : string[] = path.replace(/\/+$/, "").split("/");
 
+        if (path === "/") {
+            segs = ["", ""];
+        }
+
         if (segs.length < 2 || segs[0] !== "") {
             throw "bad path: " + path;
         }
@@ -324,7 +327,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
             view = segs.pop().replace(/^@/, "");
         }
 
-        var resourceUrl : string = this.adhConfig.rest_url + segs.join("/") + "/";
+        var resourceUrl : string = this.adhConfig.rest_url + (segs.join("/") + "/").replace(/\/+$/, "/");
 
         return self.$q.all([
             self.adhHttp.get(resourceUrl),
@@ -342,7 +345,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
                 return;
             }
 
-            return self.getSpecifics(resource, view, processType, embedContext).then((specifics : Dict) => {
+            return self.getSpecifics(resource, view, processType, embedContext, process).then((specifics : Dict) => {
                 var defaults : Dict = self.getDefaults(resource.content_type, view, processType, embedContext);
 
                 var meta : Dict = {
@@ -418,25 +421,4 @@ export var directive = (adhResourceArea : Service, $compile : angular.ICompileSe
             });
         }
     };
-};
-
-
-export var moduleName = "adhResourceArea";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhEmbed.moduleName,
-            AdhHttp.moduleName,
-            AdhProcess.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
-            adhTopLevelStateProvider
-                .when("r", ["adhResourceArea", (adhResourceArea : Service) => adhResourceArea]);
-        }])
-        .provider("adhResourceArea", Provider)
-        .directive("adhResourceArea", ["adhResourceArea", "$compile", directive])
-        .filter("adhParentPath", () => AdhUtil.parentPath)
-        .filter("adhResourceUrl", ["adhConfig", resourceUrl]);
 };

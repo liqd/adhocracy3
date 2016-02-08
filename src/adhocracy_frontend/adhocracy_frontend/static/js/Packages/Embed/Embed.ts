@@ -1,8 +1,8 @@
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUtil = require("../Util/Util");
+import * as AdhConfig from "../Config/Config";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUtil from "../Util/Util";
 
 var pkgLocation = "/Embed";
 
@@ -16,8 +16,10 @@ var metaParams = [
 ];
 
 export class Provider {
-    public embeddableDirectives : string[];
-    public contexts : string[];
+    protected directives : string[];
+    protected contexts : string[];
+    protected contextAliases : {[key : string]: string};
+    protected directiveAliases : {[key : string]: string};
     public $get;
 
     /**
@@ -26,7 +28,7 @@ export class Provider {
      * 'document-workbench' for directive DocumentWorkbench.)
      */
     constructor() {
-        this.embeddableDirectives = [
+        this.directives = [
             "document-workbench",
             "paragraph-version-detail",
             "comment-listing",
@@ -36,26 +38,48 @@ export class Provider {
             "user-indicator",
             "empty"
         ];
+        this.directiveAliases = {};
 
         this.contexts = [
             "plain"
         ];
+        this.contextAliases = {};
 
         this.$get = ["adhConfig", (adhConfig) => new Service(this, adhConfig)];
     }
 
-    public registerEmbeddableDirectives(directives : string[]) : void {
-        for (var i = 0; i < directives.length; i++) {
-            var directive = directives[i];
-            // remove <any> when borisyankov/DefinitelyTyped#3573 is resolved
-            if (!(<any>_).includes(this.embeddableDirectives, directive)) {
-                this.embeddableDirectives.push(directive);
-            }
+    public registerDirective(name : string, aliases : string[] = []) : Provider {
+        this.directives.push(name);
+        var i = aliases.length;
+        while (i--) {
+            this.directiveAliases[aliases[i]] = name;
         }
+        return this;
     }
 
-    public registerContext(name : string) : void {
+    public normalizeDirective(name : string) : string {
+        return this.directiveAliases[name] || name;
+    }
+
+    public hasDirective(name : string) {
+        return _.includes(this.directives,  name);
+    }
+
+    public registerContext(name : string, aliases : string[] = []) : Provider {
         this.contexts.push(name);
+        var i = aliases.length;
+        while (i--) {
+            this.contextAliases[aliases[i]] = name;
+        }
+        return this;
+    }
+
+    public normalizeContext(name : string) : string {
+        return this.contextAliases[name] || name;
+    }
+
+    public hasContext(name : string) {
+        return _.includes(this.contexts,  name);
     }
 }
 
@@ -97,12 +121,12 @@ export class Service {
         var widget : string = $location.path().split("/")[2];
         var search = $location.search();
 
-        // For later use
-        this.widget = widget;
+        var directiveName = this.provider.normalizeDirective(widget);
+        var contextName = this.provider.normalizeContext(widget);
 
-        // FIXME: DefinitelyTyped: remove <any> when borisyankov/DefinitelyTyped#3573 is resolved
-        if ((<any>_).includes(this.provider.embeddableDirectives, widget)) {
-            var template = this.location2template(widget, search);
+        if (this.provider.hasDirective(directiveName)) {
+            this.widget = directiveName;
+            var template = this.location2template(directiveName, search);
 
             if (!search.hasOwnProperty("nocenter")) {
                 template = "<div class=\"l-center m-embed\">" + template + "</div>";
@@ -116,7 +140,8 @@ export class Service {
             return {
                 template: template
             };
-        } else if ((<any>_).includes(this.provider.contexts, widget)) {
+        } else if (this.provider.hasContext(contextName)) {
+            this.widget = contextName;
             $location.url(search.initialUrl || "/");
             $location.replace();
 
@@ -183,40 +208,4 @@ export var canonicalUrl = (adhConfig : AdhConfig.IService) => {
     return (internalUrl : string) : string => {
         return adhConfig.canonical_url + internalUrl;
     };
-};
-
-
-export var moduleName = "adhEmbed";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            "pascalprecht.translate",
-            AdhTopLevelState.moduleName
-        ])
-        .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
-            adhTopLevelStateProvider
-                .when("embed", ["$location", "adhEmbed", (
-                    $location : angular.ILocationService,
-                    adhEmbed : Service
-                ) : AdhTopLevelState.IAreaInput => {
-                    return adhEmbed.route($location);
-                }]);
-        }])
-        .run(["$location", "$translate", "adhConfig", ($location, $translate, adhConfig) => {
-            // Note: This works despite the routing removing the locale search
-            // parameter immediately after. This is a bit awkward though.
-
-            // FIXME: centralize locale setup in adhLocale
-            var params = $location.search();
-            if (params.hasOwnProperty("locale")) {
-                $translate.use(params.locale);
-            }
-            if (typeof params.locale !== "undefined") {
-                adhConfig.locale = params.locale;
-            }
-        }])
-        .provider("adhEmbed", Provider)
-        .directive("href", ["adhConfig", "$location", "$rootScope", hrefDirective])
-        .filter("adhCanonicalUrl", ["adhConfig", canonicalUrl]);
 };

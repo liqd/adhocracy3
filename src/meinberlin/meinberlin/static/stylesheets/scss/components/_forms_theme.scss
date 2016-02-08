@@ -1,5 +1,5 @@
 form {
-    padding: 1em;
+    @include rem(padding, 1rem);
 }
 
 input[type="text"],
@@ -11,11 +11,11 @@ input[type="time"],
 input[type="number"],
 select,
 textarea {
+    @include rem(font-size, $font-size-small);
+    @include rem(margin-bottom, 15px);
+    @include rem(padding, 5px $font-size-small);
     background: $color-background-base-introvert;
     border: 0;
-    font-size: $font-size-small;
-    margin-bottom: 15px / $font-size-small * 1em;
-    padding: 0.4em $font-size-small;
 
     &:focus {
         border-color: $color-brand-one-normal;
@@ -24,16 +24,16 @@ textarea {
 }
 
 .label-text, .form-row, .login-check-input {
-    font-size: $font-size-small;
+    @include rem(font-size, $font-size-small);
 }
 
 .input-error {
+    @include rem(top, -16px);
     position: relative;
-    top: -(16px / $font-size-small * 1em);
 }
 
 .form-row {
-    margin-bottom: 15px / $font-size-small * 1em;
+    @include rem(margin-bottom, 15px);
 }
 
 //server errors

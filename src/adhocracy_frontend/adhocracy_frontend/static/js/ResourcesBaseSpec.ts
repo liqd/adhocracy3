@@ -1,9 +1,9 @@
 /// <reference path="../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 /// <reference path="_all.d.ts"/>
 
-import JasmineHelpers = require("./JasmineHelpers");
+import * as JasmineHelpers from "./JasmineHelpers";
 
-import ResourcesBase = require("./ResourcesBase");
+import * as ResourcesBase from "./ResourcesBase";
 
 class Sheet1 extends ResourcesBase.Sheet {
     public static _meta : ResourcesBase.ISheetMetaApi = {

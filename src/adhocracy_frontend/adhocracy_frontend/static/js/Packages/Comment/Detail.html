@@ -1,0 +1,83 @@
+<div class="comment {{ selectedState }}" data-ng-switch="mode" data-ng-if="data">
+    <div class="comment-main">
+        <div class="comment-header">
+            <div class="comment-header-column1">
+                <span class="comment-header-creator">
+                    <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
+                </span>
+                <span class="comment-header-date">
+                    <adh-time data-datetime="data.creationDate"></adh-time>.
+                </span>
+                <span class="comment-header-edited" data-ng-if="data.edited">
+                    {{ "TR__EDITED" | translate }}
+                    <adh-time data-datetime="data.modificationDate"></adh-time>
+                </span>
+            </div>
+            <div class="comment-header-column2">
+                <span class="comment-header-links">
+                    <a href=""
+                        data-ng-if="poolOptions.POST"
+                        data-ng-click="createComment()"
+                        class="comment-header-link"
+                        title="{{ 'TR__REPLY' | translate }}">
+                        <i class="comment-header-icon icon-reply"></i>
+                    </a>
+                    <a href=""
+                        data-ng-if="commentItemOptions.POST"
+                        data-ng-click="edit()"
+                        class="comment-header-link"
+                        title="{{ 'TR__EDIT' | translate }}">
+                        <i class="comment-header-icon icon-pencil"></i>
+
+                    </a>
+                    <a href=""
+                        data-ng-click="delete()"
+                        data-ng-if="versionOptions.hide"
+                        class="comment-header-link"
+                        title="{{ 'TR__DELETE' | translate }}">
+                        <i class="comment-header-icon icon-x"></i>
+                    </a>
+                    <a href=""
+                        data-ng-click="report()"
+                        data-ng-if="report"
+                        class="comment-header-link comment-header-link-report"
+                        title="{{ 'TR__REPORT' | translate }}">
+                        <i class="comment-header-icon icon-flag"></i>
+                    </a>
+                </span>
+                <adh-recompile-on-change data-value="{{data.path}}">
+                    <adh-rate data-refers-to="{{data.path}}"></adh-rate>
+                </adh-recompile-on-change>
+            </div>
+        </div>
+
+        <form class="comment-children-edit-form" data-ng-switch-when="1" data-ng-submit="submit()">
+            <div class="form-error" data-ng-repeat="error in errors">
+                <p>{{ error | translate }}</p>
+            </div>
+            <textarea class="comment-edit-form-text" data-msd-elastic="" data-ng-model="data.content"></textarea>
+            <footer class="form-footer">
+                <input type="submit" class="button-cta form-footer-button-cta" value="{{ 'TR__SAVE' | translate }}" />
+                <a href="" class="button form-footer-button" data-ng-click="cancel()" data-ng-if="!hideCancel">{{ "TR__CANCEL" | translate }}</a>
+            </footer>
+        </form>
+        <div class="comment-content" data-ng-switch-default="">{{data.content}}</div>
+    </div>
+
+    <div class="comment-children-create-form" data-ng-if="show.createForm">
+        <adh-comment-create
+            data-refers-to="{{data.path}}"
+            data-pool-path="{{data.replyPoolPath}}"
+            data-on-submit="afterCreateComment"
+            data-on-cancel="cancelCreateComment">
+        </adh-comment-create>
+    </div>
+
+    <div class="comment-children">
+        <adh-comment
+            data-ng-repeat="comment in data.comments | orderBy:'-'"
+            data-path="{{comment}}"
+            data-on-submit="update">
+        </adh-comment>
+    </div>
+</div>

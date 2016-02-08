@@ -12,7 +12,6 @@ from adhocracy_core.schema import AdhocracySequenceNode
 
 
 class WebMercatorLongitude(colander.SchemaNode):
-
     """A a web mercator longitude value.
 
     Validation values taken from http://epsg.io/3857.
@@ -25,7 +24,6 @@ class WebMercatorLongitude(colander.SchemaNode):
 
 
 class WebMercatorLatitude(colander.SchemaNode):
-
     """A a web mercator latitude value.
 
     Validation values taken from http://epsg.io/3857.
@@ -38,7 +36,6 @@ class WebMercatorLatitude(colander.SchemaNode):
 
 
 class Point(colander.TupleSchema):
-
     """A geographical point on the earth.
 
     `x`: longitude in web mercator
@@ -53,7 +50,6 @@ class Point(colander.TupleSchema):
 
 
 class LineString(AdhocracySequenceNode):
-
     """List of geographical points on the earth."""
 
     missing = []
@@ -62,7 +58,6 @@ class LineString(AdhocracySequenceNode):
 
 
 class Polygon(AdhocracySequenceNode):
-
     """List of geographical lines on the earth."""
 
     missing = []
@@ -71,7 +66,6 @@ class Polygon(AdhocracySequenceNode):
 
 
 class MultiPolygon(AdhocracySequenceNode):
-
     """List of geographical polygons on the earth."""
 
     missing = []
@@ -80,12 +74,10 @@ class MultiPolygon(AdhocracySequenceNode):
 
 
 class IMultiPolygon(ISheet):
-
     """Market interface for the multi polygon sheet."""
 
 
 class PartOfReference(SheetToSheet):
-
     """Reference to a geographical object."""
 
     source_isheet = IMultiPolygon
@@ -94,7 +86,6 @@ class PartOfReference(SheetToSheet):
 
 
 class GermanAdministrativeDivisions(Enum):
-
     """Administrative division names/levels based on the wikidata ontology."""
 
     staat = 2
@@ -111,7 +102,6 @@ class GermanAdministrativeDivisions(Enum):
 
 
 class AdministrativeDivisionName(SingleLine):
-
     """Administrative division, see :class`GermanAdministrativeDivisions`."""
 
     def validator(self, node, cstruct):
@@ -121,7 +111,6 @@ class AdministrativeDivisionName(SingleLine):
 
 
 class MultiPolygonSchema(colander.MappingSchema):
-
     """A geographical MultiPolygon object.
 
     GeoJSON like geometry object fields:
@@ -151,12 +140,10 @@ multipolygon_meta = sheet_meta._replace(isheet=IMultiPolygon,
 
 
 class ILocationReference(ISheet):
-
     """Marker interface for the location reference sheet."""
 
 
 class LocationReference(SheetToSheet):
-
     """Reference to a geographical object."""
 
     source_isheet = ILocationReference
@@ -165,7 +152,6 @@ class LocationReference(SheetToSheet):
 
 
 class LocationReferenceSchema(colander.MappingSchema):
-
     """Data structure for the location reference sheet."""
 
     location = Reference(reftype=LocationReference)
@@ -178,12 +164,10 @@ location_reference_meta = sheet_meta._replace(
 
 
 class IPoint(ISheet):
-
     """Market interface for the point sheet."""
 
 
 class PointSchema(colander.MappingSchema):
-
     """A geographical Point object.
 
     GeoJSON like geometry object fields:

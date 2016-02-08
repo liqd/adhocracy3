@@ -1,7 +1,9 @@
 /// <reference path="../../../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
 
-import AdhConfig = require("../Config/Config");
-import AdhEventManager = require("../EventManager/EventManager");
+import * as _ from "lodash";
+
+import * as AdhConfig from "../Config/Config";
+import * as AdhEventManager from "../EventManager/EventManager";
 
 
 /**
@@ -198,16 +200,4 @@ export var rawWebSocketFactoryFactory = (modernizr : ModernizrStatic) => {
     } else {
         return dummyWebSocketFactory;
     }
-};
-
-
-export var moduleName = "adhWebSocket";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhEventManager.moduleName
-        ])
-        .factory("adhRawWebSocketFactory", ["modernizr", rawWebSocketFactoryFactory])
-        .service("adhWebSocket", ["adhConfig", "adhEventManagerClass", "adhRawWebSocketFactory", Service]);
 };

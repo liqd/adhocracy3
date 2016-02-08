@@ -9,29 +9,30 @@ from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.utils import is_deleted
 from adhocracy_core.utils import is_hidden
 from adhocracy_core.interfaces import IItem
+from adhocracy_core.interfaces import search_query
+from adhocracy_core.resources.comment import ICommentVersion
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.sheets.rate import IRateable
-from adhocracy_core.sheets.tags import TagElementsReference
+from adhocracy_core.sheets.tags import ITags
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
+from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.utils import get_sheet_field
-from adhocracy_core.utils import find_graph
-from adhocracy_core.interfaces import search_query
+from adhocracy_core.utils import get_sheet
 
 
 class Reference(IndexFactory):
-
     """TODO: comment."""
 
     index_type = ReferenceIndex
 
 
 class AdhocracyCatalogIndexes:
-
     """Default indexes for the adhocracy catalog.
 
     Indexes starting with `private_` are private (not queryable from the
@@ -41,6 +42,7 @@ class AdhocracyCatalogIndexes:
     tag = catalog.Keyword()
     private_visibility = catalog.Keyword()  # visible / deleted / hidden
     badge = catalog.Keyword()
+    item_badge = catalog.Keyword()
     title = catalog.Field()
     rate = catalog.Field()
     rates = catalog.Field()
@@ -48,6 +50,9 @@ class AdhocracyCatalogIndexes:
     item_creation_date = catalog.Field()
     workflow_state = catalog.Field()
     reference = Reference()
+    user_name = catalog.Field()
+    private_user_email = catalog.Field()
+    private_user_activation_path = catalog.Field()
 
 
 def index_creator(resource, default) -> str:
@@ -115,11 +120,29 @@ def index_rates(resource, default) -> int:
     return rate_sum
 
 
+def index_comments(resource, default) -> int:
+    """
+    Return aggregated values of comments below the `item` parent of `resource`.
+
+    Only the LAST version of each rate is counted.
+    """
+    item = find_interface(resource, IItem)
+    catalogs = find_service(resource, 'catalogs')
+    query = search_query._replace(root=item,
+                                  interfaces=ICommentVersion,
+                                  indexes={'tag': 'LAST'},
+                                  )
+    result = catalogs.search(query)
+    return result.count
+
+
 def index_tag(resource, default) -> [str]:
     """Return value for the tag index."""
-    graph = find_graph(resource)
-    tags = graph.get_back_reference_sources(resource, TagElementsReference)
-    tagnames = [tag.__name__ for tag in tags]
+    item = find_interface(resource, IItem)
+    if item is None:  # ease testing
+        return
+    tags_sheet = get_sheet(item, ITags)
+    tagnames = [f for f, v in tags_sheet.get().items() if v is resource]
     return tagnames if tagnames else default
 
 
@@ -142,6 +165,15 @@ def index_badge(resource, default) -> [str]:
     return badge_names
 
 
+def index_item_badge(resource, default) -> [str]:
+    """Find item and return its badge names for the item_badge index."""
+    item = find_interface(resource, IItem)
+    if item is None:
+        return default
+    badge_names = index_badge(item, default)
+    return badge_names
+
+
 def index_workflow_state(resource, default) -> [str]:
     """Return value for the workflow_state index."""
     state = get_sheet_field(resource, IWorkflowAssignment, 'workflow_state')
@@ -157,6 +189,26 @@ def index_workflow_state_of_item(resource, default) -> [str]:
         return default
     else:
         return state
+
+
+def index_user_name(resource, default) -> str:
+    """Return value for the user_name index."""
+    name = get_sheet_field(resource, IUserBasic, 'name')
+    return name
+
+
+def index_user_email(resource, default) -> str:
+    """Return value for the private_user_email index."""
+    name = get_sheet_field(resource, IUserExtended, 'email')
+    return name
+
+
+def index_user_activation_path(resource, default) -> str:
+    """Return value for the private_user_activationpath index."""
+    path = getattr(resource, 'activation_path', None)
+    if path is None:
+        return default
+    return path
 
 
 def includeme(config):
@@ -200,6 +252,11 @@ def includeme(config):
                          index_name='badge',
                          context=IBadgeable,
                          )
+    config.add_indexview(index_item_badge,
+                         catalog_name='adhocracy',
+                         index_name='item_badge',
+                         context=IVersionable,
+                         )
     config.add_indexview(index_workflow_state,
                          catalog_name='adhocracy',
                          index_name='workflow_state',
@@ -209,4 +266,19 @@ def includeme(config):
                          catalog_name='adhocracy',
                          index_name='workflow_state',
                          context=IVersionable,
+                         )
+    config.add_indexview(index_user_name,
+                         catalog_name='adhocracy',
+                         index_name='user_name',
+                         context=IUserBasic,
+                         )
+    config.add_indexview(index_user_email,
+                         catalog_name='adhocracy',
+                         index_name='private_user_email',
+                         context=IUserExtended,
+                         )
+    config.add_indexview(index_user_activation_path,
+                         catalog_name='adhocracy',
+                         index_name='private_user_activation_path',
+                         context=IUserBasic,
                          )

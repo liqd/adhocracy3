@@ -457,22 +457,33 @@ different types of values starting from preferred.
 -  length:
 
    -  layout: ``%``
-   -  else: ``em``
-   -  not sure about ``rem`` because of compatibility
-   -  in the context of images, ``px`` may be used to avoid low-quality
-      rescaling
+   -  distances relative to element font-size ``em``
+   -  else: ``rem``
+   -  for thin lines or in the context of images, ``px`` may be used to
+      avoid low-quality rescaling
 
--  font-size: keyword, ``%``, ``px``
-
-   -  outside of variable definitions only variables and ``%`` must be
-      used
-
+-  font-size: variable, ``rem``, ``%``
 -  0 length: no unit
--  line-height: no unit, ``em``, ``px``
+-  line-height: no unit, ``em``, ``rem``
+
+   -  see `explanation by Eric Meyer
+      <http://meyerweb.com/eric/thoughts/2006/02/08/unitless-line-heights/>`_.
+
 -  color: keyword, short hex, long hex, ``rgba``, ``hsla``
 -  generally prefer variables to keywords to numeric values
 
    -  keywords are easier to apprehend when skipping through the code
+
+.. Note::
+
+   For all ``rem`` units the ``rem()`` mixin should be used, e.g.::
+
+      @include rem(margin, 10px 5px);
+      @include rem(margin-bottom, 2rem);
+      @include rem(border, 3px solid $color-function-valid);
+
+   This automatically calculates ``rem`` units with a ``px`` fallback
+   for older browsers.
 
 Accessibility
 +++++++++++++
@@ -481,7 +492,7 @@ Accessibility
    (see http://a11yproject.com/posts/how-to-hide-content/).
 -  Use `fluid and responsive
    design <http://alistapart.com/article/responsive-web-design>`_
-   (relative units like ``%`` and ``em``).
+   (relative units like ``%``, ``em``, and ``rem``).
 -  Prefer to define foreground and background colors in the same spot.
    Use
    `color-contrast <http://beta.compass-style.org/reference/compass/utilities/color/contrast/>`_

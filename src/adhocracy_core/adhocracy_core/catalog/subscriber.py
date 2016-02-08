@@ -11,10 +11,14 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.interfaces import ISheetBackReferenceModified
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
+from adhocracy_core.interfaces import IItem
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.badge import IBadgeAssignment
+from adhocracy_core.sheets.badge import IBadgeable
+from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import list_resource_with_descendants
 from adhocracy_core.utils import get_sheet_field
@@ -30,6 +34,24 @@ def reindex_rates(event):
     """Reindex the rates index if a rate backreference is modified."""
     catalogs = find_service(event.object, 'catalogs')
     catalogs.reindex_index(event.object, 'rates')
+
+
+def reindex_user_name(event):
+    """Reindex indexes `user_name`."""
+    catalogs = find_service(event.object, 'catalogs')
+    catalogs.reindex_index(event.object, 'user_name')
+
+
+def reindex_user_email(event):
+    """Reindex indexes `private_user_email`."""
+    catalogs = find_service(event.object, 'catalogs')
+    catalogs.reindex_index(event.object, 'private_user_email')
+
+
+def reindex_user_activation_path(event):
+    """Reindex indexes `private_user_activation_path`."""
+    catalogs = find_service(event.object, 'catalogs')
+    catalogs.reindex_index(event.object, 'private_user_activation_path')
 
 
 def reindex_badge(event):
@@ -59,6 +81,15 @@ def _reindex_resource_and_descendants(resource: IResource):
         catalogs.reindex_index(res, 'private_visibility')
 
 
+def reindex_item_badge(event):
+    """Reindex `item_badge` for all item versions of èvent.object."""
+    catalogs = find_service(event.object, 'catalogs')
+    children = event.object.values()
+    versionables = (c for c in children if IVersionable.providedBy(c))
+    for versionable in versionables:
+        catalogs.reindex_index(versionable, 'item_badge')
+
+
 def reindex_workflow_state(event):
     """Reindex the workflow_state index for item and its versions."""
     catalogs = find_service(event.object, 'catalogs')
@@ -86,8 +117,21 @@ def includeme(config):
     config.add_subscriber(reindex_badge,
                           IResourceCreatedAndAdded,
                           object_iface=IBadgeAssignment)
+    config.add_subscriber(reindex_item_badge,
+                          ISheetBackReferenceModified,
+                          object_iface=IItem,
+                          event_isheet=IBadgeable)
     config.add_subscriber(reindex_workflow_state,
                           IResourceSheetModified,
                           event_isheet=IWorkflowAssignment)
+    config.add_subscriber(reindex_user_name,
+                          IResourceSheetModified,
+                          event_isheet=IUserBasic)
+    config.add_subscriber(reindex_user_email,
+                          IResourceSheetModified,
+                          event_isheet=IUserExtended)
+    config.add_subscriber(reindex_user_activation_path,
+                          IResourceSheetModified,
+                          event_isheet=IUserBasic)
     # add subscriber to updated allowed index
     config.scan('substanced.objectmap.subscribers')

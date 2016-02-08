@@ -9,7 +9,6 @@ from adhocracy_core.sheets.badge import IHasBadgesPool
 
 
 class IProcess(IPool):
-
     """Participation Process Pool."""
 
 
