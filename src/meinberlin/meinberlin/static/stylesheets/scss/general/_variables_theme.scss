@@ -1,30 +1,30 @@
 //brand colors
-$color-brand-one-normal: #31458a;
-$color-brand-one-introvert: #122556;
-$color-brand-one-extrovert: #8faff5;
-$color-brand-two-normal: #ff195a;
-$color-brand-two-introvert: #c81e50;
-$color-brand-two-extrovert: #f27179;
+$color-brand-one-normal: #253276;
+$color-brand-one-introvert: #162c60;
+$color-brand-one-extrovert: #31448a;
+$color-brand-two-normal: #cd0055;
+$color-brand-two-introvert: #ae0048;
+$color-brand-two-extrovert: #ed0062;
 
 // text colors
 $color-text-normal: #4c4c4c;
 $color-text-introvert: #666;
 $color-text-extrovert: #1c1c1b;
-$color-text-highlight-normal: #ec145a;
+$color-text-highlight-normal: $color-brand-two-normal;
 $color-text-highlight-introvert: $color-brand-two-introvert;
 $color-text-highlight-extrovert: #333;
 $color-text-inverted: white;
 
 // function colors
-$color-function-valid: #73bf44;
+$color-function-valid: #139156;
 $color-function-invalid: #f00;
 
 // background colors
 $color-background-base: white;
-$color-background-base-introvert: #f2f2f2;
+$color-background-base-introvert: #f6f6f6;
 
 // structure colors
-$color-structure-normal: #e6e6e6;
+$color-structure-normal: #e4e4e4;
 $color-structure-introvert: #ccc;
 
 //font sizes
