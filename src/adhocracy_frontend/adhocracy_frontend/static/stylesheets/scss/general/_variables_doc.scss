@@ -110,11 +110,6 @@ category: Variables
         <td>Secondary background color</td>
     </tr>
     <tr>
-        <td><div class="example-color color-structure-border"></div></td>
-        <td><code>color-structure-border</code></td>
-        <td>border color</td>
-    </tr>
-    <tr>
         <td><div class="example-color color-structure-transparent"></div></td>
         <td><code>color-structure-transparent</code></td>
         <td></td>
@@ -205,7 +200,6 @@ category: Variables
 
 .color-structure-normal {background-color: $color-structure-normal;}
 .color-structure-introvert {background-color: $color-structure-introvert;}
-.color-structure-border {background-color: $color-structure-border;}
 .color-structure-transparent {background-color: $color-structure-transparent;}
 
 .color-button-text {background-color: $color-button-text;}
