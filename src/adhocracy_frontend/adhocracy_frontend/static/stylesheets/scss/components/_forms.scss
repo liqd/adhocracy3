@@ -118,11 +118,6 @@ textarea {
         @include rem(font-size, $font-size-large);
     }
 
-    &:focus {
-        border-color: $color-text-highlight-normal;
-        outline: 1px solid $color-text-highlight-normal;
-    }
-
     &.ng-dirty.ng-invalid {
         @extend .error-state;
     }
