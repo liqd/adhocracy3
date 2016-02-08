@@ -2,6 +2,7 @@ import colander
 from pyramid import testing
 from pytest import raises
 from pytest import fixture
+from pytest import mark
 
 
 class TestPasswordSheet:
@@ -138,28 +139,44 @@ class TestUserExtendedSchema:
 class TestCaptchaSchema:
 
     @fixture
-    def request(self, context, registry):
-        request = testing.DummyRequest()
-        request.registry = registry
-        request.root = context
-        return request
+    def mock_response(self, mocker):
+        return mocker.Mock()
+
+    @fixture
+    def mock_post(self, mocker, mock_response):
+        mock_post = mocker.patch('requests.post', autospec=True)
+        mock_post.return_value = mock_response
+        return mock_post
 
     def make_one(self, request):
         from adhocracy_core.sheets.principal import CaptchaSchema
         return CaptchaSchema().bind(request=request)
 
-    def test_deserialize_all(self, request):
-        inst = self.make_one(request)
+    def test_deserialize_and_validate_captcha(self, mock_response,
+                                              mock_post, request_):
+        inst = self.make_one(request_)
+        mock_response.json.return_value = {'data': True}
         cstruct = {'id': 'captcha-id', 'solution': 'some test'}
         assert inst.deserialize(cstruct) == cstruct
+        mock_post.assert_called_with('http://localhost:6542/solve_captcha',
+                                     json={'solution': 'some test',
+                                           'id': 'captcha-id'})
 
-    def test_deserialize_id_missing(self, request):
-        inst = self.make_one(request)
+    def test_deserialize_raise_if_captcha_invalid(self, mock_response,
+                                                   mock_post, request_):
+        inst = self.make_one(request_)
+        mock_response.json.return_value = {'data': False}
+        cstruct = {'id': 'captcha-id', 'solution': 'some test'}
+        with raises(colander.Invalid):
+            inst.deserialize(cstruct) == cstruct
+
+    def test_deserialize_raise_if_id_missing(self, request_):
+        inst = self.make_one(request_)
         with raises(colander.Invalid):
             inst.deserialize({'solution': 'some test'})
 
-    def test_deserialize_solution_missing(self, request):
-        inst = self.make_one(request)
+    def test_deserialize_raise_if_solution_missing(self, request_):
+        inst = self.make_one(request_)
         with raises(colander.Invalid):
             inst.deserialize({'id': 'captcha-id'})
 
@@ -283,29 +300,47 @@ class TestCaptchaSheet:
         from adhocracy_core.sheets.principal import captcha_meta
         return captcha_meta
 
-    def test_create(self, meta, context):
-        from adhocracy_core.sheets.principal import ICaptcha
-        from adhocracy_core.sheets.principal import CaptchaSchema
-        from adhocracy_core.sheets import AttributeResourceSheet
-        inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, AttributeResourceSheet)
-        assert inst.meta.isheet == ICaptcha
-        assert inst.meta.schema_class == CaptchaSchema
-        assert inst.meta.permission_create == 'create_user'
+    def test_meta(self, meta):
+        from . import principal
+        assert meta.sheet_class == principal.CaptchaSheet
+        assert meta.isheet == principal.ICaptcha
+        assert meta.schema_class == principal.CaptchaSchema
+        assert meta.permission_create == 'create_user'
+        assert meta.readable is False
+        assert meta.editable is False
+        assert meta.creatable is False
+        assert meta.create_mandatory is False
 
-    def test_get_empty(self, meta, context):
-        # FIXME Sheet should not be stored, so this should be empty??
+    def test_create(self, meta, context):
+        from zope.interface.verify import verifyObject
+        from adhocracy_core.interfaces import IResourceSheet
+        inst = meta.sheet_class(meta, context)
+        assert IResourceSheet.providedBy(inst)
+        assert verifyObject(IResourceSheet, inst)
+
+    def test_get_returns_default_values(self, meta, context):
         inst = meta.sheet_class(meta, context)
         assert inst.get() == {'id': '', 'solution': ''}
 
+    def test_set_does_not_store_data(self, mocker, meta, context):
+        inst = meta.sheet_class(meta, context)
+        inst.set({'id': '1', 'solution': '1'})
+        assert inst.get() == {'id': '', 'solution': ''}
 
-def test_includeme_register_userbasic_sheet(config):
-    from adhocracy_core.sheets.principal import IUserBasic
-    from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.sheets.principal')
-    context = testing.DummyResource(__provides__=IUserBasic)
-    assert get_sheet(context, IUserBasic)
+    @mark.usefixtures('integration')
+    def test_includeme_register(self, registry, meta):
+        from adhocracy_core.utils import get_sheet
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert get_sheet(context, meta.isheet)
+
+    def test_includeme_set_create_mandatory_if_captcha_enabled(self, config,
+                                                               meta):
+        config.registry.settings['adhocracy.thentos_captcha.enabled'] = 'true'
+        config.include('adhocracy_core.content')
+        config.include('adhocracy_core.sheets.principal')
+        meta_included = config.registry.content.sheets_meta[meta.isheet]
+        assert meta_included.creatable
+        assert meta_included.create_mandatory
 
 
 class TestPermissionsSchema:

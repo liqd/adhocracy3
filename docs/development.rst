@@ -25,68 +25,24 @@ Running the Testsuite
 
 frontend unit tests:
 
-    A.  Integrated with py.test::
+A.  In node::
 
-           bin/polytester jsunit
+       bin/polytester jsunit
 
-    B.  In browser::
+B.  In browser::
 
-            make -C ./parts/static/js/ compile_tests_browser
-            xdg-open http://localhost:6551/static/test.html
+       bin/supervisorctl start adhocracy:frontend
+       xdg-open http://localhost:6551/static/test.html
 
-        Make sure backend is running (or some means of delivering html
-        and js to the browser).
+    .. note::
 
-        This is the best way to develop, as it lets you run tests
-        indiviually and repeatedly and enter the debugger.
+       For debugging, it helps to disable blanket.
 
-        .. note::
+    .. note::
 
-           In the debugger, it helps to disable the script tag about
-           blanket in test.html.  You can do this thusly::
+       Running JS unit test in the browser with blanket enabled is
+       currently broken.
 
-               make -C ./parts/static/js/ compile_tests_browser test-no-blanket
-               xdg-open http://localhost:6551/static/test-no-blanket.html
-
-
-frontend integration tests (jsint):
-
-    Frontend integration tests behave like unit tests in the sense
-    that they are driven by jasmine and can access all exports of all
-    typescript modules; they behave like end-to-end tests in that they
-    can talk to a running backend, angular runtime, etc..
-
-    This makes it possible to write integration tests that reproduce
-    any possible bug once it is reported (even though it may sometimes
-    be better to write a unit or an acceptance test).
-
-    For instance, one can write
-    a test that registers and injects the AdhHttp service, renders
-    some directive into the DOM, sends some keys to some input fields
-    and clicks "save", and, once the object has been saved to the
-    database, gets it from the backend and compares it to the one
-    rendered in the directive.
-
-    Integration tests do not support nodejs.  They can only be run in
-    browser manually or via py.test.
-
-    A.  Integrated with py.test::
-
-           bin/polytester jsint
-
-    B.  In browser::
-
-            make -C ./parts/static/js/ compile_tests_browser
-            xdg-open http://localhost:6551/static/igtest.html
-
-        .. note::
-
-           As with the unit tests (see above), when running
-           integration tests in the browser manually, you are
-           responsible for making sure the backend is running.  In
-           contrast to unit tests, debugging works smoothly without
-           any tricks, because we don't run blanket for test coverage
-           reporting.
 
 protractor acceptance tests::
 

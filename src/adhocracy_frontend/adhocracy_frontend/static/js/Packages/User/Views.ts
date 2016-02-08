@@ -343,7 +343,7 @@ export var registerDirective = (
         scope: {},
         link: (scope : IScopeRegister) => {
             scope.siteName = adhConfig.site_name;
-            scope.termsUrl = adhConfig.terms_url;
+            scope.termsUrl = adhConfig.terms_url[adhConfig.locale];
             scope.captcha = {
                 enabled: adhConfig.captcha_enabled,
                 audioEnabled: false,
@@ -587,8 +587,6 @@ export var userListDirective = (adhCredentials : AdhCredentials.Service, adhConf
             scope.contentType = RIUser.content_type;
             scope.credentials = adhCredentials;
             scope.initialLimit = 50;
-            scope.frontendOrderPredicate = (id) => id;
-            scope.frontendOrderReverse = true;
         }
     };
 };
