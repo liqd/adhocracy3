@@ -112,11 +112,6 @@ category: Variables
         <td>For neutral (neither valid nor invalid) content</td>
     </tr>
     <tr>
-        <td><div class="example-color color-function-animation-enter"></div></td>
-        <td><code>color-function-animation-enter</code></td>
-        <td>For flashing elements that appear.</td>
-    </tr>
-    <tr>
         <td colspan="3"><strong>Structural colors</strong></td>
     </tr>
     <tr>
@@ -226,7 +221,6 @@ category: Variables
 .color-function-valid {background-color: $color-function-valid;}
 .color-function-invalid {background-color: $color-function-invalid;}
 .color-function-neutral {background-color: $color-function-neutral;}
-.color-function-animation-enter {background-color: $color-function-animation-enter;}
 
 .color-background-base {background-color: $color-background-base;}
 .color-background-base-introvert {background-color: $color-background-base-introvert;}

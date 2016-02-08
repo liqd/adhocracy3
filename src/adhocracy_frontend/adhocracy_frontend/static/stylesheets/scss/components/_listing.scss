@@ -29,21 +29,6 @@ a form for creating new elements. This form is then always visible.
     margin: 0;
 }
 
-// starting animations
-.listing-element {
-    &.ng-enter {
-        @include transition(all 0.3s);
-        @include opacity(0.5);
-        background: $color-function-animation-enter;
-
-        // destination animations
-        &.ng-enter-active {
-            @include opacity(1);
-            background: $color-background-base;
-        }
-    }
-}
-
 .listing-create-form {
     @include rem(margin-bottom, 1rem);
     @include rem(padding, 1rem 20px 12px);
