@@ -47,14 +47,14 @@ $arrow-width: 1rem;
     margin-left: $arrow-width;
     text-transform: uppercase;
     line-height: $line-height;
-    background-color: $color-brand-one-normal;
-    color: $color-text-inverted;
+    background-color: $color-button-cta-base;
+    color: $color-button-cta-text;
     cursor: pointer;
     text-align: center;
     text-decoration: none;
 
     &:before {
-        @include rem(border-right, $arrow-width solid $color-brand-one-normal);
+        @include rem(border-right, $arrow-width solid $color-button-cta-base);
         border-top: $line-height/2 * 1em solid $color-structure-transparent;
         border-bottom: $line-height/2 * 1em solid $color-structure-transparent;
         content: "";
@@ -66,11 +66,11 @@ $arrow-width: 1rem;
     }
 
     &:hover, &:focus {
-        color: $color-text-inverted;
-        background-color: $color-brand-one-extrovert;
+        color: $color-button-cta-text;
+        background-color: $color-button-cta-hover-background;
 
         &:before {
-            border-right-color: $color-brand-one-extrovert;
+            border-right-color: $color-button-cta-hover-background;
         }
     }
 
@@ -90,7 +90,7 @@ $arrow-width: 1rem;
         // That's why it is skipped here.
         &:hover {
             // scss-lint:disable NestingDepth
-            background: $color-brand-three-normal;
+            background: $color-button-cta-base;
 
             .supporting .text-unsupport {
                 display: block;
@@ -101,7 +101,7 @@ $arrow-width: 1rem;
             }
 
             &:before {
-                border-right-color: $color-brand-three-normal;
+                border-right-color: $color-button-cta-base;
             }
         }
     }
