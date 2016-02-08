@@ -60,6 +60,7 @@ import * as AdhWebSocketModule from "./Packages/WebSocket/Module";
 
 import * as AdhConfig from "./Packages/Config/Config";
 import * as AdhTopLevelState from "./Packages/TopLevelState/TopLevelState";
+
 import * as AdhTemplates from "adhTemplates";  if (AdhTemplates) { ; };
 
 webshim.setOptions("basePath", "/static/lib/webshim/js-webshim/minified/shims/");
@@ -93,9 +94,9 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "flow",
         AdhCommentModule.moduleName,
         AdhCrossWindowMessagingModule.moduleName,
+        AdhDebateWorkbenchModule.moduleName,
         AdhEmbedModule.moduleName,
         AdhResourceAreaModule.moduleName,
-        AdhDebateWorkbenchModule.moduleName,
         AdhTrackingModule.moduleName,
         AdhUserViewsModule.moduleName
     ];
