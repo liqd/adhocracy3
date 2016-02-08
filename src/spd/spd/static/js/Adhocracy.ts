@@ -59,7 +59,11 @@ import * as AdhUserViewsModule from "./Packages/User/ViewsModule";
 import * as AdhWebSocketModule from "./Packages/WebSocket/Module";
 
 import * as AdhConfig from "./Packages/Config/Config";
+import * as AdhDebateWorkbench from "./Packages/DebateWorkbench/DebateWorkbench";
+import * as AdhProcess from "./Packages/Process/Process";
 import * as AdhTopLevelState from "./Packages/TopLevelState/TopLevelState";
+
+import RIDigitalLebenProcess from "./Resources_/adhocracy_spd/resources/digital_leben/IProcess";
 
 import * as AdhTemplates from "adhTemplates";  if (AdhTemplates) { ; };
 
@@ -96,6 +100,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         AdhCrossWindowMessagingModule.moduleName,
         AdhDebateWorkbenchModule.moduleName,
         AdhEmbedModule.moduleName,
+        AdhProcessModule.moduleName,
         AdhResourceAreaModule.moduleName,
         AdhTrackingModule.moduleName,
         AdhUserViewsModule.moduleName
@@ -153,6 +158,15 @@ export var init = (config : AdhConfig.IService, metaApi) => {
             tabindex: false
         });
     }]);
+
+    // register workbench
+    var processType = RIDigitalLebenProcess.content_type;
+    app.config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
+        adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {
+            return $q.when("<adh-debate-workbench></adh-debate-workbench>");
+        }];
+    }]);
+    app.config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(processType)]);
 
     app.value("markdownit", markdownit);
     app.value("angular", angular);
