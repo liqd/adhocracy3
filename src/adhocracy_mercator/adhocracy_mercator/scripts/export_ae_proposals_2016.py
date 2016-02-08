@@ -17,7 +17,6 @@ from adhocracy_core.utils import create_filename
 
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.interfaces import search_query
-from adhocracy_core.utils import get_sheet
 
 from pyramid.traversal import resource_path
 
