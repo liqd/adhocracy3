@@ -21,8 +21,8 @@ Start Adhocracy testapp::
 
     >>> from webtest import TestApp
     >>> log = getfixture('log')
-    >>> app = getfixture('app')
-    >>> testapp = TestApp(app)
+    >>> app_router = getfixture('app_router')
+    >>> testapp = TestApp(app_router)
     >>> rest_url = 'http://localhost'
 
 Resource structure

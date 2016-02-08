@@ -1,7 +1,7 @@
 from pytest import fixture
 from unittest.mock import Mock
-import unittest
 from pyramid import testing
+
 
 class TestAddResource:
 
@@ -31,16 +31,16 @@ class TestAddResource:
         return mock
 
     def test_add_resources(self,
-                           app,
+                           app_router,
                            mock_get_root,
                            mock_import_resources,
                            mock_transaction_commit):
         filename = "/tmp/dummy.json"
         dummy_root = testing.DummyResource()
         mock_get_root.return_value = dummy_root
-        self.call_fut(app, filename)
+        self.call_fut(app_router, filename)
         assert mock_get_root.called
         mock_import_resources.assert_called_once_with(dummy_root,
-                                                      app.registry,
+                                                      app_router.registry,
                                                       filename)
         assert mock_transaction_commit.called
