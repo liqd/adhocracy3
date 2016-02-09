@@ -46,6 +46,7 @@ test_requires = [
     'Sphinx',
     'repoze.sphinx.autointerface',
     'sphinx-autodoc-annotation',
+    'sphinx-rtd-theme',
 ]
 
 debug_requires = [
