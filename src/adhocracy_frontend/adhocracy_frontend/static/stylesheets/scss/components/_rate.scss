@@ -249,6 +249,50 @@ Click show results
     }
 }
 
+/*doc
+---
+title: Opinion
+name: opionion
+parent: rate
+---
+
+The Opinion widget is very similar in functionaility to the Rate widget, but it
+is bigger and exposes more details.
+
+```html_example
+<div class="opinion">
+    <span class="opinion-button-container">
+        <a href="#" class="opinion-yes opinion-button">yes</a>
+    </span>
+    <span class="opinion-button-container">
+        <a href="#" class="opinion-no opinion-button">no</a>
+    </span>
+</div>
+
+<div class="opinion">
+    <span class="opinion-results">
+        <span class="opinion-bar-container">
+            <span
+                class="opinion-bar opinion-bar-yes"
+                style="width: 19%"></span>
+        </span>
+        <span class="opinion-result-numerics">
+            <span class="opinion-result-yes">
+                <strong>YES</strong>
+                19
+                <span class="opinion-result-absolute">(6 votes)</span>
+            </span>
+            <span class="opinion-result-total">32 total votes</span>
+            <span class="opinion-result-no">
+                <span class="opinion-result-absolute">(26 votes)</span>
+                81
+                <strong>NO</strong>
+            </span>
+        </span>
+    </span>
+</div>
+```
+*/
 .opinion {
     @include clearfix;
     width: 100%;
