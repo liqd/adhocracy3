@@ -1,0 +1,52 @@
+<form data-ng-submit="submit()">
+    <label data-ng-if="create">
+        <span class="label-text">{{ "TR__MERCATOR_MODERATE_SELECT_BADGE" | translate }}</span>
+        <select data-ng-options="item for item in ['winning', 'community']" data-ng-model="data.winner.name"></select>
+    </label>
+
+    <div data-ng-if="data.winner.name">
+        <label>
+            <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_FUNDING" | translate }} *</span>
+            <input
+                type="number"
+                data-ng-model="data.winner.funding"
+                name="winner-funding"
+                min="0"
+                max="50000"
+                required="required" />
+
+            <span
+                class="input-error"
+                data-ng-if="showError(mercatorProposalForm, mercatorProposalWinnerForm['winner-funding'], 'required')">
+                {{ "TR__ERROR_REQUIRED_NUMBER" | translate }}</span>
+            <span
+                class="input-error"
+                data-ng-if="showError(mercatorProposalForm, mercatorProposalWinnerForm['winner-funding'], 'max')">
+                {{ "TR__ERROR_MAX_EURO_50000" | translate }}</span>
+            <span
+                class="input-error"
+                data-ng-if="showError(mercatorProposalForm, mercatorProposalWinnerForm['winner-funding'], 'min')">
+                {{ "TR__ERROR_MIN_NUMBER_0" | translate }}</span>
+            <span
+                class="input-error"
+                data-ng-if="showError(mercatorProposalForm, mercatorProposalWinnerForm['winner-funding'], 'number')">
+                {{ "TR__ERROR_MUST_BE_A_NUMBER" | translate }}</span>
+        </label>
+
+        <label>
+            <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_WINNER_DESCRIPTION" | translate }} *</span>
+            <textarea data-ng-model="data.winner.description"></textarea>
+        </label>
+    </div>
+
+    <footer class="form-footer">
+        <input
+            type="submit"
+            name="submit"
+            value="{{ 'TR__PUBLISH' | translate }}"
+            class="button-cta form-footer-button-cta" />
+
+        <a href="" data-ng-click="cancel()" class="button form-footer-button">
+        {{ "TR__CANCEL" | translate }}</a>
+    </footer>
+</form>
