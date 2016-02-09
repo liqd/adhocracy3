@@ -74,3 +74,4 @@ src/aula/aula/build/
 RELEASE-VERSION
 *-requirements.txt
 /src/Mako/
+/styleguides
