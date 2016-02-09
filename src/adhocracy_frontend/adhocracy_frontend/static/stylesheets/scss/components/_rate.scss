@@ -267,6 +267,7 @@ is bigger and exposes more details.
     <span class="opinion-button-container">
         <a href="#" class="opinion-no opinion-button">no</a>
     </span>
+    <a href="#" class="opinion-result-toggle">show results</a>
 </div>
 
 <div class="opinion">
@@ -290,11 +291,15 @@ is bigger and exposes more details.
             </span>
         </span>
     </span>
+    <a href="#" class="opinion-result-toggle">vote</a>
 </div>
 ```
 */
 .opinion {
     @include clearfix;
+    @include rem(margin-bottom, 4.5rem);
+    @include rem(padding-bottom, 2.5rem);
+    position: relative;
     width: 100%;
 }
 
@@ -347,7 +352,7 @@ is bigger and exposes more details.
     @include clearfix;
     @include rem(font-size, $font-size-small);
     display: block;
-    position: relative;
+    position: absolute;
     width: 100%;
 
     .opinion-result-yes {
@@ -382,4 +387,10 @@ is bigger and exposes more details.
 
 .is-opinion-none .opinion-bar {
     background-color: $color-text-normal;
+}
+
+.opinion-result-toggle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
 }
