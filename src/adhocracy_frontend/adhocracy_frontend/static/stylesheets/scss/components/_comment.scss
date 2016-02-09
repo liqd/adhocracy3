@@ -74,7 +74,6 @@ is selected, no state is applied.
 .comment-children-create-form,
 .comment-children-edit-form {
     @extend .listing-create-form;
-    background: $color-background-base-introvert;
 }
 
 /*doc
@@ -274,7 +273,6 @@ parent: comment
 .comment-create-form-text,
 .comment-edit-form-text {
     @include rem(min-height, 5.8rem);
-    background: $color-text-inverted;
 }
 
 .comment-edit-form-text {

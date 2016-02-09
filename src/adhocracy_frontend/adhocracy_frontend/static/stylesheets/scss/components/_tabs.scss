@@ -33,7 +33,7 @@
 
         .tab-button {
             @include rem(padding, 0.5rem 1rem);
-            background: $color-structure-border;
+            background: $color-structure-introvert;
             color: $color-text-inverted;
             display: block;
             margin-right: 1px;
@@ -50,7 +50,7 @@
         &.is-active {
             .tab-button {
                 background: $color-background-base-introvert;
-                border: 1px solid $color-structure-border;
+                border: 1px solid $color-structure-introvert;
                 border-width: 1px 1px 0;
                 color: $color-text-normal;
                 font-weight: bold;
