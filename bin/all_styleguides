@@ -7,7 +7,7 @@ else
 fi
 
 for project in $projects; do
-    builddir=src/$project/$project/build
+    builddir="styleguides/$project"
 
     mkdir -p $builddir
     find $builddir -type l -exec rm {} +
@@ -41,15 +41,4 @@ EOF
     # run hologram
     bin/compass compile -c etc/compass_${project}.rb
     bin/hologram etc/hologram_${project}.yml
-done
-
-for project in $projects; do
-    dir=src/$project/$project/build/styleguides
-
-    mkdir -p $dir
-
-    for project2 in $projects; do
-        ln -s `realpath src/$project2/$project2/build` $dir/$project2
-        echo "<a href=\"$project2/styleguide\">$project2</a>" >> $dir/index.html
-    done
 done
