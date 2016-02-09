@@ -48,11 +48,6 @@ from adhocracy_mercator.sheets.mercator2 import IExtraFunding
 from adhocracy_mercator.sheets.mercator2 import ICommunity
 
 
-def normalize_text(s: str) -> str:
-    """Normalize text to put it in CVS."""
-    return s.replace(';', '')
-
-
 def export_proposals():
     """
     Export all proposals from database and write them to csv file.
@@ -254,8 +249,13 @@ def _get_sheet_field_from_subresource(sheet,
     return get_sheet_field(sub_resource, sheet, sub_sheet_field)
 
 
+def _normalize_text(s: str) -> str:
+    """Normalize text to put it in CVS."""
+    return s.replace(';', '')
+
+
 def _append_field(result, content):
-    result.append(normalize_text(content))
+    result.append(_normalize_text(content))
 
 
 def _get_date(sheet, field, resource):
