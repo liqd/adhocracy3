@@ -89,6 +89,7 @@ python-magic==0.4.6
 pytz==2014.10
 repoze.lru==0.6
 repoze.sendmail==4.2
+repoze.sphinx.autointerface==0.7.1
 requests==2.5.1
 selenium==2.44.0
 setuptools==18.3.2

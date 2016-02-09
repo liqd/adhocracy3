@@ -32,11 +32,9 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.coverage',
               'sphinx.ext.viewcode',
               'sphinx.ext.pngmath',
+              'repoze.sphinx.autointerface',
               'sphinx_autodoc_annotation',
               'sphinx.ext.graphviz']
-
-if os.environ.get('READTHEDOCS', None) != 'True':
-    extensions.append('repoze.sphinx.autointerface')
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
