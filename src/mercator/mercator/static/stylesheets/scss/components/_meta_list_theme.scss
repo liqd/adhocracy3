@@ -1,16 +1,3 @@
-.m-phase-participate {
-    .meta-list-item {
-        &:last-child {
-            float: right;
-            margin-right: 0;
-
-            @media print {
-                float: none;
-            }
-        }
-    }
-}
-
 .proposal-list-item-meta-list {
     padding-bottom: 0;
 
