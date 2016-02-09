@@ -1,6 +1,10 @@
 #!/bin/bash
 
-projects="adhocracy_frontend mercator meinberlin spd pcompass s1"
+if [ -z ${1+x} ]; then
+    projects="adhocracy_frontend mercator meinberlin spd pcompass s1"
+else
+    projects=$1;
+fi
 
 for project in $projects; do
     builddir=src/$project/$project/build
