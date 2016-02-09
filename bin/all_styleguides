@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 if [ -z ${1+x} ]; then
     projects="adhocracy_frontend mercator meinberlin spd pcompass s1"
