@@ -7,6 +7,8 @@ else
 fi
 
 for project in $projects; do
+    echo "-- Building \"$project\""
+
     builddir="styleguides/$project"
 
     mkdir -p $builddir
@@ -41,4 +43,6 @@ EOF
     # run hologram
     bin/compass compile -c etc/compass_${project}.rb
     bin/hologram etc/hologram_${project}.yml
+
+    echo
 done
