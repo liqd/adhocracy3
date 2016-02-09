@@ -54,12 +54,19 @@ def normalize_text(s: str) -> str:
 
 
 def export_proposals():
-    """Export all proposals from database and write them to csv file."""
+    """
+    Export all proposals from database and write them to csv file.
+
+    --limited restricts the export to a few fields.
+    """
     doc = textwrap.dedent(inspect.getdoc(export_proposals))
     parser = argparse.ArgumentParser(description=doc)
     parser.add_argument('config')
+    parser.add_argument('-l',
+                        '--limited',
+                        help='only export a limited subset of all fields',
+                        action='store_true')
     args = parser.parse_args()
-
     env = bootstrap(args.config)
 
     root = env['root']
@@ -77,145 +84,152 @@ def export_proposals():
     wr = csv.writer(result_file, delimiter=';', quotechar='"',
                     quoting=csv.QUOTE_MINIMAL)
 
-    wr.writerow(['URL',
-                 'Creation date',
-                 'Title',
-                 'Creator name',
-                 'Creator email',
-                 'First name',
-                 'Last name',
-                 'Organisation name',
-                 'Organisation city',
-                 'Organisation country',
-                 'Organisation help request',
-                 'Organisation registration date',
-                 'Organisation website',
-                 'Organisation status',
-                 'Organisation status other',
-                 'Pitch',
-                 'Partner1 name',
-                 'Partner1 website',
-                 'Partner1 country',
-                 'Partner2 name',
-                 'Partner2 website',
-                 'Partner2 country',
-                 'Partner3 name',
-                 'Partner3 website',
-                 'Partner3 country',
-                 'Other partners',
-                 'Topics',
-                 'Topic other',
-                 'Duration',
-                 'Location',
-                 'Is online',
-                 'Link to Ruhr',
-                 'Status',
-                 'Challenge',
-                 'Goal',
-                 'Plan',
-                 'Target',
-                 'Team',
-                 'Extra info',
-                 'Connection cohesion',
-                 'Difference',
-                 'Practical relevance',
-                 'Budget',
-                 'Requested funding',
-                 'Major expenses',
-                 'Other sources of income',
-                 'Secured',
-                 'Reach out',
-                 'Heard from',
-                 'Heard from other'])
+    is_in_subset = True
+    is_out_subset = False
+    fields = \
+        [('URL', is_in_subset,
+          partial(_get_proposal_url, registry)),
+         ('Creation date', is_in_subset,
+          partial(_get_creation_date)),
+         ('Title', is_in_subset,
+          partial(_get_sheet_field, ITitle, 'title')),
+         ('Creator name', is_in_subset,
+          partial(_get_creator_name)),
+         ('Creator email', is_in_subset,
+          partial(_get_creator_email)),
+         ('First name', is_in_subset,
+          partial(_get_sheet_field, IUserInfo, 'first_name')),
+         ('Last name', is_in_subset,
+          partial(_get_sheet_field, IUserInfo, 'last_name')),
+         ('Organisation name', is_out_subset,
+          partial(_get_sheet_field, IOrganizationInfo, 'name')),
+         ('Organisation city', is_out_subset,
+          partial(_get_sheet_field, IOrganizationInfo, 'city')),
+         ('Organisation country', is_in_subset,
+          partial(_get_sheet_field, IOrganizationInfo, 'country')),
+         ('Organisation help request', is_out_subset,
+          partial(_get_sheet_field, IOrganizationInfo, 'help_request')),
+         ('Organisation registration date', is_out_subset,
+          partial(_get_date, IOrganizationInfo, 'registration_date')),
+         ('Organisation website', is_out_subset,
+          partial(_get_sheet_field, IOrganizationInfo, 'website')),
+         ('Organisation status', is_out_subset,
+          partial(_get_sheet_field, IOrganizationInfo, 'status')),
+         ('Organisation status other', is_out_subset,
+          partial(_get_sheet_field, IOrganizationInfo, 'status_other')),
+         ('Pitch', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IPitch, 'pitch', 'pitch')),
+         ('Partner1 name', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IPartners, 'partners', 'partner1_name')),
+         ('Partner1 website', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IPartners, 'partners', 'partner1_website')),
+         ('Partner1 country', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IPartners, 'partners', 'partner1_country')),
+         ('Partner2 name', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IPartners, 'partners', 'partner2_name')),
+         ('Partner2 website', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IPartners, 'partners', 'partner2_website')),
+         ('Partner2 country', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IPartners, 'partners', 'partner2_country')),
+         ('Partner3 name', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IPartners, 'partners', 'partner3_name')),
+         ('Partner3 website', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IPartners, 'partners', 'partner3_website')),
+         ('Partner3 country', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IPartners, 'partners', 'partner3_country')),
+         ('Others partners', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IPartners, 'partners', 'other_partners')),
+         ('Topics', is_out_subset,
+          lambda proposal: ' '.join(
+              get_sheet_field(proposal, ITopic, 'topic'))),
+         ('Topic other', is_out_subset,
+          partial(_get_sheet_field, ITopic, 'topic_other')),
+         ('Duration', is_out_subset,
+          lambda proposal: str(_get_sheet_field_from_subresource(
+              IDuration, 'duration', 'duration', proposal))),
+         ('Location', is_out_subset,
+          partial(_get_sheet_field, ILocation, 'location')),
+         ('Is online', is_out_subset,
+          lambda proposal: str(
+              get_sheet_field(proposal, ILocation, 'is_online'))),
+         ('Link to Ruhr', is_out_subset,
+          partial(_get_sheet_field, ILocation, 'link_to_ruhr')),
+         ('Status', is_out_subset,
+          partial(_get_sheet_field, IStatus, 'status')),
+         ('Challenge', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IChallenge, 'challenge', 'challenge')),
+         ('Goal', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IGoal, 'goal', 'goal')),
+         ('Plan', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IPlan, 'plan', 'plan')),
+         ('Target', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  ITarget, 'target', 'target')),
+         ('Team', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  ITeam, 'team', 'team')),
+         ('Extra info', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IExtraInfo, 'extrainfo', 'extrainfo')),
+         ('Connection cohesion', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IConnectionCohesion,
+                  'connectioncohesion', 'connection_cohesion')),
+         ('Difference', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IDifference,
+                  'difference', 'difference')),
+         ('Practical relevance', is_out_subset,
+          partial(_get_sheet_field_from_subresource,
+                  IPracticalRelevance,
+                  'practicalrelevance', 'practicalrelevance')),
+         ('Budget', is_out_subset,
+          lambda proposal: str(get_sheet_field(
+              proposal, IFinancialPlanning, 'budget'))),
+         ('Requested funding', is_out_subset,
+          lambda proposal: str(get_sheet_field(
+              proposal, IFinancialPlanning, 'requested_funding'))),
+         ('Major expenses', is_out_subset,
+          partial(_get_sheet_field,
+                  IFinancialPlanning, 'major_expenses')),
+         ('Other sources of income', is_out_subset,
+          partial(_get_sheet_field, IExtraFunding, 'other_sources')),
+         ('Secured', is_out_subset,
+          lambda proposal: str(get_sheet_field(
+              proposal, IExtraFunding, 'secured'))),
+         ('Reach out', is_out_subset,
+          partial(_get_sheet_field, ICommunity, 'expected_feedback')),
+         ('Heard from', is_out_subset,
+          lambda proposal: ' '.join(get_sheet_field(
+              proposal, ICommunity, 'heard_froms'))),
+         ('Heard from other', is_out_subset,
+          lambda proposal: ' '.join(get_sheet_field(
+              proposal, ICommunity, 'heard_from_other')))]
+
+    wr.writerow([name for (name, is_in, _) in fields if is_in])
 
     for proposal in proposals:
 
         result = []
         append_field = partial(_append_field, result)
 
-        append_field(_get_proposal_url(proposal, registry))
-        append_field(_get_creation_date(proposal))
-        append_field(get_sheet_field(proposal, ITitle, 'title'))
-        user_name, user_email = _get_user_fields(proposal)
-        append_field(user_name)
-        append_field(user_email)
-        append_field(get_sheet_field(proposal, IUserInfo, 'first_name'))
-        append_field(get_sheet_field(proposal, IUserInfo, 'last_name'))
-        append_field(get_sheet_field(proposal, IOrganizationInfo, 'name'))
-        append_field(get_sheet_field(proposal, IOrganizationInfo, 'city'))
-        append_field(get_sheet_field(proposal, IOrganizationInfo, 'country'))
-        append_field(get_sheet_field(proposal,
-                                     IOrganizationInfo, 'help_request'))
-        append_field(_get_date(proposal,
-                               IOrganizationInfo, 'registration_date'))
-        append_field(get_sheet_field(proposal, IOrganizationInfo, 'website'))
-        append_field(get_sheet_field(proposal, IOrganizationInfo, 'status'))
-        append_field(get_sheet_field(proposal,
-                                     IOrganizationInfo, 'status_other'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IPitch, 'pitch', 'pitch'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IPartners, 'partners', 'partner1_name'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IPartners, 'partners', 'partner1_website'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IPartners, 'partners', 'partner1_country'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IPartners, 'partners', 'partner2_name'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IPartners, 'partners', 'partner2_website'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IPartners, 'partners', 'partner2_country'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IPartners, 'partners', 'partner3_name'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IPartners, 'partners', 'partner3_website'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IPartners, 'partners', 'partner3_country'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IPartners, 'partners', 'other_partners'))
-        append_field(' '.join(get_sheet_field(proposal, ITopic, 'topic')))
-        append_field(get_sheet_field(proposal, ITopic, 'topic_other'))
-        append_field(str(_get_sheet_field_from_subresource(
-            proposal, IDuration, 'duration', 'duration')))
-        append_field(get_sheet_field(proposal, ILocation, 'location'))
-        append_field(str(get_sheet_field(proposal, ILocation, 'is_online')))
-        append_field(get_sheet_field(proposal, ILocation, 'link_to_ruhr'))
-        append_field(get_sheet_field(proposal, IStatus, 'status'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IChallenge, 'challenge', 'challenge'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IGoal, 'goal', 'goal'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IPlan, 'plan', 'plan'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, ITarget, 'target', 'target'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, ITeam, 'team', 'team'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IExtraInfo, 'extrainfo', 'extrainfo'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IConnectionCohesion,
-            'connectioncohesion', 'connection_cohesion'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IDifference, 'difference', 'difference'))
-        append_field(_get_sheet_field_from_subresource(
-            proposal, IPracticalRelevance,
-            'practicalrelevance', 'practicalrelevance'))
-        append_field(str(get_sheet_field(
-            proposal, IFinancialPlanning, 'budget')))
-        append_field(str(get_sheet_field(
-            proposal, IFinancialPlanning, 'requested_funding')))
-        append_field(get_sheet_field(proposal,
-                                     IFinancialPlanning, 'major_expenses'))
-        append_field(get_sheet_field(proposal, IExtraFunding, 'other_sources'))
-        append_field(str(get_sheet_field(proposal, IExtraFunding, 'secured')))
-        append_field(get_sheet_field(proposal,
-                                     ICommunity, 'expected_feedback'))
-        append_field(' '.join(get_sheet_field(proposal,
-                                              ICommunity, 'heard_froms')))
-        append_field(' '.join(get_sheet_field(proposal,
-                                              ICommunity, 'heard_from_other')))
+        for name, is_in, get_field in fields:
+            if is_in or not args.limited:
+                append_field(get_field(proposal))
 
         wr.writerow(result)
 
@@ -230,10 +244,10 @@ def _get_user_fields(proposal):
     return name, email
 
 
-def _get_sheet_field_from_subresource(proposal,
-                                      sheet,
+def _get_sheet_field_from_subresource(sheet,
                                       sheet_field,
-                                      sub_sheet_field):
+                                      sub_sheet_field,
+                                      proposal):
     sub_resource = get_sheet_field(proposal,
                                    IMercatorSubResources,
                                    sheet_field)
@@ -244,7 +258,7 @@ def _append_field(result, content):
     result.append(normalize_text(content))
 
 
-def _get_date(resource, sheet, field):
+def _get_date(sheet, field, resource):
     value = get_sheet_field(resource, sheet, field)
     if not value:
         return ''
@@ -261,8 +275,24 @@ def _get_creation_date(proposal):
     return date
 
 
-def _get_proposal_url(proposal: IMercatorProposal,
-                      registry: Registry) -> str:
+def _get_proposal_url(registry: Registry,
+                      proposal: IMercatorProposal) -> str:
     path = resource_path(proposal)
     frontend_url = registry.settings.get('adhocracy.frontend_url')
     return frontend_url + '/r' + path
+
+
+def _get_sheet_field(sheet, field, resource):
+    return get_sheet_field(resource, sheet, field)
+
+
+def _get_creator_name(proposal):
+    creator = get_sheet_field(proposal, IMetadata, 'creator')
+    name = get_sheet_field(creator, IUserBasic, 'name')
+    return name
+
+
+def _get_creator_email(proposal):
+    creator = get_sheet_field(proposal, IMetadata, 'creator')
+    email = get_sheet_field(creator, IUserExtended, 'email')
+    return email
