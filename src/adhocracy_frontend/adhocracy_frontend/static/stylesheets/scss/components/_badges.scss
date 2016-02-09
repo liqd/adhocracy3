@@ -26,6 +26,15 @@ Badges for labeling things
     color: $color-text-normal;
     line-height: $badge-line-height;
     text-transform: uppercase;
+
+    &.m-winner {
+        background: $color-brand-one-normal;
+    }
+
+    &.m-special-award {
+        background: $color-brand-two-normal;
+        color: $color-text-inverted;
+    }
 }
 
 /*doc
@@ -41,6 +50,21 @@ The description of a badge assignment. The same modifiers as for `badge` apply.
 <div class="badge-description">
     <p>Simple badge description</p>
 </div>
+```
+*/
+
+/*doc
+---
+title: Badge modfiers
+name: badge-modifiers
+category: Type
+---
+
+Proposal modifiers for badges
+
+```html_example
+<span class="badge m-winner">Winner</span>
+<span class="badge m-special-award">Special Award</span>
 ```
 */
 

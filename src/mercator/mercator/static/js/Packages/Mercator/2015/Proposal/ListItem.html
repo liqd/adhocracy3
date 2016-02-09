@@ -3,7 +3,7 @@
     data-ng-class="{
         'has-rosette': data.winnerBadgeAssignment,
         'm-winner': data.winnerBadgeAssignment.name === 'winning',
-        'm-community-award': data.winnerBadgeAssignment.name === 'community'
+        'm-special-award': data.winnerBadgeAssignment.name === 'community'
     }"
     class="proposal-list-item {{ selectedState }}">
     <adh-show-image
@@ -39,7 +39,7 @@
                 <span class="badge m-winner">{{ "TR__MERCATOR_BADGE_WINNERS" | translate }}</span>
             </li>
             <li data-ng-if="data.winnerBadgeAssignment.name === 'community'" class="meta-list-item meta-list-item-badge">
-                <span class="badge m-community-award">{{ "TR__MERCATOR_BADGE_COMMUNITY_AWARD" | translate }}</span>
+                <span class="badge m-special-award">{{ "TR__MERCATOR_BADGE_COMMUNITY_AWARD" | translate }}</span>
             </li>
         </ul>
     </div>

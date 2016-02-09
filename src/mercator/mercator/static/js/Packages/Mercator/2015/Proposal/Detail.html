@@ -3,7 +3,7 @@
     data-ng-class="{
         'has-rosette': data.winnerBadgeAssignment,
         'm-winner': data.winnerBadgeAssignment.name === 'winning',
-        'm-community-award': data.winnerBadgeAssignment.name === 'community'
+        'm-special-award': data.winnerBadgeAssignment.name === 'community'
     }">
     <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
     <div class="section-jump-cover">
@@ -27,7 +27,7 @@
                 <span class="badge m-winner">{{ "TR__MERCATOR_BADGE_WINNERS" | translate }}</span>
             </li>
             <li data-ng-if="data.winnerBadgeAssignment.name === 'community'" class="meta-list-item meta-list-item-badge">
-                <span class="badge m-community-award">{{ "TR__MERCATOR_BADGE_COMMUNITY_AWARD" | translate }}</span>
+                <span class="badge m-special-award">{{ "TR__MERCATOR_BADGE_COMMUNITY_AWARD" | translate }}</span>
             </li>
         </ul>
         <h1 class="section-jump-cover-header screen-only">{{ data.title }}

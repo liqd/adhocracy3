@@ -10,7 +10,7 @@ Add a winning rosette or similar to an element. Must have a position:relative or
 ```html_example
 <ol class="listing-elements">
     <li class="listing-element debug-placeholder has-rosette m-winner" style="min-height:75px; position: relative">Winner</li>
-    <li class="listing-element debug-placeholder has-rosette m-community-award" style="min-height:75px; position: relative">Community Winner</li>
+    <li class="listing-element debug-placeholder has-rosette m-special-award" style="min-height:75px; position: relative">Community Winner</li>
 </ol>
 
 <div class="debug-placeholder has-rosette m-winner" style="position: relative; height:100px; width: 200px">Winner</div>
@@ -34,7 +34,7 @@ Add a winning rosette or similar to an element. Must have a position:relative or
     }
 
     &.m-winner,
-    &.m-community-award {
+    &.m-special-award {
         &:before {
             color: $color-text-inverted;
             position: absolute;
@@ -55,7 +55,7 @@ Add a winning rosette or similar to an element. Must have a position:relative or
         }
     }
 
-    &.m-community-award {
+    &.m-special-award {
         &:before {
             @extend .icon-community-award:before;
             @include rem(font-size, 18px);
