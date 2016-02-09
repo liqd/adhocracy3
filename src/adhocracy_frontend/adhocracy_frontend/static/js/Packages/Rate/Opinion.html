@@ -62,4 +62,8 @@
             </span>
         </span>
     </span>
+    <a href="" data-ng-if="showResultToggle()" data-ng-click="toggleShowResult()" class="opinion-result-toggle">
+        <span data-ng-if="!showResult()">{{ "TR__OPINION_SHOW_RESULT" | translate }}</span>
+        <span data-ng-if="showResult()">{{ "TR__OPINION_SHOW_RATE" | translate }}</span>
+    </a>
 </div>
