@@ -440,7 +440,10 @@ var moderate = (
     };
 
     return adhHttp.get(scope.path).then((oldProposal) => {
-        var clone = _.cloneDeep(oldProposal);
+        var clone = {
+            content_type: oldProposal.content_type,
+            data: {}
+        };
         clone.data[SIWinnerInfo.nick] = new SIWinnerInfo.Sheet({
             funding: scope.data.winner.funding
         });
