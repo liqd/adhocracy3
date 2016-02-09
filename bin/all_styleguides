@@ -44,6 +44,10 @@ EOF
     bin/compass compile -c etc/compass_${project}.rb
     bin/hologram etc/hologram_${project}.yml
 
+    # clean up
+    find $builddir -type l -exec rm {} +
+    find $builddir -type d -empty -delete
+
     echo
 done
 
