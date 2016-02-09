@@ -39,7 +39,7 @@ A high-level section of a document with its own heading.
     }
 }
 
-.chapter-header {
+.chapter-header, .chapter h2 {
     @include rem(margin, 0 0 1rem);
     color: $color-text-introvert;
 
