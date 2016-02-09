@@ -2,13 +2,11 @@
 import colander
 
 from adhocracy_core.interfaces import ISheet
-from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import CurrencyAmount
 from adhocracy_core.schema import DateTime
-from adhocracy_core.schema import Email
 from adhocracy_core.schema import ISOCountryCode
 from adhocracy_core.schema import Integer
 from adhocracy_core.schema import Reference
@@ -18,6 +16,7 @@ from adhocracy_core.schema import URL
 from adhocracy_core.schema import AdhocracySequenceNode
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
+from adhocracy_core.sheets.subresources import ISubResources
 
 
 class IUserInfo(ISheet):
@@ -60,7 +59,6 @@ class OrganizationInfoSchema(colander.MappingSchema):
     help_request = Text(validator=colander.Length(max=300))
     registration_date = DateTime(missing=colander.drop, default=None)
     website = URL(missing=colander.drop)
-    contact_email = Email(missing=colander.drop)
     status = OrganizationStatusEnum(missing=colander.required)
     status_other = Text(validator=colander.Length(max=300))
 
@@ -333,9 +331,9 @@ class IExtraInfo(ISheet):
 
 
 class ExtraInfoSchema(colander.MappingSchema):
-    """Datastruct for the challenge field."""
+    """Datastruct for the extra info field."""
 
-    extrainfo = Text(missing=colander.required,
+    extrainfo = Text(missing=colander.drop,
                      validator=colander.Length(min=3, max=500))
 
 extrainfo_meta = sheet_meta._replace(
@@ -409,7 +407,7 @@ class IExtraFunding(ISheet):
 
 
 class ExtraFundingSchema(colander.MappingSchema):
-    other_sources = Text()
+    other_sources = Text(missing='')
     secured = Boolean(default=False)
 
 
@@ -490,7 +488,7 @@ winnerinfo_meta = sheet_meta._replace(
 )
 
 
-class IMercatorSubResources(ISheet, ISheetReferenceAutoUpdateMarker):
+class IMercatorSubResources(ISubResources):
     """Marker interface for commentable subresources of MercatorProposal."""
 
 

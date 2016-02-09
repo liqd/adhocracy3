@@ -8,6 +8,7 @@ import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
 import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
 import * as SIWorkflow from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
+import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
 
 var pkgLocation = "/Process";
 
@@ -115,7 +116,7 @@ export var processViewDirective = (
             var childScope : angular.IScope;
 
             adhTopLevelState.on("processType", (processType) => {
-                if (typeof processType !== "undefined") {
+                if (processType) {
                     adhProcess.getTemplate(processType).then((template) => {
                         if (childScope) {
                             childScope.$destroy();
@@ -126,6 +127,30 @@ export var processViewDirective = (
                     });
                 }
             });
+        }
+    };
+};
+
+export var listItemDirective = () => {
+    return {
+        restrict: "E",
+        scope: {
+            path: "@"
+        },
+        template: "<a data-ng-href=\"{{ path | adhResourceUrl }}\">{{path}}</a>"
+    };
+};
+
+export var listingDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        scope: {},
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
+        link: (scope) => {
+            scope.contentType = RIProcess.content_type;
+            scope.params = {
+                depth: "all"
+            };
         }
     };
 };

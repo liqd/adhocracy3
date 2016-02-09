@@ -117,7 +117,8 @@ export var register = () => {
                 adhUserMock.logIn.and.returnValue(q.when(undefined));
                 adhTopLevelStateMock = jasmine.createSpyObj("adhTopLevelStateMock", ["goToCameFrom"]);
 
-                directive = AdhUserViews.registerDirective(adhConfigMock, null, adhUserMock, adhTopLevelStateMock, "adhShowError");
+                directive = AdhUserViews.registerDirective(
+                    null, null, adhConfigMock, null, adhUserMock, adhTopLevelStateMock, "adhShowError");
             });
 
             describe("link", () => {
@@ -138,7 +139,8 @@ export var register = () => {
                         username: "",
                         email: "",
                         password: "",
-                        passwordRepeat: ""
+                        passwordRepeat: "",
+                        captchaGuess: ""
                     });
                 });
 
@@ -150,7 +152,7 @@ export var register = () => {
                         scopeMock.input.passwordRepeat = "passwordRepeat";
 
                         scopeMock.register().then(() => {
-                            expect(adhUserMock.register).toHaveBeenCalledWith("username", "email", "password", "passwordRepeat");
+                            expect(adhUserMock.register).toHaveBeenCalledWith("username", "email", "password", "passwordRepeat", "", "");
                             done();
                         });
                     });

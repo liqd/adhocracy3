@@ -12,6 +12,7 @@ from adhocracy_core.sheets import workflow
 from adhocracy_core.sheets.image import IImageMetadata
 from adhocracy_core.sheets.image import ImageMetadataSchema
 from adhocracy_core.sheets.image import image_metadata_meta
+from adhocracy_core.sheets.subresources import ISubResources
 from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import CurrencyAmount
@@ -24,7 +25,7 @@ from adhocracy_core.schema import URL
 from adhocracy_core.schema import Resource
 
 
-class IMercatorSubResources(ISheet, ISheetReferenceAutoUpdateMarker):
+class IMercatorSubResources(ISubResources):
     """Marker interface for commentable subresources of MercatorProposal."""
 
 

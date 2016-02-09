@@ -1,20 +1,14 @@
-"""Common fixtures for adhocracy_mercator."""
+"""Common test fixtures."""
 from pytest import fixture
 
 
 @fixture(scope='class')
-def app(app_settings):
+def app_router(app_settings):
     """Return the adhocracy_mercator test wsgi application."""
-    from pyramid.config import Configurator
-    from adhocracy_core.testing import add_create_test_users_subscriber
+    from adhocracy_core.testing import make_configurator
     import adhocracy_meinberlin
-    configurator = Configurator(settings=app_settings,
-                                root_factory=adhocracy_meinberlin.root_factory)
-    configurator.include(adhocracy_meinberlin)
-    configurator.commit()
-    add_create_test_users_subscriber(configurator)
-    app = configurator.make_wsgi_app()
-    return app
+    configurator = make_configurator(app_settings, adhocracy_meinberlin)
+    return configurator.make_wsgi_app()
 
 
 @fixture

@@ -62,7 +62,6 @@ class TestOrganizationInfoSheet:
                   'help_request': '',
                   'registration_date': None,
                   'website': '',
-                  'contact_email': '',
                   'status': 'other',
                   'status_other': '',
                   }
@@ -87,7 +86,6 @@ class TestOrganizationInfoSchema:
         return {'country': 'DE',
                 'name': 'Name',
                 'status': 'planned_nonprofit',
-                'contact_email': 'anna@example.com',
                 'registration_date': '2015-02-18T14:17:24+00:00',
                 'city': 'Berlin',
                 }
@@ -104,7 +102,6 @@ class TestOrganizationInfoSchema:
             {'country': 'DE',
              'name': 'Name',
              'status': 'planned_nonprofit',
-             'contact_email': 'anna@example.com',
              'registration_date': datetime(2015, 2, 18,
                                            14, 17, 24, 0, tzinfo=UTC),
              'city': 'Berlin',
@@ -130,7 +127,6 @@ class TestOrganizationInfoSchema:
              'name': 'Name',
              'status': 'other',
              'status_other': 'Blabla',
-             'contact_email': 'anna@example.com',
              'registration_date': datetime(2015, 2, 18,
                                            14, 17, 24, 0, tzinfo=UTC),
              'city': 'Berlin',
@@ -146,7 +142,6 @@ class TestOrganizationInfoSchema:
              'name': 'Name',
              'status': 'support_needed',
              'help_request': 'Blabla',
-             'contact_email': 'anna@example.com',
              'registration_date': datetime(2015, 2, 18,
                                            14, 17, 24, 0, tzinfo=UTC),
              'city': 'Berlin',
@@ -771,9 +766,8 @@ class TestExtraInfoSchema:
     def test_deserialize_empty(self, inst):
         from colander import Invalid
         cstruct = {}
-        with raises(Invalid) as error:
-            inst.deserialize(cstruct)
-        assert error.value.asdict() == {'extrainfo': 'Required'}
+        inst.deserialize(cstruct) == {'extrainfo': ''}
+
 
     def test_deserialize_with_required(self, inst, cstruct_required):
         wanted = cstruct_required
@@ -1025,6 +1019,12 @@ class TestExtraFundingSchema:
     def test_deserialize_with_required(self, inst, cstruct_required):
         assert inst.deserialize(cstruct_required) == \
             {'other_sources': 'XYZ grant',
+             'secured': False}
+
+    def test_deserialize_empty_other_sources(self, inst, cstruct_required):
+        assert inst.deserialize({'other_sources': '',
+                                 'secured': 'False'}) == \
+            {'other_sources': '',
              'secured': False}
 
 

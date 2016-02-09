@@ -1,5 +1,6 @@
 """Initialize Mercator ACM."""
 from pyramid.events import ApplicationCreated
+
 from adhocracy_core.authorization import set_acms_for_app_root
 from adhocracy_core.resources.root import root_acm
 from adhocracy_mercator.resources.root import mercator_acm

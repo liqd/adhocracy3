@@ -25,6 +25,7 @@ class ConfigViewTest(unittest.TestCase):
              'site_name': 'Adhocracy',
              'netiquette_url': '',
              'canonical_url': 'http://localhost:6551',
+             'redirect_url': '/',
              'custom': {},
              'debug': False,
              'piwik_enabled': False,
@@ -33,7 +34,12 @@ class ConfigViewTest(unittest.TestCase):
              'piwik_track_user_id': False,
              'piwik_use_cookies': False,
              'profile_images_enabled': True,
-             'terms_url': None}
+             'captcha_enabled': False,
+             'captcha_url': 'http://localhost:6542/',
+             'terms_url': {
+                'de' : None,
+                'en' : None
+             }}
 
     def test_ws_url_without_ws_url_settings_scheme_https(self):
         request = testing.DummyRequest(scheme='https')
@@ -44,6 +50,11 @@ class ConfigViewTest(unittest.TestCase):
         request = testing.DummyRequest(scheme='http')
         request.registry.settings = {'adhocracy.frontend.ws_url': 'ws://l.x'}
         assert self.call_fut(request)['ws_url'] == 'ws://l.x'
+        
+    def test_redirect_url_with_redirect_url_settings(self):
+        request = testing.DummyRequest(scheme='http')
+        request.registry.settings = {'adhocracy.redirect_url': '/r/example/'}
+        assert self.call_fut(request)['redirect_url'] == '/r/example/'
 
     def test_pkg_path_with_pkg_path_settings(self):
         request = testing.DummyRequest(scheme='http')

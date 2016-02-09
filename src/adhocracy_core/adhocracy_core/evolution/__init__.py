@@ -28,6 +28,7 @@ from adhocracy_core.resources.badge import IBadgeAssignmentsService
 from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.resources.comment import ICommentVersion
+from adhocracy_core.resources.organisation import IOrganisation
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IUsersService
@@ -38,6 +39,7 @@ from adhocracy_core.resources.relation import add_relationsservice
 from adhocracy_core.sheets.asset import IHasAssetPool
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.badge import IHasBadgesPool
+from adhocracy_core.sheets.description import IDescription
 from adhocracy_core.sheets.image import IImageReference
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.principal import IUserExtended
@@ -555,6 +557,66 @@ def remove_tag_resources(root):  # pragma: no cover
                         'FIRST': item[first_version]})
 
 
+@log_migration
+def add_description_sheet_to_organisations(root):  # pragma: no cover
+    """Add description sheet to organisations."""
+    migrate_new_sheet(root, IOrganisation, IDescription)
+
+
+@log_migration
+def add_description_sheet_to_processes(root):  # pragma: no cover
+    """Add description sheet to processes."""
+    migrate_new_sheet(root, IProcess, IDescription)
+
+
+@log_migration
+def add_image_reference_to_organisations(root):  # pragma: no cover
+    """Add image reference to organisations and add assets service."""
+    registry = get_current_registry(root)
+    catalogs = find_service(root, 'catalogs')
+    query = search_query._replace(interfaces=(IOrganisation,), resolve=True)
+    organisations = catalogs.search(query).elements
+    for organisation in organisations:
+        if not IHasAssetPool.providedBy(organisation):
+            logger.info('Add assets service to {0}'.format(organisation))
+            add_assets_service(organisation, registry, {})
+    migrate_new_sheet(root, IOrganisation, IHasAssetPool)
+    migrate_new_sheet(root, IOrganisation, IImageReference)
+
+
+def set_comment_count(root):  # pragma: no cover
+    """Set comment_count for all ICommentables."""
+    from adhocracy_core.resources.subscriber import update_comments_count
+    registry = get_current_registry(root)
+    catalogs = find_service(root, 'catalogs')
+    query = search_query._replace(interfaces=ICommentVersion,
+                                  only_visible=True,
+                                  resolve=True)
+    comment_versions = catalogs.search(query).elements
+    count = len(comment_versions)
+    for index, comment in enumerate(comment_versions):
+        logger.info('Set comment_count for resource {0} of {1}'
+                    .format(index + 1, count))
+        update_comments_count(comment, 1, registry)
+
+
+def remove_duplicated_group_ids(root):  # pragma: no cover
+    """Remove duplicate group_ids from users."""
+    from adhocracy_core.resources.principal import IUser
+    catalogs = find_service(root, 'catalogs')
+    users = _search_for_interfaces(catalogs, IUser)
+    count = len(users)
+    for index, user in enumerate(users):
+        logger.info('Migrate user resource{0} of {1}'.format(index + 1, count))
+        group_ids = getattr(user, 'group_ids', [])
+        if not group_ids:
+            continue
+        unique_group_ids = list(set(group_ids))
+        if len(unique_group_ids) < len(group_ids):
+            logger.info('Remove duplicated groupd_ids for {0}'.format(user))
+            user.group_ids = unique_group_ids
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -579,3 +641,8 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(update_asset_download_children)
     config.add_evolution_step(recreate_all_image_size_downloads)
     config.add_evolution_step(remove_tag_resources)
+    config.add_evolution_step(add_description_sheet_to_organisations)
+    config.add_evolution_step(add_description_sheet_to_processes)
+    config.add_evolution_step(add_image_reference_to_organisations)
+    config.add_evolution_step(set_comment_count)
+    config.add_evolution_step(remove_duplicated_group_ids)

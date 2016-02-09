@@ -530,13 +530,12 @@ def test_create_filename_create_directory_if_not_exists():
     path.exists('/tmp/' + subdir + '/x')
 
 
-def test_get_root(app, registry):
-    from adhocracy_core.resources.root import IRootPool
+def test_get_root(app_router, registry):
     from adhocracy_core.utils import get_root
     fake_root = testing.DummyResource()
-    app.root_factory = Mock()
-    app.root_factory.return_value = fake_root
-    root = get_root(app)
+    app_router.root_factory = Mock()
+    app_router.root_factory.return_value = fake_root
+    root = get_root(app_router)
     assert root == fake_root
 
 

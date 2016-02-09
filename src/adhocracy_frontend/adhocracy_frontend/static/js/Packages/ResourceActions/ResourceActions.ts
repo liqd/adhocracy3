@@ -32,7 +32,7 @@ export var resourceActionsDirective = (
 export var reportActionDirective = () => {
     return {
         restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"report();\">{{ \"TR__REPORT\" | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"report();\">{{ 'TR__REPORT' | translate }}</a>",
         require: "^adhMovingColumn",
         scope: {
             class: "@"
@@ -48,7 +48,7 @@ export var reportActionDirective = () => {
 export var shareActionDirective = () => {
     return {
         restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"report();\">{{ \"TR__SHARE\" | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"report();\">{{ 'TR__SHARE' | translate }}</a>",
         require: "^adhMovingColumn",
         scope: {
             class: "@"
@@ -64,7 +64,7 @@ export var shareActionDirective = () => {
 export var deleteActionDirective = () => {
     return {
         restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"delete();\">{{ \"TR__DELETE\" | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"delete();\">{{ 'TR__DELETE' | translate }}</a>",
         require: "^adhMovingColumn",
         scope: {
             resourcePath: "@",
@@ -85,7 +85,7 @@ export var printActionDirective = (
 ) => {
     return {
         restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"print();\">{{ \"TR__PRINT\" | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"print();\">{{ 'TR__PRINT' | translate }}</a>",
         scope: {
             class: "@"
         },
@@ -106,7 +106,7 @@ export var editActionDirective = (
 ) => {
     return {
         restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"edit();\">{{ \"TR__EDIT\" | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"edit();\">{{ 'TR__EDIT' | translate }}</a>",
         require: "^adhMovingColumn",
         scope: {
             resourcePath: "@",
@@ -129,7 +129,7 @@ export var cancelActionDirective = (
 ) => {
     return {
         restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"cancel();\">{{ \"TR__CANCEL\" | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"cancel();\">{{ 'TR__CANCEL' | translate }}</a>",
         scope: {
             resourcePath: "@",
             parentPath: "=?",

@@ -5,7 +5,7 @@
     "initial-password": "secret",
     "roles": [],
     "groups": ["gods"],
-    "bages": ["god"],
+    "badges": ["god"],
     "send_invitation_mail": true,
     "subject_tmpl_invitation_mail": "adhocracy_core:templates/invite_subject_sample.txt.mako",
     "body_tmpl_invitation_mail": "adhocracy_core:templates/invite_body_sample.txt.mako"

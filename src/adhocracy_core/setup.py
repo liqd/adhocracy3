@@ -96,6 +96,8 @@ setup(name='adhocracy_core',
           adhocracy_core.scripts.set_workflow_state:set_workflow_state
       delete_stale_login_data =\
           adhocracy_core.scripts.delete_stale_login_data:delete_stale_login_data
+      delete_not_referenced_images =\
+          adhocracy_core.scripts.delete_images:delete_not_referenced_images
       [pyramid.scaffold]
       adhocracy=adhocracy_core.scaffolds:AdhocracyExtensionTemplate
       """,

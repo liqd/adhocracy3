@@ -10,6 +10,7 @@ import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 
 import * as AdhMercator2015Proposal from "../../2015/Proposal/Proposal";
 
+import * as SICommentable from "../../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIChallenge from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IChallenge";
 import * as SICommunity from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ICommunity";
 import * as SIConnectionCohesion from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IConnectionCohesion";
@@ -89,7 +90,6 @@ export interface IData {
     };
     organizationInfo : {
         name : string;
-        email : string;
         website : string;
         city : string;
         country : string;
@@ -135,7 +135,6 @@ export interface IData {
         other : boolean;
         otherText : string;
     };
-    topic_other : string;
     duration : number;
     location : {
         location_is_linked_to_ruhr : boolean;
@@ -198,6 +197,7 @@ export interface IDetailData extends IData {
     supporterCount : number;
     creationDate : string;
     creator : string;
+    selectedTopics : string[];
 }
 
 export interface IFormData extends IData {
@@ -219,7 +219,6 @@ var fill = (data : IFormData, resource) => {
                 help_request: data.organizationInfo.helpRequest,
                 registration_date: data.organizationInfo.registrationDate,
                 website: data.organizationInfo.website,
-                contact_email: data.organizationInfo.email,
                 status: data.organizationInfo.status,
                 status_other: data.organizationInfo.otherText
             });
@@ -256,7 +255,7 @@ var fill = (data : IFormData, resource) => {
             resource.data[SICommunity.nick] = new SICommunity.Sheet({
                 expected_feedback: data.experience,
                 heard_froms: _.reduce(<any>data.heardFrom, (result, include, item) => {
-                    if (include) {
+                    if (include && item !== "otherText" ) {
                         result.push(item);
                     }
                     return result;
@@ -343,7 +342,10 @@ var fill = (data : IFormData, resource) => {
     }
 };
 
-var create = (adhHttp : AdhHttp.Service<any>) => (scope, adhPreliminaryNames) => {
+var create = (
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service
+) => (scope) => {
     var data : IFormData = scope.data;
     return adhHttp.withTransaction((transaction) => {
         var proposal = new RIMercatorProposal({preliminaryNames: adhPreliminaryNames});
@@ -381,6 +383,43 @@ var create = (adhHttp : AdhHttp.Service<any>) => (scope, adhPreliminaryNames) =>
     });
 };
 
+var edit = (
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service
+) => (scope) => {
+    var data : IFormData = scope.data;
+    return adhHttp.get(scope.path).then((oldProposal) => {
+        var subResourcesSheet : SIMercatorSubResources.Sheet = oldProposal.data[SIMercatorSubResources.nick];
+
+        return adhHttp.withTransaction((transaction) => {
+            var proposal = new RIMercatorProposal({preliminaryNames: adhPreliminaryNames});
+            fill(data, proposal);
+            transaction.put(oldProposal.path, proposal);
+
+            _.forEach({
+                pitch: RIPitch,
+                partners: RIPartners,
+                duration: RIDuration,
+                challenge: RIChallenge,
+                goal: RIGoal,
+                plan: RIPlan,
+                target: RITarget,
+                team: RITeam,
+                extrainfo: RIExtraInfo,
+                connectioncohesion: RIConnectionCohesion,
+                difference: RIDifference,
+                practicalrelevance: RIPracticalRelevance
+            }, (cls, subresourceKey : string) => {
+                var resource = new cls({preliminaryNames: adhPreliminaryNames});
+                fill(data, resource);
+                transaction.put(subResourcesSheet[subresourceKey], resource);
+            });
+
+            return transaction.commit();
+        });
+    });
+};
+
 var get = (
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>,
@@ -409,12 +448,26 @@ var get = (
         })).then(() => $q.all([
             AdhMercator2015Proposal.getWorkflowState(adhHttp, adhTopLevelState, $q)(),
             AdhMercator2015Proposal.countSupporters(adhHttp, path + "rates/", path),
-            AdhMercator2015Proposal.countComments(adhHttp, path),
         ])).then((args : any[]) : IDetailData => {
+            var commentCounts = {
+                proposal: proposal.data[SICommentable.nick].comments_count,
+                pitch: subs.pitch.data[SICommentable.nick].comments_count,
+                partners: subs.partners.data[SICommentable.nick].comments_count,
+                duration: subs.duration.data[SICommentable.nick].comments_count,
+                challenge: subs.challenge.data[SICommentable.nick].comments_count,
+                goal: subs.goal.data[SICommentable.nick].comments_count,
+                plan: subs.plan.data[SICommentable.nick].comments_count,
+                target: subs.target.data[SICommentable.nick].comments_count,
+                team: subs.team.data[SICommentable.nick].comments_count,
+                extrainfo: subs.extrainfo.data[SICommentable.nick].comments_count,
+                connectioncohesion: subs.connectioncohesion.data[SICommentable.nick].comments_count,
+                difference: subs.difference.data[SICommentable.nick].comments_count,
+                practicalrelevance: subs.practicalrelevance.data[SICommentable.nick].comments_count
+            };
+
             return {
                 currentPhase: args[0],
                 supporterCount: args[1],
-                commentCountTotal: args[2],
 
                 creationDate: proposal.data[SIMetaData.nick].item_creation_date,
                 creator: proposal.data[SIMetaData.nick].creator,
@@ -429,15 +482,22 @@ var get = (
                     helpRequest: proposal.data[SIOrganizationInfo.nick].help_request,
                     registrationDate: proposal.data[SIOrganizationInfo.nick].registration_date,
                     website: proposal.data[SIOrganizationInfo.nick].website,
-                    email: proposal.data[SIOrganizationInfo.nick].contact_email,
                     status: proposal.data[SIOrganizationInfo.nick].status,
                     otherText: proposal.data[SIOrganizationInfo.nick].status_other
                 },
                 topic: <any>_.reduce(<any>topics, (result, key : string) => {
                     result[key] = _.indexOf(proposal.data[SITopic.nick].topic, key) !== -1;
                     return result;
-                }, {}),
-                topic_other: proposal.data[SITopic.nick].topic_other,
+                }, {
+                    otherText: proposal.data[SITopic.nick].topic_other
+                }),
+                selectedTopics: _.map(proposal.data[SITopic.nick].topic, (topic : string) => {
+                    if (topic === "other") {
+                        return proposal.data[SITopic.nick].topic_other;
+                    } else {
+                        return topicTrString(topic);
+                    }
+                }),
                 title: proposal.data[SITitle.nick].title,
                 location: {
                     location_is_specific: !!proposal.data[SILocation.nick].location,
@@ -455,7 +515,10 @@ var get = (
                     secured: (proposal.data[SIExtraFunding.nick] || {}).secured
                 },
                 experience: proposal.data[SICommunity.nick].expected_feedback,
-                heardFrom: proposal.data[SICommunity.nick].heard_from,
+                heardFrom: _.reduce(proposal.data[SICommunity.nick].heard_froms, (result, item : string) => {
+                    result[item] = true;
+                    return result;
+                }, {}),
                 introduction: {
                     pitch: subs.pitch.data[SIPitch.nick].pitch,
                     picture: proposal.data[SIImageReference.nick].picture
@@ -494,37 +557,102 @@ var get = (
                     difference: subs.difference.data[SIDifference.nick].difference,
                     practical: subs.practicalrelevance.data[SIPracticalRelevance.nick].practicalrelevance
                 },
-
-                // FIXME: It is not currently possible to get the
-                // recursive comment count of a subresource. Will be
-                // fixed in the backend.
-                commentCounts: {
-                    proposal: 0,
-                    pitch: 0,
-                    partners: 0,
-                    duration: 0,
-                    challenge: 0,
-                    goal: 0,
-                    plan: 0,
-                    target: 0,
-                    team: 0,
-                    extrainfo: 0,
-                    connectioncohesion: 0,
-                    difference: 0,
-                    practicalrelevance: 0
-                }
+                commentCounts: commentCounts,
+                commentCountTotal: _.sum(<any>commentCounts)
             };
         });
     });
 };
 
 
-export var createDirective = (adhConfig : AdhConfig.IService) => {
+export var createDirective = (
+    $location : angular.ILocationService,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhResourceUrl
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
             poolPath: "@"
+        },
+        link: (scope) => {
+            scope.create = true;
+
+            scope.data = {
+                user_info: {},
+                organization_info: {},
+                introduction: {},
+                partners: {
+                    partner1: {},
+                    partner2: {},
+                    partner3: {}
+                },
+                topic: {},
+                location: {},
+                impact: {},
+                criteria: {},
+                finance: {},
+                heardFrom: {}
+            };
+
+            scope.submit = () => create(adhHttp, adhPreliminaryNames)(scope).then((proposalPath) => {
+                $location.url(adhResourceUrl(proposalPath));
+            });
+        }
+    };
+};
+
+export var editDirective = (
+    $q : angular.IQService,
+    $location : angular.ILocationService,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhResourceUrl
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope) => {
+            scope.data = {
+                user_info: {},
+                organization_info: {},
+                introduction: {},
+                partners: {
+                    partner1: {},
+                    partner2: {},
+                    partner3: {}
+                },
+                topic: {},
+                location: {},
+                impact: {},
+                criteria: {},
+                finance: {},
+                heardFrom: {}
+            };
+
+            get($q, adhHttp, adhTopLevelState)(scope.path).then((data) => {
+                scope.data = data;
+
+                scope.data.partners.hasPartners = scope.data.partners.hasPartners ? "true" : "false";
+
+                if (scope.data.organizationInfo.status === "planned_nonprofit") {
+                    scope.data.organizationInfo.registrationDateField = data.organizationInfo.registrationDate.substr(0, 7);
+                } else if (scope.data.organizationInfo.status === "registered_nonprofit") {
+                    scope.data.organizationInfo.registrationDateField = data.organizationInfo.registrationDate.substr(0, 4);
+                }
+            });
+
+            scope.submit = () => edit(adhHttp, adhPreliminaryNames)(scope).then(() => {
+                $location.url(adhResourceUrl(scope.path));
+            });
         }
     };
 };
@@ -539,9 +667,6 @@ export var listing = (adhConfig : AdhConfig.IService) => {
             facets: "=?",
             sort: "=?",
             sorts: "=?",
-            reverse: "=?",
-            frontendOrderPredicate: "=?",
-            frontendOrderReverse: "=?",
             initialLimit: "=?",
             params: "=?"
         },
@@ -574,7 +699,7 @@ export var listItem = (
                     user_info: {
                         first_name: data.userInfo.firstName,
                         last_name: data.userInfo.lastName,
-                        item_creation_date: data.creationDate,
+                        createtime: data.creationDate,
                         path: data.creator
                     },
                     organization_info: data.organizationInfo,
@@ -594,11 +719,7 @@ export var listItem = (
 export var mercatorProposalFormController2016 = (
     $scope,
     $element,
-    $window,
-    $location,
     adhShowError,
-    adhHttp : AdhHttp.Service<any>,
-    adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhSubmitIfValid,
     adhResourceUrl,
@@ -610,27 +731,20 @@ export var mercatorProposalFormController2016 = (
 
     $scope.$flow = flowFactory.create();
 
-    $scope.selection_criteria_link = "/en/idea-space/selection-criteria/";
-    $scope.financial_plan_link = "/en/idea-space/financial-plan/";
+    // Fixme: These links are not used currently due to them not working on production/staging
+    // See https://github.com/liqd/adhocracy3/issues/2011
+    $scope.selection_criteria_link = "http://advocate-europe.eu/en/idea-space/selection-criteria/";
+    $scope.financial_plan_link = "http://advocate-europe.eu/de/media/advocate-europe_project-financial-plan.xlsx";
 
-    $scope.data = {
-        user_info: {},
-        organization_info: {},
-        introduction: {},
-        partners: {
-            partner1: {},
-            partner2: {},
-            partner3: {}
-        },
-        topic: {},
-        location: {},
-        impact: {},
-        criteria: {},
-        finance: {},
-        heardFrom: {}
+    var topicTotal = () => {
+        return _.reduce($scope.data.topic, (result, include, topic : string) => {
+            if (include && (topic !== "otherText")) {
+                return result + 1;
+            } else {
+                return result;
+            }
+        }, 0);
     };
-
-    var topicTotal = 0;
 
     $scope.topics = topics;
 
@@ -651,8 +765,7 @@ export var mercatorProposalFormController2016 = (
 
     $scope.topicChange = (isChecked) => {
         if ($scope.data.topic) {
-            topicTotal = isChecked ? (topicTotal + 1) : (topicTotal - 1);
-            var validity = topicTotal > 0 && topicTotal < 3;
+            var validity = topicTotal() > 0 && topicTotal() < 3;
             $scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$setValidity("enoughTopics", validity);
             $scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$setDirty();
         } else {
@@ -677,8 +790,9 @@ export var mercatorProposalFormController2016 = (
     };
 
     $scope.showTopicsError = () : boolean => {
-        return ((topicTotal < 1) || (topicTotal > 2)) &&
-            $scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$dirty;
+        return ((topicTotal() < 1) || (topicTotal() > 2)) &&
+            ($scope.mercatorProposalForm.mercatorProposalBriefForm["introduction-topics"].$dirty ||
+                $scope.mercatorProposalForm.$submitted);
     };
 
     $scope.showLocationError = () : boolean => {
@@ -699,20 +813,17 @@ export var mercatorProposalFormController2016 = (
 
     $scope.dateChange = (date) => {
         // FIXME: this is quite hacky dates need proper validation EG not so much in the past or future too
-        $scope.data.organizationInfo.registrationDate = date + "-01";
+        if ($scope.data.organizationInfo.status === "planned_nonprofit") {
+            $scope.data.organizationInfo.registrationDate = $scope.data.organizationInfo.registrationDateField + "-01";
+        } else {
+            $scope.data.organizationInfo.registrationDate = $scope.data.organizationInfo.registrationDateField + "-01-01";
+        }
     };
 
     $scope.showError = adhShowError;
 
-    // FIXME !
-    $scope.create = "true";
-
     $scope.submitIfValid = () => {
         adhSubmitIfValid($scope, $element, $scope.mercatorProposalForm, () => {
-            var post = () => create(adhHttp)($scope, adhPreliminaryNames).then((proposalPath) => {
-                $location.url(adhResourceUrl(proposalPath));
-            });
-
             if ($scope.$flow && $scope.$flow.support && $scope.$flow.files.length > 0) {
                 return adhUploadImage(
                     adhTopLevelState.get("processUrl"),
@@ -721,10 +832,10 @@ export var mercatorProposalFormController2016 = (
                     SIMercatorIntroImageMetadata.nick
                 ).then((imageUrl : string) => {
                     $scope.data.introduction.picture = imageUrl;
-                    return post();
+                    return $scope.submit();
                 });
             } else {
-                return post();
+                return $scope.submit();
             }
         });
     };
@@ -756,14 +867,6 @@ export var detailDirective = (
 
             get($q, adhHttp, adhTopLevelState)(scope.path).then((data) => {
                 scope.data = data;
-
-                scope.selectedTopics = [];
-
-                _.forEach(scope.data.topic, function(isSelected, key) {
-                    if ((isSelected === true) && (key !== "other")) {
-                        scope.selectedTopics.push(topicTrString(key));
-                    }
-                });
             });
         }
     };

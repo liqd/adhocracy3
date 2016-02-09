@@ -722,6 +722,8 @@ class BadgeAssignmentsRESTView(PoolRESTView):
 class UsersRESTView(PoolRESTView):
     """View the IUsersService pool overwrites POST handling."""
 
+    validation_POST = (POSTResourceRequestSchema, [])
+
     @view_config(request_method='POST',
                  permission='create_user',
                  accept='application/json')

@@ -191,7 +191,8 @@ export var createDirective = (
             scope.data = {
                 title: "",
                 paragraphs: [{
-                    body: ""
+                    body: "",
+                    deleted: false
                 }]
             };
             scope.showError = adhShowError;

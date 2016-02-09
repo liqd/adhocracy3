@@ -3,18 +3,12 @@ from pytest import fixture
 
 
 @fixture(scope='class')
-def app(app_settings):
+def app_router(app_settings):
     """Return the adhocracy_s1 test wsgi application."""
-    from pyramid.config import Configurator
-    from adhocracy_core.testing import add_create_test_users_subscriber
+    from adhocracy_core.testing import make_configurator
     import adhocracy_s1
-    configurator = Configurator(settings=app_settings,
-                                root_factory=adhocracy_s1.root_factory)
-    configurator.include(adhocracy_s1)
-    configurator.commit()
-    add_create_test_users_subscriber(configurator)
-    app = configurator.make_wsgi_app()
-    return app
+    configurator = make_configurator(app_settings, adhocracy_s1)
+    return configurator.make_wsgi_app()
 
 
 @fixture

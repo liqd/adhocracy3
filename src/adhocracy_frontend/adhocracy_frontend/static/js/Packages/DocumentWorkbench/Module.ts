@@ -12,7 +12,6 @@ import * as AdhDocumentWorkbench from "./DocumentWorkbench";
 import RIBasicPool from "../../Resources_/adhocracy_core/resources/pool/IBasicPool";
 import RIDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
 import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
-import RIUsersService from "../../Resources_/adhocracy_core/resources/principal/IUsersService";
 
 
 export var moduleName = "adhDocumentWorkbench";
@@ -50,11 +49,7 @@ export var register = (angular) => {
                 })
                 .default(RIUser, "", "", "", {
                     space: "user",
-                    movingColumns: "is-show-show-hide"
-                })
-                .default(RIUsersService, "", "", "", {
-                    space: "user",
-                    movingColumns: "is-show-show-hide"
+                    movingColumns: "is-show-hide-hide"
                 });
         }])
         .directive("adhDocumentWorkbench", ["adhConfig", "adhTopLevelState", "adhUser", AdhDocumentWorkbench.documentWorkbench]);

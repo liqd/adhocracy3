@@ -2,7 +2,6 @@
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import process
 from adhocracy_core.resources import proposal
-from adhocracy_core.sheets.description import IDescription
 from adhocracy_core.sheets.geo import IPoint
 from adhocracy_core.sheets.geo import ILocationReference
 from adhocracy_core.sheets.image import IImageReference
@@ -40,7 +39,6 @@ process_meta = process.process_meta._replace(
                    ),
     is_implicit_addable=True,
     extended_sheets=(
-        IDescription,
         ILocationReference,
         IImageReference,
     ),

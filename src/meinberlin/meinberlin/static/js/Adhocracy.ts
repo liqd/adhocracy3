@@ -111,8 +111,10 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     app.config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
         adhTopLevelStateProvider
             .when("", ["$location", ($location) : AdhTopLevelState.IAreaInput => {
-                $location.replace();
-                $location.path("/r/organisation/kiezkasse/");
+                if (config.redirect_url !== "/") {
+                    $location.replace();
+                    $location.path(config.redirect_url);
+                }
                 return {
                     skip: true
                 };
@@ -121,13 +123,6 @@ export var init = (config : AdhConfig.IService, metaApi) => {
                 return {
                     template: "<adh-page-wrapper><h1>404 - Not Found</h1></adh-page-wrapper>"
                 };
-            })
-            // FIXME: should be full urls. (but seems to work)
-            .space("user", {
-                resourceUrl: "/principals/users/"
-            })
-            .space("content", {
-                resourceUrl: "/organisation/kiezkasse/"
             });
     }]);
     app.config(["$compileProvider", ($compileProvider) => {

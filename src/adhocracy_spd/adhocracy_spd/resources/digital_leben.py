@@ -9,7 +9,7 @@ class IProcess(document_process.IDocumentProcess):
 
 process_meta = document_process.document_process_meta._replace(
     iresource=IProcess,
-    workflow_name='digital_leben'
+    workflow_name='debate'
 )
 
 

@@ -8,6 +8,7 @@ import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
 import * as SIPasswordAuthentication from "../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication";
 import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
 import * as SIUserExtended from "../../Resources_/adhocracy_core/sheets/principal/IUserExtended";
+import * as SICaptcha from "../../Resources_/adhocracy_core/sheets/principal/ICaptcha";
 
 
 export interface IUserBasic {
@@ -91,7 +92,8 @@ export class Service {
         this.adhCredentials.deleteToken();
     }
 
-    public register(username : string, email : string, password : string, passwordRepeat : string) : angular.IPromise<IRegisterResponse> {
+    public register(username : string, email : string, password : string, passwordRepeat : string,
+                    captchaId : string, captchaGuess : string) : angular.IPromise<IRegisterResponse> {
         var _self : Service = this;
 
         var resource = {
@@ -107,6 +109,12 @@ export class Service {
         resource.data[SIPasswordAuthentication.nick] = {
             "password": password
         };
+        if (captchaId && captchaGuess) {
+            resource.data[SICaptcha.nick] = {
+                "id": captchaId,
+                "solution": captchaGuess
+            };
+        }
 
         return _self.adhHttp.post("/principals/users/", resource);
     }

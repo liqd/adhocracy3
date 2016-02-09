@@ -21,8 +21,8 @@ Start Adhocracy testapp::
 
     >>> from webtest import TestApp
     >>> log = getfixture('log')
-    >>> app = getfixture('app')
-    >>> testapp = TestApp(app)
+    >>> app_router = getfixture('app_router')
+    >>> testapp = TestApp(app_router)
     >>> rest_url = 'http://localhost'
 
 Resource structure
@@ -116,7 +116,7 @@ of the sheets implemented by the resource::
 
     >>> organisation_desc = resp_data['resources']['adhocracy_core.resources.organisation.IOrganisation']
     >>> sorted(organisation_desc['sheets'])
-    ['adhocracy_core.sheets.metadata.IMetadata', 'adhocracy_core.sheets.name.IName', 'adhocracy_core.sheets.pool.IPool'...]
+    ['adhocracy_core.sheets.asset.IHasAssetPool', 'adhocracy_core.sheets.description.IDescription'...]
 
 In addition we get the listing of resource super types (excluding IResource)::
 
@@ -282,6 +282,8 @@ to a array of stub views of allowed requests::
     ...                   'data': {'adhocracy_core.sheets.metadata.IMetadata': {},
     ...                            'adhocracy_core.sheets.title.ITitle': {},
     ...                            'adhocracy_core.sheets.name.IName': {},
+    ...                            'adhocracy_core.sheets.description.IDescription': {},
+    ...                            'adhocracy_core.sheets.image.IImageReference': {},
     ...                            'adhocracy_core.sheets.workflow.IWorkflowAssignment': {}}}
     >>> data_post_pool in resp_data["POST"]["request_body"]
     True
@@ -578,7 +580,7 @@ Fetch the first Document version, it is empty ::
     {'elements': []}
 
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersionable'])
-    {'followed_by': [], 'follows': []}
+    {'follows': []}
 
 but owned by the Document item creator::
     >>> pprint(resp.json['data']['adhocracy_core.sheets.metadata.IMetadata']['creator'])
@@ -608,14 +610,6 @@ to work ::
     >>> vers_fields = resp.json['sheets']['adhocracy_core.sheets.versions.IVersionable']['fields']
     >>> pprint(sorted(vers_fields, key=itemgetter('name')))
     [{'containertype': 'list',
-      'creatable': False,
-      'create_mandatory': False,
-      'editable': False,
-      'name': 'followed_by',
-      'readable': True,
-      'targetsheet': 'adhocracy_core.sheets.versions.IVersionable',
-      'valuetype': 'adhocracy_core.schema.AbsolutePath'},
-     {'containertype': 'list',
       'creatable': True,
       'create_mandatory': False,
       'editable': True,
@@ -625,10 +619,7 @@ to work ::
       'valuetype': 'adhocracy_core.schema.AbsolutePath'}]
 
 The 'follows' element must be set by the client when it creates a new
-version that is the successor of one or several earlier versions. The
-'followed_by' element is automatically populated by the server by
-"reversing" any 'follows' links pointing to the version in question.
-Therefore 'followed_by' is read-only, while 'follows' is writable.
+version that is the successor of one or several earlier versions.
 
 Create a Section item inside the Document item ::
 
@@ -737,7 +728,7 @@ But if we set the `root_version` to the last  Document version (pvrs3)::
     ...         }
     >>> resp = testapp.post_json(s2dag_path, svrs, headers=god_header)
 
-a new version is automatically created only for pvrs3, not for pvrs2::
+a new version pvrs4 is automatically created following only pvrs3, not pvrs2::
 
     >>> resp = testapp.get(pdag_path)
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersions'])
@@ -748,15 +739,14 @@ a new version is automatically created only for pvrs3, not for pvrs2::
                   '.../Documents/document_0000000/VERSION_0000003/',
                   '.../Documents/document_0000000/VERSION_0000004/']}
 
-    >>> resp = testapp.get(rest_url + '/Documents/document_0000000/VERSION_0000003')
-    >>> pvrs4_path = resp.json['path']
-    >>> resp = testapp.get(rest_url + '/Documents/document_0000000/VERSION_0000003')
-    >>> len(resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by'])
-    1
-
     >>> resp = testapp.get(rest_url + '/Documents/document_0000000/VERSION_0000004')
-    >>> len(resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by'])
-    0
+    >>> pvrs4_path = resp.json['path']
+    >>> resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['follows']
+    [.../Documents/document_0000000/VERSION_0000003/']
+
+    >>> resp = testapp.get(rest_url + '/Documents/document_0000000/VERSION_0000003')
+    >>> resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['follows']
+    [.../Documents/document_0000000/VERSION_0000002/']
 
 
 
@@ -1045,7 +1035,9 @@ multiple times::
     >>> resp_data['errors'][0]['name']
     'data.adhocracy_core.sheets.rate.IRate.object'
     >>> resp_data['errors'][0]['description']
-    'Another rate by the same user already exists'
+    '; Another rate by the same user already exists'
+
+ ...TODO: remove ';' suffix of error description, :mod:`colander` bug
 
 The *subject* of a rate must always be the user that is currently logged in --
 it's not possible to vote for other users::
@@ -1058,7 +1050,7 @@ it's not possible to vote for other users::
     >>> resp_data['errors'][0]['name']
     'data.adhocracy_core.sheets.rate.IRate.subject'
     >>> resp_data['errors'][0]['description']
-    'Must be the currently logged-in user'
+    '; Must be the currently logged-in user'
 
 
 Batch requests

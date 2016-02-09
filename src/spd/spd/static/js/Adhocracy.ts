@@ -3,6 +3,7 @@
 /// <reference path="../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 /// <reference path="../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
 /// <reference path="../lib/DefinitelyTyped/moment/moment.d.ts"/>
+/// <reference path="../lib/DefinitelyTyped/leaflet/leaflet.d.ts"/>
 /// <reference path="./_all.d.ts"/>
 
 import * as angular from "angular";
@@ -20,6 +21,7 @@ import * as angularFlow from "angularFlow";  if (angularFlow) { ; };
 import * as markdownit from "markdownit";
 import * as modernizr from "modernizr";
 import * as moment from "moment";
+import * as leaflet from "leaflet";
 import * as webshim from "polyfiller";
 
 import * as AdhAbuseModule from "./Packages/Abuse/Module";
@@ -48,7 +50,7 @@ import * as AdhRateModule from "./Packages/Rate/Module";
 import * as AdhResourceAreaModule from "./Packages/ResourceArea/Module";
 import * as AdhResourceWidgetsModule from "./Packages/ResourceWidgets/Module";
 import * as AdhShareSocialModule from "./Packages/ShareSocial/Module";
-import * as AdhSPDWorkbenchModule from "./Packages/spdWorkbench/Module";
+import * as AdhDebateWorkbenchModule from "./Packages/DebateWorkbench/Module";
 import * as AdhStickyModule from "./Packages/Sticky/Module";
 import * as AdhTopLevelStateModule from "./Packages/TopLevelState/Module";
 import * as AdhTrackingModule from "./Packages/Tracking/Module";
@@ -57,7 +59,12 @@ import * as AdhUserViewsModule from "./Packages/User/ViewsModule";
 import * as AdhWebSocketModule from "./Packages/WebSocket/Module";
 
 import * as AdhConfig from "./Packages/Config/Config";
+import * as AdhDebateWorkbench from "./Packages/DebateWorkbench/DebateWorkbench";
+import * as AdhProcess from "./Packages/Process/Process";
 import * as AdhTopLevelState from "./Packages/TopLevelState/TopLevelState";
+
+import RIDigitalLebenProcess from "./Resources_/adhocracy_spd/resources/digital_leben/IProcess";
+
 import * as AdhTemplates from "adhTemplates";  if (AdhTemplates) { ; };
 
 webshim.setOptions("basePath", "/static/lib/webshim/js-webshim/minified/shims/");
@@ -91,9 +98,10 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "flow",
         AdhCommentModule.moduleName,
         AdhCrossWindowMessagingModule.moduleName,
+        AdhDebateWorkbenchModule.moduleName,
         AdhEmbedModule.moduleName,
+        AdhProcessModule.moduleName,
         AdhResourceAreaModule.moduleName,
-        AdhSPDWorkbenchModule.moduleName,
         AdhTrackingModule.moduleName,
         AdhUserViewsModule.moduleName
     ];
@@ -107,8 +115,10 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     app.config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
         adhTopLevelStateProvider
             .when("", ["$location", ($location) : AdhTopLevelState.IAreaInput => {
-                $location.replace();
-                $location.path("/r/digital_leben/");
+                if (config.redirect_url !== "/") {
+                    $location.replace();
+                    $location.path(config.redirect_url);
+                }
                 return {
                     skip: true
                 };
@@ -117,13 +127,6 @@ export var init = (config : AdhConfig.IService, metaApi) => {
                 return {
                     template: "<adh-page-wrapper><h1>404 - Not Found</h1></adh-page-wrapper>"
                 };
-            })
-            // FIXME: should be full urls. (but seems to work)
-            .space("user", {
-                resourceUrl: "/principals/users/"
-            })
-            .space("content", {
-                resourceUrl: "/digital_leben/"
             });
     }]);
     app.config(["$compileProvider", ($compileProvider) => {
@@ -156,10 +159,19 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         });
     }]);
 
+    // register workbench
+    app.config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
+        adhProcessProvider.templateFactories[RIDigitalLebenProcess.content_type] = ["$q", ($q : angular.IQService) => {
+            return $q.when("<adh-debate-workbench></adh-debate-workbench>");
+        }];
+    }]);
+    app.config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RIDigitalLebenProcess)]);
+
     app.value("markdownit", markdownit);
     app.value("angular", angular);
     app.value("modernizr", modernizr);
     app.value("moment", moment);
+    app.value("leaflet", leaflet);
 
     // register our modules
     app.value("adhConfig", config);
@@ -168,7 +180,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhCommentModule.register(angular);
     AdhCrossWindowMessagingModule.register(angular, config.trusted_domains !== []);
     AdhDateTimeModule.register(angular);
-    AdhSPDWorkbenchModule.register(angular);
+    AdhDebateWorkbenchModule.register(angular);
     AdhDoneModule.register(angular);
     AdhEmbedModule.register(angular);
     AdhEventManagerModule.register(angular);
