@@ -46,3 +46,16 @@ EOF
 
     echo
 done
+
+{
+    echo "<html>"
+    echo "<body>"
+    echo "<h1>Styleguides</h1>"
+    echo "<ul>"
+    for project in $projects; do
+        echo "    <li><a href=\"$project/styleguide/\">$project</a></li>"
+    done
+    echo "</ul>"
+    echo "</body>"
+    echo "</html>"
+} > styleguides/index.html
