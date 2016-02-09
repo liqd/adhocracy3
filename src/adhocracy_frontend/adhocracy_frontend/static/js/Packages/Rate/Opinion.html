@@ -41,23 +41,23 @@
                 class="opinion-bar opinion-bar-yes"
                 data-ng-if="myRate !== -1"
                 title="{{'TR__YOU_VOTED' | translate}} {{'TR__YES' | translate}}"
-                style="width: {{rates(1) | percentage:(rates(1) + rates(-1))}}"></span>
+                style="width: {{rates(1) | percentage:((rates(1) + rates(-1)) || 1)}}"></span>
             <span
                 class="opinion-bar opinion-bar-no"
-                style="width: {{rates(-1) | percentage:(rates(1) + rates(-1))}}"
+                style="width: {{rates(-1) | percentage:((rates(1) + rates(-1)) || 1)}}"
                 data-ng-if="myRate === -1"
                 title="{{'TR__YOU_VOTED' | translate}} {{'TR__NO' | translate}}"></span>
         </span>
         <span class="opinion-result-numerics">
             <span class="opinion-result-yes">
                 <strong>{{'TR__YES' | translate | uppercase}}</strong>
-                {{rates(1) | percentage:(rates(1) + rates(-1))}}
+                {{rates(1) | percentage:((rates(1) + rates(-1)) || 1)}}
                 <span class="opinion-result-absolute">({{rates(1)}} {{'TR__VOTES' | translate}})</span>
             </span>
             <span class="opinion-result-total">{{rates(1) + rates(-1)}} {{'TR__TOTAL_VOTES' | translate}}</span>
             <span class="opinion-result-no">
                 <span class="opinion-result-absolute">({{rates(-1)}} {{'TR__VOTES' | translate}})</span>
-                {{rates(-1) | percentage:(rates(1) + rates(-1))}}
+                {{rates(-1) | percentage:((rates(1) + rates(-1)) || 1)}}
                 <strong>{{'TR__NO' | translate | uppercase }}</strong>
             </span>
         </span>
