@@ -344,6 +344,10 @@ export var adhCommentListing = (
                 name: "TR__CREATION_DATE",
                 index: "item_creation_date",
                 reverse: true
+            }, {
+                key: "rates",
+                name: "TR__RATES",
+                index: "rates"
             }];
             scope.params = {};
 
