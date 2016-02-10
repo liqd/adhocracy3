@@ -255,7 +255,13 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
         return self.adhHttp.get(AdhUtil.parentPath(resourceUrl)).then((item : ResourcesBase.Resource) => {
             if (item.data.hasOwnProperty(SITags.nick)) {
-                return item.data[SITags.nick].LAST !== resourceUrl;
+                var lastUrl = item.data[SITags.nick].LAST;
+                if (lastUrl === resourceUrl) {
+                    return false;
+                } else {
+                    self.$location.path(self.adhResourceUrlFilter(lastUrl));
+                    return true;
+                }
             } else {
                 return false;
             }
