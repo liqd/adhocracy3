@@ -32,6 +32,7 @@ export var logBackendError : (response : angular.IHttpPromiseCallbackArg<IBacken
 
 export interface IHttpConfig {
     noCredentials? : boolean;
+    noExport? : boolean;
 }
 
 export interface IHttpOptionsConfig extends IHttpConfig {
@@ -245,7 +246,11 @@ export class Service<Content extends ResourcesBase.Resource> {
     public put(path : string, obj : Content, config : IHttpPutConfig = {}) : angular.IPromise<Content> {
         var _self = this;
 
-        return this.putRaw(path, AdhConvert.exportContent(this.adhMetaApi, obj, config.keepMetadata), config)
+        if (!config.noExport) {
+            obj = AdhConvert.exportContent(_self.adhMetaApi, obj, config.keepMetadata);
+        }
+
+        return this.putRaw(path, obj, config)
             .then(
                 (response) => {
                     _self.adhCache.invalidateUpdated(response.data.updated_resources);
@@ -307,7 +312,11 @@ export class Service<Content extends ResourcesBase.Resource> {
     public post(path : string, obj : Content, config : IHttpConfig = {}) : angular.IPromise<Content> {
         var _self = this;
 
-        return _self.postRaw(path, AdhConvert.exportContent(_self.adhMetaApi, obj), config)
+        if (!config.noExport) {
+            obj = AdhConvert.exportContent(_self.adhMetaApi, obj);
+        }
+
+        return _self.postRaw(path, obj, config)
             .then(
                 (response) => {
                     this.adhCache.invalidateUpdated(response.data.updated_resources);
