@@ -1,6 +1,6 @@
 """Export proposal.
 
-This is registered as console script 'export_mercator_proposals'
+This is registered as console script 'export_ae_proposals_2015'
 in setup.py.
 """
 

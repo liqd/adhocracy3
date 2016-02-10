@@ -6,6 +6,7 @@ import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames
 
 import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIName from "../../../../Resources_/adhocracy_core/sheets/name/IName";
+import * as SIProcessPrivateSettings from "../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IProcessPrivateSettings";
 import * as SIProcessSettings from "../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IProcessSettings";
 import RIProcess from "../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProcess";
 
@@ -17,7 +18,7 @@ export interface IScope {
     errors : any[];
     data : {
         title : string;
-        officeWorker : string;
+        officeWorkerEmail : string;
         startDate : string;
         endDate : string;
         kind : string;
@@ -44,11 +45,13 @@ var postCreate = (
         title: "Bebauungsplan " + scope.data.title
     });
     process.data[SIProcessSettings.nick] = new SIProcessSettings.Sheet({
-        office_worker: scope.data.officeWorker,
         participation_start_date: scope.data.startDate,
         participation_end_date: scope.data.endDate,
         participation_kind: scope.data.kind,
         plan_number: scope.data.title
+    });
+    process.data[SIProcessPrivateSettings.nick] = new SIProcessPrivateSettings.Sheet({
+        office_worker_email: scope.data.officeWorkerEmail
     });
 
     return adhHttp.deepPost([process]);
