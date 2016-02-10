@@ -35,7 +35,7 @@ export interface ICommentAdapter<T extends ResourcesBase.Resource> {
     modificationDate(resource : T) : string;
     commentCount(resource : T) : number;
     edited(resource : T) : boolean;
-    elemRefs(any) : string[];
+    elemRefs(adhHttp : AdhHttp.Service<any>, any) : angular.IPromise<string[]>;
     poolPath(any) : string;
 }
 
@@ -105,10 +105,14 @@ export var update = (
             creationDate: adapter.creationDate(version),
             modificationDate: adapter.modificationDate(version),
             commentCount: adapter.commentCount(version),
-            comments: adapter.elemRefs(version),
+            comments: [],
             replyPoolPath: adapter.poolPath(version),
             edited: adapter.edited(version)
         };
+
+        return adapter.elemRefs(adhHttp, version).then((comments) => {
+            scope.data.comments = comments;
+        });
     });
 };
 
