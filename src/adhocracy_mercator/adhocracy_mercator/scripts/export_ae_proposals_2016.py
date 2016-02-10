@@ -227,8 +227,8 @@ def _export_proposals(root, registry, limited):
         result = []
         append_field = partial(_append_field, result)
 
-        for name, is_in, get_field in fields:
-            if is_in or not limited:
+        for name, is_included, get_field in fields:
+            if is_included or not limited:
                 append_field(get_field(proposal))
 
         wr.writerow(result)
