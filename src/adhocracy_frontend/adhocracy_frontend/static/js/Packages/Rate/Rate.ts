@@ -57,6 +57,8 @@ export interface IRateScope extends angular.IScope {
     uncast() : angular.IPromise<void>;
     toggle(value : number) : angular.IPromise<void>;
     showResult() : boolean;
+    showResultToggle() : boolean;
+    toggleShowResult() : void;
 
     // not currently used in the UI
     auditTrail : { subject: string; rate: number }[];
@@ -356,8 +358,22 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                 }
             };
 
+            var showResult : boolean = false;
+
             scope.showResult = () : boolean => {
-                return scope.hasCast || forceResult;
+                if (scope.showResultToggle()) {
+                    return showResult;
+                } else {
+                    return true;
+                }
+            };
+
+            scope.showResultToggle = () : boolean => {
+                return !scope.hasCast && !forceResult;
+            };
+
+            scope.toggleShowResult = () : void => {
+                showResult = !showResult;
             };
 
             // sync with other local rate buttons
