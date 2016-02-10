@@ -1,7 +1,5 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import * as JasmineHelpers from "../../JasmineHelpers";
-
 import * as AdhCommentAdapter from "./Adapter";
 
 import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
@@ -108,40 +106,6 @@ export var register = () => {
             describe("modificationDate", () => {
                 it("gets modificationDate from adhocracy_core.sheets.metadata.IMetadata", () => {
                     expect(adapter.modificationDate(resource)).toBe("modificationDate");
-                });
-            });
-
-            describe("elemRefs", () => {
-                var generateResource = () => {
-                    return {
-                        data: {
-                            "adhocracy_core.sheets.comment.ICommentable": {
-                                comments: [
-                                    "/asd/version2",
-                                    "/asd/version3",
-                                    "/foo/version1",
-                                    "/bar/version1",
-                                    "/asd/version1",
-                                    "/foo/version2"
-                                ]
-                            }
-                        }
-                    };
-
-                };
-
-                it("returns the refered comment items from the adhocracy_core.sheets.comment.ICommentable sheet", () => {
-                    jasmine.addMatchers(JasmineHelpers.customMatchers);
-
-                    var resource = generateResource();
-                    var result = adapter.elemRefs(resource);
-                    (<any>expect(result)).toSetEqual(["/asd", "/foo", "/bar"]);
-                });
-
-                it("does not modify the resource", () => {
-                    var resource = generateResource();
-                    adapter.elemRefs(resource);
-                    expect(resource).toEqual(generateResource());
                 });
             });
 

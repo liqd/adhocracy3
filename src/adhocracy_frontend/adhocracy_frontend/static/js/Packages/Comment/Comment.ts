@@ -14,6 +14,7 @@ import * as ResourcesBase from "../../ResourcesBase";
 
 import RIExternalResource from "../../Resources_/adhocracy_core/resources/external_resource/IExternalResource";
 import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import * as SIComment from "../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SICommentable from "../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 
@@ -34,7 +35,7 @@ export interface ICommentAdapter<T extends ResourcesBase.Resource> {
     modificationDate(resource : T) : string;
     commentCount(resource : T) : number;
     edited(resource : T) : boolean;
-    elemRefs(any) : string[];
+    elemRefs(adhHttp : AdhHttp.Service<any>, any) : angular.IPromise<string[]>;
     poolPath(any) : string;
 }
 
@@ -85,29 +86,33 @@ export var update = (
     $q : angular.IQService
 ) => (
     scope : ICommentResourceScope,
-    itemPath : string
+    versionPath : string
 ) : angular.IPromise<void> => {
-    var p1 = adhHttp.get(itemPath);
-    var p2 = adhHttp.getNewestVersionPathNoFork(itemPath)
-        .then((path) => adhHttp.get(path));
+    var p1 = adhHttp.get(AdhUtil.parentPath(versionPath));
+    var p2 = adhHttp.get(versionPath);
     return $q.all([p1, p2]).then((args : any[]) => {
         var item = args[0];
         var version = args[1];
 
         scope.item = item;
 
-        scope.data = {
-            path: version.path,
-            itemPath: item.path,
-            content: adapter.content(version),
-            creator: adapter.creator(item),
-            creationDate: adapter.creationDate(version),
-            modificationDate: adapter.modificationDate(version),
-            commentCount: adapter.commentCount(version),
-            comments: adapter.elemRefs(version),
-            replyPoolPath: adapter.poolPath(version),
-            edited: adapter.edited(version)
-        };
+        if (!scope.data) {
+            scope.data = <any>{};
+        }
+
+        scope.data.path = version.path;
+        scope.data.itemPath = item.path;
+        scope.data.content = adapter.content(version);
+        scope.data.creator = adapter.creator(item);
+        scope.data.creationDate = adapter.creationDate(version);
+        scope.data.modificationDate = adapter.modificationDate(version);
+        scope.data.commentCount = adapter.commentCount(version);
+        scope.data.replyPoolPath = adapter.poolPath(version);
+        scope.data.edited = adapter.edited(version);
+
+        return adapter.elemRefs(adhHttp, version).then((comments) => {
+            scope.data.comments = comments;
+        });
     });
 };
 
@@ -120,9 +125,9 @@ export var bindPath = (
     pathKey : string = "path"
 ) : void => {
     var _update = update(adapter, adhHttp, $q);
-    scope.$watch(pathKey, (itemPath : string) => {
-        if (itemPath) {
-            _update(scope, itemPath);
+    scope.$watch(pathKey, (versionPath : string) => {
+        if (versionPath) {
+            _update(scope, versionPath);
         }
     });
 };
@@ -197,7 +202,7 @@ export var commentDetailDirective = (
         scope.$on("$destroy", adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
             if (!commentVersionUrl) {
                 scope.selectedState = "";
-            } else if (AdhUtil.parentPath(commentVersionUrl) === scope.path) {
+            } else if (commentVersionUrl === scope.path) {
                 scope.selectedState = "is-selected";
             } else {
                 scope.selectedState = "is-not-selected";
@@ -237,6 +242,9 @@ export var commentDetailDirective = (
         scope.submit = () => {
             return _postEdit(scope, scope.item).then(() => {
                 scope.update();
+                if (scope.onSubmit) {
+                    scope.onSubmit();
+                }
                 scope.mode = 0;
             });
         };
@@ -330,15 +338,30 @@ export var adhCommentListing = (
         link: (scope) => {
             adhTopLevelState.setCameFrom($location.url());
 
-            scope.update = () => {
+            scope.contentType = RICommentVersion.content_type;
+            scope.sorts = [{
+                key: "date",
+                name: "TR__CREATION_DATE",
+                index: "item_creation_date",
+                reverse: true
+            }, {
+                key: "rates",
+                name: "TR__RATES",
+                index: "rates"
+            }];
+            scope.params = {};
+
+            var update = () => {
                 return adhHttp.get(scope.path).then((commentable) => {
-                    scope.elements = AdhUtil.eachItemOnce(commentable.data[SICommentable.nick].comments);
+                    scope.params[SIComment.nick + ":refers_to"] = scope.path;
                     scope.poolPath = commentable.data[SICommentable.nick].post_pool;
+                    scope.custom = {
+                        refersTo: scope.path
+                    };
                 });
             };
 
-            scope.$watch("path", scope.update);
-            adhPermissions.bindScope(scope, () => scope.poolPath, "poolOptions");
+            scope.$watch("path", update);
         }
     };
 };

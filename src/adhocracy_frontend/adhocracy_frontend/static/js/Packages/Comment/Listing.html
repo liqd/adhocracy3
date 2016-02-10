@@ -1,23 +1,23 @@
-<div class="comment-listing">
-    <div class="listing">
-        <div class="listing-create-form" data-ng-if="poolOptions.POST">
-            <adh-comment-create
-                data-refers-to="{{path}}"
-                data-pool-path="{{poolPath}}"
-                data-on-submit="update"
-                data-hide-cancel="true">
-            </adh-comment-create>
-        </div>
-        <ol class="listing-elements">
-            <li class="listing-element" data-ng-repeat="element in elements | orderBy:'-'">
-                <adh-comment
-                    data-path="{{element}}"
-                    data-on-submit="update">
-                </adh-comment>
-            </li>
-        </ol>
-        <div class="listing-empty-text" data-ng-if="elements.length === 0">
-            {{ "TR__COMMENT_EMPTY_TEXT" | translate }}
-        </div>
+<adh-listing
+    data-path="{{poolPath}}"
+    data-content-type="{{contentType}}"
+    data-sorts="sorts"
+    data-params="params"
+    data-custom="custom"
+    data-empty-text="{{ 'TR__COMMENT_EMPTY_TEXT' | translate }}"
+>
+    <div data-ng-switch="transclusionId">
+        <adh-comment-create
+            data-ng-switch-when="create-form-id"
+            data-refers-to="{{custom.refersTo}}"
+            data-pool-path="{{poolPath}}"
+            data-on-submit="onCreate"
+            data-hide-cancel="true">
+        </adh-comment-create>
+        <adh-comment
+            data-ng-switch-when="element-id"
+            data-path="{{element}}"
+            data-on-submit="update">
+        </adh-comment>
     </div>
-</div>
+</adh-listing>

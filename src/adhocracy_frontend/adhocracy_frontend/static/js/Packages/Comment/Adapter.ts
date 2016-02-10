@@ -1,5 +1,5 @@
 import * as AdhComment from "./Comment";
-import * as AdhUtil from "../Util/Util";
+import * as AdhHttp from "../Http/Http";
 
 import * as ResourcesBase from "../../ResourcesBase";
 
@@ -9,6 +9,7 @@ import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/
 import * as SICommentable from "../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIComment from "../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 
 
 export class CommentAdapter implements AdhComment.ICommentAdapter<RICommentVersion> {
@@ -88,8 +89,17 @@ export class CommentAdapter implements AdhComment.ICommentAdapter<RICommentVersi
         return meta.modification_date > meta.item_creation_date;
     }
 
-    elemRefs(container : ResourcesBase.Resource) {
-        return AdhUtil.eachItemOnce(container.data[SICommentable.nick].comments);
+    elemRefs(adhHttp : AdhHttp.Service<any>, container : ResourcesBase.Resource) {
+        var params = {
+            depth: 2,
+            tag: "LAST",
+            content_type: RICommentVersion.content_type,
+            sort: "item_creation_date"
+        };
+        params[SIComment.nick + ":refers_to"] = container.path;
+        return adhHttp.get(this.poolPath(container), params).then((pool) => {
+            return pool.data[SIPool.nick].elements;
+        });
     }
 
     poolPath(container : ResourcesBase.Resource) {
