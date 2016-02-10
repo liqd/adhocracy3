@@ -14,6 +14,7 @@ import * as ResourcesBase from "../../ResourcesBase";
 
 import RIExternalResource from "../../Resources_/adhocracy_core/resources/external_resource/IExternalResource";
 import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import * as SIComment from "../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SICommentable from "../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 
@@ -332,8 +333,18 @@ export var adhCommentListing = (
 
             scope.update = () => {
                 return adhHttp.get(scope.path).then((commentable) => {
-                    scope.elements = AdhUtil.eachItemOnce(commentable.data[SICommentable.nick].comments);
+                    var params = {
+                        depth: 2,
+                        tag: "LAST",
+                        content_type: RICommentVersion.content_type,
+                        sort: "item_creation_date",
+                        reverse: true
+                    };
+                    params[SIComment.nick + ":refers_to"] = commentable.path;
                     scope.poolPath = commentable.data[SICommentable.nick].post_pool;
+                    return adhHttp.get(scope.poolPath, params).then((pool) => {
+                        scope.elements = _.map(pool.data[SIPool.nick].elements, AdhUtil.parentPath);
+                    });
                 });
             };
 
