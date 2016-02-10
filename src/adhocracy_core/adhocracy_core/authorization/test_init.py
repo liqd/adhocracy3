@@ -211,7 +211,6 @@ def test_acm_to_acl(mock_registry):
                    ]
 
 
-
 class TestSetACMSForAppRoot:
 
     def call_fut(self, app, acms=()):

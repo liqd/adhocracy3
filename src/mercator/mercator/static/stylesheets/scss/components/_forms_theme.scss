@@ -25,7 +25,6 @@ select,
 textarea,
 .country-select {
     background: $color-structure-normal;
-    border: 0;
     margin-bottom: $input-margin-bottom;
 
     &.ng-dirty.ng-invalid {

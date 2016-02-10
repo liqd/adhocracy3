@@ -19,15 +19,10 @@
         color: $color-text-highlight-normal;
     }
 
+    .meta-list-item-total-comments,
     .meta-list-item-supporters {
         i {
-            color: $color-brand-one-normal;
-        }
-    }
-
-    .meta-list-item-total-comments {
-        i {
-            color: $color-brand-three-normal;
+            color: $color-text-highlight-normal;
         }
     }
 }

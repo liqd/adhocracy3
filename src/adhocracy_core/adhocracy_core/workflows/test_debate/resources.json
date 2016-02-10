@@ -1,0 +1,8 @@
+[ {"path": "/",
+   "content_type": "adhocracy_core.resources.process.IProcess",
+   "data": {"adhocracy_core.sheets.name.IName":
+            {"name": "debate"},
+            "adhocracy_core.sheets.title.ITitle":
+            {"title": "Debate documents process"}
+           }}
+]

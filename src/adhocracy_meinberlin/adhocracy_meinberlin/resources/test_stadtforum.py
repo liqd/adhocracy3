@@ -25,6 +25,7 @@ class TestProcess:
     def test_create(self, registry, meta):
         assert registry.content.create(meta.iresource.__identifier__)
 
+
 class TestPoll:
 
     @fixture

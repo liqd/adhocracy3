@@ -15,7 +15,7 @@ class TestDocumentProcess:
         assert meta.iresource == resources.digital_leben.IProcess
         assert meta.iresource.isOrExtends(
             adhocracy_core.resources.document_process.IDocumentProcess)
-        assert meta.workflow_name == 'digital_leben'
+        assert meta.workflow_name == 'debate'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

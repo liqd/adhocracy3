@@ -6,6 +6,7 @@ from adhocracy_core.resources.asset import add_assets_service
 from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.sheets.asset import IHasAssetPool
 from adhocracy_core.sheets.badge import IHasBadgesPool
+from adhocracy_core.sheets.description import IDescription
 
 
 class IProcess(IPool):
@@ -20,7 +21,8 @@ process_meta = pool_meta._replace(
                     ),
     workflow_name='sample',
 )._add(basic_sheets=(IHasAssetPool,
-                     IHasBadgesPool))
+                     IHasBadgesPool,
+                     IDescription,))
 
 
 def includeme(config):

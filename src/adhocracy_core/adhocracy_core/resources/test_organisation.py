@@ -10,6 +10,7 @@ class TestOrganisation:
         return organisation_meta
 
     def test_meta(self, meta):
+        import adhocracy_core.sheets
         from .organisation import IOrganisation
         from .process import IProcess
         from adhocracy_core.interfaces import IPool
@@ -20,7 +21,17 @@ class TestOrganisation:
         assert meta.element_types == (IProcess,
                                       IOrganisation,
                                       )
-
+        assert meta.basic_sheets == \
+               (adhocracy_core.sheets.name.IName,
+                adhocracy_core.sheets.title.ITitle,
+                adhocracy_core.sheets.pool.IPool,
+                adhocracy_core.sheets.metadata.IMetadata,
+                adhocracy_core.sheets.workflow.IWorkflowAssignment,
+                adhocracy_core.sheets.description.IDescription,
+                adhocracy_core.sheets.image.IImageReference,
+                )
+        assert meta.extended_sheets == \
+            (adhocracy_core.sheets.asset.IHasAssetPool,)
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

@@ -80,15 +80,11 @@ def deferred_validate_follows(node: colander.SchemaNode, kw: dict) -> callable:
 class VersionableSchema(colander.MappingSchema):
     """Versionable sheet data structure.
 
-    Set/get predecessor (`follows`) and get successor (`followed_by`) versions
-    of this resource.
+    Set/get predecessor (`follows`) versions of this resource.
     """
 
     follows = UniqueReferences(reftype=VersionableFollowsReference,
                                validator=deferred_validate_follows)
-    followed_by = UniqueReferences(readonly=True,
-                                   backref=True,
-                                   reftype=VersionableFollowsReference)
 
 
 versionable_meta = sheet_meta._replace(

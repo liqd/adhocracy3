@@ -105,6 +105,7 @@ class TestItemVersion:
     def test_autoupdate_with_referencing_versionable(self, config, registry,
                                                      item, other_item):
         # for more tests see adhocracy_core.resources.subscriber
+        from pyramid.traversal import resource_path
         from adhocracy_core.sheets.document import IDocument
         from adhocracy_core.resources.itemversion import itemversion_meta
         from adhocracy_core.resources import add_resource_type_to_registry
@@ -122,6 +123,6 @@ class TestItemVersion:
         referenced_v1 = self.make_one(registry, item, follows=[referenced_v0])
         referenced_v1.v1 = 1
 
-        referencing_v0_versions = get_sheet(referenceing_v0, IVersionable).get()
-        assert len(referencing_v0_versions['followed_by']) == 1
+        referenceing_v0_path = resource_path(referenceing_v0)
+        assert registry.changelog[referenceing_v0_path].followed_by
 

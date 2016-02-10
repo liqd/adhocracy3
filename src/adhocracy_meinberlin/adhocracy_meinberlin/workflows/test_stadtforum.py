@@ -73,14 +73,13 @@ class TestStadtForumWorkflow:
                               registry,
                               datadir,
                               process_url,
-                              app,
                               app_admin):
         json_file = str(datadir.join('resources.json'))
-        add_resources(app, json_file)
+        add_resources(app_admin.app_router, json_file)
         resp = app_admin.get(process_url)
         assert resp.status_code == 200
 
-    def test_set_process_participate_state(self, registry, app, process_url, app_admin):
+    def test_set_process_participate_state(self, registry, process_url, app_admin):
         resp = app_admin.get(process_url)
         assert resp.status_code == 200
 
@@ -95,14 +94,13 @@ class TestStadtForumWorkflow:
         assert resp.status_code == 200
 
     def test_participate_initiator_creates_proposal(self,
-                                                      registry,
-                                                      app,
-                                                      process_url,
-                                                      app_initiator):
+                                                    registry,
+                                                    process_url,
+                                                    app_initiator):
         resp = _post_poll_item(app_initiator, path=process_url)
         assert resp.status_code == 200
 
-    def test_set_poll_participate_state(self, registry, app, process_url, app_admin):
+    def test_set_poll_participate_state(self, registry, process_url, app_admin):
         poll_url = process_url + '/poll_0000000'
         resp = app_admin.get(poll_url)
         assert resp.status_code == 200
@@ -119,7 +117,6 @@ class TestStadtForumWorkflow:
 
     def test_participate_participant_creates_comment(self,
                                                      registry,
-                                                     app,
                                                      process_url,
                                                      app_participant):
         path = process_url + '/poll_0000000/comments'
@@ -128,7 +125,6 @@ class TestStadtForumWorkflow:
 
     def test_participate_participant_creates_polarization(self,
                                                           registry,
-                                                          app,
                                                           process_url,
                                                           app_participant):
         path = process_url + '/poll_0000000/relations'

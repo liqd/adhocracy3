@@ -9,10 +9,10 @@ from adhocracy_core.scripts import import_resources
 from adhocracy_core.utils import get_root
 
 
-def add_resources(app: Router, filename: str):
+def add_resources(app_router: Router, filename: str):
     """Add resources from a JSON file to the app."""
-    root = get_root(app)
-    import_resources(root, app.registry, filename)
+    root = get_root(app_router)
+    import_resources(root, app_router.registry, filename)
     transaction.commit()
 
 
