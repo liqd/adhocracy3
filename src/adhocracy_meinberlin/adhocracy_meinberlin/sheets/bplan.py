@@ -72,7 +72,8 @@ class ProcessSettingsSchema(colander.MappingSchema):
 
 process_settings_meta = sheet_meta._replace(
     isheet=IProcessSettings,
-    schema_class=ProcessSettingsSchema
+    schema_class=ProcessSettingsSchema,
+    create_mandatory=True
 )
 
 

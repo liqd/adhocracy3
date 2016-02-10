@@ -91,6 +91,7 @@ class TestProcessSettingsSheet:
         from . import bplan
         assert meta.isheet == bplan.IProcessSettings
         assert meta.schema_class == bplan.ProcessSettingsSchema
+        assert meta.create_mandatory is True
 
     def test_create(self, meta, context):
         from zope.interface.verify import verifyObject
