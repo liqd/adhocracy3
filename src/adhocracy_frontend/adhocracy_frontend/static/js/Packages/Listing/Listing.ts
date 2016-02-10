@@ -138,6 +138,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 params: "=?",
                 noCreateForm: "=?",
                 emptyText: "@",
+                // use this to pass custom data to the injected templates
                 custom: "=?"
             },
             transclude: true,
