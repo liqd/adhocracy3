@@ -63,9 +63,13 @@ def export_proposals():
                         action='store_true')
     args = parser.parse_args()
     env = bootstrap(args.config)
-
     root = env['root']
     registry = env['registry']
+    _export_proposals(root, registry, args.limited)
+    env['closer']()
+
+
+def _export_proposals(root, registry, limited):
     catalogs = find_service(root, 'catalogs')
     query = search_query._replace(interfaces=IMercatorProposal,
                                   resolve=True,
@@ -79,143 +83,143 @@ def export_proposals():
     wr = csv.writer(result_file, delimiter=';', quotechar='"',
                     quoting=csv.QUOTE_MINIMAL)
 
-    is_in_subset = True
-    is_out_subset = False
+    include_field = True
+    exclude_field = False
     fields = \
-        [('URL', is_in_subset,
+        [('URL', include_field,
           partial(_get_proposal_url, registry)),
-         ('Creation date', is_in_subset,
+         ('Creation date', include_field,
           partial(_get_creation_date)),
-         ('Title', is_in_subset,
+         ('Title', include_field,
           partial(_get_sheet_field, ITitle, 'title')),
-         ('Creator name', is_in_subset,
+         ('Creator name', include_field,
           partial(_get_creator_name)),
-         ('Creator email', is_in_subset,
+         ('Creator email', include_field,
           partial(_get_creator_email)),
-         ('First name', is_in_subset,
+         ('First name', include_field,
           partial(_get_sheet_field, IUserInfo, 'first_name')),
-         ('Last name', is_in_subset,
+         ('Last name', include_field,
           partial(_get_sheet_field, IUserInfo, 'last_name')),
-         ('Organisation name', is_out_subset,
+         ('Organisation name', exclude_field,
           partial(_get_sheet_field, IOrganizationInfo, 'name')),
-         ('Organisation city', is_out_subset,
+         ('Organisation city', exclude_field,
           partial(_get_sheet_field, IOrganizationInfo, 'city')),
-         ('Organisation country', is_in_subset,
+         ('Organisation country', include_field,
           partial(_get_sheet_field, IOrganizationInfo, 'country')),
-         ('Organisation help request', is_out_subset,
+         ('Organisation help request', exclude_field,
           partial(_get_sheet_field, IOrganizationInfo, 'help_request')),
-         ('Organisation registration date', is_out_subset,
+         ('Organisation registration date', exclude_field,
           partial(_get_date, IOrganizationInfo, 'registration_date')),
-         ('Organisation website', is_out_subset,
+         ('Organisation website', exclude_field,
           partial(_get_sheet_field, IOrganizationInfo, 'website')),
-         ('Organisation status', is_out_subset,
+         ('Organisation status', exclude_field,
           partial(_get_sheet_field, IOrganizationInfo, 'status')),
-         ('Organisation status other', is_out_subset,
+         ('Organisation status other', exclude_field,
           partial(_get_sheet_field, IOrganizationInfo, 'status_other')),
-         ('Pitch', is_out_subset,
+         ('Pitch', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IPitch, 'pitch', 'pitch')),
-         ('Partner1 name', is_out_subset,
+         ('Partner1 name', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IPartners, 'partners', 'partner1_name')),
-         ('Partner1 website', is_out_subset,
+         ('Partner1 website', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IPartners, 'partners', 'partner1_website')),
-         ('Partner1 country', is_out_subset,
+         ('Partner1 country', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IPartners, 'partners', 'partner1_country')),
-         ('Partner2 name', is_out_subset,
+         ('Partner2 name', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IPartners, 'partners', 'partner2_name')),
-         ('Partner2 website', is_out_subset,
+         ('Partner2 website', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IPartners, 'partners', 'partner2_website')),
-         ('Partner2 country', is_out_subset,
+         ('Partner2 country', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IPartners, 'partners', 'partner2_country')),
-         ('Partner3 name', is_out_subset,
+         ('Partner3 name', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IPartners, 'partners', 'partner3_name')),
-         ('Partner3 website', is_out_subset,
+         ('Partner3 website', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IPartners, 'partners', 'partner3_website')),
-         ('Partner3 country', is_out_subset,
+         ('Partner3 country', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IPartners, 'partners', 'partner3_country')),
-         ('Others partners', is_out_subset,
+         ('Others partners', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IPartners, 'partners', 'other_partners')),
-         ('Topics', is_out_subset,
+         ('Topics', exclude_field,
           lambda proposal: ' '.join(
               get_sheet_field(proposal, ITopic, 'topic'))),
-         ('Topic other', is_out_subset,
+         ('Topic other', exclude_field,
           partial(_get_sheet_field, ITopic, 'topic_other')),
-         ('Duration', is_out_subset,
+         ('Duration', exclude_field,
           lambda proposal: str(_get_sheet_field_from_subresource(
               IDuration, 'duration', 'duration', proposal))),
-         ('Location', is_out_subset,
+         ('Location', exclude_field,
           partial(_get_sheet_field, ILocation, 'location')),
-         ('Is online', is_out_subset,
+         ('Is online', exclude_field,
           lambda proposal: str(
               get_sheet_field(proposal, ILocation, 'is_online'))),
-         ('Link to Ruhr', is_out_subset,
+         ('Link to Ruhr', exclude_field,
           partial(_get_sheet_field, ILocation, 'link_to_ruhr')),
-         ('Status', is_out_subset,
+         ('Status', exclude_field,
           partial(_get_sheet_field, IStatus, 'status')),
-         ('Challenge', is_out_subset,
+         ('Challenge', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IChallenge, 'challenge', 'challenge')),
-         ('Goal', is_out_subset,
+         ('Goal', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IGoal, 'goal', 'goal')),
-         ('Plan', is_out_subset,
+         ('Plan', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IPlan, 'plan', 'plan')),
-         ('Target', is_out_subset,
+         ('Target', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   ITarget, 'target', 'target')),
-         ('Team', is_out_subset,
+         ('Team', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   ITeam, 'team', 'team')),
-         ('Extra info', is_out_subset,
+         ('Extra info', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IExtraInfo, 'extrainfo', 'extrainfo')),
-         ('Connection cohesion', is_out_subset,
+         ('Connection cohesion', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IConnectionCohesion,
                   'connectioncohesion', 'connection_cohesion')),
-         ('Difference', is_out_subset,
+         ('Difference', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IDifference,
                   'difference', 'difference')),
-         ('Practical relevance', is_out_subset,
+         ('Practical relevance', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IPracticalRelevance,
                   'practicalrelevance', 'practicalrelevance')),
-         ('Budget', is_out_subset,
+         ('Budget', exclude_field,
           lambda proposal: str(get_sheet_field(
               proposal, IFinancialPlanning, 'budget'))),
-         ('Requested funding', is_out_subset,
+         ('Requested funding', exclude_field,
           lambda proposal: str(get_sheet_field(
               proposal, IFinancialPlanning, 'requested_funding'))),
-         ('Major expenses', is_out_subset,
+         ('Major expenses', exclude_field,
           partial(_get_sheet_field,
                   IFinancialPlanning, 'major_expenses')),
-         ('Other sources of income', is_out_subset,
+         ('Other sources of income', exclude_field,
           partial(_get_sheet_field, IExtraFunding, 'other_sources')),
-         ('Secured', is_out_subset,
+         ('Secured', exclude_field,
           lambda proposal: str(get_sheet_field(
               proposal, IExtraFunding, 'secured'))),
-         ('Reach out', is_out_subset,
+         ('Reach out', exclude_field,
           partial(_get_sheet_field, ICommunity, 'expected_feedback')),
-         ('Heard from', is_out_subset,
+         ('Heard from', exclude_field,
           lambda proposal: ' '.join(get_sheet_field(
               proposal, ICommunity, 'heard_froms'))),
-         ('Heard from other', is_out_subset,
+         ('Heard from other', exclude_field,
           lambda proposal: ' '.join(get_sheet_field(
               proposal, ICommunity, 'heard_from_other')))]
 
-    wr.writerow([name for (name, is_in, _) in fields if is_in])
+    wr.writerow([name for (name, is_included, _) in fields if is_included])
 
     for proposal in proposals:
 
@@ -223,12 +227,11 @@ def export_proposals():
         append_field = partial(_append_field, result)
 
         for name, is_in, get_field in fields:
-            if is_in or not args.limited:
+            if is_in or not limited:
                 append_field(get_field(proposal))
 
         wr.writerow(result)
 
-    env['closer']()
     print('Exported mercator proposals to %s' % filename)
 
 
