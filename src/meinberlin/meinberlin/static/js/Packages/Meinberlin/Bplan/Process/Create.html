@@ -31,11 +31,11 @@
         <label>
             <span class="label-text">{{ "TR__OFFICE_WORKER" | translate }}</span>
             <input
-                type="url"
-                data-ng-model="data.officeWorker"
-                name="officeWorker"
+                type="email"
+                data-ng-model="data.officeWorkerEmail"
+                name="officeWorkerEmail"
                 required="required" />
-            <span class="input-error" data-ng-show="showError(processForm, processForm.officeWorker, 'required')">
+            <span class="input-error" data-ng-show="showError(processForm, processForm.officeWorkerEmail, 'required')">
                 {{ "TR__ERROR_REQUIRED_OFFICE_WORKER" | translate }}
             </span>
         </label>
