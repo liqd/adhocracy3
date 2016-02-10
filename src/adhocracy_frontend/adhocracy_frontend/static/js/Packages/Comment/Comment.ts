@@ -96,18 +96,19 @@ export var update = (
 
         scope.item = item;
 
-        scope.data = {
-            path: version.path,
-            itemPath: item.path,
-            content: adapter.content(version),
-            creator: adapter.creator(item),
-            creationDate: adapter.creationDate(version),
-            modificationDate: adapter.modificationDate(version),
-            commentCount: adapter.commentCount(version),
-            comments: [],
-            replyPoolPath: adapter.poolPath(version),
-            edited: adapter.edited(version)
-        };
+        if (!scope.data) {
+            scope.data = <any>{};
+        }
+
+        scope.data.path = version.path;
+        scope.data.itemPath = item.path;
+        scope.data.content = adapter.content(version);
+        scope.data.creator = adapter.creator(item);
+        scope.data.creationDate = adapter.creationDate(version);
+        scope.data.modificationDate = adapter.modificationDate(version);
+        scope.data.commentCount = adapter.commentCount(version);
+        scope.data.replyPoolPath = adapter.poolPath(version);
+        scope.data.edited = adapter.edited(version);
 
         return adapter.elemRefs(adhHttp, version).then((comments) => {
             scope.data.comments = comments;
