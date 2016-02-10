@@ -241,6 +241,9 @@ export var commentDetailDirective = (
         scope.submit = () => {
             return _postEdit(scope, scope.item).then(() => {
                 scope.update();
+                if (scope.onSubmit) {
+                    scope.onSubmit();
+                }
                 scope.mode = 0;
             });
         };
