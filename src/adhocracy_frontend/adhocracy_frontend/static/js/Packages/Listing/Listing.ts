@@ -137,7 +137,8 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 initialLimit: "=?",
                 params: "=?",
                 noCreateForm: "=?",
-                emptyText: "@"
+                emptyText: "@",
+                custom: "=?"
             },
             transclude: true,
             link: (scope, element, attrs, controller, transclude) => {

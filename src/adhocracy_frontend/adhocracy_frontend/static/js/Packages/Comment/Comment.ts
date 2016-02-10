@@ -334,25 +334,26 @@ export var adhCommentListing = (
         link: (scope) => {
             adhTopLevelState.setCameFrom($location.url());
 
-            scope.update = () => {
+            scope.contentType = RICommentVersion.content_type;
+            scope.sorts = [{
+                key: "date",
+                name: "TR__CREATION_DATE",
+                index: "item_creation_date",
+                reverse: true
+            }];
+            scope.params = {};
+
+            var update = () => {
                 return adhHttp.get(scope.path).then((commentable) => {
-                    var params = {
-                        depth: 2,
-                        tag: "LAST",
-                        content_type: RICommentVersion.content_type,
-                        sort: "item_creation_date",
-                        reverse: true
-                    };
-                    params[SIComment.nick + ":refers_to"] = commentable.path;
+                    scope.params[SIComment.nick + ":refers_to"] = scope.path;
                     scope.poolPath = commentable.data[SICommentable.nick].post_pool;
-                    return adhHttp.get(scope.poolPath, params).then((pool) => {
-                        scope.elements = pool.data[SIPool.nick].elements;
-                    });
+                    scope.custom = {
+                        refersTo: scope.path
+                    };
                 });
             };
 
-            scope.$watch("path", scope.update);
-            adhPermissions.bindScope(scope, () => scope.poolPath, "poolOptions");
+            scope.$watch("path", update);
         }
     };
 };
