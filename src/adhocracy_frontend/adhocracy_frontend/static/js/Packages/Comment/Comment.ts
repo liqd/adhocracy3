@@ -86,11 +86,10 @@ export var update = (
     $q : angular.IQService
 ) => (
     scope : ICommentResourceScope,
-    itemPath : string
+    versionPath : string
 ) : angular.IPromise<void> => {
-    var p1 = adhHttp.get(itemPath);
-    var p2 = adhHttp.getNewestVersionPathNoFork(itemPath)
-        .then((path) => adhHttp.get(path));
+    var p1 = adhHttp.get(AdhUtil.parentPath(versionPath));
+    var p2 = adhHttp.get(versionPath);
     return $q.all([p1, p2]).then((args : any[]) => {
         var item = args[0];
         var version = args[1];
@@ -125,9 +124,9 @@ export var bindPath = (
     pathKey : string = "path"
 ) : void => {
     var _update = update(adapter, adhHttp, $q);
-    scope.$watch(pathKey, (itemPath : string) => {
-        if (itemPath) {
-            _update(scope, itemPath);
+    scope.$watch(pathKey, (versionPath : string) => {
+        if (versionPath) {
+            _update(scope, versionPath);
         }
     });
 };
@@ -202,7 +201,7 @@ export var commentDetailDirective = (
         scope.$on("$destroy", adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
             if (!commentVersionUrl) {
                 scope.selectedState = "";
-            } else if (AdhUtil.parentPath(commentVersionUrl) === scope.path) {
+            } else if (commentVersionUrl === scope.path) {
                 scope.selectedState = "is-selected";
             } else {
                 scope.selectedState = "is-not-selected";
@@ -347,7 +346,7 @@ export var adhCommentListing = (
                     params[SIComment.nick + ":refers_to"] = commentable.path;
                     scope.poolPath = commentable.data[SICommentable.nick].post_pool;
                     return adhHttp.get(scope.poolPath, params).then((pool) => {
-                        scope.elements = _.map(pool.data[SIPool.nick].elements, AdhUtil.parentPath);
+                        scope.elements = pool.data[SIPool.nick].elements;
                     });
                 });
             };

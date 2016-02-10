@@ -1,5 +1,4 @@
 import * as AdhComment from "./Comment";
-import * as AdhUtil from "../Util/Util";
 import * as AdhHttp from "../Http/Http";
 
 import * as ResourcesBase from "../../ResourcesBase";
@@ -99,7 +98,7 @@ export class CommentAdapter implements AdhComment.ICommentAdapter<RICommentVersi
         };
         params[SIComment.nick + ":refers_to"] = container.path;
         return adhHttp.get(this.poolPath(container), params).then((pool) => {
-            return _.map(pool.data[SIPool.nick].elements, AdhUtil.parentPath);
+            return pool.data[SIPool.nick].elements;
         });
     }
 
