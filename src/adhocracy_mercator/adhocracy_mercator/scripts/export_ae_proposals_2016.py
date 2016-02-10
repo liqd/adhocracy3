@@ -219,7 +219,8 @@ def _export_proposals(root, registry, limited):
           lambda proposal: ' '.join(get_sheet_field(
               proposal, ICommunity, 'heard_from_other')))]
 
-    wr.writerow([name for (name, is_included, _) in fields if is_included])
+    wr.writerow([name for (name, is_included, _) in fields
+                 if is_included or not limited])
 
     for proposal in proposals:
 
