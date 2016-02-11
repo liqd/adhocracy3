@@ -959,21 +959,24 @@ As usual, we have to add another version to actually say something::
     '.../Documents/document_0000000/comments/comment_000.../VERSION_0000001/'
 
 
-Lets view all the comments referring to the proposal.
-Retrieve the wanted version and consult the 'comments' fields of its
-'adhocracy_core.sheets.comment.ICommentable' sheet::
+Let view all the comments referring to the proposal with a query on
+the comments pool::
 
-    >>> resp = testapp.get(pvrs4_path)
-    >>> comlist = resp.json['data']['adhocracy_core.sheets.comment.ICommentable']['comments']
-    >>> snd_commvers_path in comlist
+    >>> resp_data = testapp.get(post_pool_path,
+    ...     params={'content_type': 'adhocracy_core.resources.comment.ICommentVersion',
+    ...             'depth': 2}).json
+    >>> commvers = resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
+    >>> snd_commvers_path in commvers
     True
 
-Any commentable resource has this sheet. Since comments can refer to other
-comments, they have it as well. Lets find out which other comments refer to
-this comment version::
+Since comments can refer to other comments, we can also find out which
+other comments refer to this comment version::
 
-    >>> resp = testapp.get(snd_commvers_path)
-    >>> comlist = resp.json['data']['adhocracy_core.sheets.comment.ICommentable']['comments']
+    >>> resp_data = testapp.get(post_pool_path,
+    ...     params={'content_type': 'adhocracy_core.resources.comment.ICommentVersion',
+    ...             'adhocracy_core.sheets.comment.IComment:refers_to': snd_commvers_path,
+    ...             'depth': 2}).json
+    >>> comlist = resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
     >>> comlist == [snd_metacommvers_path]
     True
 
