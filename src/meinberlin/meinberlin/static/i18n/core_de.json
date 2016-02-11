@@ -20,6 +20,7 @@
     "TR__CONTENT": "Inhalt",
     "TR__COUNTRY": "Land",
     "TR__CREATE": "erstellen",
+    "TR__CREATE_A_COMMENT": "Kommentar erstellen",
     "TR__CREATE_DOCUMENT": "Dokument erstellen",
     "TR__CREATE_PASSWORD_RESET_PROCEED": "Ihr Passwort wurde erfolgreich gesetzt. Gehen Sie zurück zu [[link:{{siteName}}]], um weiter zu machen.",
     "TR__CREATE_PASSWORD_RESET_SUCCESS": "Wir haben Ihre Anfrage zum Zurücksetzen Ihres Passworts erhalten und werden Ihnen innerhalb der nächsten 24 Stunden einen neuen Link zur Authentifizierung zusenden. Bitte überprüfen Sie Ihre E-Mails und schauen Sie auch im Spam-Ordner nach.",
