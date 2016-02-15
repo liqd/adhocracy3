@@ -35,7 +35,7 @@ def change_german_salutation():
         ('Wenn Du einem Kommentar inhaltlich widersprechen möchtest',
             'Wenn Sie einem Kommentar inhaltlich widersprechen möchten'),
         ('utze dies', 'utzen Sie dies'),
-        ('chalte bitte', 'chalten Sie bitte'),
+        ('ähle bitte', 'ählen Sie bitte'),
         ('ähle ein Badge', 'ählen Sie ein Badge'),
         ('erstelle ein ', 'erstellen Sie ein '),
         ('Bitte entschuldige', 'Bitte entschuldigen Sie'),
