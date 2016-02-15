@@ -7,7 +7,6 @@ from adhocracy_core.interfaces import ISheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import workflow
-from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
 from adhocracy_core.sheets.principal import IUserBasic
@@ -69,8 +68,6 @@ class ProcessSettingsSchema(colander.MappingSchema):
 
     plan_number = SingleLine(missing=colander.required)
     participation_kind = SingleLine(missing=colander.required)
-    participation_start_date = DateTime(default=None)
-    participation_end_date = DateTime(default=None)
 
 process_settings_meta = sheet_meta._replace(
     isheet=IProcessSettings,

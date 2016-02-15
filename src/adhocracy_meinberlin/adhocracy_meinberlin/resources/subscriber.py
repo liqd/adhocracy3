@@ -9,6 +9,7 @@ from adhocracy_core.authorization import set_acms_for_app_root
 from adhocracy_core.resources.root import root_acm
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import has_annotation_sheet_data
+from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_meinberlin.resources.root import meinberlin_acm
 from adhocracy_meinberlin.resources.bplan import IProposalVersion
 from adhocracy_meinberlin.resources.bplan import IProposal
@@ -31,8 +32,8 @@ def send_bplan_submission_confirmation_email(event):
         return
     templates_values = _get_templates_values(process_settings, appstruct)
     subject = 'Ihre Stellungnahme zum Bebauungsplan {plan_number}, ' \
-              '{participation_kind} von {participation_start_date:%d/%m/%Y} ' \
-              '- {participation_end_date:%d/%m/%Y}.' \
+              '{participation_kind} von {state_data[0][start_date]:%d/%m/%Y} ' \
+              '- {state_data[0][end_date]:%d/%m/%Y}.' \
               .format(**process_settings)
     messenger.send_mail(subject,
                         [appstruct['email']],
@@ -62,6 +63,8 @@ def _get_all_process_settings(proposal_version):
         sheets.bplan.IProcessPrivateSettings).get()
     all_process_settings = process_settings.copy()
     all_process_settings.update(process_private_settings)
+    workflowassigment = get_sheet(process, IWorkflowAssignment).get()
+    all_process_settings.update(workflowassigment)
     return all_process_settings
 
 

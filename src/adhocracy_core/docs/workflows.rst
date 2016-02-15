@@ -100,7 +100,8 @@ this metadata can be set::
 
     >>> data = {'data': {'adhocracy_core.sheets.workflow.IWorkflowAssignment':  {'state_data':
     ...                  [{'name': 'participate', 'description': 'new',
-    ...                    'start_date': '2015-05-26T12:40:49.638293+00:00', 'end_date': '2015-10-26T12:40:49.638293+00:00'}]
+    ...                    'start_date': '2015-05-26T12:40:49.638293+00:00',
+    ...                    'end_date': '2015-10-26T12:40:49.638293+00:00'}]
     ...         }}}
     >>> resp = app_god.put('/process', data)
     >>> resp.status_code
