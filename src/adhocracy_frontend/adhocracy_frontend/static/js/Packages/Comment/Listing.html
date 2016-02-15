@@ -14,6 +14,13 @@
             data-on-submit="onCreate"
             data-hide-cancel="true">
         </adh-comment-create>
+        <div data-ng-switch-when="create-button-id">
+            <a
+                href=""
+                data-ng-click="custom.goToLogin()"
+                class="button-cta">{{ "TR__CREATE_A_COMMENT" | translate }}
+            </a>
+        </div>
         <adh-comment
             data-ng-switch-when="element-id"
             data-path="{{element}}"
