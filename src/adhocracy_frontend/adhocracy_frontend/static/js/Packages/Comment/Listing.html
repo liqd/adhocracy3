@@ -16,8 +16,9 @@
         </adh-comment-create>
         <div data-ng-switch-when="create-button-id">
             <a
+                data-ng-click="custom.goToLogin()"
                 class="button-cta listing-button-cta"
-                href="register">{{ "TR__CREATE_A_COMMENT" | translate }}
+                href="">{{ "TR__CREATE_A_COMMENT" | translate }}
             </a>
         </div>
         <adh-comment

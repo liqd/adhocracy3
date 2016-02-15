@@ -356,7 +356,10 @@ export var adhCommentListing = (
                     scope.params[SIComment.nick + ":refers_to"] = scope.path;
                     scope.poolPath = commentable.data[SICommentable.nick].post_pool;
                     scope.custom = {
-                        refersTo: scope.path
+                        refersTo: scope.path,
+                        goToLogin: () => {
+                            return adhTopLevelState.setCameFromAndGo("/login");
+                        }
                     };
                 });
             };
