@@ -46,6 +46,11 @@ a form for creating new elements. This form is then always visible.
     }
 }
 
+.listing-create-button {
+    @include rem(margin, 0.5em 0);
+    text-align: center;
+}
+
 .listing-elements + .listing-create-form {
     margin-top: 0;
 }
