@@ -31,7 +31,7 @@
     <div class="listing-create-form" data-ng-if="!noCreateForm && poolOptions.POST">
         <adh-inject data-transclusion-id="create-form-id"></adh-inject>
     </div>
-    <div class="listing-create-button" data-ng-if="noCreateForm || !poolOptions.POST">
+    <div class="listing-create-button" data-ng-if="!noCreateForm && !poolOptions.POST">
         <adh-inject data-transclusion-id="create-button-id"></adh-inject>
     </div>
     <ol class="listing-elements">
