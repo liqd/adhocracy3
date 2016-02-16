@@ -7,7 +7,8 @@ var shared = require("./shared");
 
 describe("user registration", function() {
     it("can register", function() {
-        UserPages.logout();
+        browser.get("/");
+        UserPages.ensureLogout();
         UserPages.register("u1", "u1@example.com", "password1");
         UserPages.logout();
         UserPages.login("u1", "password1");
@@ -15,7 +16,8 @@ describe("user registration", function() {
     });
 
     it("cannot register with wrong password repeat", function() {
-        UserPages.logout();
+        browser.get("/");
+        UserPages.ensureLogout();
         var page = new UserPages.RegisterPage().get();
         page.fill("u2", "u2@example.com", "password2", "password3");
         expect(page.submitButton.isEnabled()).toBe(false);
