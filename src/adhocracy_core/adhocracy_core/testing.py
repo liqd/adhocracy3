@@ -74,6 +74,11 @@ participant2_header = {'X-User-Path': '/principals/users/0000005',
 participant2_login = 'participant2'
 participant2_password = 'password'
 
+authenticated_header = {'X-User-Path': '/principals/users/0000006',
+                        'X-User-Token': 'SECRET_AUTHENTICATED'}
+authenticated_login = 'authenticated'
+authenticated_password = 'password'
+
 broken_header = {'X-User-Path': '/principals/users/0000001',
                  'X-User-Token': ''}
 
@@ -654,6 +659,9 @@ def add_test_users(root, registry):
     add_user(root, login=participant2_login, password=participant2_password,
              email='participant2@example.org', roles=['participant'],
              registry=registry)
+    add_user(root, login=authenticated_login, password=authenticated_password,
+             email='authenticated@example.org', roles=['participant'],
+             registry=registry)
 
 
 def add_create_test_users_subscriber(configurator):
@@ -675,9 +683,9 @@ def app_router(app_settings) -> Router:
 
 def make_configurator(app_settings: dict, package) -> Configurator:
     """Make the pyramid configurator."""
-    from pyramid.events import ApplicationCreated
-    from adhocracy_core.authorization import set_acms_for_app_root
-    from adhocracy_core.resources.root import root_acm
+    # from pyramid.events import ApplicationCreated
+    # from adhocracy_core.authorization import set_acms_for_app_root
+    # from adhocracy_core.resources.root import root_acm
     configurator = Configurator(settings=app_settings,
                                 root_factory=package.root_factory)
     configurator.include(package)
@@ -687,9 +695,10 @@ def make_configurator(app_settings: dict, package) -> Configurator:
     # (<InterfaceClass substanced.interfaces.ICatalogFactory>, 'system')
     # in functional tests.
 
-    def set_acm_subscriber(event):
-        set_acms_for_app_root(event.app, (root_acm,))
-    configurator.add_subscriber(set_acm_subscriber, ApplicationCreated)
+    # FIXME  this creates a problem by euth, since euth override the root acl
+    # def set_acm_subscriber(event):
+    #     set_acms_for_app_root(event.app, (root_acm,))
+    # configurator.add_subscriber(set_acm_subscriber, ApplicationCreated)
     return configurator
 
 
@@ -888,6 +897,12 @@ def app_participant(app_router) -> TestApp:
 def app_participant2(app_router) -> TestApp:
     """Return backend test app wrapper with participant authentication."""
     return AppUser(app_router, header=participant2_header)
+
+
+@fixture(scope='class')
+def app_authenticated(app_router) -> TestApp:
+    """Return backend test app wrapper with authenticated authentication."""
+    return AppUser(app_router, header=authenticated_header)
 
 
 @fixture(scope='class')
