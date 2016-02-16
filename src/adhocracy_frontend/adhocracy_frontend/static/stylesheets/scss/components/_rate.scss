@@ -375,16 +375,6 @@ is bigger and exposes more details.
     }
 }
 
-.opinion-result-absolute {
-    @include rem(margin-left, 20px);
-}
-
-.opinion-result-no {
-    .opinion-result-absolute {
-        @include rem(margin-right, 20px);
-    }
-}
-
 .is-opinion-none .opinion-bar {
     background-color: $color-text-normal;
 }
