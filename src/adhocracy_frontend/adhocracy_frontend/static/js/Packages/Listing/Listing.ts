@@ -199,7 +199,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     }
                     if (sortItem) {
                         params.sort = sortItem.index;
-                        params.reverse = !!sortItem.reverse;
+                        params.reverse = !sortItem.reverse;
                     }
 
                     if (limit) {
