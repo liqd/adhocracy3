@@ -9,9 +9,5 @@
            {"plan_number": "112233",
             "participation_kind": "öffentliche Auslegung"},
            "adhocracy_meinberlin.sheets.bplan.IProcessPrivateSettings":
-           {"office_worker_email": "officeworkername@example.com"},
-           "adhocracy_core.sheets.workflow.IWorkflowAssignment":
-           {"state_data": [{"name": "","description": "",
-             "start_date": "2015-05-26T12:40:49.638293+00:00",
-             "end_date": "2015-10-26T12:40:49.638293+00:00"}]}}}
+           {"office_worker_email": "officeworkername@example.com"}}}
 ]

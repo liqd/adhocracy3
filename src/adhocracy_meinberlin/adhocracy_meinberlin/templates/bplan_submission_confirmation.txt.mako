@@ -1,4 +1,4 @@
-Ihre Stellungnahme zum Bebauungsplan ${plan_number}, ${participation_kind} von ${state_data[0]['start_date'].strftime('%d/%m/%Y')} - ${state_data[0]['end_date'].strftime('%d/%m/%Y')}.
+Ihre Stellungnahme zum Bebauungsplan ${plan_number}, ${participation_kind} von ${workflow_state_data_participate['start_date'].strftime('%d/%m/%Y')} - ${workflow_state_data_participate['end_date'].strftime('%d/%m/%Y')}.
 
 
 
