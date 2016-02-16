@@ -10,7 +10,7 @@ def includeme(config):
     config.include('adhocracy_core')
     # commit to allow overriding pyramid config
     config.commit()
-    # add translations 
+    # add translations
     config.add_translation_dirs('adhocracy_core:locale/')
 
 

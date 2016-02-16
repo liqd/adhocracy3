@@ -43,6 +43,10 @@ test_requires = [
     'babel',
     'lingua',
     'testfixtures',
+    'Sphinx',
+    'repoze.sphinx.autointerface',
+    'sphinx-autodoc-annotation',
+    'sphinx-rtd-theme',
 ]
 
 debug_requires = [

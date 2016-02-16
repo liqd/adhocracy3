@@ -9,7 +9,7 @@ import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 
 import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
-import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import * as SITags from "../../Resources_/adhocracy_core/sheets/tags/ITags";
 
 var pkgLocation = "/ResourceArea";
 
@@ -253,17 +253,14 @@ export class Service implements AdhTopLevelState.IAreaInput {
     private conditionallyRedirectVersionToLast(resourceUrl : string) : angular.IPromise<boolean> {
         var self : Service = this;
 
-        return self.adhHttp.get(resourceUrl).then((resource : ResourcesBase.Resource) => {
-            if (resource.data.hasOwnProperty(SIVersionable.nick)) {
-                if (resource.data[SIVersionable.nick].followed_by.length === 0) {
+        return self.adhHttp.get(AdhUtil.parentPath(resourceUrl)).then((item : ResourcesBase.Resource) => {
+            if (item.data.hasOwnProperty(SITags.nick)) {
+                var lastUrl = item.data[SITags.nick].LAST;
+                if (lastUrl === resourceUrl) {
                     return false;
                 } else {
-                    var itemUrl = AdhUtil.parentPath(resourceUrl);
-                    return self.adhHttp.getNewestVersionPathNoFork(itemUrl).then((lastUrl) => {
-                        self.$location.path(self.adhResourceUrlFilter(lastUrl));
-                        return true;
-                    });
-
+                    self.$location.path(self.adhResourceUrlFilter(lastUrl));
+                    return true;
                 }
             } else {
                 return false;

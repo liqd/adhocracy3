@@ -137,7 +137,9 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 initialLimit: "=?",
                 params: "=?",
                 noCreateForm: "=?",
-                emptyText: "@"
+                emptyText: "@",
+                // use this to pass custom data to the injected templates
+                custom: "=?"
             },
             transclude: true,
             link: (scope, element, attrs, controller, transclude) => {
