@@ -91,7 +91,7 @@ export var bindPath = (
         };
     };
 
-    adhHttp.get(scope.badgesPath).then((badges) => {
+    adhHttp.get(scope.badgesPath, {elements: "paths"}).then((badges) => {
         var badgelist : string[] = badges.data[SIPool.nick].elements;
         $q.all(_.map(badgelist, (b) => adhHttp.get(b))).then((result) => {
             scope.badges = _.map(result, getBadge);

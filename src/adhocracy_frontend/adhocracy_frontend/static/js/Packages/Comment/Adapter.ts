@@ -91,6 +91,7 @@ export class CommentAdapter implements AdhComment.ICommentAdapter<RICommentVersi
 
     elemRefs(adhHttp : AdhHttp.Service<any>, container : ResourcesBase.Resource) {
         var params = {
+            elements: "paths",
             depth: 2,
             tag: "LAST",
             content_type: RICommentVersion.content_type,

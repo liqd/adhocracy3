@@ -32,6 +32,7 @@ export interface IListingContainerAdapter {
 }
 
 export class ListingPoolAdapter implements IListingContainerAdapter {
+    // NOTE: container *must* have been requested with `elements=paths`
     public elemRefs(container : ResourcesBase.Resource) {
         return container.data[SIPool.nick].elements;
     }
@@ -160,6 +161,8 @@ export class Listing<Container extends ResourcesBase.Resource> {
 
                 var getElements = (count? : boolean, limit? : number, offset? : number) : angular.IPromise<Container> => {
                     var params = <any>{};
+
+                    params.elements = "paths";
 
                     if (typeof $scope.contentType !== "undefined") {
                         params.content_type = $scope.contentType;
