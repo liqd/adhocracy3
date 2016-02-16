@@ -11,4 +11,3 @@ Coding Guides
    python_guidelines.rst
    js_guidelines.rst
    css_guidelines.rst
-   generic_widgets.rst
