@@ -20,31 +20,6 @@ var pkgLocation = "/Listing";
 //////////////////////////////////////////////////////////////////////
 // Listings
 
-export interface IListingContainerAdapter {
-    // A list of elements that should be displayed
-    elemRefs(any) : string[];
-
-    // Total number of elements
-    totalCount(any) : number;
-
-    // The pool a new element should be posted to.
-    poolPath(any) : string;
-}
-
-export class ListingPoolAdapter implements IListingContainerAdapter {
-    public elemRefs(container : ResourcesBase.Resource) {
-        return container.data[SIPool.nick].elements;
-    }
-
-    public totalCount(container : ResourcesBase.Resource) {
-        return container.data[SIPool.nick].count;
-    }
-
-    public poolPath(container : ResourcesBase.Resource) {
-        return container.path;
-    }
-}
-
 export interface IFacetItem {
     key : string;
     name : string;
@@ -111,8 +86,6 @@ export interface IFacetsScope extends angular.IScope {
 
 export class Listing<Container extends ResourcesBase.Resource> {
     public static templateUrl : string = pkgLocation + "/Listing.html";
-
-    constructor(private containerAdapter : IListingContainerAdapter) {}
 
     public createDirective(adhConfig : AdhConfig.IService, adhWebSocket: AdhWebSocket.Service) {
         var _self = this;
@@ -258,11 +231,11 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     }
                     return getElements(true, $scope.currentLimit).then((container) => {
                         $scope.container = container;
-                        $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
-                        $scope.totalCount = _self.containerAdapter.totalCount($scope.container);
+                        $scope.poolPath = $scope.container.path;
+                        $scope.totalCount = $scope.container.data[SIPool.nick].count;
 
                         // avoid modifying the cached result
-                        $scope.elements = _.clone(_self.containerAdapter.elemRefs($scope.container));
+                        $scope.elements = _.clone($scope.container.data[SIPool.nick].elements);
 
                         if (!$scope.sorts || $scope.sorts.length === 0) {
                             // If no backend based sorting is used, we
@@ -276,7 +249,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 $scope.loadMore = () : void => {
                     if ($scope.currentLimit < $scope.totalCount) {
                         getElements(false, $scope.initialLimit, $scope.currentLimit).then((container) => {
-                            var elements = _.clone(_self.containerAdapter.elemRefs(container));
+                            var elements = _.clone(container.data[SIPool.nick].elements);
                             $scope.elements = $scope.elements.concat(elements);
                             $scope.currentLimit += $scope.initialLimit;
                         });
