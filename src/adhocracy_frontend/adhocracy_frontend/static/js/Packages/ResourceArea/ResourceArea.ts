@@ -10,6 +10,7 @@ import * as AdhUtil from "../Util/Util";
 
 import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
 import * as SITags from "../../Resources_/adhocracy_core/sheets/tags/ITags";
+import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
 var pkgLocation = "/ResourceArea";
 
@@ -253,8 +254,13 @@ export class Service implements AdhTopLevelState.IAreaInput {
     private conditionallyRedirectVersionToLast(resourceUrl : string) : angular.IPromise<boolean> {
         var self : Service = this;
 
-        return self.adhHttp.get(AdhUtil.parentPath(resourceUrl)).then((item : ResourcesBase.Resource) => {
-            if (item.data.hasOwnProperty(SITags.nick)) {
+        return self.$q.all([
+            self.adhHttp.get(resourceUrl),
+            self.adhHttp.get(AdhUtil.parentPath(resourceUrl))
+        ]).then((args : ResourcesBase.Resource[]) => {
+            var version = args[0];
+            var item = args[1];
+            if (version.data.hasOwnProperty(SIVersionable.nick) && item.data.hasOwnProperty(SITags.nick)) {
                 var lastUrl = item.data[SITags.nick].LAST;
                 if (lastUrl === resourceUrl) {
                     return false;
