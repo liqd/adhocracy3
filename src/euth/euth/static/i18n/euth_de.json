@@ -1,5 +1,5 @@
 {
-	"TR__CREATE_PROPOSAL": "Vorschlag anlegen",
+    "TR__CREATE_PROPOSAL": "Vorschlag anlegen",
     "TR__DETAIL": "Details",
     "TR__ERROR_REQUIRED_DETAIL": "Bitte Details angeben.",
     "TR__PROPOSAL_EMPTY_TEXT": "Noch keine Vorschläge.",

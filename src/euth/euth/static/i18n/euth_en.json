@@ -1,5 +1,5 @@
 {
-	"TR__CREATE_PROPOSAL": "Create proposal",
+    "TR__CREATE_PROPOSAL": "Create proposal",
     "TR__DETAIL": "Details",
     "TR__ERROR_REQUIRED_DETAIL": "Please enter details.",
     "TR__PROPOSAL_EMPTY_TEXT": "No proposals yet.",
