@@ -178,7 +178,7 @@ export var directiveFactory = (template : string, sheetName : string) => (
                 }).then(() => {
                     return adhHttp.withTransaction((transaction) : angular.IPromise<void> => {
                         var gets : AdhHttp.ITransactionResult[] = rates.map((rate) => {
-                            return rate.data[SIRate.nick].subject;
+                            return transaction.get(rate.data[SIRate.nick].subject);
                         });
 
                         return transaction.commit()
