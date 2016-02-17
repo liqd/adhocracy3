@@ -347,7 +347,8 @@ export var adhCommentListing = (
             }, {
                 key: "rates",
                 name: "TR__RATES",
-                index: "rates"
+                index: "rates",
+                reverse: true
             }];
             scope.params = {};
 
