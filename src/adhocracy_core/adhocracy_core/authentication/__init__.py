@@ -112,7 +112,7 @@ def get_tokenmanager(request: Request, **kwargs) -> ITokenManger:
     if getattr(request, 'root', None) is None:
         return None
     try:
-        return ITokenManger(request.root)
+        return request.registry.getAdapter(request.root, ITokenManger)
     except (ComponentLookupError, TypeError):
         return None
 
