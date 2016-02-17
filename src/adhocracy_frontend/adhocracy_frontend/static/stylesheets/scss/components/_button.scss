@@ -182,3 +182,12 @@ Add a + sign to a button
         content: "+ ";
     }
 }
+
+
+.help-link {
+    @extend .button-cta-secondary;
+    @include rem(min-width, unquote("#{$button-line-height}rem"));
+    @include rem(margin-left, 1rem);
+    padding-left: 0;
+    padding-right: 0;
+}
