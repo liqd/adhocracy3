@@ -12,9 +12,8 @@ import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 import * as AdhWebSocket from "../WebSocket/WebSocket";
 
-import * as ResourcesBase from "../../ResourcesBase";
-
 import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
+import RIRate from "../../Resources_/adhocracy_core/resources/rate/IRate";
 import RIRateVersion from "../../Resources_/adhocracy_core/resources/rate/IRateVersion";
 import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
 import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
@@ -29,14 +28,14 @@ var pkgLocation = "/Rate";
  * Generic rate directive
  *
  * This module provides a generic code for rate widgets. It is generic in that
- * it can be used with different adapters and templates.
+ * it can be used with different sheets and templates.
  *
  * FIXME: The code is currently tied to RIRateVersion
  *
  * An interesting detail is that the rate item is only created on the server
  * when a user casts a rate for the first time.  This does pose a special
  * challange for keeping multiple rate directives on the same page in sync
- * because there is not resource on the server that we could register
+ * because there is no resource on the server that we could register
  * websockets on.  For this reason, there is the adhRateEventManager service
  * that is used to sync these directives locally.
  */
@@ -64,27 +63,6 @@ export interface IRateScope extends angular.IScope {
     auditTrail : { subject: string; rate: number }[];
     auditTrailVisible : boolean;
     toggleShowDetails() : void;
-}
-
-
-// (this type is over-restrictive in that T is used for both the
-// rate, the subject, and the target.  luckily, subtype-polymorphism
-// is too cool to complain about it here.  :-)
-export interface IRateAdapter<T extends ResourcesBase.Resource> {
-    create(settings : any) : T;
-    createItem(settings : any) : any;
-    isRate(resource : T) : boolean;
-    isRateable(resource : T) : boolean;
-    rateablePostPoolPath(resource : T) : string;
-    subject(resource : T) : string;
-    subject(resource : T, value : string) : T;
-    object(resource : T) : string;
-    object(resource : T, value : string) : T;
-    rate(resource : T) : number;
-    rate(resource : T, value : number) : T;
-    creator(resource : T) : string;
-    creationDate(resource : T) : string;
-    modificationDate(resource : T) : string;
 }
 
 
@@ -154,7 +132,7 @@ export class Service {
 }
 
 
-export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateVersion>) => (
+export var directiveFactory = (template : string, sheetName : string) => (
     $q : angular.IQService,
     adhRate : Service,
     adhRateEventManager : AdhEventManager.EventManager,
@@ -199,7 +177,9 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                         });
                 }).then(() => {
                     return adhHttp.withTransaction((transaction) : angular.IPromise<void> => {
-                        var gets : AdhHttp.ITransactionResult[] = rates.map((rate) => transaction.get(adapter.subject(rate)));
+                        var gets : AdhHttp.ITransactionResult[] = rates.map((rate) => {
+                            return transaction.get(rate.data[SIRate.nick].subject);
+                        });
 
                         return transaction.commit()
                             .then((responses) => {
@@ -211,8 +191,8 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                 }).then(() => {
                     _.forOwn(ratePaths, (ratePath, ix) => {
                         auditTrail[ix] = {
-                            subject: users[ix].data[SIUserBasic.nick].name,  // (use adapter for user, too?)
-                            rate: adapter.rate(rates[ix])
+                            subject: users[ix].data[SIUserBasic.nick].name,
+                            rate: parseInt(rates[ix].data[SIRate.nick].rate, 10)
                         };
                     });
                     return auditTrail;
@@ -241,7 +221,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                 if (adhCredentials.loggedIn) {
                     return adhRate.fetchRate(postPoolPath, scope.refersTo, adhCredentials.userPath).then((resource) => {
                         storeMyRateResource(resource);
-                        scope.myRate = adapter.rate(resource);
+                        scope.myRate = parseInt(resource.data[SIRate.nick].rate, 10);
                         scope.hasCast = true;
                     }, () => undefined);
                 } else {
@@ -266,7 +246,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                     return $q.when(myRateResource);
                 } else {
                     return adhHttp.withTransaction((transaction) => {
-                        var item = transaction.post(postPoolPath, adapter.createItem({preliminaryNames: adhPreliminaryNames}));
+                        var item = transaction.post(postPoolPath, new RIRate({preliminaryNames: adhPreliminaryNames}));
                         var version = transaction.get(item.first_version_path);
 
                         return transaction.commit()
@@ -332,9 +312,9 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                             preliminaryNames: adhPreliminaryNames
                         });
 
-                        adapter.rate(newVersion, rate);
-                        adapter.object(newVersion, scope.refersTo);
-                        adapter.subject(newVersion, adhCredentials.userPath);
+                        newVersion.data[SIRate.nick].rate = rate;
+                        newVersion.data[SIRate.nick].object = scope.refersTo;
+                        newVersion.data[SIRate.nick].subject = adhCredentials.userPath;
 
                         return adhHttp.postNewVersionNoFork(version.path, newVersion)
                             .then(() => {
@@ -385,7 +365,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             scope.auditTrailVisible = false;
             adhHttp.get(scope.refersTo)
                 .then((rateable) => {
-                    postPoolPath = adapter.rateablePostPoolPath(rateable);
+                    postPoolPath = rateable.data[sheetName].post_pool;
                 })
                 .then(() => $q.all([updateMyRate(), updateAggregatedRates()]))
                 .then(() => {
