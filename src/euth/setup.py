@@ -9,15 +9,15 @@ README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
 requires = ['adhocracy_frontend',
-            'adhocracy_kit',
+            'adhocracy_euth',
             ]
 
 test_requires = ['adhocracy_frontend[test]',
-                 'adhocracy_kit[test]',
+                 'adhocracy_euth[test]',
                  ]
 
 debug_requires = ['adhocracy_frontend[debug]',
-                  'adhocracy_kit[debug]',
+                  'adhocracy_euth[debug]',
                   ]
 
 setup(name='euth',
