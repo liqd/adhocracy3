@@ -25,7 +25,7 @@ standard_meta = freeze({
                         'description': '',
                         'acm': {'principals':                    ['anonymous', 'participant', 'moderator', 'creator', 'initiator'],
                                 'permissions':
-                                  [['view',                       'Allow',     'Allow',       'Allow',     'Allow',   'Allow'],
+                                  [['view',                        None,       'Allow',       'Allow',     'Allow',   'Allow'],
                                    ['create_proposal',             None,       'Allow',        None,        None,      None],
                                    ['edit_proposal',               None,        None,          None,       'Allow',    None],
                                    ['create_comment',              None,       'Allow',       'Allow',      None,      None],

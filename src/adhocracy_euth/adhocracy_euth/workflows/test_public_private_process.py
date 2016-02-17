@@ -22,6 +22,7 @@ class TestPrivatePublicProcess:
         return '/opin/idea_collection'
 
     def test_create_resources(self,
+                               # FIXME: avoid triggering error during commit
                               registry,
                               datadir,
                               process_url_private,

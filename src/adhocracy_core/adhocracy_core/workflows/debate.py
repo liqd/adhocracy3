@@ -7,16 +7,17 @@ from adhocracy_core.workflows.standard import standard_meta
 
 debate_meta =  standard_meta \
                .transform(('states', 'participate', 'acm'),
-                          {'principals': [                 'participant', 'moderator', 'creator', 'initiator'],
+                          {'principals': [                 'anonymous',  'participant', 'moderator', 'creator', 'initiator'],
                            'permissions':
-                           [['create_proposal',             None,          None,        None,     'Allow'],
-                            ['edit_proposal',               None,          None,       'Allow',   'Allow'],
-                            ['create_document',             None,          None,        None,     'Allow'],
-                            ['edit_document',               None,          None,       'Allow',   'Allow'],
-                            ['create_comment',             'Allow',       'Allow',      None,     'Allow'],
-                            ['edit_comment',                None,          None,       'Allow',    None  ],
-                            ['create_rate',                'Allow',        None,        None,      None  ],
-                            ['edit_rate',                   None,          None,       'Allow',    None  ],
+                           [['view',                        None,        'Allow',       'Allow',     'Allow',   'Allow'],
+                            ['create_proposal',             None,         None,          None,        None,     'Allow'],
+                            ['edit_proposal',               None,         None,          None,       'Allow',   'Allow'],
+                            ['create_document',             None,         None,          None,        None,     'Allow'],
+                            ['edit_document',               None,         None,          None,       'Allow',   'Allow'],
+                            ['create_comment',              None,        'Allow',       'Allow',      None,     'Allow'],
+                            ['edit_comment',                None,         None,          None,       'Allow',    None  ],
+                            ['create_rate',                 None,        'Allow',        None,        None,      None  ],
+                            ['edit_rate',                   None,         None,          None,       'Allow',    None  ],
                            ]})
 
 
