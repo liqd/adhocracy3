@@ -35,7 +35,7 @@ var pkgLocation = "/Rate";
  * An interesting detail is that the rate item is only created on the server
  * when a user casts a rate for the first time.  This does pose a special
  * challange for keeping multiple rate directives on the same page in sync
- * because there is not resource on the server that we could register
+ * because there is no resource on the server that we could register
  * websockets on.  For this reason, there is the adhRateEventManager service
  * that is used to sync these directives locally.
  */
