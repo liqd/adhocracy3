@@ -19,4 +19,4 @@ export var register = (angular) => {
             }];
         }])
         .config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RIEuthResourcesCollaborativeTextIProcess)]);
-        };
+};
