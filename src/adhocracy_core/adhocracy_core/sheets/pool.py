@@ -95,8 +95,7 @@ class PoolSheet(AnnotationRessourceSheet):
             add 'aggregateby` field. defaults to False.
         """
         params = params or {}
-        has_no_custom_filters = params == {'depth': 1,
-                                           'root': self.context}
+        has_custom_filters = params != {}
         filter_view_permission = asbool(self.registry.settings.get(
             'adhocracy.filter_by_view_permission', True))
         if filter_view_permission:
@@ -107,7 +106,7 @@ class PoolSheet(AnnotationRessourceSheet):
             params['only_visible'] = True
         params_query = remove_keys_from_dict(params, self._additional_params)
         appstruct = self.get(params=params_query)
-        if has_no_custom_filters:
+        if not has_custom_filters and self.meta.isheet is IPool:
             # workaround to reduce needless but expensive listing of elements
             params['serialization_form'] = 'omit'
             params['show_count'] = True

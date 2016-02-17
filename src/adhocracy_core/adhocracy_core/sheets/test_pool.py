@@ -96,8 +96,7 @@ class TestFilteringPoolSheet:
         child = testing.DummyResource()
         inst.get.return_value = {'elements': [child],
                                  'count': 1}
-        cstruct = inst.get_cstruct(request_, params={'root': inst.context,
-                                                     'depth': 1})
+        cstruct = inst.get_cstruct(request_, params={})
         assert cstruct == {'elements': [],
                            'count': '1'}
 
