@@ -86,6 +86,8 @@ be used instead.
 
 .button {
     @include button-base;
+    @include border-radius($font-size-normal);
+    @include border-radius(1rem);
     background: transparent;
     color: $color-button-text;
     text-transform: uppercase;
@@ -106,7 +108,9 @@ be used instead.
 .button-cta-secondary {
     @include button-base;
     @include rem(min-width, 110px);
-    @include rem(padding, 0 1rem)
+    @include rem(padding, 0 1rem);
+    @include border-radius($font-size-normal);
+    @include border-radius(1rem);
 }
 
 .button-cta {
