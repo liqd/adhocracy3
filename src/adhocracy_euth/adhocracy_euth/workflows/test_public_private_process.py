@@ -27,6 +27,8 @@ class TestPrivatePublicProcess:
                               process_url_private,
                               process_url_public,
                               app_admin):
+        import sys
+        sys.debug = False
         root = get_root(app_admin.app_router)
         json_file_private = str(datadir.join('private.json'))
         add_resources(app_admin.app_router, json_file_private)
@@ -47,76 +49,60 @@ class TestPrivatePublicProcess:
         resp = app_admin.get(process_url_public)
         assert resp.status_code == 200
 
-    def test_set_private_process_participate_state(self,
-                                                   registry,
-                                                   process_url_private,
-                                                   app_god):
-        resp = app_god.get(process_url_private)
+    def set_process_participate_state(self,
+                                      process_url,
+                                      app_admin):
+        resp = app_admin.get(process_url)
         assert resp.status_code == 200
 
-        resp = do_transition_to(app_god,
-                                process_url_private,
+        resp = do_transition_to(app_admin,
+                                process_url,
                                 'announce')
         assert resp.status_code == 200
 
-        resp = do_transition_to(app_god,
-                                process_url_private,
-                                'participate')
-        assert resp.status_code == 200
-
-
-    def test_set_public_process_participate_state(self,
-                                                  registry,
-                                                  process_url_public,
-                                                  app_god):
-        resp = app_god.get(process_url_public)
-        assert resp.status_code == 200
-
-        resp = do_transition_to(app_god,
-                                process_url_public,
-                                'announce')
-        assert resp.status_code == 200
-
-        resp = do_transition_to(app_god,
-                                process_url_public,
+        resp = do_transition_to(app_admin,
+                                process_url,
                                 'participate')
         assert resp.status_code == 200
 
     def test_participate_anonymous_cannot_read_private_process(
-            self, registry, process_url_private, app_anonymous):
+            self, process_url_private, app_anonymous, app_admin):
+        self.set_process_participate_state(process_url_private,
+                                           app_admin)
         resp = app_anonymous.get(process_url_private)
         assert resp.status_code == 403
 
     def test_participate_authenticated_cannot_read_private_process(
-            self, registry, process_url_private, app_authenticated):
+            self, process_url_private, app_authenticated, app_admin):
         resp = app_authenticated.get(process_url_private)
         assert resp.status_code == 403
 
     def test_participate_authenticated_can_read_public_process(
-            self, registry, process_url_public, app_authenticated, app_god):
+            self, process_url_public, app_authenticated, app_admin):
+        self.set_process_participate_state(process_url_public,
+                                           app_admin)
         resp = app_authenticated.get(process_url_public)
         assert resp.status_code == 200
 
     def test_participate_anonymous_can_read_public_process(
-            self, registry, process_url_public, app_anonymous):
-        root = get_root(app_anonymous.app_router)
+            self, process_url_public, app_anonymous, request):
         resp = app_anonymous.get(process_url_public)
         assert resp.status_code == 200
 
     def test_participate_initiator_can_read_public_process(
-            self, registry, process_url_public, app_initiator):
+            self, process_url_public, app_initiator):
         root = get_root(app_initiator.app_router)
         resp = app_initiator.get(process_url_public)
         assert resp.status_code == 200
 
     def test_participate_moderator_can_read_public_process(
-            self, registry, process_url_public, app_moderator):
+            self, process_url_public, app_moderator):
         root = get_root(app_moderator.app_router)
         resp = app_moderator.get(process_url_public)
         assert resp.status_code == 200
 
     def test_participate_admin_can_read_public_process(
-            self, registry, process_url_public, app_admin):
+            self, process_url_public, app_admin):
         root = get_root(app_admin.app_router)
         resp = app_admin.get(process_url_public)
         assert resp.status_code == 200
