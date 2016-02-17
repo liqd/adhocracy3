@@ -426,7 +426,7 @@ new password to the reset password end point::
     >>> resp = anonymous.post('http://localhost/password_reset', data).json
     >>> pprint(resp)
     {'status': 'success',
-     'user_path': 'http://localhost/principals/users/0000011/',
+     'user_path': 'http://localhost/principals/users/0000013/',
      'user_token':...
 
 If the user is not activated yet::

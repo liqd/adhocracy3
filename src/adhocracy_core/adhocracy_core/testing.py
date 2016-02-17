@@ -660,8 +660,12 @@ def add_test_users(root, registry):
              email='participant2@example.org', roles=['participant'],
              registry=registry)
     add_user(root, login=authenticated_login, password=authenticated_password,
-             email='authenticated@example.org', roles=['participant'],
+             email='authenticated@example.org', roles=[],
              registry=registry)
+    add_user_token(root,
+                   authenticated_header['X-User-Path'],
+                   authenticated_header['X-User-Token'],
+                   registry)
 
 
 def add_create_test_users_subscriber(configurator):
