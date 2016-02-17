@@ -89,6 +89,8 @@ export var update = (
         scope.data.modificationDate = version.data[SIMetadata.nick].modification_date;
         scope.data.commentCount = version.data[SICommentable.nick].comments_count;
         scope.data.replyPoolPath = version.data[SICommentable.nick].post_pool;
+        // NOTE: this is lexicographic comparison. Might break if the datetime
+        // encoding changes.
         scope.data.edited = scope.data.modificationDate > scope.data.creationDate;
 
         var params = {
