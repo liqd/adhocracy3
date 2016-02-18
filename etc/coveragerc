@@ -20,10 +20,12 @@ omit =
     src/adhocracy_meinberlin/adhocracy_meinberlin/__init__.py
     src/adhocracy_meinberlin/adhocracy_meinberlin/scripts/*
     src/adhocracy_mercator/adhocracy_mercator/scripts/*
+    src/adhocracy_euth/adhocracy_euth/__init__.py
     src/adhocracy_aula/adhocracy_aula/__init__.py
 
 source =
     src/adhocracy_core
+    src/adhocracy_euth
     src/adhocracy_mercator
     src/adhocracy_sample
     src/adhocracy_meinberlin

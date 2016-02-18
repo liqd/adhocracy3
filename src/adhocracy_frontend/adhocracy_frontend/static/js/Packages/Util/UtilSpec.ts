@@ -1,7 +1,5 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import * as JasmineHelpers from "../../JasmineHelpers";
-
 import * as q from "q";
 
 import * as AdhUtil from "./Util";
@@ -61,36 +59,6 @@ export var register = () => {
             });
             it("does not replace {n} if there is no n-th parameter", () => {
                 expect(AdhUtil.formatString("Hello {0} from {1}", "World")).toBe("Hello World from {1}");
-            });
-        });
-
-        describe("eachItemOnce", () => {
-            var testCase = [
-                "/asd/version2",
-                "/asd/version3",
-                "/foo/version1",
-                "/bar/version1",
-                "/asd/version1",
-                "/foo/version2"
-            ];
-
-            it("returns only the most recent versions from the adhocracy_core.sheets.comment.ICommentable sheet", () => {
-                jasmine.addMatchers(JasmineHelpers.customMatchers);
-
-                var result = AdhUtil.eachItemOnce(testCase);
-                (<any>expect(result)).toSetEqual(["/asd", "/foo", "/bar"]);
-            });
-
-            it("does not alter the input list", () => {
-                AdhUtil.eachItemOnce(testCase);
-                expect(testCase).toEqual([
-                    "/asd/version2",
-                    "/asd/version3",
-                    "/foo/version1",
-                    "/bar/version1",
-                    "/asd/version1",
-                    "/foo/version2"
-                ]);
             });
         });
 

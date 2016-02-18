@@ -1,6 +1,8 @@
 from pyramid import testing
 from pytest import mark
 from pytest import fixture
+from pytest import mark
+
 from webtest import TestResponse
 
 from adhocracy_core.utils.testing import add_resources

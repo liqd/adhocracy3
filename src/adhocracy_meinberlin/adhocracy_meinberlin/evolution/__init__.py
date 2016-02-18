@@ -6,8 +6,12 @@ from zope.interface import alsoProvides
 from zope.interface import directlyProvides
 
 from adhocracy_core.interfaces import search_query
+
+
 from adhocracy_core.evolution import log_migration
 from adhocracy_core.evolution import migrate_new_sheet
+from adhocracy_core.evolution import _search_for_interfaces
+from adhocracy_core.utils import get_sheet
 from adhocracy_meinberlin.resources.kiezkassen import IProposalVersion
 import adhocracy_core.sheets
 import adhocracy_meinberlin.sheets
@@ -90,9 +94,32 @@ def migrate_stadtforum_proposals_to_ipolls(root):  # pragma: no cover
             catalogs.reindex_index(proposal, 'interfaces')
 
 
+def change_bplan_officeworker_email_representation(root):  # pragma: no cover
+    """Change bplan officeworker email representation."""
+    from substanced.util import find_objectmap
+    from adhocracy_core.utils import find_graph
+    from adhocracy_meinberlin.resources.bplan import IProcess
+    from adhocracy_meinberlin.sheets.bplan import IProcessSettings
+    from adhocracy_meinberlin.sheets.bplan import IProcessPrivateSettings
+    from adhocracy_meinberlin.sheets.bplan import OfficeWorkerUserReference
+    migrate_new_sheet(root, IProcess, IProcessPrivateSettings)
+    catalogs = find_service(root, 'catalogs')
+    bplaene = _search_for_interfaces(catalogs, IProcess)
+    objectmap = find_objectmap(root)
+    graph = find_graph(root)
+    for bplan in bplaene:
+        office_worker = graph.get_references_for_isheet(
+            bplan,
+            IProcessSettings)['office_worker'][0]
+        private_settings = get_sheet(bplan, IProcessPrivateSettings)
+        private_settings.set({'office_worker_email': office_worker.email})
+        objectmap.disconnect(bplan, office_worker, OfficeWorkerUserReference)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(use_adhocracy_core_title_sheet)
     config.add_evolution_step(use_adhocracy_core_description_sheet)
     config.add_evolution_step(remove_meinberlin_workflow_assignment_sheets)
     config.add_evolution_step(migrate_stadtforum_proposals_to_ipolls)
+    config.add_evolution_step(change_bplan_officeworker_email_representation)
