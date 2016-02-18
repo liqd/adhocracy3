@@ -24,8 +24,3 @@ class TestCollaborativeTextProcess:
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):
         assert registry.content.create(meta.iresource.__identifier__)
-
-def _post_document_item(app_user, path='') -> TestResponse:
-    from adhocracy_core.resources.document import IDocument
-    resp = app_user.post_resource(path, IDocument, {})
-    return resp
