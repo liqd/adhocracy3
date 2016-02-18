@@ -2,7 +2,7 @@ import * as AdhEuthIdeaProposalModule from "./Proposal/Module";
 import * as AdhEuthIdeaContextModule from "./Context/Module";
 import * as AdhEuthIdeaWorkbenchModule from "./Workbench/Module";
 
-export var moduleName = "euthIdeaCollection";
+export var moduleName = "adhEuthIdeaCollection";
 
 export var register = (angular) => {
     AdhEuthIdeaProposalModule.register(angular);

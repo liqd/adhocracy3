@@ -10,7 +10,7 @@ import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
 
 import * as AdhEuthWorkbench from "../Workbench/Workbench";
 
-import RIPeuthProcess from "../../../../Resources_/adhocracy_euth/resources/idea_collection/IProcess";
+import RIEuthProcess from "../../../../Resources_/adhocracy_euth/resources/idea_collection/IProcess";
 
 import * as Context from "./Context";
 
@@ -32,7 +32,7 @@ export var register = (angular) => {
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider.template("euth", ["adhConfig", "$templateRequest", Context.areaTemplate]);
             AdhEuthWorkbench.registerRoutes(
-               RIPeuthProcess.content_type,
+               RIEuthProcess.content_type,
                 "euth"
             )(adhResourceAreaProvider);
         }]);

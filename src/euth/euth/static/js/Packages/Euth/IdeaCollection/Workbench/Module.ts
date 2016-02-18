@@ -10,7 +10,7 @@ import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 
 import * as AdhProcess from "../../../Process/Process";
 
-import RIPeuthProcess from "../../../../Resources_/adhocracy_euth/resources/idea_collection/IProcess";
+import RIEuthProcess from "../../../../Resources_/adhocracy_euth/resources/idea_collection/IProcess";
 
 import * as Workbench from "./Workbench";
 
@@ -30,9 +30,9 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIPeuthProcess.content_type)])
+        .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIEuthProcess.content_type)])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[RIPeuthProcess.content_type] = ["$q", ($q : angular.IQService) => {
+            adhProcessProvider.templateFactories[RIEuthProcess.content_type] = ["$q", ($q : angular.IQService) => {
                 return $q.when("<adh-pcompass-workbench></adh-pcompass-workbench>");
             }];
         }])

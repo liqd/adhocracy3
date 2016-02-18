@@ -10,7 +10,7 @@ import * as SIBadgeable from "../../../../Resources_/adhocracy_core/sheets/badge
 import * as SIComment from "../../../../Resources_/adhocracy_core/sheets/comment/IComment";
 import RIComment from "../../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
-import RIPeuthProcess from "../../../../Resources_/adhocracy_euth/resources/idea_collection/IProcess";
+import RIEuthProcess from "../../../../Resources_/adhocracy_euth/resources/idea_collection/IProcess";
 import RIProposal from "../../../../Resources_/adhocracy_core/resources/proposal/IProposal";
 import RIProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
 
@@ -105,16 +105,16 @@ export var registerRoutes = (
     context : string = ""
 ) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
     adhResourceAreaProvider
-        .default(RIPeuthProcess, "", processType, context, {
+        .default(RIEuthProcess, "", processType, context, {
             space: "content",
             movingColumns: "is-show-hide-hide"
         })
-        .default(RIPeuthProcess, "create_proposal", processType, context, {
+        .default(RIEuthProcess, "create_proposal", processType, context, {
             space: "content",
             movingColumns: "is-show-show-hide"
         })
-        .specific(RIPeuthProcess, "create_proposal", processType, context, [
-            "adhHttp", (adhHttp: AdhHttp.Service<any>) => (resource: RIPeuthProcess) => {
+        .specific(RIEuthProcess, "create_proposal", processType, context, [
+            "adhHttp", (adhHttp: AdhHttp.Service<any>) => (resource: RIEuthProcess) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
