@@ -944,12 +944,13 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         resultType = "string";
         break;
     case "adhocracy_core.sheets.workflow.StateData":
-        resultType = "{start_date : string; description : string; name : string;}";
-        jsonType = "{start_date : string; description : string; name : string;}";
+        resultType = "{name : string; description : string; start_date : string; end_date : string}";
+        jsonType = "{name : string; description : string; start_date : string; end_date : string}";
         parser = dictParser({
             start_date: null,
             description: stringToDate,
             name: null
+            end_date: null
         });
         break;
     case "adhocracy_core.sheets.relation.Position":
