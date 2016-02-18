@@ -5,6 +5,7 @@ from webtest import TestResponse
 from adhocracy_core.utils.testing import add_resources
 from adhocracy_core.utils.testing import do_transition_to
 
+
 @mark.functional
 class TestCollaborativeText:
 
