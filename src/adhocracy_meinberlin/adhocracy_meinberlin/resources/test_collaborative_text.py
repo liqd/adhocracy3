@@ -1,7 +1,3 @@
-from distutils import dir_util
-import os
-import transaction
-
 from pytest import fixture
 from pytest import mark
 from webtest import TestResponse
@@ -9,17 +5,21 @@ from webtest import TestResponse
 from adhocracy_core.utils.testing import add_resources
 from adhocracy_core.utils.testing import do_transition_to
 
-class TestProcess:
+
+class TestCollaborativeTextProcess:
 
     @fixture
     def meta(self):
-        from .stadtforum import process_meta
+        from .collaborative_text import process_meta
         return process_meta
 
     def test_meta(self, meta):
-        from .stadtforum import IProcess
-        assert meta.iresource is IProcess
-        assert meta.workflow_name == 'standard'
+        import adhocracy_core.resources
+        from .collaborative_text import IProcess
+        assert meta.iresource == IProcess
+        assert meta.iresource.isOrExtends(
+            adhocracy_core.resources.document_process.IDocumentProcess)
+        assert meta.workflow_name == 'debate'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):
