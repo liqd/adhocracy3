@@ -45,8 +45,6 @@ var postCreate = (
         title: "Bebauungsplan " + scope.data.title
     });
     process.data[SIProcessSettings.nick] = new SIProcessSettings.Sheet({
-        participation_start_date: scope.data.startDate,
-        participation_end_date: scope.data.endDate,
         participation_kind: scope.data.kind,
         plan_number: scope.data.title
     });
