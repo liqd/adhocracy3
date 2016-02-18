@@ -28,6 +28,8 @@ class TestPrivatePublicProcess:
                               process_url_private,
                               process_url_public,
                               app_admin):
+        # import sys
+        # sys.debug = False
         root = get_root(app_admin.app_router)
         json_file_private = str(datadir.join('private.json'))
         add_resources(app_admin.app_router, json_file_private)
@@ -48,17 +50,59 @@ class TestPrivatePublicProcess:
         resp = app_admin.get(process_url_public)
         assert resp.status_code == 200
 
-    def set_process_participate_state(self,
-                                      process_url,
-                                      app_admin):
-        resp = app_admin.get(process_url)
-        assert resp.status_code == 200
-
+    def set_process_announce_state(self,
+                                   process_url,
+                                   app_admin):
         resp = do_transition_to(app_admin,
                                 process_url,
                                 'announce')
         assert resp.status_code == 200
 
+    def test_announce_anonymous_cannot_read_private_process(
+            self, process_url_private, app_anonymous, app_admin):
+        self.set_process_announce_state(process_url_private,
+                                        app_admin)
+        resp = app_anonymous.get(process_url_private)
+        assert resp.status_code == 403
+
+    def test_announce_authenticated_cannot_read_private_process(
+            self, process_url_private, app_authenticated, app_admin):
+        resp = app_authenticated.get(process_url_private)
+        assert resp.status_code == 403
+
+    def test_announce_authenticated_can_read_public_process(
+            self, process_url_public, app_authenticated, app_admin):
+        self.set_process_announce_state(process_url_public,
+                                           app_admin)
+        resp = app_authenticated.get(process_url_public)
+        assert resp.status_code == 200
+
+    def test_announce_anonymous_can_read_public_process(
+            self, process_url_public, app_anonymous, request):
+        resp = app_anonymous.get(process_url_public)
+        assert resp.status_code == 200
+
+    def test_announce_initiator_can_read_public_process(
+            self, process_url_public, app_initiator):
+        root = get_root(app_initiator.app_router)
+        resp = app_initiator.get(process_url_public)
+        assert resp.status_code == 200
+
+    def test_announce_moderator_can_read_public_process(
+            self, process_url_public, app_moderator):
+        root = get_root(app_moderator.app_router)
+        resp = app_moderator.get(process_url_public)
+        assert resp.status_code == 200
+
+    def test_announce_admin_can_read_public_process(
+            self, process_url_public, app_admin):
+        root = get_root(app_admin.app_router)
+        resp = app_admin.get(process_url_public)
+        assert resp.status_code == 200
+
+    def set_process_participate_state(self,
+                                      process_url,
+                                      app_admin):
         resp = do_transition_to(app_admin,
                                 process_url,
                                 'participate')
@@ -101,6 +145,162 @@ class TestPrivatePublicProcess:
         assert resp.status_code == 200
 
     def test_participate_admin_can_read_public_process(
+            self, process_url_public, app_admin):
+        root = get_root(app_admin.app_router)
+        resp = app_admin.get(process_url_public)
+        assert resp.status_code == 200
+
+
+    def set_process_evaluate_state(self,
+                                      process_url,
+                                      app_admin):
+        resp = app_admin.get(process_url)
+        assert resp.status_code == 200
+
+        resp = do_transition_to(app_admin,
+                                process_url,
+                                'evaluate')
+        assert resp.status_code == 200
+
+    def test_evaluate_anonymous_cannot_read_private_process(
+            self, process_url_private, app_anonymous, app_admin):
+        self.set_process_evaluate_state(process_url_private,
+                                        app_admin)
+        resp = app_anonymous.get(process_url_private)
+        assert resp.status_code == 403
+
+    def test_evaluate_authenticated_cannot_read_private_process(
+            self, process_url_private, app_authenticated, app_admin):
+        resp = app_authenticated.get(process_url_private)
+        assert resp.status_code == 403
+
+    def test_evaluate_authenticated_can_read_public_process(
+            self, process_url_public, app_authenticated, app_admin):
+        self.set_process_evaluate_state(process_url_public,
+                                           app_admin)
+        resp = app_authenticated.get(process_url_public)
+        assert resp.status_code == 200
+
+    def test_evaluate_anonymous_can_read_public_process(
+            self, process_url_public, app_anonymous, request):
+        resp = app_anonymous.get(process_url_public)
+        assert resp.status_code == 200
+
+    def test_evaluate_initiator_can_read_public_process(
+            self, process_url_public, app_initiator):
+        root = get_root(app_initiator.app_router)
+        resp = app_initiator.get(process_url_public)
+        assert resp.status_code == 200
+
+    def test_evaluate_moderator_can_read_public_process(
+            self, process_url_public, app_moderator):
+        root = get_root(app_moderator.app_router)
+        resp = app_moderator.get(process_url_public)
+        assert resp.status_code == 200
+
+    def test_evaluate_admin_can_read_public_process(
+            self, process_url_public, app_admin):
+        root = get_root(app_admin.app_router)
+        resp = app_admin.get(process_url_public)
+        assert resp.status_code == 200
+
+
+    def set_process_result_state(self,
+                                      process_url,
+                                      app_admin):
+        resp = do_transition_to(app_admin,
+                                process_url,
+                                'result')
+        assert resp.status_code == 200
+
+    def test_result_anonymous_cannot_read_private_process(
+            self, process_url_private, app_anonymous, app_admin):
+        self.set_process_result_state(process_url_private,
+                                           app_admin)
+        resp = app_anonymous.get(process_url_private)
+        assert resp.status_code == 403
+
+    def test_result_authenticated_cannot_read_private_process(
+            self, process_url_private, app_authenticated, app_admin):
+        resp = app_authenticated.get(process_url_private)
+        assert resp.status_code == 403
+
+    def test_result_authenticated_can_read_public_process(
+            self, process_url_public, app_authenticated, app_admin):
+        self.set_process_result_state(process_url_public,
+                                           app_admin)
+        resp = app_authenticated.get(process_url_public)
+        assert resp.status_code == 200
+
+    def test_result_anonymous_can_read_public_process(
+            self, process_url_public, app_anonymous, request):
+        resp = app_anonymous.get(process_url_public)
+        assert resp.status_code == 200
+
+    def test_result_initiator_can_read_public_process(
+            self, process_url_public, app_initiator):
+        root = get_root(app_initiator.app_router)
+        resp = app_initiator.get(process_url_public)
+        assert resp.status_code == 200
+
+    def test_result_moderator_can_read_public_process(
+            self, process_url_public, app_moderator):
+        root = get_root(app_moderator.app_router)
+        resp = app_moderator.get(process_url_public)
+        assert resp.status_code == 200
+
+    def test_result_admin_can_read_public_process(
+            self, process_url_public, app_admin):
+        root = get_root(app_admin.app_router)
+        resp = app_admin.get(process_url_public)
+        assert resp.status_code == 200
+
+
+    def set_process_closed_state(self,
+                                      process_url,
+                                      app_admin):
+        resp = do_transition_to(app_admin,
+                                process_url,
+                                'closed')
+        assert resp.status_code == 200
+
+    def test_closed_anonymous_cannot_read_private_process(
+            self, process_url_private, app_anonymous, app_admin):
+        self.set_process_closed_state(process_url_private,
+                                           app_admin)
+        resp = app_anonymous.get(process_url_private)
+        assert resp.status_code == 403
+
+    def test_closed_authenticated_cannot_read_private_process(
+            self, process_url_private, app_authenticated, app_admin):
+        resp = app_authenticated.get(process_url_private)
+        assert resp.status_code == 403
+
+    def test_closed_authenticated_can_read_public_process(
+            self, process_url_public, app_authenticated, app_admin):
+        self.set_process_closed_state(process_url_public,
+                                           app_admin)
+        resp = app_authenticated.get(process_url_public)
+        assert resp.status_code == 200
+
+    def test_closed_anonymous_can_read_public_process(
+            self, process_url_public, app_anonymous, request):
+        resp = app_anonymous.get(process_url_public)
+        assert resp.status_code == 200
+
+    def test_closed_initiator_can_read_public_process(
+            self, process_url_public, app_initiator):
+        root = get_root(app_initiator.app_router)
+        resp = app_initiator.get(process_url_public)
+        assert resp.status_code == 200
+
+    def test_closed_moderator_can_read_public_process(
+            self, process_url_public, app_moderator):
+        root = get_root(app_moderator.app_router)
+        resp = app_moderator.get(process_url_public)
+        assert resp.status_code == 200
+
+    def test_closed_admin_can_read_public_process(
             self, process_url_public, app_admin):
         root = get_root(app_admin.app_router)
         resp = app_admin.get(process_url_public)
