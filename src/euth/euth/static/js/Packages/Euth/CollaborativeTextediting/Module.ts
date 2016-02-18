@@ -3,7 +3,7 @@ import * as AdhDebateWorkbench from "../../DebateWorkbench/DebateWorkbench";
 import * as AdhProcess from "../../Process/Process";
 import RIEuthCollaborativeTextProcess from "../../../Resources_/adhocracy_euth/resources/collaborative_text/IProcess";
 
-export var moduleName = "euthCollaberativeTextediting";
+export var moduleName = "adhEuthCollaberativeTextediting";
 
 export var register = (angular) => {
 
@@ -18,5 +18,5 @@ export var register = (angular) => {
                 return $q.when("<adh-debate-workbench></adh-debate-workbench>");
             }];
         }])
-        .config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RIEuthResourcesCollaborativeTextIProcess)]);
+        .config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RIEuthCollaborativeTextProcess)]);
 };
