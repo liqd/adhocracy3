@@ -55,96 +55,6 @@ path of the new user::
     >>> user_path
     '.../principals/users/00...
 
-The "name" field in the "IUserBasic" schema is a non-empty string that
-can contain any characters except '@' (to make user names distinguishable
-from email addresses). The username must not contain any whitespace except
-single spaces, preceded and followed by non-whitespace (no whitespace at
-begin or end, multiple subsequent spaces are forbidden,
-tabs and newlines are forbidden).
-
-The "email" field in the "IUserExtended" sheet must be a valid email address.
-
-Creating a new user will not automatically log them in. First, the backend
-will send a registration message to the specified email address. Once the user
-has clicked on the activation link in the message, the user account is ready
-to be used (see "Account Activation" below).
-
-On failure, the backend responds with status code 400 and an error message.
-E.g. when we try to register a user with an empty password::
-
-    >>> data = {'content_type': 'adhocracy_core.resources.principal.IUser',
-    ...         'data': {
-    ...              'adhocracy_core.sheets.principal.IUserBasic': {
-    ...                  'name': 'Other User'},
-    ...              'adhocracy_core.sheets.principal.IUserExtended': {
-    ...                  'email': 'annina@example.org'},
-    ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
-    ...                  'password': ''}}}
-    >>> resp = anonymous.post('http://localhost/principals/users', data)
-    >>> resp.status_code
-    400
-    >>> pprint(resp.json)
-    {'errors': [{'description': 'Required',
-                 'location': 'body',
-                 'name': 'data.adhocracy_core.sheets.principal.IPasswordAuthentication.password'}],
-     'status': 'error'}
-
-<errors> is a list of errors. The above error indicates that a required
-field (the password field) is missing or empty. The following other error
-conditions can occur:
-
-  * username does already exist
-  * email does already exist
-  * email is invalid (doesn't look like an email address)
-  * couldn't send a registration mail to the email address (description
-    starts with 'Cannot send registration mail')
-  * password is too short (less than 6 chars)
-  * password is too long (more than 100 chars)
-  * internal error: something went wrong in the backend
-
-For example, if we try to register a user whose email address is already
-registered::
-
-    >>> data = {'content_type': 'adhocracy_core.resources.principal.IUser',
-    ...         'data': {
-    ...              'adhocracy_core.sheets.principal.IUserBasic': {
-    ...                  'name': 'New user with old email'},
-    ...              'adhocracy_core.sheets.principal.IUserExtended': {
-    ...                  'email': 'anna@example.org'},
-    ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
-    ...                  'password': 'EckVocUbs3'}}}
-    >>> resp = anonymous.post('http://localhost/principals/users', data)
-    >>> resp.status_code
-    400
-    >>> pprint(resp.json)
-    {'errors': [{'description': 'The user login email is not unique',
-                 'location': 'body',
-                 'name': 'data.adhocracy_core.sheets.principal.IUserExtended.email'}],
-     'status': 'error'}
-
-*Note:* in the future, the registration request may contain additional
-personal data for the user. This data will probably be added to the
-"IUserBasic" sheets, if it's generally public, to the "IUserExtended" sheet
-otherwise (or maybe it'll be store in additional new sheets); e.g.::
-
-    'data': {
-        'adhocracy_core.sheets.principal.IUserBasic': {
-            'name': 'Anna Müller',
-            'forename': '...',
-            'surname': '...'},
-        'adhocracy_core.sheets.principal.IPasswordAuthentication': {
-            'password': '...'},
-        'adhocracy_core.sheets.principal.IUserExtended': {
-            'email': 'anna@example.org',
-            'day_of_birth': '...',
-            'street': '...',
-            'town': '...',
-            'postcode': '...',
-            'gender': '...'
-        }
-     }
-
-
 Account Activation
 ------------------
 
@@ -174,11 +84,6 @@ must post a JSON request containing the path to the
     {'status': 'success',
      'user_path': '.../principals/users/...',
      'user_token': '...'}
-
-The backend responds with either response code 200 and 'status':
-'success' and 'user_path' and 'user_token', just like after a
-successful login request (see next section).  This means that the user
-account has been activated and the user is now logged in. ::
 
     >>> data = {'path': '/activate/blahblah'}
     >>> resp = anonymous.post('http://localhost/activate_account', data)
@@ -241,8 +146,7 @@ JSON request to the URL ``login_username`` with a user name and password::
      'user_token': '...'}
     >>> user_path = resp['user_path']
     >>> user_token_via_username = resp['user_token']
-    >>> headers = {'X-User-Path': user_path,
-    ...            'X-User-Token': user_token_via_username}
+    >>> headers = {'X-User-Token': user_token_via_username}
     >>> user = copy(anonymous)
     >>> user.header = headers
 
@@ -287,9 +191,9 @@ the user account hasn't been activated yet::
 User Authentication
 -------------------
 
-Once the user is logged in, the backend must add two header fields to all
-HTTP requests made for the user: "X-User-Path" and "X-User-Token". Their
-values are the received "user_path" and "user_token",
+Once the user is logged in, the backend must add add header field to all
+HTTP requests made for the user: "X-User-Token". It`s value
+is the received "user_token",
 respectively. The backend validates the token. If it's valid and not
 expired, the requested action is performed in the name and with the rights
 of the logged-in user.
@@ -349,13 +253,11 @@ visible::
 Only admins and the user herself can view extended information such as her
 email address::
 
-    >>> resp = admin.get (user_path).json
+    >>> resp = admin.get(user_path).json
     >>> pprint(resp['data']['adhocracy_core.sheets.principal.IUserExtended'])
     {'email': 'anna@example.org', 'tzname': 'UTC'}
     >>> 'adhocracy_core.sheets.principal.IPermissions' in resp['data']
     True
-    >>> headers = {'X-User-Path': user_path,
-    ...            'X-User-Token': user_token_via_username}
     >>> resp = user.get(user_path).json
     >>> 'adhocracy_core.sheets.principal.IUserExtended' in resp['data']
     True
@@ -369,99 +271,3 @@ Other users, even if logged in, cannot::
     False
     >>> 'adhocracy_core.sheets.principal.IPermissions' in resp['data']
     False
-
-
-User Logout
------------
-
-For now, there is no explicit "logout" action that would discard a
-generated user token. (*Note:* This may change in a future story.) To log a
-user out, the frontend can simply "forget" the received user token and
-never use it any more. The token will automatically expire in the backend
-after a few hours.
-
-
-User Re-Login
--------------
-
-If a user logs in, any previous user tokens generated for the same user
-will still remain valid until they expire in the normal way. This allows
-the user to be logged in from different devices at the same time. ::
-
-    >>> user_token_via_username != user_token_via_email
-    True
-    >>> headers = {'X-User-Path': user_path,
-    ...            'X-User-Token': user_token_via_username }
-    >>> user_reloggedin = copy(anonymous)
-    >>> user.header = headers
-    >>> resp = user_reloggedin.get('http://localhost/meta_api/').json
-    >>> 'resources' in resp.keys()
-    True
-    >>> headers['X-User-Token'] = user_token_via_email
-    >>> resp = user_reloggedin.get('http://localhost/meta_api/').json
-    >>> 'resources' in resp.keys()
-    True
-
-User Password reset
---------------------
-
-The frontend sends an email to the create password reset end point
-
-    >>> data = {'email': 'anna@example.org'}
-    >>> resp = anonymous.post("http://localhost/create_password_reset", data)
-    >>> resp.status_code
-    200
-
-On Success the backend sends an email with the link to reset the password to
-the user. The link contains the path to identify the password reset request::
-
-    http://frontend_url/password_reset/?path=/1318...
-
-If the user clicks on this link, the frontend has to send a post request with the
-new password to the reset password end point::
-
-    >>> newest_reset_path = getfixture('newest_reset_path')()
-    >>> data = {'path': newest_reset_path,
-    ...         'password': 'new_password'}
-    >>> resp = anonymous.post('http://localhost/password_reset', data).json
-    >>> pprint(resp)
-    {'status': 'success',
-     'user_path': 'http://localhost/principals/users/0000011/',
-     'user_token':...
-
-If the user is not activated yet::
-
-    >>> data = {'content_type': 'adhocracy_core.resources.principal.IUser',
-    ...         'data': {
-    ...              'adhocracy_core.sheets.principal.IUserBasic': {
-    ...                  'name': 'Gerd Müller'},
-    ...              'adhocracy_core.sheets.principal.IUserExtended': {
-    ...                  'email': 'gerd@example.org'},
-    ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
-    ...                  'password': 'EckVocUbs3'}}}
-    >>> resp = anonymous.post("http://localhost/principals/users", data).json
-    >>> user_path = resp["path"]
-
-    >>> resp = anonymous.get(user_path).json
-    >>> resp['reason']
-    'hidden'
-
-but does a successful password reset::
-
-    >>> data = {'email': 'gerd@example.org'}
-    >>> resp = anonymous.post("http://localhost/create_password_reset", data)
-    >>> resp.status_code
-    200
-
-    >>> newest_reset_path = getfixture('newest_reset_path')()
-    >>> data = {'path': newest_reset_path,
-    ...         'password': 'new_password'}
-    >>> resp = anonymous.post("http://localhost/password_reset", data)
-    >>> resp.status_code
-    200
-
-he is activated ::
-
-    >>> resp = anonymous.get(user_path).json
-    >>> resp['path'] == user_path
-    True

@@ -156,7 +156,7 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
     """A :term:`authentication policy` based on the the X-User-* header.
 
     To authenticate the client has to send http header with `X-User-Token`
-    and `X-User-Path`.
+    and the optional `X-User-Path`.
 
     Constructor Arguments
 
@@ -187,8 +187,8 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         self.hashalg = hashalg
 
     def unauthenticated_userid(self, request):
-        """Return unauthenticated userid."""
-        return _get_raw_x_user_headers(request)[0]
+        """Return authenticated userid because we don't have one."""
+        return self.authenticated_userid(request)
 
     def authenticated_userid(self, request):
         """Return authenticated userid."""
@@ -211,8 +211,6 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         with statsd_timer('authentication.user', rate=.1):
             authenticated_userid = \
                 tokenmanager.get_user_id(token, timeout=self.timeout)
-        if authenticated_userid != userid:
-            raise KeyError
         return authenticated_userid
 
     def remember(self, request, userid, **kw) -> dict:

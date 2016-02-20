@@ -116,8 +116,7 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         self.user_url = self.request.application_url + '/user/'
         self.userid = '/user'
         self.token = 'secret'
-        self.token_and_user_id_headers = {'X-User-Token': self.token,
-                                          'X-User-Path': self.user_url}
+        self.token_headers = {'X-User-Token': self.token}
 
     def tearDown(self):
         testing.tearDown()
@@ -140,20 +139,11 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         assert inst.timeout == 1
         assert inst.get_tokenmanager == get_tokenmanager
 
-    def test_unauthenticated_userid_without_header(self):
+    def test_unauthenticated_userid(self):
         inst = self.make_one('')
-        assert inst.unauthenticated_userid(self.request) is None
-
-    def test_unauthenticated_userid_with_header_and_user_url(self):
-        inst = self.make_one('')
-        self.request.headers = self.token_and_user_id_headers
-        assert inst.unauthenticated_userid(self.request) == self.userid
-
-    def test_unauthenticated_userid_with_header_and_user_path(self):
-        inst = self.make_one('')
-        self.token_and_user_id_headers['X-User-Path'] = self.userid
-        self.request.headers = self.token_and_user_id_headers
-        assert inst.unauthenticated_userid(self.request) == self.userid
+        inst.authenticated_userid = Mock()
+        inst.unauthenticated_userid(self.request)
+        inst.authenticated_userid.assert_called_with(self.request)
 
     def test_authenticated_userid_without_tokenmanger(self):
         get_tokenmanager=lambda x: None
@@ -171,30 +161,15 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         tokenmanager.get_user_id.return_value = self.userid
         inst = self.make_one('', get_tokenmanager=lambda x: tokenmanager,
                               timeout=10)
-        self.request.headers = self.token_and_user_id_headers
+        self.request.headers = self.token_headers
         assert inst.authenticated_userid(self.request) == self.userid
         assert tokenmanager.get_user_id.call_args[1] == {'timeout': 10}
-
-    def test_authenticated_userid_with_tokenmanger_valid_token_but_wrong_user_id(self):
-        tokenmanager = Mock()
-        tokenmanager.get_user_id.return_value = self.userid + 'WRONG_ID'
-        inst = self.make_one('', get_tokenmanager=lambda x: tokenmanager)
-        self.request.headers = self.token_and_user_id_headers
-        assert inst.authenticated_userid(self.request) is None
-
-    def test_authenticated_userid_with_tokenmanger_valid_token_but_invalid_user_id(self):
-        tokenmanager = Mock()
-        tokenmanager.get_user_id.return_value = None
-        inst = self.make_one('', get_tokenmanager=lambda x: tokenmanager)
-        self.token_and_user_id_headers['X-User-Path'] = 'INVALID_PATH/URL'
-        self.request.headers = self.token_and_user_id_headers
-        assert inst.authenticated_userid(self.request) is None
 
     def test_authenticated_userid_with_tokenmanger_wrong_token(self):
         tokenmanager = Mock()
         tokenmanager.get_user_id.side_effect = KeyError
         inst = self.make_one('', get_tokenmanager=lambda x: tokenmanager)
-        self.request.headers = self.token_and_user_id_headers
+        self.request.headers = self.token_headers
         assert inst.authenticated_userid(self.request) == None
 
     def test_authenticated_userid_with_token_validation_off_no_token(self):
@@ -231,7 +206,7 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         from pyramid.security import Authenticated
         def groupfinder(userid, request):
             return ['group']
-        self.request.headers = self.token_and_user_id_headers
+        self.request.headers = self.token_headers
         tokenmanager = Mock()
         tokenmanager.get_user_id.return_value = self.userid
         inst = self.make_one('', get_tokenmanager=lambda x: tokenmanager,
@@ -244,7 +219,7 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         from . import Anonymous
         def groupfinder(userid, request):
             return ['group']
-        self.request.headers = {'X-User-Path': self.user_url}
+        self.request.headers = {}
         tokenmanager = Mock()
         tokenmanager.get_user_id.return_value = None
         inst = self.make_one('', get_tokenmanager=lambda x: tokenmanager,
@@ -255,7 +230,7 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
     def test_effective_principals_set_cache(self):
         from pyramid.security import Authenticated
         from pyramid.security import Everyone
-        self.request.headers = self.token_and_user_id_headers
+        self.request.headers = self.token_headers
         tokenmanager = Mock()
         tokenmanager.get_user_id.return_value = self.userid
         inst = self.make_one('', get_tokenmanager=lambda x: tokenmanager,
@@ -303,13 +278,13 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
 
     def test_forget_without_tokenmanager(self):
         inst = self.make_one('', get_tokenmanager=lambda x: None)
-        self.request.headers = self.token_and_user_id_headers
+        self.request.headers = self.token_headers
         assert inst.forget(self.request) == {}
 
     def test_forget_with_tokenmanger(self):
         tokenmanager = Mock()
         inst = self.make_one('', get_tokenmanager=lambda x: tokenmanager)
-        self.request.headers = self.token_and_user_id_headers
+        self.request.headers = self.token_headers
         assert inst.forget(self.request) == {}
         assert tokenmanager.delete_token.is_called
 
