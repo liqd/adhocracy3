@@ -179,6 +179,19 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
                                 'X-User-Token': 'whatever'}
         assert inst.authenticated_userid(self.request) == self.userid
 
+    def test_authenticated_userid_set_cached_userid(self):
+        tokenmanager = Mock()
+        tokenmanager.get_user_id.return_value = self.userid
+        inst = self.make_one('', get_tokenmanager=lambda x: tokenmanager)
+        self.request.headers = self.token_headers
+        inst.authenticated_userid(self.request)
+        assert self.request.__cached_userid__ == self.userid
+
+    def test_authenticated_userid_get_cached_userid(self):
+        self.request.__cached_userid__ = self.userid
+        inst = self.make_one('', get_tokenmanager=lambda x: None)
+        assert inst.authenticated_userid(self.request) == self.userid
+
     def test_effective_principals_without_headers(self):
         from pyramid.security import Everyone
         from . import Anonymous

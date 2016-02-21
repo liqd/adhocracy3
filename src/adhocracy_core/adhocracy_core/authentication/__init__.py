@@ -160,7 +160,14 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         return self.authenticated_userid(request)
 
     def authenticated_userid(self, request) -> str:
-        """Return authenticated userid or None."""
+        """Return authenticated userid or None.
+
+        THE RESULT IS CACHED for the current request in the request attribute
+        called: __cached_userid__ .
+        """
+        cached_userid = getattr(request, '__cached_userid__', None)
+        if cached_userid:
+            return cached_userid
         settings = request.registry.settings
         if not asbool(settings.get('adhocracy.validate_user_token', True)):
             # used for work in progress thentos integration
@@ -171,8 +178,8 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
             return None
         token = get_user_token(request)
         userid = tokenmanager.get_user_id(token, timeout=self.timeout)
+        request.__cached_userid__ = userid
         return userid
-        # TODO cache
 
     def remember(self, request, userid, **kw) -> [tuple]:
         """Create persistent user session and return authentication headers."""
