@@ -58,14 +58,12 @@ class TokenManagerUnitTest(unittest.TestCase):
 
     def test_get_user_id_with_non_existing_token(self):
         inst = self.make_one(self.context)
-        with pytest.raises(KeyError):
-            inst.get_user_id('wrong_token')
+        assert inst.get_user_id('wrong_token') is None
 
     def test_get_user_id_with_existing_token_but_passed_timeout(self):
         inst = self.make_one(self.context)
         inst.token_to_user_id_timestamp[self.token] = (self.userid, self.timestamp)
-        with pytest.raises(KeyError):
-            inst.get_user_id(self.token, timeout=0)
+        assert inst.get_user_id(self.token, timeout=0) is None
 
     def test_delete_token_with_non_existing_user_id(self):
         inst = self.make_one(self.context)
@@ -146,14 +144,8 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         inst.authenticated_userid.assert_called_with(self.request)
 
     def test_authenticated_userid_without_tokenmanger(self):
-        get_tokenmanager=lambda x: None
+        get_tokenmanager = lambda x: None
         inst = self.make_one('', get_tokenmanager=get_tokenmanager)
-        assert inst.authenticated_userid(self.request) is None
-
-    def test_authenticated_userid_without_root(self):
-        get_tokenmanager=lambda x: Mock()
-        inst = self.make_one('', get_tokenmanager=get_tokenmanager)
-        self.request.root = None
         assert inst.authenticated_userid(self.request) is None
 
     def test_authenticated_userid_with_tokenmanger_valid_token(self):
@@ -167,10 +159,10 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
 
     def test_authenticated_userid_with_tokenmanger_wrong_token(self):
         tokenmanager = Mock()
-        tokenmanager.get_user_id.side_effect = KeyError
+        tokenmanager.get_user_id.return_value = None
         inst = self.make_one('', get_tokenmanager=lambda x: tokenmanager)
         self.request.headers = self.token_headers
-        assert inst.authenticated_userid(self.request) == None
+        assert inst.authenticated_userid(self.request) is None
 
     def test_authenticated_userid_with_token_validation_off_no_token(self):
         tokenmanager = Mock()
@@ -245,47 +237,30 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         inst = self.make_one('')
         assert inst.effective_principals(self.request) == ['cached']
 
-    def test_remember_without_tokenmanager_without_user_locator(self):
+    def test_remember_without_tokenmanager(self):
         inst = self.make_one('', get_tokenmanager=lambda x: None)
-        result = inst.remember(self.request, self.userid)
-        assert result['X-User-Token'] is None
-        assert result['X-User-Path'] is None
+        headers = dict(inst.remember(self.request, self.userid))
+        assert headers['X-User-Token'] is None
 
     def test_remember_with_tokenmanger(self):
         tokenmanager = Mock()
         inst = self.make_one('secret', get_tokenmanager=lambda x: tokenmanager)
         tokenmanager.create_token.return_value = self.token
-        result = inst.remember(self.request, self.userid)
-        assert not result['X-User-Token'] is None
+        headers = dict(inst.remember(self.request, self.userid))
+        assert headers['X-User-Token'] is not None
         assert tokenmanager.create_token.call_args[1] == {'secret': 'secret',
                                                           'hashalg': 'sha512'}
-
-    def test_remember_with_user_locator(self):
-        inst = self.make_one('', get_tokenmanager=lambda x: None)
-        from adhocracy_core.testing import mock_user_locator
-        locator = mock_user_locator(self.config.registry)
-        locator.get_user_by_userid.return_value = self.user
-        result = inst.remember(self.request, self.userid)
-        assert result['X-User-Path'] == 'http://example.com/user/'
-
-    def test_remember_with_user_locator_wrong_user_id(self):
-        inst = self.make_one('', get_tokenmanager=lambda x: None)
-        from adhocracy_core.testing import mock_user_locator
-        locator = mock_user_locator(self.config.registry)
-        locator.get_user_by_userid.return_value = None
-        result = inst.remember(self.request, self.userid + 'WRONGID')
-        assert result['X-User-Path'] is None
 
     def test_forget_without_tokenmanager(self):
         inst = self.make_one('', get_tokenmanager=lambda x: None)
         self.request.headers = self.token_headers
-        assert inst.forget(self.request) == {}
+        assert inst.forget(self.request) == []
 
     def test_forget_with_tokenmanger(self):
         tokenmanager = Mock()
         inst = self.make_one('', get_tokenmanager=lambda x: tokenmanager)
         self.request.headers = self.token_headers
-        assert inst.forget(self.request) == {}
+        assert inst.forget(self.request) == []
         assert tokenmanager.delete_token.is_called
 
     def delete_expired_tokens(self, timeout: float):
@@ -373,8 +348,7 @@ class TokenHeaderAuthenticationPolicyIntegrationTest(unittest.TestCase):
     def test_remember(self):
         from pyramid.security import remember
         self._register_authentication_policy()
-        headers = remember(self.request, self.user_id)
-        assert headers['X-User-Path'] == self.user_url
+        headers = dict(remember(self.request, self.user_id))
         assert headers['X-User-Token'] is not None
 
 
