@@ -392,6 +392,7 @@ export var adhCreateOrShowCommentListing = (
             // create commentable if it doesn't exist yet
             // REFACT: Add Filter "name": scope.key - this requires name index to be enabled in the backend
             adhHttp.get(scope.poolPath, {
+                elements: "paths",
                 "content_type": RIExternalResource.content_type
             }).then(
                 (result) => {

@@ -97,6 +97,7 @@ export class Service {
      */
     public fetchRate(poolPath : string, object : string, subject : string) : angular.IPromise<RIRateVersion> {
         var query : any = {
+            elements: "paths",
             content_type: RIRateVersion.content_type,
             depth: "all",
             tag: "LAST"

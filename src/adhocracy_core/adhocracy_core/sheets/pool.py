@@ -90,11 +90,12 @@ class PoolSheet(AnnotationRessourceSheet):
             list, `url` the resource urls, `content` all resource data.
             Defaults to `path`.
         show_count (bool):
-            add 'count` field, defaults to False.
+            add 'count` field, defaults to True.
         show_frequency (bool):
             add 'aggregateby` field. defaults to False.
         """
         params = params or {}
+        has_custom_filters = params != {}
         filter_view_permission = asbool(self.registry.settings.get(
             'adhocracy.filter_by_view_permission', True))
         if filter_view_permission:
@@ -105,6 +106,10 @@ class PoolSheet(AnnotationRessourceSheet):
             params['only_visible'] = True
         params_query = remove_keys_from_dict(params, self._additional_params)
         appstruct = self.get(params=params_query)
+        if not has_custom_filters and self.meta.isheet is IPool:
+            # workaround to reduce needless but expensive listing of elements
+            params['serialization_form'] = 'omit'
+            params['show_count'] = True
         if params.get('serialization_form', False) == 'omit':
             appstruct['elements'] = []
         if params.get('show_frequency', False):
@@ -123,7 +128,7 @@ class PoolSheet(AnnotationRessourceSheet):
             typ_copy = deepcopy(elements.children[0].typ)
             typ_copy.serialization_form = 'content'
             elements.children[0].typ = typ_copy
-        if params.get('show_count', False):
+        if params.get('show_count', True):
             child = colander.SchemaNode(colander.Integer(),
                                         default=0,
                                         missing=colander.drop,

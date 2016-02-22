@@ -215,18 +215,15 @@ export class Service<Content extends ResourcesBase.Resource> {
     ) : angular.IPromise<Content> {
         var query = (typeof params === "undefined") ? "" : "?" + $.param(params);
 
+        var originalElements = (params || {}).elements || "omit";
         if (config.warmupPoolCache) {
-            if (_.has(params, "elements")) {
-                throw "cannot use warmupPoolCache when elements is set";
-            } else {
-                params["elements"] = "content";
-            }
+            params["elements"] = "content";
         }
 
         return this.adhCache.memoize(path, query,
             () => this.getRaw(path, params, config).then(
                 (response) => AdhConvert.importContent(
-                    <any>response, this.adhMetaApi, this.adhPreliminaryNames, this.adhCache, config.warmupPoolCache),
+                    <any>response, this.adhMetaApi, this.adhPreliminaryNames, this.adhCache, config.warmupPoolCache, originalElements),
                 AdhError.logBackendError));
     }
 
