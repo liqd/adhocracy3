@@ -8,7 +8,6 @@ import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
 import * as AdhWebSocketModule from "../WebSocket/Module";
 
 import * as AdhEmbed from "../Embed/Embed";
-import * as AdhListing from "../Listing/Listing";
 
 import * as AdhMapping from "./Mapping";
 
@@ -64,5 +63,5 @@ export var register = (angular) => {
         .directive("adhMapListingInternal", ["adhConfig", "adhHttp", AdhMapping.mapListingInternal])
         .directive("adhMapSwitch", ["adhConfig", AdhMapping.mapSwitch])
         .directive("adhMapListing", ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
-                new AdhMapping.Listing(new AdhListing.ListingPoolAdapter()).createDirective(adhConfig, adhWebSocket)]);
+                new AdhMapping.Listing().createDirective(adhConfig, adhWebSocket)]);
 };

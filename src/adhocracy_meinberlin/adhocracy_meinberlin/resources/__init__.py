@@ -8,5 +8,6 @@ def includeme(config):
     config.include('.burgerhaushalt')
     config.include('.alexanderplatz')
     config.include('.stadtforum')
+    config.include('.collaborative_text')
     config.include('.root')
     config.include('.subscriber')
