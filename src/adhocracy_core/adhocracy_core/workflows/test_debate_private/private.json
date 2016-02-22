@@ -4,11 +4,10 @@
            {"name": "opin"}
           }},
  {"path": "/opin",
-  "content_type": "adhocracy_euth.resources.idea_collection.IProcess",
+  "content_type": "adhocracy_core.resources.process.IProcess",
   "data": {"adhocracy_core.sheets.name.IName":
-           {"name": "idea_collection"},
+           {"name": "collaborative_text"},
            "adhocracy_core.sheets.title.ITitle":
-           {"title": "Idea collection participation process"}
+           {"title": "Collaborative text participation process"}
           }}
 ]
-
