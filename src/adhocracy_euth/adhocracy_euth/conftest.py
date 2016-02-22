@@ -5,8 +5,6 @@ from pytest import fixture
 @fixture(scope='session')
 def app_settings(app_settings) -> dict:
     """Return settings to start the test wsgi app."""
-    # disable creating a default group, this causes
-    # ZODB.POSException.InvalidObjectReference
     app_settings['adhocracy.add_default_group'] = True
     return app_settings
 
