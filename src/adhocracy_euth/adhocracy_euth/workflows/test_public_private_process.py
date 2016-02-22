@@ -28,8 +28,6 @@ class TestPrivatePublicProcess:
                               process_url_private,
                               process_url_public,
                               app_admin):
-        # import sys
-        # sys.debug = False
         root = get_root(app_admin.app_router)
         json_file_private = str(datadir.join('private.json'))
         add_resources(app_admin.app_router, json_file_private)
