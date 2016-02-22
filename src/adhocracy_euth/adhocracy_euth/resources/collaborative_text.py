@@ -13,7 +13,7 @@ process_meta = document_process.document_process_meta._replace(
 )
 
 
-class IPrivateProcess(document_process.IDocumentProcess):
+class IPrivateProcess(IProcess):
     """Private collaborative text participation process."""
 
 

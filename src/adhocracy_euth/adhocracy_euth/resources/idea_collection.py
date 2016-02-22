@@ -15,7 +15,7 @@ process_meta = process.process_meta._replace(
 )
 
 
-class IPrivateProcess(process.IProcess):
+class IPrivateProcess(IProcess):
     """Private idea collection participation process."""
 
 
