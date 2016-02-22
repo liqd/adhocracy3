@@ -4,10 +4,11 @@ import * as AdhConfig from "../../../Config/Config";
 import * as AdhHttp from "../../../Http/Http";
 import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
 
-import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIName from "../../../../Resources_/adhocracy_core/sheets/name/IName";
 import * as SIProcessPrivateSettings from "../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IProcessPrivateSettings";
 import * as SIProcessSettings from "../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IProcessSettings";
+import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
+import * as SIWorkflowAssignment from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 import RIProcess from "../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProcess";
 
 var pkgLocation = "/Meinberlin/Bplan/Process";
@@ -50,6 +51,14 @@ var postCreate = (
     });
     process.data[SIProcessPrivateSettings.nick] = new SIProcessPrivateSettings.Sheet({
         office_worker_email: scope.data.officeWorkerEmail
+    });
+    process.data[SIWorkflowAssignment.nick] = new SIWorkflowAssignment.Sheet({
+        state_data: [{
+            start_date: scope.data.startDate,
+            end_date: scope.data.endDate,
+            name: "",
+            description: ""
+        }]
     });
 
     return adhHttp.deepPost([process]);
