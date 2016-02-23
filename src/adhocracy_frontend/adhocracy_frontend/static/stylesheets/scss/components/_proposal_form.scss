@@ -1,5 +1,4 @@
 .proposal-form {
-    background-color: $color-background-base-introvert;
     bottom: 0;
     padding: 0;
     position: absolute;
@@ -14,9 +13,12 @@
     .map-buttons {
         background: $color-background-base;
     }
+
+    .form-footer {
+        @include rem(padding, 0 1rem);
+    }
 }
 
 .proposal-form-upper {
     @include rem(padding, 1rem);
-    background: $color-background-base;
 }
