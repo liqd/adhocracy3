@@ -145,6 +145,8 @@ export class Service {
             $location.url(search.initialUrl || "/");
             $location.replace();
 
+            this.adhConfig.custom["hide_header"] = this.adhConfig.custom["hide_header"] || search.hasOwnProperty("noheader");
+
             return {
                 skip: true
             };
