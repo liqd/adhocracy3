@@ -68,7 +68,7 @@ import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITi
 import * as SIVersionable from "../../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/Mercator/2015/Proposal";
+export var pkgLocation = "/Mercator/2015/Proposal";
 
 
 export interface IScopeData {
