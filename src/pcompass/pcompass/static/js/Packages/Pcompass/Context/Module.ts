@@ -12,8 +12,6 @@ import * as AdhPcompassWorkbench from "../Workbench/Workbench";
 
 import RIPcompassProcess from "../../../Resources_/adhocracy_pcompass/resources/request/IProcess";
 
-import * as Context from "./Context";
-
 
 export var moduleName = "adhPcompassContext";
 
@@ -30,7 +28,6 @@ export var register = (angular) => {
             adhEmbedProvider.registerContext("pcompass");
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            adhResourceAreaProvider.template("pcompass", ["adhConfig", "$templateRequest", Context.areaTemplate]);
             AdhPcompassWorkbench.registerRoutes(
                 RIPcompassProcess.content_type,
                 "pcompass"
