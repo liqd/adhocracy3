@@ -1,7 +1,5 @@
 import * as AdhEmbedModule from "../../../Embed/Module";
-import * as AdhPermissionsModule from "../../../Permissions/Module";
 import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 
 import * as AdhEuthWorkbenchModule from "../Workbench/Module";
 
@@ -26,7 +24,6 @@ export var register = (angular) => {
             adhEmbedProvider.registerContext("euth");
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            adhResourceAreaProvider.template("euth", ["adhConfig", "$templateRequest", Context.areaTemplate]);
             AdhEuthWorkbench.registerRoutes(
                RIEuthProcess.content_type,
                 "euth"

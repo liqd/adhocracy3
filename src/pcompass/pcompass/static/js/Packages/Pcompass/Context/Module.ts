@@ -1,7 +1,5 @@
 import * as AdhEmbedModule from "../../Embed/Module";
-import * as AdhPermissionsModule from "../../Permissions/Module";
 import * as AdhResourceAreaModule from "../../ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
 
 import * as AdhPcompassWorkbenchModule from "../Workbench/Module";
 
@@ -20,9 +18,7 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhEmbedModule.moduleName,
             AdhPcompassWorkbenchModule.moduleName,
-            AdhPermissionsModule.moduleName,
             AdhResourceAreaModule.moduleName,
-            AdhTopLevelStateModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerContext("pcompass");
