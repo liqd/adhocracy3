@@ -194,10 +194,6 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     @include action-section-button;
     float: right;
 
-    &:hover, &:focus {
-        color: $color-brand-three-normal;
-    }
-
     i {
         @include rem(font-size, 23px);
     }

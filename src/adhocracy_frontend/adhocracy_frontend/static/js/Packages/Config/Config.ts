@@ -18,7 +18,8 @@ export interface IService {
     embedded : boolean;
     trusted_domains : string[];
     locale : string;
-    support_email : string;
+    support_email? : string;
+    support_url? : string;
     captcha_enabled : boolean;
     captcha_url : string;
     // the place for instance specific customizations

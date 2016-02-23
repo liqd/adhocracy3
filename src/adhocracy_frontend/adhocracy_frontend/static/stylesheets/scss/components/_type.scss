@@ -231,7 +231,7 @@ table {
     td, th {
         @include rem(padding, 0.5rem);
         @include text-align(start);
-        border-top: 1px solid $color-structure-border;
+        border-top: 1px solid $color-structure-introvert;
         vertical-align: top;
     }
 
@@ -414,7 +414,7 @@ pre {
     @include rem(padding, 0.7rem);
     display: block;
     background-color: $color-structure-introvert;
-    border: 1px solid $color-structure-border;
+    border: 1px solid $color-structure-introvert;
     overflow: auto;
 
     code {

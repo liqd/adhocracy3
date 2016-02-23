@@ -9,7 +9,9 @@ import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 import * as AdhWebSocketModule from "../WebSocket/Module";
 
 import * as AdhRate from "./Rate";
-import * as Adapter from "./Adapter";
+
+import * as SILikeable from "../../Resources_/adhocracy_core/sheets/rate/ILikeable";
+import * as SIRateable from "../../Resources_/adhocracy_core/sheets/rate/IRateable";
 
 
 export var moduleName = "adhRate";
@@ -42,7 +44,7 @@ export var register = (angular) => {
             "adhTopLevelState",
             "adhResourceArea",
             "adhDone",
-            AdhRate.directiveFactory("/Rate.html", new Adapter.RateAdapter())])
+            AdhRate.directiveFactory("/Rate.html", SIRateable.nick)])
         .directive("adhLike", [
             "$q",
             "adhRate",
@@ -56,7 +58,7 @@ export var register = (angular) => {
             "adhTopLevelState",
             "adhResourceArea",
             "adhDone",
-            AdhRate.directiveFactory("/Like.html", new Adapter.LikeAdapter())])
+            AdhRate.directiveFactory("/Like.html", SILikeable.nick)])
         .directive("adhOpinion", [
             "$q",
             "adhRate",
@@ -70,5 +72,5 @@ export var register = (angular) => {
             "adhTopLevelState",
             "adhResourceArea",
             "adhDone",
-            AdhRate.directiveFactory("/Opinion.html", new Adapter.RateAdapter())]);
+            AdhRate.directiveFactory("/Opinion.html", SIRateable.nick)]);
 };

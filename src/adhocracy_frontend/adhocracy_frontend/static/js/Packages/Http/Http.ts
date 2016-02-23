@@ -32,6 +32,7 @@ export var logBackendError : (response : angular.IHttpPromiseCallbackArg<IBacken
 
 export interface IHttpConfig {
     noCredentials? : boolean;
+    noExport? : boolean;
 }
 
 export interface IHttpOptionsConfig extends IHttpConfig {
@@ -56,6 +57,7 @@ export interface IOptions {
     delete : boolean;
     hide : boolean;
     canPost(contentType : string) : boolean;
+    canPut(sheetNick : string) : boolean;
 }
 
 
@@ -67,7 +69,8 @@ export var emptyOptions : IOptions = {
     HEAD: false,
     delete: false,
     hide: false,
-    canPost: (contentType) => false
+    canPost: (contentType) => false,
+    canPut: (sheetNick) => false
 };
 
 
@@ -151,6 +154,14 @@ export class Service<Content extends ResourcesBase.Resource> {
                 } else {
                     return false;
                 }
+            },
+            canPut: (sheetNick : string) => {
+                if (raw.data.PUT) {
+                    var putOptions = raw.data.PUT.request_body.data;
+                    return _.has(putOptions, sheetNick);
+                } else {
+                    return false;
+                }
             }
         };
     }
@@ -204,18 +215,15 @@ export class Service<Content extends ResourcesBase.Resource> {
     ) : angular.IPromise<Content> {
         var query = (typeof params === "undefined") ? "" : "?" + $.param(params);
 
+        var originalElements = (params || {}).elements || "omit";
         if (config.warmupPoolCache) {
-            if (_.has(params, "elements")) {
-                throw "cannot use warmupPoolCache when elements is set";
-            } else {
-                params["elements"] = "content";
-            }
+            params["elements"] = "content";
         }
 
         return this.adhCache.memoize(path, query,
             () => this.getRaw(path, params, config).then(
                 (response) => AdhConvert.importContent(
-                    <any>response, this.adhMetaApi, this.adhPreliminaryNames, this.adhCache, config.warmupPoolCache),
+                    <any>response, this.adhMetaApi, this.adhPreliminaryNames, this.adhCache, config.warmupPoolCache, originalElements),
                 AdhError.logBackendError));
     }
 
@@ -235,7 +243,11 @@ export class Service<Content extends ResourcesBase.Resource> {
     public put(path : string, obj : Content, config : IHttpPutConfig = {}) : angular.IPromise<Content> {
         var _self = this;
 
-        return this.putRaw(path, AdhConvert.exportContent(this.adhMetaApi, obj, config.keepMetadata), config)
+        if (!config.noExport) {
+            obj = AdhConvert.exportContent(_self.adhMetaApi, obj, config.keepMetadata);
+        }
+
+        return this.putRaw(path, obj, config)
             .then(
                 (response) => {
                     _self.adhCache.invalidateUpdated(response.data.updated_resources);
@@ -297,7 +309,11 @@ export class Service<Content extends ResourcesBase.Resource> {
     public post(path : string, obj : Content, config : IHttpConfig = {}) : angular.IPromise<Content> {
         var _self = this;
 
-        return _self.postRaw(path, AdhConvert.exportContent(_self.adhMetaApi, obj), config)
+        if (!config.noExport) {
+            obj = AdhConvert.exportContent(_self.adhMetaApi, obj);
+        }
+
+        return _self.postRaw(path, obj, config)
             .then(
                 (response) => {
                     this.adhCache.invalidateUpdated(response.data.updated_resources);

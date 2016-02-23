@@ -26,7 +26,7 @@ The button has the is-rate-button-active state.
     &.is-disabled {
         .like-button, .like-button:hover, .like-button:focus {
             background: $color-structure-normal;
-            color: $color-structure-extrovert;
+            color: $color-structure-introvert;
 
             &:before {
                 border-right-color: $color-structure-normal;
@@ -47,14 +47,14 @@ $arrow-width: 1rem;
     margin-left: $arrow-width;
     text-transform: uppercase;
     line-height: $line-height;
-    background-color: $color-brand-one-normal;
-    color: $color-text-inverted;
+    background-color: $color-button-cta-base;
+    color: $color-button-cta-text;
     cursor: pointer;
     text-align: center;
     text-decoration: none;
 
     &:before {
-        @include rem(border-right, $arrow-width solid $color-brand-one-normal);
+        @include rem(border-right, $arrow-width solid $color-button-cta-base);
         border-top: $line-height/2 * 1em solid $color-structure-transparent;
         border-bottom: $line-height/2 * 1em solid $color-structure-transparent;
         content: "";
@@ -66,11 +66,11 @@ $arrow-width: 1rem;
     }
 
     &:hover, &:focus {
-        color: $color-text-inverted;
-        background-color: $color-brand-one-extrovert;
+        color: $color-button-cta-text;
+        background-color: $color-button-cta-hover-background;
 
         &:before {
-            border-right-color: $color-brand-one-extrovert;
+            border-right-color: $color-button-cta-hover-background;
         }
     }
 
@@ -90,7 +90,7 @@ $arrow-width: 1rem;
         // That's why it is skipped here.
         &:hover {
             // scss-lint:disable NestingDepth
-            background: $color-brand-three-normal;
+            background: $color-button-cta-base;
 
             .supporting .text-unsupport {
                 display: block;
@@ -101,7 +101,7 @@ $arrow-width: 1rem;
             }
 
             &:before {
-                border-right-color: $color-brand-three-normal;
+                border-right-color: $color-button-cta-base;
             }
         }
     }
@@ -249,8 +249,57 @@ Click show results
     }
 }
 
+/*doc
+---
+title: Opinion
+name: opionion
+parent: rate
+---
+
+The Opinion widget is very similar in functionaility to the Rate widget, but it
+is bigger and exposes more details.
+
+```html_example
+<div class="opinion">
+    <span class="opinion-button-container">
+        <a href="#" class="opinion-yes opinion-button">yes</a>
+    </span>
+    <span class="opinion-button-container">
+        <a href="#" class="opinion-no opinion-button">no</a>
+    </span>
+    <a href="#" class="opinion-result-toggle">show results</a>
+</div>
+
+<div class="opinion">
+    <span class="opinion-results">
+        <span class="opinion-bar-container">
+            <span
+                class="opinion-bar opinion-bar-yes"
+                style="width: 19%"></span>
+        </span>
+        <span class="opinion-result-numerics">
+            <span class="opinion-result-yes">
+                <strong>YES</strong>
+                19
+                <span class="opinion-result-absolute">(6 votes)</span>
+            </span>
+            <span class="opinion-result-total">32 total votes</span>
+            <span class="opinion-result-no">
+                <span class="opinion-result-absolute">(26 votes)</span>
+                81
+                <strong>NO</strong>
+            </span>
+        </span>
+    </span>
+    <a href="#" class="opinion-result-toggle">vote</a>
+</div>
+```
+*/
 .opinion {
     @include clearfix;
+    @include rem(margin-bottom, 4.5rem);
+    @include rem(padding-bottom, 2.5rem);
+    position: relative;
     width: 100%;
 }
 
@@ -303,7 +352,7 @@ Click show results
     @include clearfix;
     @include rem(font-size, $font-size-small);
     display: block;
-    position: relative;
+    position: absolute;
     width: 100%;
 
     .opinion-result-yes {
@@ -326,16 +375,12 @@ Click show results
     }
 }
 
-.opinion-result-absolute {
-    @include rem(margin-left, 20px);
-}
-
-.opinion-result-no {
-    .opinion-result-absolute {
-        @include rem(margin-right, 20px);
-    }
-}
-
 .is-opinion-none .opinion-bar {
     background-color: $color-text-normal;
+}
+
+.opinion-result-toggle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
 }

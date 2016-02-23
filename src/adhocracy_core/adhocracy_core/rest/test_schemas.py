@@ -642,8 +642,7 @@ class TestGETPoolRequestSchema:
 
     def test_deserialize_empty(self, inst, context):
         inst = inst.bind(context=context)
-        assert inst.deserialize({}) == {'depth': 1,
-                                        'root': context}
+        assert inst.deserialize({}) == {}
 
     def test_deserialize_valid(self, inst, context):
         from hypatia.interfaces import IIndexSort
@@ -765,7 +764,7 @@ class TestGETPoolRequestSchema:
     def test_deserialize_depth_default(self, inst, context):
         data = {}
         inst = inst.bind(context=context)
-        assert inst.deserialize(data)['depth'] == 1
+        assert inst.deserialize(data) == {}
 
     @mark.parametrize('value', ['-7', '1.5'])
     def test_deserialize_depth_invalid(self, inst, value, context):

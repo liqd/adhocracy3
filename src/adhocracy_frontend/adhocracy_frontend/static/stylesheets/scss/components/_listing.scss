@@ -29,25 +29,9 @@ a form for creating new elements. This form is then always visible.
     margin: 0;
 }
 
-// starting animations
-.listing-element {
-    &.ng-enter {
-        @include transition(all 0.3s);
-        @include opacity(0.5);
-        background: $color-function-animation-enter;
-
-        // destination animations
-        &.ng-enter-active {
-            @include opacity(1);
-            background: $color-background-base;
-        }
-    }
-}
-
 .listing-create-form {
-    @include rem(margin-bottom, 1rem);
+    @include rem(margin-bottom, 2rem);
     @include rem(padding, 1rem 20px 12px);
-    background-color: $color-structure-introvert;
 
     .comment-create-form-text {
         @include rem(margin-bottom, 20px);
@@ -62,6 +46,11 @@ a form for creating new elements. This form is then always visible.
     }
 }
 
+.listing-create-button {
+    @include rem(margin, 0.5em 0 2rem);
+    text-align: center;
+}
+
 .listing-elements + .listing-create-form {
     margin-top: 0;
 }
@@ -69,7 +58,7 @@ a form for creating new elements. This form is then always visible.
 .load-more {
     display: block;
     line-height: 2;
-    background: $color-structure-extrovert;
+    background: $color-structure-introvert;
     color: $color-text-inverted;
     text-align: center;
     text-decoration: none;

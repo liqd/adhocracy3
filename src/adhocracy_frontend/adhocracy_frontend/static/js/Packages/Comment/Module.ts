@@ -12,13 +12,11 @@ import * as AdhRateModule from "../Rate/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
 import * as AdhComment from "./Comment";
-import * as Adapter from "./Adapter";
 
 
 export var moduleName = "adhComment";
 
 export var register = (angular) => {
-    var adapter = new Adapter.CommentAdapter();
     angular
         .module(moduleName, [
             AdhAngularHelpersModule.moduleName,
@@ -52,7 +50,7 @@ export var register = (angular) => {
             "adhRecursionHelper",
             "$window",
             "$q",
-            AdhComment.commentDetailDirective(adapter)])
-        .directive("adhCommentCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", AdhComment.commentCreateDirective(adapter)])
+            AdhComment.commentDetailDirective])
+        .directive("adhCommentCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", AdhComment.commentCreateDirective])
         .directive("adhCommentColumn", ["adhConfig", AdhComment.commentColumnDirective]);
 };

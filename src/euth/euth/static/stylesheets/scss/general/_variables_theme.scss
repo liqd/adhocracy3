@@ -1,30 +1,21 @@
 // Text colors
 $color-text-normal: #333;
-$color-text-highlight-normal: #00b4cc;
-
-// Function colors
-$color-function-valid: #73bf44;
-$color-function-invalid: #f00;
+$color-text-highlight-normal: #008dd0;
 
 // Brand colors
-$color-brand-one-normal: #00b4cc;
-$color-brand-one-introvert: darken($color-brand-one-normal, 10%);
-$color-brand-one-extrovert: lighten($color-brand-one-normal, 10%);
-$color-brand-two-normal: #1468b3;
-$color-brand-two-introvert: #204379;
-$color-brand-two-extrovert: $color-brand-two-introvert;
-$color-brand-three-normal: $color-brand-one-normal;
-$color-brand-three-extrovert: lighten($color-brand-three-normal, 10%);
-$color-brand-three-extrovert: lighten($color-brand-three-normal, 10%);
+$color-brand-one-normal: #018dd0;
+$color-brand-one-introvert: #0071a7;
+$color-brand-one-extrovert: #00acff;
+$color-brand-two-normal: #fab61b;
+$color-brand-two-introvert: #cb8d00;
+$color-brand-two-extrovert: #ffb100;
 
-$font-family-normal: "Open Sans", sans-serif;
-$font-size-large: 18px;
-$font-size-huge: 20px;
-
-//images
-$thumbnail-width: 105px;
-$thumbnail-height: 90px;
+$color-text-highlight-introvert: $color-brand-one-introvert;
+$color-text-highlight-extrovert: $color-brand-one-extrovert;
 
 //Buttons
-$color-button-cta-base: $color-brand-two-normal;
-$color-button-cta-hover-background: $color-brand-two-introvert;
+$color-button-text: $color-brand-one-normal;
+$color-button-text-hover: $color-brand-one-introvert;
+$color-button-cta-base: $color-brand-one-normal;
+$color-button-cta-hover-background: $color-brand-one-introvert;
+$color-button-cta-active-background: $color-brand-one-extrovert;

@@ -6,16 +6,6 @@
 
 .comment-create-form,
 .comment-children-edit-form {
-    background: $color-background-base-introvert;
-    margin: 0;
-    padding: 0;
-
-    .comment-create-form-text,
-    .comment-edit-form-text {
-        @include rem(min-height, 70px);
-        margin: 0;
-    }
-
     .form-footer-button {
         @include rem(font-size, $font-size-small);
         @include rem(line-height, 24px);
@@ -56,16 +46,6 @@
 .comment-children-create-form,
 .comment-children-edit-form {
     @include rem(margin-bottom, 20px);
-
-    .comment-create-form, & {
-        background: transparent;
-
-        .comment-create-form-text,
-        .comment-edit-form-text {
-            background: $color-background-base-introvert;
-            border-left: 1px solid $color-text-highlight-normal;
-        }
-    }
 }
 
 .comment-main {

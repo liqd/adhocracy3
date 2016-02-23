@@ -91,7 +91,7 @@ export var bindPath = (
         };
     };
 
-    adhHttp.get(scope.badgesPath).then((badges) => {
+    adhHttp.get(scope.badgesPath, {elements: "paths"}).then((badges) => {
         var badgelist : string[] = badges.data[SIPool.nick].elements;
         $q.all(_.map(badgelist, (b) => adhHttp.get(b))).then((result) => {
             scope.badges = _.map(result, getBadge);
@@ -124,9 +124,9 @@ export var fill = (resource, scope, userPath : string) => {
         description: scope.data.description
     };
     clone.data[SIBadgeAssignment.nick] = {
-        badge : scope.data.badge,
-        object : scope.badgeablePath,
-        subject : userPath
+        badge: scope.data.badge,
+        object: scope.badgeablePath,
+        subject: userPath
     };
     return clone;
 };

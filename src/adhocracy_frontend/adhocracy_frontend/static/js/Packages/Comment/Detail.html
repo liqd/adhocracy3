@@ -75,7 +75,7 @@
 
     <div class="comment-children">
         <adh-comment
-            data-ng-repeat="comment in data.comments | orderBy:'-'"
+            data-ng-repeat="comment in data.comments"
             data-path="{{comment}}"
             data-on-submit="update">
         </adh-comment>

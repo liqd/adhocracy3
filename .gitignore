@@ -14,6 +14,7 @@ __pycache__
 /.mr.developer.cfg
 .sass-cache
 .idea
+.cache
 /bin
 /docs/build
 /docs/styleguide/*
@@ -74,3 +75,4 @@ src/aula/aula/build/
 RELEASE-VERSION
 *-requirements.txt
 /src/Mako/
+/styleguides

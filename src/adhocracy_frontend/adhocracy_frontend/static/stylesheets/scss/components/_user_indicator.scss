@@ -31,21 +31,12 @@ It is usually used in the header bar.
     .user-indicator-login,
     .user-indicator-register {
         @include rem(font-size, $font-size-plus);
-        color: $color-text-highlight-introvert;
         font-variant: small-caps;
         text-transform: lowercase;
 
         &:hover, &:focus {
             text-decoration: underline;
         }
-
-        &:active {
-            color: $color-text-normal;
-        }
-    }
-
-    .user-indicator-login-icon {
-        display: none;
     }
 }
 
