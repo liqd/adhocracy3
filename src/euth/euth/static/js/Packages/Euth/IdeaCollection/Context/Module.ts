@@ -12,8 +12,6 @@ import * as AdhEuthWorkbench from "../Workbench/Workbench";
 
 import RIEuthProcess from "../../../../Resources_/adhocracy_euth/resources/idea_collection/IProcess";
 
-import * as Context from "./Context";
-
 
 export var moduleName = "adhPcompassContext";
 
@@ -22,9 +20,7 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhEmbedModule.moduleName,
             AdhEuthWorkbenchModule.moduleName,
-            AdhPermissionsModule.moduleName,
             AdhResourceAreaModule.moduleName,
-            AdhTopLevelStateModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerContext("euth");
