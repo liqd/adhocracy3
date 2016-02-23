@@ -192,7 +192,7 @@ User Authentication
 -------------------
 
 Once the user is logged in, the backend must add add header field to all
-HTTP requests made for the user: "X-User-Token". It`s value
+HTTP requests made for the user: "X-User-Token". Its value
 is the received "user_token",
 respectively. The backend validates the token. If it's valid and not
 expired, the requested action is performed in the name and with the rights
