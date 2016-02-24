@@ -558,6 +558,13 @@ def remove_tag_resources(root):  # pragma: no cover
 
 
 @log_migration
+def reindex_interfaces_catalog_for_root(root):  # pragma: no cover
+    """Reindex 'interfaces' catalog for root."""
+    catalogs = find_service(root, 'catalogs')
+    catalogs.reindex_index(root, 'interfaces')
+
+
+@log_migration
 def add_description_sheet_to_organisations(root):  # pragma: no cover
     """Add description sheet to organisations."""
     migrate_new_sheet(root, IOrganisation, IDescription)
@@ -640,6 +647,7 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_image_reference_to_users)
     config.add_evolution_step(update_asset_download_children)
     config.add_evolution_step(recreate_all_image_size_downloads)
+    config.add_evolution_step(reindex_interfaces_catalog_for_root)
     config.add_evolution_step(remove_tag_resources)
     config.add_evolution_step(add_description_sheet_to_organisations)
     config.add_evolution_step(add_description_sheet_to_processes)
