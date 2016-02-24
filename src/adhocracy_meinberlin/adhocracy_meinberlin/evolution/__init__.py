@@ -116,12 +116,15 @@ def change_bplan_officeworker_email_representation(root):  # pragma: no cover
     objectmap = find_objectmap(root)
     graph = find_graph(root)
     for bplan in bplaene:
-        office_worker = graph.get_references_for_isheet(
+        process_settings_ref = graph.get_references_for_isheet(
             bplan,
-            IProcessSettings)['office_worker'][0]
-        private_settings = get_sheet(bplan, IProcessPrivateSettings)
-        private_settings.set({'office_worker_email': office_worker.email})
-        objectmap.disconnect(bplan, office_worker, OfficeWorkerUserReference)
+            IProcessSettings)
+        if 'office_worker' in process_settings_ref:
+            office_worker = process_settings_ref['office_worker'][0]
+            private_settings = get_sheet(bplan, IProcessPrivateSettings)
+            private_settings.set({'office_worker_email': office_worker.email})
+            objectmap.disconnect(bplan, office_worker,
+                                 OfficeWorkerUserReference)
 
 
 def includeme(config):  # pragma: no cover
