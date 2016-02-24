@@ -20,7 +20,7 @@ class ConfigViewTest(unittest.TestCase):
              'rest_url': 'http://localhost:6541',
              'rest_platform_path': '/adhocracy/',
              'trusted_domains': [],
-             'support_email': 'support@unconfigured.domain',
+             'support_email': None,
              'locale': 'en',
              'site_name': 'Adhocracy',
              'netiquette_url': '',
@@ -36,9 +36,10 @@ class ConfigViewTest(unittest.TestCase):
              'profile_images_enabled': True,
              'captcha_enabled': False,
              'captcha_url': 'http://localhost:6542/',
+             'support_url': None,
              'terms_url': {
-                'de' : None,
-                'en' : None
+                'de': None,
+                'en': None
              }}
 
     def test_ws_url_without_ws_url_settings_scheme_https(self):
@@ -50,7 +51,7 @@ class ConfigViewTest(unittest.TestCase):
         request = testing.DummyRequest(scheme='http')
         request.registry.settings = {'adhocracy.frontend.ws_url': 'ws://l.x'}
         assert self.call_fut(request)['ws_url'] == 'ws://l.x'
-        
+
     def test_redirect_url_with_redirect_url_settings(self):
         request = testing.DummyRequest(scheme='http')
         request.registry.settings = {'adhocracy.redirect_url': '/r/example/'}
