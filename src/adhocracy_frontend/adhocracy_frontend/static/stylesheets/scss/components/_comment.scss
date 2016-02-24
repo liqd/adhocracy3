@@ -54,7 +54,7 @@ is selected, no state is applied.
 }
 
 .comment {
-    @include rem(margin-bottom, 2rem);
+    @include rem(margin, 1rem 0);
     @include rem(padding, 0 1rem);
 
     &.is-not-selected {
