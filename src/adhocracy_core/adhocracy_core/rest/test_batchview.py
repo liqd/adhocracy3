@@ -48,6 +48,7 @@ class TestBatchView:
         request_.registry.changelog = changelog
         request_.invoke_subrequest = mock_invoke_subrequest
         request_.method = 'POST'
+        request_.json = {}
         return request_
 
     @fixture
