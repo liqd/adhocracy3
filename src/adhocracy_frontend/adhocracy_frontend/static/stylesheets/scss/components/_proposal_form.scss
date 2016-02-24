@@ -1,0 +1,51 @@
+/*doc
+---
+title: Proposal Form
+name: proposal-form
+category: Proposal
+---
+
+A simple proposal form.
+
+```html_example
+<form class="proposal-form">
+
+    <div class="proposal-form-upper">
+        <label>
+            <span class="label-text">Title</span>
+            <input type="text" name="title" minlength="3">
+        </label>
+        <label>
+            <span class="label-text">Detail</span>
+            <textarea></textarea>
+        </label>
+    </div>
+
+</form>
+```
+*/
+
+.proposal-form {
+    bottom: 0;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+
+    label,
+    .input-error {
+        display: block;
+    }
+
+    .map-buttons {
+        background: $color-background-base;
+    }
+
+    .form-footer {
+        @include rem(padding, 0 1rem);
+    }
+}
+
+.proposal-form-upper {
+    @include rem(padding, 1rem);
+}
