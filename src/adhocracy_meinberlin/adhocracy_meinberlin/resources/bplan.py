@@ -3,6 +3,7 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import process
 from adhocracy_core.resources import proposal
 import adhocracy_meinberlin.sheets.bplan
+import adhocracy_core.sheets.image
 
 
 class IProposalVersion(proposal.IProposalVersion):
@@ -41,6 +42,7 @@ process_meta = process.process_meta._replace(
     workflow_name = 'bplan',
     extended_sheets=(adhocracy_meinberlin.sheets.bplan.IProcessSettings,
                      adhocracy_meinberlin.sheets.bplan.IProcessPrivateSettings,
+                     adhocracy_core.sheets.image.IImageReference,
                      ),
 )
 
