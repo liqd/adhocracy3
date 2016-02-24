@@ -56,7 +56,7 @@ var postCreate = (
         state_data: [{
             start_date: scope.data.startDate,
             end_date: scope.data.endDate,
-            name: "",
+            name: "participate",
             description: ""
         }]
     });
