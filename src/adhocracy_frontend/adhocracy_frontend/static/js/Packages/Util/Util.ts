@@ -84,17 +84,6 @@ export function formatString(format : string, ...args : string[]) {
 }
 
 
-/**
- * Given a list of version paths this function returns a list of corresponding
- * items, but each item only once.
- */
-export function eachItemOnce(refs : string[]) : string[] {
-    "use strict";
-
-    return _.uniq(_.map(refs, parentPath));
-};
-
-
 export interface IVertex<vertexType> {
     content : vertexType;
     incoming : string[];

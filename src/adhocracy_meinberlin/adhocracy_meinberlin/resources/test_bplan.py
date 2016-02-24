@@ -62,8 +62,11 @@ class TestProcess:
         assert meta.is_implicit_addable is True
         assert meta.permission_create == 'create_process'
         assert meta.extended_sheets == (sheets.bplan.IProcessSettings,
+                                        sheets.bplan.IProcessPrivateSettings,
                                         IEmbed,
                                         )
+        assert meta.extended_sheets == (sheets.bplan.IProcessSettings,
+                                        sheets.bplan.IProcessPrivateSettings)
         assert meta.permission_create == 'create_process'
         assert meta.workflow_name == 'bplan'
 

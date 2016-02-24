@@ -378,7 +378,7 @@ class PoolQueryDepth(SchemaNode):
     """
 
     schema_type = colander.Integer
-    missing = 1
+    missing = colander.drop
     validator = colander.Range(min=1)
 
 

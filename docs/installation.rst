@@ -13,7 +13,7 @@ Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 5. ruby ruby-dev
 6. gettext
 
-If you don't use the custom compiled python (see below) you need some
+If you don't use the custom compiled python (see below) you need
 some basic dependencies to build PIL (python image library):
 
 6. libjpeg8-dev zlib1g-dev (http://pillow.readthedocs.org/en/latest/installation.html)
