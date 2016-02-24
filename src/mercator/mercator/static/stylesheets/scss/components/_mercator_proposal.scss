@@ -15,11 +15,6 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
         display: block;
     }
 
-    .form-inline label {
-        @include inline-block;
-        @include rem(padding-right, 1rem);
-    }
-
     fieldset {
         @include rem(padding, 0 0 0 1.6rem);
         border: 0;
