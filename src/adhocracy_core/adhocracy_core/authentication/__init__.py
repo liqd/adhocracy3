@@ -20,6 +20,12 @@ from adhocracy_core.schema import Resource
 Anonymous = 'system.Anonymous'
 """The anonymous (not authenticated) principal"""
 
+UserTokenHeader = 'X-User-Token'
+"""The request header parameter to set the authentication token."""
+
+UserPathHeader = 'X-User-Path'
+"""Deprecated: The optional request header to set the userid."""
+
 
 @implementer(ITokenManger)
 class TokenMangerAnnotationStorage:
@@ -171,15 +177,26 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         settings = request.registry.settings
         if not asbool(settings.get('adhocracy.validate_user_token', True)):
             # used for work in progress thentos integration
-            userid = get_user_path(request)
+            userid = self._get_user_path(request)
             return userid
         tokenmanager = self.get_tokenmanager(request)
         if tokenmanager is None:
             return None
-        token = get_user_token(request)
+        token = request.headers.get(UserTokenHeader, None)
         userid = tokenmanager.get_user_id(token, timeout=self.timeout)
         request.__cached_userid__ = userid
         return userid
+
+    def _get_user_path(self, request: IRequest) -> str:
+        """Return normalised X-User-Path request header or None."""
+        user_path_header = request.headers.get(UserPathHeader, None)
+        user_path = None
+        if user_path_header is not None:
+            schema = Resource().bind(request=request,
+                                     context=request.context)
+            user = schema.deserialize(user_path_header)
+            user_path = resource_path(user)
+        return user_path
 
     def remember(self, request, userid, **kw) -> [tuple]:
         """Create persistent user session and return authentication headers."""
@@ -196,7 +213,7 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         """Remove user session and return "forget this session" headers."""
         tokenmanager = self.get_tokenmanager(request)
         if tokenmanager:
-            token = get_user_token(request)
+            token = request.headers.get(UserTokenHeader, None)
             tokenmanager.delete_token(token)
         return []  # forget user session headers are not implemented
 
@@ -215,24 +232,6 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
             principals = super().effective_principals(request)
         request.__cached_principals__ = principals
         return principals
-
-
-def get_user_path(request: IRequest) -> str:
-    """Return normalised X-User-Path request header or None."""
-    user_path_header = request.headers.get('X-User-Path', None)
-    user_path = None
-    if user_path_header is not None:
-        schema = Resource().bind(request=request,
-                                 context=request.context)
-        user = schema.deserialize(user_path_header)
-        user_path = resource_path(user)
-    return user_path
-
-
-def get_user_token(request: IRequest) -> str:
-    """Return X-User-Token request header or None."""
-    user_token = request.headers.get('X-User-Token', None)
-    return user_token
 
 
 def includeme(config):
