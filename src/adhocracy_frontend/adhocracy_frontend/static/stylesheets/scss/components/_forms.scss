@@ -107,7 +107,7 @@ textarea {
     width: 100%;
     border: 1px solid $color-structure-introvert;
     color: $color-text-normal;
-    background-color: $color-structure-normal;
+    background-color: $color-background-base-introvert;
 
     @include placeholder {
         @include opacity(1);

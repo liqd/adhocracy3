@@ -19,7 +19,6 @@ input[type="time"],
 input[type="number"],
 select,
 textarea {
-    background: $color-background-base-introvert;
     margin-bottom: $input-margin-bottom;
 
     &.ng-dirty.ng-invalid {
