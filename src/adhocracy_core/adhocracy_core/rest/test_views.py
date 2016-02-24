@@ -37,6 +37,7 @@ def registry(registry_with_content):
 def request_(request_, registry, changelog):
     request_.registry = registry
     request_.registry.changelog= changelog
+    request_.json = {}
     return request_
 
 
@@ -681,6 +682,55 @@ class TestPoolRESTView:
                                         'modified': [],
                                         'removed': []}}
         assert wanted == response
+
+
+class TestGetWorkflow:
+
+    def call_fut(self, *args):
+        from .views import _get_workflow
+        return _get_workflow(*args)
+
+    @fixture
+    def request_(self, request_):
+        request_.content_type = 'application/json'
+        return request_
+
+    def test_return_none_if_no_json_content_type(self, request_, context):
+        request_.content_type = 'NOT_JSON'
+        assert self.call_fut(context, request_) is None
+
+    def test_return_none_if_no_json_dict_body(self, request_, context):
+        request_.json = []
+        assert self.call_fut(context, request_) is None
+
+    def test_return_context_workflow_if_put_request(self, request_, context):
+        request_.method = 'PUT'
+        request_.registry.content.get_workflow.return_value = None
+        assert self.call_fut(context, request_) is None
+
+    def test_return_context_workflow_if_get_request(self, request_, context):
+        request_.method = 'GET'
+        request_.registry.content.get_workflow.return_value = None
+        assert self.call_fut(context, request_) is None
+
+    def test_return_none_if_post_request_without_content_type_field(
+        self, request_, context):
+        request_.method = 'POST'
+        request_.json = {}
+        assert self.call_fut(context, request_) is None
+
+    def test_return_none_if_post_request_with_broken_content_type(
+        self, request_, context):
+        request_.method = 'POST'
+        request_.json = {'content_type': 'brocken'}
+        assert self.call_fut(context, request_) is None
+
+    def test_return_none_if_post_request_with_wrong_content_type(
+        self, request_, context):
+        request_.method = 'POST'
+        request_.json = {'content_type': 'adhocracy_core.interfaces.ISheet'}
+        assert self.call_fut(context, request_) is None
+
 
 
 class TestUsersRESTView:
