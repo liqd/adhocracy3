@@ -72,6 +72,14 @@ def remove_meinberlin_workflow_assignment_sheets(root):  # pragma: no cover
 
 
 @log_migration
+def add_embed_sheet_to_bplan_processes(root):  # pragma: no cover
+    """Add embed sheet to bplan processes."""
+    from adhocracy_core.sheets.embed import IEmbed
+    from adhocracy_meinberlin.resources.bplan import IProcess
+    migrate_new_sheet(root, IProcess, IEmbed)
+
+
+@log_migration
 def migrate_stadtforum_proposals_to_ipolls(root):  # pragma: no cover
     """Migrate stadtforum proposals to ipolls."""
     from adhocracy_core.resources.proposal import IProposal
@@ -121,5 +129,6 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(use_adhocracy_core_title_sheet)
     config.add_evolution_step(use_adhocracy_core_description_sheet)
     config.add_evolution_step(remove_meinberlin_workflow_assignment_sheets)
+    config.add_evolution_step(add_embed_sheet_to_bplan_processes)
     config.add_evolution_step(migrate_stadtforum_proposals_to_ipolls)
     config.add_evolution_step(change_bplan_officeworker_email_representation)
