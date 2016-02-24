@@ -41,17 +41,10 @@ class TestCommentableSheet:
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
 
-    def test_get_empty(self, inst):
+    def test_get_empty(self, inst, context):
         data = inst.get()
-        assert list(data['comments']) == []
+        assert data['post_pool'] == context['comments']
         assert data['comments_count'] == 0
-
-    def test_get_with_comments(self, inst, sheet_catalogs, search_result):
-        comment = testing.DummyResource()
-        sheet_catalogs.search.return_value =\
-            search_result._replace(elements=[comment])
-        data = inst.get()
-        assert list(data['comments']) == [comment]
 
     def test_get_with_comments_count(self, inst):
         from BTrees.Length import Length

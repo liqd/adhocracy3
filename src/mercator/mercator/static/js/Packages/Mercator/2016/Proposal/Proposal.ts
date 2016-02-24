@@ -401,6 +401,8 @@ var edit = (
         return adhHttp.withTransaction((transaction) => {
             var proposal = new RIMercatorProposal({preliminaryNames: adhPreliminaryNames});
             fill(data, proposal);
+            // ICommunity can and should not be changed on edit
+            delete proposal.data[SICommunity.nick];
             transaction.put(oldProposal.path, proposal);
 
             _.forEach({

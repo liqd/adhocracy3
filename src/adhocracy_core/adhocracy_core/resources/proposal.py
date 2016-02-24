@@ -12,9 +12,10 @@ from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.sheets.description import IDescription
 from adhocracy_core.sheets.geo import IPoint
+from adhocracy_core.sheets.image import IImageReference
 from adhocracy_core.sheets.rate import IRateable
-from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.relation import IPolarizable
+from adhocracy_core.sheets.title import ITitle
 
 
 class IProposalVersion(IItemVersion):
@@ -29,6 +30,7 @@ proposal_version_meta = itemversion_meta._replace(
                      ICommentable,
                      IRateable,
                      IPolarizable,
+                     IImageReference,
                      ),
     permission_create='edit_proposal',
 )

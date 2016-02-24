@@ -761,7 +761,6 @@ export var adhUserActivityOverviewDirective = (
                 var params = {
                     depth: "all",
                     count: true,
-                    elements: false,
                     content_type: contentType.content_type
                 };
                 params[SIMetadata.nick + ":creator"] = scope.path;
@@ -834,6 +833,18 @@ export var adhUserProfileImageEditDirective = (
             scope.$watch("path", (path) => {
                 adhPermissions.bindScope(scope, () => scope.path, "userOptions");
             });
+        }
+    };
+};
+
+export var adhHelpLinkDirective = (
+    adhConfig: AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/HelpLink.html",
+        link: (scope) => {
+            scope.supportUrl = adhConfig.support_url;
         }
     };
 };

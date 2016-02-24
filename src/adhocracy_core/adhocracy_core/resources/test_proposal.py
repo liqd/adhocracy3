@@ -42,6 +42,7 @@ class TestProposalVersion:
                 adhocracy_core.sheets.comment.ICommentable,
                 adhocracy_core.sheets.rate.IRateable,
                 adhocracy_core.sheets.relation.IPolarizable,
+                adhocracy_core.sheets.image.IImageReference,
                 )
         assert meta.permission_create == 'edit_proposal'
 
@@ -84,6 +85,7 @@ class TestGeoProposalVersion:
                 adhocracy_core.sheets.comment.ICommentable,
                 adhocracy_core.sheets.rate.IRateable,
                 adhocracy_core.sheets.relation.IPolarizable,
+                adhocracy_core.sheets.image.IImageReference,
                 adhocracy_core.sheets.geo.IPoint,
                 )
         assert meta.permission_create == 'edit_proposal'

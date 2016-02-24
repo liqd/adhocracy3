@@ -168,7 +168,7 @@ As expected, we can retrieve the pool and its child::
 
 Both pools show up in the pool sheet::
 
-    >>> resp = anonymous.get("/").json
+    >>> resp = anonymous.get("/",  params={'elements': 'paths'}).json
     >>> pprint(sorted(resp['data']['adhocracy_core.sheets.pool.IPool']
     ...                        ['elements']))
     ['.../pool1/',.../pool2/'...
