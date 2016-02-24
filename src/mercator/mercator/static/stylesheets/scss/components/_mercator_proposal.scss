@@ -15,6 +15,11 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
         display: block;
     }
 
+    fieldset {
+        @include rem(padding, 0 0 0 1.6rem);
+        border: 0;
+    }
+
     .annotated-section {
         width: 157.5%;
 
@@ -25,11 +30,6 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 
     .button-cta-secondary {
         width: 100%;
-    }
-
-    fieldset {
-        @include rem(padding, 0 0 0 1.6rem);
-        border: 0;
     }
 }
 
