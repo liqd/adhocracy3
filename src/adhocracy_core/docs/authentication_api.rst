@@ -55,6 +55,96 @@ path of the new user::
     >>> user_path
     '.../principals/users/00...
 
+The "name" field in the "IUserBasic" schema is a non-empty string that
+can contain any characters except '@' (to make user names distinguishable
+from email addresses). The username must not contain any whitespace except
+single spaces, preceded and followed by non-whitespace (no whitespace at
+begin or end, multiple subsequent spaces are forbidden,
+tabs and newlines are forbidden).
+
+The "email" field in the "IUserExtended" sheet must be a valid email address.
+
+Creating a new user will not automatically log them in. First, the backend
+will send a registration message to the specified email address. Once the user
+has clicked on the activation link in the message, the user account is ready
+to be used (see "Account Activation" below).
+
+On failure, the backend responds with status code 400 and an error message.
+E.g. when we try to register a user with an empty password::
+
+    >>> data = {'content_type': 'adhocracy_core.resources.principal.IUser',
+    ...         'data': {
+    ...              'adhocracy_core.sheets.principal.IUserBasic': {
+    ...                  'name': 'Other User'},
+    ...              'adhocracy_core.sheets.principal.IUserExtended': {
+    ...                  'email': 'annina@example.org'},
+    ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
+    ...                  'password': ''}}}
+    >>> resp = anonymous.post('http://localhost/principals/users', data)
+    >>> resp.status_code
+    400
+    >>> pprint(resp.json)
+    {'errors': [{'description': 'Required',
+                 'location': 'body',
+                 'name': 'data.adhocracy_core.sheets.principal.IPasswordAuthentication.password'}],
+     'status': 'error'}
+
+<errors> is a list of errors. The above error indicates that a required
+field (the password field) is missing or empty. The following other error
+conditions can occur:
+
+  * username does already exist
+  * email does already exist
+  * email is invalid (doesn't look like an email address)
+  * couldn't send a registration mail to the email address (description
+    starts with 'Cannot send registration mail')
+  * password is too short (less than 6 chars)
+  * password is too long (more than 100 chars)
+  * internal error: something went wrong in the backend
+
+For example, if we try to register a user whose email address is already
+registered::
+
+    >>> data = {'content_type': 'adhocracy_core.resources.principal.IUser',
+    ...         'data': {
+    ...              'adhocracy_core.sheets.principal.IUserBasic': {
+    ...                  'name': 'New user with old email'},
+    ...              'adhocracy_core.sheets.principal.IUserExtended': {
+    ...                  'email': 'anna@example.org'},
+    ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
+    ...                  'password': 'EckVocUbs3'}}}
+    >>> resp = anonymous.post('http://localhost/principals/users', data)
+    >>> resp.status_code
+    400
+    >>> pprint(resp.json)
+    {'errors': [{'description': 'The user login email is not unique',
+                 'location': 'body',
+                 'name': 'data.adhocracy_core.sheets.principal.IUserExtended.email'}],
+     'status': 'error'}
+
+*Note:* in the future, the registration request may contain additional
+personal data for the user. This data will probably be added to the
+"IUserBasic" sheets, if it's generally public, to the "IUserExtended" sheet
+otherwise (or maybe it'll be store in additional new sheets); e.g.::
+
+    'data': {
+        'adhocracy_core.sheets.principal.IUserBasic': {
+            'name': 'Anna Müller',
+            'forename': '...',
+            'surname': '...'},
+        'adhocracy_core.sheets.principal.IPasswordAuthentication': {
+            'password': '...'},
+        'adhocracy_core.sheets.principal.IUserExtended': {
+            'email': 'anna@example.org',
+            'day_of_birth': '...',
+            'street': '...',
+            'town': '...',
+            'postcode': '...',
+            'gender': '...'
+        }
+     }
+
+
 Account Activation
 ------------------
 
@@ -84,6 +174,11 @@ must post a JSON request containing the path to the
     {'status': 'success',
      'user_path': '.../principals/users/...',
      'user_token': '...'}
+
+The backend responds with either response code 200 and 'status':
+'success' and 'user_path' and 'user_token', just like after a
+successful login request (see next section).  This means that the user
+account has been activated and the user is now logged in. ::
 
     >>> data = {'path': '/activate/blahblah'}
     >>> resp = anonymous.post('http://localhost/activate_account', data)
