@@ -65,8 +65,6 @@ class TestProcess:
                                         sheets.bplan.IProcessPrivateSettings,
                                         IEmbed,
                                         )
-        assert meta.extended_sheets == (sheets.bplan.IProcessSettings,
-                                        sheets.bplan.IProcessPrivateSettings)
         assert meta.permission_create == 'create_process'
         assert meta.workflow_name == 'bplan'
 
