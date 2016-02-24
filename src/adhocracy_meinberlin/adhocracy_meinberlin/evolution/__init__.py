@@ -72,6 +72,14 @@ def remove_meinberlin_workflow_assignment_sheets(root):  # pragma: no cover
 
 
 @log_migration
+def add_embed_sheet_to_bplan_processes(root):  # pragma: no cover
+    """Add embed sheet to bplan processes."""
+    from adhocracy_core.sheets.embed import IEmbed
+    from adhocracy_meinberlin.resources.bplan import IProcess
+    migrate_new_sheet(root, IProcess, IEmbed)
+
+
+@log_migration
 def migrate_stadtforum_proposals_to_ipolls(root):  # pragma: no cover
     """Migrate stadtforum proposals to ipolls."""
     from adhocracy_core.resources.proposal import IProposal
@@ -108,12 +116,15 @@ def change_bplan_officeworker_email_representation(root):  # pragma: no cover
     objectmap = find_objectmap(root)
     graph = find_graph(root)
     for bplan in bplaene:
-        office_worker = graph.get_references_for_isheet(
+        process_settings_ref = graph.get_references_for_isheet(
             bplan,
-            IProcessSettings)['office_worker'][0]
-        private_settings = get_sheet(bplan, IProcessPrivateSettings)
-        private_settings.set({'office_worker_email': office_worker.email})
-        objectmap.disconnect(bplan, office_worker, OfficeWorkerUserReference)
+            IProcessSettings)
+        if 'office_worker' in process_settings_ref:
+            office_worker = process_settings_ref['office_worker'][0]
+            private_settings = get_sheet(bplan, IProcessPrivateSettings)
+            private_settings.set({'office_worker_email': office_worker.email})
+            objectmap.disconnect(bplan, office_worker,
+                                 OfficeWorkerUserReference)
 
 
 @log_migration
@@ -129,6 +140,7 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(use_adhocracy_core_title_sheet)
     config.add_evolution_step(use_adhocracy_core_description_sheet)
     config.add_evolution_step(remove_meinberlin_workflow_assignment_sheets)
+    config.add_evolution_step(add_embed_sheet_to_bplan_processes)
     config.add_evolution_step(migrate_stadtforum_proposals_to_ipolls)
     config.add_evolution_step(change_bplan_officeworker_email_representation)
     config.add_evolution_step(add_image_reference_to_blplan)

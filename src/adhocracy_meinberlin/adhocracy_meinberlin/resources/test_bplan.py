@@ -10,7 +10,6 @@ class TestProposal:
         return proposal_meta
 
     def test_meta(self, meta):
-        import adhocracy_core.sheets
         from adhocracy_meinberlin import resources
         assert meta.iresource == resources.bplan.IProposal
         assert meta.element_types == (resources.bplan.IProposalVersion,)
@@ -55,7 +54,8 @@ class TestProcess:
 
     def test_meta(self, meta):
         from adhocracy_core.resources.process import IProcess
-        import adhocracy_core.sheets.image
+        from adhocracy_core.sheets.embed import IEmbed
+        import adhocracy_core.sheets.image import IImageReference
         from adhocracy_meinberlin import sheets
         from adhocracy_meinberlin import resources
         assert meta.iresource is resources.bplan.IProcess
@@ -64,7 +64,8 @@ class TestProcess:
         assert meta.permission_create == 'create_process'
         assert meta.extended_sheets == (sheets.bplan.IProcessSettings,
                                         sheets.bplan.IProcessPrivateSettings,
-                                        adhocracy_core.sheets.image.IImageReference,
+                                        IEmbed,
+                                        IImageReference,
                                         )
         assert meta.permission_create == 'create_process'
         assert meta.workflow_name == 'bplan'

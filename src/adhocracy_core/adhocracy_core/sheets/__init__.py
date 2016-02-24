@@ -370,3 +370,4 @@ def includeme(config):  # pragma: no cover
     config.include('.description')
     config.include('.badge')
     config.include('.logbook')
+    config.include('.embed')
