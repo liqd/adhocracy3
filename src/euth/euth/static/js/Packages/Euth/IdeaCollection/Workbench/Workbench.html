@@ -5,7 +5,8 @@
     <adh-moving-column>
         <adh-pcompass-proposal-create-column data-ng-if="view === 'create_proposal'"></adh-pcompass-proposal-create-column>
         <adh-pcompass-proposal-edit-column data-ng-if="view === 'edit'"></adh-pcompass-proposal-edit-column>
-        <adh-pcompass-proposal-detail-column data-ng-if="view !== 'create_proposal' && view !== 'edit'"></adh-pcompass-proposal-detail-column>
+        <adh-pcompass-proposal-image-column data-ng-if="view === 'image'"></adh-pcompass-proposal-image-column>
+        <adh-pcompass-proposal-detail-column data-ng-if="view !== 'create_proposal' && view !== 'edit' && view !== 'image'"></adh-pcompass-proposal-detail-column>
     </adh-moving-column>
     <adh-moving-column>
         <adh-comment-column></adh-comment-column>
