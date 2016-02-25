@@ -1,33 +1,53 @@
-Imperia API
-===========
+B-PLAN API
+==========
 
-This document specifies the API used by Imperia to manage bplan processes in
-the a3 platform.
+This document specifies the API used to a manage B-Plan processes in the a3
+platform.
 
 Process
 -------
 
-The full process of creation and management of a bplan:
+The full process of creation and management of a B-Plan:
 
-1. Create a bplan process
-2. Editing an unpublished bplan
-3. Publishing a bplan
-4. Editing a published bplan
+1. Create a B-Plan process
+2. Edit an unpublished B-Plan
+3. Get the HTML embed code and external URL to integrate the B-Plan
+4. Make a B-Plan accessible
+5. Edit a published B-Plan
 
 Data fields
 -----------
 
-The following data needs to be provided to create a bplan:
+The following data needs to be provided to create a B-Plan:
 
-- bplan_number:
-- bplan_name:
-- bplan_titile:
-- participation_kind:
-- office_worker_email:
-- short_description: Teaser text
-- description:
-- external_picture_url:
-- picture_description: Copyright
+- *organization*: The organization the B-Plan belongs to
+- *bplan_number*: Number of the BPlan
+- *bplan_name*: Could be the same as bplan_number
+- *bplan_titile*: Could be the same as bplan_number
+- *participation_kind*: Kind of participation, e.g. 'öffentliche Auslegung'
+- *office_worker_email*: Email address to receive the B-Plan statements
+- *short_description*: Teaser text
+- *description*: Full description of the BPlan
+- *external_picture_url*: External URL to the BPlan picture
+- *picture_description*: Picture copyright notice
+- *start_date*: Start time of the praticipation phase
+- *end_date*: End of the participation phase
+
+Workflows
+---------
+
+A B-Plan process transits the following workflows:
+
+1. *draft*: Initial worflow state used for editing, the B-Plan is not public
+2. *announce*: The B-Plan information is accessible, but no statements can be
+    send
+3. *participate*: B-Plan participation is active, statements can be issued
+4. *closed*: The B-Plan is not accessible anymore
+
+The transition from the *draft* state to the *announce* state has to be done
+via an API call. The further transitions to *participate* and *closed* are
+performed automatically by the a3 platform depending on the provided
+*start_date* and *end_date*.
 
 API Calls
 ---------
@@ -35,18 +55,14 @@ API Calls
 The following API calls are required to implement the process:
 
 - login
-- create a bplan process
-- edit a bplan process
-- get the bplan workflow state
-- make the bplan accessible
-- get the bplan embed HTML snippet
+- create a B-Plan process
+- get the B-Plan workflow state
+- make the B-Plan accessible
+- get the B-Plan embed HTML snippet and external URL
+- edit a B-Plan process
 
-Initialization::
+**Initialization**::
 
-    For the exampple API call an organisation "orga" is created.
-    The organizations need to exist beforehand.
-
-    >>> from pprint import pprint
     >>> from webtest import TestApp
     >>> app_router = getfixture('app_router')
     >>> testapp = TestApp(app_router)
@@ -59,26 +75,27 @@ Initialization::
     ...         }}
     >>> resp = app_god.post('/', data)
 
-Login::
+For the example API calls an organisation "orga" is created.
+The organization for the B-Plan needs to exist beforehand in the a3
+platform.
 
-    To login post the username and password.
-    The 'user_path' and 'user_token' from  the response are passed as HTTP
-    custom header values in the following communication.
+**Login**::
 
     >>> data = {'name': 'god',
     ...         'password': 'password'}
     >>> resp = testapp.post_json('/login_username', data)
     >>> resp.status_code
     200
-    >>> user_path = resp.json['user_path']
     >>> user_token = resp.json['user_token']
-    >>> auth_header = {'X-User-Path': user_path,
-    ...                'X-User-Token': user_token}
+    >>> auth_header = {'X-User-Token': user_token}
 
-Create a new bplan process::
+To login post the username and password.
+The 'user_token' from  the response is used in a HTTP custom header in the
+following communication.
+The username here is just an example, please use your credentials.
 
-    The creation of a bplan consist of two post request, containing all the
-    required fields.
+
+**Create a new bplan process**::
 
     >>> data = {'content_type': 'adhocracy_meinberlin.resources.bplan.IProcess',
     ...         'data': {
@@ -96,28 +113,23 @@ Create a new bplan process::
     ...                  'short_description':'Teaser text'},
     ...             'adhocracy_core.sheets.image.IImageReference':
     ...                 {'picture_description': 'copyright notice',
-    ...                  'external_picture_url': 'http://foo.bar/image.jpg'}
+    ...                  'external_picture_url': 'http://foo.bar/image.jpg'},
+    ...             'adhocracy_core.sheets.workflow.IWorkflowAssignment':
+    ...                 {'state_data':
+    ...                  [{'name': 'participate', 'description': '',
+    ...                  'start_date': '2016-03-01T12:00:09',
+    ...                  'end_date': '2016-05-01T12t:00:09'}]}
     ...             }}
     >>> resp = testapp.post_json('/orga/', data, headers=auth_header)
     >>> resp.status_code
     200
-    >>> resp.json['path']
-    'http://localhost/orga/1-23/'
-    >>> data = {'content_type': 'adhocracy_meinberlin.resources.bplan.IProcess',
-    ...         'data': {
-    ...             'adhocracy_core.sheets.workflow.IWorkflowAssignment':
-    ...                 {'state_data':
-    ...                  [{'name': 'participate', 'description': 'test',
-    ...                  'start_date': '2016-03-01T12:00:09',
-    ...                  'end_date': '2016-05-01T12t:00:09'}]}
-    ...         }}
-    >>> resp = testapp.put_json('/orga/1-23/', data, headers=auth_header)
-    >>> resp.status_code
-    200
 
-Get workflow state:
+The creation of a bplan consist of a post request containing all the
+required fields.
 
-    >>> resp = testapp.get('/orga/1-23', headers=auth_header)
+**Get the workflow state**::
+
+    >>> resp = testapp.get('/orga/1-23/', headers=auth_header)
     >>> resp.status_code
     200
     >>> resp.json['data'] \
@@ -125,12 +137,58 @@ Get workflow state:
     ...     ['workflow_state']
     'draft'
 
+**Perform a workflow state transition**::
 
-Edit a bplan process::
+    >>> data = {'content_type': 'adhocracy_meinberlin.resources.bplan.IProcess',
+    ...         'data': {
+    ...             'adhocracy_core.sheets.workflow.IWorkflowAssignment':
+    ...                 {'workflow_state': 'announce'}
+    ...             }}
+    >>> resp = testapp.put_json('/orga/1-23/', data, headers=auth_header)
+    >>> resp.status_code
+    200
+    >>> resp = testapp.get('/orga/1-23/', headers=auth_header)
+    >>> resp.status_code
+    200
+    >>> resp.json['data'] \
+    ...     ['adhocracy_core.sheets.workflow.IWorkflowAssignment'] \
+    ...     ['workflow_state']
+    'announce'
 
-    To edit a bplan the fields set in the initial post requests can be used.
 
-    E.g. Changing the description:
+**Get the HTML code snipped to embed the bplan and its external URL**::
+
+    >>> resp = testapp.get('/orga/1-23/', headers=auth_header)
+    >>> resp.status_code
+    200
+    >>> resp.json['data'] \
+    ...     ['adhocracy_core.sheets.embed.IEmbed'] \
+    ...     ['embed_code']
+    ''
+    >>> resp.json['data'] \
+    ...     ['adhocracy_core.sheets.embed.IEmbed'] \
+    ...     ['external_url']
+    ''
+
+NOTE: This is still under development. The returned embed_code will have the
+following format::
+
+    '\n\n<script src="http://foo.bar/static/embed.html#!/AdhocracySDK.js"></script>\n
+    <script> adhocracy.init(\'http://foo.bar/static/embed.html#!\',\n
+    function(adhocracy) {adhocracy.embed(\'.adhocracy_marker\');\n });\n</script>\n
+    <div class="adhocracy_marker"\n data-path="http://foo.bar/orga/1-23/"\n
+    data-widget="mein-berlin-bplaene-proposal-embed"\n data-autoresize="false"\n
+    data-locale="en"\n
+    data-autourl="false"\n
+    data-nocenter="true"\n
+    style="height: 650px">\n
+    </div>\n'
+
+**Edit a B-Plan process**:
+
+To edit a B-Plan the fields set in the initial post requests can be used.
+
+E.g. Changing the description::
 
     >>> data = {'content_type': 'adhocracy_meinberlin.resources.bplan.IProcess',
     ...         'data': {
@@ -141,7 +199,7 @@ Edit a bplan process::
     >>> resp.status_code
     200
 
-    E.g. Changing the participation start data:
+E.g. Changing the participation start data::
 
     >>> data = {'content_type': 'adhocracy_meinberlin.resources.bplan.IProcess',
     ...         'data': {
