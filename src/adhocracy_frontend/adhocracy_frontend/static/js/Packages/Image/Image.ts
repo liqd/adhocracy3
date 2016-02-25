@@ -129,7 +129,7 @@ export var showImageDirective = (
 ) => {
     return {
         restrict: "E",
-        template: "<img class=\"{{ cssClass }}\" data-ng-src=\"{{ imageUrl }}\" alt=\"{{alt}}\" />",
+        template: "<img class=\"{{ cssClass }}\" data-ng-if=\"imageUrl\" data-ng-src=\"{{ imageUrl }}\" alt=\"{{alt}}\" />",
         scope: {
             path: "@", // of the attachment resource
             cssClass: "@",
@@ -137,6 +137,7 @@ export var showImageDirective = (
             format: "@?", // defaults to "detail"
             imageMetadataNick: "@?", // defaults to SIImageMetadata.nick
             fallbackUrl: "@?", // defaults to "/static/fallback_$format.jpg";
+            noFallback: "=?",
             didFailToLoadImage: "&?"
         },
         link: (scope) => {
@@ -145,7 +146,11 @@ export var showImageDirective = (
             var imageMetadataNick = () =>
                 scope.imageMetadataNick ? scope.imageMetadataNick : SIImageMetadata.nick;
             var format = () => scope.format || "detail";
-            var fallbackUrl = () => scope.fallbackUrl || ("/static/fallback_" + format() + ".jpg");
+            var fallbackUrl = () => {
+                if (!scope.noFallback) {
+                    return scope.fallbackUrl || ("/static/fallback_" + format() + ".jpg");
+                }
+            };
             scope.imageUrl = fallbackUrl(); // show fallback till real image is loaded
 
             scope.$watch("path", (path) => {
