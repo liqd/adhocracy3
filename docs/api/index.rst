@@ -17,4 +17,3 @@ API
    messaging
    abuse
    badges
-   bplan
