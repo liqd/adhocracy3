@@ -28,7 +28,6 @@ translateMe = [
     "TR__ERROR_TOO_BIG_IMAGE",
     "TR__ERROR_TOO_NARROW_IMAGE",
     "TR__ERROR_TYPE_IMAGE",
-    "TR__FILTERS",
     "TR__FIRSTNAME",
     "TR__IMAGE_CHANGE",
     "TR__IMAGE_CHOOSE",
