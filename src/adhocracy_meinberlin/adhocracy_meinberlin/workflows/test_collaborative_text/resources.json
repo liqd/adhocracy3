@@ -1,0 +1,8 @@
+[{"path": "/organisation",
+  "content_type": "adhocracy_meinberlin.resources.collaborative_text.IProcess",
+  "data": {"adhocracy_core.sheets.name.IName":
+           {"name": "collaborative_text"},
+           "adhocracy_core.sheets.title.ITitle":
+           {"title": "Collaborative text participation process"}
+          }}
+]

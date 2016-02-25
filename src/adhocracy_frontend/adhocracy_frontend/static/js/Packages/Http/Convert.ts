@@ -36,7 +36,8 @@ export var importContent = <Content extends ResourcesBase.Resource>(
     metaApi : AdhMetaApi.MetaApiQuery,
     preliminaryNames : AdhPreliminaryNames.Service,
     adhCache : AdhCache.Service,
-    warmupPoolCache ?: boolean
+    warmupPoolCache : boolean = false,
+    originalElements : string = "omit"
 ) : Content => {
     "use strict";
 
@@ -71,8 +72,7 @@ export var importContent = <Content extends ResourcesBase.Resource>(
         }
 
         if (warmupPoolCache && (sheetName === SIPool.nick)) {
-            // do as if the query param element === content hadn't been set
-            var subresourceList = [];
+            var elementsPaths = [];
 
             _.forEach(jsonSheet.elements, (rawSubresource : any) => {
                 var pseudoResponse = {
@@ -80,10 +80,16 @@ export var importContent = <Content extends ResourcesBase.Resource>(
                 };
                 var subresource = importContent(pseudoResponse, metaApi, preliminaryNames, adhCache);
                 adhCache.putCached(rawSubresource.path, "", subresource);
-                subresourceList.push(rawSubresource.path);
+                elementsPaths.push(rawSubresource.path);
             });
 
-            jsonSheet.elements = subresourceList;
+            if (originalElements === "content") {
+                // do nothing
+            } else if (originalElements === "paths") {
+                jsonSheet.elements = elementsPaths;
+            } else {
+                jsonSheet.elements = [];
+            }
         }
 
         var _sclass = Resources_.sheetRegistry[sheetName];

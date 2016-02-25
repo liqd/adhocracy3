@@ -32,6 +32,7 @@ export interface IListingContainerAdapter {
 }
 
 export class ListingPoolAdapter implements IListingContainerAdapter {
+    // NOTE: container *must* have been requested with `elements=paths`
     public elemRefs(container : ResourcesBase.Resource) {
         return container.data[SIPool.nick].elements;
     }
@@ -112,8 +113,6 @@ export interface IFacetsScope extends angular.IScope {
 export class Listing<Container extends ResourcesBase.Resource> {
     public static templateUrl : string = pkgLocation + "/Listing.html";
 
-    constructor(private containerAdapter : IListingContainerAdapter) {}
-
     public createDirective(adhConfig : AdhConfig.IService, adhWebSocket: AdhWebSocket.Service) {
         var _self = this;
         var _class = (<any>_self).constructor;
@@ -137,7 +136,9 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 initialLimit: "=?",
                 params: "=?",
                 noCreateForm: "=?",
-                emptyText: "@"
+                emptyText: "@",
+                // use this to pass custom data to the injected templates
+                custom: "=?"
             },
             transclude: true,
             link: (scope, element, attrs, controller, transclude) => {
@@ -158,6 +159,8 @@ export class Listing<Container extends ResourcesBase.Resource> {
 
                 var getElements = (count? : boolean, limit? : number, offset? : number) : angular.IPromise<Container> => {
                     var params = <any>{};
+
+                    params.elements = "paths";
 
                     if (typeof $scope.contentType !== "undefined") {
                         params.content_type = $scope.contentType;
@@ -256,11 +259,11 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     }
                     return getElements(true, $scope.currentLimit).then((container) => {
                         $scope.container = container;
-                        $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
-                        $scope.totalCount = _self.containerAdapter.totalCount($scope.container);
+                        $scope.poolPath = $scope.container.path;
+                        $scope.totalCount = $scope.container.data[SIPool.nick].count;
 
                         // avoid modifying the cached result
-                        $scope.elements = _.clone(_self.containerAdapter.elemRefs($scope.container));
+                        $scope.elements = _.clone($scope.container.data[SIPool.nick].elements);
 
                         if (!$scope.sorts || $scope.sorts.length === 0) {
                             // If no backend based sorting is used, we
@@ -274,7 +277,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 $scope.loadMore = () : void => {
                     if ($scope.currentLimit < $scope.totalCount) {
                         getElements(false, $scope.initialLimit, $scope.currentLimit).then((container) => {
-                            var elements = _.clone(_self.containerAdapter.elemRefs(container));
+                            var elements = _.clone(container.data[SIPool.nick].elements);
                             $scope.elements = $scope.elements.concat(elements);
                             $scope.currentLimit += $scope.initialLimit;
                         });

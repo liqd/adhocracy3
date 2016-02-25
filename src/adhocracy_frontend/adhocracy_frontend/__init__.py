@@ -35,8 +35,8 @@ def config_view(request):
                                       '/static/js/Packages')
     config['trusted_domains'] = aslist(
         settings.get('adhocracy.trusted_domains', []))
-    config['support_email'] = settings.get('adhocracy.frontend.support_email',
-                                           'support@unconfigured.domain')
+    config['support_email'] = settings.get('adhocracy.frontend.support_email')
+    config['support_url'] = settings.get('adhocracy.frontend.support_url')
     config['captcha_enabled'] = asbool(settings.get(
         'adhocracy.thentos_captcha.enabled', 'false'))
     config['captcha_url'] = settings.get(

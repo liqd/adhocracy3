@@ -8,7 +8,6 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import workflow
 from adhocracy_core.schema import DateTime
-from adhocracy_core.schema import Reference
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
 from adhocracy_core.sheets.principal import IUserBasic
@@ -61,10 +60,13 @@ class OfficeWorkerUserReference(SheetToSheet):
     target_isheet = IUserBasic
 
 
+deprecated('OfficeWorkerUserReference',
+           'Office worker email is not stored via an user anymore')
+
+
 class ProcessSettingsSchema(colander.MappingSchema):
     """Settings for the B-Plan process."""
 
-    office_worker = Reference(reftype=OfficeWorkerUserReference)
     plan_number = SingleLine(missing=colander.required)
     participation_kind = SingleLine(missing=colander.required)
     participation_start_date = DateTime(default=None)
@@ -77,7 +79,26 @@ process_settings_meta = sheet_meta._replace(
 )
 
 
+class IProcessPrivateSettings(ISheet):
+    """Marker interface for the process private settings."""
+
+
+class ProcessPrivateSettingsSchema(colander.MappingSchema):
+    """Private Settings for the B-Plan process."""
+
+    office_worker_email = SingleLine(validator=colander.Email(),
+                                     missing=colander.required)
+
+
+process_private_settings_meta = sheet_meta._replace(
+    isheet=IProcessPrivateSettings,
+    schema_class=ProcessPrivateSettingsSchema,
+    permission_view='view_bplan_private_settings'
+)
+
+
 def includeme(config):
     """Register sheets."""
     add_sheet_to_registry(proposal_meta, config.registry)
     add_sheet_to_registry(process_settings_meta, config.registry)
+    add_sheet_to_registry(process_private_settings_meta, config.registry)

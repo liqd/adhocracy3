@@ -30,7 +30,7 @@ a form for creating new elements. This form is then always visible.
 }
 
 .listing-create-form {
-    @include rem(margin-bottom, 1rem);
+    @include rem(margin-bottom, 2rem);
     @include rem(padding, 1rem 20px 12px);
 
     .comment-create-form-text {
@@ -44,6 +44,11 @@ a form for creating new elements. This form is then always visible.
     @media print {
         display: none;
     }
+}
+
+.listing-create-button {
+    @include rem(margin, 0.5em 0 2rem);
+    text-align: center;
 }
 
 .listing-elements + .listing-create-form {

@@ -6,9 +6,11 @@
            "adhocracy_core.sheets.title.ITitle":
            {"title": "Sample BPlan process"},
            "adhocracy_meinberlin.sheets.bplan.IProcessSettings":
-           {"office_worker": "user_by_login:god",
-            "plan_number": "112233",
+           {"plan_number": "112233",
             "participation_kind": "öffentliche Auslegung",
             "participation_start_date": "2015-05-05",
-            "participation_end_date": "2015-06-11"}}}
+            "participation_end_date": "2015-06-11"},
+           "adhocracy_meinberlin.sheets.bplan.IProcessPrivateSettings":
+           {"office_worker_email": "officeworkername@example.com"
+            }}}
 ]
