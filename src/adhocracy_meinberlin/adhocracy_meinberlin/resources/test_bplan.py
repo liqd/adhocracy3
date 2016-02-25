@@ -55,7 +55,7 @@ class TestProcess:
     def test_meta(self, meta):
         from adhocracy_core.resources.process import IProcess
         from adhocracy_core.sheets.embed import IEmbed
-        import adhocracy_core.sheets.image import IImageReference
+        from adhocracy_core.sheets.image import IImageReference
         from adhocracy_meinberlin import sheets
         from adhocracy_meinberlin import resources
         assert meta.iresource is resources.bplan.IProcess
