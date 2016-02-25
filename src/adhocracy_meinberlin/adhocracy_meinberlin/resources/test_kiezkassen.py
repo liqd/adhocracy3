@@ -40,6 +40,7 @@ class TestProposalVersion:
                 adhocracy_core.sheets.comment.ICommentable,
                 adhocracy_core.sheets.rate.IRateable,
                 adhocracy_core.sheets.relation.IPolarizable,
+                adhocracy_core.sheets.image.IImageReference,
                 kiezkassen.IProposal,
                 adhocracy_core.sheets.geo.IPoint,
                 )
