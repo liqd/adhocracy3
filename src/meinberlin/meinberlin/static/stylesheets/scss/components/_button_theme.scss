@@ -34,37 +34,10 @@
 }
 
 .button-cta {
-    @include border-radius($font-size-normal);
-    @include border-radius(1rem);
     @include rem(padding, 0 30px);
     font-weight: $font-weight-extrovert;
 }
 
 .button, .button-cta, .button-cta-secondary {
     text-transform: capitalize;
-}
-
-/*doc
----
-title: Call to action button index of moving column or embed
-name: button.button-cta.inside
-parent: button
----
-
-For Mein Berlin CTA buttons inside of the moving columns or embed context appear square
-
-```html_example
-<div class="l-center m-embed">
-<a class="button-cta" href="">Link</a>
-<button type="button" class="button-cta">Button</button>
-<input type="submit" class="button-cta" value="Disabled" disabled="disabled" />
-</div>
-```
-
-*/
-
-.moving-column-body, .l-center.m-embed {
-    .button-cta {
-        @include border-radius(0);
-    }
 }
