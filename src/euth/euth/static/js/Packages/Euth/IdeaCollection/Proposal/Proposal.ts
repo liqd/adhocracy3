@@ -11,6 +11,7 @@ import * as AdhUtil from "../../../Util/Util";
 
 import * as SICommentable from "../../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIDescription from "../../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIImageReference from "../../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIMetadata from "../../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 import * as SIRateable from "../../../../Resources_/adhocracy_core/sheets/rate/IRateable";
 import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
@@ -33,6 +34,7 @@ export interface IScope extends angular.IScope {
         creationDate: string;
         commentCount: number;
         assignments: AdhBadge.IBadge[];
+        picture? : string;
     };
     selectedState?: string;
     resource: any;
@@ -77,7 +79,8 @@ var bindPath = (
                             creator: metadataSheet.creator,
                             creationDate: metadataSheet.item_creation_date,
                             commentCount: resource.data[SICommentable.nick].comments_count,
-                            assignments: assignments
+                            assignments: assignments,
+                            picture: resource.data[SIImageReference.nick].picture
                         };
                     });
                 });
