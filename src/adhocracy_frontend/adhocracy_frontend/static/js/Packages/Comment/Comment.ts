@@ -181,7 +181,7 @@ export var commentDetailDirective = (
     var _postEdit = postEdit(adhHttp, adhPreliminaryNames);
 
     var link = (scope : ICommentResourceScope, element, attrs, column? : AdhMovingColumns.MovingColumnController) => {
-        if (typeof column !== "undefined") {
+        if (column) {
             scope.report = () => {
                 column.$scope.shared.abuseUrl = scope.data.path;
                 column.toggleOverlay("abuse");

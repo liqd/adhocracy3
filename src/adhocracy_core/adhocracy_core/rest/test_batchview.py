@@ -109,6 +109,7 @@ class TestBatchView:
         request_.body = self._make_json_with_subrequest_cstructs(
             path='http://a.org/virtual/adhocracy/blah')
         request_.__cached_principals__ = [1]
+        request_.__cached_userid__ = '/user'
         date = object()
         request_.headers['X-User-Path'] = 2
         request_.headers['X-User-Token'] = 3
@@ -126,6 +127,7 @@ class TestBatchView:
         subrequest  = mock_invoke_subrequest.call_args[0][0]
         assert is_batchmode(subrequest)
         assert subrequest.__cached_principals__ == [1]
+        assert subrequest.__cached_userid__ == '/user'
         assert subrequest.headers.get('X-User-Path') == 2
         assert subrequest.headers.get('X-User-Token') == 3
         assert subrequest.script_name == '/virtual'
