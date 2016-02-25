@@ -1,6 +1,10 @@
 <article class="proposal-detail">
     <header class="proposal-detail-header">
 
+        <adh-show-image
+            data-css-path="proposal-detail-image"
+            data-path="{{data.picture}}"
+        ></adh-show-image>
         <span
             data-ng-repeat="assignment in data.assignments"
             class="badge">{{ assignment.title }}</span>
