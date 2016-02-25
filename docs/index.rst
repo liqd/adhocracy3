@@ -18,6 +18,7 @@ Contents
    coding_guides/index
    api/index
    translation
+   projects/index
    drafts/index
    attic/index
    CHANGES
