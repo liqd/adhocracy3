@@ -2,6 +2,7 @@ import * as _ from "lodash";
 
 import * as AdhConfig from "../Config/Config";
 import * as AdhHttp from "../Http/Http";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
 import RIImage from "../../Resources_/adhocracy_core/resources/image/IImage";
 import * as SIHasAssetPool from "../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
@@ -95,8 +96,10 @@ export var addImage = (
 export var uploadImageDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service,
     adhUploadImage,
-    flowFactory
+    flowFactory,
+    adhResourceUrl
 ) => {
     return {
         restrict: "E",
@@ -115,10 +118,16 @@ export var uploadImageDirective = (
                 return false;
             });
 
+            scope.goToCameFrom = () => {
+                var url = adhResourceUrl(scope.path);
+                adhTopLevelState.goToCameFrom(url);
+            };
+
             scope.submit = () => {
                 return adhUploadImage(scope.poolPath, scope.$flow)
                     .then((imagePath : string) => addImage(adhHttp)(scope.path, imagePath)
-                        .then(scope.didCompleteUpload));
+                        .then(scope.didCompleteUpload)
+                        .then(scope.goToCameFrom));
             };
         }
     };
