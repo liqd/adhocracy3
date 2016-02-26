@@ -14,14 +14,6 @@ def integration(config):
     config.include('adhocracy_meinberlin.sheets')
 
 
-@mark.usefixtures('integration')
-def test_includeme_register_proposal_sheet(config):
-    from .burgerhaushalt import IProposal
-    from adhocracy_core.utils import get_sheet
-    context = testing.DummyResource(__provides__=IProposal)
-    assert get_sheet(context, IProposal)
-
-
 class TestProposalSheet:
 
     @fixture
@@ -51,6 +43,11 @@ class TestProposalSheet:
                   'location_text': '',
                   }
         assert inst.get() == wanted
+
+    @mark.usefixtures('integration')
+    def test_includeme_register_sheet(self, meta, registry):
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestProposalSchema:

@@ -18,7 +18,6 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.name import IName
 from adhocracy_core.sheets.pool import IPool
-from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
 
 
@@ -164,6 +163,7 @@ def create_unique_badge_assignment_validator(badge_ref: Reference,
     :param:`kw`: dictionary with keys `context` and `registry`.
     """
     context = kw['context']
+    registry = kw['registry']
 
     def validator(node, value):
         new_badge = node.get_value(value, badge_ref.name)
@@ -171,8 +171,9 @@ def create_unique_badge_assignment_validator(badge_ref: Reference,
         new_object = node.get_value(value, object_ref.name)
         pool = find_service(context, 'badge_assignments')
         for badge_assignment in pool.values():
-            badge_sheet_values = get_sheet(badge_assignment,
-                                           IBadgeAssignment).get()
+            badge_sheet_values = registry.content.get_sheet(
+                badge_assignment,
+                IBadgeAssignment).get()
             badge = badge_sheet_values['badge']
             badge_name = get_sheet_field(badge, IName, 'name')
             obj = badge_sheet_values['object']

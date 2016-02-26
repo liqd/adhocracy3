@@ -129,6 +129,7 @@ class TestChangeChildrenToSelectedRejected:
             self, context, item, request_, registry, mock_sheet, mock_catalogs):
         from copy import copy
         from datetime import datetime
+        request_.registry = registry
         version_most_rated = testing.DummyResource()
         item['version'] = version_most_rated
         item2 = item.clone()

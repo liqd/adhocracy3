@@ -23,7 +23,6 @@ from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.events import ResourceCreatedAndAdded
 from adhocracy_core.sheets.name import IName
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_modification_date
 
 
@@ -186,7 +185,7 @@ class ResourceFactory:
 
         for key, struct in appstructs.items():
             isheet = DottedNameResolver().maybe_resolve(key)
-            sheet = get_sheet(resource, isheet, registry=registry)
+            sheet = registry.content.get_sheet(resource, isheet)
             if sheet.meta.creatable:
                 sheet.set(struct,
                           send_event=False,
@@ -207,7 +206,7 @@ class ResourceFactory:
 
         if IMetadata.providedBy(resource):
             metadata = self._get_metadata(resource, creator, registry)
-            sheet = get_sheet(resource, IMetadata, registry=registry)
+            sheet = registry.content.get_sheet(resource, IMetadata)
             sheet.set(metadata,
                       send_event=False,
                       request=request,
@@ -238,7 +237,7 @@ class ResourceFactory:
 
         item = find_interface(resource, IItem)
         if IItemVersion.providedBy(resource) and item is not None:
-            item_sheet = get_sheet(item, IMetadata, registry=registry)
+            item_sheet = registry.content.get_sheet(item, IMetadata)
             item_creation_date = item_sheet.get()['creation_date']
             metadata['item_creation_date'] = item_creation_date
         return metadata

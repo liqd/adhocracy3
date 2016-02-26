@@ -13,83 +13,70 @@ def integration(integration):
 @mark.usefixtures('integration')
 class TestIncludeme:
 
-    def test_includeme_register_title_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import ITitle
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_title_sheet(self, registry):
+        from .mercator import ITitle
         context = testing.DummyResource(__provides__=ITitle)
-        assert get_sheet(context, ITitle)
+        assert registry.content.get_sheet(context, ITitle)
 
-    def test_includeme_register_userinfo_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IUserInfo
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_userinfo_sheet(self, registry):
+        from .mercator import IUserInfo
         context = testing.DummyResource(__provides__=IUserInfo)
-        assert get_sheet(context, IUserInfo)
+        assert registry.content.get_sheet(context, IUserInfo)
 
-    def test_includeme_register_organizationinfo_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IOrganizationInfo
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_organizationinfo_sheet(self, registry):
+        from .mercator import IOrganizationInfo
         context = testing.DummyResource(__provides__=IOrganizationInfo)
-        assert get_sheet(context, IOrganizationInfo)
+        assert registry.content.get_sheet(context, IOrganizationInfo)
 
-    def test_includeme_register_introduction_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IIntroduction
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_introduction_sheet(self, registry):
+        from .mercator import IIntroduction
         context = testing.DummyResource(__provides__=IIntroduction)
-        assert get_sheet(context, IIntroduction)
+        assert registry.content.get_sheet(context, IIntroduction)
 
-    def test_includeme_register_description_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IDescription
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_description_sheet(self, registry):
+        from .mercator import IDescription
         context = testing.DummyResource(__provides__=IDescription)
-        assert get_sheet(context, IDescription)
+        assert registry.content.get_sheet(context, IDescription)
 
-    def test_includeme_register_location_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import ILocation
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_location_sheet(self, registry):
+        from .mercator import ILocation
         context = testing.DummyResource(__provides__=ILocation)
-        assert get_sheet(context, ILocation)
+        assert registry.content.get_sheet(context, ILocation)
 
-    def test_includeme_register_story_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IStory
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_story_sheet(self, registry):
+        from .mercator import IStory
         context = testing.DummyResource(__provides__=IStory)
-        assert get_sheet(context, IStory)
+        assert registry.content.get_sheet(context, IStory)
 
-    def test_includeme_register_outcome_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IOutcome
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_outcome_sheet(self, registry):
+        from .mercator import IOutcome
         context = testing.DummyResource(__provides__=IOutcome)
-        assert get_sheet(context, IOutcome)
+        assert registry.content.get_sheet(context, IOutcome)
 
-    def test_includeme_register_steps_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import ISteps
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_steps_sheet(self, registry):
+        from .mercator import ISteps
         context = testing.DummyResource(__provides__=ISteps)
-        assert get_sheet(context, ISteps)
+        assert registry.content.get_sheet(context, ISteps)
 
-    def test_includeme_register_value_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IValue
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_value_sheet(self, registry):
+        from .mercator import IValue
         context = testing.DummyResource(__provides__=IValue)
-        assert get_sheet(context, IValue)
+        assert registry.content.get_sheet(context, IValue)
 
-    def test_includeme_register_finance_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IFinance
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_finance_sheet(self, registry):
+        from .mercator import IFinance
         context = testing.DummyResource(__provides__=IFinance)
-        assert get_sheet(context, IFinance)
+        assert registry.content.get_sheet(context, IFinance)
 
-    def test_includeme_register_experience_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IExperience
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_experience_sheet(self, registry):
+        from .mercator import IExperience
         context = testing.DummyResource(__provides__=IExperience)
-        assert get_sheet(context, IExperience)
+        assert registry.content.get_sheet(context, IExperience)
 
-    def test_includeme_register_heardfrom_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IHeardFrom
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_heardfrom_sheet(self, registry):
+        from .mercator import IHeardFrom
         context = testing.DummyResource(__provides__=IHeardFrom)
-        assert get_sheet(context, IHeardFrom)
+        assert registry.content.get_sheet(context, IHeardFrom)
 
 
 class TestTitleSheet:

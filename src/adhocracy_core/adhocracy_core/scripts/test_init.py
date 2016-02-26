@@ -5,7 +5,6 @@ from tempfile import mkstemp
 import os
 import json
 import pytest
-from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.resources.organisation import IOrganisation
 from adhocracy_core.resources.root import IRootPool
@@ -198,7 +197,6 @@ class TestImportResources:
 
     def test_raise_when_resolving_non_existing_user(self, registry):
         from adhocracy_core.scripts import import_resources
-        from .import_users import _get_user_locator
 
         (self._tempfd, filename) = mkstemp()
         with open(filename, 'w') as f:

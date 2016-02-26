@@ -1,5 +1,6 @@
 from pyramid import testing
 from pytest import fixture
+from pytest import mark
 
 
 class TestDescriptionSheet:
@@ -26,12 +27,7 @@ class TestDescriptionSheet:
                               'description': ''
                               }
 
-
-def test_includeme_register_description_sheet(config):
-    from adhocracy_core.sheets.description import IDescription
-    from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.sheets.description')
-    context = testing.DummyResource(__provides__=IDescription)
-    inst = get_sheet(context, IDescription)
-    assert inst.meta.isheet is IDescription
+    @mark.usefixtures('integration')
+    def test_includeme_register_sheet(self, meta, config):
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert config.registry.content.get_sheet(context, meta.isheet)

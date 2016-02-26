@@ -72,7 +72,6 @@ from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.tags import ITags
 from adhocracy_core.utils import extract_events_from_changelog_metadata
-from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import get_reason_if_blocked
 from adhocracy_core.utils import get_user
@@ -685,7 +684,8 @@ class ItemRESTView(PoolRESTView):
 
     def _update_version(self, resource: IVersionable):
         create_sheets = self.content.get_sheets_create(resource, self.request)
-        is_first = get_sheet_field(self.context, ITags, 'FIRST') == resource
+        is_first = get_sheet_field(self.context, ITags, 'FIRST',
+                                   registry=self.registry) == resource
         appstructs = self.request.validated.get('data', {})
         for sheet in create_sheets:
             isheet = sheet.meta.isheet
@@ -1028,8 +1028,8 @@ def validate_login_password(context, request: Request):
     user = request.validated.get('user', None)
     if user is None:
         return
-    password_sheet = get_sheet(user, IPasswordAuthentication,
-                               registry=request.registry)
+    registry = request.registry
+    password_sheet = registry.content.get_sheet(user, IPasswordAuthentication)
     password = request.validated['password']
     try:
         valid = password_sheet.check_plaintext_password(password)

@@ -13,7 +13,6 @@ from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.workflows import add_workflow
-from adhocracy_core.utils import get_sheet
 
 
 def do_transition_to_propose(context: IPool, request: Request, **kwargs):
@@ -54,8 +53,9 @@ def _change_children_to_rejected_or_selected(context: IPool, request: Request,
 
 
 def _store_state_data(context: IWorkflowAssignment, state_name: str,
-                      request: Request, **kwargs):
-    sheet = get_sheet(context, IWorkflowAssignment)
+                      request: Request,
+                      **kwargs):
+    sheet = request.registry.content.get_sheet(context, IWorkflowAssignment)
     state_data = sheet.get()['state_data']
     datas = [x for x in state_data if x['name'] == state_name]
     if datas == []:
@@ -69,7 +69,7 @@ def _store_state_data(context: IWorkflowAssignment, state_name: str,
 
 def _remove_state_data(context: IWorkflowAssignment, state_name: str,
                        key: str, request: Request):
-    sheet = get_sheet(context, IWorkflowAssignment)
+    sheet = request.registry.content.get_sheet(context, IWorkflowAssignment)
     state_data = sheet.get()['state_data']
     datas = [x for x in state_data if x['name'] == state_name]
     if datas == []:
@@ -100,9 +100,11 @@ def _get_children_sort_by_rates(context) -> []:
 def _do_transition(context, request: Request, from_state: str, to_state: str,
                    start_date: datetime=None):
     try:
-        sheet = request.registry.content.get_sheet(context, IWorkflowAssignment)
+        sheet = request.registry.content.get_sheet(
+            context,
+            IWorkflowAssignment)
     except RuntimeConfigurationError:
-        pass
+        pass  # we ignore context without IWorklowAssignment sheet
     else:
         current_state = sheet.get()['workflow_state']
         if current_state == from_state:

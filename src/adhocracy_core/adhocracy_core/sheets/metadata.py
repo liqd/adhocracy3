@@ -14,7 +14,6 @@ from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Reference
-from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import now
 
 
@@ -113,7 +112,7 @@ def view_blocked_by_metadata(resource: IResource, registry: Registry,
     result = {'reason': block_reason}
     if not IMetadata.providedBy(resource):
         return result
-    metadata = get_sheet(resource, IMetadata, registry=registry)
+    metadata = registry.content.get_sheet(resource, IMetadata)
     appstruct = metadata.get()
     result['modification_date'] = appstruct['modification_date']
     result['modified_by'] = appstruct['modified_by']

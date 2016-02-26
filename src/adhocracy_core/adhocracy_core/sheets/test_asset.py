@@ -31,10 +31,9 @@ class TestIHasAssetPoolSheet:
         assert data['asset_pool'] == service
 
     @mark.usefixtures('integration')
-    def test_includeme_register_has_asset_pool_sheet(registry, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_has_asset_pool_sheet(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestIAssetMetadata:
@@ -78,7 +77,6 @@ class TestIAssetMetadata:
         assert appstruct['size'] == 890828
 
     @mark.usefixtures('integration')
-    def test_includeme_register(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)

@@ -193,13 +193,12 @@ class TestIntegrationPoolSheet:
         return registry.content.create(
             content_type.__identifier__, parent, appstructs)
 
-    def _get_pool_sheet(self, pool):
+    def _get_pool_sheet(self, pool, registry):
         from adhocracy_core.sheets.pool import IPool
-        from adhocracy_core.utils import get_sheet
-        return get_sheet(pool, IPool)
+        return registry.content.get_sheet(pool, IPool)
 
-    def test_get_empty(self, pool):
-        inst = self._get_pool_sheet(pool)
+    def test_get_empty(self, pool, registry):
+        inst = self._get_pool_sheet(pool, registry)
         assert inst.get() == {'elements': [],
                               'frequency_of': {},
                               'group_by': {},
@@ -208,18 +207,17 @@ class TestIntegrationPoolSheet:
 
     def test_get_custom_search_empty(self, registry, pool):
         child = self._make_resource(registry, parent=pool, name='child')
-        inst = self._get_pool_sheet(pool)
+        inst = self._get_pool_sheet(pool, registry)
         assert inst.get({'indexes': {'name':'WRONG'}})['elements'] == []
 
     def test_get_custom_search_not_empty(self, registry, pool):
         child = self._make_resource(registry, parent=pool, name='child')
-        inst = self._get_pool_sheet(pool)
+        inst = self._get_pool_sheet(pool, registry)
         assert inst.get({'indexes': {'name':'child'}})['elements'] == [child]
 
 
 @mark.usefixtures('integration')
-def test_includeme_register_pool_sheet(config):
+def test_includeme_register_pool_sheet(registry):
     from adhocracy_core.sheets.pool import IPool
-    from adhocracy_core.utils import get_sheet
     context = testing.DummyResource(__provides__=IPool)
-    assert get_sheet(context, IPool)
+    assert registry.content.get_sheet(context, IPool)

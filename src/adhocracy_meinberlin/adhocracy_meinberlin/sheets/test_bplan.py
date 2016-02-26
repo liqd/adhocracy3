@@ -44,10 +44,9 @@ class TestProposalSheet:
         assert inst.get() == wanted
 
     @mark.usefixtures('integration')
-    def test_includeme_register(registry, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register(self, registry, meta):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestProposalSchema:
@@ -110,10 +109,9 @@ class TestProcessSettingsSheet:
         assert inst.get() == wanted
 
     @mark.usefixtures('integration')
-    def test_includeme_register(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestProcessPrivateSettingsSheet:
@@ -137,13 +135,12 @@ class TestProcessPrivateSettingsSheet:
         assert verifyObject(IResourceSheet, inst)
 
     @mark.usefixtures('integration')
-    def test_get_empty(self, meta, context, registry):
+    def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
         wanted = {'office_worker_email': ''}
         assert inst.get() == wanted
 
     @mark.usefixtures('integration')
-    def test_includeme_register(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)

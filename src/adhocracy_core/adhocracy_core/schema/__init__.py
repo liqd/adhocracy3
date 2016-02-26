@@ -23,7 +23,6 @@ import pytz
 
 from adhocracy_core.utils import normalize_to_tuple
 from adhocracy_core.exceptions import RuntimeConfigurationError
-from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_iresource
 from adhocracy_core.utils import now
 from adhocracy_core.interfaces import SheetReference
@@ -723,7 +722,7 @@ def create_post_pool_validator(child_node: Reference, kw: dict) -> callable:
         child_node_value = node.get_value(value, child_node.name)
         referenced = normalize_to_tuple(child_node_value)
         for resource in referenced:
-            sheet = get_sheet(resource, isheet, registry=registry)
+            sheet = registry.content.get_sheet(resource, isheet)
             post_pool_type = _get_post_pool_type(sheet.schema)
             post_pool = _get_post_pool(resource, post_pool_type)
             _validate_post_pool(node, (context,), post_pool)

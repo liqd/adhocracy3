@@ -1,6 +1,7 @@
 """Scripts to migrate legacy objects in existing databases."""
 import logging  # pragma: no cover
 
+from pyramid.traversal import get_current_registry
 from substanced.util import find_service
 from zope.interface import alsoProvides
 from zope.interface import directlyProvides
@@ -11,7 +12,6 @@ from adhocracy_core.interfaces import search_query
 from adhocracy_core.evolution import log_migration
 from adhocracy_core.evolution import migrate_new_sheet
 from adhocracy_core.evolution import _search_for_interfaces
-from adhocracy_core.utils import get_sheet
 from adhocracy_meinberlin.resources.kiezkassen import IProposalVersion
 import adhocracy_core.sheets
 import adhocracy_meinberlin.sheets
@@ -110,6 +110,7 @@ def change_bplan_officeworker_email_representation(root):  # pragma: no cover
     from adhocracy_meinberlin.sheets.bplan import IProcessSettings
     from adhocracy_meinberlin.sheets.bplan import IProcessPrivateSettings
     from adhocracy_meinberlin.sheets.bplan import OfficeWorkerUserReference
+    registry = get_current_registry(root)
     migrate_new_sheet(root, IProcess, IProcessPrivateSettings)
     catalogs = find_service(root, 'catalogs')
     bplaene = _search_for_interfaces(catalogs, IProcess)
@@ -121,7 +122,9 @@ def change_bplan_officeworker_email_representation(root):  # pragma: no cover
             IProcessSettings)
         if 'office_worker' in process_settings_ref:
             office_worker = process_settings_ref['office_worker'][0]
-            private_settings = get_sheet(bplan, IProcessPrivateSettings)
+            private_settings = registry.content.get_sheet(
+                bplan,
+                IProcessPrivateSettings)
             private_settings.set({'office_worker_email': office_worker.email})
             objectmap.disconnect(bplan, office_worker,
                                  OfficeWorkerUserReference)

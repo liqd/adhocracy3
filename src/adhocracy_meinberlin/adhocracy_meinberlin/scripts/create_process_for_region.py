@@ -10,7 +10,6 @@ from pyramid.traversal import find_resource
 
 import transaction
 
-from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.geo import IMultiPolygon
@@ -34,14 +33,14 @@ def create_process_for_region():
     root = env['root']
     registry = env['registry']
 
-    district = _fetch_district_by_name(root, args.region_name)
+    district = _fetch_district_by_name(root, args.region_name, registry)
     organisation = _fetch_organisation_by_name(root, args.organisation_name)
 
     _create_process(root, registry, organisation, district)
 
 
-def _fetch_district_by_name(root, district):
-    pool = get_sheet(root, IPool)
+def _fetch_district_by_name(root, district, registry):
+    pool = registry.content.get_sheet(root, IPool)
     params = {'depth': 3,
               'interfaces': IMultiPolygon,
               }
@@ -66,8 +65,8 @@ def _fetch_organisation_by_name(root, organisation_path):
 
 def _create_process(root, registry, organisation, district):
 
-    name = get_sheet_field(district, IName, 'name')
-    title = get_sheet_field(district, ITitle, 'title')
+    name = get_sheet_field(district, IName, 'name', registry=registry)
+    title = get_sheet_field(district, ITitle, 'title', registry=registry)
 
     appstructs = {IName.__identifier__:
                   {'name': name},

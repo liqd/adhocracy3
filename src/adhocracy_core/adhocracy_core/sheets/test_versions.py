@@ -2,6 +2,7 @@ import colander
 from pyramid import testing
 from pytest import fixture
 from pytest import raises
+from pytest import mark
 
 
 class TestValidateLinearHistoryNoMerge:
@@ -131,9 +132,9 @@ class TestVersionsSheet:
         return versions_meta
 
     def test_create(self, meta, context):
-        from adhocracy_core.sheets.versions import IVersions
-        from adhocracy_core.sheets.versions import VersionsSchema
         from adhocracy_core.sheets.pool import PoolSheet
+        from .versions import IVersions
+        from .versions import VersionsSchema
         inst = meta.sheet_class(meta, context)
         assert isinstance(inst, PoolSheet)
         assert inst.meta.isheet == IVersions
@@ -150,14 +151,10 @@ class TestVersionsSheet:
         inst = meta.sheet_class(meta, context)
         assert inst.get() == {'elements': []}
 
-
-def test_includeme_register_version_sheet(config):
-    from adhocracy_core.utils import get_sheet
-    from adhocracy_core.sheets.versions import IVersions
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.sheets.versions')
-    context = testing.DummyResource(__provides__=IVersions)
-    assert get_sheet(context, IVersions)
+    @mark.usefixtures('integration')
+    def test_includeme_register_sheet(self, meta, config):
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert config.registry.content.get_sheet(context, meta.isheet)
 
 
 class TestVersionableSheet:
@@ -183,11 +180,7 @@ class TestVersionableSheet:
         data = inst.get()
         assert list(data['follows']) == []
 
-
-def test_includeme_register_versionable_sheet(config):
-    from adhocracy_core.utils import get_sheet
-    from adhocracy_core.sheets.versions import IVersionable
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.sheets.versions')
-    context = testing.DummyResource(__provides__=IVersionable)
-    assert get_sheet(context, IVersionable)
+    @mark.usefixtures('integration')
+    def test_includeme_register_sheet(self, meta, config):
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert config.registry.content.get_sheet(context, meta.isheet)

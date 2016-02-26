@@ -570,7 +570,6 @@ class TestUpdateCommentsCount:
         from adhocracy_core.resources.document import IDocumentVersion
         from adhocracy_core.resources.rate import IRateVersion
         from adhocracy_core import sheets
-        from adhocracy_core.utils import get_sheet
         pool = pool_with_catalogs
         pool['comments'] = service  # the IComment sheet needs a post pool
         comment1 = self._make_resource(pool, ICommentVersion, registry)
@@ -580,16 +579,16 @@ class TestUpdateCommentsCount:
         sub_commentable = self._make_resource(pool, IParagraphVersion, registry)
         main_commentable = self._make_resource(pool, IDocumentVersion, registry)
 
-        sheet = get_sheet(main_commentable, sheets.document.IDocument)
+        sheet = registry.content.get_sheet(main_commentable, sheets.document.IDocument)
         sheet.set({'elements': [sub_commentable]}, send_reference_event=False)
-        sheet = get_sheet(non_commentable, sheets.rate.IRate)
+        sheet = registry.content.get_sheet(non_commentable, sheets.rate.IRate)
         sheet.set({'object': [sub_commentable]}, send_reference_event=False)
 
-        sheet = get_sheet(comment3, sheets.comment.IComment)
+        sheet = registry.content.get_sheet(comment3, sheets.comment.IComment)
         sheet.set({'refers_to': sub_commentable}, send_reference_event=False)
-        sheet = get_sheet(comment2, sheets.comment.IComment)
+        sheet = registry.content.get_sheet(comment2, sheets.comment.IComment)
         sheet.set({'refers_to': comment3}, send_reference_event=False)
-        sheet = get_sheet(comment1, sheets.comment.IComment)
+        sheet = registry.content.get_sheet(comment1, sheets.comment.IComment)
         sheet.set({'refers_to': comment2}, send_reference_event=False)
 
         self.call_fut(comment1, 1, registry)

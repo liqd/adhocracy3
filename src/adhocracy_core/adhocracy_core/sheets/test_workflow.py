@@ -193,7 +193,6 @@ class TestWorkflowAssignmentSheet:
                                              'workflow_state': 'draft',
                                              'state_data': []}
 
-
     def test_set_workflow_state(self, meta, context, registry, mock_workflow):
         registry.content.get_workflow.return_value = mock_workflow
         mock_workflow._states = {'announced': {}}
@@ -214,8 +213,7 @@ class TestWorkflowAssignmentSheet:
         appstruct = getattr(context, inst._annotation_key)
         assert 'other' in appstruct
 
-
-    def tesget_next_states(self, meta, context, registry, mock_workflow):
+    def tet_get_next_states(self, meta, context, registry, mock_workflow):
         registry.content.get_workflow.return_value = mock_workflow
         mock_workflow.get_next_states.return_value = ['announced']
         inst = meta.sheet_class(meta, context, registry=registry)
@@ -224,7 +222,6 @@ class TestWorkflowAssignmentSheet:
         mock_workflow.get_next_states.assert_called_with(inst.context, request)
 
     @mark.usefixtures('integration')
-    def test_includeme_register(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register(self, meta, config):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert config.registry.content.get_sheet(context, meta.isheet)

@@ -141,5 +141,6 @@ def _get_creator(resource_info: dict,
 
 def _get_user_locator(context: IResource, registry: Registry) -> IUserLocator:
     request = Request.blank('/dummy')
+    request.registry = registry
     locator = registry.getMultiAdapter((context, request), IUserLocator)
     return locator

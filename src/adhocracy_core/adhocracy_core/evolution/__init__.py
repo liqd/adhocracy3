@@ -48,7 +48,6 @@ from adhocracy_core.sheets.relation import IPolarizable
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
-from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import has_annotation_sheet_data
 
@@ -165,8 +164,8 @@ def log_migration(func):
 def _migrate_field_values(registry: Registry, resource: IResource,
                           isheet: IInterface, isheet_old: IInterface,
                           fields_mapping=[(str, str)]):
-    sheet = get_sheet(resource, isheet, registry=registry)
-    old_sheet = get_sheet(resource, isheet_old, registry=registry)
+    sheet = registry.content.get_sheet(resource, isheet)
+    old_sheet = registry.content.get_sheet(resource, isheet_old)
     appstruct = {}
     for field, old_field in fields_mapping:
         old_appstruct = old_sheet.get()
@@ -314,13 +313,14 @@ def hide_password_resets(root):  # pragma: no cover
 @log_migration
 def lower_case_users_emails(root):  # pragma: no cover
     """Lower case users email, add 'private_user_email'/'user_name' index."""
+    registry = get_current_registry(root)
     _update_adhocracy_catalog(root)
     catalogs = find_service(root, 'catalogs')
     users = find_service(root, 'principals', 'users')
     for user in users.values():
         if not IUserExtended.providedBy(user):
             return
-        sheet = get_sheet(user, IUserExtended)
+        sheet = registry.content.get_sheet(user, IUserExtended)
         sheet.set({'email': user.email.lower()})
         catalogs.reindex_index(user, 'private_user_email')
         catalogs.reindex_index(user, 'user_name')

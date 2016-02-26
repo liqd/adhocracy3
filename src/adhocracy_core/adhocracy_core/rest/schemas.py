@@ -56,7 +56,6 @@ from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.catalog import ICatalogsService
 from adhocracy_core.catalog.index import ReferenceIndex
-from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import now
 from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import unflatten_multipart_request
@@ -106,8 +105,8 @@ class GETItemResponseSchema(ResourcePathAndContentSchema):
 
 def add_put_data_subschemas(node: colander.Schema, kw: dict):
     """Add the resource sheet colander schemas that are 'editable'."""
-    context = kw.get('context', None)
-    request = kw.get('request', None)
+    context = kw['context']
+    request = kw['request']
     sheets = request.registry.content.get_sheets_edit(context, request)
     if request.content_type == 'multipart/form-data':
         body = unflatten_multipart_request(request)
@@ -937,12 +936,13 @@ class POSTCreatePasswordResetRequestSchema(colander.Schema):
 def validate_password_reset_path(node, kw):
     """Validate password reset and add the user needing password reset."""
     request = kw['request']
+    registry = request.registry
 
     def validate_path(node, value):
         if value is None:
             return
         _raise_if_no_password_reset(node, value)
-        metadata = get_sheet(value, IMetadata).get()
+        metadata = registry.content.get_sheet(value, IMetadata).get()
         _raise_if_outdated(node, value, metadata['creation_date'])
         request.validated['user'] = metadata['creator']
     return validate_path

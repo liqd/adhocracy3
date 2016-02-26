@@ -68,10 +68,9 @@ class TestOrganizationInfoSheet:
         assert inst.get() == wanted
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestOrganizationInfoSchema:
@@ -200,10 +199,9 @@ class TestPitchSheet:
         assert inst.meta.schema_class == PitchSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestPartnersSheet:
@@ -241,10 +239,9 @@ class TestPartnersSheet:
         assert inst.get() == wanted
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestTopicSchema:
@@ -328,10 +325,9 @@ class TestTopicSheet:
         assert inst.meta.schema_class == TopicSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestDurationSchema:
@@ -376,10 +372,9 @@ class TestDurationSheet:
         assert inst.meta.schema_class == DurationSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestLocationSchema:
@@ -455,10 +450,9 @@ class TestLocationSheet:
         assert inst.meta.schema_class == LocationSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestStatusSchema:
@@ -503,10 +497,9 @@ class TestStatusSheet:
         assert inst.meta.schema_class == StatusSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestChallengeSchema:
@@ -552,10 +545,9 @@ class TestChallengeSheet:
         assert inst.meta.schema_class == ChallengeSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestGoalSchema:
@@ -601,10 +593,9 @@ class TestGoalSheet:
         assert inst.meta.schema_class == GoalSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestPlanSchema:
@@ -650,10 +641,9 @@ class TestPlanSheet:
         assert inst.meta.schema_class == PlanSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestTargetSchema:
@@ -698,10 +688,9 @@ class TestTargetSheet:
         assert inst.meta.schema_class == TargetSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestTeamSchema:
@@ -746,10 +735,9 @@ class TestTeamSheet:
         assert inst.meta.schema_class == TeamSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestExtraInfoSchema:
@@ -795,10 +783,9 @@ class TestExtraInfoSheet:
         assert inst.meta.schema_class == ExtraInfoSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestConnectionCohesionSchema:
@@ -844,10 +831,9 @@ class TestConnectionCohesionSheet:
         assert inst.meta.schema_class == ConnectionCohesionSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestDifferenceSchema:
@@ -893,10 +879,9 @@ class TestDifferenceSheet:
         assert inst.meta.schema_class == DifferenceSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestPracticalRelevanceSchema:
@@ -942,10 +927,9 @@ class TestPracticalRelevanceSheet:
         assert inst.meta.schema_class == PracticalRelevanceSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestFinancialPlanningSchema:
@@ -998,10 +982,9 @@ class TestFinancialPlanningSheet:
         assert inst.meta.schema_class == FinancialPlanningSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestExtraFundingSchema:
@@ -1048,10 +1031,9 @@ class TestExtraFundingSheet:
         assert inst.meta.schema_class == ExtraFundingSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestCommunitySchema:
@@ -1126,10 +1108,9 @@ class TestCommunitySheet:
         assert inst.meta.schema_class == CommunitySchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestWinnerInfoSchema:
@@ -1174,7 +1155,6 @@ class TestWinnerInfoSheet:
         assert inst.meta.permission_edit == 'edit_mercator2_winnerinfo'
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)

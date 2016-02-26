@@ -7,7 +7,6 @@ from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.authorization import set_acms_for_app_root
 from adhocracy_core.resources.root import root_acm
-from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import has_annotation_sheet_data
 from adhocracy_meinberlin.resources.root import meinberlin_acm
 from adhocracy_meinberlin.resources.bplan import IProposalVersion
@@ -24,8 +23,9 @@ def send_bplan_submission_confirmation_email(event):
     proposal_version = event.object
     if not _is_proposal_creation_finished(proposal_version):
         return
-    appstruct = _get_appstruct(proposal_version)
-    process_settings = _get_all_process_settings(proposal_version)
+    appstruct = _get_appstruct(proposal_version, event.registry)
+    process_settings = _get_all_process_settings(proposal_version,
+                                                 event.registry)
     if process_settings['plan_number'] == 0 or \
             process_settings['office_worker_email'] is None:
         return
@@ -54,10 +54,12 @@ def _get_templates_values(process_settings, appstruct):
     return templates_values
 
 
-def _get_all_process_settings(proposal_version):
+def _get_all_process_settings(proposal_version, registry):
     process = find_interface(proposal_version, resources.bplan.IProcess)
-    process_settings = get_sheet(process, sheets.bplan.IProcessSettings).get()
-    process_private_settings = get_sheet(
+    process_settings = registry.content.get_sheet(
+        process,
+        sheets.bplan.IProcessSettings).get()
+    process_private_settings = registry.content.get_sheet(
         process,
         sheets.bplan.IProcessPrivateSettings).get()
     all_process_settings = process_settings.copy()
@@ -65,8 +67,9 @@ def _get_all_process_settings(proposal_version):
     return all_process_settings
 
 
-def _get_appstruct(proposal_version):
-    proposal_sheet = get_sheet(proposal_version, sheets.bplan.IProposal)
+def _get_appstruct(proposal_version, registry):
+    proposal_sheet = registry.content.get_sheet(proposal_version,
+                                                sheets.bplan.IProposal)
     appstruct = proposal_sheet.get()
     return appstruct
 

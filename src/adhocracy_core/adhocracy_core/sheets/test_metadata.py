@@ -85,10 +85,9 @@ class TestMetadataSheet:
         assert inst.meta.sheet_class is AttributeResourceSheet
 
     @mark.usefixtures('integration')
-    def test_includeme_register_metadata_sheet(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_sheet(self, meta, config):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert config.registry.content.get_sheet(context, meta.isheet)
 
 
 class TestVisibility:

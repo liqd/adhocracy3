@@ -15,11 +15,10 @@ def integration(config):
 
 
 @mark.usefixtures('integration')
-def test_includeme_register_proposal_sheet(config):
+def test_includeme_register_proposal_sheet(registry):
     from .kiezkassen import IProposal
-    from adhocracy_core.utils import get_sheet
     context = testing.DummyResource(__provides__=IProposal)
-    assert get_sheet(context, IProposal)
+    assert registry.content.get_sheet(context, IProposal)
 
 
 class TestProposalSheet:

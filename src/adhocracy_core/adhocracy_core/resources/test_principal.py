@@ -193,7 +193,6 @@ class TestGroup:
     @mark.usefixtures('integration')
     def test_create_and_add_group(self, registry, principals):
         from . import principal
-        from adhocracy_core.utils import get_sheet
         from adhocracy_core import sheets
         appstructs = {sheets.name.IName.__identifier__: {'name': 'Group1'},
                       sheets.principal.IGroup.__identifier__:
@@ -207,7 +206,7 @@ class TestGroup:
                                        parent=principals['users'],
                                        appstructs=appstructs)
         user.activate()
-        group_sheet = get_sheet(group, sheets.principal.IGroup)
+        group_sheet = registry.content.get_sheet(group, sheets.principal.IGroup)
         assert principals['groups']['Group1'] is group
         assert group_sheet.get()['users'] == [user]
         assert group_sheet.get()['roles'] == ['reader']

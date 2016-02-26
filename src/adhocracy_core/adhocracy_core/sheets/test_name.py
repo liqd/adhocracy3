@@ -1,5 +1,6 @@
 from pyramid import testing
 from pytest import fixture
+from pytest import mark
 
 
 class TestNameSheet:
@@ -24,12 +25,7 @@ class TestNameSheet:
         inst = meta.sheet_class(meta, context)
         assert inst.get() == {'name': ''}
 
-
-def test_includeme_register_name_sheet(config):
-    from adhocracy_core.sheets.name import IName
-    from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.sheets.name')
-    context = testing.DummyResource(__provides__=IName)
-    inst = get_sheet(context, IName)
-    assert inst.meta.isheet is IName
+    @mark.usefixtures('integration')
+    def test_includeme_register_name_sheet(self, meta, registry):
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
