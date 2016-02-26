@@ -141,6 +141,21 @@ class ResourceContentRegistry(ContentRegistry):
         sheet = meta.sheet_class(meta, context, self.registry)
         return sheet
 
+    def get_sheet_field(self, context: object,
+                        isheet: IInterface,
+                        field: str
+                        ) -> object:
+        """Get sheet for `context` and return the value for field `name`.
+
+        :raise adhocracy_core.exceptions.RuntimeConfigurationError:
+           if there is no `isheet` sheet registered for context.
+        :raise KeyError: if `field` does not exists for sheet `isheet`.
+        """
+        sheet = self.get_sheet(context, isheet)
+        appstruct = sheet.get()
+        value = appstruct[field]
+        return value
+
     def get_sheets_all(self, context: object) -> list:
         """Get all sheets for `context` and set the 'context' attribute."""
         iresource = get_iresource(context)

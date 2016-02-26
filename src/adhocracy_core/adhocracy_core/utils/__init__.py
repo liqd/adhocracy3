@@ -17,7 +17,6 @@ from pyramid.request import Request
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
-from pyramid.threadlocal import get_current_registry
 from pyramid.router import Router
 from substanced.util import acquire
 from substanced.util import find_catalog
@@ -266,21 +265,6 @@ def nested_dict_set(d: dict, keys: list, value: object):
     for key in keys[:-1]:
         d = d.setdefault(key, {})
     d[keys[-1]] = value
-
-
-def get_sheet_field(resource, isheet: ISheet, field_name: str,
-                    registry: Registry=None) -> object:
-    """Return value of `isheet` field `field_name` for `resource`.
-
-    :raise KeyError: if `field_name` does not exists for `isheet` sheets.
-    :raises adhocracy_core.exceptions.RuntimeConfigurationError:
-        if there is no `isheet` sheet registered for context.
-
-    """
-    registry = registry or get_current_registry(resource)
-    sheet = registry.content.get_sheet(resource, isheet)
-    field = sheet.get()[field_name]
-    return field
 
 
 def unflatten_multipart_request(request: Request) -> dict:

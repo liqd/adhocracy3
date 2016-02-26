@@ -17,7 +17,6 @@ from adhocracy_core.utils import create_filename
 from adhocracy_core.catalog.adhocracy import index_rates
 from adhocracy_core.catalog.adhocracy import index_comments
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.interfaces import search_query
 
 from pyramid.traversal import resource_path
@@ -49,10 +48,12 @@ def normalize_text(s: str) -> str:
 
 def get_text_from_sheet(proposal, field, isheet, registry):
     """Get text from sheetfields and return it."""
-    retrieved_field = get_sheet_field(proposal, IMercatorSubResources, field,
-                                      registry=registry)
-    field_text = get_sheet_field(retrieved_field, isheet, field,
-                                 registry=registry)
+    retrieved_field = registry.content.get_sheet_field(proposal,
+                                                       IMercatorSubResources,
+                                                       field)
+    field_text = registry.content.get_sheet_field(retrieved_field,
+                                                  isheet,
+                                                  field)
     return normalize_text(field_text)
 
 
@@ -126,6 +127,7 @@ def export_proposals():
                  'Experience',
                  'Heard from'])
 
+    get_sheet_field = registry.content.get_sheet_field
     for proposal in proposals:
 
         result = []

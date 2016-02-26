@@ -72,7 +72,6 @@ from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.tags import ITags
 from adhocracy_core.utils import extract_events_from_changelog_metadata
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import get_reason_if_blocked
 from adhocracy_core.utils import get_user
 from adhocracy_core.utils import is_batchmode
@@ -570,8 +569,9 @@ class PoolRESTView(SimpleRESTView):
         """Build response data structure for a POST request."""
         appstruct = {}
         if IItem.providedBy(resource):
-            first = get_sheet_field(resource, ITags, 'FIRST',
-                                    registry=self.registry)
+            first = self.registry.content.get_sheet_field(resource,
+                                                          ITags,
+                                                          'FIRST')
             appstruct['first_version_path'] = first
             schema = ItemResponseSchema().bind(request=self.request,
                                                context=resource)
@@ -641,8 +641,9 @@ class ItemRESTView(PoolRESTView):
             schema = GETItemResponseSchema().bind(request=self.request,
                                                   context=self.context)
             appstruct = {}
-            first_version = get_sheet_field(self.context, ITags, 'FIRST',
-                                            registry=self.registry)
+            first_version = self.registry.content.get_sheet_field(self.context,
+                                                                  ITags,
+                                                                  'FIRST')
             if first_version is not None:
                 appstruct['first_version_path'] = first_version
             cstruct = schema.serialize(appstruct)
@@ -666,8 +667,9 @@ class ItemRESTView(PoolRESTView):
         metric = self._get_post_metric_name()
         with statsd_timer(metric, rate=1, registry=self.registry):
             if is_batchmode(self.request) and self._creating_new_version():
-                last = get_sheet_field(self.context, ITags, 'LAST',
-                                       registry=self.registry)
+                last = self.registry.content.get_sheet_field(self.context,
+                                                             ITags,
+                                                             'LAST')
                 if is_created_in_current_transaction(last, self.registry):
                     self._update_version(last)
                     resource = last
@@ -684,8 +686,9 @@ class ItemRESTView(PoolRESTView):
 
     def _update_version(self, resource: IVersionable):
         create_sheets = self.content.get_sheets_create(resource, self.request)
-        is_first = get_sheet_field(self.context, ITags, 'FIRST',
-                                   registry=self.registry) == resource
+        is_first = self.registry.content.get_sheet_field(self.context,
+                                                         ITags,
+                                                         'FIRST')
         appstructs = self.request.validated.get('data', {})
         for sheet in create_sheets:
             isheet = sheet.meta.isheet

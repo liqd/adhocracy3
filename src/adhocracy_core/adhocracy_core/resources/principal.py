@@ -30,7 +30,6 @@ from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.resources.asset import add_assets_service
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.metadata import is_older_than
-from adhocracy_core.utils import get_sheet_field
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.pool
@@ -233,8 +232,7 @@ class PasswordReset(Base):
     def reset_password(self, password):
         """Set `password` for creator user and delete itself."""
         registry = get_current_registry(self)
-        user = get_sheet_field(self, IMetadata, 'creator',
-                               registry=registry)
+        user = registry.content.get_sheet_field(self, IMetadata, 'creator')
         password_sheet = registry.content.get_sheet(
             user, adhocracy_core.sheets.principal.IPasswordAuthentication)
         password_sheet.set({'password': password}, send_event=False)

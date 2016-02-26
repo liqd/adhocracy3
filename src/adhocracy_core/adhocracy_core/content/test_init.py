@@ -117,6 +117,23 @@ class TestResourceContentRegistry:
         with raises(KeyError):
             inst.get_sheet(context, ISheet)
 
+    def test_get_sheet_field(self, inst, mock_sheet):
+        context = testing.DummyResource()
+        inst.get_sheet = Mock(spec=inst.get_sheet,
+                              return_value = mock_sheet)
+        mock_sheet.get.return_value = {'field': 1}
+        assert inst.get_sheet_field(context, ISheet, 'field') == 1
+        inst.get_sheet.assert_called_with(context, ISheet)
+
+    def test_get_sheet_field_raise_key_error_if_wrong_field(self, inst,
+                                                            mock_sheet):
+        context = testing.DummyResource()
+        inst.get_sheet = Mock(spec=inst.get_sheet,
+                              return_value = mock_sheet)
+        mock_sheet.get.return_value = {}
+        with raises(KeyError):
+            inst.get_sheet_field(context, ISheet, 'field')
+
     def test_get_sheets_all(self, inst, context, mock_sheet):
         assert inst.get_sheets_all(context) == [mock_sheet]
         assert mock_sheet.context is context

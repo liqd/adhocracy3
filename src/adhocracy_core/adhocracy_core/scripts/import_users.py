@@ -22,7 +22,6 @@ from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.resources.badge import IBadge
 from adhocracy_core.resources.subscriber import _get_default_group
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_core import sheets
 from adhocracy_core.scripts.assign_badges import create_badge_assignment
 from adhocracy_core.sheets.name import IName
@@ -148,8 +147,9 @@ def _update_badges_assignments(user: IUser,
     _delete_badges_assignments(user, registry)
     badges = _create_badges(user, badges_names, registry)
     normalized_badges_names = [_normalize_badge_name(b) for b in badges_names]
+    get_sheet_field = registry.content.get_sheet_field
     badges_to_assign = [b for b in badges
-                        if get_sheet_field(b, IName, 'name', registry=registry)
+                        if get_sheet_field(b, IName, 'name')
                         in normalized_badges_names]
     _assign_badges(user, badges_to_assign, registry)
 

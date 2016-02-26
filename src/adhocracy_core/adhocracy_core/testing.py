@@ -396,6 +396,7 @@ def mock_content_registry() -> Mock:
     mock.sheets_edit = {}
     mock.sheets_create = {}
     mock.sheets_create_mandatory = {}
+    mock.get_sheet_field = lambda x, y, z: mock.get_sheet(x, y).get()[z]
     return mock
 
 

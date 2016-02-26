@@ -48,7 +48,6 @@ from adhocracy_core.sheets.relation import IPolarizable
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import has_annotation_sheet_data
 
 logger = logging.getLogger(__name__)
@@ -482,8 +481,9 @@ def _is_version_without_data(version: IItemVersion)\
 
 def _has_follower(version: IItemVersion,
                   registry: Registry) -> bool:  # pragma: no cover
-    followed_by = get_sheet_field(version, IVersionable, 'followed_by',
-                                  registry=registry)
+    followed_by = registry.content.get_sheet_field(version,
+                                                   IVersionable,
+                                                   'followed_by')
     return followed_by != []
 
 

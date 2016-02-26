@@ -16,7 +16,6 @@ from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.resources.principal import IUser
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import create_filename
 from adhocracy_mercator.scripts.export_users import get_most_rated_proposals
 from adhocracy_mercator.scripts.export_users import get_titles
@@ -71,7 +70,7 @@ def _get_lost_rate_users(rateable: IRateable,
                          registry: Registry,
                          ) -> set(IUser):
     lost_rate_users = set()
-    old_versions = _get_old_versions(rateable)
+    old_versions = _get_old_versions(rateable, registry)
     for old in old_versions:
         old_rate_users = _get_rate_users(old, registry)
         old_lost = old_rate_users.difference(rate_users)
@@ -79,13 +78,18 @@ def _get_lost_rate_users(rateable: IRateable,
     return lost_rate_users
 
 
-def _get_old_versions(version: IVersionable) -> [IVersionable]:
-    follows = get_sheet_field(version, IVersionable, 'follows')
+def _get_old_versions(version: IVersionable,
+                      registry: Registry) -> [IVersionable]:
+    follows = registry.content.get_sheet_field(version,
+                                               IVersionable,
+                                               'follows')
     versions = []
     while follows:
         old_version = follows[0]
         versions.append(old_version)
-        follows = get_sheet_field(old_version, IVersionable, 'follows')
+        follows = registry.content.get_sheet_field(old_version,
+                                                   IVersionable,
+                                                   'follows')
     return versions
 
 
@@ -99,5 +103,6 @@ def _get_rate_users(rateable: IRateable, registry: Registry) -> set(IUser):
               }
     pool = registry.content.get_sheet(rateable.__parent__, IPool)
     rates = pool.get(params)['elements']
+    get_sheet_field = registry.content.get_sheet_field
     users = [get_sheet_field(x, IRate, 'subject') for x in rates]
     return set(users)

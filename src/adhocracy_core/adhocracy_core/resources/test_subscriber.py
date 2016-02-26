@@ -556,12 +556,11 @@ class TestUpdateCommentsCount:
                                        send_event=False,
                                        )
 
-    def _get_comments_count(self, resource):
-        from adhocracy_core.utils import get_sheet_field
+    def _get_comments_count(self, resource, registry):
         from adhocracy_core.sheets.comment import ICommentable
-        comments_count = get_sheet_field(resource,
-                                         ICommentable,
-                                         'comments_count')
+        comments_count = registry.content.get_sheet_field(resource,
+                                                          ICommentable,
+                                                          'comments_count')
         return comments_count
 
     def test_call(self, registry, pool_with_catalogs, service):
@@ -595,11 +594,11 @@ class TestUpdateCommentsCount:
         self.call_fut(comment2, 1, registry)
         self.call_fut(comment3, 1, registry)
 
-        assert self._get_comments_count(comment1) == 0
-        assert self._get_comments_count(comment2) == 1
-        assert self._get_comments_count(comment3) == 2
-        assert self._get_comments_count(sub_commentable) == 3
-        assert self._get_comments_count(main_commentable) == 0
+        assert self._get_comments_count(comment1, registry) == 0
+        assert self._get_comments_count(comment2, registry) == 1
+        assert self._get_comments_count(comment3, registry) == 2
+        assert self._get_comments_count(sub_commentable, registry) == 3
+        assert self._get_comments_count(main_commentable, registry) == 0
 
 
 class TestUpdateCommentsCountAfterVisibilityChange:

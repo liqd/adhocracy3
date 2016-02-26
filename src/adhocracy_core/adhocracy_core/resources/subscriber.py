@@ -40,7 +40,6 @@ from adhocracy_core.sheets.tags import ITags
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
 from adhocracy_core.utils import find_graph
 from adhocracy_core.utils import get_changelog_metadata
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import get_iresource
 from adhocracy_core.utils import get_modification_date
 from adhocracy_core.utils import get_user
@@ -180,10 +179,12 @@ def _new_version_needed_and_not_forking(event: ISheetReferenceNewVersion)\
     last = _get_last_version(event.object, event.registry)
     if last is None or last is event.object:
         return True
-    value = get_sheet_field(event.object, event.isheet, event.isheet_field,
-                            registry=event.registry)
-    last_value = get_sheet_field(last, event.isheet, event.isheet_field,
-                                 registry=event.registry)
+    value = event.registry.content.get_sheet_field(event.object,
+                                                   event.isheet,
+                                                   event.isheet_field)
+    last_value = event.registry.content.get_sheet_field(last,
+                                                        event.isheet,
+                                                        event.isheet_field)
     if last_value == value:
         return False
     else:
@@ -194,7 +195,7 @@ def _get_last_version(resource: IItemVersion,
                       registry: Registry) -> IItemVersion:
     """Get last version of  resource' according to the last tag."""
     item = find_interface(resource, IItem)
-    last = get_sheet_field(item, ITags, 'LAST', registry=registry)
+    last = registry.content.get_sheet_field(item, ITags, 'LAST')
     return last
 
 
@@ -239,8 +240,9 @@ def autoupdate_non_versionable_has_new_version(event):
 
 def send_password_reset_mail(event):
     """Send mail with reset password link if a reset resource is created."""
-    user = get_sheet_field(event.object, IMetadata, 'creator',
-                           registry=event.registry)
+    user = event.registry.content.get_sheet_field(event.object,
+                                                  IMetadata,
+                                                  'creator')
     password_reset = event.object
     event.registry.messenger.send_password_reset_mail(user, password_reset)
 
@@ -307,8 +309,9 @@ def update_comments_count_after_visibility_change(event):
     else:
         delta = 0
     if delta != 0:
-        versions = get_sheet_field(event.object, IVersions, 'elements',
-                                   registry=event.registry)
+        versions = event.registry.content.get_sheet_field(event.object,
+                                                          IVersions,
+                                                          'elements')
         for version in versions:
             update_comments_count(version, delta, event.registry)
 

@@ -11,7 +11,6 @@ from adhocracy_core.sheets.pool import PoolSheet
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.utils import is_created_in_current_transaction
 from adhocracy_core.utils import is_batchmode
-from adhocracy_core.utils import get_sheet_field
 
 
 class IVersionable(ISheet):
@@ -48,7 +47,7 @@ def validate_linear_history_no_fork(node: colander.SchemaNode, value: list):
     request = node.bindings['request']
     registry = node.bindings['registry']
     batchmode = is_batchmode(request)
-    last = get_sheet_field(context, ITags, 'LAST', registry=registry)
+    last = registry.content.get_sheet_field(context, ITags, 'LAST')
     if batchmode and is_created_in_current_transaction(last, registry):
         # In batchmode there is only one new last version created that is
         # updated by the following versions. See

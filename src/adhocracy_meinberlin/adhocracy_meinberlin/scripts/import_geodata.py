@@ -28,7 +28,6 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.resources.geo import ILocationsService
 from adhocracy_core.resources.geo import multipolygon_meta
 from adhocracy_core.sheets.geo import IMultiPolygon
-from adhocracy_core.utils import get_sheet_field
 
 
 # Set GDAL_LEGACY flag for GDAL <= 1.10
@@ -164,13 +163,13 @@ def _fetch_all_districs(root: IResource, registry: Registry) -> dict:
     results = pool.get(params)
     bezirke = results['elements']
     lookup = {}
+    get_sheet_field = registry.content.get_sheet_field
     for bezirk in bezirke:
-        if (get_sheet_field(bezirk,
-                            IMultiPolygon,
-                            'administrative_division',
-                            registry=registry) == 'stadtbezirk'):
-            name = (get_sheet_field(bezirk, IName, 'name',
-                                    registry=registry))
+        division = get_sheet_field(bezirk,
+                                   IMultiPolygon,
+                                   'administrative_division')
+        if division == 'stadtbezirk':
+            name = get_sheet_field(bezirk, IName, 'name')
             lookup[name] = bezirk
     return lookup
 

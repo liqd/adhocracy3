@@ -18,7 +18,6 @@ from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.rate import IRate
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import create_filename
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from adhocracy_core.sheets.title import ITitle
@@ -59,7 +58,7 @@ def _export_users_and_proposals_rates(root: IResource, filename: str,
     if not args.min_rate:
         args.min_rate = 0
     proposals = get_most_rated_proposals(root, args.min_rate, registry)
-    proposals_titles = get_titles(proposals)
+    proposals_titles = get_titles(proposals, registry)
     column_names = ['Username', 'Email', 'Creation date'] + proposals_titles
     with open(filename, 'w', newline='') as result_file:
         wr = csv.writer(result_file, delimiter=';', quotechar='"',
@@ -69,16 +68,17 @@ def _export_users_and_proposals_rates(root: IResource, filename: str,
         proposals_users_map = _map_rating_users(proposals, registry)
         for pos, user in enumerate(users):
             row = []
-            _append_user_data(user, row, args.include_passwords)
+            _append_user_data(user, row, args.include_passwords, registry)
             _append_rate_dates(user, proposals_users_map, row, registry)
             wr.writerow(row)
             print('exported user {0} of {1}'.format(pos, len(users)))
     print('Users exported to {0}'.format(filename))
 
 
-def get_titles(resources: [ITitle]) -> [str]:
+def get_titles(resources: [ITitle], registry: Registry) -> [str]:
     """Return all titles for `resources`."""
-    titles = [get_sheet_field(p, ITitle, 'title') for p in resources]
+    titles = [registry.content.get_sheet_field(p, ITitle, 'title')
+              for p in resources]
     return titles
 
 
@@ -118,6 +118,7 @@ def get_most_rated_proposals(root: IResource,
 def _map_rating_users(rateables: [IRateable],
                       registry: Registry) -> [(IRateable, set(IUser))]:
     rateables_users_map = []
+    get_sheet_field = registry.content.get_sheet_field
     for rateable in rateables:
         params = {'depth': 3,
                   'interfaces': IRate,
@@ -132,7 +133,9 @@ def _map_rating_users(rateables: [IRateable],
     return rateables_users_map
 
 
-def _append_user_data(user: IUser, row: [str], include_passwords: bool):
+def _append_user_data(user: IUser, row: [str], include_passwords: bool,
+                      registry: Registry):
+    get_sheet_field = registry.content.get_sheet_field
     name = get_sheet_field(user, IUserBasic, 'name')
     email = get_sheet_field(user, IUserExtended, 'email')
     creation_date = get_sheet_field(user, IMetadata, 'creation_date')
@@ -167,6 +170,8 @@ def _get_rate_date(user: IUser,
               }
     result = pool.get(params)
     rate = result['elements'][0]
-    creation_date = get_sheet_field(rate, IMetadata, 'item_creation_date')
+    creation_date = registry.content.get_sheet_field(rate,
+                                                     IMetadata,
+                                                     'item_creation_date')
     creation_date_str = creation_date.strftime('%Y-%m-%d_%H:%M:%S')
     return creation_date_str

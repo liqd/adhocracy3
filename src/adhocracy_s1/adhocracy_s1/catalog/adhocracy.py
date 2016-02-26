@@ -2,9 +2,9 @@
 from datetime import datetime
 from substanced.catalog import Field
 from pyramid.traversal import find_interface
+from pyramid.traversal import get_current_registry
 
 from adhocracy_core.catalog.adhocracy import AdhocracyCatalogIndexes
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_s1.resources.s1 import IProposal
 from adhocracy_s1.resources.s1 import IProposalVersion
@@ -24,7 +24,10 @@ def index_decision_date(context, default) -> datetime:
     context = find_interface(context, IWorkflowAssignment)
     if context is None:
         return 'default'
-    state_data = get_sheet_field(context, IWorkflowAssignment, 'state_data')
+    registry = get_current_registry(context)
+    state_data = registry.content.get_sheet_field(context,
+                                                  IWorkflowAssignment,
+                                                  'state_data')
     datas = [x for x in state_data
              if x['name'] in ['result', 'selected', 'rejected']]
     if datas:
