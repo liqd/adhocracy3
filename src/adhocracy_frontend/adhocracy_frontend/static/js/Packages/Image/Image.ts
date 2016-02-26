@@ -2,6 +2,7 @@ import * as _ from "lodash";
 
 import * as AdhConfig from "../Config/Config";
 import * as AdhHttp from "../Http/Http";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
 import RIImage from "../../Resources_/adhocracy_core/resources/image/IImage";
 import * as SIHasAssetPool from "../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
@@ -95,8 +96,10 @@ export var addImage = (
 export var uploadImageDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service,
     adhUploadImage,
-    flowFactory
+    flowFactory,
+    adhResourceUrl
 ) => {
     return {
         restrict: "E",
@@ -115,10 +118,16 @@ export var uploadImageDirective = (
                 return false;
             });
 
+            scope.goToCameFrom = () => {
+                var url = adhResourceUrl(scope.path);
+                adhTopLevelState.goToCameFrom(url);
+            };
+
             scope.submit = () => {
                 return adhUploadImage(scope.poolPath, scope.$flow)
                     .then((imagePath : string) => addImage(adhHttp)(scope.path, imagePath)
-                        .then(scope.didCompleteUpload));
+                        .then(scope.didCompleteUpload)
+                        .then(scope.goToCameFrom));
             };
         }
     };
@@ -129,7 +138,7 @@ export var showImageDirective = (
 ) => {
     return {
         restrict: "E",
-        template: "<img class=\"{{ cssClass }}\" data-ng-src=\"{{ imageUrl }}\" alt=\"{{alt}}\" />",
+        template: "<img class=\"{{ cssClass }}\" data-ng-if=\"imageUrl\" data-ng-src=\"{{ imageUrl }}\" alt=\"{{alt}}\" />",
         scope: {
             path: "@", // of the attachment resource
             cssClass: "@",
@@ -137,6 +146,7 @@ export var showImageDirective = (
             format: "@?", // defaults to "detail"
             imageMetadataNick: "@?", // defaults to SIImageMetadata.nick
             fallbackUrl: "@?", // defaults to "/static/fallback_$format.jpg";
+            noFallback: "=?",
             didFailToLoadImage: "&?"
         },
         link: (scope) => {
@@ -145,7 +155,11 @@ export var showImageDirective = (
             var imageMetadataNick = () =>
                 scope.imageMetadataNick ? scope.imageMetadataNick : SIImageMetadata.nick;
             var format = () => scope.format || "detail";
-            var fallbackUrl = () => scope.fallbackUrl || ("/static/fallback_" + format() + ".jpg");
+            var fallbackUrl = () => {
+                if (!scope.noFallback) {
+                    return scope.fallbackUrl || ("/static/fallback_" + format() + ".jpg");
+                }
+            };
             scope.imageUrl = fallbackUrl(); // show fallback till real image is loaded
 
             scope.$watch("path", (path) => {

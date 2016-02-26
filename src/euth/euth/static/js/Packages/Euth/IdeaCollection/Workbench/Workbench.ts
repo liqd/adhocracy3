@@ -84,6 +84,26 @@ export var proposalEditColumnDirective = (
     };
 };
 
+export var proposalImageColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhResourceUrl,
+    adhParentPath
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalImageColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
+            scope.goBack = () => {
+                var url = adhResourceUrl(adhParentPath(scope.proposalUrl));
+                adhTopLevelState.goToCameFrom(url);
+            };
+        }
+    };
+};
+
 export var processDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service
@@ -128,6 +148,22 @@ export var registerRoutes = (
             movingColumns: "is-show-show-hide"
         })
         .specificVersionable(RIProposal, RIProposalVersion, "edit", processType, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIProposal, version : RIProposalVersion) => {
+                return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
+                    if (!options.POST) {
+                        throw 401;
+                    } else {
+                        return {
+                            proposalUrl: version.path
+                        };
+                    }
+                });
+            }])
+        .defaultVersionable(RIProposal, RIProposalVersion, "image", processType, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide"
+        })
+        .specificVersionable(RIProposal, RIProposalVersion, "image", processType, context, [
             "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIProposal, version : RIProposalVersion) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
