@@ -30,12 +30,13 @@ class TestResourceContentRegistry:
 
     @fixture
     def sheet_meta(self, sheet_meta, mock_sheet):
+        dummy_factory = lambda x, y, z, request=None, creating=None: mock_sheet
         sheet_meta = sheet_meta._replace(isheet=ISheet,
                                          creatable=True,
                                          create_mandatory=True,
                                          editable=True,
                                          readable=True,
-                                         sheet_class=lambda x, y, z: mock_sheet,
+                                         sheet_class=dummy_factory,
                                        )
         mock_sheet.meta = sheet_meta
         return sheet_meta
@@ -68,11 +69,15 @@ class TestResourceContentRegistry:
         registry.registerUtility(policy, IAuthorizationPolicy)
         return policy
 
+    @fixture
+    def context(self):
+        return testing.DummyResource(__provides__=(IResource, ISheet))
+
     def make_one(self, registry):
         from adhocracy_core.content import ResourceContentRegistry
         return ResourceContentRegistry(registry)
 
-    def test_create(self, inst):
+    def test_create(self):
         registry = object()
         inst = self.make_one(registry)
         assert inst.registry == registry
@@ -81,53 +86,54 @@ class TestResourceContentRegistry:
         assert inst.resources_meta_addable == {}
         assert inst.workflows_meta == {}
 
-    def test_sheets_all(self, inst, mock_sheet):
-        assert inst.sheets_all == {IResource: [mock_sheet]}
-
-    def test_sheets_create(self, inst, mock_sheet):
-        assert inst.sheets_create == {IResource: [mock_sheet]}
-
-    def test_sheets_create_mandatory(self, inst, mock_sheet):
-        assert inst.sheets_create_mandatory == {IResource: [mock_sheet]}
-
-    def test_sheets_read(self, inst, mock_sheet):
-        assert inst.sheets_read == {IResource: [mock_sheet]}
-
-    def test_sheets_edit(self, inst, mock_sheet):
-        assert inst.sheets_edit == {IResource: [mock_sheet]}
-
-    def test_get_sheet_isheet_provided_and_registered(self, inst, sheet_meta):
-        from adhocracy_core.sheets import AnnotationRessourceSheet
-        context = testing.DummyResource(__provides__=ISheet)
-        inst.sheets_meta[ISheet] = sheet_meta._replace(
-            sheet_class=AnnotationRessourceSheet)
+    def test_get_sheet_isheet_provided_and_registered(self, inst, context,
+                                                      sheet_meta):
+        inst.sheets_meta[ISheet] = sheet_meta
         sheet = inst.get_sheet(context, ISheet)
         assert sheet.context is context
+        assert sheet.meta == sheet_meta
+        assert sheet.registry == inst.registry
+
+    def test_get_sheet_with_request(self, inst, context, sheet_meta, request_):
+        inst.sheets_meta[ISheet] = sheet_meta
+        sheet = inst.get_sheet(context, ISheet, request=request_)
+        assert sheet.request is request_
+
+    def test_get_sheet_with_creating(self, inst, context, sheet_meta,
+                                     resource_meta):
+        inst.sheets_meta[ISheet] = sheet_meta
+        sheet = inst.get_sheet(context, ISheet, creating=resource_meta)
+        assert sheet.creating == resource_meta
 
     def test_get_sheet_isheet_not_provided(self, inst, sheet_meta):
         from adhocracy_core.exceptions import RuntimeConfigurationError
-        context = testing.DummyResource()
+        context_no_isheet = testing.DummyResource()
         inst.sheets_meta[ISheet] = sheet_meta
         with raises(RuntimeConfigurationError):
-            inst.get_sheet(context, ISheet)
+            inst.get_sheet(context_no_isheet, ISheet)
 
-    def test_get_sheet_isheet_not_registered(self, inst):
-        context = testing.DummyResource(__provides__=ISheet)
+    def test_get_sheet_isheet_not_registered(self, inst, context):
         del inst.sheets_meta[ISheet]
         with raises(KeyError):
             inst.get_sheet(context, ISheet)
 
-    def test_get_sheet_field(self, inst, mock_sheet):
-        context = testing.DummyResource()
+    def test_get_sheet_field(self, inst, mock_sheet, context):
         inst.get_sheet = Mock(spec=inst.get_sheet,
-                              return_value = mock_sheet)
+                              return_value=mock_sheet)
         mock_sheet.get.return_value = {'field': 1}
         assert inst.get_sheet_field(context, ISheet, 'field') == 1
-        inst.get_sheet.assert_called_with(context, ISheet)
+        inst.get_sheet.assert_called_with(context, ISheet, request=None)
 
-    def test_get_sheet_field_raise_key_error_if_wrong_field(self, inst,
-                                                            mock_sheet):
-        context = testing.DummyResource()
+    def test_get_sheet_field_with_request(self, inst, mock_sheet, request_,
+                                          context):
+        inst.get_sheet = Mock(spec=inst.get_sheet,
+                              return_value=mock_sheet)
+        mock_sheet.get.return_value = {'field': 1}
+        inst.get_sheet_field(context, ISheet, 'field', request=request_)
+        inst.get_sheet.assert_called_with(context, ISheet, request=request_)
+
+    def test_get_sheet_field_raise_key_error_if_wrong_field(
+            self, inst, context, mock_sheet):
         inst.get_sheet = Mock(spec=inst.get_sheet,
                               return_value = mock_sheet)
         mock_sheet.get.return_value = {}
@@ -161,15 +167,29 @@ class TestResourceContentRegistry:
         config.testing_securitypolicy(userid='hank', permissive=False)
         assert inst.get_sheets_edit(context, request_) == []
 
-    def test_get_sheets_create(self, inst, context, mock_sheet):
+    def test_get_sheets_create(self, inst, context, mock_sheet, mocker):
+        mocker.spy(inst, 'get_sheet')
         assert inst.get_sheets_create(context) == [mock_sheet]
-        assert mock_sheet.context is context
+        inst.get_sheet.assert_called_with(context, ISheet, request=None,
+                                          creating=None)
 
-    def test_get_sheets_create_with_iresource(self, inst, context, mock_sheet):
-        inst.sheets_all[ISimple] = [mock_sheet]
+    def test_get_sheets_create_with_request(self, inst, context, mocker,
+                                            request_):
+        mocker.spy(inst, 'get_sheet')
+        inst.get_sheets_create(context, request=request_)
+        inst.get_sheet.assert_called_with(context, ISheet, request=request_,
+                                          creating=None)
+
+    def test_get_sheets_create_with_iresource(self, inst, context, mock_sheet,
+                                              resource_meta, mocker):
+        inst.resources_meta = {ISimple: resource_meta}
+        mocker.spy(inst, 'get_sheet')
         assert inst.get_sheets_create(context, iresource=ISimple) == [mock_sheet]
+        inst.get_sheet.assert_called_with(context, ISheet, request=None,
+                                          creating=resource_meta)
 
     def test_get_sheets_create_with_wrong_iresource(self, inst, context):
+        inst.resources_meta = {}
         with raises(KeyError):
             inst.get_sheets_create(context, iresource=ISimple)
 

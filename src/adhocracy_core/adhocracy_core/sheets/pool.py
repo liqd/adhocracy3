@@ -1,6 +1,5 @@
 """List, search and filter child resources."""
 from copy import deepcopy
-from pyramid.request import Request
 from pyramid.settings import asbool
 import colander
 
@@ -21,7 +20,9 @@ class PoolSheet(AnnotationRessourceSheet):
 
     _additional_params = ('serialization_form', 'show_frequency', 'show_count')
 
-    def get(self, params: dict={}, add_back_references=True) -> dict:
+    def get(self, params: dict={},
+            add_back_references=True,
+            omit_readonly=False) -> dict:
         """Return child references or arbitrary search for descendants.
 
         :param params: Parameters to update the search query to find `elements`
@@ -35,7 +36,9 @@ class PoolSheet(AnnotationRessourceSheet):
         :returns: dictionary with key/values according to
                   :class:`adhocracy_core.interfaces.SearchResult`
         """
-        return super().get(params)
+        return super().get(params,
+                           add_back_references=add_back_references,
+                           omit_readonly=omit_readonly)
 
     def _get_references_query(self, params: dict) -> SearchQuery:
         reftype = self._fields['reference']['elements'].reftype
@@ -71,41 +74,35 @@ class PoolSheet(AnnotationRessourceSheet):
                      }
         return appstruct
 
-    def get_cstruct(self, request: Request, params: dict=None) -> dict:
-        """Return cstruct data.
+    def serialize(self, params: dict=None) -> dict:
+        """Get sheet appstruct data and serialize.
 
-        Bind `request` and `self.context` to colander schema
-        (self.schema). Get sheet appstruct data and serialize.
+        Extends :func:`adhocracy_core.interfaces.IResourceSheet.serialize`
+        with the following parameters:
 
-        :param request: Bind to schema and get principals to filter elements
-                        by 'view' permission.
-        :param params: Parameters to update the search query to find `elements`
+            serialization_form (str):
+                serialization for references resources: `omit` returns an empty
+                list, `url` the resource urls, `content` all resource data.
+                Defaults to `path`.
 
-        For available  values in `params` read the `get` method docstring.
-        Automatically set params are: `only_visible` and `allows`
-        read permission. Additional params are:
+            show_count (bool):
+                add 'count` field, defaults to True.
 
-        serialization_form (str):
-            serialization for references resources: `omit` returns an empty
-            list, `url` the resource urls, `content` all resource data.
-            Defaults to `path`.
-        show_count (bool):
-            add 'count` field, defaults to True.
-        show_frequency (bool):
-            add 'aggregateby` field. defaults to False.
+            show_frequency (bool):
+                add 'aggregateby` field. defaults to False.
         """
         params = params or {}
         has_custom_filters = params != {}
         filter_view_permission = asbool(self.registry.settings.get(
             'adhocracy.filter_by_view_permission', True))
         if filter_view_permission:
-            params['allows'] = (request.effective_principals, 'view')
+            params['allows'] = (self.request.effective_principals, 'view')
         filter_visible = asbool(self.registry.settings.get(
             'adhocracy.filter_by_visible', True))
         if filter_visible:
             params['only_visible'] = True
         params_query = remove_keys_from_dict(params, self._additional_params)
-        appstruct = self.get(params=params_query)
+        appstruct = self.get(params=params_query, omit_readonly=True)
         if not has_custom_filters and self.meta.isheet is IPool:
             # workaround to reduce needless but expensive listing of elements
             params['serialization_form'] = 'omit'
@@ -117,12 +114,13 @@ class PoolSheet(AnnotationRessourceSheet):
             frequency = appstruct['frequency_of']
             appstruct['aggregateby'] = {index_name: frequency}
         # TODO: rename aggregateby in frequency_of
-        schema = self._get_schema_for_cstruct(request, params)
+        schema = self.get_schema_with_bindings()
+        schema = self._add_additional_nodes(schema, params)
         cstruct = schema.serialize(appstruct)
         return cstruct
 
-    def _get_schema_for_cstruct(self, request, params: dict):
-        schema = super()._get_schema_for_cstruct(request, params)
+    def _add_additional_nodes(self, schema: colander.MappingSchema,
+                              params: dict):
         if params.get('serialization_form', False) == 'content':
             elements = schema['elements']
             typ_copy = deepcopy(elements.children[0].typ)

@@ -29,12 +29,12 @@ class TestProposalSheet:
     def test_create(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         wanted = {'name': '',
                   'street_number': '',
                   'postal_code_city': '',
@@ -95,13 +95,13 @@ class TestProcessSettingsSheet:
     def test_create(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
 
     @mark.usefixtures('integration')
     def test_get_empty(self, meta, context, registry):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         wanted = {'plan_number': '',
                   'participation_kind': '',
                   'participation_start_date': None,
@@ -130,13 +130,13 @@ class TestProcessPrivateSettingsSheet:
     def test_create(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
 
     @mark.usefixtures('integration')
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         wanted = {'office_worker_email': ''}
         assert inst.get() == wanted
 

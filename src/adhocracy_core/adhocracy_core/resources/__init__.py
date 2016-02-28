@@ -185,11 +185,10 @@ class ResourceFactory:
 
         for key, struct in appstructs.items():
             isheet = DottedNameResolver().maybe_resolve(key)
-            sheet = registry.content.get_sheet(resource, isheet)
+            sheet = registry.content.get_sheet(resource, isheet,
+                                               request=request)
             if sheet.meta.creatable:
-                sheet.set(struct,
-                          send_event=False,
-                          request=request)
+                sheet.set(struct, send_event=False)
 
         # Fixme: Sideffect. We change here the passed creator because the
         # creator of user resources should always be the created user.
@@ -206,10 +205,10 @@ class ResourceFactory:
 
         if IMetadata.providedBy(resource):
             metadata = self._get_metadata(resource, creator, registry)
-            sheet = registry.content.get_sheet(resource, IMetadata)
+            sheet = registry.content.get_sheet(resource, IMetadata,
+                                               request=request)
             sheet.set(metadata,
                       send_event=False,
-                      request=request,
                       omit_readonly=False)
 
         if run_after_creation:

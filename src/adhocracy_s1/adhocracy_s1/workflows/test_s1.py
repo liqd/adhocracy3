@@ -29,8 +29,7 @@ class TestDoTransitionToPropose:
         mock_sheet.get.return_value = {'state_data': [{'name': 'result',
                                                        'start_date': '2015'}]}
         self.call_fut(context, request_)
-        mock_sheet.set.assert_called_with({'state_data': [{'name': 'result'}]},
-                                          request=request_)
+        mock_sheet.set.assert_called_with({'state_data': [{'name': 'result'}]})
 
 
 class TestDoTransitionToVotable:
@@ -62,8 +61,7 @@ class TestDoTransitionToVotable:
         context['child'] = testing.DummyResource()
         mock_sheet.get.return_value = {'workflow_state': 'proposed'}
         self.call_fut(context, request_, )
-        mock_sheet.set.assert_called_with({'workflow_state': 'voteable'},
-                                          request=request_)
+        mock_sheet.set.assert_called_with({'workflow_state': 'voteable'})
 
 
 class TestChangeChildrenToSelectedRejected:

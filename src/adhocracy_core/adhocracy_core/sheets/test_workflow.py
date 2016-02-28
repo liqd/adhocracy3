@@ -27,55 +27,12 @@ class TestWorkflow:
         assert isinstance(inst, AdhocracySchemaNode)
         assert inst.readonly
 
-    def test_serialize_default_workflow_is_none(self, inst):
-        inst = inst.bind(workflow=None)
-        assert inst.serialize() == ''
-
-    def test_serialize_default(self, inst, mock_workflow):
-        mock_workflow.type = 'w'
-        inst = inst.bind(workflow=mock_workflow)
-        assert inst.serialize() == 'w'
+    def test_serialize_empty(self, inst):
+        assert inst.serialize() == None
 
     def test_serialize_workflow(self, inst, mock_workflow):
         mock_workflow.type = 'w'
-        inst = inst.bind(workflow=mock_workflow)
         assert inst.serialize(mock_workflow) == 'w'
-
-
-class TestState:
-
-    @fixture
-    def inst(self):
-        from .workflow import State
-        return State()
-
-    def test_create(self, inst):
-        from adhocracy_core.schema import SingleLine
-        assert isinstance(inst, SingleLine)
-
-    def test_serialize_default_workflow_is_none(self, inst):
-        inst = inst.bind(workflow=None)
-        assert inst.serialize() == ''
-
-    def test_serialize_default_state_is_none(self, inst, mock_workflow, context):
-        mock_workflow.state_of.return_value = None
-        inst = inst.bind(workflow=mock_workflow, context=context)
-        assert inst.serialize() == ''
-
-    def test_deserialize_raise_if_wrong_state(self, inst, context, mock_workflow):
-        from colander import Invalid
-        request_ = testing.DummyRequest()
-        mock_workflow.get_next_states.return_value = []
-        inst = inst.bind(workflow=mock_workflow, context=context,
-                         request=request_)
-        with raises(Invalid):
-            inst.deserialize('announced')
-
-    def test_deserialize(self, inst, context, registry, mock_workflow, request):
-        inst = inst.bind(workflow=mock_workflow, context=context)
-        mock_workflow.get_next_states.return_value = ['announced']
-        assert inst.deserialize('announced') == 'announced'
-        assert mock_workflow.get_next_states.called_with(context, request)
 
 
 class TestStateName:
@@ -114,10 +71,13 @@ def test_state_data_list():
 
 
 def test_workflow_assignment_schema_create():
+    import colander
+    from adhocracy_core.schema import SingleLine
     from . import workflow
     inst = workflow.WorkflowAssignmentSchema()
     assert isinstance(inst['workflow'], workflow.Workflow)
-    assert isinstance(inst['workflow_state'], workflow.State)
+    assert isinstance(inst['workflow_state'], SingleLine)
+    assert inst['workflow_state'].missing == colander.drop
     assert isinstance(inst['state_data'], workflow.StateDataList)
 
 
@@ -138,24 +98,10 @@ class TestWorkflowAssignmentSheet:
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
         from . import workflow
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert isinstance(inst, workflow.WorkflowAssignmentSheet)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
-
-    def test_create_raise_if_wrong_isheet(self, meta, context):
-        from adhocracy_core.interfaces import ISheet
-        from adhocracy_core.exceptions import RuntimeConfigurationError
-        meta = meta._replace(isheet=ISheet)
-        with raises(RuntimeConfigurationError):
-            meta.sheet_class(meta, context)
-
-    def test_create_raise_if_wrong_schema(self, meta, context):
-        from colander import MappingSchema
-        from adhocracy_core.exceptions import RuntimeConfigurationError
-        meta = meta._replace(schema_class=MappingSchema)
-        with raises(RuntimeConfigurationError):
-            meta.sheet_class(meta, context)
 
     def test_get_empty_without_workflow(self, meta, context, registry):
         registry.content.get_workflow.return_value = None
@@ -174,29 +120,28 @@ class TestWorkflowAssignmentSheet:
                               'workflow_state': 'draft',
                               'state_data': []}
 
-    def test_get_cstruct_empty_without_workflow(self, meta, context, registry):
+    def test_serialize_empty_without_workflow(self, meta, context, registry,
+                                                request_):
         registry.content.get_workflow.return_value = None
-        inst = meta.sheet_class(meta, context, registry=registry)
-        request = testing.DummyRequest(registry=registry)
-        assert inst.get_cstruct(request) == {'workflow': '',
-                                             'workflow_state': '',
-                                             'state_data': []}
+        inst = meta.sheet_class(meta, context, registry, request=request_)
+        assert inst.serialize() == {'workflow': None,
+                                    'workflow_state': '',
+                                    'state_data': []}
 
-    def test_get_cstruct_empty_with_workflow(self, meta, context, registry,
-                                             mock_workflow):
+    def test_deserialize_empty_with_workflow(self, meta, context, registry,
+                                             mock_workflow, request_):
         registry.content.get_workflow.return_value = mock_workflow
         mock_workflow.type = 'w'
         mock_workflow.state_of.return_value = 'draft'
-        inst = meta.sheet_class(meta, context, registry=registry)
-        request = testing.DummyRequest(registry=registry)
-        assert inst.get_cstruct(request) == {'workflow': 'w',
-                                             'workflow_state': 'draft',
-                                             'state_data': []}
+        inst = meta.sheet_class(meta, context, registry, request=request_)
+        assert inst.serialize() == {'workflow': 'w',
+                                    'workflow_state': 'draft',
+                                    'state_data': []}
 
     def test_set_workflow_state(self, meta, context, registry, mock_workflow):
         registry.content.get_workflow.return_value = mock_workflow
         mock_workflow._states = {'announced': {}}
-        inst = meta.sheet_class(meta, context, registry=registry)
+        inst = meta.sheet_class(meta, context, registry)
         inst.set({'workflow_state': 'announced'})
         call_args = mock_workflow.transition_to_state.call_args
         assert call_args[0][0] is inst.context
@@ -206,7 +151,7 @@ class TestWorkflowAssignmentSheet:
     def test_set_other(self, meta, context, registry, mock_workflow):
         from colander import MappingSchema
         registry.content.get_workflow.return_value = mock_workflow
-        inst = meta.sheet_class(meta, context, registry=registry)
+        inst = meta.sheet_class(meta, context, registry)
         inst.schema = inst.schema.clone()
         inst.schema.add(MappingSchema(name='other'))
         inst.set({'other': {}})
@@ -216,7 +161,7 @@ class TestWorkflowAssignmentSheet:
     def tet_get_next_states(self, meta, context, registry, mock_workflow):
         registry.content.get_workflow.return_value = mock_workflow
         mock_workflow.get_next_states.return_value = ['announced']
-        inst = meta.sheet_class(meta, context, registry=registry)
+        inst = meta.sheet_class(meta, context, registry)
         request = testing.DummyRequest()
         assert inst.get_next_states(request) == ['announced']
         mock_workflow.get_next_states.assert_called_with(inst.context, request)

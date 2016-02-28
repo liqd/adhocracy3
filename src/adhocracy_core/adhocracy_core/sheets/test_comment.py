@@ -24,8 +24,8 @@ class TestCommentableSheet:
         return pool
 
     @fixture
-    def inst(self, meta, context):
-        return meta.sheet_class(meta, context)
+    def inst(self, meta, context, registry):
+        return meta.sheet_class(meta, context, registry)
 
     def test_meta(self, meta):
         from . import comment

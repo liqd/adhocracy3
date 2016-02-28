@@ -24,12 +24,12 @@ class TestDocumentSheet:
     def test_create(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'elements': []}
 
     @mark.usefixtures('integration')
@@ -54,12 +54,12 @@ class TestParagraphSheet:
     def test_create(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'text': '',
                               'documents': []}
 

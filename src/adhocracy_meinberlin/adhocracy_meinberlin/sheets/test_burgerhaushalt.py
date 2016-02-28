@@ -31,14 +31,14 @@ class TestProposalSheet:
         from adhocracy_core.interfaces import IResourceSheet
         from .burgerhaushalt import IProposal
         from .burgerhaushalt import ProposalSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
         assert inst.meta.isheet == IProposal
         assert inst.meta.schema_class == ProposalSchema
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         wanted = {'budget': None,
                   'location_text': '',
                   }

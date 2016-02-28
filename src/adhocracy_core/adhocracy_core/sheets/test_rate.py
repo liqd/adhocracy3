@@ -23,10 +23,14 @@ def _make_rateable(provides=IRateable):
 class TestRateableSheet:
 
     @fixture
-    def inst(self, pool, service):
+    def meta(self):
+        from .rate import rateable_meta
+        return rateable_meta
+
+    @fixture
+    def inst(self, pool, meta, service):
         pool['rates'] = service
-        from adhocracy_core.sheets.rate import rateable_meta
-        return rateable_meta.sheet_class(rateable_meta, pool)
+        return meta.sheet_class(meta, pool, None)
 
     def test_create(self, inst):
         from adhocracy_core.sheets import AnnotationRessourceSheet
@@ -49,7 +53,11 @@ class TestRateSheet:
         from adhocracy_core.sheets.rate import rate_meta
         return rate_meta
 
-    def test_meta(self, meta, context):
+    @fixture
+    def inst(self, meta, context, registry):
+        return meta.sheet_class(meta, context, registry)
+
+    def test_meta(self, meta):
         from adhocracy_core.sheets.rate import IRate
         from adhocracy_core.sheets.rate import RateSchema
         from adhocracy_core.sheets import AttributeResourceSheet
@@ -59,30 +67,26 @@ class TestRateSheet:
         assert meta.create_mandatory
 
     def test_crete(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst
 
-    def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+    def test_get_empty(self, inst):
         assert inst.get() == {'subject': None,
                               'object': None,
                               'rate': 0,
                               }
 
-    def test_validators(self, mocker, meta, context, request_):
+    def test_validators(self, mocker, inst, kw):
         from . import rate
-        inst = meta.sheet_class(meta, context)
         validate_value = mocker.patch.object(rate, 'create_validate_rate_value')
         validate_subject = mocker.patch.object(rate, 'create_validate_subject')
         validate_unique = mocker.patch.object(rate,
                                               'create_validate_is_unique')
-        bindings = {'context': context, 'request': request_}
+        validators = inst.schema.validator(inst.schema, kw)
 
-        validators = inst.schema.validator(inst.schema, bindings)
-
-        validate_value.assert_called_with(request_.registry)
-        validate_subject.assert_called_with(request_)
-        validate_unique.assert_called_with(context, request_.registry)
+        validate_value.assert_called_with(kw['registry'])
+        validate_subject.assert_called_with(kw['request'])
+        validate_unique.assert_called_with(kw['context'], kw['registry'])
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta, registry):

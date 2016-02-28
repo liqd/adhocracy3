@@ -106,10 +106,8 @@ class RateSchema(colander.MappingSchema):
         """Validate the rate."""
         # TODO add post_pool validator
         context = kw['context']
-        request = kw.get('request', None)
-        if request is None:
-            return
-        registry = request.registry
+        request = kw['request']
+        registry = kw['registry']
         return colander.All(create_validate_rate_value(registry),
                             create_validate_subject(request),
                             create_validate_is_unique(context, registry),

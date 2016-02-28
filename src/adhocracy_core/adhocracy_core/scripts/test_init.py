@@ -191,7 +191,6 @@ class TestImportResources:
                                 orga['badges'],
                                 appstructs=badge_appstructs,
                                 registry=registry)
-
         import_resources(root, registry, filename)
         assignments = find_resource(root, '/principals/users/badge_assignments/')
         assignment = list(assignments.values())[0]

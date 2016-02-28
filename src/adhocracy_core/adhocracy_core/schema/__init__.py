@@ -77,28 +77,32 @@ def raise_attribute_error_if_not_location_aware(context) -> None:
     context.__name__
 
 
-def validate_name_is_unique(node: colander.SchemaNode, value: str):
+def deferred_validate_name_is_unique(node: colander.SchemaNode, kw: dict):
     """Validate if `value` is name that does not exists in the parent object.
-
-    Node must a have a `parent_pool` binding object attribute
-    that points to the parent pool object
-    with :class:`adhocracy_core.interfaces.IPool`.
 
     :raises colander.Invalid: if `name` already exists in the parent or parent
                               is None.
     """
-    parent = node.bindings.get('parent_pool', None)
-    try:
-        parent.check_name(value)
-    except AttributeError:
-        msg = 'This resource has no parent pool to validate the name.'
-        raise colander.Invalid(node, msg)
-    except KeyError:
-        msg = 'The name already exists in the parent pool.'
-        raise colander.Invalid(node, msg, value=value)
-    except ValueError:
-        msg = 'The name has forbidden characters or is not a string.'
-        raise colander.Invalid(node, msg, value=value)
+    context = kw['context']
+    creating = kw['creating']
+
+    def validate_name(node, value):
+        if creating:
+            parent = context
+        else:
+            parent = context.__parent__
+        try:
+            parent.check_name(value)
+        except AttributeError:
+            msg = 'This resource has no parent pool to validate the name.'
+            raise colander.Invalid(node, msg)
+        except KeyError:
+            msg = 'The name already exists in the parent pool.'
+            raise colander.Invalid(node, msg, value=value)
+        except ValueError:
+            msg = 'The name has forbidden characters or is not a string.'
+            raise colander.Invalid(node, msg, value=value)
+    return validate_name
 
 
 class Identifier(AdhocracySchemaNode):
@@ -118,7 +122,7 @@ class Identifier(AdhocracySchemaNode):
 @colander.deferred
 def deferred_validate_name(node: colander.SchemaNode, kw: dict) -> callable:
     """Check that the node value is a valid child name."""
-    return colander.All(validate_name_is_unique,
+    return colander.All(deferred_validate_name_is_unique(node, kw),
                         *Identifier.validator.validators)
 
 
@@ -306,8 +310,12 @@ class SingleLine(AdhocracySchemaNode):
 def deferred_content_type_default(node: colander.MappingSchema,
                                   kw: dict) -> str:
     """Return the content_type for the given `context`."""
-    context = kw.get('context')
-    return get_iresource(context) or IResource
+    creating = kw['creating']
+    if creating:
+        return ''
+    else:
+        context = kw['context']
+        return get_iresource(context) or IResource
 
 
 class Boolean(AdhocracySchemaNode):
@@ -336,19 +344,13 @@ class ContentType(AdhocracySchemaNode):
     default = deferred_content_type_default
 
 
-def get_sheet_cstructs(context: IResource, request) -> dict:
+def get_sheet_cstructs(context: IResource, registry, request) -> dict:
     """Serialize and return the `viewable`resource sheet data."""
-    sheets = request.registry.content.get_sheets_read(context, request)
+    sheets = registry.content.get_sheets_read(context, request)
     cstructs = {}
     for sheet in sheets:
-        appstruct = sheet.get()
-        workflow = request.registry.content.get_workflow(context)
-        schema = sheet.schema.bind(context=context,
-                                   request=request,
-                                   workflow=workflow)
-        cstruct = schema.serialize(appstruct)
         name = sheet.meta.isheet.__identifier__
-        cstructs[name] = cstruct
+        cstructs[name] = sheet.serialize()
     return cstructs
 
 
@@ -434,24 +436,20 @@ class ResourceObject(colander.SchemaType):
         return self._serialize_location_or_url_or_content(node, value)
 
     def _serialize_location_or_url_or_content(self, node, value):
+        bindings = node.bindings.copy()
         if self.serialization_form == 'path':
-            assert 'context' in node.bindings
             return resource_path(value)
         if self.serialization_form == 'content':
-            assert 'request' in node.bindings
-            request = node.bindings['request']
-            workflow = request.registry.content.get_workflow(value)
-            schema = ResourcePathAndContentSchema().bind(request=request,
-                                                         context=value,
-                                                         workflow=workflow)
+            bindings['context'] = value
+            schema = ResourcePathAndContentSchema().bind(**bindings)
             cstruct = schema.serialize({'path': value})
-            sheet_cstructs = get_sheet_cstructs(value, request)
+            sheet_cstructs = get_sheet_cstructs(value,
+                                                bindings['registry'],
+                                                bindings['request'])
             cstruct['data'] = sheet_cstructs
             return cstruct
         else:
-            assert 'request' in node.bindings
-            request = node.bindings['request']
-            return request.resource_url(value)
+            return bindings['request'].resource_url(value)
 
     def deserialize(self, node, value):
         """Deserialize url or path to object.
@@ -474,18 +472,17 @@ class ResourceObject(colander.SchemaType):
 
     def _deserialize_location_or_url(self, node, value):
         if value.startswith('/'):
-            assert 'context' in node.bindings
             context = node.bindings['context']
             return find_resource(context, value)
         else:
-            assert 'request' in node.bindings
+            context = node.bindings['context']
             request = node.bindings['request']
             application_url_len = len(request.application_url)
             if application_url_len > len(str(value)):
                 raise KeyError
             # Fixme: This does not work with :term:`virtual hosting`
             path = value[application_url_len:]
-            return find_resource(request.root, path)
+            return find_resource(context, path)
 
 
 class Resource(AdhocracySchemaNode):
@@ -502,7 +499,7 @@ class Resource(AdhocracySchemaNode):
 @colander.deferred
 def deferred_path_default(node: colander.MappingSchema, kw: dict) -> str:
     """Return the `context`."""
-    return kw.get('context')
+    return kw['context']
 
 
 class ResourcePathSchema(colander.MappingSchema):
@@ -668,7 +665,7 @@ def deferred_get_post_pool(node: colander.MappingSchema, kw: dict) -> IPool:
         if the :term:`post_pool` does not exists in the term:`lineage`
         of `context`.
     """
-    context = kw.get('context')
+    context = kw['context']
     post_pool = _get_post_pool(context, node.iresource_or_service_name)
     return post_pool
 
@@ -703,7 +700,7 @@ class PostPool(Reference):
 
     readonly = True
     default = deferred_get_post_pool
-    missing = deferred_get_post_pool
+    missing = colander.drop
     schema_type = ResourceObject
     iresource_or_service_name = IPool
 
@@ -869,7 +866,7 @@ class ACMRow(colander.SequenceSchema):
     @colander.deferred
     def validator(node, kw):
         """Validator."""
-        registry = kw.get('registry')
+        registry = kw['registry']
 
         def validate_permission_name(node, value):
             permission_name = value[0]

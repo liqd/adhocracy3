@@ -55,7 +55,8 @@ def _change_children_to_rejected_or_selected(context: IPool, request: Request,
 def _store_state_data(context: IWorkflowAssignment, state_name: str,
                       request: Request,
                       **kwargs):
-    sheet = request.registry.content.get_sheet(context, IWorkflowAssignment)
+    sheet = request.registry.content.get_sheet(context, IWorkflowAssignment,
+                                               request=request)
     state_data = sheet.get()['state_data']
     datas = [x for x in state_data if x['name'] == state_name]
     if datas == []:
@@ -64,12 +65,13 @@ def _store_state_data(context: IWorkflowAssignment, state_name: str,
     else:
         data = datas[0]
     data.update(**kwargs)
-    sheet.set({'state_data': state_data}, request=request)
+    sheet.set({'state_data': state_data})
 
 
 def _remove_state_data(context: IWorkflowAssignment, state_name: str,
                        key: str, request: Request):
-    sheet = request.registry.content.get_sheet(context, IWorkflowAssignment)
+    sheet = request.registry.content.get_sheet(context, IWorkflowAssignment,
+                                               request=request)
     state_data = sheet.get()['state_data']
     datas = [x for x in state_data if x['name'] == state_name]
     if datas == []:
@@ -77,7 +79,7 @@ def _remove_state_data(context: IWorkflowAssignment, state_name: str,
     data = datas[0]
     if key in data:
         del data[key]
-    sheet.set({'state_data': state_data}, request=request)
+    sheet.set({'state_data': state_data})
 
 
 def _get_children_sort_by_rates(context) -> []:
@@ -102,13 +104,14 @@ def _do_transition(context, request: Request, from_state: str, to_state: str,
     try:
         sheet = request.registry.content.get_sheet(
             context,
-            IWorkflowAssignment)
+            IWorkflowAssignment,
+            request=request)
     except RuntimeConfigurationError:
         pass  # we ignore context without IWorklowAssignment sheet
     else:
         current_state = sheet.get()['workflow_state']
         if current_state == from_state:
-            sheet.set({'workflow_state': to_state}, request=request)
+            sheet.set({'workflow_state': to_state})
             if start_date is not None:
                 _store_state_data(context, to_state, request,
                                   start_date=start_date)

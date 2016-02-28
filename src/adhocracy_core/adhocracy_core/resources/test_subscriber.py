@@ -419,8 +419,8 @@ class TestUpdateModificationDate:
         self.call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'modification_date': now,
                                                   'modified_by': user}
-        assert mock_sheet.set.call_args[1] ==\
-            {'send_event': False,  'omit_readonly': False, 'request': request}
+        assert mock_sheet.set.call_args[1] == {'send_event': False,
+                                               'omit_readonly': False}
 
 
 class TestSendPasswordResetMail:

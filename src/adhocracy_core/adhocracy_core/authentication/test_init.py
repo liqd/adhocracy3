@@ -106,12 +106,12 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
 
     def setUp(self):
         context = testing.DummyResource()
+        self.context = context
         user = testing.DummyResource()
         self.user = user
         context['user'] = user
         self.config = testing.setUp()
-        self.request = testing.DummyRequest(root=context,
-
+        self.request = testing.DummyRequest(context=context,
                                             registry=self.config.registry)
         self.user_url = self.request.application_url + '/user/'
         self.userid = '/user'

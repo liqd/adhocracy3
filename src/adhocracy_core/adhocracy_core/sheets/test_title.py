@@ -14,7 +14,7 @@ class TestTitleSheet:
         from adhocracy_core.sheets.title import ITitle
         from adhocracy_core.sheets.title import TitleSchema
         from adhocracy_core.sheets import AnnotationRessourceSheet
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert isinstance(inst, AnnotationRessourceSheet)
         assert inst.meta.isheet == ITitle
         assert inst.meta.schema_class == TitleSchema
@@ -22,7 +22,7 @@ class TestTitleSheet:
         assert inst.meta.create_mandatory is False
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'title': ''}
 
     @mark.usefixtures('integration')

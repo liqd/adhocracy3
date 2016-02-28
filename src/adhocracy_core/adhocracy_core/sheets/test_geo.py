@@ -83,10 +83,10 @@ class TestMultiPolygonSheet:
         assert meta.create_mandatory is True
 
     def test_create(self, meta, context):
-        assert meta.sheet_class(meta, context)
+        assert meta.sheet_class(meta, context, None)
 
     def test_get_empty(self, meta, context, multipolygon_default):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == multipolygon_default
 
     @mark.usefixtures('integration')
@@ -135,10 +135,10 @@ class TestPointSheet:
         assert meta.create_mandatory is False
 
     def test_create(self, meta, context):
-        assert meta.sheet_class(meta, context)
+        assert meta.sheet_class(meta, context, None)
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'coordinates': (0, 0),
                               'type': 'Point'}
 
@@ -166,10 +166,10 @@ class TestLocationReferenceSheet:
         assert meta.create_mandatory is False
 
     def test_create(self, meta, context):
-        assert meta.sheet_class(meta, context)
+        assert meta.sheet_class(meta, context, None)
 
     def test_get_empty(self, meta, context, sheet_catalogs):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'location': None}
 
     @mark.usefixtures('integration')

@@ -19,13 +19,13 @@ def create_initial_content_for_item(context, registry, options):
     create = registry.content.create
     first_version = create(metadata.item_type.__identifier__, parent=context,
                            **options)
+    request = options.get('request', None)
     tags_sheet = registry.content.get_sheet(context,
                                             adhocracy_core.sheets.tags.ITags,
+                                            request=request,
                                             )
-    request = options.get('request', None)
     tags_sheet.set({'FIRST': first_version,
-                    'LAST': first_version},
-                   request=request)
+                    'LAST': first_version})
 
 
 item_meta = pool_meta._replace(

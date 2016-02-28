@@ -38,7 +38,7 @@ class TestProposalSheet:
         from adhocracy_core.interfaces import IResourceSheet
         from .kiezkassen import IProposal
         from .kiezkassen import ProposalSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
         assert inst.meta.isheet == IProposal
@@ -46,7 +46,7 @@ class TestProposalSheet:
 
     def test_get_empty(self, meta, context):
         from decimal import Decimal
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         wanted = {'budget': Decimal(0),
                   'creator_participate': False,
                   'location_text': '',

@@ -15,7 +15,7 @@ class TestHasLogbookPoolSheet:
     @fixture
     def inst(self, pool, service, meta):
         pool['logbook'] = service
-        return meta.sheet_class(meta, pool)
+        return meta.sheet_class(meta, pool, None)
 
     def test_meta(self, meta):
         from . import logbook

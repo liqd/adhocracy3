@@ -76,9 +76,7 @@ class BadgeGroupReference(SheetToSheet):
 def deferred_groups_default(node: colander.SchemaNode, kw: dict) -> []:
     """Return badge groups."""
     from adhocracy_core.resources.badge import IBadgeGroup  # no circle imports
-    context = kw.get('context', None)
-    if context is None:
-        return []
+    context = kw['context']
     parents = [x for x in lineage(context)][1:]
     groups = []
     for parent in parents:
@@ -192,9 +190,7 @@ def create_unique_badge_assignment_validator(badge_ref: Reference,
 @colander.deferred
 def deferred_validate_badge(node, kw):
     """Check `assign_badge` permission and ISheet interface of `badge` node."""
-    request = kw.get('request', None)
-    if request is None:
-        return
+    request = kw['request']
 
     def check_assign_badge_permisson(node, value):
         if not request.has_permission('assign_badge', value):

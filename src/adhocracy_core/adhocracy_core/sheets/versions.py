@@ -35,26 +35,28 @@ def validate_linear_history_no_merge(node: colander.SchemaNode, value: list):
         raise colander.Invalid(node, msg, value=value)
 
 
-def validate_linear_history_no_fork(node: colander.SchemaNode, value: list):
+def deferred_validate_linear_history_no_fork(node: colander.SchemaNode,
+                                             kw: dict):
     """Validate lineare history (no fork) for the follows field.
-
-    :param:'value': list of one 'follows' resource.
 
     :raises colander.Invalid: if value does not reference the last version.
     """
     from adhocracy_core.sheets.tags import ITags  # prevent circle dependencies
-    context = node.bindings['context']
-    request = node.bindings['request']
-    registry = node.bindings['registry']
-    batchmode = is_batchmode(request)
-    last = registry.content.get_sheet_field(context, ITags, 'LAST')
-    if batchmode and is_created_in_current_transaction(last, registry):
-        # In batchmode there is only one new last version created that is
-        # updated by the following versions. See
-        # func:`adhocracy_core.rest.views.IItemRestView.post` and
-        # func:`adhocracy_core.resource.subscriber` for more information.
-        return
-    _assert_follows_last_version(node, value, last)
+    context = kw['context']
+    request = kw['request']
+    registry = kw['registry']
+
+    def validate_linear_history(node, value):
+        batchmode = is_batchmode(request)
+        last = registry.content.get_sheet_field(context, ITags, 'LAST')
+        if batchmode and is_created_in_current_transaction(last, registry):
+            # In batchmode there is only one new last version created that is
+            # updated by the following versions. See
+            # func:`adhocracy_core.rest.views.IItemRestView.post` and
+            # func:`adhocracy_core.resource.subscriber` for more information.
+            return
+        _assert_follows_last_version(node, value, last)
+    return validate_linear_history
 
 
 def _assert_follows_last_version(node: colander.SchemaNode, value: list,
@@ -72,7 +74,7 @@ def deferred_validate_follows(node: colander.SchemaNode, kw: dict) -> callable:
     """Validate lineare history for the `follows` field."""
     # TODO add validation for ForkableVersionables
     return colander.All(validate_linear_history_no_merge,
-                        validate_linear_history_no_fork,
+                        deferred_validate_linear_history_no_fork(node, kw),
                         )
 
 

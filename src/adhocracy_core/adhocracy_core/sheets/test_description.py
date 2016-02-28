@@ -14,7 +14,7 @@ class TestDescriptionSheet:
         from adhocracy_core.sheets.description import IDescription
         from adhocracy_core.sheets.description import DescriptionSchema
         from adhocracy_core.sheets import AnnotationRessourceSheet
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert isinstance(inst, AnnotationRessourceSheet)
         assert inst.meta.isheet == IDescription
         assert inst.meta.schema_class == DescriptionSchema
@@ -22,7 +22,7 @@ class TestDescriptionSheet:
         assert inst.meta.create_mandatory is False
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'short_description': '',
                               'description': ''
                               }

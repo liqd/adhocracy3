@@ -26,10 +26,11 @@ def update_last_tag(version, registry, options):
     item = find_interface(version, IItem)
     if item is None:  # ease tests
         return
-    tags_sheet = registry.content.get_sheet(item,
-                                            adhocracy_core.sheets.tags.ITags)
     request = options.get('request', None)
-    tags_sheet.set({'LAST': version}, request=request)
+    tags_sheet = registry.content.get_sheet(item,
+                                            adhocracy_core.sheets.tags.ITags,
+                                            request=request)
+    tags_sheet.set({'LAST': version})
 
 
 def notify_new_itemversion_created(context, registry, options):

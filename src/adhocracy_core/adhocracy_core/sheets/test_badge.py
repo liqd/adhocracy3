@@ -17,7 +17,7 @@ class TestBadgeableSheet:
     @fixture
     def inst(self, pool, service, meta):
         pool['badge_assignments'] = service
-        return meta.sheet_class(meta, pool)
+        return meta.sheet_class(meta, pool, None)
 
     def test_meta(self, meta):
         from . import badge
@@ -27,10 +27,7 @@ class TestBadgeableSheet:
         assert meta.creatable is False
 
     def test_create(self, inst):
-        from zope.interface.verify import verifyObject
-        from adhocracy_core.interfaces import IResourceSheet
-        assert IResourceSheet.providedBy(inst)
-        assert verifyObject(IResourceSheet, inst)
+        assert inst
 
     def test_get_empty(self, inst, service ):
         assert inst.get() == {'post_pool': service,
@@ -44,8 +41,10 @@ class TestBadgeableSheet:
         assert inst.get()['assignments'] == [badge]
 
     @mark.usefixtures('integration')
-    def test_includeme_register(self, meta, registry):
+    def test_includeme_register(self, meta, pool, service, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
+        pool['context'] = context
+        pool['badge_assignments'] = service
         assert registry.content.get_sheet(context, meta.isheet)
 
 
@@ -202,8 +201,8 @@ class TestBadgeAssignmentsSheet:
         return badge_assignment_meta
 
     @fixture
-    def inst(self, context, meta):
-        return meta.sheet_class(meta, context)
+    def inst(self, context, meta, registry):
+        return meta.sheet_class(meta, context, registry)
 
     @fixture
     def mock_create_post_validator(self, monkeypatch):
@@ -229,10 +228,7 @@ class TestBadgeAssignmentsSheet:
         assert meta.permission_edit == 'edit'
 
     def test_create(self, inst):
-        from zope.interface.verify import verifyObject
-        from adhocracy_core.interfaces import IResourceSheet
-        assert IResourceSheet.providedBy(inst)
-        assert verifyObject(IResourceSheet, inst)
+        assert inst
 
     def test_get_empty(self, inst):
         assert inst.get() == {'subject': None,
@@ -243,11 +239,12 @@ class TestBadgeAssignmentsSheet:
     def test_validate_object_post_pool(self, inst,
                                        mock_create_post_validator,
                                        mock_create_assignment_validator):
-        inst.schema.validator(inst.schema, {})
+        inst.schema.validator(inst.schema, {'object': None})
         mock_create_post_validator.assert_called_with(inst.schema['object'],
-                                                      {})
+                                                      {'object': None})
         mock_create_assignment_validator\
-            .assert_called_with(inst.schema['badge'], inst.schema['object'], {})
+            .assert_called_with(inst.schema['badge'], inst.schema['object'],
+                                {'object': None})
 
     def test_validate_bade_validator(self, inst):
         from .badge import deferred_validate_badge
@@ -304,7 +301,7 @@ class TestBadgeSheet:
 
     @fixture
     def inst(self, context, meta):
-        return meta.sheet_class(meta, context)
+        return meta.sheet_class(meta, context, None)
 
     def test_meta(self, meta):
         from . import badge
@@ -313,33 +310,33 @@ class TestBadgeSheet:
         assert meta.permission_edit == 'edit'
 
     def test_create(self, inst):
-        from zope.interface.verify import verifyObject
-        from adhocracy_core.interfaces import IResourceSheet
-        assert IResourceSheet.providedBy(inst)
-        assert verifyObject(IResourceSheet, inst)
+        assert inst
 
     def test_get_empty(self, inst):
         assert inst.get() == {'groups': []}
 
-    def test_get_with_groups(self, inst):
+    def test_get_with_groups(self, meta, context, service):
         from adhocracy_core.resources.badge import IBadgeGroup
-        group1 = testing.DummyResource(__provides__=IBadgeGroup,
-                                       __name__='group1')
+        group1 = testing.DummyResource(__provides__=IBadgeGroup)
         group2 = testing.DummyResource(__provides__=IBadgeGroup)
-        group1['group2'] = group2
-        group2['badge'] = inst.context
+        service['group1'] = group1
+        service['group1']['group2'] = group2
+        service['group1']['group2']['badge'] = context
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'groups': [group2, group1]}
 
-    def test_get_with_groups_no_context(self, meta):
-        inst = meta.sheet_class(meta, None)
+    def test_get_with_groups_no_context(self, inst):
         assert inst.get() == {'groups': []}
 
-    def test_get_with_groups_parent_not_badge_group(self, inst):
+    def test_get_with_groups_parent_not_badge_group(self, meta, context,
+                                                    service):
         from adhocracy_core.resources.badge import IBadgeGroup
-        o1 = testing.DummyResource(__name__='o1')
+        no_group = testing.DummyResource()
         group2 = testing.DummyResource(__provides__=IBadgeGroup)
-        o1['group2'] = group2
-        group2['badge'] = inst.context
+        service['no_group'] = no_group
+        service['no_group']['group2'] = group2
+        service['no_group']['group2']['badge'] = context
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'groups': [group2]}
 
     @mark.usefixtures('integration')
@@ -358,7 +355,7 @@ class TestHasBadgesPoolSheet:
     @fixture
     def inst(self, pool, service, meta):
         pool['badges'] = service
-        return meta.sheet_class(meta, pool)
+        return meta.sheet_class(meta, pool, None)
 
     def test_meta(self, meta):
         from . import badge
@@ -377,8 +374,10 @@ class TestHasBadgesPoolSheet:
         assert inst.get() == {'badges_pool': service}
 
     @mark.usefixtures('integration')
-    def test_includeme_register(self, meta, registry):
+    def test_includeme_register(self, meta, pool, service, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
+        pool['badges'] = service
+        pool['context'] = context
         assert registry.content.get_sheet(context, meta.isheet)
 
 

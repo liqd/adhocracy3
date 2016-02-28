@@ -58,15 +58,14 @@ _ = TranslationStringFactory('adhocracy')
 
 def update_modification_date_modified_by(event):
     """Update the IMetadata fields `modified_by` and `modification_date`."""
-    sheet = event.registry.content.get_sheet(event.object, IMetadata)
-    request = event.request
+    sheet = event.registry.content.get_sheet(event.object, IMetadata,
+                                             request=event.request)
     appstruct = {}
     appstruct['modification_date'] = get_modification_date(event.registry)
-    if request is not None:
-        appstruct['modified_by'] = get_user(request)
+    if event.request is not None:
+        appstruct['modified_by'] = get_user(event.request)
     sheet.set(appstruct,
               send_event=False,
-              request=request,
               omit_readonly=False,
               )
 

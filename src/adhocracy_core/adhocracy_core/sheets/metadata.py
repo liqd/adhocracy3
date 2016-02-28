@@ -44,11 +44,9 @@ class MetadataModifiedByReference(SheetToSheet):
 def deferred_validate_hidden(node, kw):
     """Check hide_permission."""
     context = kw['context']
-    request = kw.get('request', None)
-    if request is None:
-        return
+    request = kw['request']
 
-    def check_hide_permisison(node, cstruct):
+    def check_hide_permisison(node, value):
         if not request.has_permission('hide', context):
             raise colander.Invalid(node, 'Changing this field is not allowed')
     return check_hide_permisison
