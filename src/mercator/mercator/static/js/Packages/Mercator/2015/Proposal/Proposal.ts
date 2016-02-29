@@ -5,7 +5,6 @@ import * as _ from "lodash";
 
 import * as AdhBadge from "../../../Badge/Badge";
 import * as AdhConfig from "../../../Config/Config";
-import * as AdhCredentials from "../../../User/Credentials";
 import * as AdhHttp from "../../../Http/Http";
 import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
@@ -955,23 +954,22 @@ export var listItem = (
 };
 
 
-export var addButton = (
+export var addProposalButton = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhTopLevelState : AdhTopLevelState.Service,
     adhPermissions : AdhPermissions.Service,
-    adhCredentials : AdhCredentials.Service,
     $q : angular.IQService
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/AddButton.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/AddProposalButton.html",
         link: (scope) => {
             getWorkflowState(adhHttp, adhTopLevelState, $q)().then((workflowState) => {
-                scope.loggedOutAndParticipate = (!adhCredentials.loggedIn && workflowState === "participate");
+                scope.participate = workflowState === "participate";
             });
-            adhPermissions.bindScope(scope, adhConfig.rest_url + adhConfig.custom["mercator_platform_path"], "poolOptions");
-        }
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");        }
     };
 };
 

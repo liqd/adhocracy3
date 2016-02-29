@@ -1,7 +1,6 @@
 import * as AdhAngularHelpersModule from "../../../AngularHelpers/Module";
 import * as AdhBadgeModule from "../../../Badge/Module";
 import * as AdhBlogModule from "../../../Blog/Module";
-import * as AdhCredentialsModule from "../../../User/Module";
 import * as AdhHttpModule from "../../../Http/Module";
 import * as AdhImageModule from "../../../Image/Module";
 import * as AdhInjectModule from "../../../Inject/Module";
@@ -30,7 +29,6 @@ export var register = (angular) => {
             AdhAngularHelpersModule.moduleName,
             AdhBadgeModule.moduleName,
             AdhBlogModule.moduleName,
-            AdhCredentialsModule.moduleName,
             AdhHttpModule.moduleName,
             AdhImageModule.moduleName,
             AdhInjectModule.moduleName,
@@ -107,15 +105,8 @@ export var register = (angular) => {
             }])
         .directive("adhMercator2015ProposalListing", ["adhConfig", Proposal.listing])
         .directive("adhMercator2015UserProposalListing", ["adhConfig", Proposal.userListing])
-        .directive("adhMercator2015ProposalAddButton", [
-            "adhConfig",
-            "adhHttp",
-            "adhTopLevelState",
-            "adhPermissions",
-            "adhCredentials",
-            "$q",
-            Proposal.addButton
-            ])
+        .directive("adhMercator2015AddProposalButton", [
+            "adhConfig", "adhHttp", "adhTopLevelState", "adhPermissions", "$q", Proposal.addProposalButton])
         .controller("mercatorProposalFormController", [
             "$scope", "$element", "$window", "adhShowError", "adhSubmitIfValid", Proposal.mercatorProposalFormController]);
 };
