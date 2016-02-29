@@ -14,7 +14,7 @@ import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 
 import * as AdhUtil from "../../../Util/Util";
 
-import RIProcess from "../../../../Resources_/adhocracy_mercator/resources/mercator/IProcess";
+import RIMercator2015Process from "../../../../Resources_/adhocracy_mercator/resources/mercator/IProcess";
 
 import * as Proposal from "./Proposal";
 
@@ -42,7 +42,7 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", "adhConfigProvider", (adhResourceAreaProvider, adhConfigProvider) => {
             var adhConfig = adhConfigProvider.config;
-            var processType = RIProcess.content_type;
+            var processType = RIMercator2015Process.content_type;
             var customHeader = adhConfig.pkg_path + Proposal.pkgLocation + "/CustomHeader.html";
             adhResourceAreaProvider.customHeader(processType, customHeader);
             Proposal.registerRoutes(processType)(adhResourceAreaProvider);

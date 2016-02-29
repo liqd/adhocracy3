@@ -5,7 +5,7 @@ import * as AdhProcessModule from "../../../Process/Module";
 import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
 import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 
-import RIProcess from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IProcess";
+import RIMercator2016Process from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IProcess";
 
 import * as AdhMercator2015WorkbenchModule from "../../2015/Workbench/Module";
 import * as AdhMercator2016ProposalModule from "../Proposal/Module";
@@ -16,7 +16,7 @@ import * as Workbench from "./Workbench";
 export var moduleName = "adhMercator2016Workbench";
 
 export var register = (angular) => {
-    var processType = RIProcess.content_type;
+    var processType = RIMercator2016Process.content_type;
 
     angular
         .module(moduleName, [
