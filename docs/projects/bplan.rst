@@ -1,0 +1,1 @@
+../../src/adhocracy_meinberlin/docs/bplan.rst
