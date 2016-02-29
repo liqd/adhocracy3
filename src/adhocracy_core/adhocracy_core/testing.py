@@ -692,15 +692,14 @@ def make_configurator(app_settings: dict, package) -> Configurator:
                                 root_factory=package.root_factory)
     configurator.include(package)
     add_create_test_users_subscriber(configurator)
-    # TODO
-    # The following subscriber is a workaround to prevent ComponentLookupError:
-    # (<InterfaceClass substanced.interfaces.ICatalogFactory>, 'system')
-    # in functional tests.
-
     # FIXME  this creates a problem by euth, since euth override the root acl
-    # def set_acm_subscriber(event):
-    #     set_acms_for_app_root(event.app, (root_acm,))
-    # configurator.add_subscriber(set_acm_subscriber, ApplicationCreated)
+    from adhocracy_core.resources.root import root_acm
+    from adhocracy_core.authorization import set_acms_for_app_root
+    from pyramid.events import ApplicationCreated
+
+    def set_acm_subscriber(event):
+        set_acms_for_app_root(event.app, (root_acm,))
+    configurator.add_subscriber(set_acm_subscriber, ApplicationCreated)
     return configurator
 
 
