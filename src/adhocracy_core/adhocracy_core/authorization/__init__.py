@@ -143,7 +143,7 @@ def _sort_by_principal_priority(acl: list) -> list:
     return acl
 
 
-def set_acms_for_app_root(app: Router, acms: (dict)=()):
+def set_acms_for_app_root(app: Router, acms: tuple=()):
     """
     Set the :term:`acm`s for the `app`s root object.
 

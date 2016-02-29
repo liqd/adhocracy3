@@ -20,7 +20,6 @@ class TestIdeaCollection:
         return '/opin/idea_collection'
 
     def test_create_resources(self,
-                              registry,
                               datadir,
                               process_url,
                               app_admin):
@@ -29,7 +28,7 @@ class TestIdeaCollection:
         resp = app_admin.get(process_url)
         assert resp.status_code == 200
 
-    def test_set_participate_state(self, registry, process_url, app_admin):
+    def test_set_participate_state(self, process_url, app_admin):
         resp = app_admin.get(process_url)
         assert resp.status_code == 200
 
@@ -44,7 +43,6 @@ class TestIdeaCollection:
         assert resp.status_code == 200
 
     def test_participate_participant_creates_proposal(self,
-                                                      registry,
                                                       process_url,
                                                       app_participant):
         resp = _post_proposal_item(app_participant, path=process_url)

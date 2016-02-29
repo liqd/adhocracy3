@@ -59,13 +59,13 @@ def test_initiate_and_transition_to_result(registry, context):
     workflow.transition_to_state(context, request, 'closed')
     assert workflow.state_of(context) is 'closed'
 
+
 @mark.functional
 class TestStandardPublicWithPrivateProcessesConfig:
 
     @fixture
     def process_url_public(self):
         return '/opin/idea_collection'
-
 
     @fixture(scope='session')
     def app_settings(self, app_settings) -> dict:
@@ -91,11 +91,9 @@ class TestStandardPublicWithPrivateProcessesConfig:
                               process_url_public,
                               app_admin):
         registry = app_admin.app_router.registry
-        from pyramid.threadlocal import manager
-        manager.push({'registry': registry})
-        root = get_root(app_admin.app_router)
         json_file_public = str(datadir.join('public.json'))
         add_resources(app_admin.app_router, json_file_public)
+        root = get_root(app_admin.app_router)
         process_public = find_resource(root, process_url_public)
         set_local_roles(process_public,
                         {"opin-idea-collection-participants":
@@ -113,6 +111,7 @@ class TestStandardPublicWithPrivateProcessesConfig:
                          {"role:participant"},})
         transaction.commit()
         resp = app_admin.get(process_url_public)
+        assert resp.status_code == 200
 
     def set_process_state(self,
                           process_url,
@@ -132,25 +131,22 @@ class TestStandardPublicWithPrivateProcessesConfig:
         assert resp.status_code == 200
 
     def test_announce_anonymous_can_read_public_process(
-            self, process_url_public, app_anonymous, request):
+            self, process_url_public, app_anonymous):
         resp = app_anonymous.get(process_url_public)
         assert resp.status_code == 200
 
     def test_announce_initiator_can_read_public_process(
             self, process_url_public, app_initiator):
-        root = get_root(app_initiator.app_router)
         resp = app_initiator.get(process_url_public)
         assert resp.status_code == 200
 
     def test_announce_moderator_can_read_public_process(
             self, process_url_public, app_moderator):
-        root = get_root(app_moderator.app_router)
         resp = app_moderator.get(process_url_public)
         assert resp.status_code == 200
 
     def test_announce_admin_can_read_public_process(
             self, process_url_public, app_admin):
-        root = get_root(app_admin.app_router)
         resp = app_admin.get(process_url_public)
         assert resp.status_code == 200
 
@@ -161,25 +157,22 @@ class TestStandardPublicWithPrivateProcessesConfig:
         assert resp.status_code == 200
 
     def test_participate_anonymous_can_read_public_process(
-            self, process_url_public, app_anonymous, request):
+            self, process_url_public, app_anonymous):
         resp = app_anonymous.get(process_url_public)
         assert resp.status_code == 200
 
     def test_participate_initiator_can_read_public_process(
             self, process_url_public, app_initiator):
-        root = get_root(app_initiator.app_router)
         resp = app_initiator.get(process_url_public)
         assert resp.status_code == 200
 
     def test_participate_moderator_can_read_public_process(
             self, process_url_public, app_moderator):
-        root = get_root(app_moderator.app_router)
         resp = app_moderator.get(process_url_public)
         assert resp.status_code == 200
 
     def test_participate_admin_can_read_public_process(
             self, process_url_public, app_admin):
-        root = get_root(app_admin.app_router)
         resp = app_admin.get(process_url_public)
         assert resp.status_code == 200
 
@@ -190,25 +183,22 @@ class TestStandardPublicWithPrivateProcessesConfig:
         assert resp.status_code == 200
 
     def test_evaluate_anonymous_can_read_public_process(
-            self, process_url_public, app_anonymous, request):
+            self, process_url_public, app_anonymous):
         resp = app_anonymous.get(process_url_public)
         assert resp.status_code == 200
 
     def test_evaluate_initiator_can_read_public_process(
             self, process_url_public, app_initiator):
-        root = get_root(app_initiator.app_router)
         resp = app_initiator.get(process_url_public)
         assert resp.status_code == 200
 
     def test_evaluate_moderator_can_read_public_process(
             self, process_url_public, app_moderator):
-        root = get_root(app_moderator.app_router)
         resp = app_moderator.get(process_url_public)
         assert resp.status_code == 200
 
     def test_evaluate_admin_can_read_public_process(
             self, process_url_public, app_admin):
-        root = get_root(app_admin.app_router)
         resp = app_admin.get(process_url_public)
         assert resp.status_code == 200
 
@@ -219,25 +209,22 @@ class TestStandardPublicWithPrivateProcessesConfig:
         assert resp.status_code == 200
 
     def test_result_anonymous_can_read_public_process(
-            self, process_url_public, app_anonymous, request):
+            self, process_url_public, app_anonymous):
         resp = app_anonymous.get(process_url_public)
         assert resp.status_code == 200
 
     def test_result_initiator_can_read_public_process(
             self, process_url_public, app_initiator):
-        root = get_root(app_initiator.app_router)
         resp = app_initiator.get(process_url_public)
         assert resp.status_code == 200
 
     def test_result_moderator_can_read_public_process(
             self, process_url_public, app_moderator):
-        root = get_root(app_moderator.app_router)
         resp = app_moderator.get(process_url_public)
         assert resp.status_code == 200
 
     def test_result_admin_can_read_public_process(
             self, process_url_public, app_admin):
-        root = get_root(app_admin.app_router)
         resp = app_admin.get(process_url_public)
         assert resp.status_code == 200
 
@@ -248,24 +235,21 @@ class TestStandardPublicWithPrivateProcessesConfig:
         assert resp.status_code == 200
 
     def test_closed_anonymous_can_read_public_process(
-            self, process_url_public, app_anonymous, request):
+            self, process_url_public, app_anonymous):
         resp = app_anonymous.get(process_url_public)
         assert resp.status_code == 200
 
     def test_closed_initiator_can_read_public_process(
             self, process_url_public, app_initiator):
-        root = get_root(app_initiator.app_router)
         resp = app_initiator.get(process_url_public)
         assert resp.status_code == 200
 
     def test_closed_moderator_can_read_public_process(
             self, process_url_public, app_moderator):
-        root = get_root(app_moderator.app_router)
         resp = app_moderator.get(process_url_public)
         assert resp.status_code == 200
 
     def test_closed_admin_can_read_public_process(
             self, process_url_public, app_admin):
-        root = get_root(app_admin.app_router)
         resp = app_admin.get(process_url_public)
         assert resp.status_code == 200
