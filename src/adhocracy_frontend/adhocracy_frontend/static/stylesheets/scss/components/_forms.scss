@@ -40,6 +40,7 @@ Element to enter one line of text.
 In fact, there are multiple variants of this already defined in HTML.
 They should all look and behave similarily.
 
+
 ```html_example
 <input type="text" placeholder="text" />
 <input type="url" placeholder="url" />
@@ -54,6 +55,14 @@ They should all look and behave similarily.
     <option>The other one</option>
 </select>
 ```
+
+Design note
+Every input field has a light-grey background and a grey border. We use default-settings of the browser for hover/focus/active. 
+Keep in mind that input fields with a light-grey background should only be used for pages with white background. 
+
+We use input fields for login, register, creating a comment and creating a proposal. 
+
+
 */
 
 /*doc
