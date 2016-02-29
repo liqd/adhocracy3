@@ -104,9 +104,7 @@ class TestProcessSettingsSheet:
     def test_get_empty(self, meta, context, registry):
         inst = meta.sheet_class(meta, context)
         wanted = {'plan_number': '',
-                  'participation_kind': '',
-                  'participation_start_date': None,
-                  'participation_end_date': None}
+                  'participation_kind': ''}
         assert inst.get() == wanted
 
     @mark.usefixtures('integration')

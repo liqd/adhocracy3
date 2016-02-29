@@ -127,6 +127,33 @@ def change_bplan_officeworker_email_representation(root):  # pragma: no cover
                                  OfficeWorkerUserReference)
 
 
+@log_migration
+def use_workflow_state_for_participation_time_range(root):  # pragma: no cover
+    """use workflow state data for participation start and end."""
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
+    from adhocracy_meinberlin.resources.bplan import IProcess
+    from adhocracy_meinberlin.sheets.bplan import IProcessSettings
+    catalogs = find_service(root, 'catalogs')
+    bplaene = _search_for_interfaces(catalogs, IProcess)
+    for bplan in bplaene:
+        process_settings_sheet = bplan.\
+            _sheet_adhocracy_meinberlin_sheets_bplan_IProcessSettings
+        if ('participation_start_date' in process_settings_sheet
+                and 'participation_end_date' in process_settings_sheet):
+            participation_start_date = \
+                process_settings_sheet['participation_start_date']
+            participation_end_date = \
+                process_settings_sheet['participation_end_date']
+            process_settings = get_sheet(bplan, IProcessSettings)
+            process_settings.delete_field_values(['participation_start_date'])
+            process_settings.delete_field_values(['participation_end_date'])
+            workflow_assignment = get_sheet(bplan, IWorkflowAssignment)
+            workflow_assignment.set(
+                {'state_data': [{'name': 'participate', 'description': '',
+                                 'start_date': participation_start_date,
+                                 'end_date': participation_end_date}]})
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(use_adhocracy_core_title_sheet)
@@ -135,3 +162,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_embed_sheet_to_bplan_processes)
     config.add_evolution_step(migrate_stadtforum_proposals_to_ipolls)
     config.add_evolution_step(change_bplan_officeworker_email_representation)
+    config.add_evolution_step(use_workflow_state_for_participation_time_range)
