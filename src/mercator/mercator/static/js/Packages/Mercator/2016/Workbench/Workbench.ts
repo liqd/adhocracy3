@@ -373,3 +373,18 @@ export var registerRoutes = (
             );
     }).value();
 };
+
+export var addProposalButton = (
+    adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/AddProposalButton.html",
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
+        }
+    };
+};
