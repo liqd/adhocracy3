@@ -1,14 +1,5 @@
-.m-phase-participate {
-    .meta-list-item {
-        &:last-child {
-            float: right;
-            margin-right: 0;
-
-            @media print {
-                float: none;
-            }
-        }
-    }
+.meta-list-item-rate {
+    float: right;
 }
 
 .proposal-list-item-meta-list {

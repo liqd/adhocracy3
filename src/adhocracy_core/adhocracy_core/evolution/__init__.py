@@ -617,6 +617,12 @@ def remove_duplicated_group_ids(root):  # pragma: no cover
             user.group_ids = unique_group_ids
 
 
+@log_migration
+def add_image_reference_to_proposals(root):  # pragma: no cover
+    """Add description sheet to proposals."""
+    migrate_new_sheet(root, IProposalVersion, IImageReference)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -646,3 +652,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_image_reference_to_organisations)
     config.add_evolution_step(set_comment_count)
     config.add_evolution_step(remove_duplicated_group_ids)
+    config.add_evolution_step(add_image_reference_to_proposals)

@@ -14,7 +14,6 @@ textarea {
     @include rem(font-size, $font-size-small);
     @include rem(margin-bottom, 15px);
     @include rem(padding, 5px $font-size-small);
-    background: $color-background-base-introvert;
 }
 
 .label-text, .form-row, .login-check-input {

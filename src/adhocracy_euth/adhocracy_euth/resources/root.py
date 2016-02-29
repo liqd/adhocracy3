@@ -7,5 +7,5 @@ from adhocracy_core.schema import ACM
 
 euth_acm = ACM().deserialize(
     {'principals':            ['anonymous', 'authenticated', 'participant', 'moderator',  'creator', 'initiator', 'admin'],
-     'permissions': [['view',  'Deny',      'Deny',          'Allow',       'Allow',      'Allow',   'Allow',     'Allow'],
+     'permissions': [['view',  'Allow',      'Deny',          'Allow',       'Allow',      'Allow',   'Allow',     'Allow'],
                      ]})

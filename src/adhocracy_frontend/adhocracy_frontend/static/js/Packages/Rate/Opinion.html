@@ -51,13 +51,13 @@
         <span class="opinion-result-numerics">
             <span class="opinion-result-yes">
                 <strong>{{'TR__YES' | translate | uppercase}}</strong>
-                {{rates(1) | percentage:((rates(1) + rates(-1)) || 1)}}
-                <span class="opinion-result-absolute">({{rates(1)}} {{'TR__VOTES' | translate}})</span>
+                {{rates(1) | percentage:((rates(1) + rates(-1)) || 1)}} |
+                <span class="opinion-result-absolute">{{rates(1)}} {{'TR__VOTES' | translate}}</span>
             </span>
             <span class="opinion-result-total">{{rates(1) + rates(-1)}} {{'TR__TOTAL_VOTES' | translate}}</span>
             <span class="opinion-result-no">
-                <span class="opinion-result-absolute">({{rates(-1)}} {{'TR__VOTES' | translate}})</span>
-                {{rates(-1) | percentage:((rates(1) + rates(-1)) || 1)}}
+                <span class="opinion-result-absolute">{{rates(-1)}} {{'TR__VOTES' | translate}}</span>
+                | {{rates(-1) | percentage:((rates(1) + rates(-1)) || 1)}}
                 <strong>{{'TR__NO' | translate | uppercase }}</strong>
             </span>
         </span>

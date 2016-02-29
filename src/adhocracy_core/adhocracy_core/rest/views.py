@@ -14,6 +14,7 @@ from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.httpexceptions import HTTPGone
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.request import Request
+from pyramid.util import DottedNameResolver
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.security import remember
@@ -82,6 +83,7 @@ from adhocracy_core.utils import unflatten_multipart_request
 from adhocracy_core.utils import is_created_in_current_transaction
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.workflows.schemas import create_workflow_meta_schema
+from adhocracy_core.workflows import IWorkflow
 
 
 logger = getLogger(__name__)
@@ -157,11 +159,28 @@ def validate_request_data(context: ILocation, request: Request,
         raise HTTPBadRequest()
 
 
-def _get_workflow(context: IResource, request: Request):
-    if request.method == 'POST':
-        return
-    get_workflow = request.registry.content.get_workflow
-    workflow = get_workflow(context)
+def _get_workflow(context: IResource, request: Request) -> IWorkflow:
+    if request.content_type != 'application/json':
+        return None
+    elif not isinstance(request.json, dict):
+        return None
+    elif request.method == 'POST':
+        # for post request we need to get the workflow for the resource type
+        # that is going to be created, but before any validation has been done.
+        # TODO refactor, not dry at all
+        resource_type = request.json.get('content_type', None)
+        try:
+            iresource = DottedNameResolver().resolve(resource_type)
+        except (ValueError, ImportError, KeyError):
+            return None  # we don't want to validate the content type here
+        try:
+            iresource_meta = request.registry.content.resources_meta[iresource]
+        except KeyError:
+            return None
+        name = iresource_meta.workflow_name
+        workflow = request.registry.content.workflows.get(name, None)
+    else:
+        workflow = request.registry.content.get_workflow(context)
     return workflow
 
 
@@ -1066,12 +1085,12 @@ def _login_user(request: Request) -> dict:
     """Log-in a user and return a response indicating success."""
     user = request.validated['user']
     userid = resource_path(user)
-    headers = remember(request, userid) or {}
-    user_path = headers['X-User-Path']
-    user_token = headers['X-User-Token']
+    authentication_headers = dict(remember(request, userid))
+    url = request.resource_url(user)
+    token = authentication_headers['X-User-Token']
     return {'status': 'success',
-            'user_path': user_path,
-            'user_token': user_token}
+            'user_path': url,
+            'user_token': token}
 
 
 @view_defaults(

@@ -1,31 +1,37 @@
-.proposal-form {
-    background-color: $color-background-base-introvert;
-    bottom: 0;
-    padding: 0;
-    position: absolute;
-    top: 0;
-    width: 100%;
+/*doc
+---
+title: Proposal Detail
+name: proposal-detail
+category: Proposal
+---
 
-    label,
-    .input-error {
-        display: block;
-    }
+Proposal detail article.
 
-    .map-buttons {
-        background: $color-background-base;
-    }
-}
+```html_example
+<article class="proposal-detail">
+    <header class="proposal-detail-header">
+        <ul class="meta-list">
+            <li class="meta-list-item meta-item-comments">
+                <a href="" class="disguised-link">
+                    <i class="icon-speechbubble"></i> 0 Kommentare
+                </a>
+            </li>
+        </ul>
+        <h1 class="proposal-detail-header-title">Here is my proposal</h1>
+    </header>
+    <section class="proposal-detail-body">
+        <a href="" class="disguised-link proposal-detail-body-comments">
+            <i class="icon-speechbubble"></i> 0
+        </a>
+        <p class="proposal-detail-detail">This is the body of this proposal</p>
 
-.proposal-form-upper {
-    @include rem(padding, 1rem);
-    background: $color-background-base;
-}
-
-.proposal-detail {
-    .rate {
-        float: right;
-    }
-}
+        <p class="proposal-detail-author">
+            by Bart Simpson
+        </p>
+    </section>
+</article>
+```
+*/
 
 .proposal-detail-header,
 .proposal-badge-descriptions,
@@ -123,5 +129,11 @@
         a {
             color: $color-text-highlight-introvert;
         }
+    }
+}
+
+.proposal-detail {
+    .rate {
+        float: right;
     }
 }

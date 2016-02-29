@@ -116,7 +116,9 @@ export class Service {
             };
         }
 
-        return _self.adhHttp.post("/principals/users/", resource);
+        return _self.adhHttp.post("/principals/users/", resource, {
+            noExport: true
+        });
     }
 
     public activate(path : string) : angular.IPromise<void> {

@@ -18,7 +18,7 @@ class TitleSchema(colander.MappingSchema):
     `title`: a human readable title
     """
 
-    title = SingleLine(validator=colander.Length(min=3, max=100))
+    title = SingleLine(validator=colander.Length(min=3, max=200))
 
 
 title_meta = sheet_meta._replace(isheet=ITitle,

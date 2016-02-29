@@ -107,7 +107,7 @@ To get assignable badges we send an options request to this post pool::
 
 The user is typically the current logged in user::
 
-    >>> user = initiator.header['X-User-Path']
+    >>> user = initiator.user_path
 
 Now we can post the assignment to a proposal version::
 
@@ -213,14 +213,14 @@ There the admin can create badges::
 
 The user gives us the badge assignment post pool::
 
-    >>> user_with_badge = initiator.header['X-User-Path']
+    >>> user_with_badge = initiator.user_path
     >>> resp = initiator.get(user_with_badge).json
     >>> post_pool = resp['data']['adhocracy_core.sheets.badge.IBadgeable']['post_pool']
 
 
 to create badge assignments::
 
-    >>> user = admin.header['X-User-Path']
+    >>> user = admin.user_path
     >>> prop = {'content_type': 'adhocracy_core.resources.badge.IBadgeAssignment',
     ...         'data': {'adhocracy_core.sheets.badge.IBadgeAssignment':
     ...                      {'subject': user,

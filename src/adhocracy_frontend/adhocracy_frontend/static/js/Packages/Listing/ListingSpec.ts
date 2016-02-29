@@ -39,37 +39,6 @@ var registerDirectiveSpec = (directive: angular.IDirective): void => {
 
 export var register = () => {
     describe("Listing", () => {
-        describe("ListingPoolAdapter", () => {
-            var path = "some/path";
-            var elements = ["foo", "bar", "baz"];
-            var container;
-            var adapter;
-
-            beforeEach(() => {
-                container = <any>{
-                    path: path,
-                    data: {
-                        "adhocracy_core.sheets.pool.IPool": {
-                            elements: elements
-                        }
-                    }
-                };
-                adapter = new AdhListing.ListingPoolAdapter();
-            });
-
-            describe("elemRefs", () => {
-                it("returns the elements from the adhocracy_core.sheets.pool.IPool sheet", () => {
-                    expect(adapter.elemRefs(container)).toEqual(elements);
-                });
-            });
-
-            describe("poolPath", () => {
-                it("returns the container path", () => {
-                    expect(adapter.poolPath(container)).toBe("some/path");
-                });
-            });
-        });
-
         describe("Listing", () => {
             it("has property 'templateUrl'", () => {
                 expect(AdhListing.Listing.templateUrl).toBeDefined();
@@ -79,6 +48,7 @@ export var register = () => {
                 var elements = ["foo", "bar", "baz"];
                 var poolPath = "pool/path";
                 var container = {
+                    path: poolPath,
                     data: {
                         "adhocracy_core.sheets.pool.IPool": {
                             elements: elements
@@ -88,12 +58,7 @@ export var register = () => {
 
                 var adhWebSocketMock = jasmine.createSpyObj("WebSocketMock", ["register"]);
 
-                var adapter = jasmine.createSpyObj("adapter", ["elemRefs", "totalCount", "poolPath"]);
-                adapter.elemRefs.and.returnValue(elements);
-                adapter.totalCount.and.returnValue(elements.length);
-                adapter.poolPath.and.returnValue(poolPath);
-
-                var listing = new AdhListing.Listing(adapter);
+                var listing = new AdhListing.Listing();
                 var directive : angular.IDirective = listing.createDirective(config, adhWebSocketMock);
 
                 registerDirectiveSpec(directive);
@@ -159,17 +124,18 @@ export var register = () => {
                         });
 
                         it("updates scope.container from server", () => {
-                            expect(adhHttpMock.get).toHaveBeenCalledWith(path, {count: "true"}, {warmupPoolCache: true});
+                            expect(adhHttpMock.get).toHaveBeenCalledWith(path, {
+                                elements: "paths",
+                                count: "true"
+                            }, {warmupPoolCache: true});
                             expect(scope.container).toBe(container);
                         });
 
-                        it("updates scope.poolPath using adapter from container", () => {
-                            expect(adapter.poolPath).toHaveBeenCalledWith(container);
+                        it("updates scope.poolPath from container", () => {
                             expect(scope.poolPath).toBe(poolPath);
                         });
 
-                        it("updates scope.elements using adapter from container", () => {
-                            expect(adapter.elemRefs).toHaveBeenCalledWith(container);
+                        it("updates scope.elements from container", () => {
                             expect(scope.elements).toEqual(["foo", "baz", "bar"]);
                         });
                     });
@@ -185,6 +151,7 @@ export var register = () => {
 
                         it("updates scope.container from server", () => {
                             expect(adhHttpMock.get).toHaveBeenCalledWith(path, {
+                                elements: "paths",
                                 content_type: "some_content_type",
                                 count: "true"
                             }, {warmupPoolCache: true});

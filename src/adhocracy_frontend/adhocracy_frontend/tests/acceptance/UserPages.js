@@ -25,7 +25,6 @@ var LoginPage = function() {
         this.passwordInput.sendKeys(password);
         this.submitButton.click();
         browser.waitForAngular();
-
     };
 };
 
@@ -116,6 +115,12 @@ var logout = function() {
     browser.waitForAngular();
 };
 
+var ensureLogout = function() {
+    if (isLoggedIn()) {
+        logout();
+    }
+};
+
 var loginParticipant = function() {
     login(participantName, participantPassword);
 };
@@ -152,6 +157,7 @@ module.exports = {
     UserPage: UserPage,
     login: login,
     logout: logout,
+    ensureLogout: ensureLogout,
     isLoggedIn: isLoggedIn,
     participantName: participantName,
     participantEmail: participantEmail,

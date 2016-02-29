@@ -16,6 +16,7 @@ Some imports to work with rest api calls::
     >>> import requests
     >>> from pprint import pprint
     >>> from adhocracy_core.testing import god_header
+    >>> from adhocracy_core.testing import god_path
 
 Start Adhocracy testapp::
 
@@ -682,7 +683,8 @@ version is automatically created along with the updated Section version::
 
     >>> resp = testapp.get(pdag_path)
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersions'])
-    {'elements': ['.../Documents/document_0000000/VERSION_0000000/',
+    {'count': '4',
+     'elements': ['.../Documents/document_0000000/VERSION_0000000/',
                   '.../Documents/document_0000000/VERSION_0000001/',
                   '.../Documents/document_0000000/VERSION_0000002/',
                   '.../Documents/document_0000000/VERSION_0000003/']}
@@ -731,7 +733,8 @@ a new version pvrs4 is automatically created following only pvrs3, not pvrs2::
 
     >>> resp = testapp.get(pdag_path)
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersions'])
-    {'elements': ['.../Documents/document_0000000/VERSION_0000000/',
+    {'count': '5',
+     'elements': ['.../Documents/document_0000000/VERSION_0000000/',
                   '.../Documents/document_0000000/VERSION_0000001/',
                   '.../Documents/document_0000000/VERSION_0000002/',
                   '.../Documents/document_0000000/VERSION_0000003/',
@@ -959,21 +962,24 @@ As usual, we have to add another version to actually say something::
     '.../Documents/document_0000000/comments/comment_000.../VERSION_0000001/'
 
 
-Lets view all the comments referring to the proposal.
-Retrieve the wanted version and consult the 'comments' fields of its
-'adhocracy_core.sheets.comment.ICommentable' sheet::
+Let view all the comments referring to the proposal with a query on
+the comments pool::
 
-    >>> resp = testapp.get(pvrs4_path)
-    >>> comlist = resp.json['data']['adhocracy_core.sheets.comment.ICommentable']['comments']
-    >>> snd_commvers_path in comlist
+    >>> resp_data = testapp.get(post_pool_path,
+    ...     params={'content_type': 'adhocracy_core.resources.comment.ICommentVersion',
+    ...             'depth': 2}).json
+    >>> commvers = resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
+    >>> snd_commvers_path in commvers
     True
 
-Any commentable resource has this sheet. Since comments can refer to other
-comments, they have it as well. Lets find out which other comments refer to
-this comment version::
+Since comments can refer to other comments, we can also find out which
+other comments refer to this comment version::
 
-    >>> resp = testapp.get(snd_commvers_path)
-    >>> comlist = resp.json['data']['adhocracy_core.sheets.comment.ICommentable']['comments']
+    >>> resp_data = testapp.get(post_pool_path,
+    ...     params={'content_type': 'adhocracy_core.resources.comment.ICommentVersion',
+    ...             'adhocracy_core.sheets.comment.IComment:refers_to': snd_commvers_path,
+    ...             'depth': 2}).json
+    >>> comlist = resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
     >>> comlist == [snd_metacommvers_path]
     True
 
@@ -1295,11 +1301,31 @@ any), but not for any further failed requests. The backend stops processing
 encoded requests once the first of them has failed, since further processing
 would probably only lead to further errors.
 
-Filtering Pools
----------------
 
-It's possible to filter and aggregate the information collected in pools by
-adding suitable GET parameters. For example, we can only retrieve children
+Filtering Pools / Search
+------------------------
+
+By default resources with IPool sheets do not list the child elements but
+only the `count`:
+
+    >>> resp_data = testapp.get('/Documents/document_0000000/comments/').json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
+    {'count': '3', 'elements': []}
+
+*Note:* due to limitations of our (de)serialization library (Colander),
+-the count is returned as a string, though it is actually a number.
+
+To list child elements you have to do a search query with `elements=paths`
+ (see below for more detailed examples):
+
+    >>> resp_data = testapp.get('/Documents/document_0000000/comments',
+    ...     params={'elements': 'paths'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
+    {'count': '3',
+     'elements': ['http://localhost...]}
+
+It's possible to filter and aggregate the elements listed in the IPool sheet
+by additional GET parameters. For example, we can only retrieve children
 that have specific resource type (*content_type'):
 
     >>> resp_data = testapp.get('/Documents/document_0000000',
@@ -1405,27 +1431,6 @@ wouldn't have found anything, since they are children of children of the pool::
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     []
 
-To retrieve a count of the elements matching your query, specify
-*count=true* or just *count*. If you do so, an additional *count* field will
-be added to the returned IPool sheet::
-
-    >>> resp_data = testapp.get('/Documents/document_0000000',
-    ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraph',
-    ...             'count': 'true'}).json
-    >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['count']
-    '3'
-
-*Note:* due to limitations of our (de)serialization library (Colander),
-the count is returned as a string, though it is actually a number.
-
-If you specify *count* without any other query parameters,
-you'll get the number of children in the pool::
-
-    >>> resp_data = testapp.get('/Documents/document_0000000',
-    ...     params={'count': 'true'}).json
-    >>> child_count = resp_data['data']['adhocracy_core.sheets.pool.IPool']['count']
-    >>> assert int(child_count) >= 10
-
 If you specify *sort* you can set a *<custom>* filter (see below) that supports
 sorting to sort the result::
 
@@ -1468,24 +1473,22 @@ The *count* is not affected by *limit*::
     >>> assert int(child_count) >= 10
 
 The *elements* parameter allows controlling how matching element are
-returned. By default, 'elements' in the IPool sheet contains a list of paths.
-This corresponds to setting *elements=paths*.
+returned. By default, 'elements' in the IPool sheet contains nothing.
+This corresponds to setting *elements=omit*
+
+    >>> resp_data = testapp.get('/Documents/document_0000000',
+    ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
+    ...             'elements': 'omit'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
+    []
+
+Setting *elements=paths* will yield a response with a listing of resource paths.
 
     >>> resp_data = testapp.get('/Documents/document_0000000',
     ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
     ...             'elements': 'paths'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/Documents/document_0000000/VERSION_0000000/',...
-
-Setting *elements=omit* will yield a response with an empty 'elements' listing.
-This makes only sense if you ask for something else instead, e.g. a count of
-elements::
-
-    >>> resp_data = testapp.get('/Documents/document_0000000',
-    ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
-    ...             'elements': 'omit', 'count': 'true'}).json
-    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
-    {'count': '5', 'elements': []}
 
 Setting *elements=content* will instead return the complete contents of all
 matching elements -- what you would get by making a GET request on each of
@@ -1495,7 +1498,8 @@ their paths::
     ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
     ...             'elements': 'content'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
-    {'elements': [{'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
+    {'count': '5',
+     'elements': [{'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
                    'data': ...
 
 *sheet* filter resources with a specific sheet type::
@@ -1546,7 +1550,7 @@ custom filters:
   Valid query comparable: 'eq'
   Supports sorting.
 
-    >>> resp_data = testapp.get('/Documents', params={'creator': god_header['X-User-Path']}).json
+    >>> resp_data = testapp.get('/Documents', params={'creator': god_path}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/Documents/document_0000000/']
 
@@ -1636,3 +1640,4 @@ will be 1 or higher. ::
     ...             'depth': 'all', 'aggregateby': 'tag'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['aggregateby'])
     {'tag': {'FIRST': 3, 'LAST': 3}}
+

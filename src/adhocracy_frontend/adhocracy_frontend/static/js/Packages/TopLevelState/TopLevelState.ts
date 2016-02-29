@@ -446,7 +446,7 @@ export var pageWrapperDirective = (adhConfig : AdhConfig.IService) => {
         transclude: true,
         templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + "Wrapper.html",
         link: (scope) => {
-            scope.hide_header = adhConfig["custom"]["hide_header"];
+            scope.hideHeader = adhConfig.custom["hide_header"];
             scope.headerTemplateUrl = adhConfig.pkg_path + pkgLocation + "/templates/" + "Header.html";
         }
     };

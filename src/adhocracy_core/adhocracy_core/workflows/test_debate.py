@@ -1,7 +1,10 @@
 from pyramid import testing
+from pyramid.threadlocal import manager
+from pyramid.traversal import find_resource
 from pytest import fixture
 from pytest import mark
 from webtest import TestResponse
+import transaction
 
 from adhocracy_core.utils.testing import add_resources
 from adhocracy_core.utils.testing import do_transition_to
@@ -47,6 +50,12 @@ def _post_document_item(app_user, path='') -> TestResponse:
 @mark.functional
 class TestDebateWorkflow:
 
+    @fixture(scope='session')
+    def app_settings(self, app_settings) -> dict:
+        """Return settings to start the test wsgi app."""
+        app_settings['adhocracy.skip_registration_mail'] = True
+        return app_settings
+
     @fixture(scope='class')
     def app_router(self, app_settings):
         """Add `debate` workflow to IProcess resources and return wsgi app."""
@@ -61,9 +70,10 @@ class TestDebateWorkflow:
         return app_router
 
     def test_create_debate_process(self,
-                                   registry,
                                    datadir,
                                    app_admin):
+        registry = app_admin.app_router.registry
+        manager.push({'registry': registry})
         json_file = str(datadir.join('resources.json'))
         add_resources(app_admin.app_router, json_file)
         resp = app_admin.get('/debate')
