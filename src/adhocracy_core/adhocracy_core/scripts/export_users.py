@@ -7,8 +7,9 @@ import argparse
 import csv
 import inspect
 from pyramid.paster import bootstrap
-from substanced.util import find_service
-
+from pyramid.registry import Registry
+from pyramid.request import Request
+from substanced.interfaces import IUserLocator
 
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.resources.principal import IUser
@@ -33,12 +34,12 @@ def export_users():  # pragma: no cover
     filename = create_filename(directory='./var/export/',
                                prefix='adhocracy-users',
                                suffix='.csv')
-    _export_users(env['root'], filename)
+    _export_users(env['root'], env['registry'], filename)
     env['closer']()
 
 
-def _export_users(root, filename):  # pragma: no cover
-    users = _get_users(root)
+def _export_users(root, registry, filename):  # pragma: no cover
+    users = _get_users(root, registry)
     with open(filename, 'w', newline='') as result_file:
         wr = csv.writer(result_file, delimiter=';', quotechar='"',
                         quoting=csv.QUOTE_MINIMAL)
@@ -46,11 +47,10 @@ def _export_users(root, filename):  # pragma: no cover
     print('Users exported to {}'.format(filename))
 
 
-def _get_users(root: IResource) -> [IUser]:
-    users = find_service(root, 'principals', 'users')
-    for user in users.values():
-        if IUser.providedBy(user):
-            yield user
+def _get_users(root: IResource, registry: Registry) -> [IUser]:
+    request = Request.blank('/dummy')
+    locator = registry.getMultiAdapter((root, request), IUserLocator)
+    return locator.get_users()
 
 
 def _write_users_to_csv(users: [IUser], writer: object) -> None:

@@ -25,13 +25,15 @@ class TestGetUsers:
         pool['principals']['users']['badges'] = deepcopy(service)
         return pool
 
-    def call_fut(self, root):
+    def call_fut(self, root, registry):
         from .export_users import _get_users
-        return _get_users(root)
+        return _get_users(root, registry)
 
-    def test_get_users(self, context, user1):
-        users = self.call_fut(context)
-        assert list(users) == [user1]
+    def test_get_users(self, context, registry, user1):
+        mock_locator = Mock()
+        registry.getMultiAdapter = mock_locator
+        users = self.call_fut(context, registry)
+        mock_locator.get_users.assert_called_once()
 
 class TestWriteUsersToCSV:
 
