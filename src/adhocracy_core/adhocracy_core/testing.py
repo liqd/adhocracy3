@@ -479,9 +479,7 @@ def settings(request) -> dict:
 def app_settings(request) -> dict:
     """Return settings to start the test wsgi app."""
     settings = {}
-    # disable creating a default group, this causes
     # ZODB.POSException.InvalidObjectReference
-    settings['adhocracy.add_default_group'] = False
     # enable create test user for every :term:`role`
     settings['adhocracy.add_test_users'] = True
     # don't look for the websocket server
