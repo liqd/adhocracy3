@@ -50,12 +50,6 @@ def _post_document_item(app_user, path='') -> TestResponse:
 @mark.functional
 class TestDebateWorkflow:
 
-    @fixture(scope='session')
-    def app_settings(self, app_settings) -> dict:
-        """Return settings to start the test wsgi app."""
-        app_settings['adhocracy.skip_registration_mail'] = True
-        return app_settings
-
     @fixture(scope='class')
     def app_router(self, app_settings):
         """Add `debate` workflow to IProcess resources and return wsgi app."""

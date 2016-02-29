@@ -67,7 +67,7 @@ class TestStandardPublicWithPrivateProcessesConfig:
     def process_url_public(self):
         return '/opin/idea_collection'
 
-    @fixture(scope='session')
+    @fixture(scope='class')
     def app_settings(self, app_settings) -> dict:
         """Return settings to start the test wsgi app."""
         app_settings['adhocracy.skip_registration_mail'] = True

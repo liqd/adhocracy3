@@ -27,14 +27,13 @@ def test_includeme(registry):
 
 
 @mark.functional
-@mark.xfail(True, reason='Fix change database while running functional tests.')
 class TestDebatePrivateProcess:
 
     @fixture
     def process_url_private(self):
         return '/opin/collaborative_text'
 
-    @fixture(scope='session')
+    @fixture(scope='class')
     def app_settings(self, app_settings) -> dict:
         """Return settings to start the test wsgi app."""
         app_settings['adhocracy.skip_registration_mail'] = True

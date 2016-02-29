@@ -464,7 +464,7 @@ def _get_settings(request, part, config_path_key='pyramid_config'):
     return settings
 
 
-@fixture(scope='session')
+@fixture(scope='class')
 def settings(request) -> dict:
     """Return app:main and server:main settings."""
     settings = {}
@@ -475,7 +475,7 @@ def settings(request) -> dict:
     return settings
 
 
-@fixture(scope='session')
+@fixture(scope='class')
 def app_settings(request) -> dict:
     """Return settings to start the test wsgi app."""
     settings = {}
@@ -501,7 +501,7 @@ def app_settings(request) -> dict:
     return settings
 
 
-@fixture(scope='session')
+@fixture(scope='class')
 def ws_settings(request) -> Configurator:
     """Return websocket server settings."""
     return _get_settings(request, 'websockets')
