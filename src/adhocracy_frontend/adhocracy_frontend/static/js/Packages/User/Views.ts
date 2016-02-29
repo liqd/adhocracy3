@@ -840,15 +840,13 @@ export var adhUserProfileImageEditDirective = (
 export var adhHelpLinkDirective = (
     adhConfig: AdhConfig.IService
 ) => {
-    if (adhConfig.support_url.length > 0) {
-        return {
-            restrict: "E",
-            templateUrl: adhConfig.pkg_path + pkgLocation + "/HelpLink.html",
-            link: (scope) => {
-                scope.supportUrl = adhConfig.support_url;
-            }
-        };
-    }
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/HelpLink.html",
+        link: (scope) => {
+            scope.supportUrl = adhConfig.support_url;
+        }
+    };
 };
 
 export var registerRoutes = (
