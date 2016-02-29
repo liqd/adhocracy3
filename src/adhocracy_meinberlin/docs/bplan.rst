@@ -40,7 +40,7 @@ A B-Plan process transits the following workflows:
 
 1. *draft*: Initial worflow state used for editing, the B-Plan is not public
 2. *announce*: The B-Plan information is accessible, but no statements can be
-    send
+   send
 3. *participate*: B-Plan participation is active, statements can be issued
 4. *closed*: The B-Plan is not accessible anymore
 
