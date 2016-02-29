@@ -125,8 +125,7 @@ export var register = () => {
 
                         it("updates scope.container from server", () => {
                             expect(adhHttpMock.get).toHaveBeenCalledWith(path, {
-                                elements: "paths",
-                                count: "true"
+                                elements: "paths"
                             }, {warmupPoolCache: true});
                             expect(scope.container).toBe(container);
                         });
@@ -152,8 +151,7 @@ export var register = () => {
                         it("updates scope.container from server", () => {
                             expect(adhHttpMock.get).toHaveBeenCalledWith(path, {
                                 elements: "paths",
-                                content_type: "some_content_type",
-                                count: "true"
+                                content_type: "some_content_type"
                             }, {warmupPoolCache: true});
                             expect(scope.container).toBe(container);
                         });

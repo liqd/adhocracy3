@@ -760,7 +760,6 @@ export var adhUserActivityOverviewDirective = (
 
                 var params = {
                     depth: "all",
-                    count: true,
                     content_type: contentType.content_type
                 };
                 params[SIMetadata.nick + ":creator"] = scope.path;

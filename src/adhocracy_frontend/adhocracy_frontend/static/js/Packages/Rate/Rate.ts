@@ -121,7 +121,6 @@ export class Service {
             content_type: RIRateVersion.content_type,
             depth: "all",
             tag: "LAST",
-            count: "true",
             aggregateby: "rate"
         };
         query[SIRate.nick + ":object"] = object;

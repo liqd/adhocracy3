@@ -196,7 +196,6 @@ export var countSupporters = (adhHttp : AdhHttp.Service<any>, postPoolPath : str
         depth: "2",
         tag: "LAST",
         rate: "1",
-        count: "true",
         elements: "omit"
     };
     query[SIRate.nick + ":object"] = objectPath;
