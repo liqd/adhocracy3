@@ -1,5 +1,5 @@
-from pytest import fixture
 from pytest import mark
+from pytest import fixture
 from webtest import TestResponse
 
 from adhocracy_core.utils.testing import add_resources
@@ -17,7 +17,7 @@ class TestCollaborativeText:
 
     @fixture
     def process_url(self):
-        return '/organisation/collaborative_text'
+        return '/opin/collaborative_text'
 
     def test_create_resources(self,
                               datadir,

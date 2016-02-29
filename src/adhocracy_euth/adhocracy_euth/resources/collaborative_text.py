@@ -13,6 +13,17 @@ process_meta = document_process.document_process_meta._replace(
 )
 
 
+class IPrivateProcess(IProcess):
+    """Private collaborative text participation process."""
+
+
+private_process_meta = document_process.document_process_meta._replace(
+    iresource=IPrivateProcess,
+    workflow_name='debate_private'
+)
+
+
 def includeme(config):
     """Add resource type to content."""
     add_resource_type_to_registry(process_meta, config)
+    add_resource_type_to_registry(private_process_meta, config)

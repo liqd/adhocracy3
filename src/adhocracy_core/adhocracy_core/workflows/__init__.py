@@ -76,6 +76,19 @@ def transition_to_states(context, states: [str], registry: Registry,
         workflow.transition_to_state(context, request, state)
 
 
+def match_permission(acm, state, permission):
+    """Create a function matching a permission in an ACM.
+
+    The function can be used as matcher with the `transform`
+    function of pyrsistent when transforming an existing ACM to select
+    a specific permission to change.
+
+    """
+    def matcher(idx):
+        return acm['states'][state]['acm']['permissions'][idx][0] == permission
+    return matcher
+
+
 def _validate_workflow_cstruct(cstruct: dict) -> dict:
     """Deserialize workflow :term:`cstruct` and return :term:`appstruct`."""
     schema = create_workflow_meta_schema(cstruct)
@@ -108,5 +121,7 @@ def includeme(config):  # pragma: no cover
     """Include workflows."""
     config.include('.sample')
     config.include('.standard')
+    config.include('.standard_private')
     config.include('.debate')
+    config.include('.debate_private')
     config.include('.subscriber')

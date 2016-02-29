@@ -1,23 +1,23 @@
-from pytest import fixture
 from pytest import mark
+from pytest import fixture
 from webtest import TestResponse
 
 from adhocracy_core.utils.testing import add_resources
 from adhocracy_core.utils.testing import do_transition_to
 
 
-def _post_document_item(app_user, path='') -> TestResponse:
-    from adhocracy_core.resources.document import IDocument
-    resp = app_user.post_resource(path, IDocument, {})
+def _post_proposal_item(app_user, path='') -> TestResponse:
+    from adhocracy_core.resources.proposal import IProposal
+    resp = app_user.post_resource(path, IProposal, {})
     return resp
 
 
 @mark.functional
-class TestCollaborativeText:
+class TestIdeaCollection:
 
     @fixture
     def process_url(self):
-        return '/organisation/collaborative_text'
+        return '/opin/idea_collection'
 
     def test_create_resources(self,
                               datadir,
@@ -42,8 +42,8 @@ class TestCollaborativeText:
                                 'participate')
         assert resp.status_code == 200
 
-    def test_participate_initiator_creates_document(self,
-                                                    process_url,
-                                                    app_initiator):
-        resp = _post_document_item(app_initiator, path=process_url)
+    def test_participate_participant_creates_proposal(self,
+                                                      process_url,
+                                                      app_participant):
+        resp = _post_proposal_item(app_participant, path=process_url)
         assert resp.status_code == 200

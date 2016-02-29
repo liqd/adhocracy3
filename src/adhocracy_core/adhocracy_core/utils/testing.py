@@ -3,6 +3,7 @@
 import transaction
 
 from pyramid.router import Router
+from pyramid.threadlocal import manager
 from webtest import TestResponse
 
 from adhocracy_core.scripts import import_resources
@@ -11,9 +12,13 @@ from adhocracy_core.utils import get_root
 
 def add_resources(app_router: Router, filename: str):
     """Add resources from a JSON file to the app."""
-    root = get_root(app_router)
-    import_resources(root, app_router.registry, filename)
-    transaction.commit()
+    manager.push({'registry': app_router.registry})
+    try:
+        root = get_root(app_router)
+        import_resources(root, app_router.registry, filename)
+        transaction.commit()
+    finally:
+        manager.pop()
 
 
 def do_transition_to(app_user, path, state) -> TestResponse:
