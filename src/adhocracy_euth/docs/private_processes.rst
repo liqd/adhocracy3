@@ -16,11 +16,11 @@ Administration
 --------------
 Following local roles must be created for every public processes::
 
-     {"group:authenticated": {"role:participant"}}
+     {"group:authenticated": ["role:participant"]}
 
 Following local roles must be created for every private processes::
 
-     {"name-of-process-participants": {"role:participant"}}
+     {"name-of-process-participants": ["role:participant"]}
 
 The users of the process must be assigned to the
 "name-of-process-participants" group via the `import_users` script.
