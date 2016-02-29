@@ -118,7 +118,7 @@ The username here is just an example, please use your credentials.
     ...                 {'state_data':
     ...                  [{'name': 'participate', 'description': '',
     ...                  'start_date': '2016-03-01T12:00:09',
-    ...                  'end_date': '2016-05-01T12t:00:09'}]}
+    ...                  'end_date': '2016-05-01T12:00:09'}]}
     ...             }}
     >>> resp = testapp.post_json('/orga/', data, headers=auth_header)
     >>> resp.status_code
@@ -207,7 +207,7 @@ E.g. Changing the participation start data::
     ...                 {'state_data':
     ...                  [{'name': 'participate', 'description': 'test',
     ...                  'start_date': '2016-03-03T12:00:09',
-    ...                  'end_date': '2016-05-01T12t:00:09'}]}}}
+    ...                  'end_date': '2016-05-01T12:00:09'}]}}}
     >>> resp = testapp.put_json('/orga/1-23', data, headers=auth_header)
     >>> resp.status_code
     200
