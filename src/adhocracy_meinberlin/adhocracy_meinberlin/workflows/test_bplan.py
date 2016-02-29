@@ -83,12 +83,31 @@ def _post_proposal_itemversion(app_user, path='') -> TestResponse:
 @mark.functional
 class TestBPlanWorkflow:
 
+    def _set_workflow_assignment(self,
+                                 app_admin):
+        import transaction
+        import datetime
+        from adhocracy_core.utils import get_root
+        from adhocracy_core.utils import get_sheet
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        from pyramid.traversal import find_resource
+        root = get_root(app_admin.app_router)
+        bplan = find_resource(root,'/organisation/bplan/')
+        content = app_admin.app_router.registry.content
+        workflowassigment = content.get_sheet(bplan, IWorkflowAssignment)
+        workflowassigment.set({'state_data': [
+            {'name': 'participate','description': '',
+             'start_date': datetime.date(2015, 5, 5),
+             'end_date': datetime.date(2015, 6, 11)}]})
+        transaction.commit()
+
     def test_create_resources(self,
                               registry,
                               datadir,
                               app_admin):
         json_file = str(datadir.join('resources.json'))
         add_resources(app_admin.app_router, json_file)
+        self._set_workflow_assignment(app_admin)
         resp = app_admin.get('/bplan')
         assert resp.status_code == 200
 

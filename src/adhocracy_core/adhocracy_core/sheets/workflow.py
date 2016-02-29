@@ -118,6 +118,8 @@ class StateData(MappingSchema):
                        default='')
     start_date = DateTime(missing=None,
                           default=None)
+    end_date = DateTime(missing=None,
+                        default=None)
 
 
 class StateDataList(AdhocracySequenceNode):
@@ -147,7 +149,8 @@ class WorkflowAssignmentSchema(MappingSchema):
 
     example:
 
-        {'name': 'state1', 'description': 'text', 'start_date': <DateTime>}
+        {'name': 'state1', 'description': 'text', 'start_date': <DateTime>,
+         'end_date: <DateTime>}
     """
 
 

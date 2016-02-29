@@ -7,10 +7,7 @@
            {"title": "Sample BPlan process"},
            "adhocracy_meinberlin.sheets.bplan.IProcessSettings":
            {"plan_number": "112233",
-            "participation_kind": "öffentliche Auslegung",
-            "participation_start_date": "2015-05-05",
-            "participation_end_date": "2015-06-11"},
+            "participation_kind": "öffentliche Auslegung"},
            "adhocracy_meinberlin.sheets.bplan.IProcessPrivateSettings":
-           {"office_worker_email": "officeworkername@example.com"
-            }}}
+           {"office_worker_email": "officeworkername@example.com"}}}
 ]

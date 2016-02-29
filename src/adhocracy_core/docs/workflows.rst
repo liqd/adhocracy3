@@ -99,7 +99,9 @@ in addition it can have custom metadata for specific workflow states::
 this metadata can be set::
 
     >>> data = {'data': {'adhocracy_core.sheets.workflow.IWorkflowAssignment':  {'state_data':
-    ...                  [{'name': 'participate', 'description': 'new', 'start_date': '2015-05-26T12:40:49.638293+00:00'}]
+    ...                  [{'name': 'participate', 'description': 'new',
+    ...                    'start_date': '2015-05-26T12:40:49.638293+00:00',
+    ...                    'end_date': '2015-10-26T12:40:49.638293+00:00'}]
     ...         }}}
     >>> resp = app_god.put('/process', data)
     >>> resp.status_code
@@ -109,6 +111,7 @@ this metadata can be set::
     >>> workflow_data = resp['data']['adhocracy_core.sheets.workflow.IWorkflowAssignment']
     >>> pprint(workflow_data['state_data'][0])
     {'description': 'new',
+     'end_date': '2015-10-26T12:40:49.638293+00:00',
      'name': 'participate',
      'start_date': '2015-05-26T12:40:49.638293+00:00'}
 

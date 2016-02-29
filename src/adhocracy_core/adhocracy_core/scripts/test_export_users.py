@@ -1,0 +1,62 @@
+from copy import deepcopy
+
+
+from pyramid import testing
+from pytest import fixture
+from unittest.mock import Mock
+from unittest.mock import call
+
+class TestGetUsers:
+
+    @fixture
+    def user1(self):
+        from adhocracy_core.resources.principal import IUser
+        user = testing.DummyResource(__provides__=IUser)
+        user.name = "Ana Musterman"
+        user.email = "ana@example.org"
+        return user
+
+    @fixture
+    def context(self, pool, service, user1):
+        from substanced.interfaces import IFolder
+        pool['principals'] = deepcopy(service)
+        pool['principals']['users'] = deepcopy(service)
+        pool['principals']['users']['0000000'] = user1
+        pool['principals']['users']['badges'] = deepcopy(service)
+        return pool
+
+    def call_fut(self, root):
+        from .export_users import _get_users
+        return _get_users(root)
+
+    def test_get_users(self, context, user1):
+        users = self.call_fut(context)
+        assert list(users) == [user1]
+
+class TestWriteUsersToCSV:
+
+    @fixture
+    def registry(self, registry_with_content, mock_sheet):
+        registry = registry_with_content
+        registry.content.get_sheet.return_value = mock_sheet
+        return registry
+
+    @fixture
+    def user1(self):
+        from adhocracy_core.resources.principal import IUser
+        user = testing.DummyResource(__provides__=IUser)
+        user.name = "Ana Musterman"
+        user.email = "ana@example.org"
+        return user
+
+    def call_fut(self, users, writer):
+        from .export_users import _write_users_to_csv
+        return _write_users_to_csv(users, writer)
+
+    def test_write_users_to_csv(self, registry, mock_sheet, user1):
+        writer = Mock()
+        mock_sheet.get.return_value = {'creation_date': '2016-01-01'}
+        result = self.call_fut([user1], writer)
+        calls = [call(['Username', 'Email', 'Creation date']),
+                 call([user1.name, user1.email, '2016-01-01'])]
+        writer.writerow.assert_has_calls(calls)
