@@ -1,20 +1,20 @@
-<form name="imageUpload" data-ng-submit="submit()" data-ng-if="$flow.support">
+<form name="imageUpload" data-ng-submit="submit()" data-ng-if="$flow.support" class="image-upload m-standalone">
     <span class="label-text">{{ "TR__IMAGE_UPLOAD" | translate }}</span>
     <div
         data-flow-init=""
         data-flow-object="$flow">
         <span
-            class="button-cta-secondary"
+            class="button-cta-secondary image-upload-button"
             data-flow-btn=""
             data-flow-attrs="{accept:'image/*'}">
             <span data-ng-if="$flow.files.length > 0">{{ "TR__IMAGE_CHANGE" | translate }}</span>
             <span data-ng-if="!$flow.files.length || $flow.files.length === 0">{{ "TR__IMAGE_CHOOSE" | translate }}</span>
         </span>
-        <div data-ng-repeat="file in $flow.files">
+        <div data-ng-repeat="file in $flow.files" class="image-upload-preview">
             <img data-flow-img="file" height="120" alt="{{ 'TR__IMAGE_SELECTED' | translate }}" /><br/>{{file.name}}
         </div>
         <div class="form-footer">
-            <input type="submit" ng-value="{{'TR__SUBMIT' | translate}}" class="button" data-ng-disabled="0 === $flow.files.length" />
+            <input type="submit" ng-value="{{'TR__SUBMIT' | translate}}" class="button-cta image-upload-submit-button" data-ng-disabled="0 === $flow.files.length" />
             <input type="reset" ng-value="{{'TR__CANCEL' | translate }}" class="button" ng-click="didCancelUpload()"/>
         </div>
     </div>

@@ -4,6 +4,7 @@
             <i class="icon-document moving-column-icon"></i>
         </div>
         <a class="moving-column-menu-button" data-ng-if="proposalItemOptions.POST" data-ng-href="{{ proposalUrl | adhParentPath | adhResourceUrl:'edit' }}">{{ "TR__EDIT" | translate }}</a>
+        <a class="moving-column-menu-button" data-ng-if="proposalItemOptions.POST" data-ng-href="{{ proposalUrl | adhParentPath | adhResourceUrl:'image' }}">{{ "TR__IMAGE_UPLOAD" | translate }}</a>
         <a
             class="moving-column-menu-button"
             data-ng-if="badgeAssignmentPoolOptions.POST"

@@ -13,6 +13,19 @@ category: Widgets
 */
 .image-upload {
     @include rem(margin, 1.4rem 0);
+
+    .form-footer {
+        @include rem(margin-top, 1rem);
+    }
+
+    &.m-standalone {
+        @include rem(margin-left, 1rem);
+        @include rem(margin-right, 1rem);
+    }
+}
+
+.image-upload-submit-button {
+    @include rem(margin-right, 1rem);
 }
 
 .image-upload-preview {
