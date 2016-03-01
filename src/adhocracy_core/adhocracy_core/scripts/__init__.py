@@ -70,7 +70,7 @@ def _create_resource(resource_info: PMap,
     registry.content.create(iresource.__identifier__,
                             parent=parent,
                             appstructs=appstructs,
-                            registry=request.registry,
+                            registry=registry,
                             request=request,
                             creator=creator,
                             )

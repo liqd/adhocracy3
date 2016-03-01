@@ -2,14 +2,6 @@ from pyramid.traversal import find_resource
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
-import transaction
-
-from adhocracy_core.authorization import acm_to_acl
-from adhocracy_core.authorization import get_acl
-from adhocracy_core.authorization import set_acl
-from adhocracy_core.authorization import set_local_roles
-from adhocracy_core.schema import ACM
-from adhocracy_core.utils import get_root
 from adhocracy_core.utils.testing import add_resources
 from adhocracy_core.utils.testing import do_transition_to
 
@@ -90,33 +82,12 @@ class TestStandardPublicWithPrivateProcessesConfig:
                               datadir,
                               process_url_public,
                               app_admin):
-        registry = app_admin.app_router.registry
         json_file_public = str(datadir.join('public.json'))
         add_resources(app_admin.app_router, json_file_public)
-        root = get_root(app_admin.app_router)
-        process_public = find_resource(root, process_url_public)
-        set_local_roles(process_public,
-                        {"opin-idea-collection-participants":
-                         {"role:participant"}})
-        old_acl = get_acl(root)
-        acm = ACM().deserialize(
-            {'principals':            ['anonymous', 'authenticated', 'participant', 'moderator',  'creator', 'initiator', 'admin'],
-             'permissions': [['view',  'Allow',      'Deny',          'Allow',       'Allow',      'Allow',   'Allow',     'Allow'],
-             ]})
-        new_acl = acm_to_acl(acm, registry) + old_acl
-        set_acl(root, new_acl)
-        set_local_roles(process_public,
-                        # this is "group:authenticated" in prod
-                        {"system.Authenticated":
-                         {"role:participant"},})
-        transaction.commit()
         resp = app_admin.get(process_url_public)
         assert resp.status_code == 200
 
-    def set_process_state(self,
-                          process_url,
-                          app_admin,
-                          state):
+    def set_process_state(self, process_url, app_admin, state):
         resp = do_transition_to(app_admin,
                                 process_url,
                                 state)
