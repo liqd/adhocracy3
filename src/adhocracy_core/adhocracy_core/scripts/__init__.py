@@ -15,6 +15,7 @@ from pyrsistent import ny
 from substanced.interfaces import IUserLocator
 from zope.interface.interfaces import IInterface
 
+from adhocracy_core.authorization import set_local_roles
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.schema import ContentType
@@ -26,7 +27,7 @@ logger = logging.getLogger(__name__)
 def import_resources(root: IResource, registry: Registry, filename: str):
     """Import resources from a JSON file."""
     request = _create_request(root, registry)
-    resources_info = _load_resources_info(filename)
+    resources_info = _load_info(filename)
     for resource_info in resources_info:
         expected_path = _get_expected_path(resource_info)
         if _resource_exists(expected_path, root):
@@ -76,7 +77,7 @@ def _create_resource(resource_info: PMap,
                             )
 
 
-def _load_resources_info(filename: str) -> [dict]:
+def _load_info(filename: str) -> [dict]:
     with open(filename, 'r') as f:
         return json.load(f)
 
@@ -143,3 +144,23 @@ def _get_user_locator(context: IResource, registry: Registry) -> IUserLocator:
     request = Request.blank('/dummy')
     locator = registry.getMultiAdapter((context, request), IUserLocator)
     return locator
+
+
+def import_local_roles(context: IResource, registry: Registry, filename: str):
+    """Import/set local roles from a JSON file."""
+    multi_local_roles_info = _load_info(filename)
+    for local_roles_info in multi_local_roles_info:
+        _set_local_roles(local_roles_info, context, registry)
+
+
+def _set_local_roles(local_roles_info: dict, context: IResource,
+                     registry: Registry):
+    resource = find_resource(context, local_roles_info['path'])
+    local_roles_info['roles'] = _deserialize_roles(local_roles_info['roles'])
+    set_local_roles(resource, local_roles_info['roles'], registry=registry)
+
+
+def _deserialize_roles(roles: dict) -> dict:
+    for k, v in roles.items():
+        roles[k] = set(v)
+    return roles

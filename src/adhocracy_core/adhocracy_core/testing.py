@@ -490,6 +490,8 @@ def app_settings(request) -> dict:
     settings['substanced.secret'] = 'secret'
     # extra dependenies
     settings['pyramid.includes'] = [
+        # database connection
+        'pyramid_zodbconn',
         # commit after request
         'pyramid_tm',
         # mock mail server

@@ -10,12 +10,12 @@ from pyramid.registry import Registry
 from pyramid.request import Request
 from pyramid.router import Router
 from zope.interface import implementer
+from substanced.interfaces import IRoot
 from substanced.util import get_acl
 from substanced.stats import statsd_timer
 import substanced.util
 import transaction
 
-from adhocracy_core.utils import get_root
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IRoleACLAuthorizationPolicy
 from adhocracy_core.events import LocalRolesModified
@@ -157,12 +157,20 @@ def set_acms_for_app_root(app: Router, acms: tuple=()):
     new_acl = [god_all_permission_ace]
     for acm in acms:
         new_acl += acm_to_acl(acm, app.registry)
-    root = get_root(app)
+    root = _get_root(app)
     old_acl = get_acl(root)
     if old_acl == new_acl:
         return
     set_acl(root, new_acl, app.registry)
     transaction.commit()
+
+
+def _get_root(app: Router) -> IRoot:
+    """Return the root of the application."""
+    request = Request.blank('/path-is-meaningless-here')
+    request.registry = app.registry
+    root = app.root_factory(request)
+    return root
 
 
 def set_acl(resource: IResource, acl: list, registry=None) -> bool:

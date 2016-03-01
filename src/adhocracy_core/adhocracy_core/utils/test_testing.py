@@ -3,44 +3,62 @@ from unittest.mock import Mock
 from pyramid import testing
 
 
-class TestAddResource:
+@fixture
+def mock_get_root(mocker):
+    from . import testing
+    mock = mocker.patch.object(testing, 'get_root', AutoSpec=True)
+    return mock
+
+
+@fixture
+def mock_transaction_commit(mocker):
+    mock = mocker.patch('transaction.commit', AutoSpec=True)
+    return mock
+
+
+@fixture
+def mock_run_import_function(mocker):
+    mock = mocker.patch('adhocracy_core.utils.testing._run_import_function',
+                        AutoSpec=True)
+    return mock
+
+
+def test_import_local_roles(mock_run_import_function, app_router):
+        from adhocracy_core.scripts import import_local_roles
+        from .testing import add_local_roles
+        add_local_roles(app_router, '/tmp/import.json')
+        assert mock_run_import_function.call_args[0] ==\
+               (import_local_roles, app_router, '/tmp/import.json')
+
+
+def test_import_resources(mock_run_import_function, app_router):
+        from adhocracy_core.scripts import import_resources
+        from .testing import add_resources
+        add_resources(app_router, '/tmp/import.json')
+        assert mock_run_import_function.call_args[0] ==\
+               (import_resources, app_router, '/tmp/import.json')
+
+
+class TestRunImportFunction:
 
     def call_fut(self, *args):
-        from .testing import add_resources
-        add_resources(*args)
+        from .testing import _run_import_function
+        _run_import_function(*args)
 
-    @fixture
-    def mock_import_resources(self, monkeypatch):
-        from . import testing
-        mock = Mock(spec=testing.import_resources)
-        monkeypatch.setattr(testing, 'import_resources', mock)
-        return mock
-
-    @fixture
-    def mock_get_root(self, monkeypatch):
-        from . import testing
-        mock = Mock(spec=testing.get_root)
-        monkeypatch.setattr(testing, 'get_root', mock)
-        return mock
-
-    @fixture
-    def mock_transaction_commit(self, monkeypatch):
-        import transaction
-        mock = Mock(spec=transaction.commit)
-        monkeypatch.setattr(transaction, 'commit', mock)
-        return mock
-
-    def test_add_resources(self,
-                           app_router,
-                           mock_get_root,
-                           mock_import_resources,
-                           mock_transaction_commit):
+    def test_run_import_function(self,
+                                 app_router,
+                                 mock_get_root,
+                                 mock_transaction_commit):
         filename = "/tmp/dummy.json"
+        mock_import_func = Mock()
         dummy_root = testing.DummyResource()
-        mock_get_root.return_value = dummy_root
-        self.call_fut(app_router, filename)
+        dummy_closer = Mock()
+        mock_get_root.return_value = (dummy_root, dummy_closer)
+        self.call_fut(mock_import_func, app_router, filename)
         assert mock_get_root.called
-        mock_import_resources.assert_called_once_with(dummy_root,
-                                                      app_router.registry,
-                                                      filename)
+        mock_import_func.assert_called_once_with(dummy_root,
+                                                 app_router.registry,
+                                                 filename)
+        assert dummy_closer.called
         assert mock_transaction_commit.called
+
