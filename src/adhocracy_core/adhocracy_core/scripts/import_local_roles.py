@@ -1,6 +1,6 @@
 """Import local roles resources into the system.
 
-This is registered as console script 'bin/import_local_roles.py' in setup.py.
+This is registered as console script in setup.py.
 
 """
 import argparse

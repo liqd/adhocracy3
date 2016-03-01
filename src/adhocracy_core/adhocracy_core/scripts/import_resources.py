@@ -1,6 +1,6 @@
 """Import/create resources into the system.
 
-This is registered as console script 'import_resources' in setup.py.
+This is registered as console script in setup.py.
 
 """
 import argparse
