@@ -65,7 +65,6 @@ import * as SIPool from "../../../../Resources_/adhocracy_core/sheets/pool/IPool
 import * as SIRate from "../../../../Resources_/adhocracy_core/sheets/rate/IRate";
 import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIVersionable from "../../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
-import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 export var pkgLocation = "/Mercator/2015/Proposal";
 
@@ -203,28 +202,6 @@ export var countSupporters = (adhHttp : AdhHttp.Service<any>, postPoolPath : str
             var pool : SIPool.Sheet = response.data[SIPool.nick];
             return parseInt((<any>pool).count, 10);  // see #261
         });
-};
-
-/**
- * promise workflow state.
- */
-export var getWorkflowState = (
-    adhHttp : AdhHttp.Service<any>,
-    adhTopLevelState : AdhTopLevelState.Service,
-    $q : angular.IQService
-) => () : angular.IPromise<string> => {
-    var processUrl = adhTopLevelState.get("processUrl");
-
-    if (typeof processUrl !== "undefined") {
-        return adhHttp.get(processUrl).then((resource) => {
-            var workflowSheet = resource.data[SIWorkflow.nick];
-            if (typeof workflowSheet !== "undefined") {
-                return workflowSheet.workflow_state;
-            }
-        });
-    } else {
-        return $q.when(undefined);
-    }
 };
 
 
@@ -374,9 +351,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             data.winnerBadgeAssignment = communityAssignment || winningAssignment;
         });
 
-        getWorkflowState(this.adhHttp, this.adhTopLevelState, this.$q)().then((workflowState) => {
-            data.currentPhase = workflowState;
-        });
+        instance.scope.$on("$destroy", this.adhTopLevelState.bind("processState", data, "currentPhase"));
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
         var subResourcePromises : angular.IPromise<ResourcesBase.Resource[]> = this.$q.all([
@@ -879,7 +854,6 @@ export var userListing = (adhConfig : AdhConfig.IService) => {
 
 
 export var listItem = (
-    $q : angular.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhTopLevelState : AdhTopLevelState.Service,
@@ -927,9 +901,7 @@ export var listItem = (
                     scope.data.winnerBadgeAssignment = communityAssignment || winningAssignment;
                 });
 
-                getWorkflowState(adhHttp, adhTopLevelState, $q)().then((workflowState) => {
-                    scope.data.currentPhase = workflowState;
-                });
+                scope.$on("$destroy", adhTopLevelState.bind("processState", scope.data, "currentPhase"));
 
                 scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                     if (!proposalVersionUrl) {

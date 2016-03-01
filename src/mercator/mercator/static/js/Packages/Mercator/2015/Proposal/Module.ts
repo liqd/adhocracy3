@@ -68,7 +68,7 @@ export var register = (angular) => {
             };
         }])
         // NOTE: we do not use a Widget based directive here for performance reasons
-        .directive("adhMercator2015Proposal", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", "adhGetBadges", Proposal.listItem])
+        .directive("adhMercator2015Proposal", ["adhConfig", "adhHttp", "adhTopLevelState", "adhGetBadges", Proposal.listItem])
         .directive("adhMercator2015ProposalDetailView", [
             "adhConfig",
             "adhHttp",
