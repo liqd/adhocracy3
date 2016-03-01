@@ -1,6 +1,6 @@
 """Export proposals and count 'lost' rates of older versions.
 
-This is registered as console script 'export_mercator_lost_rates' in setup.py.
+This is registered as console script in setup.py.
 
 """
 

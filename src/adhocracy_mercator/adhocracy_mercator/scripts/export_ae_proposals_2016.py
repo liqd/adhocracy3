@@ -1,7 +1,6 @@
 """Export advocate europe 2016 proposal.
 
-This is registered as console script 'export_ae_proposals_2016'
-in setup.py.
+This is registered as console script in setup.py.
 """
 
 import argparse
