@@ -105,8 +105,7 @@ export var register = (angular) => {
             }])
         .directive("adhMercator2015ProposalListing", ["adhConfig", Proposal.listing])
         .directive("adhMercator2015UserProposalListing", ["adhConfig", Proposal.userListing])
-        .directive("adhMercator2015AddProposalButton", [
-            "adhConfig", "adhHttp", "adhTopLevelState", "adhPermissions", "$q", Proposal.addProposalButton])
+        .directive("adhMercator2015AddProposalButton", ["adhConfig", "adhPermissions", "adhTopLevelState", Proposal.addProposalButton])
         .controller("mercatorProposalFormController", [
             "$scope", "$element", "$window", "adhShowError", "adhSubmitIfValid", Proposal.mercatorProposalFormController]);
 };

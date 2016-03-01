@@ -955,19 +955,15 @@ export var listItem = (
 
 export var addProposalButton = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhTopLevelState : AdhTopLevelState.Service,
     adhPermissions : AdhPermissions.Service,
-    $q : angular.IQService
+    adhTopLevelState : AdhTopLevelState.Service,
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/AddProposalButton.html",
         link: (scope) => {
-            getWorkflowState(adhHttp, adhTopLevelState, $q)().then((workflowState) => {
-                scope.participate = workflowState === "participate";
-            });
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("processState", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
             scope.setCameFrom = () => adhTopLevelState.setCameFrom();
         }
