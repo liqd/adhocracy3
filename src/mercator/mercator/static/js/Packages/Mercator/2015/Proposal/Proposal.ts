@@ -969,7 +969,9 @@ export var addProposalButton = (
                 scope.participate = workflowState === "participate";
             });
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
-            adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");        }
+            adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
+            scope.setCameFrom = () => adhTopLevelState.setCameFrom();
+        }
     };
 };
 
