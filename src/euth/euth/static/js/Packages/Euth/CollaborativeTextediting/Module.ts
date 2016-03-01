@@ -2,6 +2,7 @@ import * as AdhDebateWorkbenchModule from "../../DebateWorkbench/Module";
 import * as AdhDebateWorkbench from "../../DebateWorkbench/DebateWorkbench";
 import * as AdhProcess from "../../Process/Process";
 import RIEuthCollaborativeTextProcess from "../../../Resources_/adhocracy_euth/resources/collaborative_text/IProcess";
+import PrivateRIEuthCollaborativeTextProcess from "../../../Resources_/adhocracy_euth/resources/collaborative_text/IPrivateProcess";
 
 export var moduleName = "adhEuthCollaberativeTextediting";
 
@@ -18,5 +19,11 @@ export var register = (angular) => {
                 return $q.when("<adh-debate-workbench></adh-debate-workbench>");
             }];
         }])
-        .config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RIEuthCollaborativeTextProcess)]);
+       .config(["adhProcessProvider", (adhProcessProvider: AdhProcess.Provider) => {
+            adhProcessProvider.templateFactories[PrivateRIEuthCollaborativeTextProcess.content_type] = ["$q", ($q: angular.IQService) => {
+                return $q.when("<adh-debate-workbench></adh-debate-workbench>");
+            }];
+        }])
+        .config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RIEuthCollaborativeTextProcess)])
+        .config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(PrivateRIEuthCollaborativeTextProcess)]);
 };

@@ -9,6 +9,7 @@ import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
 import * as AdhEuthWorkbench from "../Workbench/Workbench";
 
 import RIEuthProcess from "../../../../Resources_/adhocracy_euth/resources/idea_collection/IProcess";
+import PrivateRIEuthProcess from "../../../../Resources_/adhocracy_euth/resources/idea_collection/IPrivateProcess";
 
 
 export var moduleName = "adhPcompassContext";
@@ -26,6 +27,12 @@ export var register = (angular) => {
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             AdhEuthWorkbench.registerRoutes(
                RIEuthProcess.content_type,
+                "euth"
+            )(adhResourceAreaProvider);
+        }])
+        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
+            AdhEuthWorkbench.registerRoutes(
+               PrivateRIEuthProcess.content_type,
                 "euth"
             )(adhResourceAreaProvider);
         }]);

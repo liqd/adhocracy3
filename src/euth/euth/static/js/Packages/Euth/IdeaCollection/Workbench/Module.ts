@@ -11,6 +11,7 @@ import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 import * as AdhProcess from "../../../Process/Process";
 
 import RIEuthProcess from "../../../../Resources_/adhocracy_euth/resources/idea_collection/IProcess";
+import PrivateRIEuthProcess from "../../../../Resources_/adhocracy_euth/resources/idea_collection/IPrivateProcess";
 
 import * as Workbench from "./Workbench";
 
@@ -33,6 +34,11 @@ export var register = (angular) => {
         .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIEuthProcess.content_type)])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templateFactories[RIEuthProcess.content_type] = ["$q", ($q : angular.IQService) => {
+                return $q.when("<adh-pcompass-workbench></adh-pcompass-workbench>");
+            }];
+        }])
+        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
+            adhProcessProvider.templateFactories[PrivateRIEuthProcess.content_type] = ["$q", ($q : angular.IQService) => {
                 return $q.when("<adh-pcompass-workbench></adh-pcompass-workbench>");
             }];
         }])
