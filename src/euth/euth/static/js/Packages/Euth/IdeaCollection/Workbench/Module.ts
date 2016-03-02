@@ -31,12 +31,13 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIEuthProcess.content_type)])
+        .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIEuthProcess)])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templateFactories[RIEuthProcess.content_type] = ["$q", ($q : angular.IQService) => {
                 return $q.when("<adh-pcompass-workbench></adh-pcompass-workbench>");
             }];
         }])
+        .config(["adhResourceAreaProvider", Workbench.registerRoutes(PrivateRIEuthProcess)])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templateFactories[PrivateRIEuthProcess.content_type] = ["$q", ($q : angular.IQService) => {
                 return $q.when("<adh-pcompass-workbench></adh-pcompass-workbench>");

@@ -26,13 +26,13 @@ export var register = (angular) => {
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             AdhEuthWorkbench.registerRoutes(
-               RIEuthProcess.content_type,
+               RIEuthProcess,
                 "euth"
             )(adhResourceAreaProvider);
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             AdhEuthWorkbench.registerRoutes(
-               PrivateRIEuthProcess.content_type,
+               PrivateRIEuthProcess,
                 "euth"
             )(adhResourceAreaProvider);
         }]);
