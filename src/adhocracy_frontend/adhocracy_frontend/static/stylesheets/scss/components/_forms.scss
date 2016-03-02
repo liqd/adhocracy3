@@ -35,11 +35,15 @@ name: textinput
 parent: input
 ---
 
-Element to enter one line of text.
+Element to enter one line of text. It is used e.g. for login, register,
+creating/editing comments, or creating/editing proposals.
 
 In fact, there are multiple variants of this already defined in HTML.
 They should all look and behave similarily.
 
+Input fields need sufficient contrast to the background, ideally with a
+border. In order to make this simple, they must only be used on
+surfaces with background color `color-background-base`.
 
 ```html_example
 <input type="text" placeholder="text" />
@@ -56,15 +60,9 @@ They should all look and behave similarily.
 </select>
 ```
 
-Design note
-Every input field has a light-grey background and a grey border. We use default-settings of the browser for hover/focus/active. 
-Keep in mind that input fields with a light-grey background should only be used for pages with white background. 
-
-We use input fields for login, register, creating a comment and creating a proposal. 
 
 
 */
-
 /*doc
 ---
 title: Textareas
