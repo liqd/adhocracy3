@@ -1,10 +1,8 @@
-from pyramid.traversal import find_resource
 from pytest import fixture
 from pytest import mark
 
-from adhocracy_core.authorization import set_local_roles
-from adhocracy_core.utils import get_root
 from adhocracy_core.utils.testing import add_resources
+from adhocracy_core.utils.testing import add_local_roles
 from adhocracy_core.utils.testing import do_transition_to
 
 
@@ -24,30 +22,21 @@ class TestPrivatePublicProcess:
                               process_url_private,
                               process_url_public,
                               app_admin):
-        json_file_private = str(datadir.join('private.json'))
-        add_resources(app_admin.app_router, json_file_private)
-        json_file_public = str(datadir.join('public.json'))
-        add_resources(app_admin.app_router, json_file_public)
-        root = get_root(app_admin.app_router)
-        process_private = find_resource(root, process_url_private)
-        set_local_roles(process_private,
-                        {"opin-idea-collection-participants":
-                         {"role:participant"}})
-        process_public = find_resource(root, process_url_public)
-        set_local_roles(process_public,
-                        {"group:authenticated":
-                         {"role:participant"}})
+        private = str(datadir.join('private.json'))
+        add_resources(app_admin.app_router, private)
+        public = str(datadir.join('public.json'))
+        add_resources(app_admin.app_router, public)
+        public_local_roles = str(datadir.join('public_local_roles.json'))
+        add_local_roles(app_admin.app_router, public_local_roles)
+
         resp = app_admin.get(process_url_private)
         assert resp.status_code == 200
         resp = app_admin.get(process_url_public)
         assert resp.status_code == 200
 
-    @mark.xfail(True, reason='Fix change database while running funct. tests.')
     def test_set_private_process_participate_state(self,
                                                    process_url_private,
                                                    app_admin):
-        #process_public = find_resource(get_root(app_admin.app_router), process_url_private)
-        # TODO, FIXME here the __local_roles__ attribute is not there anymore
         resp = app_admin.get(process_url_private)
         assert resp.status_code == 200
 
@@ -77,8 +66,15 @@ class TestPrivatePublicProcess:
                                 'participate')
         assert resp.status_code == 200
 
-    @mark.xfail(True, reason='Fix change database while running funct. tests.')
-    def test_participate_participant_cannot_read_private_process(
-            self, process_url_private, app_participant):
-        resp = app_participant.get(process_url_private)
+    def test_participate_authenticated_cannot_read_private_process(
+            self, process_url_private, app_authenticated):
+        """The authenticated test user has no gobal role but is member ob the
+        default user group.
+        """
+        resp = app_authenticated.get(process_url_private)
         assert resp.status_code == 403
+
+    def test_participate_authenticated_can_read_prublic_process(
+            self, process_url_public, app_authenticated):
+        resp = app_authenticated.get(process_url_public)
+        assert resp.status_code == 200
