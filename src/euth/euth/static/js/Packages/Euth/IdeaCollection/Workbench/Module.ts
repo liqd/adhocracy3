@@ -11,7 +11,7 @@ import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 import * as AdhProcess from "../../../Process/Process";
 
 import RIEuthProcess from "../../../../Resources_/adhocracy_euth/resources/idea_collection/IProcess";
-import PrivateRIEuthProcess from "../../../../Resources_/adhocracy_euth/resources/idea_collection/IPrivateProcess";
+import RIEuthPrivateProcess from "../../../../Resources_/adhocracy_euth/resources/idea_collection/IPrivateProcess";
 
 import * as Workbench from "./Workbench";
 
@@ -31,18 +31,16 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIEuthProcess)])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templateFactories[RIEuthProcess.content_type] = ["$q", ($q : angular.IQService) => {
                 return $q.when("<adh-pcompass-workbench></adh-pcompass-workbench>");
             }];
-        }])
-        .config(["adhResourceAreaProvider", Workbench.registerRoutes(PrivateRIEuthProcess)])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[PrivateRIEuthProcess.content_type] = ["$q", ($q : angular.IQService) => {
+            adhProcessProvider.templateFactories[RIEuthPrivateProcess.content_type] = ["$q", ($q : angular.IQService) => {
                 return $q.when("<adh-pcompass-workbench></adh-pcompass-workbench>");
             }];
         }])
+        .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIEuthProcess)])
+        .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIEuthPrivateProcess)])
         .directive("adhPcompassWorkbench", ["adhTopLevelState", "adhConfig", "adhHttp", Workbench.workbenchDirective])
         .directive("adhPcompassProposalDetailColumn", ["adhConfig", "adhHttp", "adhPermissions", Workbench.proposalDetailColumnDirective])
         .directive("adhPcompassProposalCreateColumn", ["adhConfig", Workbench.proposalCreateColumnDirective])
