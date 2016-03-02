@@ -4,7 +4,7 @@
            {"name": "opin"}
           }},
  {"path": "/opin",
-  "content_type": "adhocracy_euth.resources.collaborative_text.IProcess",
+  "content_type": "adhocracy_euth.resources.collaborative_text.IPrivateProcess",
   "data": {"adhocracy_core.sheets.name.IName":
            {"name": "collaborative_text"},
            "adhocracy_core.sheets.title.ITitle":
