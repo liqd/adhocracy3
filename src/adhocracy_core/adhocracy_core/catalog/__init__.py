@@ -228,8 +228,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
             # hypatia.field.FieldIndex is missing this interface.
             assert 'sort' in sort_index.__dir__()
             elements = elements.sort(sort_index,
-                                     reverse=query.reverse,
-                                     limit=query.limit or None)
+                                     reverse=query.reverse)
         return elements
 
     def _get_slice(self, elements: Iterable, query: IResultSet) -> Iterable:
