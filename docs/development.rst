@@ -85,11 +85,11 @@ Generate html documentation
 
 Recreate api documentation source files::
 
-    bin/sphinx_api_adhocracy
+    bin/ad_sphinx_api_adhocracy
 
 Generate html documentation::
 
-    bin/sphinx_build_adhocracy
+    bin/ad_sphinx_build_adhocracy
 
 Open html documentation::
 
