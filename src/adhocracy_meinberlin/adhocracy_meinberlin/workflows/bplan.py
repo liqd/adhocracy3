@@ -30,9 +30,9 @@ bplan_private_meta = freeze({
     'states': {
         'private': {'title': 'Private',
                     'description': 'Disable view for non admins.',
-                    'acm': {'principals': ['anonymous', 'participant'],
+                    'acm': {'principals': ['anonymous', 'participant', 'initiator', 'admin'],
                             'permissions':
-                                [['view',  'Deny',      'Deny'],
+                                [['view',  'Deny',      'Deny',      'Allow',   'Allow'],
                                  ]},
                   },
     },

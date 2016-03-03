@@ -3,17 +3,30 @@
 import transaction
 
 from pyramid.router import Router
+from pyramid.scripting import get_root
 from webtest import TestResponse
 
 from adhocracy_core.scripts import import_resources
-from adhocracy_core.utils import get_root
+from adhocracy_core.scripts import import_local_roles
 
 
 def add_resources(app_router: Router, filename: str):
     """Add resources from a JSON file to the app."""
-    root = get_root(app_router)
-    import_resources(root, app_router.registry, filename)
-    transaction.commit()
+    _run_import_function(import_resources, app_router, filename)
+
+
+def add_local_roles(app_router: Router, filename: str):
+    """Add local roles from a JSON file to resources."""
+    _run_import_function(import_local_roles, app_router, filename)
+
+
+def _run_import_function(func: callable, app_router: Router, filename: str):
+    root, closer = get_root(app_router)
+    try:
+        func(root, app_router.registry, filename)
+        transaction.commit()
+    finally:
+        closer()
 
 
 def do_transition_to(app_user, path, state) -> TestResponse:

@@ -45,6 +45,10 @@ EOF
     bin/hologram etc/hologram_${project}.yml
 
     # clean up
+    find $builddir -type l | grep '\(images\|fonts\)' | while read file; do
+        cp --remove-destination "$(readlink $file)" $file
+    done
+    sed -i 's/\/static/../g' $builddir/styleguide/*.html $builddir/stylesheets/a3.css
     find $builddir -type l -exec rm {} +
     find $builddir -type d -empty -delete
 

@@ -114,7 +114,7 @@ def get_tokenmanager(request: IRequest) -> ITokenManger:
         # allow to run pyramid scripts without authentication
         return None
     try:
-        return ITokenManger(request.root)
+        return request.registry.getAdapter(request.root, ITokenManger)
     except (ComponentLookupError, TypeError):
         return None
 

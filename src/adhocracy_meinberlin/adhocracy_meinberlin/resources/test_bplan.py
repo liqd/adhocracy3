@@ -55,6 +55,7 @@ class TestProcess:
     def test_meta(self, meta):
         from adhocracy_core.resources.process import IProcess
         from adhocracy_core.sheets.embed import IEmbed
+        from adhocracy_core.sheets.image import IImageReference
         from adhocracy_meinberlin import sheets
         from adhocracy_meinberlin import resources
         assert meta.iresource is resources.bplan.IProcess
@@ -64,6 +65,7 @@ class TestProcess:
         assert meta.extended_sheets == (sheets.bplan.IProcessSettings,
                                         sheets.bplan.IProcessPrivateSettings,
                                         IEmbed,
+                                        IImageReference,
                                         )
         assert meta.permission_create == 'create_process'
         assert meta.workflow_name == 'bplan'

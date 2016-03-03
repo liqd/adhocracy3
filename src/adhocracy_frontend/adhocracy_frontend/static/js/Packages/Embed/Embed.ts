@@ -4,8 +4,6 @@ import * as AdhConfig from "../Config/Config";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 
-var pkgLocation = "/Embed";
-
 
 var metaParams = [
     "autoresize",
@@ -124,6 +122,8 @@ export class Service {
         var directiveName = this.provider.normalizeDirective(widget);
         var contextName = this.provider.normalizeContext(widget);
 
+        this.adhConfig.custom["hide_header"] = this.adhConfig.custom["hide_header"] || search.hasOwnProperty("noheader");
+
         if (this.provider.hasDirective(directiveName)) {
             this.widget = directiveName;
             var template = this.location2template(directiveName, search);
@@ -132,10 +132,7 @@ export class Service {
                 template = "<div class=\"l-center m-embed\">" + template + "</div>";
             }
 
-            if (!search.hasOwnProperty("noheader")) {
-                var headerTemplateUrl = this.adhConfig.pkg_path + pkgLocation + "/Header.html";
-                template = "<ng-include src=\"'" + headerTemplateUrl + "'\"></ng-include>" + template;
-            }
+            template = "<adh-header></adh-header>" + template;
 
             return {
                 template: template
@@ -144,8 +141,6 @@ export class Service {
             this.widget = contextName;
             $location.url(search.initialUrl || "/");
             $location.replace();
-
-            this.adhConfig.custom["hide_header"] = this.adhConfig.custom["hide_header"] || search.hasOwnProperty("noheader");
 
             return {
                 skip: true

@@ -102,6 +102,8 @@ setup(name='adhocracy_core',
           adhocracy_core.scripts.delete_stale_login_data:delete_stale_login_data
       delete_not_referenced_images =\
           adhocracy_core.scripts.delete_images:delete_not_referenced_images
+      export_users =\
+          adhocracy_core.scripts.export_users:export_users
       [pyramid.scaffold]
       adhocracy=adhocracy_core.scaffolds:AdhocracyExtensionTemplate
       """,

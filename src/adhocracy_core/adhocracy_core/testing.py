@@ -74,7 +74,13 @@ participant2_path = '/principals/users/0000005'
 participant2_login = 'participant2'
 participant2_password = 'password'
 
-broken_header = {'X-User-Token': ''}
+authenticated_header = {'X-User-Token': 'SECRET_AUTHENTICATED'}
+authenticated_path = '/principals/users/0000006'
+authenticated_login = 'authenticated'
+authenticated_password = 'password'
+
+broken_header = {'X-User-Path': '/principals/users/0000001',
+                 'X-User-Token': ''}
 
 batch_url = '/batch'
 
@@ -458,7 +464,7 @@ def _get_settings(request, part, config_path_key='pyramid_config'):
     return settings
 
 
-@fixture(scope='session')
+@fixture(scope='class')
 def settings(request) -> dict:
     """Return app:main and server:main settings."""
     settings = {}
@@ -469,13 +475,11 @@ def settings(request) -> dict:
     return settings
 
 
-@fixture(scope='session')
+@fixture(scope='class')
 def app_settings(request) -> dict:
     """Return settings to start the test wsgi app."""
     settings = {}
-    # disable creating a default group, this causes
     # ZODB.POSException.InvalidObjectReference
-    settings['adhocracy.add_default_group'] = False
     # enable create test user for every :term:`role`
     settings['adhocracy.add_test_users'] = True
     # don't look for the websocket server
@@ -486,6 +490,8 @@ def app_settings(request) -> dict:
     settings['substanced.secret'] = 'secret'
     # extra dependenies
     settings['pyramid.includes'] = [
+        # database connection
+        'pyramid_zodbconn',
         # commit after request
         'pyramid_tm',
         # mock mail server
@@ -497,7 +503,7 @@ def app_settings(request) -> dict:
     return settings
 
 
-@fixture(scope='session')
+@fixture(scope='class')
 def ws_settings(request) -> Configurator:
     """Return websocket server settings."""
     return _get_settings(request, 'websockets')
@@ -653,6 +659,13 @@ def add_test_users(root, registry):
     add_user(root, login=participant2_login, password=participant2_password,
              email='participant2@example.org', roles=['participant'],
              registry=registry)
+    add_user_token(root,
+                   authenticated_path,
+                   authenticated_header['X-User-Token'],
+                   registry)
+    add_user(root, login=authenticated_login, password=authenticated_password,
+             email='authenticated@example.org', roles=[],
+             registry=registry)
 
 
 def add_create_test_users_subscriber(configurator):
@@ -674,21 +687,10 @@ def app_router(app_settings) -> Router:
 
 def make_configurator(app_settings: dict, package) -> Configurator:
     """Make the pyramid configurator."""
-    from pyramid.events import ApplicationCreated
-    from adhocracy_core.authorization import set_acms_for_app_root
-    from adhocracy_core.resources.root import root_acm
     configurator = Configurator(settings=app_settings,
                                 root_factory=package.root_factory)
     configurator.include(package)
     add_create_test_users_subscriber(configurator)
-    # TODO
-    # The following subscriber is a workaround to prevent ComponentLookupError:
-    # (<InterfaceClass substanced.interfaces.ICatalogFactory>, 'system')
-    # in functional tests.
-
-    def set_acm_subscriber(event):
-        set_acms_for_app_root(event.app, (root_acm,))
-    configurator.add_subscriber(set_acm_subscriber, ApplicationCreated)
     return configurator
 
 
@@ -895,6 +897,14 @@ def app_participant2(app_router) -> TestApp:
     return AppUser(app_router,
                    header=participant2_header,
                    user_path=participant2_path)
+
+
+@fixture(scope='class')
+def app_authenticated(app_router) -> TestApp:
+    """Return backend test app wrapper with authenticated authentication."""
+    return AppUser(app_router,
+                   header=authenticated_header,
+                   user_path=authenticated_path)
 
 
 @fixture(scope='class')

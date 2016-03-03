@@ -83,7 +83,6 @@ def _post_proposal_item(app_user, path='') -> TestResponse:
 class TestKiezkassenWorkflow:
 
     def test_create_resources(self,
-                              registry,
                               datadir,
                               app_admin):
         json_file = str(datadir.join('resources.json'))
@@ -91,26 +90,22 @@ class TestKiezkassenWorkflow:
         resp = app_admin.get('/kiezkasse')
         assert resp.status_code == 200
 
-    def test_draft_admin_can_view_process(self, registry, app_admin):
+    def test_draft_admin_can_view_process(self, app_admin):
         resp = app_admin.get('/kiezkasse')
         assert resp.status_code == 200
 
     def test_draft_participant_cannot_view_process(self,
-                                                   registry,
                                                    app_participant):
         resp = app_participant.get('/kiezkasse')
         assert resp.status_code == 403
 
     def test_draft_participant_cannot_create_proposal(self,
-                                                      registry,
                                                       app_participant):
         from adhocracy_meinberlin.resources.kiezkassen import IProposal
         assert IProposal not in app_participant.get_postable_types('/kiezkasse')
 
     def test_change_state_to_announce(self,
-                                      registry,
-                                      app_initiator,
-                                      app_god):
+                                      app_initiator):
         resp = do_transition_to(app_initiator, '/kiezkasse', 'announce')
         assert resp.status_code == 200
 
@@ -121,64 +116,57 @@ class TestKiezkassenWorkflow:
         assert resp.status_code == 200
 
     def test_participant_cannot_create_proposal(self,
-                                                registry,
                                                 app_participant):
         from adhocracy_meinberlin.resources.kiezkassen import IProposal
         assert IProposal not in app_participant.get_postable_types('/kiezkasse')
 
-    def test_change_state_to_participate(self, registry, app_initiator):
+    def test_change_state_to_participate(self, app_initiator):
         resp = do_transition_to(app_initiator, '/kiezkasse', 'participate')
         assert resp.status_code == 200
 
     def test_participate_participant_creates_proposal(self,
-                                                      registry,
                                                       app_participant):
         resp = _post_proposal_item(app_participant, path='/kiezkasse')
         assert resp.status_code == 200
 
     def test_participate_participant_can_comment_proposal(self,
-                                                          registry,
                                                           app_participant):
         from adhocracy_core.resources.comment import IComment
         assert IComment in app_participant.get_postable_types(
             '/kiezkasse/proposal_0000000/comments')
 
     def test_participate_participant_can_rate_proposal(self,
-                                                       registry,
                                                        app_participant):
         from adhocracy_core.resources.rate import IRate
         assert IRate in app_participant.get_postable_types(
             '/kiezkasse/proposal_0000000/rates')
 
-    def test_change_state_to_evaluate(self, registry, app_initiator):
+    def test_change_state_to_evaluate(self, app_initiator):
         resp = do_transition_to(app_initiator, '/kiezkasse', 'evaluate')
         assert resp.status_code == 200
 
-    def test_change_state_to_result(self, registry, app_initiator):
+    def test_change_state_to_result(self, app_initiator):
         resp = do_transition_to(app_initiator, '/kiezkasse', 'result')
         assert resp.status_code == 200
 
     def test_result_participant_can_view_process(self,
-                                                 registry,
                                                  app_participant):
         resp = app_participant.get('/kiezkasse')
         assert resp.status_code == 200
 
     def test_result_participant_cannot_comment_other_proposal(self,
-                                                              registry,
                                                               app_participant2):
         from adhocracy_core.resources.comment import IComment
         assert IComment not in app_participant2.get_postable_types(
             '/kiezkasse/proposal_0000000/comments')
 
     def test_result_participant_cannot_rate_other_proposal(self,
-                                                           registry,
                                                            app_participant2):
         from adhocracy_core.resources.rate import IRate
         assert IRate not in app_participant2.get_postable_types(
             '/kiezkasse/proposal_0000000/rates')
 
-    def test_change_state_to_closed(self, registry, app_initiator):
+    def test_change_state_to_closed(self, app_initiator):
         resp = do_transition_to(app_initiator, '/kiezkasse', 'closed')
         assert resp.status_code == 200
 

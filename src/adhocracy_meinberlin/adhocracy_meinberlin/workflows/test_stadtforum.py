@@ -72,7 +72,6 @@ class TestStadtForumWorkflow:
         return '/organisation/stadtforum'
 
     def test_create_resources(self,
-                              registry,
                               datadir,
                               process_url,
                               app_admin):
@@ -81,7 +80,7 @@ class TestStadtForumWorkflow:
         resp = app_admin.get(process_url)
         assert resp.status_code == 200
 
-    def test_set_process_participate_state(self, registry, process_url, app_admin):
+    def test_set_process_participate_state(self, process_url, app_admin):
         resp = app_admin.get(process_url)
         assert resp.status_code == 200
 
@@ -96,13 +95,12 @@ class TestStadtForumWorkflow:
         assert resp.status_code == 200
 
     def test_participate_initiator_creates_proposal(self,
-                                                    registry,
                                                     process_url,
                                                     app_initiator):
         resp = _post_poll_item(app_initiator, path=process_url)
         assert resp.status_code == 200
 
-    def test_set_poll_participate_state(self, registry, process_url, app_admin):
+    def test_set_poll_participate_state(self, process_url, app_admin):
         poll_url = process_url + '/poll_0000000'
         resp = app_admin.get(poll_url)
         assert resp.status_code == 200
@@ -118,7 +116,6 @@ class TestStadtForumWorkflow:
         assert resp.status_code == 200
 
     def test_participate_participant_creates_comment(self,
-                                                     registry,
                                                      process_url,
                                                      app_participant):
         path = process_url + '/poll_0000000/comments'
@@ -126,7 +123,6 @@ class TestStadtForumWorkflow:
         assert resp.status_code == 200
 
     def test_participate_participant_creates_polarization(self,
-                                                          registry,
                                                           process_url,
                                                           app_participant):
         path = process_url + '/poll_0000000/relations'

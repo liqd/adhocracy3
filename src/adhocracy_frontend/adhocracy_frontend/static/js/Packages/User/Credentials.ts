@@ -61,8 +61,7 @@ export class Service {
                 var token = session["user-token"];
                 _self.$http.head(_self.adhConfig.rest_url, {
                     headers: {
-                        "X-User-Token": token,
-                        "X-User-Path": path
+                        "X-User-Token": token
                     }
                 }).then((response) => {
                     _self.enableToken(token, path);
@@ -96,7 +95,6 @@ export class Service {
         this.userPath = userPath;
         this.loggedIn = true;
         this.$http.defaults.headers.common["X-User-Token"] = token;
-        this.$http.defaults.headers.common["X-User-Path"] = userPath;
         this.adhTracking.setLoginState(true);
         this.adhTracking.setUserId(userPath);
     }
@@ -119,7 +117,6 @@ export class Service {
             this.$window.localStorage.removeItem("user-session");
         }
         delete this.$http.defaults.headers.common["X-User-Token"];
-        delete this.$http.defaults.headers.common["X-User-Path"];
         this.token = undefined;
         this.userPath = undefined;
         this.loggedIn = false;
