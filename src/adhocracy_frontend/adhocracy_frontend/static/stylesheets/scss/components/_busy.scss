@@ -1,18 +1,16 @@
-.busy-bar {
-    @include opacity(1);
-    background: url("/static/images/busy.gif") repeat-x left bottom;
-    height: 4px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+/*doc
+---
+title: busy bar
+name: busy-bar
+category: widgets
+---
 
-    &.ng-hide-add.ng-hide-add-active,
-    &.ng-hide-remove.ng-hide-remove-active {
-        transition: 0.5s linear all;
-    }
+The busy bar shows up whenever the frontend is busy requesting something from
+the backend. This way it gives instant visual feedback to user actions.
 
-    &.ng-hide {
-        @include opacity(0);
-    }
-}
+```html_example
+<div style="position: relative; height: 2em;">
+    <div class="busy-bar"></div>
+</div>
+```
+*/
