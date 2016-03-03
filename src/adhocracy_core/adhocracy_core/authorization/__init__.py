@@ -173,9 +173,6 @@ def _get_root(app: Router) -> IRoot:
     return root
 
 
-def set_acl(resource: IResource, acl: list, registry=None) -> bool:
-    """Set the acl and mark the resource as dirty."""
-    substanced.util.set_acl(resource, acl, registry)
 
 
 def set_god_all_permissions(resource: IResource, registry=None) -> bool:

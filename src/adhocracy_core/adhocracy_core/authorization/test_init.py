@@ -191,10 +191,12 @@ def test_get_local_roles_all_parents_with_creator_role(context):
     child = context['child']
     assert get_local_roles_all(child) == {'principal': {'role:editor'}}
 
+
 @fixture
 def mock_registry():
     registry = Mock()
     return registry
+
 
 def test_acm_to_acl(mock_registry):
     mock_registry.content.permissions = ['view', 'edit']
@@ -270,14 +272,6 @@ class TestSetACMSForAppRoot:
                                                 ]
 
 
-def test_set_acl_set_changes_acl():
-    from . import set_acl
-    from pyramid.security import Allow
-    resource = testing.DummyResource()
-    resource.__acl__ = []
-    acl = [(Allow, 'role:creator', 'edit_comment')]
-    set_acl(resource, acl)
-    assert resource.__acl__ == acl
 
 
 def test_set_acl_set_resource_dirty():
