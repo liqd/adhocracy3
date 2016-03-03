@@ -50,7 +50,6 @@ export interface IScope extends angular.IScope {
         budget? : number;
         creatorParticipate? : boolean;
         locationText? : string;
-        address? : string;
     };
     selectedState? : string;
     isKiezkasse : boolean;
@@ -155,8 +154,7 @@ var fill = (
         proposalVersion.data[SIKiezkasseProposal.nick] = new SIKiezkasseProposal.Sheet({
             budget: scope.data.budget,
             creator_participate: scope.data.creatorParticipate,
-            location_text: scope.data.locationText,
-            address: scope.data.address
+            location_text: scope.data.locationText
         });
     } else if (isBuergerhaushalt) {
         proposalVersion.data[SIBuergerhaushaltProposal.nick] = new SIBuergerhaushaltProposal.Sheet({
