@@ -129,7 +129,6 @@ var bindPath = (
                     };
                     if (isKiezkasse) {
                         scope.data.budget = kiezkasseSheet.budget;
-                        scope.data.address = kiezkasseSheet.address;
                         scope.data.creatorParticipate = kiezkasseSheet.creator_participate;
                         scope.data.locationText = kiezkasseSheet.location_text;
                     } else if (isBuergerhaushalt) {
