@@ -7,6 +7,13 @@ from pyramid.security import Deny
 from unittest.mock import Mock
 
 
+@fixture
+def integration(config):
+    config.include('adhocracy_core.authorization')
+    config.include('adhocracy_core.renderers')
+    return config
+
+
 class TestRuleACLAuthorizationPolicy:
 
     @fixture
@@ -230,7 +237,13 @@ class TestSetACMSForAppRoot:
         event = testing.DummyResource(app=mock_app)
         return event
 
-    def test_set_god_permissions(self, mocker, root, event):
+    @fixture
+    def root_acl(self, mocker):
+        mock = mocker.patch('adhocracy_core.authorization._get_root_base_acl')
+        mock.return_value =[('Allow', 'role:admin', 'view')]
+        return mock
+
+    def test_set_god_permissions(self, mocker, root, event, root_acl):
         from adhocracy_core import authorization
         from . import god_all_permission_ace
         mock_commit = mocker.patch('transaction.commit')
@@ -240,25 +253,33 @@ class TestSetACMSForAppRoot:
         assert root.__acl__[0] == god_all_permission_ace
         assert authorization.set_acl.called
 
-    def test_set_root_acl_after_god_permission(self, root, event):
+    def test_set_root_acl_after_god_permission(self, root, event, root_acl):
         self.call_fut(event)
-        assert root.__acl__[1] == ('Allow', 'role:admin', 'view')
+        assert root.__acl__[1] == root_acl.return_value[0]
 
-    def test_set_extension_acl_after_root_acl(self, root, event, registry):
+    def test_set_extension_acl_after_root_acl(self, root, event, registry,
+                                              root_acl):
         from . import IResource
         from . import IRootACMExtension
-        adapter = lambda x: {'principals':  ['role:moderator'],
+        adapter = lambda x: {'principals':  ['moderator'],
                              'permissions': [['mypermission', 'Deny']]}
         registry.registerAdapter(adapter, (IResource,), IRootACMExtension)
         self.call_fut(event)
         assert root.__acl__[1] == ('Deny', 'role:moderator', 'mypermission')
 
-    def test_ignore_if_acl_not_changed(self, mocker, root, event):
+    def test_ignore_if_acl_not_changed(self, mocker, event, root_acl):
         from adhocracy_core import authorization
         mocker.spy(authorization, 'set_acl')
         self.call_fut(event)
         self.call_fut(event)
         assert authorization.set_acl.call_count == 1
+
+
+@mark.usefixtures('integration')
+def test_get_root_base_acl():
+    from . import _get_root_base_acl
+    acl = _get_root_base_acl()
+    assert acl[0] == ('Allow', 'role:admin', 'view')
 
 
 def test_set_acl_set_resource_dirty():
