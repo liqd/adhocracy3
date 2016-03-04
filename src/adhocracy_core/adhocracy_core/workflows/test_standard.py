@@ -13,7 +13,7 @@ class TestStandardWorkflow:
         from adhocracy_core.authorization import acm_to_acl
         from .standard import standard_meta
         acm = ACM().deserialize(standard_meta['states'][state]['acm'])
-        acl = acm_to_acl(acm, registry)
+        acl = acm_to_acl(acm)
         return acl
 
     def test_draft_moderator_can_view_document(self, registry):

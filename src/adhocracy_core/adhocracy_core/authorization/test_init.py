@@ -1,6 +1,7 @@
 from pyramid import testing
 from pytest import fixture
 from pytest import raises
+from pytest import mark
 from pyramid.security import Allow
 from pyramid.security import Deny
 from unittest.mock import Mock
@@ -192,19 +193,12 @@ def test_get_local_roles_all_parents_with_creator_role(context):
     assert get_local_roles_all(child) == {'principal': {'role:editor'}}
 
 
-@fixture
-def mock_registry():
-    registry = Mock()
-    return registry
-
-
-def test_acm_to_acl(mock_registry):
-    mock_registry.content.permissions = ['view', 'edit']
+def test_acm_to_acl():
     from . import acm_to_acl
     appstruct = {'principals':           ['system.Everyone', 'role:participant', 'role:moderator'],
                  'permissions': [['view',  Allow,      Allow,          Allow],
                                  ['edit',  Deny,       None,           Allow]]}
-    acl = acm_to_acl(appstruct, mock_registry)
+    acl = acm_to_acl(appstruct)
     assert acl == [('Allow', 'role:moderator', 'view'),
                    ('Allow', 'role:moderator', 'edit'),
                    ('Allow', 'role:participant', 'view'),
@@ -215,83 +209,77 @@ def test_acm_to_acl(mock_registry):
 
 class TestSetACMSForAppRoot:
 
-    def call_fut(self, app, acms=()):
+    def call_fut(self, app):
         from . import set_acms_for_app_root
-        return set_acms_for_app_root(app, acms)
+        return set_acms_for_app_root(app)
 
     @fixture
-    def mock_commit(self, monkeypatch) -> Mock:
-        mock = Mock()
-        monkeypatch.setattr('transaction.commit', mock)
-        return mock
+    def root(self, context):
+        return context
 
     @fixture
-    def mock_set_acl(self, monkeypatch) -> Mock:
-        mock = Mock()
-        monkeypatch.setattr('adhocracy_core.authorization.set_acl', mock)
-        return mock
-
-    @fixture
-    def root(self):
-        return testing.DummyResource(__acl__=[])
-
-
-    @fixture
-    def app(self, root) -> Mock:
-        app = Mock()
+    def mock_app(self, root, registry) -> Mock:
+        from pyramid.router import Router
+        app = Mock(spec=Router)()
         app.root_factory.return_value = root
+        app.registry = registry
         return app
 
-    def test_implicit_set_god_permissions(self, mock_commit, mock_set_acl, app,
-                                          root):
+    @fixture
+    def event(self, mock_app):
+        event = testing.DummyResource(app=mock_app)
+        return event
+
+    def test_set_god_permissions(self, mocker, root, event):
+        from adhocracy_core import authorization
         from . import god_all_permission_ace
-        self.call_fut(app)
-        mock_set_acl.assert_called_with(root, [god_all_permission_ace],
-                                        app.registry)
+        mock_commit = mocker.patch('transaction.commit')
+        mocker.spy(authorization, 'set_acl')
+        self.call_fut(event)
         assert mock_commit.called
+        assert root.__acl__[0] == god_all_permission_ace
+        assert authorization.set_acl.called
 
-    def test_ignore_if_acl_not_changed(self, mock_commit, mock_set_acl, app,
-                                       root):
-        from . import god_all_permission_ace
-        root.__acl__ = [god_all_permission_ace]
-        self.call_fut(app)
-        assert not mock_set_acl.called
-        assert not mock_commit.called
+    def test_set_root_acl_after_god_permission(self, root, event):
+        self.call_fut(event)
+        assert root.__acl__[1] == ('Allow', 'role:admin', 'view')
 
-    def test_set_acms(self, mock_commit, mock_set_acl, app, root):
-        from pyramid.security import Allow
-        from adhocracy_core.schema import ACM
-        from . import god_all_permission_ace
-        acm = ACM().deserialize(
-        {'principals':           ['creator'],
-         'permissions': [['view',  Allow        ]]})
-        acms = (acm,)
-        self.call_fut(app, acms)
-        assert mock_set_acl.call_args[0][1] == [god_all_permission_ace,
-                                                (Allow, 'role:creator', 'view'),
-                                                ]
+    def test_set_extension_acl_after_root_acl(self, root, event, registry):
+        from . import IResource
+        from . import IRootACMExtension
+        adapter = lambda x: {'principals':  ['role:moderator'],
+                             'permissions': [['mypermission', 'Deny']]}
+        registry.registerAdapter(adapter, (IResource,), IRootACMExtension)
+        self.call_fut(event)
+        assert root.__acl__[1] == ('Deny', 'role:moderator', 'mypermission')
 
-
+    def test_ignore_if_acl_not_changed(self, mocker, root, event):
+        from adhocracy_core import authorization
+        mocker.spy(authorization, 'set_acl')
+        self.call_fut(event)
+        self.call_fut(event)
+        assert authorization.set_acl.call_count == 1
 
 
 def test_set_acl_set_resource_dirty():
-    from . import set_acl
-    from pyramid.security import Deny
+    """Regression test."""
     from persistent.mapping import PersistentMapping
+    from . import set_acl
     resource = PersistentMapping()
     resource._p_jar = Mock()  # make _p_changed property work
-    set_acl(resource, [(Deny, 'role:creator', 'edit_comment')])
+    set_acl(resource, [('Deny', 'role:creator', 'edit_comment')])
     assert resource._p_changed is True
 
-
-def test_set_god_all_permissions():
-    from pyramid.security import ALL_PERMISSIONS
-    from . import set_god_all_permissions
-    resource = testing.DummyResource(__acl__=[(Deny, 'role:creator', 'edit_comment')])
-    set_god_all_permissions(resource)
-    assert resource.__acl__[0] == (Allow, 'role:god', ALL_PERMISSIONS)
 
 def test_create_fake_god_request(registry):
     from . import create_fake_god_request
     req = create_fake_god_request(registry)
     assert req.__cached_principals__ == ['role:god']
+
+
+@mark.usefixtures('integration')
+def test_root_acm_extensions_adapter_register(registry, context):
+    from . import IRootACMExtension
+    root_acm_extension = registry.getAdapter(context, IRootACMExtension)
+    assert root_acm_extension == {'principals': [],
+                                  'permissions': []}

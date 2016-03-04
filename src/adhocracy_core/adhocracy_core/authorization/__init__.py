@@ -8,12 +8,12 @@ from pyramid.threadlocal import get_current_registry
 from pyramid.traversal import lineage
 from pyramid.registry import Registry
 from pyramid.request import Request
-from pyramid.router import Router
+from pyramid.scripting import get_root
 from zope.interface import implementer
-from substanced.interfaces import IRoot
+from zope.interface import Interface
 from substanced.util import get_acl
+from substanced.util import set_acl
 from substanced.stats import statsd_timer
-import substanced.util
 import transaction
 
 from adhocracy_core.interfaces import IResource
@@ -22,11 +22,69 @@ from adhocracy_core.events import LocalRolesModified
 from adhocracy_core.schema import ACEPrincipal
 from adhocracy_core.schema import ROLE_PRINCIPALS
 from adhocracy_core.schema import SYSTEM_PRINCIPALS
+from adhocracy_core.schema import ACM
+
+
+# flake8: noqa
 
 
 CREATOR_ROLEID = 'role:creator'
 
 god_all_permission_ace = (Allow, 'role:god', ALL_PERMISSIONS)
+
+
+class IRootACMExtension(Interface):
+    """Marker interface for extension :term:`acm` of the  application root."""
+
+
+# Access Control Matrix. Permissions are mapped to a role.
+# Every role should only have the permission for the specific actions it is
+# meant to enable.
+root_acm = \
+    {'principals':                                   ['anonymous', 'authenticated', 'participant', 'moderator',  'creator', 'initiator', 'admin'],
+     'permissions': [  # general
+                     ['view',                          Allow,      Allow,          Allow,         Allow,        Allow,     Allow,       Allow],
+                     ['create',                        None,       None,           Allow,         Allow,        None,      Allow,       Allow],
+                     ['edit',                          None,       None,           None,          None,         Allow,     None,        Allow],
+                     ['edit_some',                     None,       None,           Allow,         Allow,        Allow,     Allow,       Allow],
+                     ['delete',                        None,       None,           None,          Allow,        Allow,     None,        Allow],
+                     ['hide',                          None,       None,           None,          Allow,        None,      Allow,       Allow],
+                     ['do_transition',                 None,       None,           None,          None,         None,      Allow,       Allow],
+                     ['message_to_user',               None,       None,           Allow,         Allow,        None,      Allow,       Allow],
+                     # structure resources
+                     ['create_pool',                   None,       None,           None,          None,         None,      None,        Allow],
+                     ['create_organisation',           None,       None,           None,          None,         None,      None,        Allow],
+                     ['create_process',                None,       None,           None,          None,         None,      Allow,       Allow],
+                     # simple content resources
+                     ['create_asset',                  None,       None,           Allow,         None,         None,      None,        Allow],
+                     ['create_external',               None,       None,           Allow,         None,         None,      None,        Allow],
+                     ['create_badge',                  None,       None,           None,          Allow,        None,      Allow,       Allow],
+                     ['create_badge_assignment',       None,       None,           None,          Allow,        None,      Allow,       Allow],
+                     ['create_badge_group',            None,       None,           None,          Allow,        None,      Allow,       Allow],
+                     ['assign_badge',                  None,       None,           None,          Allow,        None,      Allow,       Allow],
+                     # versioned content resources
+                     ['create_proposal',               None,       None,           None,          None,         None,      None,        Allow],
+                     ['edit_proposal',                 None,       None,           None,          None,         None,      None,        Allow],
+                     ['create_document',               None,       None,           None,          None,         None,      None,        Allow],
+                     ['edit_document',                 None,       None,           None,          None,         None,      None,        Allow],
+                     ['create_comment',                None,       None,           None,          None,         None,      None,        Allow],
+                     ['edit_comment',                  None,       None,           None,          None,         None,      None,        None],
+                     ['create_rate',                   None,       None,           None,          None,         None,      None,        None],
+                     ['edit_rate',                     None,       None,           None,          None,         None,      None,        None],
+                     # user, groups, permissions
+                     ['create_user',                   Allow,      None,          None,          None,         None,      None,        Allow],
+                     ['edit_userextended',             None,       None,          None,          None,         Allow,     None,        Allow],
+                     ['view_userextended',             None,       None,          None,          None,         Allow,     None,        Allow],
+                     ['create_edit_sheet_permissions', None,       None,          None,          None,         None,      None,        Allow],
+                     ['create_group',                  None,       None,          None,          None,         None,      None,        Allow],
+
+     ]}
+
+
+@implementer(IRootACMExtension)
+def acm_extension_adapter(context: IResource) -> dict:
+    """Dummy adpater to extend the `root_acm`."""
+    return ACM().deserialize({})
 
 
 @implementer(IRoleACLAuthorizationPolicy)
@@ -103,7 +161,7 @@ def get_local_roles_all(resource) -> dict:
     return local_roles_all
 
 
-def acm_to_acl(acm: dict, registry: Registry) -> [str]:
+def acm_to_acl(acm: dict) -> [str]:
     """Convert an Access Control Matrix into a pyramid ACL.
 
     To avoid generating too many ACE, action which are None will not
@@ -143,43 +201,47 @@ def _sort_by_principal_priority(acl: list) -> list:
     return acl
 
 
-def set_acms_for_app_root(app: Router, acms: tuple=()):
-    """
-    Set the :term:`acm`s for the `app`s root object.
+def set_acms_for_app_root(event):
+    """Set/update :term:`acm`s for the root object of the pyramid application.
+
+    :param event: this function should be used as a subscriber for the
+                  :class:`pyramid.interfaces.IApplicationCreated` event.
+                  That way everytime the application starts the root `acm`
+                  is updated.
+
+    The :func:`root_acm` is extended by the :term:`acm` returned by the
+    :class:`adhocracy_core.authorization.IRootACMExtension`
+    adapter.
 
     In addition all permissions are granted the god user.
-
-    :param app: The pyramid wsgi application
-    :param acms: :class:`adhocracy_core.schema.ACM` dictionaries.
-                 :term:`acm`s with overriding permissions should be put
-                 before :term:`acm`s with default permissions.
     """
-    new_acl = [god_all_permission_ace]
-    for acm in acms:
-        new_acl += acm_to_acl(acm, app.registry)
-    root = _get_root(app)
-    old_acl = get_acl(root)
-    if old_acl == new_acl:
+    root, closer = get_root(event.app)
+    acl = [god_all_permission_ace]
+    acl += _get_root_extension_acl(root, event.app.registry)
+    acl += _get_root_base_acl()
+    old_acl = get_acl(root, [])
+    if old_acl == acl:
         return
-    set_acl(root, new_acl, app.registry)
+    set_acl(root, acl, event.app.registry)
     transaction.commit()
+    closer()
 
 
-def _get_root(app: Router) -> IRoot:
-    """Return the root of the application."""
-    request = Request.blank('/path-is-meaningless-here')
-    request.registry = app.registry
-    root = app.root_factory(request)
-    return root
+def _get_root_base_acl() -> []:
+    acm = ACM().deserialize(root_acm)
+    acl = acm_to_acl(acm)
+    return acl
 
 
+def _get_root_extension_acl(context: IResource, registry: Registry) -> []:
+    acm_cstruct = registry.queryAdapter(context, IRootACMExtension)
+    if acm_cstruct is None:
+        return []
+    else:
+        acm = ACM().deserialize(acm_cstruct)
+        acl = acm_to_acl(acm)
+        return acl
 
-
-def set_god_all_permissions(resource: IResource, registry=None) -> bool:
-    """Set the god's permissions on the resource."""
-    old_acl = get_acl(resource)
-    new_acl = [god_all_permission_ace] + old_acl
-    set_acl(resource, new_acl, registry)
 
 
 def create_fake_god_request(registry):
@@ -188,3 +250,10 @@ def create_fake_god_request(registry):
     request.registry = registry
     request.__cached_principals__ = ['role:god']
     return request
+
+
+def includeme(config):
+    """Register adapter to extend the root acm and subscriber to set the acm."""
+    config.registry.registerAdapter(acm_extension_adapter,
+                                    (Interface,),
+                                    IRootACMExtension)

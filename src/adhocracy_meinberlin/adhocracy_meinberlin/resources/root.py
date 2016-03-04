@@ -10,7 +10,6 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.geo import IMultiPolygon
 from adhocracy_core.resources.root import create_initial_content_for_app_root
 from adhocracy_core.resources.root import root_meta
-from adhocracy_core.schema import ACM
 import adhocracy_core.resources.root
 import adhocracy_core.sheets
 
@@ -38,16 +37,6 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
                             parent=context,
                             appstructs=appstructs,
                             registry=registry)
-
-
-meinberlin_acm = ACM().deserialize(
-    {'principals': ['anonymous',
-                    'participant',
-                    'moderator',
-                    'creator',
-                    'initiator',
-                    'admin'],
-     'permissions': []})
 
 
 meinberlin_root_meta = root_meta._replace(

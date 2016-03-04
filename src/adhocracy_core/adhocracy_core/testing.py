@@ -178,6 +178,7 @@ def integration(config) -> Configurator:
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.graph')
     config.include('adhocracy_core.catalog')
+    config.include('adhocracy_core.authorization')
     config.include('adhocracy_core.sheets')
     config.include('adhocracy_core.resources')
     config.include('adhocracy_core.workflows')

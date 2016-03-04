@@ -1,7 +1,6 @@
 from pytest import fixture
 from pytest import mark
 
-from adhocracy_core.schema import ACM
 from adhocracy_core.utils.testing import add_resources
 from adhocracy_core.utils.testing import do_transition_to
 
@@ -39,6 +38,8 @@ class TestDebatePrivateProcess:
         In addition the global participator role is removed from the user
         default user group and the global view permission removed.
         """
+        from pyramid.interfaces import IApplicationCreated
+        from adhocracy_core.authorization import IRootACMExtension
         from adhocracy_core.testing import make_configurator
         from adhocracy_core.interfaces import IResourceCreatedAndAdded
         from adhocracy_core.resources.root import IRootPool
@@ -48,26 +49,28 @@ class TestDebatePrivateProcess:
         configurator = make_configurator(app_settings, adhocracy_core)
         debate_process_meta = process_meta._replace(workflow_name='debate_private')
         add_resource_type_to_registry(debate_process_meta, configurator)
-        configurator.add_subscriber(
-            self._set_root_acm_and_remove_default_group_roles,
-            IResourceCreatedAndAdded,
-            object_iface=IRootPool)
+        configurator.registry.registerAdapter(self._get_root_acm_extension,
+                                              (IRootPool,),IRootACMExtension),
+        configurator.add_subscriber(self._remove_default_group_roles,
+                                    IResourceCreatedAndAdded,
+                                    object_iface=IRootPool)
         app_router = configurator.make_wsgi_app()
-
         return app_router
 
     @staticmethod
-    def _set_root_acm_and_remove_default_group_roles(event):
-        from adhocracy_core.resources.subscriber import _get_default_group
-        from adhocracy_core.sheets.principal import IGroup
-        root = event.object
-        old_acl = get_acl(root)
-        acm = ACM().deserialize(
+    def _get_root_acm_extension(context):
+        acm = \
             {'principals':            ['anonymous', 'authenticated', 'participant', 'moderator',  'creator', 'initiator', 'admin'],
              'permissions': [['view',  'Allow',      'Deny',          'Allow',       'Allow',      'Allow',   'Allow',     'Allow'],
-             ]})
-        new_acl = acm_to_acl(acm, event.registry) + old_acl
-        set_acl(root, new_acl, registry=event.registry)
+             ]}
+        return acm
+
+    @staticmethod
+    def _remove_default_group_roles(event):
+        from pyramid.traversal import find_root
+        from adhocracy_core.resources.subscriber import _get_default_group
+        from adhocracy_core.sheets.principal import IGroup
+        root = find_root(event.object)
         default = _get_default_group(root)
         group_sheet = event.registry.content.get_sheet(default, IGroup)
         group_sheet.set({'roles': []})

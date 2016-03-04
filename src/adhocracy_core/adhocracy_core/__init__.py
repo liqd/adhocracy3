@@ -102,6 +102,7 @@ def includeme(config):
         timeout=authn_timeout)
     config.set_authentication_policy(authn_policy)
     config.include('.authentication')
+    config.include('.authorization')
     config.include('.evolution')
     config.include('.events')
     config.include('.content')

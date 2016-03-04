@@ -102,7 +102,7 @@ def _create_workflow(registry: Registry,
     initial_state = appstruct['initial_state']
     workflow = AdhocracyACLWorkflow(initial_state=initial_state, type=name)
     for name, data in appstruct['states'].items():
-        acl = acm_to_acl(data['acm'], registry)
+        acl = acm_to_acl(data['acm'])
         workflow.add_state(name, callback=None, acl=acl)
     for name, data in appstruct['transitions'].items():
         workflow.add_transition(name, **data)
