@@ -861,6 +861,14 @@ class ACMCell(colander.SchemaNode):
     schema_type = colander.String
     missing = None
 
+    def preparer(node, value):
+        if value == 'A':
+            return security.Allow
+        elif value == 'D':
+            return security.Deny
+        else:
+            return value
+
 
 class ACMRow(colander.SequenceSchema):
     """ACM Row."""
