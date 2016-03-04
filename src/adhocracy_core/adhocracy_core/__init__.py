@@ -101,6 +101,7 @@ def includeme(config):
         groupfinder=groups_and_roles_finder,
         timeout=authn_timeout)
     config.set_authentication_policy(authn_policy)
+    config.include('.renderers')
     config.include('.authentication')
     config.include('.authorization')
     config.include('.evolution')

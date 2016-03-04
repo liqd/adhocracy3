@@ -24,6 +24,7 @@ requires = [
     'requests',
     'pyrsistent',
     'multipledispatch',
+    'PyYAML',
 ]
 
 if sys.version_info < (3, 4):
