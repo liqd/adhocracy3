@@ -116,7 +116,7 @@ class TestHandleErrorX0XException:
 
     def test_forward_http_exception(self, request_):
         from pyramid.httpexceptions import HTTPException
-        error = HTTPException(status_code=204)
+        error = HTTPException(code=204)
         result_error = self.call_fut(error, request_)
         assert error is result_error
 
@@ -136,9 +136,9 @@ class TestHandleError40X_exception:
 
     def test_render_http_client_exception(self, request_):
         from pyramid.httpexceptions import HTTPClientError
-        error = HTTPClientError(status_code=400)
+        error = HTTPClientError(code=400)
         json_error = self.call_fut(error, request_)
-        assert json_error.status_code == 400
+        assert json_error.code == 400
         assert json_error.json_body == \
                {"status": "error",
                 "errors": [{"description": "{0} {1}".format(error.status, error),
@@ -154,7 +154,7 @@ class TestHandleError40X_exception:
     def create_dummy_app(self, config, error=None):
         def dummy_view(request):
             if error:
-                raise error()
+                raise error
             else:
                 return "{}"
         config.add_view(dummy_view, name='dummy_view')
@@ -166,15 +166,19 @@ class TestHandleError40X_exception:
     @mark.usefixtures('integration')
     def test_response_get_40X(self, integration):
         from pyramid.httpexceptions import HTTPClientError
-        app_dummy = self.create_dummy_app(integration, error=HTTPClientError)
+        app_dummy = self.create_dummy_app(
+            integration,
+            error=HTTPClientError(status_code=400, code=400))
         resp = app_dummy.get('/dummy_view', status=400)
-        assert '400' in resp.json['errors'][0]['description']\
+        assert '400' in resp.json['errors'][0]['description']
 
     @mark.usefixtures('integration')
     def test_response_options_40X(self, integration):
         from pyramid.httpexceptions import HTTPClientError
-        app_dummy = self.create_dummy_app(integration, error=HTTPClientError)
-        resp = app_dummy.get('/dummy_view', status=400)
+        app_dummy = self.create_dummy_app(
+            integration,
+            error=HTTPClientError(status_code=400, code=400))
+        resp = app_dummy.options('/dummy_view', status=400)
         assert '400' in resp.json['errors'][0]['description']
 
 
@@ -349,6 +353,6 @@ class TestHandleError400:
         assert inst.json ==\
                {"errors": [{"location":"b","name":"","description":""}],
                 "status": "error"}
-        assert inst.status_code == 400
+        assert inst.code == 400
 
 
