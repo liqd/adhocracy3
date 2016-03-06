@@ -51,7 +51,6 @@ test_requires = [
 ]
 
 debug_requires = [
-    'ipdb',  # ipython pdb
     'pudb',  # Graphical debugger
     'contexttimer',  # decorator to measure time
     'profilehooks',  # decorator to run/output cprofile
