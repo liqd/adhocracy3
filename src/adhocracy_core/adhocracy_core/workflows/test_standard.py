@@ -6,22 +6,6 @@ from adhocracy_core.utils.testing import add_resources
 from adhocracy_core.utils.testing import do_transition_to
 
 
-class TestStandardWorkflow:
-
-    def get_acl(self, state, registry):
-        from adhocracy_core.schema import ACM
-        from adhocracy_core.authorization import acm_to_acl
-        from .standard import standard_meta
-        acm = ACM().deserialize(standard_meta['states'][state]['acm'])
-        acl = acm_to_acl(acm)
-        return acl
-
-    def test_draft_moderator_can_view_document(self, registry):
-        acl = self.get_acl('draft', registry)
-        index_allow = acl.index(('Allow', 'role:moderator', 'view'))
-        index_deny = acl.index(('Deny', 'role:participant', 'view'))
-        assert index_allow < index_deny
-
 @fixture
 def integration(integration):
     integration.include('adhocracy_core.workflows')
@@ -39,17 +23,17 @@ def test_initiate_and_transition_to_result(registry, context):
     request = testing.DummyRequest()
     assert workflow.state_of(context) is None
     workflow.initialize(context)
-    assert workflow.state_of(context) is 'draft'
+    assert workflow.state_of(context) == 'draft'
     workflow.transition_to_state(context, request, 'announce')
-    assert workflow.state_of(context) is 'announce'
+    assert workflow.state_of(context) == 'announce'
     workflow.transition_to_state(context, request, 'participate')
-    assert workflow.state_of(context) is 'participate'
+    assert workflow.state_of(context) == 'participate'
     workflow.transition_to_state(context, request, 'evaluate')
-    assert workflow.state_of(context) is 'evaluate'
+    assert workflow.state_of(context) == 'evaluate'
     workflow.transition_to_state(context, request, 'result')
-    assert workflow.state_of(context) is 'result'
+    assert workflow.state_of(context) == 'result'
     workflow.transition_to_state(context, request, 'closed')
-    assert workflow.state_of(context) is 'closed'
+    assert workflow.state_of(context) == 'closed'
 
 
 @mark.functional

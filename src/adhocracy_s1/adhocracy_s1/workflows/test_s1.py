@@ -175,7 +175,7 @@ def test_s1_initiate_and_transition_to_result(registry, pool_with_catalogs,
     pool_with_catalogs["process"] = process
     workflow = registry.content.workflows['s1']
     workflow.initialize(process)
-    assert workflow.state_of(process) is 'propose'
+    assert workflow.state_of(process) == 'propose'
     workflow.transition_to_state(process, request_, 'select')
     workflow.transition_to_state(process, request_, 'result')
     workflow.transition_to_state(process, request_, 'propose')
@@ -347,7 +347,7 @@ def test_s1_content_initiate_and_transition_to_selected(registry, request_):
     process = testing.DummyResource(__provides__=IProcess)
     workflow = registry.content.workflows['s1_content']
     workflow.initialize(process)
-    assert workflow.state_of(process) is 'proposed'
+    assert workflow.state_of(process) == 'proposed'
     workflow.transition_to_state(process, request_, 'voteable')
     workflow.transition_to_state(process, request_, 'selected')
 

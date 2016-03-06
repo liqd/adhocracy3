@@ -8,6 +8,7 @@ from colander import MappingSchema
 from colander import SchemaNode
 from colander import SequenceSchema
 from substanced.interfaces import IUserLocator
+from substanced.interfaces import IWorkflow
 from substanced.util import find_service
 from substanced.stats import statsd_timer
 from pyramid.httpexceptions import HTTPMethodNotAllowed
@@ -83,7 +84,6 @@ from adhocracy_core.utils import unflatten_multipart_request
 from adhocracy_core.utils import is_created_in_current_transaction
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.workflows.schemas import create_workflow_meta_schema
-from adhocracy_core.workflows import IWorkflow
 
 
 logger = getLogger(__name__)
