@@ -9,6 +9,7 @@ from pyramid.request import Request
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
+from pyramid.util import DottedNameResolver
 from pyrsistent import PMap
 from pyrsistent import freeze
 from pyrsistent import ny
@@ -116,6 +117,8 @@ def _deserialize_data(resource_info: dict, parent: IPool, request: Request,
     iresource = _deserialize_content_type(resource_info, request)
     data = resource_info['data']
     sheets = registry.content.get_sheets_create(parent, iresource=iresource)
+    resource_type = resource_info['content_type']
+    workflow = _get_workflow(registry, resource_type)
     for sheet in sheets:
         sheet_name = sheet.meta.isheet.__identifier__
         if sheet_name not in data:
@@ -123,6 +126,7 @@ def _deserialize_data(resource_info: dict, parent: IPool, request: Request,
         schema = sheet.schema.bind(registry=registry,
                                    request=request,
                                    context=parent,
+                                   workflow=workflow,
                                    parent_pool=parent)
         appstruct = schema.deserialize(data[sheet_name])
         appstructs[sheet_name] = appstruct
@@ -164,3 +168,15 @@ def _deserialize_roles(roles: dict) -> dict:
     for k, v in roles.items():
         roles[k] = set(v)
     return roles
+
+
+def _get_workflow(registry: Registry, resource_type: str):
+    # for post request we need to get the workflow for the resource type
+    # that is going to be created, but before any validation has been done.
+    # TODO refactor, see notes in adhocracy_core.rest.views.py
+    iresource = DottedNameResolver().resolve(resource_type)
+    iresource_meta = registry.content.resources_meta[iresource]
+    name = iresource_meta.workflow_name
+    workflow = registry.content.workflows.get(name, None)
+
+    return workflow
