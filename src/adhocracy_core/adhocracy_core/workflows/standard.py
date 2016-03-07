@@ -37,7 +37,8 @@ standard_meta = freeze({
                                    ['create_rate',                None,       'Allow',        None,        None,      None,        None],
                                    ['edit_rate',                  None,        None,          None,       'Allow',    None,        None],
                                    ['create_relation',            None,       'Allow',        None,        None,      None,        None],
-                                   ['edit_relation',              None,        None,          None,       'Allow',    None,        None]
+                                   ['edit_relation',              None,        None,          None,       'Allow',    None,        None],
+                                   ['create_badge_assignment',    None,       'Allow',        None,        None,      None,        None]
                                   ]},
                         },
         'evaluate': {'title': 'Evaluate',

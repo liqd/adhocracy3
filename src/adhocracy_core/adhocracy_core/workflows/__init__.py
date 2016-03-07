@@ -121,6 +121,7 @@ def includeme(config):  # pragma: no cover
     """Include workflows."""
     config.include('.sample')
     config.include('.standard')
+    config.include('.badge_assignment')
     config.include('.standard_private')
     config.include('.debate')
     config.include('.debate_private')
