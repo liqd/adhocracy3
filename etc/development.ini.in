@@ -80,6 +80,7 @@ mail.queue_path = %(here)s/../var/mail
 # Configure the following fields for sending mails via SMTP
 # See github.com/Pylons/pyramid_mailer for details
 mail.default_sender = support@unconfigured.domain
+mail.noreply_sender = noreply@unconfigured.domain
 mail.host = localhost
 mail.port = 25
 #mail.username = None

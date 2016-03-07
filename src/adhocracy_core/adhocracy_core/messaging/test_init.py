@@ -139,6 +139,7 @@ class TestSendMessageToUser:
     def test_send_message_to_user(self, monkeypatch, registry, request_):
         from adhocracy_core import messaging
         from adhocracy_core.resources.principal import IUser
+        registry.settings['mail.noreply_sender'] = 'noreply@example.org'
         recipient = Mock(spec=IUser)
         recipient.email = 'recipient@example.org'
         sender = Mock(spec=IUser)
@@ -155,7 +156,7 @@ class TestSendMessageToUser:
             request=request_,
             from_user=sender)
         msgtext = _msg_to_str(mailer.outbox[0])
-        assert 'From: sender@example.org' in msgtext
+        assert 'From: noreply@example.org' in msgtext
         assert 'Subject: Adhocracy Message from Sandy Sender: Important Adhocracy notice' in msgtext
         assert 'To: recipient@example.org' in msgtext
 

@@ -39,7 +39,7 @@ msgstr ""
 "Best wishes,\n"
 "The ${site_name} Team}\n"
 "\n"
-"Click here to visit ${sender_name}’s profile:}\n"
+"Click here to visit ${sender_name}’s profile:\n"
 "${sender_url}"
 
 #: src/adhocracy_core/adhocracy_core/resources/subscriber.py:226
