@@ -1,8 +1,5 @@
-/// <reference path="../../lib2/types/require.d.ts"/>
 /// <reference path="../../lib2/types/lodash.d.ts"/>
-
-/* tslint:disable:no-var-requires */
-/* tslint:enable:no-var-requires */
+/// <reference path="./node.d.ts"/>
 
 import * as _ from "lodash";
 

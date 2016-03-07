@@ -1,14 +1,12 @@
-/// <reference path="../lib2/types/require.d.ts"/>
 /// <reference path="../lib2/types/lodash.d.ts"/>
-
-/* tslint:disable:no-var-requires */
-var http : any = require("http");
-var fs : any = require("fs");
-var _fs : any = require("node-fs");
-/* tslint:enable:no-var-requires */
+/// <reference path="./mkResources/node.d.ts"/>
 
 declare var process : any;
 
+import * as http from "http";
+import * as fs from "fs";
+import * as _fs from "node-fs";
+import * as _ from "lodash";
 import * as Base from "./ResourcesBase";
 import * as UtilR from "./mkResources/Util";
 import * as MetaApi from "./Packages/Http/MetaApi";
