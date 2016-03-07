@@ -614,7 +614,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var allKeys = _.uniq(_.flatten(_.values(fieldsMap)));
 
         _.forOwn(data.organization_info, (value, key, object) => {
-            if (_.contains(allKeys, key) && !(_.contains(fieldsMap[object.status_enum], key))) {
+            if (_.includes(allKeys, key) && !(_.includes(fieldsMap[object.status_enum], key))) {
                 delete object[key];
             }
         });
