@@ -351,7 +351,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             data.winnerBadgeAssignment = communityAssignment || winningAssignment;
         });
 
-        instance.scope.$on("$destroy", this.adhTopLevelState.bind("processState", data, "currentPhase"));
+        instance.scope.$on("$destroy", <any>this.adhTopLevelState.bind("processState", data, "currentPhase"));
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
         var subResourcePromises : angular.IPromise<ResourcesBase.Resource[]> = this.$q.all([
