@@ -168,7 +168,7 @@ export var editDirective = (
                     process.data[SIName.nick] = undefined;
                     process.data[SIImageReference.nick] = undefined;
 
-                    if (_.contains(scope.data.availableWorkflowStates, scope.data.workflowState)) {
+                    if (_.includes(scope.data.availableWorkflowStates, scope.data.workflowState)) {
                         process.data[SIWorkflow.nick] = {
                             workflow_state: scope.data.workflowState
                         };

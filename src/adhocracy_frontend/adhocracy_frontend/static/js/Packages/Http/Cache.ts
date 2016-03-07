@@ -102,7 +102,7 @@ export class Service {
         var cached = this.cache.get(path);
         if (typeof cached === "undefined") {
             var wsOff : () => void;
-            if (!_.contains(this.nonResourceUrls, path)) {
+            if (!_.includes(this.nonResourceUrls, path)) {
                 wsOff = this.adhWebSocket.register(path, (msg) => {
                     this.invalidate(path);
                 });

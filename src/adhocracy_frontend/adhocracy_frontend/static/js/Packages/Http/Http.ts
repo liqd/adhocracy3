@@ -149,7 +149,7 @@ export class Service<Content extends ResourcesBase.Resource> {
             canPost: (contentType : string) => {
                 if (raw.data.POST) {
                     var postOptions = raw.data.POST.request_body;
-                    return _.any(postOptions, { "content_type": contentType });
+                    return _.some(postOptions, { "content_type": contentType });
                 } else {
                     return false;
                 }
