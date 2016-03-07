@@ -1,4 +1,3 @@
-/// <reference path="../../../lib2/types/require.d.ts"/>
 /// <reference path="../../../lib2/types/lodash.d.ts"/>
 
 import * as _ from "lodash";

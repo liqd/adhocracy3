@@ -1,4 +1,3 @@
-/// <reference path="../lib2/types/require.d.ts"/>
 /// <reference path="../lib2/types/angular.d.ts"/>
 /// <reference path="../lib2/types/lodash.d.ts"/>
 /// <reference path="../lib2/types/moment.d.ts"/>
