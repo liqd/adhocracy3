@@ -677,8 +677,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                 return [item, version];
             });
 
-            // FIXME: remove <any> when borisyankov/DefinitelyTyped#3573 is resolved
-            return this.$q.when((<any>_).flattenDeep([mercatorProposal, mercatorProposalVersion, subresources]));
+            return this.$q.when(_.flattenDeep([mercatorProposal, mercatorProposalVersion, subresources]));
         };
 
         if (instance.scope.$flow && instance.scope.$flow.support && instance.scope.$flow.files.length > 0) {
@@ -727,8 +726,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                     });
                     return deferred.promise;
                 }), self.$q)
-                // FIXME: remove <any> when borisyankov/DefinitelyTyped#3573 is resolved
-                .then((subresources) => (<any>_).flattenDeep([mercatorProposalVersion, subresources]));
+                .then((subresources) => _.flattenDeep([mercatorProposalVersion, subresources]));
 
         };
 
