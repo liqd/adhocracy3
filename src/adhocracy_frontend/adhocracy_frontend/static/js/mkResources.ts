@@ -5,7 +5,6 @@
 var http : any = require("http");
 var fs : any = require("fs");
 var _fs : any = require("node-fs");
-var _s : any = require("underscore.string");
 /* tslint:enable:no-var-requires */
 
 declare var process : any;
@@ -1026,20 +1025,20 @@ isWriteableField = (field) => field.editable || field.creatable || field.create_
  */
 
 mkdirForFile = (filepath : string) : void => {
-    var dirpath : string[] = _s.words(filepath, "/");
+    var dirpath : string[] = _.split(filepath, "/");
     dirpath.pop();
     _fs.mkdirSync(dirpath.join("/"), 0o755, true);
 };
 
 pyModuleToTsModule = (filepath : string) : string =>
-    "./" + _s.words(filepath, "\.").join("/");
+    "./" + _.split(filepath, ".").join("/");
 
 /**
  * The `relativeRoot` always points from file containing contents to
  * `.../Resources_/`.  The trailing `/` is important!
  */
 mkRelativeRoot = (source : string) : string => {
-    var arr = _s.words(source, "/");
+    var arr = _.split(source, "/");
     arr.pop();  // don't count leading `.`.
     arr.pop();  // just count directories, not the file name.
     return arr.map(() => "..").join("/") + "/";
