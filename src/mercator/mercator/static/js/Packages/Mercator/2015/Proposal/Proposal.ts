@@ -928,7 +928,7 @@ export var listItem = (
 export var addProposalButton = (
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service,
-    adhTopLevelState : AdhTopLevelState.Service,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
