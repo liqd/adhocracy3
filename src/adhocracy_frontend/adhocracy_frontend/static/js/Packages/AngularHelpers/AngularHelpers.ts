@@ -1,4 +1,4 @@
-/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../lib2/types/angular.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
 import * as _ from "lodash";

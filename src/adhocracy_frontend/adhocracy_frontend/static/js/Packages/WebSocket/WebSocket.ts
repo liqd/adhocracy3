@@ -1,4 +1,4 @@
-/// <reference path="../../../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
+/// <reference path="../../../lib2/types/modernizr.d.ts"/>
 
 import * as _ from "lodash";
 

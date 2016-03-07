@@ -1,7 +1,7 @@
-/// <reference path="../../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
-/// <reference path="../../../lib/DefinitelyTyped/jquery/jquery.d.ts"/>
-/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
-/// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
+/// <reference path="../../../lib2/types/require.d.ts"/>
+/// <reference path="../../../lib2/types/jquery.d.ts"/>
+/// <reference path="../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../lib2/types/lodash.d.ts"/>
 
 import * as _ from "lodash";
 

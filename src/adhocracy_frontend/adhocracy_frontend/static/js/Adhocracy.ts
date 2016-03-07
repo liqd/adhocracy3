@@ -1,9 +1,9 @@
-/// <reference path="../lib/DefinitelyTyped/requirejs/require.d.ts"/>
-/// <reference path="../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
-/// <reference path="../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
-/// <reference path="../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
-/// <reference path="../lib/DefinitelyTyped/moment/moment.d.ts"/>
-/// <reference path="../lib/DefinitelyTyped/leaflet/leaflet.d.ts"/>
+/// <reference path="../lib2/types/require.d.ts"/>
+/// <reference path="../lib2/types/angular.d.ts"/>
+/// <reference path="../lib2/types/lodash.d.ts"/>
+/// <reference path="../lib2/types/modernizr.d.ts"/>
+/// <reference path="../lib2/types/moment.d.ts"/>
+/// <reference path="../lib2/types/leaflet.d.ts"/>
 /// <reference path="./_all.d.ts"/>
 
 import * as angular from "angular";
