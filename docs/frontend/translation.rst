@@ -100,12 +100,5 @@ is: Iteratively run the script, check the output and add new rules until
 everything is fine.
 
 
-Missing Features
-----------------
-
--  There is currently no mechanism to translate stuff from the backend
-   (e.g. mail templates)
-
-
 .. _angular-translate: https://angular-translate.github.io
 .. _transifex: https://www.transifex.com/liqd/adhocracy3/

@@ -102,6 +102,10 @@ In the frontend it also defines which template should be used.  The
 directive ``adhProcessView`` is used to render that template.  It is
 currently used in the resource area's content space.
 
+.. NOTE::
+
+   The UI for a process is sometimes refered to as a *workbench*.
+
 Embed Context
 -------------
 
