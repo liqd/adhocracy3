@@ -49,6 +49,19 @@ badge_group_meta = pool_meta._replace(
 )
 
 
+class IParticipantsAssignableBadgeGroup(IPool):
+    """A badge group pool for badges assignable by participants."""
+
+
+participants_assignable_badge_group_meta = badge_group_meta._replace(
+    iresource=IParticipantsAssignableBadgeGroup,
+    workflow_name='badge_assignment',
+    element_types=(IBadge,
+                   IBadgeGroup,
+                   IParticipantsAssignableBadgeGroup,),
+)
+
+
 class IBadgesService(IServicePool):
     """The 'badges' ServicePool."""
 
@@ -107,6 +120,8 @@ def includeme(config):
     """Add resource type to registry."""
     add_resource_type_to_registry(badge_meta, config)
     add_resource_type_to_registry(badge_group_meta, config)
+    add_resource_type_to_registry(participants_assignable_badge_group_meta,
+                                  config)
     add_resource_type_to_registry(badges_service_meta, config)
     add_resource_type_to_registry(badge_assignment_meta, config)
     add_resource_type_to_registry(badge_assignments_service_meta, config)
