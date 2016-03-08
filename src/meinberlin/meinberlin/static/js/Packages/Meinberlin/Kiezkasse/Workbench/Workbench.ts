@@ -145,6 +145,10 @@ export var addProposalButtonDirective = (
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
+
+            scope.setCameFrom = () => {
+                adhTopLevelState.setCameFrom();
+            };
         }
     };
 
