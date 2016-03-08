@@ -157,3 +157,16 @@ the one from core.
    This mechanism allows the customization to replace any file from
    core. However, this is strongly discouraged in most cases as it is
    hard to maintain the overwrites.
+
+Independent widgets
+-------------------
+
+In order to provide reusable widgets, we try to make our directives as
+independent as possible. In practice that means that we always isolate
+the directive scope (with few exceptions) and pass a minimal number of
+parameters.
+
+For example, a proposal directive would only get the ``path`` of a
+resource instead of relying on some parent directive to fetch it first.
+This of course means that many directives may trigger the same HTTP
+requests. This is mitigated by a build in caching system.
