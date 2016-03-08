@@ -46,5 +46,7 @@ export var register = (angular) => {
         .directive("adhMeinberlinBuergerhaushaltProposalCreateColumn", [
             "adhConfig", Workbench.buergerhaushaltProposalCreateColumnDirective])
         .directive("adhMeinberlinBuergerhaushaltProposalEditColumn", ["adhConfig", Workbench.buergerhaushaltProposalEditColumnDirective])
-        .directive("adhMeinberlinBuergerhaushaltDetailColumn", ["adhConfig", Workbench.buergerhaushaltDetailColumnDirective]);
+        .directive("adhMeinberlinBuergerhaushaltDetailColumn", ["adhConfig", Workbench.buergerhaushaltDetailColumnDirective])
+        .directive("adhMeinberlinBuergerhaushaltAddProposalButton", [
+            "adhConfig", "adhPermissions", "adhTopLevelState", Workbench.addProposalButtonDirective]);
 };

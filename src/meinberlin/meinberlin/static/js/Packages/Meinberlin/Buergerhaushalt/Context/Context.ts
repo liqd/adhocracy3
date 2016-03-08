@@ -1,22 +1,14 @@
 import * as AdhConfig from "../../../Config/Config";
-import * as AdhPermissions from "../../../Permissions/Permissions";
-import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 
 var pkgLocation = "/Meinberlin/Buergerhaushalt/Context";
 
 
 export var headerDirective = (
-    adhConfig : AdhConfig.IService,
-    adhPermissions : AdhPermissions.Service,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhConfig : AdhConfig.IService
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/header.html",
-        link: (scope) => {
-            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
-            adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
-        }
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/header.html"
     };
 };
 
