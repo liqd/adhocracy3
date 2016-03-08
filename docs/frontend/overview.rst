@@ -129,3 +129,31 @@ automatically.
    Websocket notifications are also used to do cache invalidation in the
    frontend. So if the websocket connection fails, the frontend stops
    caching completely and may get slow.
+
+The build directory
+-------------------
+
+Adhocracy is split into several python packages. For a specific project
+there are typically four packages:
+
+==============  ==================  =============  ========
+             Core                        Customization
+----------------------------------  -----------------------
+Backend         Frontend            Backend        Frontend
+==============  ==================  =============  ========
+adhocracy_core  adhocracy_frontend  adhocracy_foo  foo
+==============  ==================  =============  ========
+
+The ``static`` directories from both frontend packages are merged into
+a single one called ``build`` that is located next to ``static`` in the
+customization package. This is done by a script called
+``bin/merge_static_directories``. Merging in this case means that files
+from both directories are symlinked into the build directory. If a file
+exists in both packages, the one from the customization is overwrites
+the one from core.
+
+.. NOTE::
+
+   This mechanism allows the customization to replace any file from
+   core. However, this is strongly discouraged in most cases as it is
+   hard to maintain the overwrites.
