@@ -256,7 +256,8 @@ texinfo_documents = [
 intersphinx_mapping = {'python': ('http://docs.python.org/3.4', None),
                        'colander': ('http://colander.readthedocs.org/en/latest', None),
                        'substanced': ('https://substanced.readthedocs.org/en/latest', None),
-                       'pyramid': ('http://docs.pylonsproject.org/en/latest', None),
+                       'pyramid': ('http://docs.pylonsproject.org/projects/pyramid/en/latest', None),
+
                        }
 
 #autodoc config
