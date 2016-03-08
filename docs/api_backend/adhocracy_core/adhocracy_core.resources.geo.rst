@@ -1,7 +1,7 @@
-adhocracy_core.resources.tag module
+adhocracy_core.resources.geo module
 ===================================
 
-.. automodule:: adhocracy_core.resources.tag
+.. automodule:: adhocracy_core.resources.geo
     :members:
     :undoc-members:
     :show-inheritance:

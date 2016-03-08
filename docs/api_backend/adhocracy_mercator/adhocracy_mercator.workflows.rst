@@ -1,7 +1,7 @@
-adhocracy_frontend.scaffolds package
+adhocracy_mercator.workflows package
 ====================================
 
-.. automodule:: adhocracy_frontend.scaffolds
+.. automodule:: adhocracy_mercator.workflows
     :members:
     :undoc-members:
     :show-inheritance:
@@ -11,5 +11,5 @@ Submodules
 
 .. toctree::
 
-   adhocracy_frontend.scaffolds.test_init
+   adhocracy_mercator.workflows.mercator2
 

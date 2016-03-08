@@ -12,6 +12,4 @@ Submodules
 .. toctree::
 
    adhocracy_core.changelog.subscriber
-   adhocracy_core.changelog.test_init
-   adhocracy_core.changelog.test_subscriber
 

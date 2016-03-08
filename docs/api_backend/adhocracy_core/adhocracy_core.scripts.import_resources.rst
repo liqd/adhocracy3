@@ -1,7 +1,7 @@
-adhocracy_core.resources.sample_section module
+adhocracy_core.scripts.import_resources module
 ==============================================
 
-.. automodule:: adhocracy_core.resources.sample_section
+.. automodule:: adhocracy_core.scripts.import_resources
     :members:
     :undoc-members:
     :show-inheritance:

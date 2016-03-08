@@ -1,7 +1,7 @@
-adhocracy_core.sheets.sample_image module
+adhocracy_core.sheets.subresources module
 =========================================
 
-.. automodule:: adhocracy_core.sheets.sample_image
+.. automodule:: adhocracy_core.sheets.subresources
     :members:
     :undoc-members:
     :show-inheritance:
