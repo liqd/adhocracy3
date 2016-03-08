@@ -22,7 +22,6 @@ export var register = (angular) => {
             AdhMeinberlinKiezkasseWorkbenchModule.moduleName,
             AdhResourceAreaModule.moduleName
         ])
-        .directive("adhKiezkasseContextHeader", ["adhConfig", Context.headerDirective])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerContext("kiezkasse", ["kiezkassen"]);
         }])
