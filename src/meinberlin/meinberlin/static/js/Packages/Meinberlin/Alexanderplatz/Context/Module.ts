@@ -25,8 +25,6 @@ export var register = (angular) => {
             AdhMeinberlinAlexanderplatzWorkbenchModule.moduleName,
             AdhResourceAreaModule.moduleName
         ])
-        .directive("adhAlexanderplatzContextHeader", [
-            "adhConfig", AdhMeinberlinAlexanderplatzContext.headerDirective])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
             adhEmbedProvider.registerContext("alexanderplatz");
         }])
