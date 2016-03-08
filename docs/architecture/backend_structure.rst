@@ -166,7 +166,7 @@ History Notes
 
 We started with the plan to port adhocracy2 to pyramid.
 This become a long discussion how to implement something completely new
-based on fancy graph data structures :doc:`../attic/index.rst`.
+based on fancy graph data structures `../attic/index.rst`.
 
 We compared multiple framework/database combinations, here in more or
 less chronical order:

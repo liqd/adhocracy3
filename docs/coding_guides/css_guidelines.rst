@@ -8,11 +8,11 @@ This document describes the CSS development process in the context of
 Adhocracy 3. However, it is not specific to Adhocracy 3 and can be
 applied in any project which needs CSS code.
 
--  If you are a CSS developer you should read the whole document.
--  Everyone concerned with the frontend should read `Goals`_ and
-   `Common Terminology`_.
--  UI designers and graphic designers should also read `CSS and Design`_.
--  JavaScript programmers should also read `CSS, HTML, and JavaScript`_.
+- If you are a CSS developer you should read the whole document.
+- Everyone concerned with the frontend should read `Goals`_ and
+  `Common Terminology`_.
+- UI designers and graphic designers should also read `CSS and Design`_.
+- JavaScript programmers should also read `CSS, HTML, and JavaScript`_.
 
 Goals
 -----
@@ -327,8 +327,7 @@ for layout, variables, and mixins. Adjustments must go into separate
 modules.
 
 It is recommended to use (modified) modules from 3rd party projects such
-as `bootstrap <https://github.com/twbs/bootstrap/tree/master/less>`_ or
-`foundation <https://github.com/zurb/foundation/tree/master/scss/foundation/components>`_.
+as bootstrap_ or foundation_.
 
 All SCSS files not to be compiled on their own must begin with
 an underscore (``_``). They must be structured into folders reflecting
@@ -529,7 +528,7 @@ Inheritance is hard to avoid and does little damage. So we should
 embrace it.
 
 I am not so sure about child selectors:
-`OOCSS <https://github.com/stubbornella/oocss/wiki#separate-container-and-content>`_
-and `SMACSS <http://smacss.com/book/type-module#subclassing>`_ both
+`OOCSS container <https://github.com/stubbornella/oocss/wiki#separate-container-and-content>`_
+and `SMACSS subclassing <http://smacss.com/book/type-module#subclassing>`_ both
 recommend to avoid them. Still it is a powerful feature. This is still
 an open question.

@@ -8,8 +8,7 @@ Testing
 * Test driven development with functional, integration and unit test (should)
   * test driven concept: http://en.wikipedia.org/wiki/Test-driven_development
   * programming work flow: functional/integration test <-> unit tests <-> code
-  * use `pytest <http://pytest.org/>`_ fixtures, functional tests have the
-   `functional` marker, integration are using a fixture called `integration`.
+  * use `pytest <http://pytest.org/>`_ fixtures, functional tests have the `functional` marker, integration are using a fixture called `integration`.
 
 Imports
 -------
@@ -22,9 +21,9 @@ Imports
   ``pkgresources.getdistribution`` and catch ``DistributionNotFound``.
   (http://do3.cc/blog/2010/08/20/do-not-catch-import-errors,-use-pkg_resources/)
 * must not import from upper level
- * should not import from same level
-   (pluggable: must not have imports from other modules or to other pluggable modules)
-   (pluggable: must have interface for public methods)
+* should not import from same level
+  (pluggable: must not have imports from other modules or to other pluggable modules)
+  (pluggable: must have interface for public methods)
 * may import from bottom level
 * may import interfaces
 * you can use `bin/check_forbidden_imports` to list suspicious imports  # TODO update script
@@ -43,7 +42,7 @@ Code formatting
 * Advances String Formatting `pep3101 <http://legacy.python.org/dev/peps/pep-3101/>`_ (must)
 
 * Single Quotes for strings except for docstrings (must)
-  
+
 
 Docstring formatting
 --------------------
