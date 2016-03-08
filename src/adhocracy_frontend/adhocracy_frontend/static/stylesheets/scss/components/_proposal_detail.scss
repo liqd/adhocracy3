@@ -135,5 +135,21 @@ Proposal detail article.
 .proposal-detail {
     .rate {
         float: right;
+        margin-right: 0;
+    }
+}
+
+.proposal-detail-image-clip {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+
+    img {
+        left: 0;
+        position: absolute;
+        top: 0;
+        height: auto;
+        min-height: 200px;
+        max-width: 100%;
     }
 }

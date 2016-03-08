@@ -1055,12 +1055,12 @@ def _login_user(request: Request) -> dict:
     """Log-in a user and return a response indicating success."""
     user = request.validated['user']
     userid = resource_path(user)
-    headers = remember(request, userid) or {}
-    user_path = headers['X-User-Path']
-    user_token = headers['X-User-Token']
+    authentication_headers = dict(remember(request, userid))
+    url = request.resource_url(user)
+    token = authentication_headers['X-User-Token']
     return {'status': 'success',
-            'user_path': user_path,
-            'user_token': user_token}
+            'user_path': url,
+            'user_token': token}
 
 
 @view_defaults(

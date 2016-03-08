@@ -61,6 +61,7 @@ def test_state_data_create():
     inst = workflow.StateData()
     assert isinstance(inst['name'], workflow.StateName)
     assert isinstance(inst['start_date'], schema.DateTime)
+    assert isinstance(inst['end_date'], schema.DateTime)
     assert isinstance(inst['description'], schema.Text)
 
 

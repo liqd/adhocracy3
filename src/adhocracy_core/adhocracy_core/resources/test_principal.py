@@ -1,8 +1,6 @@
 """Tests for the principal package."""
 from pyramid import testing
 from pytest import fixture
-from pytest import fixture
-from pytest import mark
 from pytest import mark
 from unittest.mock import Mock
 import pytest

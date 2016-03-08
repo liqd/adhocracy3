@@ -38,7 +38,6 @@ class TestMercator2:
         return '/organisation/advocate-europe2/proposal_0000000'
 
     def test_create_resources(self,
-                              registry,
                               datadir,
                               process_url,
                               app_admin):
@@ -47,7 +46,7 @@ class TestMercator2:
         resp = app_admin.get(process_url)
         assert resp.status_code == 200
 
-    def test_set_participate_state(self, registry, process_url, app_admin):
+    def test_set_participate_state(self, process_url, app_admin):
         resp = app_admin.get(process_url)
         assert resp.status_code == 200
 
@@ -62,15 +61,12 @@ class TestMercator2:
         assert resp.status_code == 200
 
     def test_participate_participant_creates_proposal(self,
-                                                      registry,
                                                       process_url,
                                                       app_participant):
         resp = _post_proposal(app_participant, path=process_url)
         assert resp.status_code == 200
 
     def test_participate_participant_can_read_extrafunding(self,
-                                                           registry,
-                                                           process_url,
                                                            app_participant,
                                                            proposal0_url):
         from adhocracy_mercator.sheets.mercator2 import IExtraFunding
@@ -79,8 +75,6 @@ class TestMercator2:
         assert IExtraFunding.__identifier__ in data
 
     def test_participate_participant2_cannot_read_extrafunding(self,
-                                                               registry,
-                                                               process_url,
                                                                app_participant2,
                                                                proposal0_url):
         from adhocracy_mercator.sheets.mercator2 import IExtraFunding
@@ -89,8 +83,6 @@ class TestMercator2:
         assert IExtraFunding.__identifier__ not in data
 
     def test_participate_participant_can_edit_topic(self,
-                                                    registry,
-                                                    process_url,
                                                     app_participant,
                                                     proposal0_url):
         from adhocracy_mercator.sheets.mercator2 import ITopic
@@ -99,7 +91,6 @@ class TestMercator2:
         assert ITopic.__identifier__ in data
 
     def test_participate_participant_creates_comment(self,
-                                                     registry,
                                                      app_participant,
                                                      proposal0_url):
         path = proposal0_url +  '/comments'
@@ -107,8 +98,6 @@ class TestMercator2:
         assert resp.status_code == 200
 
     def test_participate_participant_cannot_update_winnerinfo(self,
-                                                              registry,
-                                                              process_url,
                                                               app_participant,
                                                               proposal0_url):
         from adhocracy_mercator.sheets.mercator2 import IWinnerInfo
@@ -117,8 +106,6 @@ class TestMercator2:
         assert IWinnerInfo not in data
 
     def test_participate_participant_can_assign_badge(self,
-                                                 registry,
-                                                 process_url,
                                                  app_participant,
                                                  proposal0_url):
         from adhocracy_core.resources.badge import IBadgeAssignment
@@ -126,14 +113,13 @@ class TestMercator2:
         postable_types = app_participant.get_postable_types(url)
         assert IBadgeAssignment in postable_types
 
-    def test_set_evaluate_state(self, registry, process_url, app_admin):
+    def test_set_evaluate_state(self, process_url, app_admin):
         resp = do_transition_to(app_admin,
                                 process_url,
                                 'evaluate')
         assert resp.status_code == 200
 
     def test_evaluate_participant_cannot_creates_proposal(self,
-                                                          registry,
                                                           process_url,
                                                           app_participant):
         from adhocracy_mercator.resources.mercator2 import IMercatorProposal
@@ -141,8 +127,6 @@ class TestMercator2:
         assert IMercatorProposal not in postable_types
 
     def test_evaluate_participant_cannot_comment(self,
-                                                 registry,
-                                                 process_url,
                                                  app_participant,
                                                  proposal0_url):
         from adhocracy_core.resources.comment import ICommentVersion
@@ -151,8 +135,6 @@ class TestMercator2:
         assert ICommentVersion not in postable_types
 
     def test_evaluate_participant_cannot_edit_topic(self,
-                                                    registry,
-                                                    process_url,
                                                     app_participant,
                                                     proposal0_url):
         from adhocracy_mercator.sheets.mercator2 import ITopic
@@ -161,8 +143,6 @@ class TestMercator2:
         assert ITopic.__identifier__ not in data
 
     def test_evaluate_moderator_can_update_winnerinfo(self,
-                                                      registry,
-                                                      process_url,
                                                       app_moderator,
                                                       proposal0_url):
         from adhocracy_mercator.sheets.mercator2 import IWinnerInfo
@@ -171,8 +151,6 @@ class TestMercator2:
         assert IWinnerInfo.__identifier__ in data
 
     def test_evaluate_participant_cannot_view_winnerinfo(self,
-                                                         registry,
-                                                         process_url,
                                                          app_participant,
                                                          proposal0_url):
         from adhocracy_mercator.sheets.mercator2 import IWinnerInfo
@@ -181,8 +159,6 @@ class TestMercator2:
         assert IWinnerInfo.__identifier__ not in data
 
     def test_evaluate_moderator_can_assign_badge(self,
-                                                 registry,
-                                                 process_url,
                                                  app_moderator,
                                                  proposal0_url):
         from adhocracy_core.resources.badge import IBadgeAssignment
@@ -190,13 +166,11 @@ class TestMercator2:
         postable_types = app_moderator.get_postable_types(url)
         assert IBadgeAssignment in postable_types
 
-    def test_set_result_state(self, registry, process_url, app_admin):
+    def test_set_result_state(self, process_url, app_admin):
         resp = do_transition_to(app_admin, process_url, 'result')
         assert resp.status_code == 200
 
     def test_result_participant_can_view_winnerinfo(self,
-                                                    registry,
-                                                    process_url,
                                                     app_participant,
                                                     proposal0_url):
         from adhocracy_mercator.sheets.mercator2 import IWinnerInfo
@@ -205,7 +179,6 @@ class TestMercator2:
         assert IWinnerInfo.__identifier__ in data
 
     def test_result_participant_cannot_creates_proposal(self,
-                                                        registry,
                                                         process_url,
                                                         app_participant):
         from adhocracy_mercator.resources.mercator2 import IMercatorProposal
@@ -213,7 +186,6 @@ class TestMercator2:
         assert IMercatorProposal not in postable_types
 
     def test_result_participant_cannot_comment(self,
-                                               registry,
                                                app_participant,
                                                proposal0_url):
         from adhocracy_core.resources.comment import ICommentVersion
@@ -222,8 +194,6 @@ class TestMercator2:
         assert ICommentVersion not in postable_types
 
     def test_result_participant_can_edit_topic(self,
-                                               registry,
-                                               process_url,
                                                app_participant,
                                                proposal0_url):
         from adhocracy_mercator.sheets.mercator2 import ITopic
@@ -233,8 +203,6 @@ class TestMercator2:
 
     # partners are a subresources
     def test_result_participant_can_edit_partners(self,
-                                                  registry,
-                                                  process_url,
                                                   app_participant,
                                                   proposal0_url):
         from adhocracy_mercator.sheets.mercator2 import IPartners
@@ -245,8 +213,6 @@ class TestMercator2:
         assert IPartners.__identifier__ in sheets
 
     def test_result_participant_can_create_logbook(self,
-                                                   registry,
-                                                   process_url,
                                                    app_participant,
                                                    proposal0_url):
         from adhocracy_core.resources.document import IDocument
@@ -254,15 +220,13 @@ class TestMercator2:
                                                             '/logbook')
         assert IDocument in postable_types
 
-    def test_set_closed_state(self, registry, process_url, app_admin):
+    def test_set_closed_state(self, process_url, app_admin):
         resp = do_transition_to(app_admin,
                                 process_url,
                                 'closed')
         assert resp.status_code == 200
 
     def test_closed_participant_cannot_edit_topic(self,
-                                                  registry,
-                                                  process_url,
                                                   app_participant,
                                                   proposal0_url):
         from adhocracy_mercator.sheets.mercator2 import ITopic

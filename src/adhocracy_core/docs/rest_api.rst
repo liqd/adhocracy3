@@ -16,6 +16,7 @@ Some imports to work with rest api calls::
     >>> import requests
     >>> from pprint import pprint
     >>> from adhocracy_core.testing import god_header
+    >>> from adhocracy_core.testing import god_path
 
 Start Adhocracy testapp::
 
@@ -1549,7 +1550,7 @@ custom filters:
   Valid query comparable: 'eq'
   Supports sorting.
 
-    >>> resp_data = testapp.get('/Documents', params={'creator': god_header['X-User-Path']}).json
+    >>> resp_data = testapp.get('/Documents', params={'creator': god_path}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/Documents/document_0000000/']
 

@@ -1,4 +1,6 @@
-Ihre Stellungnahme zum Bebauungsplan ${plan_number}, ${participation_kind} von ${participation_start_date.strftime('%d/%m/%Y')} - ${participation_end_date.strftime('%d/%m/%Y')}.
+Ihre Stellungnahme zum Bebauungsplan ${plan_number}, ${participation_kind} von ${workflow_state_data_participate['start_date'].strftime('%d/%m/%Y')} - ${workflow_state_data_participate['end_date'].strftime('%d/%m/%Y')}.
+
+
 
 Vielen Dank für Ihre Stellungnahme. Sie geht in die Abwägung der öffentlichen
 und privaten Belange ein. Haben Sie sich an einer öffentlichen Auslegung

@@ -1,4 +1,5 @@
 from pyramid.traversal import find_resource
+from pyramid import testing
 from pytest import fixture
 from pytest import mark
 from tempfile import mkstemp
@@ -233,3 +234,28 @@ class TestImportResources:
     def teardown_method(self, method):
         if hasattr(self, 'tempfd'):
             os.close(self._tempfd)
+
+
+class TestImportLocalRoles:
+
+    def call_fut(self, *args):
+        from . import import_local_roles
+        return import_local_roles(*args)
+
+    @fixture
+    def filename(self, tmpdir):
+        return str(tmpdir) + '/local_roles.json'
+
+    def test_import_local_roles(self, registry, filename):
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {"path": "/alt-treptow",
+                 "roles": {"initiators-treptow-koepenick": ["role:initiator"]}}
+            ]))
+        root = testing.DummyResource()
+        root['alt-treptow'] = testing.DummyResource(__parent__=root)
+
+        self.call_fut(root, registry, filename)
+
+        assert root['alt-treptow'].__local_roles__ == \
+            {'initiators-treptow-koepenick': set(['role:initiator'])}

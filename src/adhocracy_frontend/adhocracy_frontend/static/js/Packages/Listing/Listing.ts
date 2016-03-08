@@ -157,7 +157,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
 
                 $scope.createPath = adhPreliminaryNames.nextPreliminary();
 
-                var getElements = (count? : boolean, limit? : number, offset? : number) : angular.IPromise<Container> => {
+                var getElements = (limit? : number, offset? : number) : angular.IPromise<Container> => {
                     var params = <any>{};
 
                     params.elements = "paths";
@@ -209,9 +209,6 @@ export class Listing<Container extends ResourcesBase.Resource> {
                             params.offset = offset;
                         }
                     }
-                    if (count) {
-                        params.count = "true";
-                    }
                     return adhHttp.get($scope.path, params, {
                         warmupPoolCache: true
                     });
@@ -257,7 +254,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                             $scope.currentLimit = $scope.initialLimit;
                         }
                     }
-                    return getElements(true, $scope.currentLimit).then((container) => {
+                    return getElements($scope.currentLimit).then((container) => {
                         $scope.container = container;
                         $scope.poolPath = $scope.container.path;
                         $scope.totalCount = $scope.container.data[SIPool.nick].count;
@@ -276,7 +273,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
 
                 $scope.loadMore = () : void => {
                     if ($scope.currentLimit < $scope.totalCount) {
-                        getElements(false, $scope.initialLimit, $scope.currentLimit).then((container) => {
+                        getElements($scope.initialLimit, $scope.currentLimit).then((container) => {
                             var elements = _.clone(container.data[SIPool.nick].elements);
                             $scope.elements = $scope.elements.concat(elements);
                             $scope.currentLimit += $scope.initialLimit;

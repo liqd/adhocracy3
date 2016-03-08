@@ -130,8 +130,7 @@ export class Service<Content extends ResourcesBase.Resource> {
         var headers = {};
         if (config.noCredentials) {
             _.assign(headers, {
-                "X-User-Token": undefined,
-                "X-User-Path": undefined
+                "X-User-Token": undefined
             });
         }
         return headers;

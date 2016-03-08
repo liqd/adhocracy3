@@ -14,6 +14,7 @@ requires = [
     'pyramid',
     'pyramid_debugtoolbar',
     'pyramid_exclog',
+    'pyramid_bpython',
     'gunicorn',
     'substanced',
     'pyramid_tm',
@@ -50,7 +51,6 @@ test_requires = [
 ]
 
 debug_requires = [
-    'ipdb',  # ipython pdb
     'pudb',  # Graphical debugger
     'contexttimer',  # decorator to measure time
     'profilehooks',  # decorator to run/output cprofile
@@ -102,6 +102,8 @@ setup(name='adhocracy_core',
           adhocracy_core.scripts.delete_stale_login_data:delete_stale_login_data
       delete_not_referenced_images =\
           adhocracy_core.scripts.delete_images:delete_not_referenced_images
+      export_users =\
+          adhocracy_core.scripts.export_users:export_users
       [pyramid.scaffold]
       adhocracy=adhocracy_core.scaffolds:AdhocracyExtensionTemplate
       """,

@@ -133,6 +133,7 @@ class TestSendMessageToUser:
     def test_send_message_to_user(self, request_, registry):
         from adhocracy_core.sheets.principal import IUserExtended
         from adhocracy_core.sheets.principal import IUserBasic
+        registry.settings['mail.noreply_sender'] = 'noreply@example.org'
         recipient = testing.DummyResource(__provides__=(IUserExtended,
                                                         IUserBasic),
                                           email='recipient@example.org')
@@ -148,7 +149,7 @@ class TestSendMessageToUser:
             request=request_,
             from_user=sender)
         msgtext = _msg_to_str(mailer.outbox[0])
-        assert 'From: sender@example.org' in msgtext
+        assert 'From: noreply@example.org' in msgtext
         assert 'Subject: Adhocracy Message from Sandy Sender: Important Adhocracy notice' in msgtext
         assert 'To: recipient@example.org' in msgtext
 

@@ -34,11 +34,11 @@ from adhocracy_core.resources.root import IRootPool
 # Integration/Function test helper  #
 #####################################
 
-god_header = {'X-User-Path': '/principals/users/0000000',
-              'X-User-Token': 'SECRET_GOD'}
+god_header = {'X-User-Token': 'SECRET_GOD'}
 """The authentication headers for the `god` user, used by functional fixtures.
 This assumes the initial user is created and has the `god` role.
 """
+god_path = '/principals/users/0000000'
 god_login = 'god'
 """The login name for the god user, default value."""
 god_password = 'password'
@@ -46,33 +46,38 @@ god_password = 'password'
 god_email = 'sysadmin@test.de'
 """The email for the god user, default value."""
 
-participant_header = {'X-User-Path': '/principals/users/0000001',
-                      'X-User-Token': 'SECRET_PARTICIPANT'}
+participant_header = {'X-User-Token': 'SECRET_PARTICIPANT'}
 """The authentication headers for the `participant`, used by funct. fixtures.
-This assumes the user exists with path == 'X-User-Path'.
+This assumes the user exists with the given path.
 """
+participant_path = '/principals/users/0000001'
 participant_login = 'participant'
 participant_password = 'password'
 
-moderator_header = {'X-User-Path': '/principals/users/0000002',
-                    'X-User-Token': 'SECRET_MODERATOR'}
+moderator_header = {'X-User-Token': 'SECRET_MODERATOR'}
+moderator_path = '/principals/users/0000002'
 moderator_login = 'moderator'
 moderator_password = 'password'
 
-initiator_header = {'X-User-Path': '/principals/users/0000003',
-                    'X-User-Token': 'SECRET_INITIATOR'}
+initiator_header = {'X-User-Token': 'SECRET_INITIATOR'}
+initiator_path = '/principals/users/0000003'
 initiator_login = 'initiator'
 initiator_password = 'password'
 
-admin_header = {'X-User-Path': '/principals/users/0000004',
-                'X-User-Token': 'SECRET_ADMIN'}
+admin_header = {'X-User-Token': 'SECRET_ADMIN'}
+admin_path = '/principals/users/0000004'
 admin_login = 'admin'
 admin_password = 'password'
 
-participant2_header = {'X-User-Path': '/principals/users/0000005',
-                       'X-User-Token': 'SECRET_PARTICIPANT2'}
+participant2_header = {'X-User-Token': 'SECRET_PARTICIPANT2'}
+participant2_path = '/principals/users/0000005'
 participant2_login = 'participant2'
 participant2_password = 'password'
+
+authenticated_header = {'X-User-Token': 'SECRET_AUTHENTICATED'}
+authenticated_path = '/principals/users/0000006'
+authenticated_login = 'authenticated'
+authenticated_password = 'password'
 
 broken_header = {'X-User-Path': '/principals/users/0000001',
                  'X-User-Token': ''}
@@ -473,7 +478,7 @@ def _get_settings(request, part, config_path_key='pyramid_config'):
     return settings
 
 
-@fixture(scope='session')
+@fixture(scope='class')
 def settings(request) -> dict:
     """Return app:main and server:main settings."""
     settings = {}
@@ -484,13 +489,11 @@ def settings(request) -> dict:
     return settings
 
 
-@fixture(scope='session')
+@fixture(scope='class')
 def app_settings(request) -> dict:
     """Return settings to start the test wsgi app."""
     settings = {}
-    # disable creating a default group, this causes
     # ZODB.POSException.InvalidObjectReference
-    settings['adhocracy.add_default_group'] = False
     # enable create test user for every :term:`role`
     settings['adhocracy.add_test_users'] = True
     # don't look for the websocket server
@@ -501,6 +504,8 @@ def app_settings(request) -> dict:
     settings['substanced.secret'] = 'secret'
     # extra dependenies
     settings['pyramid.includes'] = [
+        # database connection
+        'pyramid_zodbconn',
         # commit after request
         'pyramid_tm',
         # mock mail server
@@ -514,7 +519,7 @@ def app_settings(request) -> dict:
     return settings
 
 
-@fixture(scope='session')
+@fixture(scope='class')
 def ws_settings(request) -> Configurator:
     """Return websocket server settings."""
     return _get_settings(request, 'websockets')
@@ -633,42 +638,49 @@ def add_user(root, login: str=None, password: str=None, email: str=None,
 def add_test_users(root, registry):
     """Add test user and dummy authentication token for every role."""
     add_user_token(root,
-                   god_header['X-User-Path'],
+                   god_path,
                    god_header['X-User-Token'],
                    registry)
     add_user(root, login=participant_login, password=participant_password,
              email='participant@example.org', roles=['participant'],
              registry=registry)
     add_user_token(root,
-                   participant_header['X-User-Path'],
+                   participant_path,
                    participant_header['X-User-Token'],
                    registry)
     add_user(root, login=moderator_login, password=moderator_password,
              email='moderator@example.org', roles=['moderator'],
              registry=registry)
     add_user_token(root,
-                   moderator_header['X-User-Path'],
+                   moderator_path,
                    moderator_header['X-User-Token'],
                    registry)
     add_user(root, login=initiator_login, password=initiator_password,
              email='initiator@example.org', roles=['initiator'],
              registry=registry)
     add_user_token(root,
-                   initiator_header['X-User-Path'],
+                   initiator_path,
                    initiator_header['X-User-Token'],
                    registry)
     add_user(root, login=admin_login, password=admin_password,
              email='admin@example.org', roles=['admin'], registry=registry)
     add_user_token(root,
-                   admin_header['X-User-Path'],
+                   admin_path,
                    admin_header['X-User-Token'],
                    registry)
     add_user_token(root,
-                   participant2_header['X-User-Path'],
+                   participant2_path,
                    participant2_header['X-User-Token'],
                    registry)
     add_user(root, login=participant2_login, password=participant2_password,
              email='participant2@example.org', roles=['participant'],
+             registry=registry)
+    add_user_token(root,
+                   authenticated_path,
+                   authenticated_header['X-User-Token'],
+                   registry)
+    add_user(root, login=authenticated_login, password=authenticated_password,
+             email='authenticated@example.org', roles=[],
              registry=registry)
 
 
@@ -691,21 +703,10 @@ def app_router(app_settings) -> Router:
 
 def make_configurator(app_settings: dict, package) -> Configurator:
     """Make the pyramid configurator."""
-    from pyramid.events import ApplicationCreated
-    from adhocracy_core.authorization import set_acms_for_app_root
-    from adhocracy_core.resources.root import root_acm
     configurator = Configurator(settings=app_settings,
                                 root_factory=package.root_factory)
     configurator.include(package)
     add_create_test_users_subscriber(configurator)
-    # TODO
-    # The following subscriber is a workaround to prevent ComponentLookupError:
-    # (<InterfaceClass substanced.interfaces.ICatalogFactory>, 'system')
-    # in functional tests.
-
-    def set_acm_subscriber(event):
-        set_acms_for_app_root(event.app, (root_acm,))
-    configurator.add_subscriber(set_acm_subscriber, ApplicationCreated)
     return configurator
 
 
@@ -803,7 +804,9 @@ class AppUser:
                  app_router: Router,
                  rest_url: str='http://localhost',
                  base_path: str='/',
-                 header: dict=None):
+                 header: dict=None,
+                 user_path: str='',
+                 ):
         """Initialize self."""
         self.app_router = app_router
         """The adhocracy wsgi application"""
@@ -815,6 +818,8 @@ class AppUser:
         """path prefix to generate request urls."""
         self.header = header or {}
         """default header for requests, mostly for authentication."""
+        self.user_path = user_path
+        """path to authenticated user."""
         self._resolver = DottedNameResolver()
 
     def post_resource(self, path: str,
@@ -897,37 +902,53 @@ def app_broken_token(app_router) -> TestApp:
 @fixture(scope='class')
 def app_participant(app_router) -> TestApp:
     """Return backend test app wrapper with participant authentication."""
-    return AppUser(app_router, header=participant_header)
+    return AppUser(app_router,
+                   header=participant_header,
+                   user_path=participant_path)
 
 
 @fixture(scope='class')
 def app_participant2(app_router) -> TestApp:
     """Return backend test app wrapper with participant authentication."""
-    return AppUser(app_router, header=participant2_header)
+    return AppUser(app_router,
+                   header=participant2_header,
+                   user_path=participant2_path)
+
+
+@fixture(scope='class')
+def app_authenticated(app_router) -> TestApp:
+    """Return backend test app wrapper with authenticated authentication."""
+    return AppUser(app_router,
+                   header=authenticated_header,
+                   user_path=authenticated_path)
 
 
 @fixture(scope='class')
 def app_moderator(app_router):
     """Return backend test app wrapper with moderator authentication."""
-    return AppUser(app_router, header=moderator_header)
+    return AppUser(app_router,
+                   header=moderator_header,
+                   user_path=moderator_path)
 
 
 @fixture(scope='class')
 def app_initiator(app_router):
     """Return backend test app wrapper with initiator authentication."""
-    return AppUser(app_router, header=initiator_header)
+    return AppUser(app_router,
+                   header=initiator_header,
+                   user_path=initiator_path)
 
 
 @fixture(scope='class')
 def app_admin(app_router):
     """Return backend test app wrapper with admin authentication."""
-    return AppUser(app_router, header=admin_header)
+    return AppUser(app_router, header=admin_header, user_path=admin_path)
 
 
 @fixture(scope='class')
 def app_god(app_router):
     """Return backend test app wrapper with god authentication."""
-    return AppUser(app_router, header=god_header)
+    return AppUser(app_router, header=god_header, user_path=god_path)
 
 
 @fixture(scope='class')

@@ -11,6 +11,7 @@ import * as AdhUtil from "../../../Util/Util";
 
 import * as SICommentable from "../../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIDescription from "../../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIImageReference from "../../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIMetadata from "../../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 import * as SIRateable from "../../../../Resources_/adhocracy_core/sheets/rate/IRateable";
 import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
@@ -33,6 +34,7 @@ export interface IScope extends angular.IScope {
         creationDate: string;
         commentCount: number;
         assignments: AdhBadge.IBadge[];
+        picture? : string;
     };
     selectedState?: string;
     resource: any;
@@ -49,42 +51,43 @@ var bindPath = (
     scope: IScope,
     pathKey: string = "path"
 ): void => {
-        scope.$watch(pathKey, (value: string) => {
-            if (value) {
-                adhHttp.get(value).then((resource) => {
-                    scope.resource = resource;
+    scope.$watch(pathKey, (value: string) => {
+        if (value) {
+            adhHttp.get(value).then((resource) => {
+                scope.resource = resource;
 
-                    var titleSheet: SITitle.Sheet = resource.data[SITitle.nick];
-                    var descriptionSheet: SIDescription.Sheet = resource.data[SIDescription.nick];
-                    var metadataSheet: SIMetadata.Sheet = resource.data[SIMetadata.nick];
-                    var rateableSheet: SIRateable.Sheet = resource.data[SIRateable.nick];
+                var titleSheet: SITitle.Sheet = resource.data[SITitle.nick];
+                var descriptionSheet: SIDescription.Sheet = resource.data[SIDescription.nick];
+                var metadataSheet: SIMetadata.Sheet = resource.data[SIMetadata.nick];
+                var rateableSheet: SIRateable.Sheet = resource.data[SIRateable.nick];
 
-                    $q.all([
-                        adhRate.fetchAggregatedRates(rateableSheet.post_pool, resource.path),
-                        adhGetBadges(resource)
-                    ]).then((args: any[]) => {
-                        var rates = args[0];
-                        var assignments = args[1];
+                $q.all([
+                    adhRate.fetchAggregatedRates(rateableSheet.post_pool, resource.path),
+                    adhGetBadges(resource)
+                ]).then((args: any[]) => {
+                    var rates = args[0];
+                    var assignments = args[1];
 
-                        // FIXME: an adapter should take care of this
-                        var ratesPro = rates["1"] || 0;
-                        var ratesContra = rates["-1"] || 0;
+                    // FIXME: an adapter should take care of this
+                    var ratesPro = rates["1"] || 0;
+                    var ratesContra = rates["-1"] || 0;
 
-                        scope.data = {
-                            title: titleSheet.title,
-                            detail: descriptionSheet.description,
-                            rateCount: ratesPro - ratesContra,
-                            creator: metadataSheet.creator,
-                            creationDate: metadataSheet.item_creation_date,
-                            commentCount: resource.data[SICommentable.nick].comments_count,
-                            assignments: assignments
-                        };
-                    });
+                    scope.data = {
+                        title: titleSheet.title,
+                        detail: descriptionSheet.description,
+                        rateCount: ratesPro - ratesContra,
+                        creator: metadataSheet.creator,
+                        creationDate: metadataSheet.item_creation_date,
+                        commentCount: resource.data[SICommentable.nick].comments_count,
+                        assignments: assignments,
+                        picture: resource.data[SIImageReference.nick].picture
+                    };
                 });
-            }
-            adhPermissions.bindScope(scope, () => scope[pathKey]);
-        });
-    };
+            });
+        }
+        adhPermissions.bindScope(scope, () => scope[pathKey]);
+    });
+};
 
 var fill = (
     scope: IScope,

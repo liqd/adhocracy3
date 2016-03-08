@@ -9,6 +9,7 @@ from pyramid.request import Request
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
+from pyramid.util import DottedNameResolver
 from pyrsistent import PMap
 from pyrsistent import freeze
 from pyrsistent import ny
@@ -16,6 +17,7 @@ from substanced.interfaces import IUserLocator
 from zope.interface.interfaces import IInterface
 
 from adhocracy_core.authorization import create_fake_god_request
+from adhocracy_core.authorization import set_local_roles
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.schema import ContentType
@@ -27,7 +29,7 @@ logger = logging.getLogger(__name__)
 def import_resources(root: IResource, registry: Registry, filename: str):
     """Import resources from a JSON file with dummy `god` user."""
     request = create_fake_god_request(registry)
-    resources_info = _load_resources_info(filename)
+    resources_info = _load_info(filename)
     for resource_info in resources_info:
         expected_path = _get_expected_path(resource_info)
         if _resource_exists(expected_path, root):
@@ -42,11 +44,6 @@ def _get_expected_path(resource_info: dict) -> str:
     name = name_field.get('name', '')
     path = name and os.path.join(resource_info['path'], name)
     return path
-
-
-def _create_request(root: IPool, registry: Registry) -> Request:
-    request = Request.blank('/')
-    return request
 
 
 def _resource_exists(expected_path: dict, context: IResource) -> bool:
@@ -75,7 +72,7 @@ def _create_resource(resource_info: PMap,
                             )
 
 
-def _load_resources_info(filename: str) -> [dict]:
+def _load_info(filename: str) -> [dict]:
     with open(filename, 'r') as f:
         return json.load(f)
 
@@ -137,3 +134,41 @@ def _get_creator(resource_info: dict,
     locator = registry.getMultiAdapter((context, request), IUserLocator)
     creator = locator.get_user_by_login(creator_name)
     return creator
+
+
+def _get_user_locator(context: IResource, registry: Registry) -> IUserLocator:
+    request = Request.blank('/dummy')
+    locator = registry.getMultiAdapter((context, request), IUserLocator)
+    return locator
+
+
+def import_local_roles(context: IResource, registry: Registry, filename: str):
+    """Import/set local roles from a JSON file."""
+    multi_local_roles_info = _load_info(filename)
+    for local_roles_info in multi_local_roles_info:
+        _set_local_roles(local_roles_info, context, registry)
+
+
+def _set_local_roles(local_roles_info: dict, context: IResource,
+                     registry: Registry):
+    resource = find_resource(context, local_roles_info['path'])
+    local_roles_info['roles'] = _deserialize_roles(local_roles_info['roles'])
+    set_local_roles(resource, local_roles_info['roles'], registry=registry)
+
+
+def _deserialize_roles(roles: dict) -> dict:
+    for k, v in roles.items():
+        roles[k] = set(v)
+    return roles
+
+
+def _get_workflow(registry: Registry, resource_type: str):
+    # for post request we need to get the workflow for the resource type
+    # that is going to be created, but before any validation has been done.
+    # TODO refactor, see notes in adhocracy_core.rest.views.py
+    iresource = DottedNameResolver().resolve(resource_type)
+    iresource_meta = registry.content.resources_meta[iresource]
+    name = iresource_meta.workflow_name
+    workflow = registry.content.workflows.get(name, None)
+
+    return workflow

@@ -15,6 +15,18 @@ process_meta = process.process_meta._replace(
 )
 
 
+class IPrivateProcess(IProcess):
+    """Private idea collection participation process."""
+
+
+private_process_meta = process.process_meta._replace(
+    iresource=IPrivateProcess,
+    element_types=(IProposal,),
+    workflow_name='standard_private',
+)
+
+
 def includeme(config):
     """Add resource type to content."""
     add_resource_type_to_registry(process_meta, config)
+    add_resource_type_to_registry(private_process_meta, config)

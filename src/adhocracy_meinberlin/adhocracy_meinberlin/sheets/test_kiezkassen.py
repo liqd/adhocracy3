@@ -50,7 +50,6 @@ class TestProposalSheet:
         wanted = {'budget': Decimal(0),
                   'creator_participate': False,
                   'location_text': '',
-                  'address': '',
                   }
         assert inst.get() == wanted
 

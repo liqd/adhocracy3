@@ -32,9 +32,7 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
     @fixture
     def process_settings_appstruct(self):
         return {'plan_number': '112233-ba',
-                'participation_kind': 'öffentliche Auslegung',
-                'participation_start_date': datetime.date(2015, 5, 5),
-                'participation_end_date': datetime.date(2015, 6, 11)}
+                'participation_kind': 'öffentliche Auslegung'}
 
     @fixture
     def process_private_settings_appstruct(self):
@@ -44,11 +42,19 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
     def process_private_settings_no_email_appstruct(self):
         return {'office_worker_email': None}
 
+    @fixture
+    def workflow_state_data_appstruct(self):
+        return {'state_data': [{'name': 'participate',
+                 'description': '',
+                 'start_date': datetime.date(2015, 5, 5),
+                 'end_date': datetime.date(2015, 6, 11)}]}
+
     def _make_process(self,
                       registry,
                       context,
                       process_settings_appstruct,
-                      process_private_settings_appstruct):
+                      process_private_settings_appstruct,
+                      workflow_state_data_appstruct):
         from adhocracy_meinberlin import resources
         import adhocracy_meinberlin.sheets.bplan
         import adhocracy_core.sheets.name
@@ -59,7 +65,9 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
                             adhocracy_meinberlin.sheets.bplan.IProcessSettings.__identifier__:
                             process_settings_appstruct,
                             adhocracy_meinberlin.sheets.bplan.IProcessPrivateSettings.__identifier__:
-                            process_private_settings_appstruct}
+                            process_private_settings_appstruct,
+                            adhocracy_core.sheets.workflow.IWorkflowAssignment.__identifier__:
+                            workflow_state_data_appstruct}
         process = registry.content.create(resources.bplan.IProcess.__identifier__,
                                           parent=context,
                                           appstructs=bplan_appstructs)
@@ -70,23 +78,26 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
                 registry,
                 pool_with_catalogs,
                 process_settings_appstruct,
-                process_private_settings_appstruct):
+                process_private_settings_appstruct,
+                workflow_state_data_appstruct):
         return self._make_process(registry,
                                   pool_with_catalogs,
                                   process_settings_appstruct,
-                                  process_private_settings_appstruct)
+                                  process_private_settings_appstruct,
+                                  workflow_state_data_appstruct)
 
     @fixture
     def context_no_office_worker(self,
                                  registry,
                                  pool_with_catalogs,
                                  process_settings_appstruct,
-                                 process_private_settings_no_email_appstruct
-                                 ):
+                                 process_private_settings_no_email_appstruct,
+                                 workflow_state_data_appstruct):
         return self._make_process(registry,
                                   pool_with_catalogs,
                                   process_settings_appstruct,
-                                  process_private_settings_no_email_appstruct)
+                                  process_private_settings_no_email_appstruct,
+                                  workflow_state_data_appstruct)
 
     @fixture
     def appstructs(self):

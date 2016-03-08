@@ -1,7 +1,4 @@
-from pyramid import testing
-from pyramid.request import Request
 from pyrsistent import discard
-from pyrsistent import freeze
 from pyrsistent import freeze
 from pytest import fixture
 from pytest import mark
@@ -9,12 +6,6 @@ from pytest import raises
 from unittest.mock import Mock
 import pytest
 from substanced.workflow import WorkflowError
-
-from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.resources import process
-from adhocracy_core.sheets.workflow import IWorkflowAssignment
-from adhocracy_core.sheets.workflow import WorkflowAssignmentSchema
-from adhocracy_core.sheets import add_sheet_to_registry
 
 
 @fixture
@@ -188,6 +179,7 @@ class TestTransitionToStates:
 
     def test_error_if_state_already_set(self, integration, context,
                                          resource_meta):
+        from pyramid.request import Request
         registry = integration.registry
         self._add_workflow(registry, 'test_workflow')
         registry.content.resources_meta[resource_meta.iresource] = resource_meta

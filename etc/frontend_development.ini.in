@@ -39,7 +39,7 @@ adhocracy.thentos_captcha.frontend_url = http://localhost:6542/
 # The email address shown to users seeking support
 adhocracy.frontend.support_email = support@unconfigured.domain
 # The link shown to users seeking support
-adhocracy.frontend.support_url = http://help.unconfigured.domain
+adhocracy.frontend.support_url =
 # Default frontend locale
 adhocracy.frontend.locale = de
 # Enable debugging mode

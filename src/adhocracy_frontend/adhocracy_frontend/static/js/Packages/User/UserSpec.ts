@@ -157,7 +157,6 @@ export var register = () => {
                     });
                     it("sets default http headers for the http service", () => {
                         expect(httpMock.defaults.headers.common["X-User-Token"]).toBe("user1_tok");
-                        expect(httpMock.defaults.headers.common["X-User-Path"]).toBe("user1_path");
                     });
                 };
 
@@ -277,7 +276,6 @@ export var register = () => {
                     });
                     it("unsets default http headers for the http service", () => {
                         expect(httpMock.defaults.headers.common["X-User-Token"]).not.toBeDefined();
-                        expect(httpMock.defaults.headers.common["X-User-Path"]).not.toBeDefined();
                     });
                 };
 
@@ -355,7 +353,6 @@ export var register = () => {
                     it("logs in user on success", () => {
                         expect(adhCredentials.userPath).toEqual(postRawResponse.data.user_path);
                         expect(httpMock.defaults.headers.common["X-User-Token"]).toEqual(postRawResponse.data.user_token);
-                        expect(httpMock.defaults.headers.common["X-User-Path"]).toEqual(postRawResponse.data.user_path);
                     });
                 });
 

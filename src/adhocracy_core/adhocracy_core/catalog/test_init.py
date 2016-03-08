@@ -530,3 +530,13 @@ class TestCatalogsServiceAdhocracy:
                                             allows=(['principal'], 'view')))
         assert list(result.elements) == [child]
 
+    def test_search_count_with_limit_and_sort(self, registry, pool, inst,
+                                              query):
+        from adhocracy_core.interfaces import IPool
+        child = self._make_resource(registry, parent=pool)
+        child2 = self._make_resource(registry, parent=pool)
+        result = inst.search(query._replace(interfaces=IPool,
+                                            limit=1,
+                                            sort_by='name'))
+        assert result.count == 2
+

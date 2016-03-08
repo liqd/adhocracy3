@@ -1349,11 +1349,10 @@ class TestLoginUserName:
             inst.post()
 
     def test_post_with_token_authentication_policy(self, request, context, mock_authpolicy):
-        mock_authpolicy.remember.return_value = {'X-User-Path': '/user',
-                                                 'X-User-Token': 'token'}
+        mock_authpolicy.remember.return_value = [('X-User-Token', 'token')]
         inst = self.make_one(context, request)
         assert inst.post() == {'status': 'success',
-                               'user_path': '/user',
+                               'user_path': 'http://example.com/',
                                'user_token': 'token'}
 
     def test_options(self, request, context):
@@ -1378,11 +1377,10 @@ class TestLoginEmailView:
             inst.post()
 
     def test_post_with_token_authentication_policy(self, request, context, mock_authpolicy):
-        mock_authpolicy.remember.return_value = {'X-User-Path': '/user',
-                                                 'X-User-Token': 'token'}
+        mock_authpolicy.remember.return_value = [('X-User-Token', 'token')]
         inst = self.make_one(context, request)
         assert inst.post() == {'status': 'success',
-                               'user_path': '/user',
+                               'user_path': 'http://example.com/',
                                'user_token': 'token'}
 
     def test_options(self, request, context):
@@ -1447,11 +1445,10 @@ class TestActivateAccountView:
         return ActivateAccountView(context, request)
 
     def test_post(self, request, context, mock_authpolicy):
-        mock_authpolicy.remember.return_value = {'X-User-Path': '/user',
-                                                 'X-User-Token': 'token'}
+        mock_authpolicy.remember.return_value = [('X-User-Token', 'token')]
         inst = self.make_one(context, request)
         assert inst.post() == {'status': 'success',
-                               'user_path': '/user',
+                               'user_path': 'http://example.com/',
                                'user_token': 'token'}
 
     def test_options(self, request, context):
@@ -1673,15 +1670,14 @@ class TestPasswordResetView:
         request_.validated['user'] = testing.DummyResource()
         request_.validated['path'] = mock_reset
         request_.validated['password'] = 'password'
-        mock_remember.return_value = {'X-User-Path': '/',
-                                      'X-User-Token': 'token'}
+        mock_remember.return_value = [('X-User-Token', 'token')]
         inst = self.make_one(context, request_)
         result = inst.post()
         mock_reset.reset_password.assert_called()
         mock_remember.assert_called_with(request_, '/')
         mock_reset.reset_password.assert_called_with('password')
         assert result == {'status': 'success',
-                          'user_path': '/',
+                          'user_path': 'http://example.com/',
                           'user_token': 'token'}
 
     def test_options(self, request_, context):

@@ -308,6 +308,11 @@ is bigger and exposes more details.
     width: 50%;
 }
 
+.opion-button-container,
+.opinion-bar-container {
+    @include rem(margin-bottom, 5px);
+}
+
 .opinion-button {
     @include rem(line-height, 30px);
     background-color: $color-structure-normal;
@@ -336,7 +341,6 @@ is bigger and exposes more details.
 }
 
 .opinion-bar-container {
-    @include rem(margin-bottom, 5px);
     background-color: $color-structure-normal;
 }
 

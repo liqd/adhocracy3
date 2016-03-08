@@ -11,6 +11,7 @@ import * as AdhUtil from "../Util/Util";
 import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
 import * as SITags from "../../Resources_/adhocracy_core/sheets/tags/ITags";
 import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import * as SIWorkflowAssignment from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/ResourceArea";
 
@@ -28,12 +29,14 @@ export class Provider implements angular.IServiceProvider {
         type? : string;
     }};
     public templates : {[embedContext : string]: any};
+    public customHeaders : {[processType : string]: string};
 
     constructor() {
         var self = this;
         this.defaults = {};
         this.specifics = {};
         this.templates = {};
+        this.customHeaders = {};
         this.$get = ["$q", "$injector", "$location", "adhHttp", "adhConfig", "adhEmbed", "adhResourceUrlFilter",
             ($q, $injector, $location, adhHttp, adhConfig, adhEmbed, adhResourceUrlFilter) => new Service(
         self, $q, $injector, $location, adhHttp, adhConfig, adhEmbed, adhResourceUrlFilter)];
@@ -106,6 +109,11 @@ export class Provider implements angular.IServiceProvider {
 
     public template(embedContext : string, templateFn : any) : Provider {
         this.templates[embedContext] = templateFn;
+        return this;
+    }
+
+    public customHeader(processType : string, templateUrl : string) : Provider {
+        this.customHeaders[processType] = templateUrl;
         return this;
     }
 }
@@ -343,6 +351,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
             var processType = process ? process.content_type : "";
             var processUrl = process ? process.path : "/";
+            var processState = process ? process.data[SIWorkflowAssignment.nick].workflow_state : "";
 
             if (hasRedirected) {
                 return;
@@ -352,9 +361,11 @@ export class Service implements AdhTopLevelState.IAreaInput {
                 var defaults : Dict = self.getDefaults(resource.content_type, view, processType, embedContext);
 
                 var meta : Dict = {
+                    customHeader: self.provider.customHeaders[processType],
                     embedContext: embedContext,
                     processType: processType,
                     processUrl: processUrl,
+                    processState: processState,
                     platformUrl: self.adhConfig.rest_url + "/" + segs[1],
                     contentType: resource.content_type,
                     resourceUrl: resourceUrl,

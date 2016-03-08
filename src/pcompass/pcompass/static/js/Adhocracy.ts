@@ -26,6 +26,7 @@ import * as AdhAbuseModule from "./Packages/Abuse/Module";
 import * as AdhAngularHelpersModule from "./Packages/AngularHelpers/Module";
 import * as AdhBadgeModule from "./Packages/Badge/Module";
 import * as AdhCommentModule from "./Packages/Comment/Module";
+import * as AdhConfigModule from "./Packages/Config/Module";
 import * as AdhCrossWindowMessagingModule from "./Packages/CrossWindowMessaging/Module";
 import * as AdhDateTimeModule from "./Packages/DateTime/Module";
 import * as AdhDocumentWorkbenchModule from "./Packages/DocumentWorkbench/Module";
@@ -89,6 +90,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "ngAria",
         "ngMessages",
         AdhCommentModule.moduleName,
+        AdhConfigModule.moduleName,
         AdhCrossWindowMessagingModule.moduleName,
         AdhDocumentWorkbenchModule.moduleName,
         AdhEmbedModule.moduleName,
@@ -162,11 +164,11 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     app.value("markdownit", markdownit);
 
     // register our modules
-    app.value("adhConfig", config);
     AdhAbuseModule.register(angular);
     AdhAngularHelpersModule.register(angular);
     AdhBadgeModule.register(angular);
     AdhCommentModule.register(angular);
+    AdhConfigModule.register(angular, config);
     AdhCrossWindowMessagingModule.register(angular, config.trusted_domains !== []);
     AdhDateTimeModule.register(angular);
     AdhDocumentWorkbenchModule.register(angular);
