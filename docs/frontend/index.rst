@@ -8,3 +8,4 @@ Frontend
    modules.rst
    routing.rst
    translation.rst
+   services.rst
