@@ -1,5 +1,5 @@
-Frontend Routing
-================
+Routing
+=======
 
 As Adhocracy 3 is a single page application, the routing is done in the
 frontend.  Unfortunately, the obvious choice `angular-route`_ does not

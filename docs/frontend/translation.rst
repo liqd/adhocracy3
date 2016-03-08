@@ -1,5 +1,5 @@
-Frontend translation
-====================
+Translation
+===========
 
 Markup translatable strings
 ---------------------------

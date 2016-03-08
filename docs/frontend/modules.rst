@@ -1,5 +1,5 @@
-Frontend Structure
-==================
+Modules
+=======
 
 Module Systems
 --------------
