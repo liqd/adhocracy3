@@ -22,7 +22,6 @@ export var register = (angular) => {
             AdhMeinberlinBuergerhaushaltWorkbenchModule.moduleName,
             AdhResourceAreaModule.moduleName
         ])
-        .directive("adhBuergerhaushaltContextHeader", ["adhConfig", Context.headerDirective])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerContext("buergerhaushalt", ["burgerhaushalt"]);
         }])
