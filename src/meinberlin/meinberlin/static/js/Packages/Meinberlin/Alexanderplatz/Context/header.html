@@ -3,16 +3,7 @@
         <a href="https://mein.berlin.de/" target="_top"><i class="header-logo icon-meinberlin-logo" title="mein Berlin"></i></a>
     </div>
     <div class="l-header-right">
-        <a
-            href="{{processUrl | adhResourceUrl:'create_proposal'}}"
-            class="button-cta"
-            data-ng-click="setCameFrom()"
-            data-ng-if="!(!processOptions.canPost(proposalItemType) && processOptions.loggedIn)">
-            {{ "TR__CREATE_PROPOSAL" | translate }}</a>
-        <span
-            class="button-cta ng-disabled"
-            data-ng-if="!processOptions.canPost(proposalItemType) && processOptions.loggedIn">
-            {{ "TR__CREATE_PROPOSAL" | translate }}</span>
+        <adh-meinberlin-alexanderplatz-add-proposal-button></adh-meinberlin-alexanderplatz-add-proposal-button>
         <adh-user-indicator></adh-user-indicator>
         <adh-help-link></adh-help-link>
     </div>

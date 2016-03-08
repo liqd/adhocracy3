@@ -71,5 +71,7 @@ export var register = (angular) => {
         .directive("adhMeinberlinAlexanderplatzDocumentEditColumn", [
             "adhConfig", "adhHttp", "adhTopLevelState", "adhResourceUrlFilter", Workbench.documentEditColumnDirective])
         .directive("adhMeinberlinAlexanderplatzProposalEditColumn", [
-            "adhConfig", "adhTopLevelState", "adhResourceUrlFilter", Workbench.proposalEditColumnDirective]);
+            "adhConfig", "adhTopLevelState", "adhResourceUrlFilter", Workbench.proposalEditColumnDirective])
+        .directive("adhMeinberlinAlexanderplatzAddProposalButton", [
+            "adhConfig", "adhPermissions", "adhTopLevelState", Workbench.addProposalButtonDirective]);
 };
