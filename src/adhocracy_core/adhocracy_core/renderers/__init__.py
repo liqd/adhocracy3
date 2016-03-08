@@ -1,13 +1,13 @@
-"""Additional pyramid renderer."""
+"""Additional pyramid renderers."""
 import pkg_resources
 from yaml import safe_load
 
 
 class YAMLToPython:
-    """YAML to python Renderer using :func:`yaml.safe_load`."""
+    """YAML to python renderer using :func:`yaml.safe_load`."""
 
     def __init__(self, info: dict):
-        """See :method:`pyramid.interfaces.IRendererFacatory.__call__`."""
+        """See :method:`pyramid.interfaces.IRendererFactory.__call__`."""
 
     def __call__(self, value: dict, system: dict) -> object:
         """Render yaml file :term:asset` given in `system` to python.
