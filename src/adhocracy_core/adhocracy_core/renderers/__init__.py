@@ -26,7 +26,6 @@ class YAMLToPython:
             raise ValueError(msg.format(package, filename))
         with open(path, 'r') as f:
             appstruct = safe_load(f)
-        f.close()
         return appstruct
 
 
