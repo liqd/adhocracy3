@@ -1,3 +1,5 @@
+.. _api-websockets:
+
 Asynchronous Backend-Frontend Communication Via Web Sockets
 ===========================================================
 

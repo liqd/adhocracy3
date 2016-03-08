@@ -1,3 +1,5 @@
+.. _api-permission-system:
+
 Permission system
 -----------------
 
