@@ -385,7 +385,8 @@ export class Service<Content extends ResourcesBase.Resource> {
                 });
 
                 var preliminaryPaths = _.map(resources, "path");
-                return _.sortBy(postedResources, (postedResource, index : number) => {
+                return _.sortBy(postedResources, (postedResource) => {
+                    var index = _.indexOf(postedResources, postedResource);
                     var preliminaryPath = sortedResources[index].path;
                     return preliminaryPaths.indexOf(preliminaryPath);
                 });
