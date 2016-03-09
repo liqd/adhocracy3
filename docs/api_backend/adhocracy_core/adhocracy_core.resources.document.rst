@@ -1,7 +1,7 @@
-adhocracy_mercator.scripts.export module
+adhocracy_core.resources.document module
 ========================================
 
-.. automodule:: adhocracy_mercator.scripts.export
+.. automodule:: adhocracy_core.resources.document
     :members:
     :undoc-members:
     :show-inheritance:

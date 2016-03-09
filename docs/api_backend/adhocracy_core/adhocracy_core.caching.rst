@@ -6,10 +6,3 @@ adhocracy_core.caching package
     :undoc-members:
     :show-inheritance:
 
-Submodules
-----------
-
-.. toctree::
-
-   adhocracy_core.caching.test_init
-

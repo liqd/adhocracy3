@@ -12,5 +12,4 @@ Submodules
 .. toctree::
 
    adhocracy_mercator.catalog.adhocracy
-   adhocracy_mercator.catalog.test_adhocracy
 

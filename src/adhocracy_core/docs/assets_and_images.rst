@@ -192,6 +192,7 @@ The actual binary data is *not* part of that JSON document::
 In case of images, it can retrieve the image binary data in one of the predefined
 cropped sizes by asking for one of the keys defined by the ImageSizeMapper as
 child element::
+
     >>> resp_data = testapp.get(resp_image_meta['detail'])
     >>> resp_data.content_type
     'image/jpeg'
