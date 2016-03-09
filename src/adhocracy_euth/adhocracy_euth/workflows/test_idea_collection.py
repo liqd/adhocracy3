@@ -65,9 +65,8 @@ class TestIdeaCollection:
                                                       process_url,
                                                       app_participant,
                                                       app_admin):
-        # can assign badges that have the badge_assignment workflow
         from adhocracy_core.resources.badge import IBadgeAssignment
-        url = process_url + '/proposal0/badge_assignments'
+        url = process_url + '/proposal_0000000/badge_assignments'
         resp = app_participant.options(url)
         badge_assignment = 'adhocracy_core.sheets.badge.IBadgeAssignment'
         post_request_body = resp.json['POST']['request_body']

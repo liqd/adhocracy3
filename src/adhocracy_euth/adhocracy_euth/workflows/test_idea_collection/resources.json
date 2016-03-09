@@ -17,7 +17,7 @@
            }
  },
  {"path": "/opin/idea_collection/badges",
-  "content_type": "adhocracy_core.resources.badge.IBadgeGroup",
+  "content_type": "adhocracy_core.resources.badge.IParticipantsAssignableBadgeGroup",
   "data": {"adhocracy_core.sheets.name.IName":
             {"name": "categories"}
            }
@@ -40,25 +40,10 @@
            {"title": "Nature"}
           }
  },
- 
  {"path": "/opin/idea_collection/badges",
   "content_type": "adhocracy_core.resources.badge.IBadgeGroup",
   "data": {"adhocracy_core.sheets.name.IName":
             {"name": "winning"}
            }
- },
- {"path": "/opin/idea_collection",
-  "content_type": "adhocracy_core.resources.pool.IPool",
-  "data": {"adhocracy_core.sheets.name.IName":
-            {"name": "proposal0"}
-           }
- },
- {"path": "/opin/idea_collection/proposal0/",
-  "creator": "/principals/users/0000000",
-  "content_type": "adhocracy_core.resources.badge.IBadgeAssignmentsService",
-  "data": {"adhocracy_core.sheets.name.IName":
-            {"name": "badge_assignments"}
-           }
  }
 ]
-
