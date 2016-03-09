@@ -78,8 +78,35 @@ def test_workflow_assignment_schema_create():
     inst = workflow.WorkflowAssignmentSchema()
     assert isinstance(inst['workflow'], workflow.Workflow)
     assert isinstance(inst['workflow_state'], SingleLine)
+    assert inst['workflow_state'].validator == workflow.deferred_state_validator
     assert inst['workflow_state'].missing == colander.drop
     assert isinstance(inst['state_data'], workflow.StateDataList)
+
+
+class TestDeferredStateValidator:
+
+    @fixture
+    def kw(self, context, request_, mock_workflow):
+        return {'context': context,
+                'request': request_,
+                'workflow': mock_workflow,
+                }
+
+    def call_fut(self, *args):
+        from .workflow import deferred_state_validator
+        return deferred_state_validator(*args)
+
+    def test_return_empty_list_if_no_workflow(self, node, kw):
+        kw['workflow'] = None
+        validator = self.call_fut(node, kw)
+        assert validator.choices == []
+
+    def test_return_next_states_list_if_workflow(self, node, kw):
+        kw['workflow'].get_next_states.return_value = ['state1']
+        validator = self.call_fut(node, kw)
+        assert validator.choices == ['state1']
+        kw['workflow'].get_next_states.assert_called_with(kw['context'],
+                                                          kw['request'])
 
 
 class TestWorkflowAssignmentSheet:

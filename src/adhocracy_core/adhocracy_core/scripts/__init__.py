@@ -9,7 +9,6 @@ from pyramid.request import Request
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
-from pyramid.util import DottedNameResolver
 from pyrsistent import PMap
 from pyrsistent import freeze
 from pyrsistent import ny
@@ -136,12 +135,6 @@ def _get_creator(resource_info: dict,
     return creator
 
 
-def _get_user_locator(context: IResource, registry: Registry) -> IUserLocator:
-    request = Request.blank('/dummy')
-    locator = registry.getMultiAdapter((context, request), IUserLocator)
-    return locator
-
-
 def import_local_roles(context: IResource, registry: Registry, filename: str):
     """Import/set local roles from a JSON file."""
     multi_local_roles_info = _load_info(filename)
@@ -160,15 +153,3 @@ def _deserialize_roles(roles: dict) -> dict:
     for k, v in roles.items():
         roles[k] = set(v)
     return roles
-
-
-def _get_workflow(registry: Registry, resource_type: str):
-    # for post request we need to get the workflow for the resource type
-    # that is going to be created, but before any validation has been done.
-    # TODO refactor, see notes in adhocracy_core.rest.views.py
-    iresource = DottedNameResolver().resolve(resource_type)
-    iresource_meta = registry.content.resources_meta[iresource]
-    name = iresource_meta.workflow_name
-    workflow = registry.content.workflows.get(name, None)
-
-    return workflow

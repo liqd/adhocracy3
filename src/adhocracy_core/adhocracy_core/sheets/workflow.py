@@ -50,11 +50,7 @@ def deferred_state_validator(node, kw: dict) -> OneOf:
         next_states = []
     else:
         next_states = workflow.get_next_states(context, request)
-
-    def validate_next_states(node, value):
-        return OneOf(next_states)(node, value)
-
-    return validate_next_states
+    return OneOf(next_states)
 
 
 class StateName(SingleLine):

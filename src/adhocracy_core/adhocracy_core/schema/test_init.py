@@ -134,56 +134,64 @@ class TestInterface():
             inst.deserialize(None, 'adhocracy_core.sheets.tags.NoSuchTag')
 
 
-class NameUnitTest:
+class TestName:
 
     @fixture
-    def parent(self):
-        return Mock()
+    def parent(self, pool):
+        from adhocracy_core.resources.pool import Pool
+        pool.check_name = Mock(spec=Pool.check_name)
+        return pool
+
+    @fixture
+    def context(self, parent, context):
+        parent['context'] = context
+        return context
 
     def make_one(self):
         from adhocracy_core.schema import Name
         return Name()
 
     def test_valid(self, context):
-        inst = self.make_one().bind(context=context)
+        inst = self.make_one().bind(context=context, creating=None)
         assert inst.deserialize('blu.ABC_12-3')
 
     def test_non_valid_empty(self, context):
-        inst = self.make_one().bind(context=context)
+        inst = self.make_one().bind(context=context, creating=None)
         with raises(colander.Invalid):
             inst.validator(inst, '')
 
     def test_non_valid_to_long(self, context):
-        inst = self.make_one().bind(context=context)
+        inst = self.make_one().bind(context=context, creating=None)
         with raises(colander.Invalid):
             inst.validator(inst, 'x' * 101)
 
     def test_non_valid_wrong_characters(self, context):
-        inst = self.make_one().bind(context=context)
+        inst = self.make_one().bind(context=context, creating=None)
         with raises(colander.Invalid):
             inst.validator(inst, 'ä')
 
-    def test_non_valid_not_unique(self, context):
-        inst = self.make_one().bind(context=context)
-        self.parent.check_name.side_effect = KeyError
+    def test_non_valid_not_unique(self, parent, context):
+        inst = self.make_one().bind(context=context, creating=None)
+        parent.check_name.side_effect = KeyError
         with raises(colander.Invalid):
             inst.validator(inst, 'name')
 
-    def test_non_valid_forbbiden_child_name(self, context):
-        inst = self.make_one().bind(context=context)
-        self.parent.check_name.side_effect = ValueError
+    def test_non_valid_forbbiden_child_name(self, parent, context):
+        inst = self.make_one().bind(context=context, creating=None)
+        parent.check_name.side_effect = ValueError
         with raises(colander.Invalid):
             inst.validator(inst, '@@')
 
-    def test_invalid_asdict_output(self, parent):
+    def test_invalid_asdict_output(self, parent, resource_meta):
         """Test case added since we had a bug here."""
-        inst = self.make_one().bind(context=context)
-        self.parent.check_name.side_effect = ValueError
+        inst = self.make_one().bind(context=parent, creating=resource_meta)
+        parent.check_name.side_effect = ValueError
         try:
             inst.validator(inst, 'ä')
             assert False
         except colander.Invalid as err:
-            wanted = {'': 'String does not match expected pattern'}
+            wanted = {'': 'The name has forbidden characters or is not a string'
+                          '.; String does not match expected pattern'}
             assert err.asdict() == wanted
 
 
