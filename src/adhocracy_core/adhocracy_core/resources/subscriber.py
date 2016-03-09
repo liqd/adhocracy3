@@ -4,6 +4,7 @@ from collections import Sequence
 from logging import getLogger
 from os import urandom
 
+from pyramid.interfaces import IApplicationCreated
 from pyramid.registry import Registry
 from pyramid.request import Request
 from pyramid.settings import asbool
@@ -11,6 +12,7 @@ from pyramid.traversal import find_interface
 from pyramid.i18n import TranslationStringFactory
 from substanced.util import find_service
 
+from adhocracy_core.authorization import set_acms_for_app_root
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -345,6 +347,7 @@ def update_comments_count(resource: ICommentVersion,
 
 def includeme(config):
     """Register subscribers."""
+    config.add_subscriber(set_acms_for_app_root, IApplicationCreated)
     config.add_subscriber(autoupdate_versionable_has_new_version,
                           ISheetReferenceNewVersion,
                           object_iface=IItemVersion,

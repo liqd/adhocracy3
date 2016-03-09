@@ -3,6 +3,7 @@ from pytest import fixture
 from pytest import mark
 from unittest.mock import Mock
 
+
 def test_root_meta():
     from .root import root_meta
     from .root import IRootPool
@@ -52,17 +53,6 @@ class TestRoot:
         assert find_catalog(inst, 'adhocracy') is not None
         assert find_service(inst, 'principals', 'users') is not None
         assert find_service(inst, 'locations') is not None
-
-    def test_create_root_with_acl(self, registry):
-        from adhocracy_core.resources.root import IRootPool
-        from substanced.util import get_acl
-        from pyramid.security import Allow
-        from pyramid.security import ALL_PERMISSIONS
-        inst = registry.content.create(IRootPool.__identifier__)
-        acl = get_acl(inst)
-        assert (Allow, 'system.Anonymous', 'view') in acl
-        assert (Allow, 'system.Anonymous', 'create_user') in acl
-        assert (Allow, 'role:god', ALL_PERMISSIONS) == acl[0]
 
     def test_create_root_with_initial_god_user(self, registry, request_):
         from substanced.interfaces import IUserLocator

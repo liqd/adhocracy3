@@ -1,0 +1,26 @@
+initial_state: participate
+states:
+  participate:
+    title: Participate
+    description: This phase is to participate.
+    acm:
+     principals:           [participant, moderator, creator, initiator]
+     permissions:
+       - [create_proposal,   A,           ~,         ~,       ~]
+       - [edit_proposal,     ~,           ~,         A,       ~]
+       - [create_document,   A,           ~,         ~,       ~]
+       - [edit_document,     ~,           ~,         A,       ~]
+       - [create_comment,    A,           A,         ~,       ~]
+       - [edit_comment,      ~,           ~,         A,       ~]
+       - [create_rate,      A,           ~,         ~,       ~]
+       - [edit_rate,         ~,           ~,         A,       ~]
+       - [create_relation,   A,           ~,         ~,       ~]
+       - [edit_relation,     ~,           ~,         A,       ~]
+  frozen:
+    title: Frozen
+transitions:
+  to_frozen:
+    from_state: participate
+    to_state: frozen
+    callback: ~
+    permission: do_transition

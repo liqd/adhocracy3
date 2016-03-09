@@ -1,16 +1,12 @@
 """Initialize meinberlin ACM."""
-from pyramid.events import ApplicationCreated
 from pyramid.traversal import find_interface
 from pyramid.renderers import render
 
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import IResourceSheetModified
-from adhocracy_core.authorization import set_acms_for_app_root
-from adhocracy_core.resources.root import root_acm
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import has_annotation_sheet_data
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
-from adhocracy_meinberlin.resources.root import meinberlin_acm
 from adhocracy_meinberlin.resources.bplan import IProposalVersion
 from adhocracy_meinberlin.resources.bplan import IProposal
 from adhocracy_meinberlin import sheets
@@ -93,14 +89,8 @@ def _is_proposal_creation_finished(proposal_version):
     return len(versions_with_data) == 1
 
 
-def set_root_acms(event):
-    """Set :term:`acm`s for root if the Pyramid application starts."""
-    set_acms_for_app_root(event.app, (meinberlin_acm, root_acm))
-
-
 def includeme(config):
     """Register subscribers."""
-    config.add_subscriber(set_root_acms, ApplicationCreated)
     config.add_subscriber(send_bplan_submission_confirmation_email,
                           IResourceCreatedAndAdded,
                           object_iface=IProposalVersion)

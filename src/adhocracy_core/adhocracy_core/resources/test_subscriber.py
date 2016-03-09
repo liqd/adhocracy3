@@ -656,6 +656,7 @@ class TestUpdateCommentsCountAfterVisibilityChange:
 @mark.usefixtures('integration')
 def test_register_subscriber(registry):
     from adhocracy_core.resources import subscriber
+    from adhocracy_core.authorization import set_acms_for_app_root
     handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
     assert subscriber.autoupdate_non_versionable_has_new_version.__name__ in handlers
     assert subscriber.autoupdate_versionable_has_new_version.__name__ in handlers
@@ -668,5 +669,6 @@ def test_register_subscriber(registry):
     assert subscriber.decrease_comments_count.__name__ in handlers
     assert subscriber.increase_comments_count.__name__ in handlers
     assert subscriber.update_comments_count_after_visibility_change.__name__ in handlers
+    assert set_acms_for_app_root.__name__ in handlers
 
 

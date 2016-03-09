@@ -5,7 +5,6 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.root import create_initial_content_for_app_root
 from adhocracy_core.resources.root import add_example_process
 from adhocracy_core.resources.root import root_meta
-from adhocracy_core.schema import ACM
 from adhocracy_spd.resources.digital_leben import IProcess
 import adhocracy_core.sheets
 
@@ -17,16 +16,6 @@ def add_spd_process(context: IPool, registry: Registry, options: dict):
     registry.content.create(IProcess.__identifier__,
                             parent=context,
                             appstructs=appstructs)
-
-
-spd_acm = ACM().deserialize(
-    {'principals': ['anonymous',
-                    'participant',
-                    'moderator',
-                    'creator',
-                    'initiator',
-                    'admin'],
-     'permissions': []})
 
 
 spd_root_meta = root_meta._replace(

@@ -1,7 +1,5 @@
 """Root resource type."""
 
-# flake8: noqa
-
 from pyramid.registry import Registry
 from pyramid.security import Allow
 
@@ -9,7 +7,6 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.root import root_meta
 from adhocracy_core.resources.root import create_initial_content_for_app_root
-from adhocracy_core.schema import ACM
 from adhocracy_core.workflows import transition_to_states
 from adhocracy_core import sheets
 from adhocracy_mercator.resources.mercator import IProcess
@@ -32,15 +29,9 @@ def initialize_workflow(context: IPool, registry: Registry, options: dict):
     # the god's permissions
     root.__acl__ = [(Allow, 'role:god', ALL_PERMISSIONS)]
     mercator_process = root['mercator']
-    transition_to_states(mercator_process, ['announce', 'participate'], registry)
-
-
-mercator_acm = ACM().deserialize(
-    {'principals':                                   ['anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin'],
-     'permissions': [['view_sheet_heardfrom',          None,        None,          None,         Allow,     Allow,       Allow],
-                     ['edit_mercator_proposal',        None,        None,          None,         None,      None,        Allow],
-                     ['create_mercator_proposal',      None,        None,          None,         None,      None,        Allow],
-                     ]})
+    transition_to_states(mercator_process,
+                         ['announce', 'participate'],
+                         registry)
 
 
 mercator_root_meta = root_meta._replace(
