@@ -114,6 +114,7 @@
     "TR__NEW_PASSWORD": "New Password",
     "TR__NEXT": "next",
     "TR__NO": "no",
+    "TR__NO_PERMISSIONS" : "You don't have permissions to see this process.",
     "TR__ON": "on",
     "TR__ONLINE": "online",
     "TR__OPINION_SHOW_RATE": "vote",
