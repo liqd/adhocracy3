@@ -24,35 +24,34 @@ def sheet_metas():
     return metas
 
 
-class TestResourceResponseSchema:
+@fixture
+def registry(registry_with_content):
+    return registry_with_content
 
-    @fixture
-    def request(self, context):
-        request = testing.DummyRequest()
-        request.root = context
-        return request
+
+class TestResourceResponseSchema:
 
     def make_one(self):
         from adhocracy_core.rest.schemas import ResourceResponseSchema
         return ResourceResponseSchema()
 
-    def test_serialize_no_appstruct(self, request, context):
-        inst = self.make_one().bind(request=request, context=context)
+    def test_serialize_no_appstruct(self, kw, request_):
+        inst = self.make_one().bind(**kw)
         wanted = {'content_type': IResource.__identifier__,
-                  'path': request.application_url + '/',
+                  'path': request_.application_url + '/',
                   'updated_resources': {'changed_descendants': [],
                           'created': [],
                           'modified': [],
                           'removed': []}}
         assert inst.serialize() == wanted
 
-    def test_serialize_with_appstruct(self, request, context):
-        inst = self.make_one().bind(request=request, context=context)
+    def test_serialize_with_appstruct(self, kw, context, request_):
+        inst = self.make_one().bind(**kw)
         context['child'] = testing.DummyResource()
         wanted = {'content_type': ISheet.__identifier__,
-                  'path': request.application_url + '/child/',
+                  'path': request_.application_url + '/child/',
                   'updated_resources': {'changed_descendants': [],
-                          'created': [request.application_url + '/child/'],
+                          'created': [request_.application_url + '/child/'],
                           'modified': [],
                           'removed': []}}
         assert inst.serialize({'content_type': ISheet,
@@ -63,12 +62,6 @@ class TestResourceResponseSchema:
 
 class TestItemResponseSchema:
 
-    @fixture
-    def request(self, context):
-        request = testing.DummyRequest()
-        request.root = context
-        return request
-
     def make_one(self):
         from adhocracy_core.rest.schemas import ItemResponseSchema
         return ItemResponseSchema()
@@ -78,15 +71,19 @@ class TestItemResponseSchema:
         inst = self.make_one()
         assert isinstance(inst, ResourceResponseSchema)
 
-    def test_serialize_no_appstruct(self, request, context):
-        inst = self.make_one().bind(request=request, context=context)
+    def test_serialize_no_appstruct(self, request_, context):
+        inst = self.make_one().bind(request=request_,
+                                    context=context,
+                                    creating=None)
         assert inst.serialize()['first_version_path'] == None
 
-    def test_serialize_with_appstruct(self, request, context):
-        inst = self.make_one().bind(request=request, context=context)
+    def test_serialize_with_appstruct(self, request_, context):
+        inst = self.make_one().bind(request=request_,
+                                    context=context,
+                                    creating=None)
         context['child'] = testing.DummyResource()
         result = inst.serialize({'first_version_path': context['child']})
-        assert result['first_version_path'] == request.application_url + '/child/'
+        assert result['first_version_path'] == request_.application_url + '/child/'
 
 
 class TestPOSTResourceRequestSchema:
@@ -149,101 +146,97 @@ def test_post_asset_request_schema():
 
 class TestDeferredValidatePostContentType:
 
-    @fixture
-    def request_(self, mock_content_registry, request_):
-        request_.body = '{}'
-        request_.registry.content = mock_content_registry
-        return request_
-
     def call_fut(self, node, kw):
         from adhocracy_core.rest.schemas import deferred_validate_post_content_type
         return deferred_validate_post_content_type(node, kw)
 
-    def test_without_content_types(self, node, request_, context):
-        validator = self.call_fut(node, {'context': context, 'request': request_})
+    def test_without_content_types(self, node, kw):
+        validator = self.call_fut(node, kw)
         assert list(validator.choices) == []
 
-    def test_with_content_types(self, node, request_, context, resource_meta):
-        request_.registry.content.get_resources_meta_addable.return_value = \
-            [resource_meta]
-        validator = self.call_fut(node, {'context': context, 'request': request_})
+    def test_with_content_types(self, node, kw, resource_meta):
+        kw['registry'].content.get_resources_meta_addable.return_value = [resource_meta]
+        validator = self.call_fut(node, kw)
         assert list(validator.choices) == [IResource]
 
 
 class TestAddPostRequestSubSchemas:
 
     @fixture
-    def request(self, mock_content_registry, request_):
+    def request_(self, request_):
         request_.body = '{}'
-        request_.registry.content = mock_content_registry
         return request_
+
+    @fixture
+    def sub_node(self, node):
+        from copy import deepcopy
+        return deepcopy(node)
 
     def call_fut(self, node, kw):
         from adhocracy_core.rest.schemas import add_post_data_subschemas
         return add_post_data_subschemas(node, kw)
 
-    def test_no_data_and_no_sheets(self, node, request, context):
-        self.call_fut(node, {'context': context, 'request': request})
+    def test_no_data_and_no_sheets(self, node, kw):
+        self.call_fut(node, kw)
         assert node.children == []
 
-    def test_no_data_and_optional_sheets(self, node, request, context, sheet_meta):
-        sheet_meta = sheet_meta._replace(create_mandatory=False)
-        request.registry.content.get_sheets_create.return_value = [sheet_meta]
-        self.call_fut(node, {'context': context, 'request': request})
+    def test_no_data_and_optional_sheets(self, node, kw, mock_sheet):
+        kw['registry'].content.get_sheets_create.return_value = [mock_sheet]
+        self.call_fut(node, kw)
         assert node.children == []
 
-    def test_data_and_optional_sheets(self, node, request, context, mock_sheet):
-        mock_sheet.meta = mock_sheet.meta._replace(create_mandatory=True)
-        request.registry.content.get_sheets_create.return_value = [mock_sheet]
+    def test_data_and_sheets(self, node, kw, mock_sheet, sub_node):
+        mock_sheet.get_schema_with_bindings.return_value = sub_node
+        kw['registry'].content.get_sheets_create.return_value = [mock_sheet]
         data = {'content_type': IResource.__identifier__,
                 'data': {ISheet.__identifier__: {}}}
-        request.body = json.dumps(data)
-        self.call_fut(node, {'context': context, 'request': request})
+        kw['request'].body = json.dumps(data)
+        self.call_fut(node, kw)
+        assert node.children[0] is sub_node
         assert node.children[0].name == ISheet.__identifier__
+        assert node.children[0].missing == colander.drop
 
-    def test_data_and_mandatory_but_no_optional_sheets(self, node, request,
-                                                       context, mock_sheet):
+    def test_data_and_mandatory_sheets(self, node, kw, mock_sheet, sub_node):
         mock_sheet.meta = mock_sheet.meta._replace(create_mandatory=True)
-        request.registry.content.get_sheets_create.return_value = [mock_sheet]
+        mock_sheet.get_schema_with_bindings.return_value = sub_node
+        kw['registry'].content.get_sheets_create.return_value = [mock_sheet]
         data = {'content_type': IResource.__identifier__,
                 'data': {ISheet.__identifier__: {}}}
-        request.body = json.dumps(data)
-        self.call_fut(node, {'context': context, 'request': request})
-        assert node.children[0].name == ISheet.__identifier__
-        assert node.children[0].bindings == {'context': context, 'request': request}
+        kw['request'].body = json.dumps(data)
+        self.call_fut(node, kw)
+        assert node.children[0].missing == colander.required
 
-    def test_multipart_formdata_request(self, node, request, context,
-                                        mock_sheet):
-        request.content_type = 'multipart/form-data'
-        mock_sheet.meta = mock_sheet.meta._replace(create_mandatory=True)
-        request.registry.content.get_sheets_create.return_value = [mock_sheet]
-        request.POST['content_type'] = IResource.__identifier__
-        request.POST['data:' + ISheet.__identifier__] = {}
-        self.call_fut(node, {'context': context, 'request': request})
+    def test_multipart_formdata_request(self, node, kw, mock_sheet):
+        kw['request'].content_type = 'multipart/form-data'
+        kw['registry'].content.get_sheets_create.return_value = [mock_sheet]
+        kw['request'].POST['content_type'] = IResource.__identifier__
+        kw['request'].POST['data:' + ISheet.__identifier__] = {}
+        self.call_fut(node, kw)
         assert node.children[0].name == ISheet.__identifier__
 
-    def test_invalid_request_content_type(self, node, request, context,):
-        request.content_type = 'text/plain'
+    def test_invalid_request_content_type(self, node, kw):
+        kw['request'].content_type = 'text/plain'
         with raises(RuntimeError):
-            self.call_fut(node, {'context': context, 'request': request})
+            self.call_fut(node, kw)
 
 
 class TestPOSTItemRequestSchemaUnitTest:
 
     @fixture
-    def request(self, mock_content_registry, request_, context, resource_meta):
+    def request_(self, request_):
         request_.body = '{}'
-        mock_content_registry.get_resources_meta_addable.return_value = \
-            [resource_meta]
-        request_.registry.content = mock_content_registry
-        request_.root = context
         return request_
+
+    @fixture
+    def registry(self, registry, resource_meta):
+        registry.content.get_resources_meta_addable.return_value = [resource_meta]
+        return registry
 
     def make_one(self):
         from adhocracy_core.rest.schemas import POSTItemRequestSchema
         return POSTItemRequestSchema()
 
-    def test_deserialize_without_binding_and_root_versions(self):
+    def test_deserialize_without_binding(self):
         inst = self.make_one()
         result = inst.deserialize({'content_type': IResource.__identifier__,
                                    'data': {}})
@@ -251,14 +244,14 @@ class TestPOSTItemRequestSchemaUnitTest:
                           'data': {},
                           'root_versions': []}
 
-    def test_deserialize_with_binding_and_root_versions(self, request, context):
-        inst = self.make_one().bind(request=request, context=context)
-        root_version_path = request.resource_url(request.root)
+    def test_deserialize_with_binding_and_root_versions(self, kw, request_):
+        inst = self.make_one().bind(**kw)
+        root_version_path = request_.resource_url(kw['context'])
         result = inst.deserialize({'content_type': IResource.__identifier__,
                                    'data': {},
                                    'root_versions': [root_version_path]})
         assert result == {'content_type': IResource, 'data': {},
-                          'root_versions': [request.root]}
+                          'root_versions': [kw['context']]}
 
 
 class TestPUTResourceRequestSchema:
@@ -358,40 +351,30 @@ class TestValidateClaimedMimeType:
 class TestAddPutRequestSubSchemasUnitTest:
 
     @fixture
-    def request(self, mock_content_registry, request_):
+    def request_(self, request_):
         request_.body = '{}'
-        request_.registry.content = mock_content_registry
         return request_
 
     def call_fut(self, node, kw):
         from adhocracy_core.rest.schemas import add_put_data_subschemas
         return add_put_data_subschemas(node, kw)
 
-    def test_no_data_and_no_sheets(self, node, context, request):
-        self.call_fut(node, {'context': context, 'request': request})
+    def test_no_data_and_no_sheets(self, node, kw):
+        self.call_fut(node, kw)
         assert node.children == []
 
-    def test_no_data_and_optional_sheets(self, node, context, request, mock_sheet):
-        request.registry.content.get_sheets_edit.return_value = [mock_sheet]
-        self.call_fut(node, {'context': context, 'request': request})
-        assert node.children == []
-
-    def test_data_and_optional_sheets(self, node, context, request, mock_sheet):
-        request.registry.content.get_sheets_edit.return_value = [mock_sheet]
-        request.body = json.dumps({'data': {ISheet.__identifier__: {}}})
-        self.call_fut(node, {'context': context, 'request': request})
+    def test_data_and_sheets(self, node, kw, mock_sheet):
+        kw['registry'].content.get_sheets_edit.return_value = [mock_sheet]
+        kw['request'].body = json.dumps({'data': {ISheet.__identifier__: {}}})
+        self.call_fut(node, kw)
         assert node.children[0].name == ISheet.__identifier__
-        assert node.children[0].bindings == {'context': context, 'request': request}
 
-    def test_multipart_formdata_request(self, node, context, request,
-                                        mock_sheet):
-        request.content_type = 'multipart/form-data'
-        request.registry.content.get_sheets_edit.return_value = [mock_sheet]
-        request.POST['data:' + ISheet.__identifier__] = {}
-        self.call_fut(node, {'context': context, 'request': request})
+    def test_multipart_formdata_request(self, node, kw, mock_sheet):
+        kw['request'].content_type = 'multipart/form-data'
+        kw['request'].registry.content.get_sheets_edit.return_value = [mock_sheet]
+        kw['request'].POST['data:' + ISheet.__identifier__] = {}
+        self.call_fut(node, kw)
         assert node.children[0].name == ISheet.__identifier__
-        assert node.children[0].bindings == {'context': context,
-                                             'request': request}
 
 
 class TestBatchRequestPath:
@@ -941,10 +924,6 @@ class TestAddArbitraryFilterNodes:
         return index
 
     @fixture
-    def registry(self, registry_with_content):
-        return registry_with_content
-
-    @fixture
     def create_node(self, monkeypatch, node):
         from . import schemas
         mock = Mock(spec=schemas.create_arbitrary_filter_node,
@@ -1118,20 +1097,14 @@ class TestCreateArbitraryFilterNode:
 
 class TestPostMessageUserViewRequestSchema:
 
-    @fixture
-    def request(self, context):
-        request = testing.DummyRequest()
-        request.root = context
-        return request
-
     def make_one(self):
         from .schemas import POSTMessageUserViewRequestSchema
         return POSTMessageUserViewRequestSchema()
 
-    def test_deserialize_valid(self, request, context):
+    def test_deserialize_valid(self, request_, context):
         from pyramid.traversal import resource_path
         from adhocracy_core.sheets.principal import IUserExtended
-        inst = self.make_one().bind(request=request, context=context)
+        inst = self.make_one().bind(request=request_, context=context)
         context['user'] = testing.DummyResource(__provides__=IUserExtended)
         cstrut = {'recipient': resource_path(context['user']),
                   'title': 'title',
@@ -1140,9 +1113,9 @@ class TestPostMessageUserViewRequestSchema:
                                             'title': 'title',
                                             'text': 'text'}
 
-    def test_deserialize_recipient_is_no_user(self, request, context):
+    def test_deserialize_recipient_is_no_user(self, request_, context):
         from pyramid.traversal import resource_path
-        inst = self.make_one().bind(request=request, context=context)
+        inst = self.make_one().bind(request=request_, context=context)
         context['user'] = testing.DummyResource()
         cstrut = {'recipient': resource_path(context['user']),
                   'title': 'title',
@@ -1177,53 +1150,50 @@ class TestPOSTCreateResetPasswordRequestSchema:
 
 class TestDeferredValidateResetPasswordEmail:
 
-    @fixture
-    def request(self, request_, registry):
-        request_.registry = registry
-        return request_
-
     def call_fut(self, node, kw):
         from . schemas import deferred_validate_password_reset_email
         return deferred_validate_password_reset_email(node, kw)
 
-    def test_email_has_no_user(self, node, request, context, mock_user_locator):
-        validator = self.call_fut(node, {'context': context, 'request': request})
+    def test_email_has_no_user(self, node, request_, context,
+                               mock_user_locator):
+        validator = self.call_fut(node, {'context': context,
+                                         'request': request_})
         with raises(colander.Invalid) as exception_info:
             validator(node, 'test@email.de')
         assert 'No user' in exception_info.value.msg
 
     def test_email_has_user_with_password_authentication(
-            self, node, request, context, mock_user_locator):
+            self, node, request_, context, mock_user_locator):
         from adhocracy_core.sheets.principal import IPasswordAuthentication
         validator = self.call_fut(node, {'context': context,
-                                          'request': request})
+                                         'request': request_})
         user = testing.DummyResource(active=True,
                                      __provides__=IPasswordAuthentication)
         mock_user_locator.get_user_by_email.return_value = user
         validator(node, 'test@email.de')
-        assert request.validated['user'] is user
+        assert request_.validated['user'] is user
 
     def test_email_has_user_without_password_authentication(
-            self, node, request, context, mock_user_locator):
+            self, node, request_, context, mock_user_locator):
         validator = self.call_fut(node, {'context': context,
-                                          'request': request})
+                                         'request': request_})
         user = testing.DummyResource(active=True)
         mock_user_locator.get_user_by_email.return_value = user
         with raises(colander.Invalid):
             validator(node, 'test@email.de')
 
-    def test_email_has_user_not_activated(self, node, request, context,
+    def test_email_has_user_not_activated(self, node, request_, context,
                                           mock_user_locator):
         from adhocracy_core.sheets.principal import IPasswordAuthentication
         validator = self.call_fut(node, {'context': context,
-                                          'request': request})
+                                         'request': request_})
         user = testing.DummyResource(active=False,
                                      __provides__=IPasswordAuthentication,
                                      activate=Mock())
         mock_user_locator.get_user_by_email.return_value = user
         validator(node, 'test@email.de')
         user.activate.assert_called
-        assert request.validated['user'] is user
+        assert request_.validated['user'] is user
 
 
 class TestPOSTResetPasswordRequestSchema:
@@ -1247,63 +1217,52 @@ class TestPOSTResetPasswordRequestSchema:
 class TestValidatePasswordResetPath:
 
     @fixture
-    def registry(self, registry_with_content):
-        return registry_with_content
-
-    @fixture
-    def request_(self, request_, context, registry):
-        request_.registry = registry
-        request_.root = context
-        return request_
+    def reset(self):
+        from adhocracy_core.resources.principal import IPasswordReset
+        return testing.DummyResource(__provides__=IPasswordReset)
 
     def call_fut(self, node, kw):
         from .schemas import validate_password_reset_path
         return validate_password_reset_path(node, kw)
 
-    def test_path_is_none(self, node, request_, context):
-        validator = self.call_fut(node, {'context': context, 'request': request_})
+    def test_path_is_none(self, node, kw):
+        validator = self.call_fut(node, kw)
         assert validator(node, None) is None
 
-    def test_path_is_reset_password(self, node,  request_, context, registry,
-                                    mock_sheet):
-        from adhocracy_core.resources.principal import IPasswordReset
+    def test_path_is_reset_password(self, node,  kw, reset, mock_sheet):
         from adhocracy_core.utils import now
         user = testing.DummyResource()
         mock_sheet.get.return_value = {'creator': user,
                                        'creation_date': now()}
-        registry.content.get_sheet.return_value = mock_sheet
-        validator = self.call_fut(node, {'request': request_, 'context': context})
+        kw['registry'].content.get_sheet.return_value = mock_sheet
+        validator = self.call_fut(node, kw)
 
-        context['reset'] = testing.DummyResource(__provides__=IPasswordReset)
-        validator(node, context['reset'])
+        validator(node, reset)
 
-        assert request_.validated['user'] is user
+        assert kw['request'].validated['user'] is user
 
-    def test_path_is_not_reset_password(self, node,  request_, context, registry,
-                                        mock_sheet):
+    def test_path_is_not_reset_password(self, node,  kw, mock_sheet):
         from adhocracy_core.utils import now
         user = testing.DummyResource()
         mock_sheet.get.return_value = {'creator': user,
                                        'creation_date': now()}
-        registry.content.get_sheet.return_value = mock_sheet
-        validator = self.call_fut(node, {'request': request_, 'context': context})
+        kw['registry'].content.get_sheet.return_value = mock_sheet
+        validator = self.call_fut(node, kw)
 
-        context['reset'] = testing.DummyResource()
+        no_reset = testing.DummyResource()
         with raises(colander.Invalid):
-            validator(node, context['reset'])
+            validator(node, no_reset)
 
-    def test_path_is_reset_password_but_8_days_old(
-            self, node,  request_, context, registry, mock_sheet):
+    def test_path_is_reset_password_but_8_days_old(self, node, kw, reset,
+                                                   mock_sheet):
         import datetime
-        from adhocracy_core.resources.principal import IPasswordReset
         from adhocracy_core.utils import now
         user = testing.DummyResource()
         creation_date = now() - datetime.timedelta(days=7)
         mock_sheet.get.return_value = {'creator': user,
                                        'creation_date': creation_date}
-        registry.content.get_sheet.return_value = mock_sheet
-        validator = self.call_fut(node, {'request': request_, 'context': context})
+        kw['registry'].content.get_sheet.return_value = mock_sheet
+        validator = self.call_fut(node, kw)
 
-        context['reset'] = testing.DummyResource(__provides__=IPasswordReset)
         with raises(colander.Invalid):
-            validator(node, context['reset'])
+            validator(node, reset)

@@ -19,7 +19,6 @@ from adhocracy_core.schema import Reference as ReferenceSchema
 from adhocracy_core.schema import PostPool
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.utils import get_user
-from adhocracy_core.utils import get_sheet_field
 
 
 class IRate(IPredicateSheet, ISheetReferenceAutoUpdateMarker):
@@ -107,10 +106,8 @@ class RateSchema(colander.MappingSchema):
         """Validate the rate."""
         # TODO add post_pool validator
         context = kw['context']
-        request = kw.get('request', None)
-        if request is None:
-            return
-        registry = request.registry
+        request = kw['request']
+        registry = kw['registry']
         return colander.All(create_validate_rate_value(registry),
                             create_validate_subject(request),
                             create_validate_is_unique(context, registry),
@@ -149,8 +146,9 @@ def create_validate_is_unique(context, registry: Registry) -> callable:
         if not same_rates:
             return
         item = find_interface(context, IRateItem)
-        old_versions = get_sheet_field(item, IVersions, 'elements',
-                                       registry=registry)
+        old_versions = registry.content.get_sheet_field(item,
+                                                        IVersions,
+                                                        'elements')
         for rate in same_rates:
             if rate not in old_versions:
                 err = colander.Invalid(node, msg='')

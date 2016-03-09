@@ -28,8 +28,6 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.resources.geo import ILocationsService
 from adhocracy_core.resources.geo import multipolygon_meta
 from adhocracy_core.sheets.geo import IMultiPolygon
-from adhocracy_core.utils import get_sheet
-from adhocracy_core.utils import get_sheet_field
 
 
 # Set GDAL_LEGACY flag for GDAL <= 1.10
@@ -96,7 +94,7 @@ def import_bezirksregions():
 
     data = json.load(open('/tmp/bezirksregions.json', 'r'))
 
-    lookup = _fetch_all_districs(root)
+    lookup = _fetch_all_districs(root, registry)
 
     for feature in data['features']:
 
@@ -157,19 +155,21 @@ def _download_geodata(filename: str, url: str, layer: str):
         sys.exit()
 
 
-def _fetch_all_districs(root: IResource) -> dict:
-    pool = get_sheet(root, IPool)
+def _fetch_all_districs(root: IResource, registry: Registry) -> dict:
+    pool = registry.content.get_sheet(root, IPool)
     params = {'depth': 3,
               'interfaces': IMultiPolygon,
               }
     results = pool.get(params)
     bezirke = results['elements']
     lookup = {}
+    get_sheet_field = registry.content.get_sheet_field
     for bezirk in bezirke:
-        if (get_sheet_field(bezirk,
-                            IMultiPolygon,
-                            'administrative_division') == 'stadtbezirk'):
-            name = (get_sheet_field(bezirk, IName, 'name'))
+        division = get_sheet_field(bezirk,
+                                   IMultiPolygon,
+                                   'administrative_division')
+        if division == 'stadtbezirk':
+            name = get_sheet_field(bezirk, IName, 'name')
             lookup[name] = bezirk
     return lookup
 

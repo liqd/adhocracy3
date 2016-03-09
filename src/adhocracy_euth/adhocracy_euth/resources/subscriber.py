@@ -5,7 +5,6 @@ from pyramid.settings import asbool
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.sheets.principal import IGroup
-from adhocracy_core.utils import get_sheet
 
 
 def _remove_participant_from_authenticated_group(event):
@@ -23,7 +22,7 @@ def _remove_participant_from_authenticated_group(event):
     root = event.object
     groups = find_service(root, 'principals', 'groups')
     authenticated = groups.get('authenticated')
-    sheet = get_sheet(authenticated, IGroup)
+    sheet = registry.content.get_sheet(authenticated, IGroup)
     values = sheet.get()
     values['roles'].remove('participant')
     sheet.set(values)

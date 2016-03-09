@@ -4,13 +4,11 @@ from pytest import fixture
 from pytest import mark
 
 
+@mark.usefixtures('integration')
 def test_includeme_register_comment_sheet(config):
     from adhocracy_core.sheets.comment import IComment
-    from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.sheets.comment')
     context = testing.DummyResource(__provides__=IComment)
-    assert get_sheet(context, IComment)
+    assert config.registry.content.get_sheet(context, IComment)
 
 
 class TestCommentableSheet:
@@ -26,8 +24,8 @@ class TestCommentableSheet:
         return pool
 
     @fixture
-    def inst(self, meta, context):
-        return meta.sheet_class(meta, context)
+    def inst(self, meta, context, registry):
+        return meta.sheet_class(meta, context, registry)
 
     def test_meta(self, meta):
         from . import comment
@@ -72,6 +70,5 @@ class TestCommentableSheet:
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta, registry):
-        from adhocracy_core.utils import get_sheet
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)

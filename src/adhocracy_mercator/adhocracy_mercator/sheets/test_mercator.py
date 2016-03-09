@@ -13,83 +13,70 @@ def integration(integration):
 @mark.usefixtures('integration')
 class TestIncludeme:
 
-    def test_includeme_register_title_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import ITitle
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_title_sheet(self, registry):
+        from .mercator import ITitle
         context = testing.DummyResource(__provides__=ITitle)
-        assert get_sheet(context, ITitle)
+        assert registry.content.get_sheet(context, ITitle)
 
-    def test_includeme_register_userinfo_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IUserInfo
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_userinfo_sheet(self, registry):
+        from .mercator import IUserInfo
         context = testing.DummyResource(__provides__=IUserInfo)
-        assert get_sheet(context, IUserInfo)
+        assert registry.content.get_sheet(context, IUserInfo)
 
-    def test_includeme_register_organizationinfo_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IOrganizationInfo
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_organizationinfo_sheet(self, registry):
+        from .mercator import IOrganizationInfo
         context = testing.DummyResource(__provides__=IOrganizationInfo)
-        assert get_sheet(context, IOrganizationInfo)
+        assert registry.content.get_sheet(context, IOrganizationInfo)
 
-    def test_includeme_register_introduction_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IIntroduction
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_introduction_sheet(self, registry):
+        from .mercator import IIntroduction
         context = testing.DummyResource(__provides__=IIntroduction)
-        assert get_sheet(context, IIntroduction)
+        assert registry.content.get_sheet(context, IIntroduction)
 
-    def test_includeme_register_description_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IDescription
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_description_sheet(self, registry):
+        from .mercator import IDescription
         context = testing.DummyResource(__provides__=IDescription)
-        assert get_sheet(context, IDescription)
+        assert registry.content.get_sheet(context, IDescription)
 
-    def test_includeme_register_location_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import ILocation
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_location_sheet(self, registry):
+        from .mercator import ILocation
         context = testing.DummyResource(__provides__=ILocation)
-        assert get_sheet(context, ILocation)
+        assert registry.content.get_sheet(context, ILocation)
 
-    def test_includeme_register_story_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IStory
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_story_sheet(self, registry):
+        from .mercator import IStory
         context = testing.DummyResource(__provides__=IStory)
-        assert get_sheet(context, IStory)
+        assert registry.content.get_sheet(context, IStory)
 
-    def test_includeme_register_outcome_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IOutcome
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_outcome_sheet(self, registry):
+        from .mercator import IOutcome
         context = testing.DummyResource(__provides__=IOutcome)
-        assert get_sheet(context, IOutcome)
+        assert registry.content.get_sheet(context, IOutcome)
 
-    def test_includeme_register_steps_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import ISteps
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_steps_sheet(self, registry):
+        from .mercator import ISteps
         context = testing.DummyResource(__provides__=ISteps)
-        assert get_sheet(context, ISteps)
+        assert registry.content.get_sheet(context, ISteps)
 
-    def test_includeme_register_value_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IValue
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_value_sheet(self, registry):
+        from .mercator import IValue
         context = testing.DummyResource(__provides__=IValue)
-        assert get_sheet(context, IValue)
+        assert registry.content.get_sheet(context, IValue)
 
-    def test_includeme_register_finance_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IFinance
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_finance_sheet(self, registry):
+        from .mercator import IFinance
         context = testing.DummyResource(__provides__=IFinance)
-        assert get_sheet(context, IFinance)
+        assert registry.content.get_sheet(context, IFinance)
 
-    def test_includeme_register_experience_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IExperience
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_experience_sheet(self, registry):
+        from .mercator import IExperience
         context = testing.DummyResource(__provides__=IExperience)
-        assert get_sheet(context, IExperience)
+        assert registry.content.get_sheet(context, IExperience)
 
-    def test_includeme_register_heardfrom_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IHeardFrom
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_heardfrom_sheet(self, registry):
+        from .mercator import IHeardFrom
         context = testing.DummyResource(__provides__=IHeardFrom)
-        assert get_sheet(context, IHeardFrom)
+        assert registry.content.get_sheet(context, IHeardFrom)
 
 
 class TestTitleSheet:
@@ -109,14 +96,14 @@ class TestTitleSheet:
         from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_mercator.sheets.mercator import ITitle
         from adhocracy_mercator.sheets.mercator import TitleSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
         assert inst.meta.isheet == ITitle
         assert inst.meta.schema_class == TitleSchema
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         wanted = {'title': ''}
         assert inst.get() == wanted
 
@@ -138,14 +125,14 @@ class TestUserInfoSheet:
         from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_mercator.sheets.mercator import IUserInfo
         from adhocracy_mercator.sheets.mercator import UserInfoSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
         assert inst.meta.isheet == IUserInfo
         assert inst.meta.schema_class == UserInfoSchema
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         wanted = {'family_name': '',
                   'personal_name': '',
                   'country': ''}
@@ -169,14 +156,14 @@ class TestOrganizationInfoSheet:
         from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_mercator.sheets.mercator import IOrganizationInfo
         from adhocracy_mercator.sheets.mercator import OrganizationInfoSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
         assert inst.meta.isheet == IOrganizationInfo
         assert inst.meta.schema_class == OrganizationInfoSchema
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         wanted = {'country': '',
                   'help_request': '',
                   'name': '',
@@ -268,14 +255,14 @@ class TestIntroductionSheet:
         from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_mercator.sheets.mercator import IIntroduction
         from adhocracy_mercator.sheets.mercator import IntroductionSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
         assert inst.meta.isheet == IIntroduction
         assert inst.meta.schema_class == IntroductionSchema
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         wanted = {'picture': None, 'teaser': ''}
         assert inst.get() == wanted
 
@@ -302,14 +289,14 @@ class TestDescriptionSheet:
         from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_mercator.sheets.mercator import IDescription
         from adhocracy_mercator.sheets.mercator import DescriptionSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
         assert inst.meta.isheet == IDescription
         assert inst.meta.schema_class == DescriptionSchema
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         wanted = {'description': '',
                   }
         assert inst.get() == wanted
@@ -337,14 +324,14 @@ class TestLocationSheet:
         from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_mercator.sheets.mercator import ILocation
         from adhocracy_mercator.sheets.mercator import LocationSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
         assert inst.meta.isheet == ILocation
         assert inst.meta.schema_class == LocationSchema
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         wanted = {'location_is_specific': False,
                   'location_specific_1': '',
                   'location_specific_2': '',
@@ -376,14 +363,14 @@ class TestOutcomeSheet:
         from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_mercator.sheets.mercator import IOutcome
         from adhocracy_mercator.sheets.mercator import OutcomeSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
         assert inst.meta.isheet == IOutcome
         assert inst.meta.schema_class == OutcomeSchema
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         wanted = {'outcome': ''}
         assert inst.get() == wanted
 
@@ -405,7 +392,7 @@ class TestFinanceSheet:
         from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_mercator.sheets.mercator import IFinance
         from adhocracy_mercator.sheets.mercator import FinanceSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
         assert inst.meta.isheet == IFinance
@@ -413,7 +400,7 @@ class TestFinanceSheet:
 
     def test_get_empty(self, meta, context):
         from decimal import Decimal
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         wanted = {'budget': Decimal(0),
                   'granted': False,
                   'other_sources': '',
@@ -486,14 +473,14 @@ class TestExperienceSheet:
         from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_mercator.sheets.mercator import IExperience
         from adhocracy_mercator.sheets.mercator import ExperienceSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
         assert inst.meta.isheet == IExperience
         assert inst.meta.schema_class == ExperienceSchema
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         wanted = {'experience': '',
                   }
         assert inst.get() == wanted

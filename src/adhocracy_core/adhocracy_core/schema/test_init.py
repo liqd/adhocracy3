@@ -13,17 +13,10 @@ from adhocracy_core.interfaces import IResource
 from pyramid.security import Allow
 from pyramid.security import Deny
 
-############
-#  helper  #
-############
 
-def add_node_binding(node, context=None, request=None):
-    node.bindings = {}
-    if context is not None:
-        node.bindings['context'] = context
-    if request is not None:
-        node.bindings['request'] = request
-    return node
+@fixture
+def registry(registry_with_content):
+    return registry_with_content
 
 
 def _add_post_pool_node(inst: colander.Schema, iresource_or_service_name=IPool):
@@ -141,61 +134,64 @@ class TestInterface():
             inst.deserialize(None, 'adhocracy_core.sheets.tags.NoSuchTag')
 
 
-class NameUnitTest(unittest.TestCase):
+class TestName:
 
-    def setUp(self):
-        self.parent = Mock()
+    @fixture
+    def parent(self, pool):
+        from adhocracy_core.resources.pool import Pool
+        pool.check_name = Mock(spec=Pool.check_name)
+        return pool
+
+    @fixture
+    def context(self, parent, context):
+        parent['context'] = context
+        return context
 
     def make_one(self):
         from adhocracy_core.schema import Name
-        inst = Name()
-        return inst.bind(parent_pool=self.parent)
+        return Name()
 
-    def test_valid(self):
-        inst = self.make_one()
+    def test_valid(self, context):
+        inst = self.make_one().bind(context=context, creating=None)
         assert inst.deserialize('blu.ABC_12-3')
 
-    def test_non_valid_missing_parent_pool_binding(self):
-        inst = self.make_one()
-        inst_no_context = inst.bind()
-        with raises(colander.Invalid):
-            inst_no_context.deserialize('blu.ABC_123')
-
-    def test_non_valid_empty(self):
-        inst = self.make_one()
+    def test_non_valid_empty(self, context):
+        inst = self.make_one().bind(context=context, creating=None)
         with raises(colander.Invalid):
             inst.validator(inst, '')
 
-    def test_non_valid_to_long(self):
-        inst = self.make_one()
+    def test_non_valid_to_long(self, context):
+        inst = self.make_one().bind(context=context, creating=None)
         with raises(colander.Invalid):
             inst.validator(inst, 'x' * 101)
 
-    def test_non_valid_wrong_characters(self):
-        inst = self.make_one()
+    def test_non_valid_wrong_characters(self, context):
+        inst = self.make_one().bind(context=context, creating=None)
         with raises(colander.Invalid):
             inst.validator(inst, 'ä')
 
-    def test_non_valid_not_unique(self):
-        inst = self.make_one()
-        self.parent.check_name.side_effect = KeyError
+    def test_non_valid_not_unique(self, parent, context):
+        inst = self.make_one().bind(context=context, creating=None)
+        parent.check_name.side_effect = KeyError
         with raises(colander.Invalid):
             inst.validator(inst, 'name')
 
-    def test_non_valid_forbbiden_child_name(self):
-        inst = self.make_one()
-        self.parent.check_name.side_effect = ValueError
+    def test_non_valid_forbbiden_child_name(self, parent, context):
+        inst = self.make_one().bind(context=context, creating=None)
+        parent.check_name.side_effect = ValueError
         with raises(colander.Invalid):
             inst.validator(inst, '@@')
 
-    def test_invalid_asdict_output(self):
+    def test_invalid_asdict_output(self, parent, resource_meta):
         """Test case added since we had a bug here."""
-        inst = self.make_one()
+        inst = self.make_one().bind(context=parent, creating=resource_meta)
+        parent.check_name.side_effect = ValueError
         try:
             inst.validator(inst, 'ä')
             assert False
         except colander.Invalid as err:
-            wanted = {'': 'String does not match expected pattern'}
+            wanted = {'': 'The name has forbidden characters or is not a string'
+                          '.; String does not match expected pattern'}
             assert err.asdict() == wanted
 
 
@@ -295,8 +291,8 @@ def test_deferred_content_type_default_call_with_iresource():
     from adhocracy_core.schema import deferred_content_type_default
     context = testing.DummyResource(__provides__=IResourceA)
     node = None
-    bindings = {'context': context}
-    assert deferred_content_type_default(node, bindings) == IResourceA
+    kw = {'context': context, 'creating': None}
+    assert deferred_content_type_default(node, kw) == IResourceA
 
 
 def test_deferred_content_type_default_call_without_iresource():
@@ -306,32 +302,30 @@ def test_deferred_content_type_default_call_without_iresource():
     from adhocracy_core.schema import deferred_content_type_default
     context = testing.DummyResource()
     node = None
-    bindings = {'context': context}
-    assert deferred_content_type_default(node, bindings) == IResource
+    kw = {'context': context, 'creating': None}
+    assert deferred_content_type_default(node, kw) == IResource
 
 
 class TestGetSheetCstructs:
 
-    @fixture
-    def request(self, mock_content_registry):
-        request = testing.DummyRequest()
-        request.registry.content = mock_content_registry
-        return request
-
-    def call_fut(self, context, request):
+    def call_fut(self, *args):
         from . import get_sheet_cstructs
-        return get_sheet_cstructs(context, request)
+        return get_sheet_cstructs(*args)
 
-    def test_call_with_context_without_sheets(self, context, request):
-        assert self.call_fut(context, request) == {}
+    def test_call_with_context_without_sheets(self, context, registry,
+                                              request_):
+        assert self.call_fut(context, registry, request_) == {}
 
-    def test_call_with_context_with_sheets(self, context, request, mock_content_registry, mock_sheet):
-        mock_sheet.get.return_value = {}
+    def test_call_with_context_with_sheets(self, context, registry, request_,
+                                           mock_sheet):
+        mock_sheet.serialize.return_value = {}
         mock_sheet.schema = colander.MappingSchema()
         isheet = mock_sheet.meta.isheet
-        mock_content_registry.get_sheets_read.return_value = [mock_sheet]
-        assert self.call_fut(context, request) == {isheet.__identifier__: {}}
-        assert mock_content_registry.get_sheets_read.call_args[0] == (context, request)
+        registry.content.get_sheets_read.return_value = [mock_sheet]
+        assert self.call_fut(context, registry, request_) == \
+               {isheet.__identifier__: {}}
+        assert registry.content.get_sheets_read.call_args[0] == (context,
+                                                                 request_)
 
 
 class TestResourceObjectUnitTests:
@@ -340,113 +334,89 @@ class TestResourceObjectUnitTests:
         from adhocracy_core.schema import ResourceObject
         return ResourceObject(**kwargs)
 
-    @fixture
-    def request(self, context, mock_content_registry):
-        request = testing.DummyRequest()
-        request.registry.content = mock_content_registry
-        request.root = context
-        return request
-
     def test_serialize_colander_null(self):
         inst = self.make_one()
         result = inst.serialize(None, colander.null)
         assert result == ''
 
-    def test_serialize_value_url_location_aware(self, context, request):
+    def test_serialize_value_url_location_aware(self, context, request_, node):
         inst = self.make_one()
         context['child'] = testing.DummyResource()
-        node = add_node_binding(colander.Mapping(), request=request)
+        node = node.bind(request=request_)
         result = inst.serialize(node, context['child'])
-        assert result == request.application_url + '/child/'
+        assert result == request_.application_url + '/child/'
 
-    def test_serialize_value_url_location_aware_but_missing_request(self, context):
-        inst = self.make_one()
-        context['child'] = testing.DummyResource()
-        node = add_node_binding(colander.Mapping())
-        with raises(AssertionError):
-            inst.serialize(node, context['child'])
-
-    def test_serialize_value_url_not_location_aware(self, request):
+    def test_serialize_value_url_not_location_aware(self, request_, node):
         inst = self.make_one()
         child = testing.DummyResource()
         del child.__name__
-        node = add_node_binding(colander.Mapping(), request=request)
+        node = node.bind(request=request_)
         with raises(colander.Invalid):
             inst.serialize(node, child)
 
-    def test_serialize_value_url_location_aware_without_parent_and_name(self, context, request):
+    def test_serialize_value_url_location_aware_without_parent_and_name(
+            self, request_, node):
         inst = self.make_one()
         child = testing.DummyResource()
-        node = add_node_binding(colander.Mapping(), request=request)
+        node = node.bind(request=request_)
         result = inst.serialize(node, child)
-        assert result == request.application_url + '/'
+        assert result == request_.application_url + '/'
 
-    def test_serialize_value_url_location_aware_with_serialize_to_content(self, context, request):
+    def test_serialize_value_url_location_aware_with_serialize_to_content(
+            self, context, request_, registry, node):
         from adhocracy_core.interfaces import IResource
         inst = self.make_one(serialization_form='content')
         context['child'] = testing.DummyResource(__provides__=IResource)
-        node = add_node_binding(colander.Mapping(),
-                                context=context['child'],
-                                request=request)
+        node = node.bind(context=context['child'],
+                         request=request_,
+                         registry=registry,
+                         creating=None)
         result = inst.serialize(node, context['child'])
         assert result == {'content_type': 'adhocracy_core.interfaces.IResource',
                           'data': {},
-                          'path': request.application_url + '/child/'}
+                          'path': request_.application_url + '/child/'}
 
-    def test_serialize_value_url_location_aware_with_serialize_to_path(self, context):
+    def test_serialize_value_url_location_aware_with_serialize_to_path(
+            self, context, node):
         inst = self.make_one(serialization_form='path')
         context['child'] = testing.DummyResource()
-        node = add_node_binding(colander.Mapping(), context=context)
+        node = node.bind(context=context)
         result = inst.serialize(node, context['child'])
         assert result == '/child'
 
-    def test_serialize_value_url_location_aware_with_serialize_to_path_without_context_binding(self, context):
-        inst = self.make_one(serialization_form='path')
-        context['child'] = testing.DummyResource()
-        node = add_node_binding(colander.Mapping())
-        with raises(AssertionError):
-            inst.serialize(node, context['child'])
-
-    def test_deserialize_value_null(self):
+    def test_deserialize_value_null(self, node):
         inst = self.make_one()
-        node = colander.Mapping()
         result = inst.deserialize(node, colander.null)
         assert result == colander.null
 
-    def test_deserialize_value_url_valid_path(self, context, request):
+    def test_deserialize_value_url_valid_path(self, context, request_, node):
         inst = self.make_one()
         context['child'] = testing.DummyResource()
-        node = add_node_binding(colander.Mapping(), request=request)
-        result = inst.deserialize(node, request.application_url + '/child')
+        node = node.bind(request=request_,
+                         context=context)
+        result = inst.deserialize(node, request_.application_url + '/child')
         assert result == context['child']
 
-    def test_deserialize_value_url_invalid_path_wrong_child_name(self, request):
+    def test_deserialize_value_url_invalid_path_wrong_child_name(
+            self, request_, node):
         inst = self.make_one()
-        node = add_node_binding(colander.Mapping(), request=request)
+        node = node.bind(request_=request_)
         with raises(colander.Invalid):
-            inst.deserialize(node, request.application_url + '/wrong_child')
+            inst.deserialize(node, request_.application_url + '/wrong_child')
 
-    def test_deserialize_value_url_invalid_path_to_short(self, request):
+    def test_deserialize_value_url_invalid_path_to_short(self, request_, node):
         inst = self.make_one()
-        node = add_node_binding(colander.Mapping(), request=request)
+        node = node.bind(request=request_)
         with raises(colander.Invalid):
             inst.deserialize(node, 'htp://x.x')
 
-    def test_deserialize_value_path_location_aware(self, context):
+    def test_deserialize_value_path_location_aware(self, context, node):
         inst = self.make_one()
         context['child'] = testing.DummyResource()
-        node = add_node_binding(colander.Mapping(), context=context)
+        node = node.bind(context=context)
         child_url = '/child/'
         result = inst.deserialize(node, child_url)
         assert result == context['child']
-
-    def test_deserialize_value_path_location_aware_without_context_binding(self, context):
-        inst = self.make_one()
-        context['child'] = testing.DummyResource()
-        node = add_node_binding(colander.Mapping())
-        child_url = '/child/'
-        with raises(AssertionError):
-            inst.deserialize(node, child_url)
 
 
 class TestResource:
@@ -474,7 +444,6 @@ class ReferenceUnitTest(unittest.TestCase):
         self.target = testing.DummyResource()
         self.child = testing.DummyResource()
         request = testing.DummyRequest()
-        request.root = self.context
         self.request = request
 
     def test_create(self):
@@ -494,23 +463,17 @@ class ReferenceUnitTest(unittest.TestCase):
         inst = self.make_one()
         isheet = inst.reftype.getTaggedValue('target_isheet')
         alsoProvides(self.target, isheet)
-        inst = add_node_binding(node=inst, request=self.request)
+        inst = inst.bind(request=self.request)
         assert inst.validator(inst, self.target) is None
 
     def test_nonvalid_interface(self):
         inst = self.make_one()
-        inst = add_node_binding(node=inst, request=self.request)
+        inst = inst.bind(request=self.request)
         with raises(colander.Invalid):
             inst.validator(inst, self.target)
 
 
 class TestResources:
-
-    @fixture
-    def request(self, context):
-        request = testing.DummyRequest()
-        request.root = context
-        return request
 
     def make_one(self, **kwargs):
         from adhocracy_core.schema import Resources
@@ -527,29 +490,27 @@ class TestResources:
         inst = self.make_one(default=[1])
         assert inst.default == [1]
 
-    def test_serialize(self, request):
-        inst = self.make_one().bind(request=request)
+    def test_serialize(self, request_, context):
+        inst = self.make_one().bind(context=context, request=request_)
         child = testing.DummyResource()
-        request.root['child'] = child
-        child_url = request.resource_url(child)
+        context['child'] = child
+        child_url = request_.resource_url(child)
         assert inst.serialize([child]) == [child_url]
 
-    def test_deserialize(self, request):
-        inst = self.make_one().bind(request=request)
+    def test_deserialize(self, request_, context):
+        inst = self.make_one().bind(context=context, request=request_)
         child = testing.DummyResource()
-        request.root['child'] = child
-        child_url = request.resource_url(child)
+        context['child'] = child
+        child_url = request_.resource_url(child)
         assert inst.deserialize([child_url]) == [child]
 
 
 class TestReferences:
 
     @fixture
-    def request(self, context):
+    def context(self, context):
         context['target'] = testing.DummyResource()
-        request = testing.DummyRequest()
-        request.root = context
-        return request
+        return context
 
     def make_one(self, **kwargs):
         from adhocracy_core.schema import References
@@ -569,17 +530,17 @@ class TestReferences:
         inst = self.make_one(backref=True)
         assert inst.backref
 
-    def test_valid_interface(self, request):
+    def test_valid_interface(self, request_, context):
         from zope.interface import alsoProvides
-        inst = self.make_one().bind(request=request)
+        inst = self.make_one().bind(request=request_)
         isheet = inst.reftype.getTaggedValue('target_isheet')
-        target = request.root['target']
+        target = context['target']
         alsoProvides(target, isheet)
         assert inst.validator(inst, [target]) is None
 
-    def test_nonvalid_interface(self, request):
-        inst = self.make_one().bind(request=request)
-        target = request.root['target']
+    def test_nonvalid_interface(self, request_, context):
+        inst = self.make_one().bind(request=request_)
+        target = context['target']
         with raises(colander.Invalid):
             inst.validator(inst, [target])
 
@@ -587,13 +548,11 @@ class TestReferences:
 class TestUniqueReferences:
 
     @fixture
-    def request(self, context):
+    def context(self, context):
         from adhocracy_core.interfaces import ISheet
         context['target'] = testing.DummyResource(__provides__=ISheet)
         context['target1'] = testing.DummyResource(__provides__=ISheet)
-        request = testing.DummyRequest()
-        request.root = context
-        return request
+        return context
 
     def make_one(self, **kwargs):
         from adhocracy_core.schema import UniqueReferences
@@ -604,22 +563,22 @@ class TestUniqueReferences:
         inst = self.make_one()
         assert isinstance(inst, References)
 
-    def test_valid_deserialize_with_colander_null(self, request):
-        inst = self.make_one().bind(request=request)
+    def test_valid_deserialize_with_colander_null(self, request_):
+        inst = self.make_one().bind(request_=request_)
         assert inst.deserialize(colander.null) == []
 
-    def test_valid_deserialize_with_duplication(self, request):
-        inst = self.make_one().bind(request=request)
-        target = request.root['target']
-        target_url = request.resource_url(target)
+    def test_valid_deserialize_with_duplication(self, request_, context):
+        inst = self.make_one().bind(request=request_, context=context)
+        target = context['target']
+        target_url = request_.resource_url(target)
         assert inst.deserialize([target_url, target_url]) == [target]
 
-    def test_valid_deserialize_without_duplication(self, request):
-        inst = self.make_one().bind(request=request)
-        target = request.root['target']
-        target1 = request.root['target1']
-        target_url = request.resource_url(target)
-        target1_url = request.resource_url(target1)
+    def test_valid_deserialize_without_duplication(self, request_, context):
+        inst = self.make_one().bind(request=request_, context=context)
+        target = context['target']
+        target1 = context['target1']
+        target_url = request_.resource_url(target)
+        target1_url = request_.resource_url(target1)
         assert inst.deserialize([target_url, target1_url]) == [target, target1]
 
 
@@ -917,10 +876,6 @@ class TestCreatePostPoolValidator:
         return pool
 
     @fixture
-    def registry(self, registry_with_content):
-        return registry_with_content
-
-    @fixture
     def back_reference_sheet(self, mock_sheet):
         schema = colander.MappingSchema()
         _add_post_pool_node(schema, iresource_or_service_name='right')
@@ -932,12 +887,6 @@ class TestCreatePostPoolValidator:
         _add_reference_node(node)
         _add_other_node(node)
         return node
-
-    @fixture
-    def request_(self, context):
-        request = testing.DummyRequest()
-        request.root = context
-        return request
 
     def test_raise_if_missing_post_pool_reference(
             self, node, back_reference_sheet, context, registry):

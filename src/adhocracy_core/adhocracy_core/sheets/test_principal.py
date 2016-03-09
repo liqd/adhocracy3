@@ -12,13 +12,18 @@ class TestPasswordSheet:
         from adhocracy_core.sheets.principal import password_meta
         return password_meta
 
+    @fixture
+    def inst(self, meta, context, registry):
+        inst = meta.sheet_class(meta, context, registry)
+        return inst
+
     def test_create(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_core.sheets.principal import IPasswordAuthentication
         from adhocracy_core.sheets.principal import PasswordAuthenticationSheet
         from adhocracy_core.sheets.principal import PasswordAuthenticationSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert isinstance(inst, PasswordAuthenticationSheet)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
@@ -26,57 +31,47 @@ class TestPasswordSheet:
         assert inst.meta.schema_class == PasswordAuthenticationSchema
         assert inst.meta.permission_create == 'create_user'
 
-    def test_set_password(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+    def test_set_password(self, inst):
         inst.set({'password': 'test'})
         assert len(inst.context.password) == 60
 
-    def test_reset_password(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+    def test_reset_password(self, inst):
         inst.set({'password': 'test'})
         password_old = inst.context.password
         inst.set({'password': 'test'})
         password_new = inst.context.password
         assert password_new != password_old
 
-    def test_set_empty_password(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+    def test_set_empty_password(self, inst):
         inst.set({'password': ''})
         assert not hasattr(inst.context, 'password')
 
-    def test_get_password(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+    def test_get_password(self, inst):
         inst.context.password = 'test'
         assert inst.get()['password'] == 'test'
 
-    def test_get_empty_password(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+    def test_get_empty_password(self, inst):
         assert inst.get()['password'] == ''
 
-    def test_check_password_valid(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+    def test_check_password_valid(self, inst):
         inst.set({'password': 'test'})
         assert inst.check_plaintext_password('test')
 
-    def test_check_password_not_valid(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+    def test_check_password_not_valid(self, inst):
         inst.set({'password': 'test'})
         assert not inst.check_plaintext_password('wrong')
 
-    def test_check_password_is_too_long(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+    def test_check_password_is_too_long(self, inst):
         password = 'x' * 40026
         with raises(ValueError):
             inst.check_plaintext_password(password)
 
 
-def test_includeme_register_password_sheet(config):
+@mark.usefixtures('integration')
+def test_includeme_register_password_sheet(registry):
     from adhocracy_core.sheets.principal import IPasswordAuthentication
-    from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.sheets.principal')
     context = testing.DummyResource(__provides__=IPasswordAuthentication)
-    assert get_sheet(context, IPasswordAuthentication)
+    assert registry.content.get_sheet(context, IPasswordAuthentication)
 
 
 class TestUserBasicSchema:
@@ -183,66 +178,52 @@ class TestCaptchaSchema:
 
 class TestDeferredValidateUserName:
 
-    @fixture
-    def requestp(self, registry):
-        return testing.DummyRequest(root=testing.DummyResource(),
-                                    registry=registry)
-
     def call_fut(self, node, kw):
         from adhocracy_core.sheets.principal import deferred_validate_user_name
         return deferred_validate_user_name(node, kw)
 
-    def test_name_is_empty_and_no_request_kw(self, node, mock_user_locator):
+    def test_name_is_empty(self, node, kw, mock_user_locator):
         mock_user_locator.get_user_by_login.return_value = None
-        assert self.call_fut(node, {}) is None
-
-    def test_name_is_empty(self, node, requestp, mock_user_locator):
-        mock_user_locator.get_user_by_login.return_value = None
-        validator = self.call_fut(node, {'request': requestp})
+        validator = self.call_fut(node, kw)
         assert validator(node, '') is None
 
-    def test_name_is_unique(self, node, requestp, mock_user_locator):
+    def test_name_is_unique(self, node, kw, mock_user_locator):
         mock_user_locator.get_user_by_login.return_value = None
-        validator = self.call_fut(node, {'request': requestp})
+        validator = self.call_fut(node, kw)
         assert validator(node, 'unique') is None
 
-    def test_name_is_not_unique(self, node, requestp, mock_user_locator):
+    def test_name_is_not_unique(self, node, kw, mock_user_locator):
         mock_user_locator.get_user_by_login.return_value = object()
-        validator = self.call_fut(node, {'request': requestp})
+        validator = self.call_fut(node, kw)
         with raises(colander.Invalid):
             validator(node, 'not unique')
 
 
 class TestDeferredValidateUserEmail:
 
-    @fixture
-    def request(self, registry):
-        return testing.DummyRequest(root=testing.DummyResource(),
-                                    registry=registry)
-
     def call_fut(self, node, kw):
         from adhocracy_core.sheets.principal import deferred_validate_user_email
         return deferred_validate_user_email(node, kw)
 
-    def test_email_is_empty(self, node, request, mock_user_locator):
+    def test_email_is_empty(self, node, kw, mock_user_locator):
         mock_user_locator.get_user_by_email.return_value = None
-        validator = self.call_fut(node, {'request': request})
+        validator = self.call_fut(node, kw)
         with raises(colander.Invalid):
             validator(node, '') is None
 
-    def test_email_is_wrong(self, node, request, mock_user_locator):
-        validator = self.call_fut(node, {'request': request})
+    def test_email_is_wrong(self, node, kw, mock_user_locator):
+        validator = self.call_fut(node, kw)
         with raises(colander.Invalid):
              validator(node, 'wrong_email') is None
 
-    def test_email_is_unique(self, node, request, mock_user_locator):
+    def test_email_is_unique(self, node, kw, mock_user_locator):
         mock_user_locator.get_user_by_email.return_value = None
-        validator = self.call_fut(node, {'request': request})
+        validator = self.call_fut(node, kw)
         assert validator(node, 'test@test.de') is None
 
-    def test_email_is_not_unique(self, node, request, mock_user_locator):
+    def test_email_is_not_unique(self, node, kw, mock_user_locator):
         mock_user_locator.get_user_by_email.return_value = object()
-        validator = self.call_fut(node, {'request': request})
+        validator = self.call_fut(node, kw)
         with raises(colander.Invalid):
             validator(node, 'not unique')
 
@@ -258,14 +239,14 @@ class TestUserBasicSheet:
         from adhocracy_core.sheets.principal import IUserBasic
         from adhocracy_core.sheets.principal import UserBasicSchema
         from adhocracy_core.sheets import AttributeResourceSheet
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert isinstance(inst, AttributeResourceSheet)
         assert inst.meta.isheet == IUserBasic
         assert inst.meta.schema_class == UserBasicSchema
         assert inst.meta.permission_create == 'create_user'
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'name': ''}
 
 
@@ -280,7 +261,7 @@ class TestUserExtendedSheet:
         from adhocracy_core.sheets.principal import IUserExtended
         from adhocracy_core.sheets.principal import UserExtendedSchema
         from adhocracy_core.sheets import AttributeResourceSheet
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert isinstance(inst, AttributeResourceSheet)
         assert inst.meta.isheet == IUserExtended
         assert inst.meta.schema_class == UserExtendedSchema
@@ -289,7 +270,7 @@ class TestUserExtendedSheet:
         assert inst.meta.permission_edit == 'edit_userextended'
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'email': '', 'tzname': 'UTC'}
 
 
@@ -299,6 +280,11 @@ class TestCaptchaSheet:
     def meta(self):
         from adhocracy_core.sheets.principal import captcha_meta
         return captcha_meta
+
+    @fixture
+    def inst(self, meta, context, registry):
+        inst = meta.sheet_class(meta, context, registry)
+        return inst
 
     def test_meta(self, meta):
         from . import principal
@@ -314,24 +300,21 @@ class TestCaptchaSheet:
     def test_create(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
 
-    def test_get_returns_default_values(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+    def test_get_returns_default_values(self, inst):
         assert inst.get() == {'id': '', 'solution': ''}
 
-    def test_set_does_not_store_data(self, mocker, meta, context):
-        inst = meta.sheet_class(meta, context)
+    def test_set_does_not_store_data(self, inst):
         inst.set({'id': '1', 'solution': '1'})
         assert inst.get() == {'id': '', 'solution': ''}
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, registry, meta):
-        from adhocracy_core.utils import get_sheet
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
     def test_includeme_set_create_mandatory_if_captcha_enabled(self, config,
                                                                meta):
@@ -349,13 +332,6 @@ class TestPermissionsSchema:
     def context(self, context):
         context.roles = []
         return context
-
-    @fixture
-    def request(self, context, registry):
-        request = testing.DummyRequest()
-        request.registry = registry
-        request.root = context
-        return request
 
     @fixture
     def group(self, context):
@@ -382,23 +358,22 @@ class TestPermissionsSchema:
         inst = self.make_one()
         assert inst.deserialize({}) == {'groups': []}
 
-    def test_serialize_empty(self):
-        inst = self.make_one().bind()
+    def test_serialize_empty(self, context):
+        inst = self.make_one().bind(context=context)
         assert inst.serialize({}) == {'groups': [],
                                       'roles': [],
                                       'roles_and_group_roles': []}
 
-    def test_serialize_with_groups_and_roles(self, context, group, request):
+    def test_serialize_with_groups_and_roles(self, context, group, request_):
         context.roles = ['view']
         context.group_ids = ['/group']
         group.roles = ['admin']
         appstruct = {'groups': [group], 'roles': ['view']}
-        inst = self.make_one().bind(context=context, request=request)
+        inst = self.make_one().bind(context=context, request=request_)
         assert inst.serialize(appstruct) == \
-            {'groups': [request.application_url + '/group/'],
+            {'groups': [request_.application_url + '/group/'],
              'roles': ['view'],
              'roles_and_group_roles': ['admin', 'view']}
-
 
 
 class TestPermissionsSheet:
@@ -410,6 +385,10 @@ class TestPermissionsSheet:
         return context
 
     @fixture
+    def inst(self, meta, context, registry):
+        return meta.sheet_class(meta, context, registry)
+
+    @fixture
     def meta(self):
         from adhocracy_core.sheets.principal import permissions_meta
         return permissions_meta
@@ -419,7 +398,7 @@ class TestPermissionsSheet:
         from adhocracy_core.sheets.principal import PermissionsSchema
         from adhocracy_core.sheets.principal import \
             PermissionsAttributeResourceSheet
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert isinstance(inst, PermissionsAttributeResourceSheet)
         assert inst.meta.isheet == IPermissions
         assert inst.meta.schema_class == PermissionsSchema
@@ -427,28 +406,22 @@ class TestPermissionsSheet:
         assert inst.meta.permission_edit == 'create_edit_sheet_permissions'
         assert inst.meta.permission_view == 'view_userextended'
 
-    def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+    def test_get_empty(self, inst):
         assert inst.get() == {'groups': [],
                               'roles': [],
                               'roles_and_group_roles': [],
                               }
 
-    def test_set_groups(self, meta, context):
+    def test_set_groups(self, inst, context):
         group = testing.DummyResource()
         context['group'] = group
-        inst = meta.sheet_class(meta, context)
         inst.set({'groups': [group]})
         assert context.group_ids == ['/group']
 
-
-def test_includeme_register_permissions_sheet(config):
-    from adhocracy_core.sheets.principal import IPermissions
-    from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.sheets.principal')
-    context = testing.DummyResource(__provides__=IPermissions)
-    assert get_sheet(context, IPermissions)
+    @mark.usefixtures('integration')
+    def test_includeme_register_permissions_sheet(self, meta, registry):
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestGroupSheet:
@@ -462,23 +435,18 @@ class TestGroupSheet:
         from adhocracy_core.sheets.principal import IGroup
         from adhocracy_core.sheets.principal import GroupSchema
         from adhocracy_core.sheets import AttributeResourceSheet
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert isinstance(inst, AttributeResourceSheet)
         assert inst.meta.isheet == IGroup
         assert inst.meta.schema_class == GroupSchema
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'users': [],
                               'roles': [],
                               }
 
-
-def test_includeme_register_group_sheet(config):
-    from adhocracy_core.sheets.principal import IGroup
-    from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.sheets.principal')
-    context = testing.DummyResource(__provides__=IGroup)
-    inst = get_sheet(context, IGroup)
-    assert inst.meta.isheet is IGroup
+    @mark.usefixtures('integration')
+    def test_includeme_register_sheet(self, meta, registry):
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)

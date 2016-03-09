@@ -18,8 +18,6 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.name import IName
 from adhocracy_core.sheets.pool import IPool
-from adhocracy_core.utils import get_sheet
-from adhocracy_core.utils import get_sheet_field
 
 
 class IBadge(ISheet):
@@ -78,9 +76,7 @@ class BadgeGroupReference(SheetToSheet):
 def deferred_groups_default(node: colander.SchemaNode, kw: dict) -> []:
     """Return badge groups."""
     from adhocracy_core.resources.badge import IBadgeGroup  # no circle imports
-    context = kw.get('context', None)
-    if context is None:
-        return []
+    context = kw['context']
     parents = [x for x in lineage(context)][1:]
     groups = []
     for parent in parents:
@@ -164,17 +160,23 @@ def create_unique_badge_assignment_validator(badge_ref: Reference,
     :param:`kw`: dictionary with keys `context` and `registry`.
     """
     context = kw['context']
+    registry = kw['registry']
 
     def validator(node, value):
         new_badge = node.get_value(value, badge_ref.name)
-        new_badge_name = get_sheet_field(new_badge, IName, 'name')
+        new_badge_name = registry.content.get_sheet_field(new_badge,
+                                                          IName,
+                                                          'name')
         new_object = node.get_value(value, object_ref.name)
         pool = find_service(context, 'badge_assignments')
         for badge_assignment in pool.values():
-            badge_sheet_values = get_sheet(badge_assignment,
-                                           IBadgeAssignment).get()
+            badge_sheet_values = registry.content.get_sheet(
+                badge_assignment,
+                IBadgeAssignment).get()
             badge = badge_sheet_values['badge']
-            badge_name = get_sheet_field(badge, IName, 'name')
+            badge_name = registry.content.get_sheet_field(badge,
+                                                          IName,
+                                                          'name')
             obj = badge_sheet_values['object']
             updating_current_assignment = context == badge_assignment
             if new_badge_name == badge_name \
@@ -188,9 +190,7 @@ def create_unique_badge_assignment_validator(badge_ref: Reference,
 @colander.deferred
 def deferred_validate_badge(node, kw):
     """Check `assign_badge` permission and ISheet interface of `badge` node."""
-    request = kw.get('request', None)
-    if request is None:
-        return
+    request = kw['request']
 
     def check_assign_badge_permisson(node, value):
         if not request.has_permission('assign_badge', value):

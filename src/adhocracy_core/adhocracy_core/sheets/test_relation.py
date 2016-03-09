@@ -15,10 +15,14 @@ def integration(config):
 class TestPolarizableSheet:
 
     @fixture
-    def inst(self, pool, service):
+    def meta(self):
+        from .relation import polarizable_meta
+        return polarizable_meta
+
+    @fixture
+    def inst(self, pool, meta, service):
         pool['relations'] = service
-        from adhocracy_core.sheets.relation import polarizable_meta
-        return polarizable_meta.sheet_class(polarizable_meta, pool)
+        return meta.sheet_class(meta, pool, None)
 
     def test_create(self, inst):
         from adhocracy_core.sheets import AnnotationRessourceSheet
@@ -48,14 +52,14 @@ class TestPolarizationSheet:
         from adhocracy_core.sheets.relation import IPolarization
         from adhocracy_core.sheets.relation import PolarizationSchema
         from adhocracy_core.sheets import AnnotationRessourceSheet
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert isinstance(inst, AnnotationRessourceSheet)
         assert inst.meta.isheet == IPolarization
         assert inst.meta.schema_class == PolarizationSchema
         assert inst.meta.create_mandatory
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'subject': None,
                               'object': None,
                               'position': 'pro',

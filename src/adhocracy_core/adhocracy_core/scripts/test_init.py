@@ -12,7 +12,6 @@ from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.name import IName
 from adhocracy_core.sheets.badge import IBadgeAssignment
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.resources.badge import IBadge
 
 
@@ -43,7 +42,9 @@ class TestImportResources:
         root = registry.content.create(IRootPool.__identifier__)
         import_resources(root, registry, filename)
         assert IOrganisation.providedBy(root['alt-treptow'])
-        assert get_sheet_field(root['alt-treptow'], IName, 'name') == 'alt-treptow'
+        assert registry.content.get_sheet_field(root['alt-treptow'],
+                                                IName,
+                                                'name') == 'alt-treptow'
 
 
     def test_import_resources_invalid_data(self, registry, log):
@@ -84,7 +85,9 @@ class TestImportResources:
         # try readding
         import_resources(root, registry, filename)
         assert IOrganisation.providedBy(root['alt-treptow'])
-        assert get_sheet_field(root['alt-treptow'], IName, 'name') == 'alt-treptow'
+        assert registry.content.get_sheet_field(root['alt-treptow'],
+                                                IName,
+                                                'name') == 'alt-treptow'
 
     def test_import_resources_already_oneleveldeep(self, registry, principals,
                                                    log):
@@ -124,7 +127,9 @@ class TestImportResources:
         import_resources(root, registry, filename)
         assert IOrganisation.providedBy(root['alt-treptow'])
         god = root['principals']['users'].values()[0]
-        assert get_sheet_field(root['alt-treptow'], IMetadata, 'creator') == god
+        assert registry.content.get_sheet_field(root['alt-treptow'],
+                                                IMetadata,
+                                                'creator') == god
 
     def test_import_resource_create_group(self, registry, log):
         from adhocracy_core.scripts import import_resources
@@ -187,18 +192,18 @@ class TestImportResources:
                                 orga['badges'],
                                 appstructs=badge_appstructs,
                                 registry=registry)
-
         import_resources(root, registry, filename)
         assignments = find_resource(root, '/principals/users/badge_assignments/')
         assignment = list(assignments.values())[0]
-        subject = get_sheet_field(assignment, IBadgeAssignment, 'subject')
+        subject = registry.content.get_sheet_field(assignment,
+                                                   IBadgeAssignment,
+                                                   'subject')
         user_locator = _get_user_locator(root, registry)
         god = user_locator.get_user_by_login('god')
         assert subject == god
 
     def test_raise_when_resolving_non_existing_user(self, registry):
         from adhocracy_core.scripts import import_resources
-        from .import_users import _get_user_locator
 
         (self._tempfd, filename) = mkstemp()
         with open(filename, 'w') as f:

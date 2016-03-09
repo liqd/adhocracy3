@@ -11,14 +11,12 @@ import copy
 import json
 import pprint
 
-
 from pyramid.compat import is_nonstr_iter
 from pyramid.location import lineage
 from pyramid.request import Request
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
-from pyramid.threadlocal import get_current_registry
 from substanced.util import acquire
 from substanced.util import find_catalog
 from substanced.util import get_dotted_name
@@ -30,7 +28,6 @@ import colander
 
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.interfaces import IResourceSheet
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.interfaces import IResourceSheetModified
@@ -74,19 +71,6 @@ def get_matching_isheet(context, isheet: IInterface) -> IInterface:
         if iface.isOrExtends(isheet):
             return iface
     return None
-
-
-def get_sheet(context, isheet: IInterface, registry: Registry=None)\
-        -> IResourceSheet:
-    """Get sheet adapter for the `isheet` interface.
-
-    :raises adhocracy_core.exceptions.RuntimeConfigurationError:
-        if there is no `isheet` sheet registered for context.
-
-    """
-    if registry is None:
-        registry = get_current_registry(context)
-    return registry.content.get_sheet(context, isheet)
 
 
 def get_all_taggedvalues(iface: IInterface) -> dict:
@@ -280,20 +264,6 @@ def nested_dict_set(d: dict, keys: list, value: object):
     for key in keys[:-1]:
         d = d.setdefault(key, {})
     d[keys[-1]] = value
-
-
-def get_sheet_field(resource, isheet: ISheet, field_name: str,
-                    registry: Registry=None) -> object:
-    """Return value of `isheet` field `field_name` for `resource`.
-
-    :raise KeyError: if `field_name` does not exists for `isheet` sheets.
-    :raises adhocracy_core.exceptions.RuntimeConfigurationError:
-        if there is no `isheet` sheet registered for context.
-
-    """
-    sheet = get_sheet(resource, isheet, registry=registry)
-    field = sheet.get()[field_name]
-    return field
 
 
 def unflatten_multipart_request(request: Request) -> dict:

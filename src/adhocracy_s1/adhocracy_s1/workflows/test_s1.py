@@ -29,8 +29,7 @@ class TestDoTransitionToPropose:
         mock_sheet.get.return_value = {'state_data': [{'name': 'result',
                                                        'start_date': '2015'}]}
         self.call_fut(context, request_)
-        mock_sheet.set.assert_called_with({'state_data': [{'name': 'result'}]},
-                                          request=request_)
+        mock_sheet.set.assert_called_with({'state_data': [{'name': 'result'}]})
 
 
 class TestDoTransitionToVotable:
@@ -62,8 +61,7 @@ class TestDoTransitionToVotable:
         context['child'] = testing.DummyResource()
         mock_sheet.get.return_value = {'workflow_state': 'proposed'}
         self.call_fut(context, request_, )
-        mock_sheet.set.assert_called_with({'workflow_state': 'voteable'},
-                                          request=request_)
+        mock_sheet.set.assert_called_with({'workflow_state': 'voteable'})
 
 
 class TestChangeChildrenToSelectedRejected:
@@ -129,6 +127,7 @@ class TestChangeChildrenToSelectedRejected:
             self, context, item, request_, registry, mock_sheet, mock_catalogs):
         from copy import copy
         from datetime import datetime
+        request_.registry = registry
         version_most_rated = testing.DummyResource()
         item['version'] = version_most_rated
         item2 = item.clone()

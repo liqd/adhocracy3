@@ -1,6 +1,5 @@
 from adhocracy_core.authorization import IRootACMExtension
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.schema import ACM
 
 
 # flake8: noqa

@@ -399,10 +399,7 @@ def mock_content_registry() -> Mock:
     mock.get_sheets_edit.return_value = []
     mock.get_sheets_create.return_value = []
     mock.get_sheet.return_value = None
-    mock.sheets_read = {}
-    mock.sheets_edit = {}
-    mock.sheets_create = {}
-    mock.sheets_create_mandatory = {}
+    mock.get_sheet_field = lambda x, y, z: mock.get_sheet(x, y).get()[z]
     return mock
 
 
@@ -425,6 +422,23 @@ def config(request) -> Configurator:
 def registry(config) -> object:
     """Return dummy registry."""
     return config.registry
+
+
+@fixture
+def kw(context, registry, request_) -> dict:
+    """Return default keyword arguments for schema binding.
+
+    Available kwargs: request, content, registry, creating
+
+    Note: If the registry keyword is not need, this fixture should not be
+          used. This makes the tests run faster and we don't declare needless
+          dependencies.
+    """
+    return {'request': request_,
+            'registry': registry,
+            'context': context,
+            'creating': None,
+            }
 
 
 @fixture
@@ -498,6 +512,8 @@ def app_settings(request) -> dict:
         'pyramid_tm',
         # mock mail server
         'pyramid_mailer.testing',
+        # force error logging
+        'pyramid_exclog',
     ]
     settings['mail.default_sender'] = 'substanced_demo@example.com'
     settings['adhocracy.abuse_handler_mail'] = \

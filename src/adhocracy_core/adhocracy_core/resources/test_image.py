@@ -232,13 +232,12 @@ class TestImage:
         from adhocracy_core.sheets.asset import IAssetData
         from adhocracy_core.sheets.image import IImageMetadata
         from .image import IImageDownload
-        from adhocracy_core.utils import get_sheet
         file = Mock(mimetype='image/png', size=100, title='title')
         appstructs = {IAssetData.__identifier__: {'data': file}}
         res = registry.content.create(meta.iresource.__identifier__,
                                       appstructs=appstructs,
                                       parent=pool)
-        meta = get_sheet(res, IImageMetadata).get()
+        meta = registry.content.get_sheet(res, IImageMetadata).get()
         assert meta['filename'] == 'title'
         assert meta['size'] == 100
         assert meta['detail'] == res['0000000']

@@ -82,14 +82,12 @@ class TestAsset:
     def test_create(self, registry, meta, pool):
         from adhocracy_core.sheets.asset import IAssetData
         from adhocracy_core.sheets.asset import IAssetMetadata
-        from .asset import IAssetDownload
-        from adhocracy_core.utils import get_sheet
         file = Mock(mimetype='image/png', size=100, title='title')
         appstructs = {IAssetData.__identifier__: {'data': file}}
         res = registry.content.create(meta.iresource.__identifier__,
                                       appstructs=appstructs,
                                       parent=pool)
-        meta = get_sheet(res, IAssetMetadata).get()
+        meta = registry.content.get_sheet(res, IAssetMetadata).get()
         assert meta['filename'] == 'title'
         assert meta['size'] == 100
 
