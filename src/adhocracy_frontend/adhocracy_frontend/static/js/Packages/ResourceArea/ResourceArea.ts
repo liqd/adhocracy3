@@ -374,7 +374,12 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
                 return _.extend(defaults, meta, specifics, search);
             });
-        }, () => {
+        }, (error) => {
+            _.forEach(error, function(value) {
+                if ((<any>value).code === 403) {
+                    throw 403;
+                }
+            });
             throw 404;
         });
     }
