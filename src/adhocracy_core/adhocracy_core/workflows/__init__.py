@@ -79,33 +79,32 @@ def _add_defaults(appstruct: PMap, registry: Registry) -> PMap:
     default_name = appstruct.get('defaults', '')
     if not default_name:
         return appstruct
-    overwrite = registry.content.workflows_meta[default_name]
+    updated = registry.content.workflows_meta[default_name]
     for key, value in appstruct.items():
         if key in ['initial_state', 'defaults']:
-            overwrite = overwrite.transform([key], value)
+            updated = updated.transform([key], value)
         elif key == 'transitions':
             for transition_name, transition in value.items():
-                overwrite = overwrite.transform(['transitions',
-                                                 transition_name],
-                                                transition)
+                updated = updated.transform(['transitions', transition_name],
+                                            transition)
         elif key == 'states':
             for state_name, state in value.items():
                 for permission in state.get('acm', {}).get('permissions', []):
                     name = permission[0]
                     permissions = \
-                        overwrite['states'][state_name]['acm']['permissions']
+                        updated['states'][state_name]['acm']['permissions']
                     editing = name in [p[0] for p in permissions]
                     if editing:
-                        overwrite = overwrite.transform(
+                        updated = updated.transform(
                             ['states', state_name, 'acm', 'permissions',
-                             match_permission(overwrite, state_name, name)],
+                             match_permission(updated, state_name, name)],
                             permission)
                     else:
                         updated_permissions = permissions.append(permission)
-                        overwrite = overwrite.transform(
+                        updated = updated.transform(
                             ['states', state_name, 'acm', 'permissions'],
                             updated_permissions)
-    return overwrite
+    return updated
 
 
 def _create_workflow(appstruct: PMap,
