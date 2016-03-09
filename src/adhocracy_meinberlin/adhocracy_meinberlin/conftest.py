@@ -14,6 +14,7 @@ def app_router(app_settings):
 @fixture
 def integration(integration):
     """Include resource types and sheets."""
+    integration.include('adhocracy_meinberlin.workflows')
     integration.include('adhocracy_meinberlin.sheets')
     integration.include('adhocracy_meinberlin.resources')
     integration.include('adhocracy_meinberlin.workflows')

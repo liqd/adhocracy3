@@ -11,6 +11,7 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IResource
 
 from pyramid.security import Allow
+from pyramid.security import Deny
 
 
 @fixture
@@ -1133,6 +1134,16 @@ class TestACMRow:
         mock_registry.content.permissions.return_value = ['edit']
         assert inst.bind(registry=mock_registry) \
         .deserialize(['edit', 'Allow']) == ['edit', Allow]
+
+    def test_deserialize_action_shortcut_A(self, inst, mock_registry):
+        mock_registry.content.permissions.return_value = ['edit']
+        assert inst.bind(registry=mock_registry) \
+        .deserialize(['edit', 'A']) == ['edit', Allow]
+
+    def test_deserialize_action_shortcut_D(self, inst, mock_registry):
+        mock_registry.content.permissions.return_value = ['edit']
+        assert inst.bind(registry=mock_registry) \
+        .deserialize(['edit', 'D']) == ['edit', Deny]
 
     def test_deserialize_invalid_permission_name(self, inst, mock_registry):
         mock_registry.content.permissions.return_value = ['edit']

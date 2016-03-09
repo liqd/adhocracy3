@@ -382,7 +382,7 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
             s += "\n";
             s += "        // FIXME: workaround for #261.  Remove if ticket is closed.\n";
             s += "        _.forOwn(args, (value, key) => {\n";
-            s += "            if (!_.contains(" + JSON.stringify(sheet.fields.map((fieldName) => fieldName.name)) + ", key)) {\n";
+            s += "            if (!_.includes(" + JSON.stringify(sheet.fields.map((fieldName) => fieldName.name)) + ", key)) {\n";
             s += "                this[key] = value;\n";
             s += "            }\n";
             s += "        });\n";
@@ -435,7 +435,7 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
             s += "\n";
             s += "        // FIXME: workaround for #261.  Remove if ticket is closed.\n";
             s += "        _.forOwn(args, (value, key) => {\n";
-            s += "            if (!_.contains(" + JSON.stringify(sheet.fields.map((fieldName) => fieldName.name)) + ", key)) {\n";
+            s += "            if (!_.includes(" + JSON.stringify(sheet.fields.map((fieldName) => fieldName.name)) + ", key)) {\n";
             s += "                parsedArgs[key] = value;\n";
             s += "            }\n";
             s += "        });\n";

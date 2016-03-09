@@ -266,8 +266,8 @@ class TestResourceContentRegistry:
         assert 'create_p' in inst.permissions
 
     def test_permissions_workflow_permission(self, inst, mock_registry):
-        from adhocracy_core.workflows.sample import sample_meta
-        inst.workflows_meta['sample'] = sample_meta
+        inst.workflows_meta['sample'] =\
+            {'transitions': {'to_announced': {'permission': 'do_transition'}}}
         inst.registry = mock_registry
         assert 'do_transition' in inst.permissions
 

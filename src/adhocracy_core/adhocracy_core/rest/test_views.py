@@ -1204,9 +1204,10 @@ class TestMetaApiView:
     def test_get_workflows(self, request_, context):
         inst = self.make_one(request_, context)
         request_.registry.content.workflows_meta['sample'] = {'states': {},
-                                                             'transitions': {}}
+                                                              'transitions': {}}
         workflows_meta = inst.get()['workflows']
         assert workflows_meta == {'sample': {'initial_state': '',
+                                             'defaults': '',
                                              'states': {},
                                              'transitions': {}}}
 

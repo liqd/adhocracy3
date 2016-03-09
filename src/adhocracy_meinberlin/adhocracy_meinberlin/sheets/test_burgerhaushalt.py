@@ -5,15 +5,6 @@ from pytest import fixture
 from pytest import raises
 
 
-@fixture()
-def integration(config):
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_meinberlin.workflows')
-    config.include('adhocracy_meinberlin.sheets')
-
-
 class TestProposalSheet:
 
     @fixture
@@ -21,12 +12,7 @@ class TestProposalSheet:
         from .burgerhaushalt import proposal_meta
         return proposal_meta
 
-    @fixture
-    def context(self):
-        from adhocracy_core.interfaces import IItem
-        return testing.DummyResource(__provides__=IItem)
-
-    def test_create_valid(self, meta, context):
+    def test_create(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
         from .burgerhaushalt import IProposal

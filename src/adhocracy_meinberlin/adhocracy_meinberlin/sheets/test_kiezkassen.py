@@ -5,15 +5,6 @@ from pytest import fixture
 from pytest import raises
 
 
-@fixture()
-def integration(config):
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_meinberlin.workflows')
-    config.include('adhocracy_meinberlin.sheets')
-
-
 @mark.usefixtures('integration')
 def test_includeme_register_proposal_sheet(registry):
     from .kiezkassen import IProposal

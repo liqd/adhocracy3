@@ -21,7 +21,7 @@ Glossary
       If `resource sheet` field with backreferences sets a
       :class:`adhocracy_core.schema.PostPool` field, the
       referencing resources can only be postet at the :term:`post_pool`.
-      This assumes that a post_pool exists in the lineage of the referenced
+      This assumes that a post_pool exists in the :term:`lineage` of the referenced
       resources.
       If a `resource sheet` field with references sets this, the
       referenced resource type can only be posted to :term:`post_pool`.
@@ -32,7 +32,7 @@ Glossary
       and helper methods. You can find them by their name with
       :func:`adhocracy_core.interfaces.IPool.find_service`.
       The `service` has to be in :term:`lineage` or a child of a
-      :term:`lineage` pool for a given `context`.
+      :term:`lineage` pool for a given :term:`context`.
 
    principal
        A principal is a string representing a :term:`userid`, :term:`groupid`,
@@ -44,13 +44,13 @@ Glossary
       The unique id for one userique id of one :term:`group`: "group:<name>".
 
    group
-       A set of users. Can be mapped to permission :term:`role`s.
+       A set of users. Can be mapped to permission :term:`role`.
 
    groupid
        Unique id of one :term:`group`: "group:<name>".
 
    role
-      A set of permissions that can be mapped to :term:`principals`s
+      A set of permissions that can be mapped to :term:`principal`
 
    roleid
        Unique id of one permission :term:`role`: "role:<name>".

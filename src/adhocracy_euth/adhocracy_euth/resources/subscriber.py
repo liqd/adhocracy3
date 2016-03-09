@@ -1,15 +1,10 @@
 """Euth subscribers."""
 from substanced.util import find_service
 from pyramid.settings import asbool
-from pyramid.events import ApplicationCreated
 
-from adhocracy_core.authorization import set_acms_for_app_root
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.resources.root import IRootPool
-from adhocracy_core.resources.root import root_acm
 from adhocracy_core.sheets.principal import IGroup
-from adhocracy_core.utils import get_sheet
-from adhocracy_euth.resources.root import euth_acm
 
 
 def _remove_participant_from_authenticated_group(event):
@@ -27,15 +22,10 @@ def _remove_participant_from_authenticated_group(event):
     root = event.object
     groups = find_service(root, 'principals', 'groups')
     authenticated = groups.get('authenticated')
-    sheet = get_sheet(authenticated, IGroup)
+    sheet = registry.content.get_sheet(authenticated, IGroup)
     values = sheet.get()
     values['roles'].remove('participant')
     sheet.set(values)
-
-
-def set_root_acms(event):
-    """Set :term:`acm`s for root if the Pyramid application starts."""
-    set_acms_for_app_root(event.app, (euth_acm, root_acm))
 
 
 def includeme(config):
@@ -43,4 +33,3 @@ def includeme(config):
     config.add_subscriber(_remove_participant_from_authenticated_group,
                           IResourceCreatedAndAdded,
                           object_iface=IRootPool)
-    config.add_subscriber(set_root_acms, ApplicationCreated)

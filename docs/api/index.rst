@@ -15,5 +15,4 @@ API
    caching_strategy
    deletion
    messaging
-   abuse
    badges

@@ -709,9 +709,9 @@ class SearchQuery(namedtuple('Query', ['interfaces',
     -----------------
 
     interfaces (IInterface or (IInterface)
-    or (KeywordSearchComparator, IInterface)
-    or (KeywordSearchComparator, (IInterface)):
-        Resource type (iresource) or sheet (isheet) interfaces
+        or (KeywordSearchComparator, IInterface)
+        or (KeywordSearchComparator, (IInterface)):
+            Resource type (iresource) or sheet (isheet) interfaces
     indexes ({str:object}
     or {str:(SearchComparator, object)}
     or {str:(SearchComparator, (object))}

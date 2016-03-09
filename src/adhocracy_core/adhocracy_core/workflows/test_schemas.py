@@ -72,22 +72,23 @@ class TestWorkflow:
         return WorkflowMeta()
 
     @fixture
-    def required_cstruct(self) -> dict:
+    def cstruct(self) -> dict:
         return \
-            {'initial_state': 'announced',
+            {'defaults': 'standard',
+             'initial_state': 'announced',
              'states': {'announced': {}},
              'transitions': {'to_announced': {'from_state': 'announced',
                                               'to_state': 'announced',
                                               }},
              }
 
-    def test_required_fields(self, inst):
-        assert inst['initial_state'].required
-        assert inst['states'].required
-        assert inst['transitions'].required
+    def test_deserialize_empty(self, inst):
+        result = inst.deserialize({})
+        assert result == {}
 
-    def test_deserialize_required(self, inst, required_cstruct):
-        result = inst.deserialize(required_cstruct)
+    def test_deserialize_all(self, inst, cstruct):
+        result = inst.deserialize(cstruct)
+        assert result['defaults']
         assert result['initial_state']
         assert len(result['states']) == 1
         assert len(result['transitions']) == 1

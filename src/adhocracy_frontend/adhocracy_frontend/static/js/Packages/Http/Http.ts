@@ -149,7 +149,7 @@ export class Service<Content extends ResourcesBase.Resource> {
             canPost: (contentType : string) => {
                 if (raw.data.POST) {
                     var postOptions = raw.data.POST.request_body;
-                    return _.any(postOptions, { "content_type": contentType });
+                    return _.some(postOptions, { "content_type": contentType });
                 } else {
                     return false;
                 }
@@ -385,7 +385,8 @@ export class Service<Content extends ResourcesBase.Resource> {
                 });
 
                 var preliminaryPaths = _.map(resources, "path");
-                return _.sortBy(postedResources, (postedResource, index : number) => {
+                return _.sortBy(postedResources, (postedResource) => {
+                    var index = _.indexOf(postedResources, postedResource);
                     var preliminaryPath = sortedResources[index].path;
                     return preliminaryPaths.indexOf(preliminaryPath);
                 });

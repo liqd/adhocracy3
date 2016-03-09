@@ -11,6 +11,7 @@ def includeme(config):
     # commit to allow overriding pyramid config
     config.commit()
     # include custom resource types
+    config.include('.authorization')
     config.include('.catalog')
     config.include('.workflows')
     config.include('.sheets')
