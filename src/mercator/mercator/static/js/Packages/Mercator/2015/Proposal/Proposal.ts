@@ -1,5 +1,5 @@
 /// <reference path="../../../../_all.d.ts"/>
-/// <reference path="../../../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
+/// <reference path="../../../../../lib2/types/moment.d.ts"/>
 
 import * as _ from "lodash";
 

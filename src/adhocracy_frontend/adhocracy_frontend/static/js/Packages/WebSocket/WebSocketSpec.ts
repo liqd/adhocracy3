@@ -1,4 +1,4 @@
-/// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
+/// <reference path="../../../lib2/types/jasmine.d.ts"/>
 
 import * as AdhConfig from "../Config/Config";
 import * as AdhWebSocket from "./WebSocket";

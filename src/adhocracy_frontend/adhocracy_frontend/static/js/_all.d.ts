@@ -1,6 +1,5 @@
 /* tslint:disable */
-/// <reference path="../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
-/// <reference path="../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../lib2/types/angular.d.ts"/>
 
 declare module "angularAnimate" {}
 declare module "angularAria" {}
@@ -14,6 +13,42 @@ declare module "angularFlow" {}
 
 declare module "sticky" {
     export var Sticky : any;
+}
+
+declare interface ModernizrStatic {
+    fullscreen : boolean;
+    input : {
+        autocomplete : boolean;
+        autofocus : boolean;
+        list : boolean;
+        max : boolean;
+        min : boolean;
+        multiple : boolean;
+        pattern : boolean;
+        placeholder : boolean;
+        required : boolean;
+        step : boolean;
+    };
+    inputtypes : {
+        color : boolean;
+        date : boolean;
+        datetime : boolean;
+        // 'datetime-local' : boolean;  // FIXME
+        email : boolean;
+        month : boolean;
+        number : boolean;
+        range : boolean;
+        search : boolean;
+        tel : boolean;
+        time : boolean;
+        url : boolean;
+        week : boolean;
+    };
+    postmessage : boolean;
+    websockets : boolean;
+    flexbox : boolean;
+    csspositionsticky : boolean;
+    localstorage : boolean;
 }
 
 declare module "modernizr" {

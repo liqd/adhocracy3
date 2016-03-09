@@ -1,4 +1,4 @@
-/// <reference path="../../../lib/DefinitelyTyped/leaflet/leaflet.d.ts"/>
+/// <reference path="../../../lib2/types/leaflet.d.ts"/>
 
 // code comes from https://github.com/substack/point-in-polygon/blob/master/index.js
 export var pointInPolygon = (point : L.LatLng, polygon : L.Polygon) : Boolean => {
