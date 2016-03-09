@@ -7,6 +7,7 @@ import * as AdhEmbed from "../Embed/Embed";
 import * as AdhHttp from "../Http/Http";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
+import * as AdhCredentials from "../User/Credentials";
 
 import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
 import * as SITags from "../../Resources_/adhocracy_core/sheets/tags/ITags";
@@ -37,9 +38,9 @@ export class Provider implements angular.IServiceProvider {
         this.specifics = {};
         this.templates = {};
         this.customHeaders = {};
-        this.$get = ["$q", "$injector", "$location", "adhHttp", "adhConfig", "adhEmbed", "adhResourceUrlFilter",
-            ($q, $injector, $location, adhHttp, adhConfig, adhEmbed, adhResourceUrlFilter) => new Service(
-        self, $q, $injector, $location, adhHttp, adhConfig, adhEmbed, adhResourceUrlFilter)];
+        this.$get = ["$q", "$injector", "$location", "adhHttp", "adhConfig", "adhCredentials", "adhEmbed", "adhResourceUrlFilter",
+            ($q, $injector, $location, adhHttp, adhConfig, adhCredentials, adhEmbed, adhResourceUrlFilter) => new Service(
+                self, $q, $injector, $location, adhHttp, adhConfig, adhCredentials, adhEmbed, adhResourceUrlFilter)];
     }
 
     public default(
@@ -185,7 +186,8 @@ export class Service implements AdhTopLevelState.IAreaInput {
         private $location : angular.ILocationService,
         private adhHttp : AdhHttp.Service<any>,
         private adhConfig : AdhConfig.IService,
-        private adhEmbed : AdhEmbed.Service,
+        private adhcredentials: AdhCredentials.Service,
+        private adhEmbed: AdhEmbed.Service,
         private adhResourceUrlFilter
     ) {
         this.template = "<adh-resource-area></adh-resource-area>";
@@ -375,9 +377,14 @@ export class Service implements AdhTopLevelState.IAreaInput {
                 return _.extend(defaults, meta, specifics, search);
             });
         }, (error) => {
+
             _.forEach(error, function(value) {
                 if ((<any>value).code === 403) {
-                    throw 403;
+                    if (self.adhcredentials.loggedIn) {
+                        throw 403;
+                    } else {
+                        throw 401;
+                    }
                 }
             });
             throw 404;
