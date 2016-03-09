@@ -11,6 +11,7 @@ import * as AdhUtil from "../Util/Util";
 import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
 import * as SITags from "../../Resources_/adhocracy_core/sheets/tags/ITags";
 import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import * as SIWorkflowAssignment from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/ResourceArea";
 
@@ -350,6 +351,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
             var processType = process ? process.content_type : "";
             var processUrl = process ? process.path : "/";
+            var processState = process ? process.data[SIWorkflowAssignment.nick].workflow_state : "";
 
             if (hasRedirected) {
                 return;
@@ -363,6 +365,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
                     embedContext: embedContext,
                     processType: processType,
                     processUrl: processUrl,
+                    processState: processState,
                     platformUrl: self.adhConfig.rest_url + "/" + segs[1],
                     contentType: resource.content_type,
                     resourceUrl: resourceUrl,

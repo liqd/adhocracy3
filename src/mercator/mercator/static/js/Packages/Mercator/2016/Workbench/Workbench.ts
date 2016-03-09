@@ -371,7 +371,7 @@ export var registerRoutes = (
                     };
                 }
             );
-    }).value();
+    });
 };
 
 export var addProposalButton = (
@@ -384,6 +384,7 @@ export var addProposalButton = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/AddProposalButton.html",
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("processState", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
             scope.setCameFrom = () => adhTopLevelState.setCameFrom();
         }

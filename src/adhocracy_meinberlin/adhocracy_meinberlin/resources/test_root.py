@@ -25,12 +25,8 @@ def test_root_meta():
 
 @mark.usefixtures('integration')
 def test_add_example_process(pool_with_catalogs, registry):
-    from adhocracy_core.utils import get_sheet_field
     from adhocracy_core.resources.organisation import IOrganisation
-    from adhocracy_core.resources.geo import IMultiPolygon
     from adhocracy_core.resources.geo import add_locations_service
-    import adhocracy_core.sheets.geo
-    from adhocracy_meinberlin import resources
     from .root import add_example_process
     root = pool_with_catalogs
     add_locations_service(root, registry, {})

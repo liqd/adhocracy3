@@ -59,15 +59,3 @@ class TestRemoveParticipantFromAuthenticatedGroup():
                                              'roles': ['participant']}
         self.call_fut(event)
         assert mock_group_sheet.set.called is False
-
-
-def test_set_root_acms(monkeypatch):
-    from adhocracy_core.resources.root import root_acm
-    from .root import euth_acm
-    from .subscriber import set_root_acms
-    mock_set_acms = Mock()
-    monkeypatch.setattr('adhocracy_euth.resources.subscriber'
-                        '.set_acms_for_app_root', mock_set_acms)
-    event = Mock()
-    set_root_acms(event)
-    mock_set_acms.assert_called_with(event.app, (euth_acm, root_acm))

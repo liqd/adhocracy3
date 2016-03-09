@@ -13,6 +13,7 @@ def includeme(config):
     # copied from adhocracy_spd (without resources and translations)
     config.include('adhocracy_core')
     config.commit()
+    config.include('adhocracy_kit.authorization')
     config.include('adhocracy_spd.sheets')
     config.include('adhocracy_spd.workflows')
     config.include('adhocracy_spd.evolution')
@@ -22,9 +23,6 @@ def includeme(config):
 
     # copoied from adhocracy_spd.resources resources
     config.include('adhocracy_spd.resources.digital_leben')
-
-    # include kit resource types
-    config.include('.resources')
 
 
 def main(global_config, **settings):

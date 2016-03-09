@@ -12,5 +12,5 @@ Submodules
 .. toctree::
 
    adhocracy_mercator.sheets.mercator
-   adhocracy_mercator.sheets.test_mercator
+   adhocracy_mercator.sheets.mercator2
 

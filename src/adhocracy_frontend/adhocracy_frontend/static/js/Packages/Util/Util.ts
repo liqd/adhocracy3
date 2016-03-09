@@ -134,7 +134,7 @@ export function sortDagTopologically(dag : IDag<any>, sources : string[]) : any[
         dag[next].done = true;
     }
 
-    if (!_.all(_.pluck(dag, "done"))) {
+    if (!_.every(dag, "done")) {
         throw "cycle detected";
     }
 

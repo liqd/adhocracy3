@@ -244,7 +244,7 @@ export var getFirstFormError = (form, element) => {
     };
 
     var errorControllers = getErrorControllers(form);
-    var names = _.unique(_.map(errorControllers, "$name"));
+    var names = _.uniq(_.map(errorControllers, "$name"));
     var selector = _.map(names, (name) => "[name=\"" + name + "\"]").join(", ");
 
     return element.find(selector).first();

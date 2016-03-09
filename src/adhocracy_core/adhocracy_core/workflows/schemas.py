@@ -60,11 +60,12 @@ class StateMeta(MappingSchema):
 class WorkflowMeta(MappingSchema):
     """Data structure to define a workflow (finite state machine)."""
 
-    initial_state = SingleLine(missing=required)
+    initial_state = SingleLine(missing=drop)
+    defaults = SingleLine(missing=drop)
     states = SchemaNode(Mapping(unknown='preserve'),
-                        missing=required)
+                        missing=drop)
     transitions = SchemaNode(Mapping(unknown='preserve'),
-                             missing=required)
+                             missing=drop)
     # TODO validate there is only on transition between two states
 
 
@@ -75,10 +76,12 @@ def create_workflow_meta_schema(data: dict) -> SchemaNode:
            transitions a child schema is added.
     """
     node = WorkflowMeta().clone().bind()
-    for name in data['states']:
+    states = data.get('states', {})
+    for name in states:
         schema = StateMeta(name=name, missing=drop)
         node['states'].add(schema)
-    for name in data['transitions']:
+    transitions = data.get('transitions', {})
+    for name in transitions:
         schema = TransitionMeta(name=name, missing=drop)
         node['transitions'].add(schema)
     return node
