@@ -93,8 +93,8 @@ def _add_defaults(appstruct: PMap, registry: Registry) -> PMap:
                     name = permission[0]
                     permissions = \
                         updated['states'][state_name]['acm']['permissions']
-                    editing = name in [p[0] for p in permissions]
-                    if editing:
+                    overwriting = name in [p[0] for p in permissions]
+                    if overwriting:
                         updated = updated.transform(
                             ['states', state_name, 'acm', 'permissions',
                              match_permission(updated, state_name, name)],
