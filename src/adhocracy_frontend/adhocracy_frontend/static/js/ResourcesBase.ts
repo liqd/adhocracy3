@@ -77,7 +77,7 @@ export class Resource implements IResource {
 
         if (resourceType === this.content_type) {
             return true;
-        } else if ((<any>_).includes(_class.super_types, resourceType)) {  // FIXME: DefinitelyTyped
+        } else if (_.includes(_class.super_types, resourceType)) {
             return true;
         } else {
             return false;
@@ -87,6 +87,6 @@ export class Resource implements IResource {
     public hasSheet(sheet : string) : boolean {
         var _class : IResourceClass = <any>this.constructor;
 
-        return (<any>_).includes(_class.sheets, sheet);  // FIXME: DefinitelyTyped
+        return _.includes(_class.sheets, sheet);
     }
 }
