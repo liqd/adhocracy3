@@ -1147,5 +1147,5 @@ export var registerRoutes = (
                     };
                 }
             );
-    }).value();
+    });
 };

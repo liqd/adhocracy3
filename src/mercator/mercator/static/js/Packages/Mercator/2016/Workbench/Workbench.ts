@@ -371,7 +371,7 @@ export var registerRoutes = (
                     };
                 }
             );
-    }).value();
+    });
 };
 
 export var addProposalButton = (
