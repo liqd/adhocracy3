@@ -381,7 +381,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
             _.forEach(error, function(value) {
                 if ((<any>value).code === 403) {
                     if (self.adhcredentials.loggedIn) {
-                        throw 403;
+                        throw 404;
                     } else {
                         throw 401;
                     }
