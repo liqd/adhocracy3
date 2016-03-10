@@ -186,8 +186,8 @@ export class Service implements AdhTopLevelState.IAreaInput {
         private $location : angular.ILocationService,
         private adhHttp : AdhHttp.Service<any>,
         private adhConfig : AdhConfig.IService,
-        private adhcredentials: AdhCredentials.Service,
-        private adhEmbed: AdhEmbed.Service,
+        private adhcredentials : AdhCredentials.Service,
+        private adhEmbed : AdhEmbed.Service,
         private adhResourceUrlFilter
     ) {
         this.template = "<adh-resource-area></adh-resource-area>";
