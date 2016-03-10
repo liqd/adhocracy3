@@ -48,14 +48,16 @@ export var register = () => {
 
                 adhResourceUrlFilterMock = (path) => path;
 
-                service = new AdhResourceArea.Service(providerMock,
-                                                      <any>q,
-                                                      $injectorMock,
-                                                      $locationMock,
-                                                      adhHttpMock,
-                                                      adhConfigMock,
-                                                      adhCredentialMock,
-                    adhEmbedMock, adhResourceUrlFilterMock);
+                service = new AdhResourceArea.Service(
+                    providerMock,
+                    <any>q,
+                    $injectorMock,
+                    $locationMock,
+                    adhHttpMock,
+                    adhConfigMock,
+                    adhCredentialMock,
+                    adhEmbedMock, adhResourceUrlFilterMock
+                );
             });
 
             describe("route", () => {
