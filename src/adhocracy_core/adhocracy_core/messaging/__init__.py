@@ -17,7 +17,6 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.principal import IUserExtended
-from adhocracy_core.utils import get_sheet_field
 
 logger = getLogger(__name__)
 
@@ -159,10 +158,14 @@ class Messenger:
         )
 
     def _get_user_email(self, user: IResource) -> str:
-        return get_sheet_field(user, IUserExtended, 'email', self.registry)
+        return self.registry.content.get_sheet_field(user,
+                                                     IUserExtended,
+                                                     'email')
 
     def _get_user_name(self, user: IResource) -> str:
-        return get_sheet_field(user, IUserBasic, 'name', self.registry)
+        return self.registry.content.get_sheet_field(user,
+                                                     IUserBasic,
+                                                     'name')
 
     def _get_user_url(self, user: IResource) -> str:
         sender_path = resource_path(user)

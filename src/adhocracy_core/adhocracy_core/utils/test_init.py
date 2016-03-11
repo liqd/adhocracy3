@@ -182,30 +182,6 @@ def test_exception_to_str_runtime_error():
     assert err_string == 'RuntimeError'
 
 
-def test_get_sheet_with_registry(context, mock_sheet, registry_with_content):
-    from adhocracy_core.interfaces import ISheet
-    from adhocracy_core.utils import get_sheet
-    registry_with_content.content.get_sheet.return_value = mock_sheet
-    assert get_sheet(context, ISheet, registry_with_content) is mock_sheet
-
-
-def test_get_sheet_without_registry(context, mock_sheet, registry_with_content):
-    from adhocracy_core.interfaces import ISheet
-    from adhocracy_core.utils import get_sheet
-    registry_with_content.content.get_sheet.return_value = mock_sheet
-    assert get_sheet(context, ISheet) is mock_sheet
-
-
-def test_get_sheet_sheet_not_registered(context, registry_with_content):
-    from adhocracy_core.interfaces import ISheet
-    from adhocracy_core.exceptions import RuntimeConfigurationError
-    from adhocracy_core.utils import get_sheet
-    registry_with_content.content.get_sheet.side_effect =\
-        RuntimeConfigurationError
-    with raises(RuntimeConfigurationError):
-        get_sheet(context, ISheet)
-
-
 class GetUserUnitTest(unittest.TestCase):
 
     def make_one(self, request):

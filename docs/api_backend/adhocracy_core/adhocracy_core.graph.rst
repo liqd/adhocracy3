@@ -6,10 +6,3 @@ adhocracy_core.graph package
     :undoc-members:
     :show-inheritance:
 
-Submodules
-----------
-
-.. toctree::
-
-   adhocracy_core.graph.test_init
-

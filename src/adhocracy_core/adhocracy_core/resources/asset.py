@@ -19,8 +19,6 @@ from adhocracy_core.resources import resource_meta
 from adhocracy_core.sheets.asset import IAssetData
 from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.utils import get_matching_isheet
-from adhocracy_core.utils import get_sheet
-from adhocracy_core.utils import get_sheet_field
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.asset
 import adhocracy_core.sheets.title
@@ -43,7 +41,7 @@ class AssetDownload(Base):
         if asset is None:
             msg = 'No IAssetData in lineage of {}'.format(self)
             raise RuntimeConfigurationError(details=msg)
-        return get_sheet_field(asset, IAssetData, 'data', registry)
+        return registry.content.get_sheet_field(asset, IAssetData, 'data')
 
 
 asset_download_meta = resource_meta._replace(
@@ -61,9 +59,9 @@ class IAsset(ISimple):
 
 def add_metadata(context: IAsset, registry: Registry, **kwargs):
     """Store asset file metadata and add `raw` download to `context`."""
-    file = get_sheet_field(context, IAssetData, 'data', registry=registry)
+    file = registry.content.get_sheet_field(context, IAssetData, 'data')
     meta_isheet = get_matching_isheet(context, IAssetMetadata)
-    meta_sheet = get_sheet(context, meta_isheet, registry=registry)
+    meta_sheet = registry.content.get_sheet(context, meta_isheet)
     meta_appstruct = {
         'size': file.size,
         'filename': file.title,

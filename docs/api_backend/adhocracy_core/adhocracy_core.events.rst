@@ -6,10 +6,3 @@ adhocracy_core.events package
     :undoc-members:
     :show-inheritance:
 
-Submodules
-----------
-
-.. toctree::
-
-   adhocracy_core.events.test_init
-

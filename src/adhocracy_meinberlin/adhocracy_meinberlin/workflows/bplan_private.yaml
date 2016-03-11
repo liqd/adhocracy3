@@ -1,0 +1,10 @@
+initial_state: private
+states:
+  private:
+    title: Private
+    description: Disable view for non admins
+    acm:
+      principals:       [anonymous, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [view,         D,         D,           ~,         ~,       A,         A]
+transitions: {}

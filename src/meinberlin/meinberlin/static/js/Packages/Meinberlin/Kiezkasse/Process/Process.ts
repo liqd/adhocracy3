@@ -1,5 +1,5 @@
-/// <reference path="../../../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
-/// <reference path="../../../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
+/// <reference path="../../../../../lib2/types/lodash.d.ts"/>
+/// <reference path="../../../../../lib2/types/moment.d.ts"/>
 
 import * as _ from "lodash";
 
@@ -168,7 +168,7 @@ export var editDirective = (
                     process.data[SIName.nick] = undefined;
                     process.data[SIImageReference.nick] = undefined;
 
-                    if (_.contains(scope.data.availableWorkflowStates, scope.data.workflowState)) {
+                    if (_.includes(scope.data.availableWorkflowStates, scope.data.workflowState)) {
                         process.data[SIWorkflow.nick] = {
                             workflow_state: scope.data.workflowState
                         };

@@ -1,5 +1,5 @@
-/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
-/// <reference path="../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
+/// <reference path="../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../lib2/types/moment.d.ts"/>
 
 import * as AdhConfig from "../Config/Config";
 

@@ -3,6 +3,7 @@ from pytest import fixture
 from pytest import mark
 from unittest.mock import Mock
 
+
 def test_root_meta():
     from .root import root_meta
     from .root import IRootPool
@@ -29,7 +30,7 @@ class TestRoot:
     @fixture
     def request_(self, registry):
         request = testing.DummyResource()
-        request._registry = registry
+        request.registry = registry
         return request
 
     def test_create_root_without_inital_content(self, registry):
@@ -52,17 +53,6 @@ class TestRoot:
         assert find_catalog(inst, 'adhocracy') is not None
         assert find_service(inst, 'principals', 'users') is not None
         assert find_service(inst, 'locations') is not None
-
-    def test_create_root_with_acl(self, registry):
-        from adhocracy_core.resources.root import IRootPool
-        from substanced.util import get_acl
-        from pyramid.security import Allow
-        from pyramid.security import ALL_PERMISSIONS
-        inst = registry.content.create(IRootPool.__identifier__)
-        acl = get_acl(inst)
-        assert (Allow, 'system.Anonymous', 'view') in acl
-        assert (Allow, 'system.Anonymous', 'create_user') in acl
-        assert (Allow, 'role:god', ALL_PERMISSIONS) == acl[0]
 
     def test_create_root_with_initial_god_user(self, registry, request_):
         from substanced.interfaces import IUserLocator
@@ -92,11 +82,10 @@ class TestRoot:
         from substanced.util import find_service
         from adhocracy_core.resources.root import IRootPool
         from adhocracy_core.sheets.principal import IGroup
-        from adhocracy_core.utils import get_sheet
         inst = registry.content.create(IRootPool.__identifier__)
         groups = find_service(inst, 'principals', 'groups')
         group_gods = groups['gods']
-        group_sheet = get_sheet(group_gods, IGroup)
+        group_sheet = registry.content.get_sheet(group_gods, IGroup)
         group_users = [x.__name__ for x in group_sheet.get()['users']]
         group_roles = group_sheet.get()['roles']
         assert group_users == ['0000000']
@@ -112,11 +101,10 @@ class TestRoot:
         from substanced.util import find_service
         from adhocracy_core.resources.root import IRootPool
         from adhocracy_core.sheets.principal import IGroup
-        from adhocracy_core.utils import get_sheet
         inst = registry.content.create(IRootPool.__identifier__)
         groups = find_service(inst, 'principals', 'groups')
         group = groups['authenticated']
-        group_sheet = get_sheet(group, IGroup)
+        group_sheet = registry.content.get_sheet(group, IGroup)
         group_users = [x.__name__ for x in group_sheet.get()['users']]
         group_roles = group_sheet.get()['roles']
         assert group is not None

@@ -1,4 +1,4 @@
-/// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../../../lib2/types/angular.d.ts"/>
 
 import * as AdhConfig from "../../../Config/Config";
 import * as AdhHttp from "../../../Http/Http";
@@ -19,7 +19,7 @@ import * as SIParagraph from "../../../../Resources_/adhocracy_core/sheets/docum
 import * as SILocationReference from "../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
 import * as SIMultiPolygon from "../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
 
-var pkgLocation = "/Meinberlin/Alexanderplatz/Workbench";
+export var pkgLocation = "/Meinberlin/Alexanderplatz/Workbench";
 
 
 export var workbenchDirective = (
@@ -226,6 +226,26 @@ export var proposalEditColumnDirective = (
             scope.cancel = () => {
                 var url = adhResourceUrl(AdhUtil.parentPath(scope.proposalUrl));
                 adhTopLevelState.goToCameFrom(url);
+            };
+        }
+    };
+};
+
+export var addProposalButtonDirective = (
+    adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/AddProposalButton.html",
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
+            scope.proposalItemType = RIGeoProposal.content_type;
+
+            scope.setCameFrom = () => {
+                adhTopLevelState.setCameFrom();
             };
         }
     };

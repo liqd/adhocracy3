@@ -6,10 +6,3 @@ adhocracy_core.authentication package
     :undoc-members:
     :show-inheritance:
 
-Submodules
-----------
-
-.. toctree::
-
-   adhocracy_core.authentication.test_init
-

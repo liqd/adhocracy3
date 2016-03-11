@@ -1,7 +1,6 @@
-/// <reference path="../../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
-/// <reference path="../../../lib/DefinitelyTyped/jquery/jquery.d.ts"/>
-/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
-/// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
+/// <reference path="../../../lib2/types/jquery.d.ts"/>
+/// <reference path="../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../lib2/types/lodash.d.ts"/>
 
 import * as _ from "lodash";
 
@@ -149,7 +148,7 @@ export class Service<Content extends ResourcesBase.Resource> {
             canPost: (contentType : string) => {
                 if (raw.data.POST) {
                     var postOptions = raw.data.POST.request_body;
-                    return _.any(postOptions, { "content_type": contentType });
+                    return _.some(postOptions, { "content_type": contentType });
                 } else {
                     return false;
                 }
@@ -385,7 +384,8 @@ export class Service<Content extends ResourcesBase.Resource> {
                 });
 
                 var preliminaryPaths = _.map(resources, "path");
-                return _.sortBy(postedResources, (postedResource, index : number) => {
+                return _.sortBy(postedResources, (postedResource) => {
+                    var index = _.indexOf(postedResources, postedResource);
                     var preliminaryPath = sortedResources[index].path;
                     return preliminaryPaths.indexOf(preliminaryPath);
                 });

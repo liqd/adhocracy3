@@ -543,7 +543,7 @@ class TestResourceRESTView:
         assert wanted == response
 
     def test_get_with_sheets(self, request_, context, mock_sheet):
-        mock_sheet.get_cstruct.return_value = {'name': '1'}
+        mock_sheet.serialize.return_value = {'name': '1'}
         mock_sheet.schema.add(colander.SchemaNode(colander.Int(), name='name'))
         request_.registry.content.get_sheets_read.return_value = [mock_sheet]
         inst = self.make_one(context, request_)
@@ -624,7 +624,7 @@ class TestPoolRESTView:
                                                     mock_sheet):
         from adhocracy_core.sheets.pool import IPool
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
-        mock_sheet.get_cstruct.return_value = {}
+        mock_sheet.serialize.return_value = {}
         request_.registry.content.get_sheets_read.return_value = [mock_sheet]
         request_.validated['param1'] = 1
 
@@ -632,8 +632,8 @@ class TestPoolRESTView:
         response = inst.get()
 
         assert response['data'] == {IPool.__identifier__: {}}
-        assert mock_sheet.get_cstruct.call_args[1] == {'params': {'param1': 1,
-                                                       }}
+        assert mock_sheet.serialize.call_args[1] == {'params': {'param1': 1,
+                                                                }}
 
     def test_post(self, request_, context):
         request_.root = context
@@ -682,55 +682,6 @@ class TestPoolRESTView:
                                         'modified': [],
                                         'removed': []}}
         assert wanted == response
-
-
-class TestGetWorkflow:
-
-    def call_fut(self, *args):
-        from .views import _get_workflow
-        return _get_workflow(*args)
-
-    @fixture
-    def request_(self, request_):
-        request_.content_type = 'application/json'
-        return request_
-
-    def test_return_none_if_no_json_content_type(self, request_, context):
-        request_.content_type = 'NOT_JSON'
-        assert self.call_fut(context, request_) is None
-
-    def test_return_none_if_no_json_dict_body(self, request_, context):
-        request_.json = []
-        assert self.call_fut(context, request_) is None
-
-    def test_return_context_workflow_if_put_request(self, request_, context):
-        request_.method = 'PUT'
-        request_.registry.content.get_workflow.return_value = None
-        assert self.call_fut(context, request_) is None
-
-    def test_return_context_workflow_if_get_request(self, request_, context):
-        request_.method = 'GET'
-        request_.registry.content.get_workflow.return_value = None
-        assert self.call_fut(context, request_) is None
-
-    def test_return_none_if_post_request_without_content_type_field(
-        self, request_, context):
-        request_.method = 'POST'
-        request_.json = {}
-        assert self.call_fut(context, request_) is None
-
-    def test_return_none_if_post_request_with_broken_content_type(
-        self, request_, context):
-        request_.method = 'POST'
-        request_.json = {'content_type': 'brocken'}
-        assert self.call_fut(context, request_) is None
-
-    def test_return_none_if_post_request_with_wrong_content_type(
-        self, request_, context):
-        request_.method = 'POST'
-        request_.json = {'content_type': 'adhocracy_core.interfaces.ISheet'}
-        assert self.call_fut(context, request_) is None
-
 
 
 class TestUsersRESTView:
@@ -919,7 +870,7 @@ class TestItemRESTView:
         inst = self.make_one(context, request_)
         response = inst.post()
 
-        mock_other_sheet.set.assert_called_with({'x': 'y'}, request=request_)
+        mock_other_sheet.set.assert_called_with({'x': 'y'})
         assert response['path'] == request_.application_url + '/last_version/'
 
     def test_post_itemversion_batchmode_first_and_last_version_in_transaction(
@@ -952,7 +903,7 @@ class TestItemRESTView:
         inst = self.make_one(context, request_)
         response = inst.post()
 
-        mock_other_sheet.set.assert_called_with({'x': 'y'}, request=request_)
+        mock_other_sheet.set.assert_called_with({'x': 'y'})
         assert response['path'] == request_.application_url + '/last_version/'
 
     def test_put_no_sheets(self, request_, context, mock_sheet):
@@ -1253,9 +1204,10 @@ class TestMetaApiView:
     def test_get_workflows(self, request_, context):
         inst = self.make_one(request_, context)
         request_.registry.content.workflows_meta['sample'] = {'states': {},
-                                                             'transitions': {}}
+                                                              'transitions': {}}
         workflows_meta = inst.get()['workflows']
         assert workflows_meta == {'sample': {'initial_state': '',
+                                             'defaults': '',
                                              'states': {},
                                              'transitions': {}}}
 

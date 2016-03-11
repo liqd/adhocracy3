@@ -396,7 +396,7 @@ export var adhCreateOrShowCommentListing = (
                 "content_type": RIExternalResource.content_type
             }).then(
                 (result) => {
-                    if (_.contains(result.data[SIPool.nick].elements, commentablePath)) {
+                    if (_.includes(result.data[SIPool.nick].elements, commentablePath)) {
                         setScope(commentablePath);
                     } else {
                         var unwatch = scope.$watch(() => adhCredentials.loggedIn, (loggedIn) => {

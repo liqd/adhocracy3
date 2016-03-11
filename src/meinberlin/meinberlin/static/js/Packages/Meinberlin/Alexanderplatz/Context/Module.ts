@@ -1,7 +1,5 @@
 import * as AdhEmbedModule from "../../../Embed/Module";
-import * as AdhPermissionsModule from "../../../Permissions/Module";
 import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 
 import * as AdhMeinberlinAlexanderplatzWorkbenchModule from "../Workbench/Module";
 
@@ -25,12 +23,8 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhEmbedModule.moduleName,
             AdhMeinberlinAlexanderplatzWorkbenchModule.moduleName,
-            AdhPermissionsModule.moduleName,
-            AdhResourceAreaModule.moduleName,
-            AdhTopLevelStateModule.moduleName
+            AdhResourceAreaModule.moduleName
         ])
-        .directive("adhAlexanderplatzContextHeader", [
-            "adhConfig", "adhPermissions", "adhTopLevelState", AdhMeinberlinAlexanderplatzContext.headerDirective])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
             adhEmbedProvider.registerContext("alexanderplatz");
         }])

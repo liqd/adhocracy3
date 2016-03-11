@@ -23,12 +23,12 @@ class TestUserInfoSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import IUserInfo
         from .mercator2 import UserInfoSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == IUserInfo
         assert inst.meta.schema_class == UserInfoSchema
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         wanted = {'first_name': '',
                   'last_name': '',
                   }
@@ -50,12 +50,12 @@ class TestOrganizationInfoSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import IOrganizationInfo
         from .mercator2 import OrganizationInfoSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == IOrganizationInfo
         assert inst.meta.schema_class == OrganizationInfoSchema
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         wanted = {'name': '',
                   'city': '',
                   'country': '',
@@ -68,10 +68,9 @@ class TestOrganizationInfoSheet:
         assert inst.get() == wanted
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestOrganizationInfoSchema:
@@ -195,15 +194,14 @@ class TestPitchSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import IPitch
         from .mercator2 import PitchSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == IPitch
         assert inst.meta.schema_class == PitchSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestPartnersSheet:
@@ -221,12 +219,12 @@ class TestPartnersSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import IPartners
         from .mercator2 import PartnersSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == IPartners
         assert inst.meta.schema_class == PartnersSchema
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         wanted = {'partner1_name': '',
                   'partner1_website': '',
                   'partner1_country': '',
@@ -241,10 +239,9 @@ class TestPartnersSheet:
         assert inst.get() == wanted
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestTopicSchema:
@@ -323,15 +320,14 @@ class TestTopicSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import ITopic
         from .mercator2 import TopicSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == ITopic
         assert inst.meta.schema_class == TopicSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestDurationSchema:
@@ -371,15 +367,14 @@ class TestDurationSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import IDuration
         from .mercator2 import DurationSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == IDuration
         assert inst.meta.schema_class == DurationSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestLocationSchema:
@@ -450,15 +445,14 @@ class TestLocationSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import ILocation
         from .mercator2 import LocationSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == ILocation
         assert inst.meta.schema_class == LocationSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestStatusSchema:
@@ -498,15 +492,14 @@ class TestStatusSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import IStatus
         from .mercator2 import StatusSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == IStatus
         assert inst.meta.schema_class == StatusSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestChallengeSchema:
@@ -547,15 +540,14 @@ class TestChallengeSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import IChallenge
         from .mercator2 import ChallengeSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == IChallenge
         assert inst.meta.schema_class == ChallengeSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestGoalSchema:
@@ -596,15 +588,14 @@ class TestGoalSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import IGoal
         from .mercator2 import GoalSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == IGoal
         assert inst.meta.schema_class == GoalSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestPlanSchema:
@@ -645,15 +636,14 @@ class TestPlanSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import IPlan
         from .mercator2 import PlanSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == IPlan
         assert inst.meta.schema_class == PlanSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestTargetSchema:
@@ -693,15 +683,14 @@ class TestTargetSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import ITarget
         from .mercator2 import TargetSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == ITarget
         assert inst.meta.schema_class == TargetSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestTeamSchema:
@@ -741,15 +730,14 @@ class TestTeamSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import ITeam
         from .mercator2 import TeamSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == ITeam
         assert inst.meta.schema_class == TeamSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestExtraInfoSchema:
@@ -790,15 +778,14 @@ class TestExtraInfoSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import IExtraInfo
         from .mercator2 import ExtraInfoSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == IExtraInfo
         assert inst.meta.schema_class == ExtraInfoSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestConnectionCohesionSchema:
@@ -839,15 +826,14 @@ class TestConnectionCohesionSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import IConnectionCohesion
         from .mercator2 import ConnectionCohesionSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == IConnectionCohesion
         assert inst.meta.schema_class == ConnectionCohesionSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestDifferenceSchema:
@@ -888,15 +874,14 @@ class TestDifferenceSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import IDifference
         from .mercator2 import DifferenceSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == IDifference
         assert inst.meta.schema_class == DifferenceSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestPracticalRelevanceSchema:
@@ -937,15 +922,14 @@ class TestPracticalRelevanceSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import IPracticalRelevance
         from .mercator2 import PracticalRelevanceSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == IPracticalRelevance
         assert inst.meta.schema_class == PracticalRelevanceSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestFinancialPlanningSchema:
@@ -993,15 +977,14 @@ class TestFinancialPlanningSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import IFinancialPlanning
         from .mercator2 import FinancialPlanningSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == IFinancialPlanning
         assert inst.meta.schema_class == FinancialPlanningSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestExtraFundingSchema:
@@ -1043,15 +1026,14 @@ class TestExtraFundingSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import IExtraFunding
         from .mercator2 import ExtraFundingSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == IExtraFunding
         assert inst.meta.schema_class == ExtraFundingSchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestCommunitySchema:
@@ -1121,15 +1103,14 @@ class TestCommunitySheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import ICommunity
         from .mercator2 import CommunitySchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == ICommunity
         assert inst.meta.schema_class == CommunitySchema
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestWinnerInfoSchema:
@@ -1167,14 +1148,13 @@ class TestWinnerInfoSheet:
     def test_create_valid(self, meta, context):
         from .mercator2 import IWinnerInfo
         from .mercator2 import WinnerInfoSchema
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == IWinnerInfo
         assert inst.meta.schema_class == WinnerInfoSchema
         assert inst.meta.permission_view == 'view_mercator2_winnerinfo'
         assert inst.meta.permission_edit == 'edit_mercator2_winnerinfo'
 
     @mark.usefixtures('integration')
-    def test_includeme(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)

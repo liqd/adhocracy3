@@ -17,9 +17,7 @@ from adhocracy_core.utils import create_filename
 from adhocracy_core.catalog.adhocracy import index_rates
 from adhocracy_core.catalog.adhocracy import index_comments
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.interfaces import search_query
-from adhocracy_core.utils import get_sheet
 
 from pyramid.traversal import resource_path
 
@@ -48,10 +46,14 @@ def normalize_text(s: str) -> str:
     return s.replace(';', '')
 
 
-def get_text_from_sheet(proposal, field, sheet):
+def get_text_from_sheet(proposal, field, isheet, registry):
     """Get text from sheetfields and return it."""
-    retrieved_field = get_sheet_field(proposal, IMercatorSubResources, field)
-    field_text = get_sheet_field(retrieved_field, sheet, field)
+    retrieved_field = registry.content.get_sheet_field(proposal,
+                                                       IMercatorSubResources,
+                                                       field)
+    field_text = registry.content.get_sheet_field(retrieved_field,
+                                                  isheet,
+                                                  field)
     return normalize_text(field_text)
 
 
@@ -125,6 +127,7 @@ def export_proposals():
                  'Experience',
                  'Heard from'])
 
+    get_sheet_field = registry.content.get_sheet_field
     for proposal in proposals:
 
         result = []
@@ -135,7 +138,8 @@ def export_proposals():
         creation_date = get_sheet_field(
             proposal,
             IMetadata,
-            'item_creation_date')
+            'item_creation_date',
+        )
         date = creation_date.date().strftime('%d.%m.%Y')
         result.append(date)
         result.append(get_sheet_field(proposal, ITitle, 'title'))
@@ -269,16 +273,21 @@ def export_proposals():
             get_text_from_sheet(
                 proposal,
                 'description',
-                IDescription))
-        result.append(get_text_from_sheet(proposal, 'steps', ISteps))
-        result.append(get_text_from_sheet(proposal, 'story', IStory))
-        result.append(get_text_from_sheet(proposal, 'outcome', IOutcome))
-        result.append(get_text_from_sheet(proposal, 'value', IValue))
-        result.append(get_text_from_sheet(proposal, 'partners', IPartners))
-        result.append(get_text_from_sheet(proposal, 'experience', IExperience))
+                IDescription,
+                registry,
+            ))
+        result.append(get_text_from_sheet(proposal, 'steps', ISteps, registry))
+        result.append(get_text_from_sheet(proposal, 'story', IStory, registry))
+        result.append(get_text_from_sheet(proposal, 'outcome', IOutcome,
+                                          registry))
+        result.append(get_text_from_sheet(proposal, 'value', IValue, registry))
+        result.append(get_text_from_sheet(proposal, 'partners', IPartners,
+                                          registry))
+        result.append(get_text_from_sheet(proposal, 'experience', IExperience,
+                                          registry))
 
         # Heard from
-        heard_from = get_sheet(proposal, IHeardFrom)
+        heard_from = registry.content.get_sheet(proposal, IHeardFrom)
         result.append(get_heard_from_text(heard_from.get()))
 
         wr.writerow(result)

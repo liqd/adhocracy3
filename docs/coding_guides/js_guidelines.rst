@@ -334,8 +334,7 @@ Template
 
 -  prefer ``{{…}}`` over ``ngBind`` (except for root template).
 
-.. FIXME:: when to apply which classes (should be in balance with
-   :doc:`css_guidelines`)
+FIXME: when to apply which classes (should be in balance with :doc:`css_guidelines`)
 
    -  apply classes w/o a specific need/by default?
 
