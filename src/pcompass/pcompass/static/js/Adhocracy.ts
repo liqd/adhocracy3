@@ -36,7 +36,6 @@ import * as AdhImageModule from "./Packages/Image/Module";
 import * as AdhInjectModule from "./Packages/Inject/Module";
 import * as AdhListingModule from "./Packages/Listing/Module";
 import * as AdhLocaleModule from "./Packages/Locale/Module";
-import * as AdhLocalSocketModule from "./Packages/LocalSocket/Module";
 import * as AdhMappingModule from "./Packages/Mapping/Module";
 import * as AdhMarkdownModule from "./Packages/Markdown/Module";
 import * as AdhMovingColumnsModule from "./Packages/MovingColumns/Module";
@@ -178,7 +177,6 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhInjectModule.register(angular);
     AdhListingModule.register(angular);
     AdhLocaleModule.register(angular);
-    AdhLocalSocketModule.register(angular);
     AdhMappingModule.register(angular);
     AdhMarkdownModule.register(angular);
     AdhMovingColumnsModule.register(angular);
