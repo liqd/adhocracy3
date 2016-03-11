@@ -1,5 +1,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
+import * as _ from "lodash";
+
+
 // Error responses in the Adhocracy REST API contain json objects in
 // the body that have the following form:
 export interface IBackendError {
