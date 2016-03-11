@@ -14,6 +14,7 @@ def app_router(app_settings):
 @fixture
 def integration(integration):
     """Include resource types and sheets."""
+    integration.include('adhocracy_mercator.authorization')
     integration.include('adhocracy_mercator.sheets')
     integration.include('adhocracy_mercator.resources')
     integration.include('adhocracy_mercator.catalog')

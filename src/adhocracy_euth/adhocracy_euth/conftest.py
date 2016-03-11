@@ -15,4 +15,5 @@ def app_router(app_settings):
 def integration(integration):
     """Include resource types and sheets."""
     integration.include('adhocracy_euth.resources')
+    integration.include('adhocracy_euth.authorization')
     return integration

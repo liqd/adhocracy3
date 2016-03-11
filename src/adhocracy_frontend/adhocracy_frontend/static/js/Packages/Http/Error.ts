@@ -1,4 +1,4 @@
-/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../lib2/types/angular.d.ts"/>
 
 // Error responses in the Adhocracy REST API contain json objects in
 // the body that have the following form:

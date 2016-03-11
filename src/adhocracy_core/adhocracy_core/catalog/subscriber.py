@@ -21,7 +21,6 @@ from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import list_resource_with_descendants
-from adhocracy_core.utils import get_sheet_field
 
 
 def reindex_tag(event):
@@ -60,8 +59,9 @@ def reindex_badge(event):
     # IBadgeable sheet here, because this event is send before the
     # IBadgeAssignment fields 'subject' and 'badge' are properly stored.
     catalogs = find_service(event.object, 'catalogs')
-    badgeable = get_sheet_field(event.object, IBadgeAssignment, 'object',
-                                registry=event.registry)
+    badgeable = event.registry.content.get_sheet_field(event.object,
+                                                       IBadgeAssignment,
+                                                       'object')
     catalogs.reindex_index(badgeable, 'badge')
 
 

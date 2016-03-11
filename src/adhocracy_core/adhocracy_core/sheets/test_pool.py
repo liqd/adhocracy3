@@ -8,23 +8,12 @@ from pytest import raises
 from adhocracy_core.resources.pool import IBasicPool
 
 
-class TestPoolSchema:
-
-    def make_one(self):
-        from .pool import PoolSchema
-        return PoolSchema().bind()
-
-    def test_serialize_empty(self):
-        inst = self.make_one()
-        assert inst.serialize() == {'elements': []}
-
-
 class TestFilteringPoolSheet:
 
     @fixture
-    def request_(self, request_, registry_with_content):
-        request_.registry = registry_with_content
-        return request_
+    def registry(self, registry_with_content):
+        registry_with_content.settings = {}
+        return registry_with_content
 
     @fixture
     def meta(self):
@@ -32,13 +21,19 @@ class TestFilteringPoolSheet:
         return pool_meta
 
     @fixture
-    def inst(self, meta, context, registry_with_content):
-        inst = meta.sheet_class(meta, context)
+    def inst(self, meta, context):
+        inst = meta.sheet_class(meta, context, None)
         return inst
 
-    def test_create(self, context, meta):
-        from adhocracy_core.sheets.pool import pool_meta
-        inst = pool_meta.sheet_class(pool_meta, context)
+    @fixture
+    def inst_mock(self, inst, request_, registry):
+        from adhocracy_core.interfaces import IResourceSheet
+        inst.registry = registry
+        inst.request = request_
+        inst.get = Mock(spec=IResourceSheet.get)
+        return inst
+
+    def test_create(self, inst, meta):
         from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_core.sheets.pool import IPool
         from adhocracy_core.sheets.pool import PoolSchema
@@ -47,10 +42,10 @@ class TestFilteringPoolSheet:
         assert isinstance(inst, PoolSheet)
         assert verifyObject(IResourceSheet, inst)
         assert IResourceSheet.providedBy(inst)
-        assert inst.meta.schema_class == PoolSchema
-        assert inst.meta.isheet == IPool
-        assert inst.meta.editable is False
-        assert inst.meta.creatable is False
+        assert meta.schema_class == PoolSchema
+        assert meta.isheet == IPool
+        assert meta.editable is False
+        assert meta.creatable is False
 
     def test_get_no_children(self, inst,  sheet_catalogs):
         appstruct = inst.get()
@@ -91,87 +86,73 @@ class TestFilteringPoolSheet:
                              'count': 1,
                              }
 
-    def test_get_cstruct(self, inst, request_):
-        inst.get = Mock()
+    def test_deserialize(self, inst_mock):
         child = testing.DummyResource()
-        inst.get.return_value = {'elements': [child],
-                                 'count': 1}
-        cstruct = inst.get_cstruct(request_, params={})
+        inst_mock.get.return_value = {'elements': [child],
+                                      'count': 1}
+        cstruct = inst_mock.serialize(params={})
         assert cstruct == {'elements': [],
                            'count': '1'}
 
-    def test_get_cstruct_with_params(self, inst, request_):
-        inst.get = Mock()
+    def test_deserialize_with_params(self, inst_mock):
         child = testing.DummyResource()
-        inst.get.return_value = {'elements': [child],
-                                 'count': 1}
-        cstruct = inst.get_cstruct(request_, params={'name': 'child'})
+        inst_mock.get.return_value = {'elements': [child],
+                                      'count': 1}
+        cstruct = inst_mock.serialize(params={'name': 'child'})
         assert cstruct == {'elements': ['http://example.com/'],
                            'count': '1'}
 
-    def test_get_cstruct_filter_by_view_permission(self, inst, request_):
-        inst.get = Mock()
-        inst.get.return_value = {'elements': []}
-        cstruct = inst.get_cstruct(request_)
-        assert inst.get.call_args[1]['params']['allows'] == \
-            (request_.effective_principals, 'view')
+    def test_deserialize_filter_by_view_permission(self, inst_mock):
+        inst_mock.get = Mock()
+        inst_mock.get.return_value = {'elements': []}
+        cstruct = inst_mock.serialize()
+        assert inst_mock.get.call_args[1]['params']['allows'] == \
+            (inst_mock.request.effective_principals, 'view')
 
-    def test_get_cstruct_filter_by_view_permission_disabled(self, inst,
-                                                            request_):
-        inst.registry.settings['adhocracy.filter_by_view_permission'] = 'False'
-        inst.get = Mock()
-        inst.get.return_value = {}
-        cstruct = inst.get_cstruct(request_)
-        assert 'allows' not in inst.get.call_args[1]['params']
+    def test_deserialize_filter_by_view_permission_disabled(self, inst_mock):
+        inst_mock.registry.settings['adhocracy.filter_by_view_permission'] = 'False'
+        inst_mock.get = Mock()
+        inst_mock.get.return_value = {}
+        cstruct = inst_mock.serialize()
+        assert 'allows' not in inst_mock.get.call_args[1]['params']
 
-    def test_get_cstruct_filter_by_only_visible(self, inst, request_):
-        inst.get = Mock()
-        inst.get.return_value = {'elements': []}
-        cstruct = inst.get_cstruct(request_)
-        assert inst.get.call_args[1]['params']['only_visible']
+    def test_deserialize_filter_by_only_visible(self, inst_mock):
+        inst_mock.get.return_value = {'elements': []}
+        cstruct = inst_mock.serialize()
+        assert inst_mock.get.call_args[1]['params']['only_visible']
 
-    def test_get_cstruct_filter_by_only_visible_disabled(self, inst, request_):
-        inst.registry.settings['adhocracy.filter_by_visible'] = 'False'
-        inst.get = Mock()
-        inst.get.return_value = {}
-        cstruct = inst.get_cstruct(request_)
-        assert 'only_visible' not in inst.get.call_args[1]['params']
+    def test_deserialize_filter_by_only_visible_disabled(self, inst_mock):
+        inst_mock.get.return_value = {}
+        inst_mock.registry.settings['adhocracy.filter_by_visible'] = 'False'
+        cstruct = inst_mock.serialize()
+        assert 'only_visible' not in inst_mock.get.call_args[1]['params']
 
-    def test_get_cstruct_with_serialization_content(self, inst, request_):
-        inst.get = Mock()
+    def test_deserialize_with_serialization_content(self, inst_mock):
         child = testing.DummyResource()
-        inst.get.return_value = {'elements': [child]}
-        cstruct = inst.get_cstruct(request_,
-                                   params={'serialization_form': 'content'})
+        inst_mock.get.return_value = {'elements': [child]}
+        cstruct = inst_mock.serialize(params={'serialization_form': 'content'})
         assert cstruct['elements'] == \
             [{'content_type': 'adhocracy_core.interfaces.IResource',
               'data': {},
               'path': 'http://example.com/'}]
 
-    def test_get_cstruct_with_serialization_omit(self, inst, request_):
-        inst.get = Mock()
+    def test_deserialize_with_serialization_omit(self, inst_mock):
         child = testing.DummyResource()
-        inst.get.return_value = {'elements': [child]}
-        cstruct = inst.get_cstruct(request_,
-                                   params={'serialization_form': 'omit'})
+        inst_mock.get.return_value = {'elements': [child]}
+        cstruct = inst_mock.serialize(params={'serialization_form': 'omit'})
         assert cstruct['elements'] == []
 
-    def test_get_cstruct_with_show_count(self, inst, request_):
-        inst.get = Mock()
-        child = testing.DummyResource()
-        inst.get.return_value = {'count': 1}
-        cstruct = inst.get_cstruct(request_,
-                                   params={'show_count': True})
+    def test_deserialize_with_show_count(self, inst_mock):
+        inst_mock.get.return_value = {'count': 1}
+        cstruct = inst_mock.serialize(params={'show_count': True})
         assert cstruct['count'] == '1'
 
-    def test_get_cstruct_with_show_aggregate(self, inst, request_):
-        inst.get = Mock()
-        child = testing.DummyResource()
-        inst.get.return_value = {'frequency_of': {'y': 1}}
-        cstruct = inst.get_cstruct(request_,
-                                   params={'show_frequency': True,
-                                           'frequency_of': 'index'})
+    def test_deserialize_with_show_aggregate(self, inst_mock):
+        inst_mock.get.return_value = {'frequency_of': {'y': 1}}
+        cstruct = inst_mock.serialize(params={'show_frequency': True,
+                                              'frequency_of': 'index'})
         assert cstruct['aggregateby']['index'] == {'y': 1}
+
 
 
 @mark.usefixtures('integration')
@@ -193,13 +174,12 @@ class TestIntegrationPoolSheet:
         return registry.content.create(
             content_type.__identifier__, parent, appstructs)
 
-    def _get_pool_sheet(self, pool):
+    def _get_pool_sheet(self, pool, registry):
         from adhocracy_core.sheets.pool import IPool
-        from adhocracy_core.utils import get_sheet
-        return get_sheet(pool, IPool)
+        return registry.content.get_sheet(pool, IPool)
 
-    def test_get_empty(self, pool):
-        inst = self._get_pool_sheet(pool)
+    def test_get_empty(self, pool, registry):
+        inst = self._get_pool_sheet(pool, registry)
         assert inst.get() == {'elements': [],
                               'frequency_of': {},
                               'group_by': {},
@@ -208,18 +188,19 @@ class TestIntegrationPoolSheet:
 
     def test_get_custom_search_empty(self, registry, pool):
         child = self._make_resource(registry, parent=pool, name='child')
-        inst = self._get_pool_sheet(pool)
+        inst = self._get_pool_sheet(pool, registry)
         assert inst.get({'indexes': {'name':'WRONG'}})['elements'] == []
 
     def test_get_custom_search_not_empty(self, registry, pool):
         child = self._make_resource(registry, parent=pool, name='child')
-        inst = self._get_pool_sheet(pool)
+        inst = self._get_pool_sheet(pool, registry)
         assert inst.get({'indexes': {'name':'child'}})['elements'] == [child]
 
 
 @mark.usefixtures('integration')
-def test_includeme_register_pool_sheet(config):
-    from adhocracy_core.sheets.pool import IPool
-    from adhocracy_core.utils import get_sheet
+def test_includeme_register_sheet(registry):
+    from .pool import IPool
     context = testing.DummyResource(__provides__=IPool)
-    assert get_sheet(context, IPool)
+    assert registry.content.get_sheet(context, IPool)
+
+

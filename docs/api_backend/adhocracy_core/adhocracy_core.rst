@@ -26,9 +26,12 @@ Subpackages
     adhocracy_core.rest
     adhocracy_core.scaffolds
     adhocracy_core.schema
+    adhocracy_core.scripts
     adhocracy_core.sheets
+    adhocracy_core.stats
     adhocracy_core.utils
     adhocracy_core.websockets
+    adhocracy_core.workflows
 
 Submodules
 ----------
@@ -37,7 +40,4 @@ Submodules
 
    adhocracy_core.exceptions
    adhocracy_core.interfaces
-   adhocracy_core.test_exceptions
-   adhocracy_core.test_interfaces
-   adhocracy_core.testing
 

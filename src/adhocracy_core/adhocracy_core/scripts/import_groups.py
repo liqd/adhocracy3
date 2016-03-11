@@ -15,7 +15,6 @@ from adhocracy_core.interfaces import IResource
 from pyramid.paster import bootstrap
 from pyramid.registry import Registry
 from substanced.util import find_service
-from adhocracy_core.utils import get_sheet
 from adhocracy_core.resources.principal import IGroup
 
 
@@ -51,7 +50,7 @@ def _import_groups(context: IResource, registry: Registry, filename: str):
     for group_info in groups_info:
         name = group_info['name']
         if name in groups.keys():
-            _update_group(group_info, groups)
+            _update_group(group_info, groups, registry)
             logger.info('Updating group {}'.format(name))
         else:
             _create_group(group_info, registry, groups)
@@ -64,9 +63,11 @@ def _load_groups_info(filename: str) -> [dict]:
         return json.load(f)
 
 
-def _update_group(group_info: dict, groups: IResource):
+def _update_group(group_info: dict, groups: IResource, registry: Registry):
     group = groups[group_info['name']]
-    group_sheet = get_sheet(group, adhocracy_core.sheets.principal.IGroup)
+    group_sheet = registry.content.get_sheet(
+        group,
+        adhocracy_core.sheets.principal.IGroup)
     group_sheet.set({'roles': group_info['roles']})
 
 

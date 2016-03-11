@@ -1,9 +1,5 @@
-/// <reference path="../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
-/// <reference path="../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
-
-/* tslint:disable:no-var-requires */
-var _s : any = require("underscore.string");
-/* tslint:enable:no-var-requires */
+/// <reference path="../../lib2/types/lodash.d.ts"/>
+/// <reference path="./node.d.ts"/>
 
 import * as _ from "lodash";
 
@@ -92,7 +88,7 @@ mkNickDict = (dict : { [index : string] : any }) : { [index : string] : string }
 };
 
 mkNickDictFromNames = (fullNames : string[]) : { [index : string] : string } =>
-        mkNickDictFromNamesX(fullNames.map((fullName) => _s.words(fullName, ".").reverse()));
+        mkNickDictFromNamesX(fullNames.map((fullName) => _.split(fullName, ".").reverse()));
 
 mkNickDictFromNamesX = (fullNames : string[][]) : { [index : string] : string } => {
     var nicksRec : { [index: string]: string } = {};

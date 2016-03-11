@@ -393,7 +393,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
         return {
             path: path,
-            search: _.transform(data, (result, value : string, key : string) => {
+            search: <Dict>_.transform(data, (result, value : string, key : string) => {
                 if (defaults.hasOwnProperty(key) && value !== defaults[key]) {
                     result[key] = value;
                 }

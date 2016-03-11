@@ -78,11 +78,10 @@ def deferred_validate_user_name(node: colander.SchemaNode, kw: dict)\
                If this is not available the validator is None.
     :raise: colander.Invalid: if name is not unique.
     """
-    request = kw.get('request', None)
-    if not request:
-        return None
-    locator = request.registry.getMultiAdapter((request.root, request),
-                                               IUserLocator)
+    request = kw['request']
+    registry = kw['registry']
+    context = kw['context']
+    locator = registry.getMultiAdapter((context, request), IUserLocator)
 
     def validate_user_name_is_unique(node, value):
         if locator.get_user_by_login(value):
@@ -101,11 +100,10 @@ def deferred_validate_user_email(node: colander.SchemaNode, kw: dict)\
                If this is not available the validator is None.
     :raise: colander.Invalid: if name is not unique or not an email address.
     """
-    request = kw.get('request', None)
-    if not request:
-        return None
-    locator = request.registry.getMultiAdapter((request.root, request),
-                                               IUserLocator)
+    request = kw['request']
+    registry = kw['registry']
+    context = kw['context']
+    locator = registry.getMultiAdapter((context, request), IUserLocator)
 
     def validate_user_email_is_unique(node, value):
         if locator.get_user_by_email(value):
@@ -227,11 +225,10 @@ def deferred_roles_and_group_roles(node: colander.SchemaNode, kw: dict)\
               :class:`adhocracy_core.sheets.principal.IPermissions` object.
     :return: list of :term:`roles` or [].
     """
-    context = kw.get('context', None)
-    if context is None:
-        return []
-    roles_and_group_roles = set(context.roles)
-    groups = [find_resource(context, gid) for gid in context.group_ids]
+    context = kw['context']
+    roles_and_group_roles = set(getattr(context, 'roles', []))
+    group_ids = getattr(context, 'group_ids', [])
+    groups = [find_resource(context, gid) for gid in group_ids]
     for group in groups:
         roles_and_group_roles.update(group.roles)
     return sorted(list(roles_and_group_roles))

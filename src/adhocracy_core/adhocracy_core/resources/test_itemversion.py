@@ -109,8 +109,6 @@ class TestItemVersion:
         from adhocracy_core.sheets.document import IDocument
         from adhocracy_core.resources.itemversion import itemversion_meta
         from adhocracy_core.resources import add_resource_type_to_registry
-        from adhocracy_core.sheets.versions import IVersionable
-        from adhocracy_core.utils import get_sheet
         metadata = itemversion_meta._replace(extended_sheets=(IDocument,))
         add_resource_type_to_registry(metadata, config)
         referenced_v0 = self.make_one(registry, item)
