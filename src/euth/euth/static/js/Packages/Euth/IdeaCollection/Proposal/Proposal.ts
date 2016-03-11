@@ -6,6 +6,7 @@ import * as AdhHttp from "../../../Http/Http";
 import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
 import * as AdhRate from "../../../Rate/Rate";
+import * as AdhResourceUtil from "../../../Util/ResourceUtil";
 import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
 import * as AdhUtil from "../../../Util/Util";
 
@@ -128,11 +129,8 @@ var postEdit = (
     scope: IScope,
     oldVersion: RIProposalVersion
 ) => {
-    var proposalVersion = new RIProposalVersion({ preliminaryNames: adhPreliminaryNames });
+    var proposalVersion = AdhResourceUtil.derive(oldVersion, { preliminaryNames: adhPreliminaryNames });
     proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
-        follows: [oldVersion.path]
-    });
     fill(scope, proposalVersion);
 
     return adhHttp.deepPost([proposalVersion]);
