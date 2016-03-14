@@ -2,8 +2,8 @@ from pytest import mark
 from pytest import fixture
 from webtest import TestResponse
 
-from adhocracy_core.utils.testing import add_resources
-from adhocracy_core.utils.testing import do_transition_to
+from adhocracy_core.testing import add_resources
+from adhocracy_core.testing import do_transition_to
 
 
 def _post_proposal(app_user, path='/') -> TestResponse:

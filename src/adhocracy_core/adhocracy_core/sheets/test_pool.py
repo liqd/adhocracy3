@@ -86,7 +86,7 @@ class TestFilteringPoolSheet:
                              'count': 1,
                              }
 
-    def test_deserialize(self, inst_mock):
+    def test_serialize(self, inst_mock):
         child = testing.DummyResource()
         inst_mock.get.return_value = {'elements': [child],
                                       'count': 1}
@@ -94,7 +94,7 @@ class TestFilteringPoolSheet:
         assert cstruct == {'elements': [],
                            'count': '1'}
 
-    def test_deserialize_with_params(self, inst_mock):
+    def test_serialize_with_params(self, inst_mock):
         child = testing.DummyResource()
         inst_mock.get.return_value = {'elements': [child],
                                       'count': 1}
@@ -102,32 +102,32 @@ class TestFilteringPoolSheet:
         assert cstruct == {'elements': ['http://example.com/'],
                            'count': '1'}
 
-    def test_deserialize_filter_by_view_permission(self, inst_mock):
+    def test_serialize_filter_by_view_permission(self, inst_mock):
         inst_mock.get = Mock()
         inst_mock.get.return_value = {'elements': []}
         cstruct = inst_mock.serialize()
         assert inst_mock.get.call_args[1]['params']['allows'] == \
             (inst_mock.request.effective_principals, 'view')
 
-    def test_deserialize_filter_by_view_permission_disabled(self, inst_mock):
+    def test_serialize_filter_by_view_permission_disabled(self, inst_mock):
         inst_mock.registry.settings['adhocracy.filter_by_view_permission'] = 'False'
         inst_mock.get = Mock()
         inst_mock.get.return_value = {}
         cstruct = inst_mock.serialize()
         assert 'allows' not in inst_mock.get.call_args[1]['params']
 
-    def test_deserialize_filter_by_only_visible(self, inst_mock):
+    def test_serialize_filter_by_only_visible(self, inst_mock):
         inst_mock.get.return_value = {'elements': []}
         cstruct = inst_mock.serialize()
         assert inst_mock.get.call_args[1]['params']['only_visible']
 
-    def test_deserialize_filter_by_only_visible_disabled(self, inst_mock):
+    def test_serialize_filter_by_only_visible_disabled(self, inst_mock):
         inst_mock.get.return_value = {}
         inst_mock.registry.settings['adhocracy.filter_by_visible'] = 'False'
         cstruct = inst_mock.serialize()
         assert 'only_visible' not in inst_mock.get.call_args[1]['params']
 
-    def test_deserialize_with_serialization_content(self, inst_mock):
+    def test_serialize_with_serialization_content(self, inst_mock):
         child = testing.DummyResource()
         inst_mock.get.return_value = {'elements': [child]}
         cstruct = inst_mock.serialize(params={'serialization_form': 'content'})
@@ -136,18 +136,18 @@ class TestFilteringPoolSheet:
               'data': {},
               'path': 'http://example.com/'}]
 
-    def test_deserialize_with_serialization_omit(self, inst_mock):
+    def test_serialize_with_serialization_omit(self, inst_mock):
         child = testing.DummyResource()
         inst_mock.get.return_value = {'elements': [child]}
         cstruct = inst_mock.serialize(params={'serialization_form': 'omit'})
         assert cstruct['elements'] == []
 
-    def test_deserialize_with_show_count(self, inst_mock):
+    def test_serialize_with_show_count(self, inst_mock):
         inst_mock.get.return_value = {'count': 1}
         cstruct = inst_mock.serialize(params={'show_count': True})
         assert cstruct['count'] == '1'
 
-    def test_deserialize_with_show_aggregate(self, inst_mock):
+    def test_serialize_with_show_aggregate(self, inst_mock):
         inst_mock.get.return_value = {'frequency_of': {'y': 1}}
         cstruct = inst_mock.serialize(params={'show_frequency': True,
                                               'frequency_of': 'index'})

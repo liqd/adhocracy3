@@ -19,17 +19,18 @@ states:
   participate:
     title: Participate
     acm:
-      principals:             [everyone, participant, moderator, creator, initiator, admin]
+      principals:                   [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [view,               ~,        A,           A,         A,       A,         ~]
-        - [create_proposal,    ~,        A,           ~,         ~,       ~,         ~]
-        - [edit_proposal,      ~,        ~,           ~,         A,       ~,         ~]
-        - [create_comment,     ~,        A,           A,         ~,       ~,         ~]
-        - [edit_comment,       ~,        ~,           ~,         A,       ~,         ~]
-        - [create_rate,        ~,        A,           ~,         ~,       ~,         ~]
-        - [edit_rate,          ~,        ~,           ~,         A,       ~,         ~]
-        - [create_relation,    ~,        A,           ~,         ~,       ~,         ~]
-        - [edit_relation,      ~,        ~,           ~,         A,       ~,         ~]
+        - [view,                     ~,        A,           A,         A,       A,         ~]
+        - [create_proposal,          ~,        A,           ~,         ~,       ~,         ~]
+        - [edit_proposal,            ~,        ~,           ~,         A,       ~,         ~]
+        - [create_comment,           ~,        A,           A,         ~,       ~,         ~]
+        - [edit_comment,             ~,        ~,           ~,         A,       ~,         ~]
+        - [create_rate,              ~,        A,           ~,         ~,       ~,         ~]
+        - [edit_rate,                ~,        ~,           ~,         A,       ~,         ~]
+        - [create_relation,          ~,        A,           ~,         ~,       ~,         ~]
+        - [edit_relation,            ~,        ~,           ~,         A,       ~,         ~]
+        - [create_badge_assignment,  ~,        ~,           ~,         A,       ~,         ~]
   evaluate:
     title: Evaluate
     acm:

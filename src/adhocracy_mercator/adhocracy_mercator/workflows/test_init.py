@@ -8,7 +8,7 @@ from webtest import TestResponse
 from mercator.tests.fixtures.fixturesMercatorProposals1 import _create_proposal
 from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposal_batch
 from mercator.tests.fixtures.fixturesMercatorProposals1 import update_proposal_batch
-from adhocracy_core.utils.testing import do_transition_to
+from adhocracy_core.testing import do_transition_to
 
 
 @mark.usefixtures('integration')
