@@ -296,6 +296,7 @@ class TestBaseResourceSheet:
                           'allows': (request_.effective_principals, 'view'),
                           }
         assert inst.get.call_args[1]['params'] == default_params
+        assert inst.get.call_args[1]['omit_readonly'] is True
 
     def test_serialize_with_params(self, inst, request_):
         inst.request = request_
