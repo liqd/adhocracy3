@@ -4,7 +4,7 @@ states:
     title: Private
     description: Disable view for non admins
     acm:
-      principals:       [anonymous, participant, moderator, creator, initiator, admin]
+      principals:       [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [view,         D,         D,           ~,         ~,       A,         A]
+        - [view,         D,        D,           ~,         ~,       A,         A]
 transitions: {}

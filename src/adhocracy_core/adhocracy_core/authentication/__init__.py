@@ -17,9 +17,6 @@ from adhocracy_core.interfaces import ITokenManger
 from adhocracy_core.schema import Resource
 
 
-Anonymous = 'system.Anonymous'
-"""The anonymous (not authenticated) principal"""
-
 UserTokenHeader = 'X-User-Token'
 """The request header parameter to set the authentication token."""
 
@@ -227,7 +224,7 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         if cached_principals:
             return cached_principals
         if self.authenticated_userid(request) is None:
-            principals = [Everyone, Anonymous]
+            principals = [Everyone]
         else:
             principals = super().effective_principals(request)
         request.__cached_principals__ = principals

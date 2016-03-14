@@ -3,15 +3,15 @@ states:
   participate:
     acm:
     acm:
-      principals:                  [anonymous, participant, moderator, creator, initiator, admin]
+      principals:                  [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [create,                  A,         ~,           A,          A,      A,         ~]
-        - [create_proposal,         A,         ~,           ~,          ~,      ~,         ~]
-        - [edit_proposal,           ~,         ~,           ~,          ~,      ~,         ~]
+        - [create,                  A,        ~,           A,          A,      A,         ~]
+        - [create_proposal,         A,        ~,           ~,          ~,      ~,         ~]
+        - [edit_proposal,           ~,        ~,           ~,          ~,      ~,         ~]
   evaluate:
     acm:
-      principals:                  [anonymous, participant, moderator, creator, initiator, admin]
+      principals:                  [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [create,                  ~,         ~,           A,          A,       A,        ~]
-        - [create_proposal,         ~,         ~,           ~,          ~,       ~,        ~]
-        - [edit_proposal,           ~,         ~,           ~,          ~,       ~,        ~]
+        - [create,                  ~,        ~,           A,          A,       A,        ~]
+        - [create_proposal,         ~,        ~,           ~,          ~,       ~,        ~]
+        - [edit_proposal,           ~,        ~,           ~,          ~,       ~,        ~]

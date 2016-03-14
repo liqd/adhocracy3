@@ -4,22 +4,22 @@ states:
   voteable: {}
   selected:
     acm:
-      principals:               [anonymous, participant, moderator, creator, initiator, admin]
+      principals:               [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [edit_proposal,        ~,         ~,           ~,         D,       ~,         ~]
-        - [create_rate,          ~,         D,           ~,         D,       ~,         ~]
-        - [edit_rate,            ~,         ~,           ~,         D,       ~,         ~]
-        - [create_comment,       ~,         D,           D,         ~,       D,         ~]
-        - [edit_comment,         ~,         ~,           ~,         D,       ~,         ~]
+        - [edit_proposal,        ~,        ~,           ~,         D,       ~,         ~]
+        - [create_rate,          ~,        D,           ~,         D,       ~,         ~]
+        - [edit_rate,            ~,        ~,           ~,         D,       ~,         ~]
+        - [create_comment,       ~,        D,           D,         ~,       D,         ~]
+        - [edit_comment,         ~,        ~,           ~,         D,       ~,         ~]
   rejected:
     acm:
-      principals:               [anonymous, participant, moderator, creator, initiator, admin]
+      principals:               [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [edit_proposal,        ~,         ~,           ~,         D,       ~,         ~]
-        - [create_rate,          ~,         D,           ~,         D,       ~,         ~]
-        - [edit_rate,            ~,         ~,           ~,         D,       ~,         ~]
-        - [create_comment,       ~,         D,           D,         ~,       D,         ~]
-        - [edit_comment,         ~,         ~,           ~,         D,       ~,         ~]
+        - [edit_proposal,        ~,        ~,           ~,         D,       ~,         ~]
+        - [create_rate,          ~,        D,           ~,         D,       ~,         ~]
+        - [edit_rate,            ~,        ~,           ~,         D,       ~,         ~]
+        - [create_comment,       ~,        D,           D,         ~,       D,         ~]
+        - [edit_comment,         ~,        ~,           ~,         D,       ~,         ~]
 transitions:
   to_voteable:
     from_state: proposed

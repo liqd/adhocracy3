@@ -10,7 +10,7 @@ from adhocracy_core.schema import  ACM
 def root_acm_extension_adapter(root: IResource) -> dict:
     """Adpater to extend the `root_acm`."""
     acm = \
-        {'principals':                                   ['anonymous', 'authenticated', 'participant', 'moderator',  'creator', 'initiator', 'admin'],
+        {'principals':                                   ['everyone', 'authenticated', 'participant', 'moderator',  'creator', 'initiator', 'admin'],
          'permissions': [  # general
                          ['view',                          Allow,      Allow,          Allow,         Allow,        Allow,     Allow,       Allow],
                          ['create',                        None,       None,           Allow,         Allow,        None,      Allow,       Allow],
