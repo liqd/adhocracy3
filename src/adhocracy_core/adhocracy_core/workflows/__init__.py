@@ -171,6 +171,7 @@ def includeme(config):  # pragma: no cover
     config.add_directive('add_workflow', add_workflow_directive)
     config.include('.sample')
     config.include('.standard')
+    config.include('.badge_assignment')
     config.include('.standard_private')
     config.include('.debate')
     config.include('.debate_private')

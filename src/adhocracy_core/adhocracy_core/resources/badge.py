@@ -49,6 +49,19 @@ badge_group_meta = pool_meta._replace(
 )
 
 
+class IParticipantsAssignableBadgeGroup(IPool):
+    """A badge group pool for badges assignable by participants."""
+
+
+participants_assignable_badge_group_meta = badge_group_meta._replace(
+    iresource=IParticipantsAssignableBadgeGroup,
+    workflow_name='badge_assignment',
+    element_types=(IBadge,
+                   IBadgeGroup,
+                   IParticipantsAssignableBadgeGroup,),
+)
+
+
 class IBadgesService(IServicePool):
     """The 'badges' ServicePool."""
 
@@ -64,8 +77,9 @@ badges_service_meta = service_meta._replace(
 
 def add_badges_service(context: IPool, registry: Registry, options: dict):
     """Add `badge` service to context."""
+    creator = options.get('creator')
     registry.content.create(IBadgesService.__identifier__, parent=context,
-                            registry=registry)
+                            registry=registry, creator=creator)
 
 
 class IBadgeAssignment(ISimple):
@@ -99,14 +113,17 @@ badge_assignments_service_meta = service_meta._replace(
 def add_badge_assignments_service(context: IPool, registry: Registry,
                                   options: dict):
     """Add `badge_assignments` service to context."""
+    creator = options.get('creator')
     registry.content.create(IBadgeAssignmentsService.__identifier__,
-                            parent=context, registry=registry)
+                            parent=context, registry=registry, creator=creator)
 
 
 def includeme(config):
     """Add resource type to registry."""
     add_resource_type_to_registry(badge_meta, config)
     add_resource_type_to_registry(badge_group_meta, config)
+    add_resource_type_to_registry(participants_assignable_badge_group_meta,
+                                  config)
     add_resource_type_to_registry(badges_service_meta, config)
     add_resource_type_to_registry(badge_assignment_meta, config)
     add_resource_type_to_registry(badge_assignments_service_meta, config)
