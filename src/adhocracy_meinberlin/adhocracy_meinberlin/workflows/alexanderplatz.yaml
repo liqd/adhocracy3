@@ -15,7 +15,6 @@ states:
         - [create_document,           ~,         A,         ~,           ~,       ~,         ~]
         - [edit,                      ~,         A,         ~,           ~,       ~,         ~]
         - [create_comment,            ~,         A,         A,           ~,       ~,         ~]
-        - [edit_comment,              ~,         ~,         ~,           A,       ~,         ~]
         - [create_rate,               ~,         A,         ~,           ~,       ~,         ~]
         - [edit_rate,                 ~,         ~,         ~,           A,       ~,         ~]
   evaluate:
@@ -26,7 +25,6 @@ states:
         - [create_document,           ~,         A,         ~,           ~,       ~,         ~]
         - [edit,                      ~,         A,         ~,           ~,       ~,         ~]
         - [create_comment,            ~,         A,         A,           ~,       ~,         ~]
-        - [edit_comment,              ~,         ~,         ~,           A,       ~,         ~]
   result:
     acm:
       principals:                    [anonymous, moderator, participant, creator, initiator, admin]
@@ -35,4 +33,4 @@ states:
         - [create_document,           ~,         A,         ~,           ~,       ~,         ~]
         - [edit,                      ~,         A,         ~,           ~,       ~,         ~]
         - [create_comment,            ~,         A,         ~,           ~,       ~,         ~]
-        - [edit_comment,              ~,         ~,         ~,           A,       ~,         ~]
+

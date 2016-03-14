@@ -25,7 +25,7 @@ def test_commentversion_meta():
                                     adhocracy_core.sheets.rate.IRateable,
                                     adhocracy_core.sheets.relation.ICanPolarize,
                                     )
-    assert meta.permission_create == 'edit_comment'
+    assert meta.permission_create == 'edit'
 
 
 def test_commentservice_meta():

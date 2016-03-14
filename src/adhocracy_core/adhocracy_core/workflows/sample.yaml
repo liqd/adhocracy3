@@ -9,7 +9,6 @@ states:
        - [create_proposal,   A,           ~,         ~,       ~]
        - [create_document,   A,           ~,         ~,       ~]
        - [create_comment,    A,           A,         ~,       ~]
-       - [edit_comment,      ~,           ~,         A,       ~]
        - [create_rate,      A,           ~,         ~,       ~]
        - [edit_rate,         ~,           ~,         A,       ~]
        - [create_relation,   A,           ~,         ~,       ~]

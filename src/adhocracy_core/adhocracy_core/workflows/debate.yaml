@@ -9,6 +9,5 @@ states:
         - [create_document,    ~,          ~,           ~,         ~,        A,        ~]
         - [edit,               ~,          ~,           ~,         ~,        A,        ~]
         - [create_comment,     ~,          A,           A,         ~,        A,        ~]
-        - [edit_comment,       ~,          ~,           ~,         A,        ~,        ~]
         - [create_rate,        ~,          A,           ~,         ~,        ~,        ~]
         - [edit_rate,          ~,          ~,           ~,         A,        ~,        ~]

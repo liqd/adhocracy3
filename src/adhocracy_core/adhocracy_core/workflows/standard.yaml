@@ -24,7 +24,6 @@ states:
         - [view,               ~,         A,           A,         A,       A,         ~]
         - [create_proposal,    ~,         A,           ~,         ~,       ~,         ~]
         - [create_comment,     ~,         A,           A,         ~,       ~,         ~]
-        - [edit_comment,       ~,         ~,           ~,         A,       ~,         ~]
         - [create_rate,        ~,         A,           ~,         ~,       ~,         ~]
         - [edit_rate,          ~,         ~,           ~,         A,       ~,         ~]
         - [create_relation,    ~,         A,           ~,         ~,       ~,         ~]
@@ -37,7 +36,6 @@ states:
         - [view,               ~,         ~,           ~,         ~,       ~,         ~]
         - [create_proposal,    ~,         ~,           ~,         ~,       ~,         ~]
         - [create_comment,     ~,         A,           A,         ~,       ~,         ~]
-        - [edit_comment,       ~,         ~,           ~,         A,       ~,         ~]
   result:
     title: Result
     acm:
@@ -46,7 +44,6 @@ states:
         - [view,               ~,         ~,           ~,         ~,       ~,         ~]
         - [create_proposal,    ~,         ~,           ~,         ~,       ~,         ~]
         - [create_comment,     ~,         ~,           A,         ~,       A,         ~]
-        - [edit_comment,       ~,         ~,           ~,         A,       ~,         ~]
   closed:
     title: Closed
     acm:

@@ -19,7 +19,6 @@ permissions:
   - [create_proposal,                ~,         ~,         ~,             ~,            ~,         ~,       ~,         A] # create proposal
   - [create_document,                ~,         ~,         ~,             ~,            ~,         ~,       ~,         A] # create document
   - [create_comment,                 ~,         ~,         ~,             ~,            ~,         ~,       ~,         A] # create comment
-  - [edit_comment,                   ~,         ~,         ~,             ~,            ~,         ~,       ~,         ~] # create comment version (edit for comments)
   - [create_rate,                    ~,         ~,         ~,             ~,            ~,         ~,       ~,         ~] # create rate
   - [edit_rate,                      ~,         ~,         ~,             ~,            ~,         ~,       ~,         ~] # create rate version (edit for rates)
   # badges

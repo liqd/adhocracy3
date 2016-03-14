@@ -6,7 +6,6 @@ states:
       permissions:
         - [create_proposal,              ~,         A,           ~,         ~,       A,         ~]
         - [create_comment,               ~,         A,           A,         ~,       A,         ~]
-        - [edit_comment,                 ~,         ~,           ~,         A,       ~,         ~]
         - [create_rate,                  ~,         A,           ~,         ~,       ~,         ~]
         - [edit_rate,                    ~,         ~,           ~,         A,       ~,         ~]
         - [create_badge_assignment,      ~,         A,           ~,         ~,       ~,         ~]
