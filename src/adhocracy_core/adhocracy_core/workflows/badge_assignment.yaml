@@ -1,0 +1,8 @@
+initial_state: assign
+states:
+  assign:
+    acm:
+      principals:             [anonymous,  participant, moderator, creator, initiator, admin]
+      permissions:
+        - [assign_badge,       ~,          A,           A,         ~,       ~,         ~]
+transitions: {}

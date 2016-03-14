@@ -48,6 +48,30 @@ class TestBadgeGroup:
         assert registry.content.create(meta.iresource.__identifier__)
 
 
+class TestParticipantsAssignableBadgeGroup:
+
+    @fixture
+    def meta(self):
+        from .badge import participants_assignable_badge_group_meta
+        return participants_assignable_badge_group_meta
+
+    def test_meta(self, meta):
+        from adhocracy_core import resources
+        from adhocracy_core import sheets
+        assert meta.iresource is resources.badge.IParticipantsAssignableBadgeGroup
+        assert meta.extended_sheets == (sheets.description.IDescription,
+                                        )
+        assert meta.permission_create == 'create_badge_group'
+        assert meta.element_types == (resources.badge.IBadge,
+                                      resources.badge.IBadgeGroup,
+                                      meta.iresource,
+                                      )
+        assert meta.workflow_name == 'badge_assignment'
+
+    @mark.usefixtures('integration')
+    def test_create(self, context, registry, meta):
+        assert registry.content.create(meta.iresource.__identifier__)
+
 class TestBadgesService:
 
     @fixture

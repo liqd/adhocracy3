@@ -32,7 +32,7 @@ def import_resources(root: IResource, registry: Registry, filename: str):
     for resource_info in resources_info:
         expected_path = _get_expected_path(resource_info)
         if _resource_exists(expected_path, root):
-            logger.info('Skipping {}.'.format(expected_path))
+            logger.info('Skipping {}'.format(expected_path))
         else:
             logger.info('Creating {}'.format(expected_path))
             _create_resource(freeze(resource_info), request, registry, root)

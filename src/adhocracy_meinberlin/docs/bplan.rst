@@ -161,28 +161,27 @@ required fields.
     >>> resp = testapp.get('/orga/1-23/', headers=auth_header)
     >>> resp.status_code
     200
-    >>> resp.json['data'] \
+    >>> embed_code = (resp.json['data'] \
     ...     ['adhocracy_core.sheets.embed.IEmbed'] \
-    ...     ['embed_code']
-    ''
-    >>> resp.json['data'] \
-    ...     ['adhocracy_core.sheets.embed.IEmbed'] \
-    ...     ['external_url']
-    ''
+    ...     ['embed_code'])
+    >>> print(embed_code)
+    <BLANKLINE>
+    <script src="http://localhost:6551/AdhocracySDK.js"></script>
+    <script> adhocracy.init('http://localhost:6551',
+                            function(adhocracy) {adhocracy.embed('.adhocracy_marker');
+                            });
+    </script>
+    <div class="adhocracy_marker"
+         data-path="http://localhost/orga/1-23/"
+         data-widget="mein-berlin-bplaene-proposal-embed"
+         data-autoresize="false"
+         data-locale="en"
+         data-autourl="false"
+         data-nocenter="true"
+         style="height: 650px">
+    </div>
+    <BLANKLINE>
 
-NOTE: This is still under development. The returned embed_code will have the
-following format::
-
-    '\n\n<script src="http://foo.bar/static/embed.html#!/AdhocracySDK.js"></script>\n
-    <script> adhocracy.init(\'http://foo.bar/static/embed.html#!\',\n
-    function(adhocracy) {adhocracy.embed(\'.adhocracy_marker\');\n });\n</script>\n
-    <div class="adhocracy_marker"\n data-path="http://foo.bar/orga/1-23/"\n
-    data-widget="mein-berlin-bplaene-proposal-embed"\n data-autoresize="false"\n
-    data-locale="en"\n
-    data-autourl="false"\n
-    data-nocenter="true"\n
-    style="height: 650px">\n
-    </div>\n'
 
 **Edit a B-Plan process**:
 

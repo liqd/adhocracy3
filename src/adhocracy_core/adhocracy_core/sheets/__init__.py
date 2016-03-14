@@ -225,7 +225,7 @@ class BaseResourceSheet:
             'adhocracy.filter_by_visible', True))
         if filter_visible:
             params['only_visible'] = True
-        appstruct = self.get(params=params)
+        appstruct = self.get(params=params, omit_readonly=True)
         schema = self.get_schema_with_bindings()
         cstruct = schema.serialize(appstruct)
         return cstruct

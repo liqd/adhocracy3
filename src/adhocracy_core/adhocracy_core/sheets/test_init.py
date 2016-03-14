@@ -285,27 +285,35 @@ class TestBaseResourceSheet:
         assert events[0].old_appstruct == {'count': 0}
         assert events[0].new_appstruct == {'count': 2}
 
-    def test_deserialize(self, inst, request_):
+    def test_serialize(self, inst, request_):
+        from . import BaseResourceSheet
         inst.request = request_
-        inst._get_data_appstruct.return_value = {'count': 2}
+        inst.get = Mock(spec=BaseResourceSheet.get)
+        inst.get.return_value = {'elements': [],
+                                 'count': 2}
         assert inst.serialize() == {'count': '2'}
+        default_params = {'only_visible': True,
+                          'allows': (request_.effective_principals, 'view'),
+                          }
+        assert inst.get.call_args[1]['params'] == default_params
+        assert inst.get.call_args[1]['omit_readonly'] is True
 
-    def test_deserialize_with_params(self, inst, request_):
+    def test_serialize_with_params(self, inst, request_):
         inst.request = request_
         inst.get = Mock()
         inst.get.return_value = {'elements': []}
         cstruct = inst.serialize(params={'name': 'child'})
         assert 'name' in inst.get.call_args[1]['params']
 
-    def test_deserialize_filter_by_view_permission(self, inst, request_):
+    def test_serialize_filter_by_view_permission(self, inst, request_):
         inst.request = request_
         inst.get = Mock()
         inst.get.return_value = {}
         cstruct = inst.serialize()
         assert inst.get.call_args[1]['params']['allows'] == \
-               (request_.effective_principals, 'view')
+                (request_.effective_principals, 'view')
 
-    def test_deserialize_filter_by_view_permission_disabled(self, inst,
+    def test_serialize_filter_by_view_permission_disabled(self, inst,
                                                             request_):
         inst.request = request_
         inst.registry.settings['adhocracy.filter_by_view_permission'] = "False"
@@ -314,14 +322,14 @@ class TestBaseResourceSheet:
         cstruct = inst.serialize()
         assert 'allows' not in inst.get.call_args[1]['params']
 
-    def test_deserialize_filter_by_only_visible(self, inst, request_):
+    def test_serialize_filter_by_only_visible(self, inst, request_):
         inst.request = request_
         inst.get = Mock()
         inst.get.return_value = {}
         cstruct = inst.serialize()
         assert inst.get.call_args[1]['params']['only_visible']
 
-    def test_deserialize_filter_by_only_visible_disabled(self, inst, request_):
+    def test_serialize_filter_by_only_visible_disabled(self, inst, request_):
         inst.request = request_
         inst.registry.settings['adhocracy.filter_by_visible'] = "False"
         inst.get = Mock()
