@@ -38,7 +38,7 @@ class PoolSheet(AnnotationRessourceSheet):
         """
         return super().get(params,
                            add_back_references=add_back_references,
-                           omit_readonly=omit_readonly)
+                           omit_defaults=omit_readonly)
 
     def _get_references_query(self, params: dict) -> SearchQuery:
         reftype = self._fields['reference']['elements'].reftype
