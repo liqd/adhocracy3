@@ -23,7 +23,6 @@ states:
       permissions:
         - [view,               ~,         A,           A,         A,       A,         ~]
         - [create_proposal,    ~,         A,           ~,         ~,       ~,         ~]
-        - [edit_proposal,      ~,         ~,           ~,         A,       ~,         ~]
         - [create_comment,     ~,         A,           A,         ~,       ~,         ~]
         - [edit_comment,       ~,         ~,           ~,         A,       ~,         ~]
         - [create_rate,        ~,         A,           ~,         ~,       ~,         ~]
@@ -37,7 +36,6 @@ states:
       permissions:
         - [view,               ~,         ~,           ~,         ~,       ~,         ~]
         - [create_proposal,    ~,         ~,           ~,         ~,       ~,         ~]
-        - [edit_proposal,      ~,         ~,           ~,         ~,       ~,         ~]
         - [create_comment,     ~,         A,           A,         ~,       ~,         ~]
         - [edit_comment,       ~,         ~,           ~,         A,       ~,         ~]
   result:
@@ -47,7 +45,6 @@ states:
       permissions:
         - [view,               ~,         ~,           ~,         ~,       ~,         ~]
         - [create_proposal,    ~,         ~,           ~,         ~,       ~,         ~]
-        - [edit_proposal,      ~,         ~,           ~,         ~,       ~,         ~]
         - [create_comment,     ~,         ~,           A,         ~,       A,         ~]
         - [edit_comment,       ~,         ~,           ~,         A,       ~,         ~]
   closed:

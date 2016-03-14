@@ -6,7 +6,6 @@ states:
       permissions:
         - [view,               ~,          A,           A,         A,        A,        ~]
         - [create_proposal,    ~,          ~,           ~,         ~,        A,        ~]
-        - [edit_proposal,      ~,          ~,           ~,         A,        A,        ~]
         - [create_document,    ~,          ~,           ~,         ~,        A,        ~]
         - [edit_document,      ~,          ~,           ~,         A,        A,        ~]
         - [create_comment,     ~,          A,           A,         ~,        A,        ~]

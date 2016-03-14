@@ -17,7 +17,6 @@ permissions:
   - [create_asset,                   ~,         ~,         ~,             A,            ~,         ~,       ~,         A] # create asset (image/file upload)
   - [create_external,                ~,         ~,         ~,             A,            ~,         ~,       ~,         A] # create external (store external URL)
   - [create_proposal,                ~,         ~,         ~,             ~,            ~,         ~,       ~,         A] # create proposal
-  - [edit_proposal,                  ~,         ~,         ~,             ~,            ~,         ~,       ~,         A] # create proposal version (edit for versionable proposals)
   - [create_document,                ~,         ~,         ~,             ~,            ~,         ~,       ~,         A] # create document
   - [edit_document,                  ~,         ~,         ~,             ~,            ~,         ~,       ~,         A] # create document version (edit for versionable documents)
   - [create_comment,                 ~,         ~,         ~,             ~,            ~,         ~,       ~,         A] # create comment

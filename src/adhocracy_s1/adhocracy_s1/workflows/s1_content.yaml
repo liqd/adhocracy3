@@ -6,7 +6,7 @@ states:
     acm:
       principals:               [anonymous, participant, moderator, creator, initiator, admin]
       permissions:
-        - [edit_proposal,        ~,         ~,           ~,         D,       ~,         ~]
+        - [edit,                 ~,         ~,           ~,         D,       ~,         ~]
         - [create_rate,          ~,         D,           ~,         D,       ~,         ~]
         - [edit_rate,            ~,         ~,           ~,         D,       ~,         ~]
         - [create_comment,       ~,         D,           D,         ~,       D,         ~]
@@ -15,7 +15,7 @@ states:
     acm:
       principals:               [anonymous, participant, moderator, creator, initiator, admin]
       permissions:
-        - [edit_proposal,        ~,         ~,           ~,         D,       ~,         ~]
+        - [edit,                 ~,         ~,           ~,         D,       ~,         ~]
         - [create_rate,          ~,         D,           ~,         D,       ~,         ~]
         - [edit_rate,            ~,         ~,           ~,         D,       ~,         ~]
         - [create_comment,       ~,         D,           D,         ~,       D,         ~]

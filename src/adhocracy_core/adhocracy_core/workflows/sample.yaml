@@ -7,7 +7,6 @@ states:
      principals:           [participant, moderator, creator, initiator]
      permissions:
        - [create_proposal,   A,           ~,         ~,       ~]
-       - [edit_proposal,     ~,           ~,         A,       ~]
        - [create_document,   A,           ~,         ~,       ~]
        - [edit_document,     ~,           ~,         A,       ~]
        - [create_comment,    A,           A,         ~,       ~]

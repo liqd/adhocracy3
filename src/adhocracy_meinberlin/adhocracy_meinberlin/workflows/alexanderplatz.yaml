@@ -12,7 +12,6 @@ states:
       principals:                    [anonymous, moderator, participant, creator, initiator, admin]
       permissions:
         - [create_proposal,           ~,         ~,         A,           ~,       ~,         ~]
-        - [edit_proposal,             ~,         ~,         ~,           A,       ~,         ~]
         - [create_document,           ~,         A,         ~,           ~,       ~,         ~]
         - [edit_document,             ~,         A,         ~,           ~,       ~,         ~]
         - [create_comment,            ~,         A,         A,           ~,       ~,         ~]
@@ -24,7 +23,6 @@ states:
       principals:                    [anonymous, moderator, participant, creator, initiator, admin]
       permissions:
         - [create_proposal,           ~,         ~,         ~,           ~,       ~,         ~]
-        - [edit_proposal,             ~,         ~,         ~,           ~,       ~,         ~]
         - [create_document,           ~,         A,         ~,           ~,       ~,         ~]
         - [edit_document,             ~,         A,         ~,           ~,       ~,         ~]
         - [create_comment,            ~,         A,         A,           ~,       ~,         ~]
@@ -34,7 +32,6 @@ states:
       principals:                    [anonymous, moderator, participant, creator, initiator, admin]
       permissions:
         - [create_proposal,           ~,         ~,         ~,           ~,       ~,         ~]
-        - [edit_proposal,             ~,         ~,         ~,           ~,       ~,         ~]
         - [create_document,           ~,         A,         ~,           ~,       ~,         ~]
         - [edit_document,             ~,         A,         ~,           ~,       ~,         ~]
         - [create_comment,            ~,         A,         ~,           ~,       ~,         ~]

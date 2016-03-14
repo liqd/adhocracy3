@@ -44,7 +44,7 @@ class TestProposalVersion:
                 adhocracy_core.sheets.relation.IPolarizable,
                 adhocracy_core.sheets.image.IImageReference,
                 )
-        assert meta.permission_create == 'edit_proposal'
+        assert meta.permission_create == 'edit'
 
     @mark.usefixtures('integration')
     def test_create(self, meta, registry):
@@ -88,7 +88,7 @@ class TestGeoProposalVersion:
                 adhocracy_core.sheets.image.IImageReference,
                 adhocracy_core.sheets.geo.IPoint,
                 )
-        assert meta.permission_create == 'edit_proposal'
+        assert meta.permission_create == 'edit'
 
     @mark.usefixtures('integration')
     def test_create(self, meta, registry):

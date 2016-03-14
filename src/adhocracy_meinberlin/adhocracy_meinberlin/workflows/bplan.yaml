@@ -7,11 +7,10 @@ states:
       permissions:
         - [create,                  A,         ~,           A,          A,      A,         ~]
         - [create_proposal,         A,         ~,           ~,          ~,      ~,         ~]
-        - [edit_proposal,           ~,         ~,           ~,          ~,      ~,         ~]
   evaluate:
     acm:
       principals:                  [anonymous, participant, moderator, creator, initiator, admin]
       permissions:
         - [create,                  ~,         ~,           A,          A,       A,        ~]
         - [create_proposal,         ~,         ~,           ~,          ~,       ~,        ~]
-        - [edit_proposal,           ~,         ~,           ~,          ~,       ~,        ~]
+
