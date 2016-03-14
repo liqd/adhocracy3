@@ -8,7 +8,6 @@ states:
      permissions:
        - [create_proposal,   A,           ~,         ~,       ~]
        - [create_document,   A,           ~,         ~,       ~]
-       - [edit_document,     ~,           ~,         A,       ~]
        - [create_comment,    A,           A,         ~,       ~]
        - [edit_comment,      ~,           ~,         A,       ~]
        - [create_rate,      A,           ~,         ~,       ~]

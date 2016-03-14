@@ -6,14 +6,14 @@ states:
       permissions:
         - [view,                      D,         A,         D,           A,       A,         ~]
         - [create_document,           ~,         A,         ~,           ~,       ~,         ~]
-        - [edit_document,             ~,         A,         ~,           A,       ~,         ~]
+        - [edit,                      ~,         A,         ~,           ~,       ~,         ~]
   participate:
     acm:
       principals:                    [anonymous, moderator, participant, creator, initiator, admin]
       permissions:
         - [create_proposal,           ~,         ~,         A,           ~,       ~,         ~]
         - [create_document,           ~,         A,         ~,           ~,       ~,         ~]
-        - [edit_document,             ~,         A,         ~,           ~,       ~,         ~]
+        - [edit,                      ~,         A,         ~,           ~,       ~,         ~]
         - [create_comment,            ~,         A,         A,           ~,       ~,         ~]
         - [edit_comment,              ~,         ~,         ~,           A,       ~,         ~]
         - [create_rate,               ~,         A,         ~,           ~,       ~,         ~]
@@ -24,7 +24,7 @@ states:
       permissions:
         - [create_proposal,           ~,         ~,         ~,           ~,       ~,         ~]
         - [create_document,           ~,         A,         ~,           ~,       ~,         ~]
-        - [edit_document,             ~,         A,         ~,           ~,       ~,         ~]
+        - [edit,                      ~,         A,         ~,           ~,       ~,         ~]
         - [create_comment,            ~,         A,         A,           ~,       ~,         ~]
         - [edit_comment,              ~,         ~,         ~,           A,       ~,         ~]
   result:
@@ -33,6 +33,6 @@ states:
       permissions:
         - [create_proposal,           ~,         ~,         ~,           ~,       ~,         ~]
         - [create_document,           ~,         A,         ~,           ~,       ~,         ~]
-        - [edit_document,             ~,         A,         ~,           ~,       ~,         ~]
+        - [edit,                      ~,         A,         ~,           ~,       ~,         ~]
         - [create_comment,            ~,         A,         ~,           ~,       ~,         ~]
         - [edit_comment,              ~,         ~,         ~,           A,       ~,         ~]

@@ -7,7 +7,7 @@ states:
         - [view,               ~,          A,           A,         A,        A,        ~]
         - [create_proposal,    ~,          ~,           ~,         ~,        A,        ~]
         - [create_document,    ~,          ~,           ~,         ~,        A,        ~]
-        - [edit_document,      ~,          ~,           ~,         A,        A,        ~]
+        - [edit,               ~,          ~,           ~,         ~,        A,        ~]
         - [create_comment,     ~,          A,           A,         ~,        A,        ~]
         - [edit_comment,       ~,          ~,           ~,         A,        ~,        ~]
         - [create_rate,        ~,          A,           ~,         ~,        ~,        ~]

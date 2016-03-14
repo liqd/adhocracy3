@@ -31,7 +31,7 @@ document_version_meta = itemversion_meta._replace(
                      adhocracy_core.sheets.image.IImageReference,
                      adhocracy_core.sheets.title.ITitle,
                      ),
-    permission_create='edit_document',
+    permission_create='edit',
 )
 
 

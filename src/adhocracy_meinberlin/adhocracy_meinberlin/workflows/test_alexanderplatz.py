@@ -26,12 +26,12 @@ class TestAlexanderplatzWorkflow:
     def test_announce_moderator_can_create_edit_any_document(self):
         acl = self.get_acl('announce')
         assert ('Allow', 'role:moderator', 'create_document') in acl
-        assert ('Allow', 'role:moderator', 'edit_document') in acl
+        assert ('Allow', 'role:moderator', 'edit') in acl
 
     def test_participate_moderator_can_add_edit_any_document(self):
         acl = self.get_acl('participate')
         assert ('Allow', 'role:moderator', 'create_document') in acl
-        assert ('Allow', 'role:moderator', 'edit_document') in acl
+        assert ('Allow', 'role:moderator', 'edit') in acl
 
     def test_participate_participant_can_create_proposal(self):
         acl = self.get_acl('participate')
@@ -44,12 +44,12 @@ class TestAlexanderplatzWorkflow:
     def test_participate_participant_cannot_create_edit_document(self):
         acl = self.get_acl('participate')
         assert ('Allow', 'role:participant', 'create_document') not in acl
-        assert ('Allow', 'role:participant', 'edit_document') not in acl
+        assert ('Allow', 'role:participant', 'edit') not in acl
 
     def test_evaluate_moderator_can_create_edit_any_document(self):
         acl = self.get_acl('evaluate')
         assert ('Allow', 'role:moderator', 'create_document') in acl
-        assert ('Allow', 'role:moderator', 'edit_document') in acl
+        assert ('Allow', 'role:moderator', 'edit') in acl
 
     def test_evaluate_participant_can_create_comment(self):
         acl = self.get_acl('evaluate')
@@ -58,7 +58,7 @@ class TestAlexanderplatzWorkflow:
     def test_result_moderator_can_create_edit_any_document(self):
         acl = self.get_acl('result')
         assert ('Allow', 'role:moderator', 'create_document') in acl
-        assert ('Allow', 'role:moderator', 'edit_document') in acl
+        assert ('Allow', 'role:moderator', 'edit') in acl
 
     def test_result_participant_cannot_create_comment(self):
         acl = self.get_acl('result')

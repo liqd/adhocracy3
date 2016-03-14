@@ -30,7 +30,6 @@ states:
         - [view_mercator2_winnerinfo,    ~,         A,           A,         ~,       ~,         ~]
         - [edit_mercator2_winnerinfo,    ~,         D,           A,         ~,       ~,         ~]
         - [create_document,              ~,         ~,           ~,         A,       ~,         ~]
-        - [edit_document,                ~,         ~,           ~,         A,       ~,         ~]
   closed:
     acm:
       principals:                       [anonymous, participant, moderator, creator, initiator, admin]

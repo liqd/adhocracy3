@@ -18,7 +18,6 @@ permissions:
   - [create_external,                ~,         ~,         ~,             A,            ~,         ~,       ~,         A] # create external (store external URL)
   - [create_proposal,                ~,         ~,         ~,             ~,            ~,         ~,       ~,         A] # create proposal
   - [create_document,                ~,         ~,         ~,             ~,            ~,         ~,       ~,         A] # create document
-  - [edit_document,                  ~,         ~,         ~,             ~,            ~,         ~,       ~,         A] # create document version (edit for versionable documents)
   - [create_comment,                 ~,         ~,         ~,             ~,            ~,         ~,       ~,         A] # create comment
   - [edit_comment,                   ~,         ~,         ~,             ~,            ~,         ~,       ~,         ~] # create comment version (edit for comments)
   - [create_rate,                    ~,         ~,         ~,             ~,            ~,         ~,       ~,         ~] # create rate

@@ -8,7 +8,7 @@ states:
       permissions:
         - [view,                   D,         D,           A,         A,       A,         A]
         - [create_document,        ~,         ~,           A,         ~,       ~,         ~]
-        - [edit_document,          ~,         ~,           A,         A,       A,         ~]
+        - [edit,                   ~,         ~,           A,         ~,       A,         ~]
       display_only_to_roles: [admin, initiator, moderator]
   announce:
     title: Announce
