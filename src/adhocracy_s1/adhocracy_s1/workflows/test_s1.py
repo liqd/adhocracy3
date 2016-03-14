@@ -4,7 +4,7 @@ from pytest import mark
 from unittest.mock import Mock
 from webtest import TestResponse
 
-from adhocracy_core.utils.testing import do_transition_to
+from adhocracy_core.testing import do_transition_to
 
 
 class TestDoTransitionToPropose:

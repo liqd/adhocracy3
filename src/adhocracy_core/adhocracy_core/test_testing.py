@@ -18,7 +18,7 @@ def mock_transaction_commit(mocker):
 
 @fixture
 def mock_run_import_function(mocker):
-    mock = mocker.patch('adhocracy_core.utils.testing._run_import_function',
+    mock = mocker.patch('adhocracy_core.testing._run_import_function',
                         AutoSpec=True)
     return mock
 
@@ -61,4 +61,3 @@ class TestRunImportFunction:
                                                  filename)
         assert dummy_closer.called
         assert mock_transaction_commit.called
-
