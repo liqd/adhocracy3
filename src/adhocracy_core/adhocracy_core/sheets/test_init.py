@@ -101,8 +101,23 @@ class TestBaseResourceSheet:
                                    'creating': inst.creating,
                                    }
 
-    def test_get_empty(self, inst):
+    def test_get_with_default(self, inst):
         assert inst.get() == {'count': 0}
+
+    def test_get_with_deferred_default(self, inst):
+        """A dictionary with 'registry' and 'context' is passed to deferred
+        default functions.
+        """
+        schema = inst.schema.bind()
+        @colander.deferred
+        def default(node, kw):
+            return len(kw)
+        schema['count'].default = default
+        inst.schema = schema
+        assert inst.get() == {'count': 2}
+
+    def test_get_with_omit_defaults(self, inst):
+        assert inst.get(omit_defaults=True) == {}
 
     def test_get_non_empty(self, inst):
         inst._get_data_appstruct.return_value = {'count': 11}
@@ -296,7 +311,7 @@ class TestBaseResourceSheet:
                           'allows': (request_.effective_principals, 'view'),
                           }
         assert inst.get.call_args[1]['params'] == default_params
-        assert inst.get.call_args[1]['omit_readonly'] is True
+        assert inst.get.call_args[1]['omit_defaults'] is True
 
     def test_serialize_with_params(self, inst, request_):
         inst.request = request_
