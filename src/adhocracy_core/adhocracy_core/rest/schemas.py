@@ -56,7 +56,6 @@ from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.catalog import ICatalogsService
 from adhocracy_core.catalog.index import ReferenceIndex
-from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import now
 from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import unflatten_multipart_request
@@ -106,8 +105,8 @@ class GETItemResponseSchema(ResourcePathAndContentSchema):
 
 def add_put_data_subschemas(node: colander.Schema, kw: dict):
     """Add the resource sheet colander schemas that are 'editable'."""
-    context = kw.get('context', None)
-    request = kw.get('request', None)
+    context = kw['context']
+    request = kw['request']
     sheets = request.registry.content.get_sheets_edit(context, request)
     if request.content_type == 'multipart/form-data':
         body = unflatten_multipart_request(request)
@@ -118,8 +117,9 @@ def add_put_data_subschemas(node: colander.Schema, kw: dict):
         name = sheet.meta.isheet.__identifier__
         if name not in data:
             continue
-        subschema = sheet.meta.schema_class(name=name)
-        node.add(subschema.bind(**kw))
+        schema = sheet.get_schema_with_bindings()
+        schema.name = name
+        node.add(schema)
 
 
 class BlockExplanationResponseSchema(colander.Schema):
@@ -191,8 +191,10 @@ def add_post_data_subschemas(node: SchemaNode, kw: dict):
         name = sheet.meta.isheet.__identifier__
         is_mandatory = sheet.meta.create_mandatory
         missing = colander.required if is_mandatory else colander.drop
-        schema = sheet.meta.schema_class(name=name, missing=missing)
-        node.add(schema.bind(**kw))
+        schema = sheet.get_schema_with_bindings()
+        schema.name = name
+        schema.missing = missing
+        node.add(schema)
 
 
 def _get_resource_type_based_on_request_type(request: Request) -> str:
@@ -209,9 +211,9 @@ def _get_resource_type_based_on_request_type(request: Request) -> str:
 def deferred_validate_post_content_type(node, kw):
     """Validate the addable content type for post requests."""
     context = kw['context']
+    registry = kw['registry']
     request = kw['request']
-    addables = request.registry.content.get_resources_meta_addable(context,
-                                                                   request)
+    addables = registry.content.get_resources_meta_addable(context, request)
     addable_iresources = [r.iresource for r in addables]
     return colander.OneOf(addable_iresources)
 
@@ -232,6 +234,7 @@ class POSTAssetRequestSchema(POSTResourceRequestSchema):
     """Data structure for Asset POST requests."""
 
     validator = validate_claimed_asset_mime_type
+
 
 class AbsolutePaths(colander.SequenceSchema):
     """List of resource paths."""
@@ -937,12 +940,13 @@ class POSTCreatePasswordResetRequestSchema(colander.Schema):
 def validate_password_reset_path(node, kw):
     """Validate password reset and add the user needing password reset."""
     request = kw['request']
+    registry = kw['registry']
 
     def validate_path(node, value):
         if value is None:
             return
         _raise_if_no_password_reset(node, value)
-        metadata = get_sheet(value, IMetadata).get()
+        metadata = registry.content.get_sheet(value, IMetadata).get()
         _raise_if_outdated(node, value, metadata['creation_date'])
         request.validated['user'] = metadata['creator']
     return validate_path

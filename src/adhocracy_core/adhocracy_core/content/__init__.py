@@ -1,10 +1,10 @@
 """Create resources, get sheets/metadata, permission checks."""
-from copy import copy
+from functools import lru_cache
 
 from pyramid.request import Request
+from pyramid.traversal import resource_path
 from pyramid.util import DottedNameResolver
 from pyramid.decorator import reify
-from pyramid.traversal import resource_path
 from substanced.content import ContentRegistry
 from substanced.content import add_content_type
 from substanced.content import add_service_type
@@ -15,6 +15,8 @@ from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ResourceMetadata
+from adhocracy_core.interfaces import SheetMetadata
+from adhocracy_core.interfaces import IResourceSheet
 from adhocracy_core.utils import get_iresource
 
 
@@ -51,7 +53,7 @@ class ResourceContentRegistry(ContentRegistry):
         """
 
     def get_resources_meta_addable(self, context: object,
-                                   request: Request) -> list:
+                                   request: Request) -> [ResourceMetadata]:
         """Get addable resource meta for context, mind permissions."""
         iresource = get_iresource(context)
         addables = self.resources_meta_addable[iresource]
@@ -69,7 +71,7 @@ class ResourceContentRegistry(ContentRegistry):
         return allowed
 
     @reify
-    def resources_meta_addable(self):
+    def resources_meta_addable(self) -> {}:
         """Addable resources metadata mapping.
 
         Dictionary with key iresource (`resource type` interface)` and value
@@ -127,142 +129,138 @@ class ResourceContentRegistry(ContentRegistry):
     def _get_workflow_permissions(self, workflow_meta):
         return [t['permission'] for t in workflow_meta['transitions'].values()]
 
-    def get_sheet(self, context: object, isheet: IInterface) -> ISheet:
+    def get_sheet(self, context: object,
+                  isheet: IInterface,
+                  request: Request=None,
+                  creating: ResourceMetadata=None) -> IResourceSheet:
         """Get sheet for `context` and set the 'context' attribute.
 
         :raise adhocracy_core.exceptions.RuntimeConfigurationError:
            if there is no `isheet` sheet registered for context.
         """
-        if not isheet.providedBy(context):
+        if not creating and not isheet.providedBy(context):
             msg = 'Sheet {0} is not provided by resource {1}'\
                 .format(isheet.__identifier__, resource_path(context))
             raise RuntimeConfigurationError(msg)
         meta = self.sheets_meta[isheet]
-        sheet = meta.sheet_class(meta, context, self.registry)
+        sheet = self._create_sheet(meta, context, None)
+        sheet.context = context
+        sheet.request = request
+        sheet.registry = self.registry
+        sheet.creating = creating
         return sheet
 
-    def get_sheets_all(self, context: object) -> list:
-        """Get all sheets for `context` and set the 'context' attribute."""
-        iresource = get_iresource(context)
-        sheets = self.sheets_all[iresource].copy()
-        self._add_context(sheets, context)
-        return sheets
+    @lru_cache(maxsize=256)
+    def _create_sheet(self, meta: SheetMetadata,
+                      context: object,
+                      request: Request,
+                      creating: ResourceMetadata=None) -> IResourceSheet:
+        sheet = meta.sheet_class(meta, context, self.registry,
+                                 request=request,
+                                 creating=creating,
+                                 )
+        return sheet
 
-    def get_sheets_create(self, context: object, request: Request=None,
-                          iresource: IInterface=None):
-        """Get creatable sheets for `context` and set the 'context' attribute.
+    def get_sheet_field(self, context: object,
+                        isheet: IInterface,
+                        field: str,
+                        request: Request=None) -> object:
+        """Get sheet for `context` and return the value for field `name`.
 
-        :param iresource: If set return creatable sheets for this resource
-                         type. Else return the creatable sheets of `context`.
-        :param request: If set check permissions.
+        :raise adhocracy_core.exceptions.RuntimeConfigurationError:
+           if there is no `isheet` sheet registered for context.
+        :raise KeyError: if `field` does not exists for sheet `isheet`.
         """
-        iresource = iresource or get_iresource(context)
-        sheets = self.sheets_create[iresource].copy()
-        self._add_context(sheets, context)
-        self._filter_permission(sheets, 'permission_create', context, request)
+        sheet = self.get_sheet(context, isheet, request=request)
+        appstruct = sheet.get()
+        value = appstruct[field]
+        return value
+
+    def get_sheets_all(self, context: object,
+                       request: Request=None) -> [IResourceSheet]:
+        """Get all sheets for `context`."""
+        iresource = get_iresource(context)
+        metas = self._get_sheets_meta(iresource)
+        sheets = [self.get_sheet(context, m.isheet, request) for m in metas]
         return sheets
 
-    def get_sheets_edit(self, context: object, request: Request=None) -> list:
-        """Get editable sheets for `context` and set the 'context' attribute.
+    def get_sheets_create(self, context: object,
+                          request: Request=None,
+                          iresource: IInterface=None) -> [IResourceSheet]:
+        """Get creatable sheets for `context` or `iresource`.
 
-        :param request: If set check permissions.
+        :param request: If not None filter by sheet create permission.
+        :param iresource: If not None return sheets for this resource type.
+            The `creating` sheet attribute is set to the resource metadata
+            of this type. The returned sheets should only be used to
+            deserialize data to create a new resource.
+        """
+        if iresource:
+            creating = self.resources_meta[iresource]
+        else:
+            creating = None
+            iresource = get_iresource(context)
+        metas = self._get_sheets_meta(iresource, filter_attr='creatable')
+        if request:
+            metas = self._filter_permission(metas, context, request,
+                                            permission_attr='permission_create'
+                                            )
+        sheets = [self.get_sheet(context, m.isheet, request=request,
+                                 creating=creating) for m in metas]
+        return sheets
+
+    def get_sheets_edit(self, context: object,
+                        request: Request=None) -> [IResourceSheet]:
+        """Get editable sheets for `context`.
+
+        :param request: If not None filter by sheet edit permission.
         """
         iresource = get_iresource(context)
-        sheets = self.sheets_edit[iresource].copy()
-        self._add_context(sheets, context)
-        self._filter_permission(sheets, 'permission_edit', context, request)
+        metas = self._get_sheets_meta(iresource, filter_attr='editable')
+        if request:
+            metas = self._filter_permission(metas, context, request,
+                                            permission_attr='permission_edit')
+        sheets = [self.get_sheet(context, m.isheet, request=request)
+                  for m in metas]
         return sheets
 
-    def get_sheets_read(self, context: object, request: Request=None) -> list:
-        """Get readable sheets for `context` and set the 'context' attribute.
+    def get_sheets_read(self, context: object,
+                        request: Request=None) -> [IResourceSheet]:
+        """Get readable sheets for `context`.
 
-        :param request: If set check permissions.
+        :param request: If not None filter by sheet edit permission.
         """
         iresource = get_iresource(context)
-        sheets = self.sheets_read[iresource].copy()
-        self._add_context(sheets, context)
-        self._filter_permission(sheets, 'permission_view', context, request)
+        metas = self._get_sheets_meta(iresource, filter_attr='readable')
+        if request:
+            metas = self._filter_permission(metas, context, request,
+                                            permission_attr='permission_view')
+        sheets = [self.get_sheet(context, m.isheet, request=request)
+                  for m in metas]
         return sheets
+
+    def _get_sheets_meta(self, iresource: IInterface,
+                         filter_attr='') -> [SheetMetadata]:
+        resource_meta = self.resources_meta[iresource]
+        isheets = set(resource_meta.basic_sheets
+                      + resource_meta.extended_sheets)
+        for isheet in isheets:
+            meta = self.sheets_meta[isheet]
+            enabled = True
+            if filter_attr:
+                enabled = getattr(meta, filter_attr)
+            if enabled:
+                yield meta
 
     @staticmethod
-    def _add_context(sheets: list, context: object):
-        for sheet in sheets:
-            sheet.context = context
-
-    @staticmethod
-    def _filter_permission(sheets: list, permission_attr: str, context: object,
-                           request: Request=None):
-        if request is None:
-            return
-        sheets_candiates = copy(sheets)
-        for sheet in sheets_candiates:
-            permission = getattr(sheet.meta, permission_attr)
-            if not request.has_permission(permission, context):
-                sheets.remove(sheet)
-
-    @reify
-    def sheets_all(self) -> dict:
-        """Sheet mapping.
-
-        Dictionary with key iresource (`resource type` interface) and
-        value list of sheets.
-        Mind to set the `context` attribute before set/get sheet data.
-        """
-        resource_sheets_all = {}
-        registry = self.registry
-        for resource_meta in self.resources_meta.values():
-            isheets = set(resource_meta.basic_sheets +
-                          resource_meta.extended_sheets)
-            sheets = []
-            for isheet in isheets:
-                sheet_meta = self.sheets_meta[isheet]
-                context = None
-                sheet = sheet_meta.sheet_class(sheet_meta, context, registry)
-                sheets.append(sheet)
-            resource_sheets_all[resource_meta.iresource] = sheets
-        return resource_sheets_all
-
-    @reify
-    def sheets_create(self) -> dict:
-        """Createable sheets mapping.
-
-        Dictionary with key `resource type` and value list of creatable sheets.
-        """
-        return self._filter_sheets_all_by_attribute('creatable')
-
-    @reify
-    def sheets_create_mandatory(self) -> dict:
-        """CreateMandatory sheets mapping.
-
-        Dictionary with key `resource type` and value list of
-        create mandatory sheets.
-        """
-        return self._filter_sheets_all_by_attribute('create_mandatory')
-
-    @reify
-    def sheets_edit(self) -> dict:
-        """Editable sheets mapping.
-
-        Dictionary with key `resource type` and value list of
-        editable sheets.
-        """
-        return self._filter_sheets_all_by_attribute('editable')
-
-    @reify
-    def sheets_read(self) -> dict:
-        """Readable sheets mapping.
-
-        Dictionary with key `resource type` and value list of
-        readable sheets.
-        """
-        return self._filter_sheets_all_by_attribute('readable')
-
-    def _filter_sheets_all_by_attribute(self, attribute: str) -> list:
-        sheets_all_filtered = {}
-        for iresource, sheets in self.sheets_all.items():
-            filtered = filter(lambda s: getattr(s.meta, attribute), sheets)
-            sheets_all_filtered[iresource] = [x for x in filtered]
-        return sheets_all_filtered
+    def _filter_permission(metas: [ResourceMetadata],
+                           context: object,
+                           request: Request,
+                           permission_attr: str) -> [ResourceMetadata]:
+        for meta in metas:
+            permission = getattr(meta, permission_attr)
+            if request.has_permission(permission, context):
+                yield(meta)
 
     def resolve_isheet_field_from_dotted_string(self, dotted: str) -> tuple:
         """Resolve `dotted` string to isheet and field name and schema node.

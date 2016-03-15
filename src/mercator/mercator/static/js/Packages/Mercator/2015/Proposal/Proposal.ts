@@ -1,11 +1,10 @@
 /// <reference path="../../../../_all.d.ts"/>
-/// <reference path="../../../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
+/// <reference path="../../../../../lib2/types/moment.d.ts"/>
 
 import * as _ from "lodash";
 
 import * as AdhBadge from "../../../Badge/Badge";
 import * as AdhConfig from "../../../Config/Config";
-import * as AdhCredentials from "../../../User/Credentials";
 import * as AdhHttp from "../../../Http/Http";
 import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
@@ -66,9 +65,8 @@ import * as SIPool from "../../../../Resources_/adhocracy_core/sheets/pool/IPool
 import * as SIRate from "../../../../Resources_/adhocracy_core/sheets/rate/IRate";
 import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIVersionable from "../../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
-import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/Mercator/2015/Proposal";
+export var pkgLocation = "/Mercator/2015/Proposal";
 
 
 export interface IScopeData {
@@ -204,28 +202,6 @@ export var countSupporters = (adhHttp : AdhHttp.Service<any>, postPoolPath : str
             var pool : SIPool.Sheet = response.data[SIPool.nick];
             return parseInt((<any>pool).count, 10);  // see #261
         });
-};
-
-/**
- * promise workflow state.
- */
-export var getWorkflowState = (
-    adhHttp : AdhHttp.Service<any>,
-    adhTopLevelState : AdhTopLevelState.Service,
-    $q : angular.IQService
-) => () : angular.IPromise<string> => {
-    var processUrl = adhTopLevelState.get("processUrl");
-
-    if (typeof processUrl !== "undefined") {
-        return adhHttp.get(processUrl).then((resource) => {
-            var workflowSheet = resource.data[SIWorkflow.nick];
-            if (typeof workflowSheet !== "undefined") {
-                return workflowSheet.workflow_state;
-            }
-        });
-    } else {
-        return $q.when(undefined);
-    }
 };
 
 
@@ -375,9 +351,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             data.winnerBadgeAssignment = communityAssignment || winningAssignment;
         });
 
-        getWorkflowState(this.adhHttp, this.adhTopLevelState, this.$q)().then((workflowState) => {
-            data.currentPhase = workflowState;
-        });
+        instance.scope.$on("$destroy", <any>this.adhTopLevelState.bind("processState", data, "currentPhase"));
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
         var subResourcePromises : angular.IPromise<ResourcesBase.Resource[]> = this.$q.all([
@@ -615,7 +589,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var allKeys = _.uniq(_.flatten(_.values(fieldsMap)));
 
         _.forOwn(data.organization_info, (value, key, object) => {
-            if (_.contains(allKeys, key) && !(_.contains(fieldsMap[object.status_enum], key))) {
+            if (_.includes(allKeys, key) && !(_.includes(fieldsMap[object.status_enum], key))) {
                 delete object[key];
             }
         });
@@ -678,8 +652,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                 return [item, version];
             });
 
-            // FIXME: remove <any> when borisyankov/DefinitelyTyped#3573 is resolved
-            return this.$q.when((<any>_).flattenDeep([mercatorProposal, mercatorProposalVersion, subresources]));
+            return this.$q.when(_.flattenDeep([mercatorProposal, mercatorProposalVersion, subresources]));
         };
 
         if (instance.scope.$flow && instance.scope.$flow.support && instance.scope.$flow.files.length > 0) {
@@ -728,8 +701,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                     });
                     return deferred.promise;
                 }), self.$q)
-                // FIXME: remove <any> when borisyankov/DefinitelyTyped#3573 is resolved
-                .then((subresources) => (<any>_).flattenDeep([mercatorProposalVersion, subresources]));
+                .then((subresources) => _.flattenDeep([mercatorProposalVersion, subresources]));
 
         };
 
@@ -880,7 +852,6 @@ export var userListing = (adhConfig : AdhConfig.IService) => {
 
 
 export var listItem = (
-    $q : angular.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhTopLevelState : AdhTopLevelState.Service,
@@ -928,9 +899,7 @@ export var listItem = (
                     scope.data.winnerBadgeAssignment = communityAssignment || winningAssignment;
                 });
 
-                getWorkflowState(adhHttp, adhTopLevelState, $q)().then((workflowState) => {
-                    scope.data.currentPhase = workflowState;
-                });
+                scope.$on("$destroy", adhTopLevelState.bind("processState", scope.data, "currentPhase"));
 
                 scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                     if (!proposalVersionUrl) {
@@ -954,22 +923,19 @@ export var listItem = (
 };
 
 
-export var addButton = (
+export var addProposalButton = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhTopLevelState : AdhTopLevelState.Service,
     adhPermissions : AdhPermissions.Service,
-    adhCredentials : AdhCredentials.Service,
-    $q : angular.IQService
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/AddButton.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/AddProposalButton.html",
         link: (scope) => {
-            getWorkflowState(adhHttp, adhTopLevelState, $q)().then((workflowState) => {
-                scope.loggedOutAndParticipate = (!adhCredentials.loggedIn && workflowState === "participate");
-            });
-            adhPermissions.bindScope(scope, adhConfig.rest_url + adhConfig.custom["mercator_platform_path"], "poolOptions");
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("processState", scope));
+            adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
+            scope.setCameFrom = () => adhTopLevelState.setCameFrom();
         }
     };
 };
@@ -1149,5 +1115,5 @@ export var registerRoutes = (
                     };
                 }
             );
-    }).value();
+    });
 };

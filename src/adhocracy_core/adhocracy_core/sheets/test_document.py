@@ -24,19 +24,18 @@ class TestDocumentSheet:
     def test_create(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'elements': []}
 
     @mark.usefixtures('integration')
-    def test_includeme_register_document_sheet(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_document_sheet(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestParagraphSheet:
@@ -55,17 +54,16 @@ class TestParagraphSheet:
     def test_create(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'text': '',
                               'documents': []}
 
     @mark.usefixtures('integration')
-    def test_includeme_register_document_sheet(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_document_sheet(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)

@@ -17,7 +17,6 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.principal import IUserExtended
-from adhocracy_core.utils import get_sheet_field
 
 logger = getLogger(__name__)
 
@@ -133,7 +132,8 @@ class Messenger:
                              request: Request=None,
                              ):
         """Send a message to a specific user."""
-        from_email = self._get_user_email(from_user)
+        from_email = self.registry.settings.get('mail.noreply_sender',
+                                                'noreply@')
         recipient_email = self._get_user_email(recipient)
         sender_name = self._get_user_name(from_user)
         sender_url = self._get_user_url(from_user)
@@ -158,10 +158,14 @@ class Messenger:
         )
 
     def _get_user_email(self, user: IResource) -> str:
-        return get_sheet_field(user, IUserExtended, 'email', self.registry)
+        return self.registry.content.get_sheet_field(user,
+                                                     IUserExtended,
+                                                     'email')
 
     def _get_user_name(self, user: IResource) -> str:
-        return get_sheet_field(user, IUserBasic, 'name', self.registry)
+        return self.registry.content.get_sheet_field(user,
+                                                     IUserBasic,
+                                                     'name')
 
     def _get_user_url(self, user: IResource) -> str:
         sender_path = resource_path(user)

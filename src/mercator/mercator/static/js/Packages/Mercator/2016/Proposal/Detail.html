@@ -2,7 +2,7 @@
     <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
 
     <div class="section-jump-cover">
-        <ul class="meta-list mercator-proposal-detail-meta-list m-phase-{{data.currentPhase}}">
+        <ul class="meta-list mercator-proposal-detail-meta-list m-phase-{{processState}}">
             <li class="meta-list-item meta-list-item-total-comments">
                 <i class="icon-speechbubbles"></i>
                 {{ data.commentCountTotal }} {{ "TR__COMMENTS_TOTAL" | translate }}
@@ -11,12 +11,12 @@
                 <i class="icon-calendar m-definition-before" title="{{ 'TR__CREATION_DATE' | translate }}:"></i>
                 <adh-time data-datetime="data.creationDate" data-format="D/M/YYYY"></adh-time>
             </li>
-            <li data-ng-if="data.currentPhase && data.currentPhase != 'result'" class="meta-list-item meta-list-item-budget screen-only">
+            <li data-ng-if="processState && processState != 'result'" class="meta-list-item meta-list-item-budget screen-only">
                 <i class="icon-pig" title="{{ 'TR__MERCATOR_PROPOSAL_REQUESTED' | translate }}"></i>
                 {{data.finance.requestedFunding | number}} &euro;
             </li>
             <li class="meta-list-item meta-list-item-rate">
-                <adh-like data-refers-to="{{path}}" data-disabled="data.currentPhase != 'participate'"></adh-like>
+                <adh-like data-refers-to="{{path}}" data-disabled="processState != 'participate'"></adh-like>
             </li>
         </ul>
 
@@ -360,7 +360,7 @@
                 <footer class="mercator-proposal-detail-footer">
                     <a class="button-back-to-top" data-du-smooth-scroll="" href="#section-jump-top">
                     <i class="icon-back-to-top"></i> {{ "TR__BACK_TO_TOP" | translate }}</a>
-                    <adh-like data-refers-to="{{path}}"></adh-like>
+                    <adh-like data-refers-to="{{path}}" data-disabled="processState != 'participate'"></adh-like>
                 </footer>
             </div>
         </div>

@@ -14,6 +14,7 @@ requires = [
     'pyramid',
     'pyramid_debugtoolbar',
     'pyramid_exclog',
+    'pyramid_bpython',
     'gunicorn',
     'substanced',
     'pyramid_tm',
@@ -24,6 +25,7 @@ requires = [
     'requests',
     'pyrsistent',
     'multipledispatch',
+    'PyYAML',
 ]
 
 if sys.version_info < (3, 4):
@@ -50,7 +52,6 @@ test_requires = [
 ]
 
 debug_requires = [
-    'ipdb',  # ipython pdb
     'pudb',  # Graphical debugger
     'contexttimer',  # decorator to measure time
     'profilehooks',  # decorator to run/output cprofile

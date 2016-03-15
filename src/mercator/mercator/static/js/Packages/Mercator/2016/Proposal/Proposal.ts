@@ -1,5 +1,5 @@
-/// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
-/// <reference path="../../../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
+/// <reference path="../../../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../../../lib2/types/moment.d.ts"/>
 
 import * as AdhBadge from "../../../Badge/Badge";
 import * as AdhConfig from "../../../Config/Config";
@@ -203,7 +203,6 @@ export interface IDetailData extends IData {
         difference : number;
         practicalrelevance : number;
     };
-    currentPhase : string;
     supporterCount : number;
     creationDate : string;
     creator : string;
@@ -520,7 +519,6 @@ var get = (
                 subs[key] = subresource;
             });
         })).then(() => $q.all([
-            AdhMercator2015Proposal.getWorkflowState(adhHttp, adhTopLevelState, $q)(),
             AdhMercator2015Proposal.countSupporters(adhHttp, path + "rates/", path),
             adhGetBadges(proposal).then((assignments : AdhBadge.IBadge[]) => {
                 var communityAssignment = _.find(assignments, (a) => a.name === "community");
@@ -546,8 +544,7 @@ var get = (
             };
 
             return {
-                currentPhase: args[0],
-                supporterCount: args[1],
+                supporterCount: args[0],
 
                 creationDate: proposal.data[SIMetaData.nick].item_creation_date,
                 creator: proposal.data[SIMetaData.nick].creator,
@@ -601,8 +598,8 @@ var get = (
                 }, {}),
                 winner: {
                     funding: (proposal.data[SIWinnerInfo.nick] || {}).funding,
-                    description: (args[2] || {}).description,
-                    name: (args[2] || {}).name
+                    description: (args[1] || {}).description,
+                    name: (args[1] || {}).name
                 },
                 introduction: {
                     pitch: subs.pitch.data[SIPitch.nick].pitch,
@@ -839,6 +836,7 @@ export var listItem = (
             path: "@"
         },
         link: (scope, element) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processState", scope));
             get($q, adhHttp, adhTopLevelState, adhGetBadges)(scope.path).then((data) => {
 
                 scope.data = {
@@ -857,7 +855,6 @@ export var listItem = (
                     },
                     introduction: data.introduction,
                     commentCountTotal: data.commentCountTotal,
-                    currentPhase: data.currentPhase,
                     supporterCount: data.supporterCount
                 };
             });
@@ -1010,7 +1007,7 @@ export var detailDirective = (
             adhPermissions.bindScope(scope, () => scope.path);
             // FIXME, waa
             scope.isModerator = scope.options.PUT;
-
+            scope.$on("$destroy", adhTopLevelState.bind("processState", scope));
             get($q, adhHttp, adhTopLevelState, adhGetBadges)(scope.path).then((data) => {
                 scope.data = data;
             });

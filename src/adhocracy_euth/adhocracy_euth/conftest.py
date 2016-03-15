@@ -2,13 +2,6 @@
 from pytest import fixture
 
 
-@fixture(scope='session')
-def app_settings(app_settings) -> dict:
-    """Return settings to start the test wsgi app."""
-    app_settings['adhocracy.add_default_group'] = True
-    return app_settings
-
-
 @fixture(scope='class')
 def app_router(app_settings):
     """Return the adhocracy_mercator test wsgi application."""
@@ -22,4 +15,5 @@ def app_router(app_settings):
 def integration(integration):
     """Include resource types and sheets."""
     integration.include('adhocracy_euth.resources')
+    integration.include('adhocracy_euth.authorization')
     return integration

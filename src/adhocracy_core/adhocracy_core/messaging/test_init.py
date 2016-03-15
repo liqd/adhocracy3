@@ -11,6 +11,7 @@ def integration(config):
     config.include('pyramid_mailer.testing')
     config.include('pyramid_mako')
     config.include('adhocracy_core.content')
+    config.include('adhocracy_core.sheets.principal')
     config.include('adhocracy_core.sheets.metadata')
     config.include('adhocracy_core.messaging')
 
@@ -93,21 +94,14 @@ def _msg_to_str(msg):
     # Undo quoted-printable encoding of spaces for convenient testing
     return msgtext.replace('=20', ' ')
 
-def mock_get_sheet_field(context, sheet, field_name, registry):
-    result = getattr(context, field_name)
-    return result
-
 
 @mark.usefixtures('integration')
 class TestSendAbuseComplaint:
 
-    def test_send_abuse_complaint_with_user(self, monkeypatch, registry,
-                                            request_):
-        from adhocracy_core import messaging
-        from adhocracy_core.resources.principal import IUser
-        monkeypatch.setattr(messaging, 'get_sheet_field', mock_get_sheet_field)
-        user = Mock(spec=IUser)
-        user.name = 'Alex User'
+    def test_send_abuse_complaint_with_user(self, request_, registry):
+        from adhocracy_core.sheets.principal import IUserBasic
+        user = testing.DummyResource(__provides__=IUserBasic,
+                                     name='Alex User')
         mailer = registry.messenger.mailer
         messenger = registry.messenger
         messenger.abuse_handler_mail = 'abuse_handler@unconfigured.domain'
@@ -121,7 +115,7 @@ class TestSendAbuseComplaint:
         assert remark in msgtext
         assert 'sent by user Alex User' in msgtext
 
-    def test_send_abuse_complaint_without_user(self, registry, request_):
+    def test_send_abuse_complaint_without_user(self, request_, registry):
         mailer = registry.messenger.mailer
         messenger = registry.messenger
         messenger.abuse_handler_mail = 'abuse_handler@unconfigured.domain'
@@ -136,16 +130,16 @@ class TestSendAbuseComplaint:
 @mark.usefixtures('integration')
 class TestSendMessageToUser:
 
-    def test_send_message_to_user(self, monkeypatch, registry, request_):
-        from adhocracy_core import messaging
-        from adhocracy_core.resources.principal import IUser
-        recipient = Mock(spec=IUser)
-        recipient.email = 'recipient@example.org'
-        sender = Mock(spec=IUser)
-        sender.name = 'username'
-        sender.email = 'sender@example.org'
-        sender.name = 'Sandy Sender'
-        monkeypatch.setattr(messaging, 'get_sheet_field', mock_get_sheet_field)
+    def test_send_message_to_user(self, request_, registry):
+        from adhocracy_core.sheets.principal import IUserExtended
+        from adhocracy_core.sheets.principal import IUserBasic
+        registry.settings['mail.noreply_sender'] = 'noreply@example.org'
+        recipient = testing.DummyResource(__provides__=(IUserExtended,
+                                                        IUserBasic),
+                                          email='recipient@example.org')
+        sender = testing.DummyResource(__provides__=(IUserExtended, IUserBasic),
+                                       email='sender@example.org',
+                                       name='Sandy Sender')
         mailer = registry.messenger.mailer
         messenger = registry.messenger
         messenger.send_message_to_user(
@@ -155,7 +149,7 @@ class TestSendMessageToUser:
             request=request_,
             from_user=sender)
         msgtext = _msg_to_str(mailer.outbox[0])
-        assert 'From: sender@example.org' in msgtext
+        assert 'From: noreply@example.org' in msgtext
         assert 'Subject: Adhocracy Message from Sandy Sender: Important Adhocracy notice' in msgtext
         assert 'To: recipient@example.org' in msgtext
 

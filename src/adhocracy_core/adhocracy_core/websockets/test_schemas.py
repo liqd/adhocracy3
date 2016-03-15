@@ -14,6 +14,7 @@ class ClientRequestSchemaUnitTests(unittest.TestCase):
         self.child = child
         context = testing.DummyResource()
         context['child'] = child
+        self.context = context
         request = testing.DummyRequest()
         request.root = context
         self.request = request
@@ -21,7 +22,7 @@ class ClientRequestSchemaUnitTests(unittest.TestCase):
     def _make_one(self):
         from adhocracy_core.websockets.schemas import ClientRequestSchema
         schema = ClientRequestSchema()
-        return schema.bind(request=self.request)
+        return schema.bind(request=self.request, context=self.context)
 
     def test_deserialize_subscribe(self):
         inst = self._make_one()
@@ -167,7 +168,7 @@ class NotificationUnitTests(unittest.TestCase):
         self.request = request
 
     def _bind(self, schema: colander.SchemaNode) -> colander.SchemaNode:
-        return schema.bind(request=self.request)
+        return schema.bind(request=self.request, context=self.context)
 
     def test_serialize_notification(self):
         from adhocracy_core.websockets.schemas import Notification

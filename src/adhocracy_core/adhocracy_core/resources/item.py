@@ -10,7 +10,6 @@ import adhocracy_core.sheets.pool
 import adhocracy_core.sheets.versions
 import adhocracy_core.sheets.tags
 from adhocracy_core.utils import get_iresource
-from adhocracy_core.utils import get_sheet
 
 
 def create_initial_content_for_item(context, registry, options):
@@ -20,13 +19,13 @@ def create_initial_content_for_item(context, registry, options):
     create = registry.content.create
     first_version = create(metadata.item_type.__identifier__, parent=context,
                            **options)
-    tags_sheet = get_sheet(context,
-                           adhocracy_core.sheets.tags.ITags,
-                           registry=registry)
     request = options.get('request', None)
+    tags_sheet = registry.content.get_sheet(context,
+                                            adhocracy_core.sheets.tags.ITags,
+                                            request=request,
+                                            )
     tags_sheet.set({'FIRST': first_version,
-                    'LAST': first_version},
-                   request=request)
+                    'LAST': first_version})
 
 
 item_meta = pool_meta._replace(

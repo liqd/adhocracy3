@@ -10,7 +10,6 @@ from datetime import datetime
 from logging import getLogger
 from adhocracy_core.utils import get_user
 from adhocracy_core.sheets.principal import IUserBasic
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import VisibilityChange
@@ -105,7 +104,9 @@ def _get_user_info(request: Request) -> (str, str):
     if user is None:
         return ('', '')
     else:
-        user_name = get_sheet_field(user, IUserBasic, 'name')
+        user_name = request.registry.content.get_sheet_field(user,
+                                                             IUserBasic,
+                                                             'name')
         user_path = resource_path(user)
         return (user_name, user_path)
 

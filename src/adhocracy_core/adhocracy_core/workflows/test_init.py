@@ -1,20 +1,10 @@
 from pyramid import testing
-from pyramid.request import Request
-from pyrsistent import discard
-from pyrsistent import freeze
-from pyrsistent import freeze
 from pytest import fixture
 from pytest import mark
 from pytest import raises
 from unittest.mock import Mock
 import pytest
 from substanced.workflow import WorkflowError
-
-from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.resources import process
-from adhocracy_core.sheets.workflow import IWorkflowAssignment
-from adhocracy_core.sheets.workflow import WorkflowAssignmentSchema
-from adhocracy_core.sheets import add_sheet_to_registry
 
 
 @fixture
@@ -66,62 +56,21 @@ class TestAddWorkflow:
         return registry
 
     @fixture
-    def cstruct(self) -> dict:
-        """Return example workflow cstruct with required data."""
-        cstruct = freeze(
+    def mock_meta(self, mocker) -> Mock:
+        cstruct = \
             {'initial_state': 'draft',
              'states': {'draft': {'acm': {'principals':           ['moderator'],
                                           'permissions': [['view', 'Deny']]}},
-                        'announced': {'acl': []}},
+                        'announced': {}},
              'transitions': {'to_announced': {'from_state': 'draft',
                                               'to_state': 'announced',
                                               'permission': 'do_transition',
                                               'callback': None,
                                               }},
-             })
-        return cstruct
-
-    def call_fut(self, registry, cstruct, name):
-        from .sample import add_workflow
-        return add_workflow(registry, cstruct, name)
-
-    def test_add_cstruct_to_workflows_meta(self, registry, cstruct):
-        self.call_fut(registry, cstruct, 'sample')
-        meta = registry.content.workflows_meta['sample']
-        assert 'name' not in meta
-        assert meta['states']
-        assert meta['transitions']
-        assert meta['initial_state']
-
-    def test_create_workflow_and_add_to_workflows_meta(self, registry, cstruct):
-        from substanced.workflow import ACLWorkflow
-        self.call_fut(registry, cstruct, 'sample')
-        workflow = registry.content.workflows['sample']
-        assert workflow.type == 'sample'
-        assert isinstance(workflow, ACLWorkflow)
-
-    def test_create_workflow_and_add_states(self, registry, cstruct):
-        self.call_fut(registry, cstruct, 'sample')
-        workflow = registry.content.workflows['sample']
-        states = sorted(workflow.get_states(None, None),
-                        key=lambda x: x['name'])
-        assert states[0]['initial'] is False
-        assert workflow._states['draft'].acl == [('Deny', 'role:moderator', 'view')]
-        assert states[1]['initial'] is True
-
-    def test_create_workflow_and_add_transitions(self, registry, cstruct):
-        transition_data = cstruct['transitions']['to_announced']
-        new_cstruct = cstruct.transform(('transitions', 'to_announced', 'name'), 'to_announced')
-        self.call_fut(registry, new_cstruct, 'sample')
-        workflow = registry.content.workflows['sample']
-        assert workflow._transitions['to_announced'] == transition_data.update({'name': 'to_announced'})
-
-    def test_raise_if_cstruct_not_valid(self, registry, cstruct):
-        from adhocracy_core.exceptions import ConfigurationError
-        cstruct = cstruct.transform(('transitions', 'to_announced', 'from_state'), discard)
-        with raises(ConfigurationError) as err:
-            self.call_fut(registry, cstruct, 'sample')
-        assert 'Required' in err.value.__str__()
+             }
+        mock = mocker.patch('adhocracy_core.workflows._get_meta')
+        mock.return_value = cstruct
+        return mock
 
     @fixture
     def mock_workflow(self, monkeypatch):
@@ -131,84 +80,172 @@ class TestAddWorkflow:
                             mock)
         return mock
 
-    def test_create_workflow_and_check(self, registry, cstruct, mock_workflow):
-        self.call_fut(registry, cstruct, 'sample')
+    def call_fut(self, *args):
+        from . import add_workflow
+        return add_workflow(*args)
+
+    def test_add_meta(self, registry, mock_meta):
+        from pyrsistent import PMap
+        self.call_fut(registry, 'package:dummy.yaml', 'dummy')
+        meta = registry.content.workflows_meta['dummy']
+        assert isinstance(meta, PMap)
+        assert meta['states']
+        assert meta['transitions']
+        assert meta['initial_state']
+
+    def test_create(self, registry, mock_meta):
+        from substanced.workflow import ACLWorkflow
+        self.call_fut(registry, 'package:dummy.yaml', 'dummy')
+        workflow = registry.content.workflows['dummy']
+        assert workflow.type == 'dummy'
+        assert isinstance(workflow, ACLWorkflow)
+
+    def test_create_and_add_states(self, registry, mock_meta):
+        self.call_fut(registry, 'package:dummy.yaml', 'dummy')
+        workflow = registry.content.workflows['dummy']
+        states = sorted(workflow.get_states(None, None),
+                        key=lambda x: x['name'])
+        assert states[0]['initial'] is False
+        assert workflow._states['draft'].acl == [('Deny', 'role:moderator', 'view')]
+        assert states[1]['initial'] is True
+
+    def test_create_and_add_transitions(self, registry, mock_meta):
+        self.call_fut(registry, 'package:dummy.yaml', 'dummy')
+        workflow = registry.content.workflows['dummy']
+        assert workflow._transitions['to_announced']['name'] == 'to_announced'
+
+    def test_raise_if_cstruct_not_valid(self, registry, mock_meta, mocker, node):
+        import colander
+        from adhocracy_core.exceptions import ConfigurationError
+        mock = mocker.patch('colander.MappingSchema.deserialize')
+        mock.side_effect = colander.Invalid(node)
+        with raises(ConfigurationError) as err:
+            self.call_fut(registry, 'package:dummy.yaml', 'dummy')
+
+    def test_create_and_check(self, registry, mock_meta, mock_workflow):
+        self.call_fut(registry, 'package:dummy.yaml', 'dummy')
         assert mock_workflow.return_value.check.called
 
-    def test_raise_if_workflow_error(self, registry, cstruct, mock_workflow):
+    def test_raise_if_workflow_error(self, registry, mock_meta, mock_workflow):
         from substanced.workflow import WorkflowError
         from adhocracy_core.exceptions import ConfigurationError
         mock_workflow.return_value.check.side_effect = WorkflowError('msg')
         with raises(ConfigurationError) as err:
-            self.call_fut(registry, cstruct, 'sample')
+            self.call_fut(registry, 'package:dummy.yaml', 'dummy')
         assert 'msg' in err.value.__str__()
 
+    def test_add_meta_with_defaults(self, registry, mock_meta):
+        from pyrsistent import freeze
+        standard_meta = freeze(mock_meta.return_value)\
+            .transform(['states', 'draft', 'acm', 'principals'], ['role:moderator'])
+        registry.content.workflows_meta['standard'] = standard_meta
+        mock_meta.return_value = {'defaults': 'standard'}
+        self.call_fut(registry, 'package:dummy.yaml', 'dummy')
+        meta = registry.content.workflows_meta['dummy']
+        assert meta['states'] == standard_meta['states']
+        assert meta['transitions'] == standard_meta['transitions']
+        assert meta['initial_state'] == standard_meta['initial_state']
+        assert meta['defaults'] == 'standard'
 
-@mark.usefixtures('integration')
+    def test_add_meta_with_defaults_inital_state(self, registry, mock_meta):
+        from pyrsistent import freeze
+        standard_meta = freeze(mock_meta.return_value)\
+            .transform(['states', 'draft', 'acm', 'principals'], ['role:moderator'])
+        registry.content.workflows_meta['standard'] = standard_meta
+        mock_meta.return_value = \
+            {'defaults': 'standard',
+             'initial_state': 'announced'}
+        self.call_fut(registry, 'package:dummy.yaml', 'dummy')
+        meta = registry.content.workflows_meta['dummy']
+        assert meta['initial_state'] == 'announced'
+
+    def test_add_meta_with_defaults_transitions(self, registry, mock_meta):
+        from pyrsistent import freeze
+        standard_meta = freeze(mock_meta.return_value)\
+            .transform(['states', 'draft', 'acm', 'principals'], ['role:moderator'])
+        registry.content.workflows_meta['standard'] = standard_meta
+        mock_meta.return_value = \
+            {'defaults': 'standard',
+             'transitions': {'to_announced2': {'to_state': 'announced',
+                                               'from_state': 'draft'}
+             }}
+        self.call_fut(registry, 'package:dummy.yaml', 'dummy')
+        meta = registry.content.workflows_meta['dummy']
+        assert meta['transitions']['to_announced2']
+
+    def test_add_meta_with_defaults_state_edit_permission(self, registry,
+                                                           mock_meta):
+        from pyrsistent import freeze
+        standard_meta = freeze(mock_meta.return_value)\
+            .transform(['states', 'draft', 'acm', 'principals'], ['role:moderator'])
+        registry.content.workflows_meta['standard'] = standard_meta
+        mock_meta.return_value =\
+            {'defaults': 'standard',
+             'states': {'draft': {'acm': {'permissions':[['view', 'Edited']]}}
+             }}
+        self.call_fut(registry, 'package:dummy.yaml', 'dummy')
+        meta = registry.content.workflows_meta['dummy']
+        assert meta['states']['draft']['acm']['permissions'] ==\
+               [['view', 'Edited']]
+
+    def test_add_meta_with_defaults_state_add_permission(self, registry,
+                                                         mock_meta):
+        from pyrsistent import freeze
+        standard_meta = freeze(mock_meta.return_value)\
+            .transform(['states', 'draft', 'acm', 'principals'], ['role:moderator'])
+        registry.content.workflows_meta['standard'] = standard_meta
+        mock_meta.return_value =\
+            {'defaults': 'standard',
+             'states': {'draft': {'acm': {'permissions':[['new', 'Added']]}}
+             }}
+        self.call_fut(registry, 'package:dummy.yaml', 'dummy')
+        meta = registry.content.workflows_meta['dummy']
+        assert meta['states']['draft']['acm']['permissions'] ==\
+               [['view', 'Deny'],
+                ['new', 'Added']]
+
+
 class TestTransitionToStates:
-
-    def _add_workflow(self, registry, name):
-        from . import add_workflow
-        cstruct = freeze(
-            {'initial_state': 'draft',
-             'states': {'draft': {'acm': {'principals':           ['moderator'],
-                                          'permissions': [['view', 'Deny']]}},
-                        'announced': {'acl': []},
-                        'participate': {'acl': []}},
-             'transitions': {'to_announced': {'from_state': 'draft',
-                                              'to_state': 'announced',
-                                              'permission': 'do_transition',
-                                              'callback': None,
-                                              },
-                             'to_participate': {'from_state': 'announced',
-                                                'to_state': 'participate',
-                                                'permission': 'do_transition',
-                                                'callback': None,
-                             }},
-             })
-        add_workflow(registry, cstruct, name)
-
-    @fixture
-    def resource_meta(self, resource_meta):
-        return resource_meta._replace(workflow_name='test_workflow')
 
     def call_fut(self, *args, **kwargs):
         from . import transition_to_states
         return transition_to_states(*args, **kwargs)
 
-    def test_do_all_transitions_needed_to_set_state(self, integration, context,
-                                                    resource_meta):
-        registry = integration.registry
-        self._add_workflow(registry, 'test_workflow')
-        registry.content.resources_meta[resource_meta.iresource] = resource_meta
+    @fixture
+    def god_request(self, mocker, request_):
+        mock = mocker.patch('adhocracy_core.workflows.create_fake_god_request')
+        mock.return_value = request_
+        return request_
+
+    def test_do_all_transitions_needed_to_set_state(self, context, registry,
+                                                    mock_workflow, god_request):
+        registry.content.get_workflow.return_value = mock_workflow
+        mock_workflow.has_state.return_value = True
         self.call_fut(context, ['announced', 'participate'], registry)
+        assert mock_workflow.transition_to_state.call_args_list[0][0] ==\
+               (context, god_request, 'announced')
+        assert mock_workflow.transition_to_state.call_args_list[1][0] == \
+               (context, god_request, 'participate')
 
-        workflow = registry.content.workflows['test_workflow']
-        assert workflow.state_of(context) is 'participate'
-
-    def test_error_if_state_already_set(self, integration, context,
-                                         resource_meta):
-        registry = integration.registry
-        self._add_workflow(registry, 'test_workflow')
-        registry.content.resources_meta[resource_meta.iresource] = resource_meta
-        request = Request.blank('/dummy')
-        request.registry = registry
-        workflow = registry.content.workflows['test_workflow']
-        workflow.initialize(context)
-        workflow.transition_to_state(context, request, 'announced')
-        workflow.transition_to_state(context, request, 'participate')
-
+    def test_raise_if_state_already_set(self, context, registry,
+                                        mock_workflow, god_request):
+        registry.content.get_workflow.return_value = mock_workflow
+        mock_workflow.has_state.return_value = True
+        mock_workflow.transition_to_state.side_effect = WorkflowError
         with pytest.raises(WorkflowError):
-            self.call_fut(context, ['announced', 'participate'], registry)
+            self.call_fut(context, ['announced'], registry)
 
-    def test_optionally_reset_to_initial_state(self, integration, context,
-                                               resource_meta):
-        registry = integration.registry
-        self._add_workflow(registry, 'test_workflow')
-        registry.content.resources_meta[resource_meta.iresource] = resource_meta
-        self.call_fut(context, ['announced', 'participate'], registry)
+    def test_optionally_reset_to_initial_state(self, context, registry,
+                                               mock_workflow, god_request):
+        registry.content.get_workflow.return_value = mock_workflow
+        mock_workflow.has_state.return_value = False
+        self.call_fut(context, ['announced'], registry)
+        mock_workflow.initialize.assert_called_once_with(context)
 
-        self.call_fut(context, [], registry, reset=True)
-        workflow = registry.content.workflows['test_workflow']
-        assert workflow.state_of(context) is 'draft'
+    def test_initialize_if_has_no_state(self, context, registry,
+                                         mock_workflow, god_request):
+        registry.content.get_workflow.return_value = mock_workflow
+        mock_workflow.has_state.return_value = False
+        self.call_fut(context, ['announced'], registry)
+        mock_workflow.initialize.assert_called_once_with(context)
 

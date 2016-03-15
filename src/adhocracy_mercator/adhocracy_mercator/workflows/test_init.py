@@ -8,13 +8,7 @@ from webtest import TestResponse
 from mercator.tests.fixtures.fixturesMercatorProposals1 import _create_proposal
 from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposal_batch
 from mercator.tests.fixtures.fixturesMercatorProposals1 import update_proposal_batch
-from adhocracy_core.utils.testing import do_transition_to
-
-@fixture
-def integration(config):
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_mercator.workflows')
+from adhocracy_core.testing import do_transition_to
 
 
 @mark.usefixtures('integration')
@@ -23,21 +17,22 @@ def test_initiate_and_transition_to_announce(registry, context):
     request = testing.DummyRequest()
     assert workflow.state_of(context) is None
     workflow.initialize(context)
-    assert workflow.state_of(context) is 'draft'
+    assert workflow.state_of(context) == 'draft'
     workflow.transition_to_state(context, request, 'announce')
-    assert workflow.state_of(context) is 'announce'
+    assert workflow.state_of(context) == 'announce'
     workflow.transition_to_state(context, request, 'participate')
-    assert workflow.state_of(context) is 'participate'
+    assert workflow.state_of(context) == 'participate'
     workflow.transition_to_state(context, request, 'evaluate')
-    assert workflow.state_of(context) is 'evaluate'
+    assert workflow.state_of(context) == 'evaluate'
     workflow.transition_to_state(context, request, 'result')
-    assert workflow.state_of(context) is 'result'
+    assert workflow.state_of(context) == 'result'
 
 
 @fixture(scope='class')
 def app_anonymous(app_anonymous):
     app_anonymous.base_path = '/mercator'
     return app_anonymous
+
 
 @fixture(scope='class')
 def app_participant(app_participant):
@@ -50,10 +45,12 @@ def app_god(app_god):
     app_god.base_path = '/mercator'
     return app_god
 
+
 @fixture(scope='class')
 def app_initiator(app_initiator):
     app_initiator.base_path = '/mercator'
     return app_initiator
+
 
 def _post_proposal_item(app_user, path='/') -> TestResponse:
     from adhocracy_mercator.resources.mercator import IMercatorProposal

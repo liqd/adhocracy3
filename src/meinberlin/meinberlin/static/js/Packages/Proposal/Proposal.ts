@@ -1,4 +1,4 @@
-/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../lib2/types/angular.d.ts"/>
 
 import * as AdhBadge from "../Badge/Badge";
 import * as AdhConfig from "../Config/Config";
@@ -50,7 +50,6 @@ export interface IScope extends angular.IScope {
         budget? : number;
         creatorParticipate? : boolean;
         locationText? : string;
-        address? : string;
     };
     selectedState? : string;
     isKiezkasse : boolean;
@@ -130,7 +129,6 @@ var bindPath = (
                     };
                     if (isKiezkasse) {
                         scope.data.budget = kiezkasseSheet.budget;
-                        scope.data.address = kiezkasseSheet.address;
                         scope.data.creatorParticipate = kiezkasseSheet.creator_participate;
                         scope.data.locationText = kiezkasseSheet.location_text;
                     } else if (isBuergerhaushalt) {
@@ -155,8 +153,7 @@ var fill = (
         proposalVersion.data[SIKiezkasseProposal.nick] = new SIKiezkasseProposal.Sheet({
             budget: scope.data.budget,
             creator_participate: scope.data.creatorParticipate,
-            location_text: scope.data.locationText,
-            address: scope.data.address
+            location_text: scope.data.locationText
         });
     } else if (isBuergerhaushalt) {
         proposalVersion.data[SIBuergerhaushaltProposal.nick] = new SIBuergerhaushaltProposal.Sheet({

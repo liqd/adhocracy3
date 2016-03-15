@@ -12,20 +12,18 @@ def integration(config):
 
 
 @mark.usefixtures('integration')
-def test_create_namedummy_sheet(config):
-    from adhocracy_core.utils import get_sheet
+def test_create_namedummy_sheet(registry):
     from adhocracy_core.sheets.name import IName
     from adhocracy_sample.sheets.sample_sheets import DummyNameSheet
     context = testing.DummyResource(__provides__=IName)
-    inst = get_sheet(context, IName)
+    inst = registry.content.get_sheet(context, IName)
     assert isinstance(inst, DummyNameSheet)
 
 
 @mark.usefixtures('integration')
-def test_create_extendendname_sheet(config):
-    from adhocracy_core.utils import get_sheet
+def test_create_extendendname_sheet(registry):
     from adhocracy_sample.sheets.sample_sheets import IExtendedName
     context = testing.DummyResource(__provides__=IExtendedName)
-    inst = get_sheet(context, IExtendedName)
+    inst = registry.content.get_sheet(context, IExtendedName)
     appstruct = inst.get()
     assert 'description_x' in appstruct

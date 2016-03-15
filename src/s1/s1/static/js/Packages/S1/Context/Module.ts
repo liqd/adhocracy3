@@ -35,7 +35,6 @@ export var register = (angular) => {
             adhEmbedProvider.registerContext("s1");
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            adhResourceAreaProvider.template("s1", ["adhConfig", "$templateRequest", Context.areaTemplate]);
             AdhS1Workbench.registerRoutes(RIS1Process.content_type, "s1")(adhResourceAreaProvider);
             AdhUserViews.registerRoutes("s1")(adhResourceAreaProvider);
         }]);

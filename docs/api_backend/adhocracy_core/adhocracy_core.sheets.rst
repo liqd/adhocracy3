@@ -12,26 +12,23 @@ Submodules
 .. toctree::
 
    adhocracy_core.sheets.asset
+   adhocracy_core.sheets.badge
    adhocracy_core.sheets.comment
+   adhocracy_core.sheets.description
    adhocracy_core.sheets.document
+   adhocracy_core.sheets.embed
+   adhocracy_core.sheets.geo
+   adhocracy_core.sheets.image
+   adhocracy_core.sheets.logbook
    adhocracy_core.sheets.metadata
    adhocracy_core.sheets.name
    adhocracy_core.sheets.pool
    adhocracy_core.sheets.principal
    adhocracy_core.sheets.rate
-   adhocracy_core.sheets.sample_image
+   adhocracy_core.sheets.relation
+   adhocracy_core.sheets.subresources
    adhocracy_core.sheets.tags
-   adhocracy_core.sheets.test_asset
-   adhocracy_core.sheets.test_comment
-   adhocracy_core.sheets.test_document
-   adhocracy_core.sheets.test_init
-   adhocracy_core.sheets.test_metadata
-   adhocracy_core.sheets.test_name
-   adhocracy_core.sheets.test_pool
-   adhocracy_core.sheets.test_principal
-   adhocracy_core.sheets.test_rate
-   adhocracy_core.sheets.test_sample_image
-   adhocracy_core.sheets.test_tags
-   adhocracy_core.sheets.test_versions
+   adhocracy_core.sheets.title
    adhocracy_core.sheets.versions
+   adhocracy_core.sheets.workflow
 

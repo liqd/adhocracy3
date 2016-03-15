@@ -16,11 +16,5 @@ Subpackages
     adhocracy_mercator.resources
     adhocracy_mercator.scripts
     adhocracy_mercator.sheets
-
-Submodules
-----------
-
-.. toctree::
-
-   adhocracy_mercator.conftest
+    adhocracy_mercator.workflows
 

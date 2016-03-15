@@ -1,5 +1,6 @@
 from pyramid import testing
 from pytest import fixture
+from pytest import mark
 
 
 class TestNameSheet:
@@ -13,7 +14,7 @@ class TestNameSheet:
         from adhocracy_core.sheets.name import IName
         from adhocracy_core.sheets.name import NameSchema
         from adhocracy_core.sheets import AnnotationRessourceSheet
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert isinstance(inst, AnnotationRessourceSheet)
         assert inst.meta.isheet == IName
         assert inst.meta.schema_class == NameSchema
@@ -21,15 +22,10 @@ class TestNameSheet:
         assert inst.meta.create_mandatory is True
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'name': ''}
 
-
-def test_includeme_register_name_sheet(config):
-    from adhocracy_core.sheets.name import IName
-    from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.sheets.name')
-    context = testing.DummyResource(__provides__=IName)
-    inst = get_sheet(context, IName)
-    assert inst.meta.isheet is IName
+    @mark.usefixtures('integration')
+    def test_includeme_register_name_sheet(self, meta, registry):
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)

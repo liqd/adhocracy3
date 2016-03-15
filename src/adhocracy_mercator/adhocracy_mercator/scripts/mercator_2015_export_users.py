@@ -7,6 +7,7 @@ import argparse
 import csv
 import inspect
 from pyramid.paster import bootstrap
+from pyramid.registry import Registry
 from substanced.util import find_service
 
 from adhocracy_core.interfaces import IResource
@@ -16,8 +17,6 @@ from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.rate import IRate
-from adhocracy_core.utils import get_sheet_field
-from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import create_filename
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from adhocracy_core.sheets.title import ITitle
@@ -48,35 +47,37 @@ def export_users():
     filename = create_filename(directory='./var/export/',
                                prefix='adhocracy-users',
                                suffix='.csv')
-    _export_users_and_proposals_rates(env['root'], filename, args)
+    _export_users_and_proposals_rates(env['root'], filename,
+                                      env['registry'], args)
     env['closer']()
 
 
 def _export_users_and_proposals_rates(root: IResource, filename: str,
-                                      args):
+                                      registry: Registry, args):
     if not args.min_rate:
         args.min_rate = 0
-    proposals = get_most_rated_proposals(root, args.min_rate)
-    proposals_titles = get_titles(proposals)
+    proposals = get_most_rated_proposals(root, args.min_rate, registry)
+    proposals_titles = get_titles(proposals, registry)
     column_names = ['Username', 'Email', 'Creation date'] + proposals_titles
     with open(filename, 'w', newline='') as result_file:
         wr = csv.writer(result_file, delimiter=';', quotechar='"',
                         quoting=csv.QUOTE_MINIMAL)
         wr.writerow(column_names)
         users = _get_users(root)
-        proposals_users_map = _map_rating_users(proposals)
+        proposals_users_map = _map_rating_users(proposals, registry)
         for pos, user in enumerate(users):
             row = []
-            _append_user_data(user, row, args.include_passwords)
-            _append_rate_dates(user, proposals_users_map, row)
+            _append_user_data(user, row, args.include_passwords, registry)
+            _append_rate_dates(user, proposals_users_map, row, registry)
             wr.writerow(row)
             print('exported user {0} of {1}'.format(pos, len(users)))
     print('Users exported to {0}'.format(filename))
 
 
-def get_titles(resources: [ITitle]) -> [str]:
+def get_titles(resources: [ITitle], registry: Registry) -> [str]:
     """Return all titles for `resources`."""
-    titles = [get_sheet_field(p, ITitle, 'title') for p in resources]
+    titles = [registry.content.get_sheet_field(p, ITitle, 'title')
+              for p in resources]
     return titles
 
 
@@ -86,9 +87,10 @@ def _get_users(root: IResource) -> [IUser]:
 
 
 def get_most_rated_proposals(root: IResource,
-                             min_rate: int) -> [IMercatorProposalVersion]:
+                             min_rate: int,
+                             registry: Registry) -> [IMercatorProposalVersion]:
     """Return child proposals of `root` with rating higher then `min_rate`."""
-    pool = get_sheet(root, IPool)
+    pool = registry.content.get_sheet(root, IPool)
     params = {'depth': 3,
               'interfaces': IMercatorProposalVersion,
               'reverse': True,
@@ -112,8 +114,10 @@ def get_most_rated_proposals(root: IResource,
     return proposals
 
 
-def _map_rating_users(rateables: [IRateable]) -> [(IRateable, set(IUser))]:
+def _map_rating_users(rateables: [IRateable],
+                      registry: Registry) -> [(IRateable, set(IUser))]:
     rateables_users_map = []
+    get_sheet_field = registry.content.get_sheet_field
     for rateable in rateables:
         params = {'depth': 3,
                   'interfaces': IRate,
@@ -121,14 +125,16 @@ def _map_rating_users(rateables: [IRateable]) -> [(IRateable, set(IUser))]:
                   'resolve': True,
                   'references': [(None, IRate, 'object', rateable)]
                   }
-        pool = get_sheet(rateable.__parent__, IPool)
+        pool = registry.content.get_sheet(rateable.__parent__, IPool)
         rates = pool.get(params)['elements']
         users = [get_sheet_field(x, IRate, 'subject') for x in rates]
         rateables_users_map.append((rateable, set(users)))
     return rateables_users_map
 
 
-def _append_user_data(user: IUser, row: [str], include_passwords: bool):
+def _append_user_data(user: IUser, row: [str], include_passwords: bool,
+                      registry: Registry):
+    get_sheet_field = registry.content.get_sheet_field
     name = get_sheet_field(user, IUserBasic, 'name')
     email = get_sheet_field(user, IUserExtended, 'email')
     creation_date = get_sheet_field(user, IMetadata, 'creation_date')
@@ -141,16 +147,19 @@ def _append_user_data(user: IUser, row: [str], include_passwords: bool):
 
 
 def _append_rate_dates(user: IUser, rateables: [(IRateable, set(IUser))],
-                       row: [str]):
+                       row: [str],
+                       registry: Registry):
     for rateable, users in rateables:
         date = ''
         if user in users:
-            date = _get_rate_date(user, rateable)
+            date = _get_rate_date(user, rateable, registry)
         row.append(date)
 
 
-def _get_rate_date(user: IUser, rateable: IRateable) -> str:
-    pool = get_sheet(rateable.__parent__, IPool)
+def _get_rate_date(user: IUser,
+                   rateable: IRateable,
+                   registry: Registry) -> str:
+    pool = registry.content.get_sheet(rateable.__parent__, IPool)
     params = {'depth': 3,
               'interfaces': IRate,
               'indexes': {'tag': 'LAST', 'rate': 1},
@@ -160,6 +169,8 @@ def _get_rate_date(user: IUser, rateable: IRateable) -> str:
               }
     result = pool.get(params)
     rate = result['elements'][0]
-    creation_date = get_sheet_field(rate, IMetadata, 'item_creation_date')
+    creation_date = registry.content.get_sheet_field(rate,
+                                                     IMetadata,
+                                                     'item_creation_date')
     creation_date_str = creation_date.strftime('%Y-%m-%d_%H:%M:%S')
     return creation_date_str

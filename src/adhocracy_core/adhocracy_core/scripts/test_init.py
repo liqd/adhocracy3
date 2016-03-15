@@ -1,18 +1,17 @@
 from pyramid.traversal import find_resource
+from pyramid import testing
 from pytest import fixture
 from pytest import mark
 from tempfile import mkstemp
 import os
 import json
 import pytest
-from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.resources.organisation import IOrganisation
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.name import IName
 from adhocracy_core.sheets.badge import IBadgeAssignment
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.resources.badge import IBadge
 
 
@@ -43,7 +42,9 @@ class TestImportResources:
         root = registry.content.create(IRootPool.__identifier__)
         import_resources(root, registry, filename)
         assert IOrganisation.providedBy(root['alt-treptow'])
-        assert get_sheet_field(root['alt-treptow'], IName, 'name') == 'alt-treptow'
+        assert registry.content.get_sheet_field(root['alt-treptow'],
+                                                IName,
+                                                'name') == 'alt-treptow'
 
 
     def test_import_resources_invalid_data(self, registry, log):
@@ -84,7 +85,9 @@ class TestImportResources:
         # try readding
         import_resources(root, registry, filename)
         assert IOrganisation.providedBy(root['alt-treptow'])
-        assert get_sheet_field(root['alt-treptow'], IName, 'name') == 'alt-treptow'
+        assert registry.content.get_sheet_field(root['alt-treptow'],
+                                                IName,
+                                                'name') == 'alt-treptow'
 
     def test_import_resources_already_oneleveldeep(self, registry, principals,
                                                    log):
@@ -124,7 +127,9 @@ class TestImportResources:
         import_resources(root, registry, filename)
         assert IOrganisation.providedBy(root['alt-treptow'])
         god = root['principals']['users'].values()[0]
-        assert get_sheet_field(root['alt-treptow'], IMetadata, 'creator') == god
+        assert registry.content.get_sheet_field(root['alt-treptow'],
+                                                IMetadata,
+                                                'creator') == god
 
     def test_import_resource_create_group(self, registry, log):
         from adhocracy_core.scripts import import_resources
@@ -187,18 +192,18 @@ class TestImportResources:
                                 orga['badges'],
                                 appstructs=badge_appstructs,
                                 registry=registry)
-
         import_resources(root, registry, filename)
         assignments = find_resource(root, '/principals/users/badge_assignments/')
         assignment = list(assignments.values())[0]
-        subject = get_sheet_field(assignment, IBadgeAssignment, 'subject')
+        subject = registry.content.get_sheet_field(assignment,
+                                                   IBadgeAssignment,
+                                                   'subject')
         user_locator = _get_user_locator(root, registry)
         god = user_locator.get_user_by_login('god')
         assert subject == god
 
     def test_raise_when_resolving_non_existing_user(self, registry):
         from adhocracy_core.scripts import import_resources
-        from .import_users import _get_user_locator
 
         (self._tempfd, filename) = mkstemp()
         with open(filename, 'w') as f:
@@ -229,3 +234,28 @@ class TestImportResources:
     def teardown_method(self, method):
         if hasattr(self, 'tempfd'):
             os.close(self._tempfd)
+
+
+class TestImportLocalRoles:
+
+    def call_fut(self, *args):
+        from . import import_local_roles
+        return import_local_roles(*args)
+
+    @fixture
+    def filename(self, tmpdir):
+        return str(tmpdir) + '/local_roles.json'
+
+    def test_import_local_roles(self, registry, filename):
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {"path": "/alt-treptow",
+                 "roles": {"initiators-treptow-koepenick": ["role:initiator"]}}
+            ]))
+        root = testing.DummyResource()
+        root['alt-treptow'] = testing.DummyResource(__parent__=root)
+
+        self.call_fut(root, registry, filename)
+
+        assert root['alt-treptow'].__local_roles__ == \
+            {'initiators-treptow-koepenick': set(['role:initiator'])}

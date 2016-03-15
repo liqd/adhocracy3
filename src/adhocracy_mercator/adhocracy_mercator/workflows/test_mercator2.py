@@ -1,17 +1,9 @@
-from pyramid import testing
 from pytest import mark
 from pytest import fixture
 from webtest import TestResponse
 
-from adhocracy_core.utils.testing import add_resources
-from adhocracy_core.utils.testing import do_transition_to
-
-
-@fixture
-def integration(config):
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_mercator.workflows')
+from adhocracy_core.testing import add_resources
+from adhocracy_core.testing import do_transition_to
 
 
 def _post_proposal(app_user, path='/') -> TestResponse:

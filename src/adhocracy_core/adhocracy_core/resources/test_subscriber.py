@@ -419,8 +419,8 @@ class TestUpdateModificationDate:
         self.call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'modification_date': now,
                                                   'modified_by': user}
-        assert mock_sheet.set.call_args[1] ==\
-            {'send_event': False,  'omit_readonly': False, 'request': request}
+        assert mock_sheet.set.call_args[1] == {'send_event': False,
+                                               'omit_readonly': False}
 
 
 class TestSendPasswordResetMail:
@@ -556,12 +556,11 @@ class TestUpdateCommentsCount:
                                        send_event=False,
                                        )
 
-    def _get_comments_count(self, resource):
-        from adhocracy_core.utils import get_sheet_field
+    def _get_comments_count(self, resource, registry):
         from adhocracy_core.sheets.comment import ICommentable
-        comments_count = get_sheet_field(resource,
-                                         ICommentable,
-                                         'comments_count')
+        comments_count = registry.content.get_sheet_field(resource,
+                                                          ICommentable,
+                                                          'comments_count')
         return comments_count
 
     def test_call(self, registry, pool_with_catalogs, service):
@@ -570,7 +569,6 @@ class TestUpdateCommentsCount:
         from adhocracy_core.resources.document import IDocumentVersion
         from adhocracy_core.resources.rate import IRateVersion
         from adhocracy_core import sheets
-        from adhocracy_core.utils import get_sheet
         pool = pool_with_catalogs
         pool['comments'] = service  # the IComment sheet needs a post pool
         comment1 = self._make_resource(pool, ICommentVersion, registry)
@@ -580,27 +578,27 @@ class TestUpdateCommentsCount:
         sub_commentable = self._make_resource(pool, IParagraphVersion, registry)
         main_commentable = self._make_resource(pool, IDocumentVersion, registry)
 
-        sheet = get_sheet(main_commentable, sheets.document.IDocument)
+        sheet = registry.content.get_sheet(main_commentable, sheets.document.IDocument)
         sheet.set({'elements': [sub_commentable]}, send_reference_event=False)
-        sheet = get_sheet(non_commentable, sheets.rate.IRate)
+        sheet = registry.content.get_sheet(non_commentable, sheets.rate.IRate)
         sheet.set({'object': [sub_commentable]}, send_reference_event=False)
 
-        sheet = get_sheet(comment3, sheets.comment.IComment)
+        sheet = registry.content.get_sheet(comment3, sheets.comment.IComment)
         sheet.set({'refers_to': sub_commentable}, send_reference_event=False)
-        sheet = get_sheet(comment2, sheets.comment.IComment)
+        sheet = registry.content.get_sheet(comment2, sheets.comment.IComment)
         sheet.set({'refers_to': comment3}, send_reference_event=False)
-        sheet = get_sheet(comment1, sheets.comment.IComment)
+        sheet = registry.content.get_sheet(comment1, sheets.comment.IComment)
         sheet.set({'refers_to': comment2}, send_reference_event=False)
 
         self.call_fut(comment1, 1, registry)
         self.call_fut(comment2, 1, registry)
         self.call_fut(comment3, 1, registry)
 
-        assert self._get_comments_count(comment1) == 0
-        assert self._get_comments_count(comment2) == 1
-        assert self._get_comments_count(comment3) == 2
-        assert self._get_comments_count(sub_commentable) == 3
-        assert self._get_comments_count(main_commentable) == 0
+        assert self._get_comments_count(comment1, registry) == 0
+        assert self._get_comments_count(comment2, registry) == 1
+        assert self._get_comments_count(comment3, registry) == 2
+        assert self._get_comments_count(sub_commentable, registry) == 3
+        assert self._get_comments_count(main_commentable, registry) == 0
 
 
 class TestUpdateCommentsCountAfterVisibilityChange:
@@ -656,6 +654,7 @@ class TestUpdateCommentsCountAfterVisibilityChange:
 @mark.usefixtures('integration')
 def test_register_subscriber(registry):
     from adhocracy_core.resources import subscriber
+    from adhocracy_core.authorization import set_acms_for_app_root
     handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
     assert subscriber.autoupdate_non_versionable_has_new_version.__name__ in handlers
     assert subscriber.autoupdate_versionable_has_new_version.__name__ in handlers
@@ -668,5 +667,6 @@ def test_register_subscriber(registry):
     assert subscriber.decrease_comments_count.__name__ in handlers
     assert subscriber.increase_comments_count.__name__ in handlers
     assert subscriber.update_comments_count_after_visibility_change.__name__ in handlers
+    assert set_acms_for_app_root.__name__ in handlers
 
 

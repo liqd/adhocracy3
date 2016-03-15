@@ -1,6 +1,7 @@
 """Adhocracy catalog and index views."""
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_interface
+from pyramid.traversal import get_current_registry
 from substanced import catalog
 from substanced.catalog import IndexFactory
 from substanced.util import find_service
@@ -22,8 +23,6 @@ from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.principal import IUserExtended
-from adhocracy_core.utils import get_sheet_field
-from adhocracy_core.utils import get_sheet
 
 
 class Reference(IndexFactory):
@@ -57,7 +56,8 @@ class AdhocracyCatalogIndexes:
 
 def index_creator(resource, default) -> str:
     """Return creator userid value for the creator index."""
-    creator = get_sheet_field(resource, IMetadata, 'creator')
+    registry = get_current_registry(resource)
+    creator = registry.content.get_sheet_field(resource, IMetadata, 'creator')
     if creator == '':  # FIXME the default value should be None
         return creator
     userid = resource_path(creator)
@@ -66,7 +66,9 @@ def index_creator(resource, default) -> str:
 
 def index_item_creation_date(resource, default) -> str:
     """Return creator userid value for the creator index."""
-    date = get_sheet_field(resource, IMetadata, 'item_creation_date')
+    registry = get_current_registry(resource)
+    date = registry.content.get_sheet_field(resource, IMetadata,
+                                            'item_creation_date')
     return date
 
 
@@ -90,13 +92,15 @@ def index_visibility(resource, default) -> [str]:
 
 def index_title(resource, default) -> str:
     """Return the value of field name ` title`."""
-    title = get_sheet_field(resource, ITitle, 'title')
+    registry = get_current_registry(resource)
+    title = registry.content.get_sheet_field(resource, ITitle, 'title')
     return title
 
 
 def index_rate(resource, default) -> int:
     """Return the value of field name `rate` for :class:`IRate` resources."""
-    rate = get_sheet_field(resource, IRate, 'rate')
+    registry = get_current_registry(resource)
+    rate = registry.content.get_sheet_field(resource, IRate, 'rate')
     return rate
 
 
@@ -141,7 +145,8 @@ def index_tag(resource, default) -> [str]:
     item = find_interface(resource, IItem)
     if item is None:  # ease testing
         return
-    tags_sheet = get_sheet(item, ITags)
+    registry = get_current_registry(resource)
+    tags_sheet = registry.content.get_sheet(item, ITags)
     tagnames = [f for f, v in tags_sheet.get().items() if v is resource]
     return tagnames if tagnames else default
 
@@ -176,15 +181,21 @@ def index_item_badge(resource, default) -> [str]:
 
 def index_workflow_state(resource, default) -> [str]:
     """Return value for the workflow_state index."""
-    state = get_sheet_field(resource, IWorkflowAssignment, 'workflow_state')
+    registry = get_current_registry(resource)
+    state = registry.content.get_sheet_field(resource,
+                                             IWorkflowAssignment,
+                                             'workflow_state')
     return state
 
 
 def index_workflow_state_of_item(resource, default) -> [str]:
     """Find item and return it`s value for the workflow_state index."""
+    registry = get_current_registry(resource)
     item = find_interface(resource, IItem)
     try:
-        state = get_sheet_field(item, IWorkflowAssignment, 'workflow_state')
+        state = registry.content.get_sheet_field(item,
+                                                 IWorkflowAssignment,
+                                                 'workflow_state')
     except (RuntimeConfigurationError, AttributeError):
         return default
     else:
@@ -193,13 +204,19 @@ def index_workflow_state_of_item(resource, default) -> [str]:
 
 def index_user_name(resource, default) -> str:
     """Return value for the user_name index."""
-    name = get_sheet_field(resource, IUserBasic, 'name')
+    registry = get_current_registry(resource)
+    name = registry.content.get_sheet_field(resource,
+                                            IUserBasic,
+                                            'name')
     return name
 
 
 def index_user_email(resource, default) -> str:
     """Return value for the private_user_email index."""
-    name = get_sheet_field(resource, IUserExtended, 'email')
+    registry = get_current_registry(resource)
+    name = registry.content.get_sheet_field(resource,
+                                            IUserExtended,
+                                            'email')
     return name
 
 

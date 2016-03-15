@@ -1,4 +1,4 @@
-/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../lib2/types/angular.d.ts"/>
 
 import * as AdhCredentials from "../User/Credentials";
 import * as AdhHttp from "../Http/Http";

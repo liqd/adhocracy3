@@ -35,10 +35,15 @@ name: textinput
 parent: input
 ---
 
-Element to enter one line of text.
+Element to enter one line of text. It is used e.g. for login, register,
+creating/editing comments, or creating/editing proposals.
 
 In fact, there are multiple variants of this already defined in HTML.
 They should all look and behave similarily.
+
+Input fields need sufficient contrast to the background, ideally with a
+border. In order to make this simple, they must only be used on
+surfaces with background color `color-background-base`.
 
 ```html_example
 <input type="text" placeholder="text" />

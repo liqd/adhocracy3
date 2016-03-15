@@ -21,7 +21,6 @@ from adhocracy_core.resources.badge import IBadgeAssignment
 from adhocracy_core import sheets
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.utils import load_json
-from adhocracy_core.utils import get_sheet
 
 
 logger = logging.getLogger(__name__)
@@ -88,7 +87,7 @@ def create_badge_assignment(user: IUser,
         appstructs[sheets.description.IDescription.__identifier__] =\
             {'description': description}
     assignments = find_service(badgeable, 'badge_assignments')
-    if _assignment_exists(assignment_appstruct, assignments):
+    if _assignment_exists(assignment_appstruct, assignments, registry):
         logger.warn('Assignment already exists, skipping. {}'
                     .format(assignment_appstruct))
         return None
@@ -98,9 +97,11 @@ def create_badge_assignment(user: IUser,
     return assignment
 
 
-def _assignment_exists(assignment_appstruct: dict, assignments: IResource):
+def _assignment_exists(assignment_appstruct: dict, assignments: IResource,
+                       registry: Registry):
     for assignment in assignments.values():
         if assignment_appstruct == \
-           get_sheet(assignment, sheets.badge.IBadgeAssignment).get():
+           registry.content.get_sheet(assignment,
+                                      sheets.badge.IBadgeAssignment).get():
             return True
     return False

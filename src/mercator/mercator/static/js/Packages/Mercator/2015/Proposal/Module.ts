@@ -1,7 +1,6 @@
 import * as AdhAngularHelpersModule from "../../../AngularHelpers/Module";
 import * as AdhBadgeModule from "../../../Badge/Module";
 import * as AdhBlogModule from "../../../Blog/Module";
-import * as AdhCredentialsModule from "../../../User/Module";
 import * as AdhHttpModule from "../../../Http/Module";
 import * as AdhImageModule from "../../../Image/Module";
 import * as AdhInjectModule from "../../../Inject/Module";
@@ -15,7 +14,7 @@ import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 
 import * as AdhUtil from "../../../Util/Util";
 
-import RIProcess from "../../../../Resources_/adhocracy_mercator/resources/mercator/IProcess";
+import RIMercator2015Process from "../../../../Resources_/adhocracy_mercator/resources/mercator/IProcess";
 
 import * as Proposal from "./Proposal";
 
@@ -30,7 +29,6 @@ export var register = (angular) => {
             AdhAngularHelpersModule.moduleName,
             AdhBadgeModule.moduleName,
             AdhBlogModule.moduleName,
-            AdhCredentialsModule.moduleName,
             AdhHttpModule.moduleName,
             AdhImageModule.moduleName,
             AdhInjectModule.moduleName,
@@ -42,7 +40,13 @@ export var register = (angular) => {
             AdhStickyModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .config(["adhResourceAreaProvider", Proposal.registerRoutes(RIProcess.content_type)])
+        .config(["adhResourceAreaProvider", "adhConfigProvider", (adhResourceAreaProvider, adhConfigProvider) => {
+            var adhConfig = adhConfigProvider.config;
+            var processType = RIMercator2015Process.content_type;
+            var customHeader = adhConfig.pkg_path + Proposal.pkgLocation + "/CustomHeader.html";
+            adhResourceAreaProvider.customHeader(processType, customHeader);
+            Proposal.registerRoutes(processType)(adhResourceAreaProvider);
+        }])
         .config(["flowFactoryProvider", (flowFactoryProvider) => {
             if (typeof flowFactoryProvider.defaults === "undefined") {
                 flowFactoryProvider.defaults = {};
@@ -64,7 +68,7 @@ export var register = (angular) => {
             };
         }])
         // NOTE: we do not use a Widget based directive here for performance reasons
-        .directive("adhMercator2015Proposal", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", "adhGetBadges", Proposal.listItem])
+        .directive("adhMercator2015Proposal", ["adhConfig", "adhHttp", "adhTopLevelState", "adhGetBadges", Proposal.listItem])
         .directive("adhMercator2015ProposalDetailView", [
             "adhConfig",
             "adhHttp",
@@ -101,15 +105,7 @@ export var register = (angular) => {
             }])
         .directive("adhMercator2015ProposalListing", ["adhConfig", Proposal.listing])
         .directive("adhMercator2015UserProposalListing", ["adhConfig", Proposal.userListing])
-        .directive("adhMercator2015ProposalAddButton", [
-            "adhConfig",
-            "adhHttp",
-            "adhTopLevelState",
-            "adhPermissions",
-            "adhCredentials",
-            "$q",
-            Proposal.addButton
-            ])
+        .directive("adhMercator2015AddProposalButton", ["adhConfig", "adhPermissions", "adhTopLevelState", Proposal.addProposalButton])
         .controller("mercatorProposalFormController", [
             "$scope", "$element", "$window", "adhShowError", "adhSubmitIfValid", Proposal.mercatorProposalFormController]);
 };

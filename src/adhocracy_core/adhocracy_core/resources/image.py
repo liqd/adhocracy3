@@ -15,7 +15,6 @@ from adhocracy_core.resources.asset import IAssetDownload
 from adhocracy_core.resources.asset import AssetDownload
 from adhocracy_core.resources.asset import asset_download_meta
 from adhocracy_core.resources.asset import asset_meta
-from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_matching_isheet
 import adhocracy_core.sheets.image
 
@@ -132,7 +131,7 @@ def add_image_size_downloads(context: IImage, registry: Registry, **kwargs):
     """Add download for every image size of `context`."""
     isheet = get_matching_isheet(context,
                                  adhocracy_core.sheets.image.IImageMetadata)
-    sheet = get_sheet(context, isheet, registry=registry)
+    sheet = registry.content.get_sheet(context, isheet)
     size_fields = (f for f in sheet.schema if hasattr(f, 'dimensions'))
     appstruct = {}
     for field in size_fields:

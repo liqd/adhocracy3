@@ -4,12 +4,13 @@ import re
 import requests
 import logging
 
+from pyramid.registry import Registry
+
 from adhocracy_core.interfaces import ISheetBackReferenceAdded
 from adhocracy_core.interfaces import ISheetBackReferenceModified
 from adhocracy_core.resources.external_resource import IExternalResource
 from adhocracy_core.sheets.name import IName
 from adhocracy_core.sheets.comment import ICommentable
-from adhocracy_core.utils import get_sheet_field
 
 log = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ def notify_policy_compass(event):
     """Send notification to policy compass to reindex an external resource."""
     external_resource = event.object
     settings = event.registry.settings
-    endpoint = _get_index_endpoint(external_resource, settings)
+    endpoint = _get_index_endpoint(external_resource, settings, event.registry)
     response = requests.post(endpoint)
     if response.status_code != 200:  # indexing error on pcompass
         msg = 'Notifying policy compass "{}" failed with "{}"'.format(
@@ -26,8 +27,10 @@ def notify_policy_compass(event):
         raise ValueError(msg)
 
 
-def _get_index_endpoint(context: IExternalResource, settings: dict) -> str:
-    resource_name = get_sheet_field(context, IName, 'name')
+def _get_index_endpoint(context: IExternalResource,
+                        settings: dict,
+                        registry: Registry) -> str:
+    resource_name = registry.content.get_sheet_field(context, IName, 'name')
     match = re.match(
         '(?P<type>visualization|event|dataset|metric|fuzzymap|indicator)'
         '_(?P<id>[0-9]+)',

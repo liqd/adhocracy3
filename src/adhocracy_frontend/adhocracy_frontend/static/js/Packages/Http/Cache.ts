@@ -1,5 +1,4 @@
-/// <reference path="../../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
-/// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
+/// <reference path="../../../lib2/types/lodash.d.ts"/>
 
 import * as _ from "lodash";
 
@@ -102,7 +101,7 @@ export class Service {
         var cached = this.cache.get(path);
         if (typeof cached === "undefined") {
             var wsOff : () => void;
-            if (!_.contains(this.nonResourceUrls, path)) {
+            if (!_.includes(this.nonResourceUrls, path)) {
                 wsOff = this.adhWebSocket.register(path, (msg) => {
                     this.invalidate(path);
                 });

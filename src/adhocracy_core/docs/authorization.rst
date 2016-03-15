@@ -71,7 +71,7 @@ The creator role is automatically set for a specific local context and is not
 inherited.
 
 Permission mappings for roles with high priority override those with lower
-priorty. The order is determined by :var:`adhocracy_core.schema.ROLE_PRINCIPALS`
+priorty. The order is determined by :const:`adhocracy_core.schema.ROLE_PRINCIPALS`
 from left (low) right (high).
 
 ACL (Access Control List)
@@ -96,7 +96,7 @@ Customizing
 1. map users to group
 2. map roles to principals
 3. use workflow system to locally add roles to principals.
-4. locally add :term:`local role`s (change permission to allow others to edit)
+4. locally add :term:`local role` s (change permission to allow others to edit)
 5. map permissions to roles:
 
     - use only configuration for this

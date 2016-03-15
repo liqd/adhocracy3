@@ -6,9 +6,9 @@ from collections import defaultdict
 from persistent.mapping import PersistentMapping
 from pyramid.decorator import reify
 from pyramid.registry import Registry
-from pyramid.request import Request
 from pyramid.settings import asbool
-from pyramid.threadlocal import get_current_registry
+from pyramid.interfaces import IRequest
+from colander import deferred
 from substanced.util import find_service
 from zope.interface import implementer
 import colander
@@ -16,6 +16,7 @@ import colander
 from adhocracy_core.events import ResourceSheetModified
 from adhocracy_core.interfaces import IResourceSheet
 from adhocracy_core.interfaces import ISheet
+from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.interfaces import SheetMetadata
 from adhocracy_core.interfaces import Reference
 from adhocracy_core.interfaces import SearchQuery
@@ -30,27 +31,28 @@ logger = getLogger(__name__)
 
 @implementer(IResourceSheet)
 class BaseResourceSheet:
-    """Basic Resource sheet to get/set resource appstruct data.
 
-    Subclasses have to implement the `_data` property to store appstruct data.
-    """
+    __doc__ = IResourceSheet.__doc__
 
-    request = None  # just to follow the interface."""
-
-    def __init__(self, meta, context, registry=None):
-        """Initialize self."""
-        self.schema = meta.schema_class()
-        """:class:`colander.MappingSchema` to define the data structure."""
-        self.context = context
-        """Resource to adapt."""
+    def __init__(self, meta: SheetMetadata,
+                 context: IResourceSheet,
+                 registry: Registry,
+                 request: IRequest=None,
+                 creating: ResourceMetadata=None):
         self.meta = meta
-        """SheetMetadata"""
-        if registry is None:
-            registry = get_current_registry(context)
+        self.context = context
         self.registry = registry
-        """Pyramid :class:`pyramid.registry.Registry`. If `None`
-           :func:`pyramid.threadlocal.get_current_registry` is used get it.
-        """
+        self.request = request
+        self.creating = creating
+        self.schema = meta.schema_class()
+
+    def get_schema_with_bindings(self) -> colander.MappingSchema:
+        schema = self.schema.bind(request=self.request,
+                                  registry=self.registry,
+                                  context=self.context,
+                                  creating=self.creating,
+                                  )
+        return schema
 
     @reify
     def _fields(self) -> dict:
@@ -67,27 +69,24 @@ class BaseResourceSheet:
                 fields['readonly'][field] = node
         return fields
 
-    @property
+    @reify
     def _graph(self):
         graph = find_graph(self.context)
         return graph
 
-    @property
+    @reify
     def _catalogs(self):
         catalogs = find_service(self.context, 'catalogs')
         return catalogs
 
-    def get(self, params: dict={}, add_back_references=True) -> dict:
+    def get(self, params: dict={},
+            add_back_references=True,
+            omit_readonly=False) -> dict:
         """Return appstruct data.
 
-        :param params: Parameters to update the search query to find
-            references data (possible items are described in
-            :class:`adhocracy_core.interfaces.SearchQuery`).
-            The default search query is set in the `_references_query`
-            property.
-        :param add_back_references: allow to omit back references
+        Read :func:`adhocracy_core.interfaces.IResourceSheet.get`
         """
-        appstruct = self._get_default_appstruct()
+        appstruct = self._get_default_appstruct(omit_readonly=omit_readonly)
         appstruct.update(self._get_data_appstruct())
         query = self._get_references_query(params)
         appstruct.update(self._get_reference_appstruct(query))
@@ -95,14 +94,21 @@ class BaseResourceSheet:
             appstruct.update(self._get_back_reference_appstruct(query))
         return appstruct
 
-    def _get_default_appstruct(self) -> dict:
-        schema = self.schema.bind(context=self.context,
-                                  registry=self.registry)
-        items = [(n.name, n.default) for n in schema]
-        return dict(items)
+    def _get_default_appstruct(self, omit_readonly=False) -> dict:
+        appstruct = {}
+        for node in self.schema:
+            if node.name in self._fields['readonly'] and omit_readonly:
+                continue
+            else:
+                if isinstance(node.default, deferred):
+                    default = node.default(node, {'context': self.context,
+                                                  'registry': self.registry})
+                else:
+                    default = node.default
+                appstruct[node.name] = default
+        return appstruct
 
     def _get_data_appstruct(self) -> dict:
-        """Get data appstruct."""
         raise NotImplementedError
 
     def _get_references_query(self, params: dict) -> SearchQuery:
@@ -122,9 +128,9 @@ class BaseResourceSheet:
         fields = self._fields['reference'].items()
         get_ref = lambda node: Reference(self.context, self.meta.isheet,
                                          node.name, None)
-        return self._yield_references(self._catalogs, fields, query, get_ref)
+        return self._yield_references(fields, query, get_ref)
 
-    def _get_back_reference_appstruct(self, query: SearchQuery) -> dict:
+    def _get_back_reference_appstruct(self, query: SearchQuery) -> iter:
         fields = self._fields['back_reference'].items()
 
         def get_ref(node):
@@ -132,10 +138,10 @@ class BaseResourceSheet:
             isheet_field = node.reftype.getTaggedValue('source_isheet_field')
             return Reference(None, isheet, isheet_field, self.context)
 
-        return self._yield_references(self._catalogs, fields, query, get_ref)
+        return self._yield_references(fields, query, get_ref)
 
-    def _yield_references(self, catalogs, fields, query, create_ref) -> iter:
-        if not catalogs:
+    def _yield_references(self, fields, query, create_ref) -> iter:
+        if not self._catalogs:
             return iter([])  # ease testing
         for field, node in fields:
             reference = create_ref(node)
@@ -158,16 +164,19 @@ class BaseResourceSheet:
             appstruct: dict,
             omit=(),
             send_event=True,
-            request: Request=None,
             send_reference_event=True,
             omit_readonly: bool=True) -> bool:
-        """Store appstruct."""
+        """Store appstruct.
+
+        Read :func:`adhocracy_core.interfaces.IResourceSheet.set`
+        """
         appstruct_old = self.get(add_back_references=False)
         appstruct = self._omit_omit_keys(appstruct, omit)
         if omit_readonly:
             appstruct = self._omit_readonly_keys(appstruct)
         self._store_data(appstruct)
-        self._store_references(appstruct, self.registry,
+        self._store_references(appstruct,
+                               self.registry,
                                send_event=send_reference_event)
         if send_event:
             event = ResourceSheetModified(self.context,
@@ -175,7 +184,7 @@ class BaseResourceSheet:
                                           self.registry,
                                           appstruct_old,
                                           appstruct,
-                                          request)
+                                          self.request)
             self.registry.notify(event)
         return bool(appstruct)
         # TODO: only store struct if values have changed
@@ -202,40 +211,33 @@ class BaseResourceSheet:
                                               registry,
                                               send_event=send_event)
 
-    def get_cstruct(self, request: Request, params: dict=None):
-        """Return cstruct data.
+    def serialize(self, params: dict=None):
+        """Get sheet appstruct data and serialize.
 
-        Bind `request` and `self.context` to colander schema
-        (self.schema). Get sheet appstruct data and serialize.
-
-        :param request: Bind to schema and get principals to filter elements
-                        by 'view' permission.
-        :param params: Parameters to update the search query to find reference
-                       data.
-
-        Automatically set params are: `only_visible` and `allows` view
-        permission.
+        Read :func:`adhocracy_core.interfaces.IResourceSheet.serialize`
         """
         params = params or {}
         filter_view_permission = asbool(self.registry.settings.get(
             'adhocracy.filter_by_view_permission', True))
         if filter_view_permission:
-            params['allows'] = (request.effective_principals, 'view')
+            params['allows'] = (self.request.effective_principals, 'view')
         filter_visible = asbool(self.registry.settings.get(
             'adhocracy.filter_by_visible', True))
         if filter_visible:
             params['only_visible'] = True
-        schema = self._get_schema_for_cstruct(request, params)
-        appstruct = self.get(params=params)
+        appstruct = self.get(params=params, omit_readonly=True)
+        schema = self.get_schema_with_bindings()
         cstruct = schema.serialize(appstruct)
         return cstruct
 
-    def _get_schema_for_cstruct(self, request, params: dict):
-        """Might be overridden in subclasses."""
-        schema = self.schema.bind(context=self.context,
-                                  registry=self.registry,
-                                  request=request)
-        return schema
+    def deserialize(self, cstruct: dict) -> dict:
+        """Deserialize `ctruct`.
+
+        Read :func:`adhocracy_core.interfaces.IResourceSheet.serialize`
+        """
+        schema = self.get_schema_with_bindings()
+        cstruct = schema.deserialize(cstruct)
+        return cstruct
 
     def delete_field_values(self, fields: [str]):
         """Delete value for every field name in `fields`."""
@@ -250,11 +252,10 @@ class BaseResourceSheet:
 class AnnotationRessourceSheet(BaseResourceSheet):
     """Resource Sheet that stores data in dictionary annotation."""
 
-    def __init__(self, meta, context, registry=None):
-        """Initialize self."""
-        super().__init__(meta, context, registry)
-        isheet_name = meta.isheet.__identifier__
-        self._annotation_key = '_sheet_' + isheet_name.replace('.', '_')
+    @reify
+    def _annotation_key(self):
+        isheet_name = self.meta.isheet.__identifier__
+        return '_sheet_' + isheet_name.replace('.', '_')
 
     def _get_data_appstruct(self) -> dict:
         """Get data appstruct."""

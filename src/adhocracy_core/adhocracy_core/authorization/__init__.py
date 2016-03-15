@@ -3,30 +3,44 @@ from collections import defaultdict
 from pyramid.security import ALL_PERMISSIONS
 from pyramid.security import Allow
 from pyramid.authorization import ACLAuthorizationPolicy
+from pyramid.renderers import render
 from pyramid.security import ACLPermitsResult
 from pyramid.threadlocal import get_current_registry
 from pyramid.traversal import lineage
 from pyramid.registry import Registry
 from pyramid.request import Request
-from pyramid.router import Router
+from pyramid.scripting import get_root
 from zope.interface import implementer
+from zope.interface import Interface
 from substanced.util import get_acl
+from substanced.util import set_acl
 from substanced.stats import statsd_timer
-import substanced.util
 import transaction
 
-from adhocracy_core.utils import get_root
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IRoleACLAuthorizationPolicy
 from adhocracy_core.events import LocalRolesModified
 from adhocracy_core.schema import ACEPrincipal
 from adhocracy_core.schema import ROLE_PRINCIPALS
 from adhocracy_core.schema import SYSTEM_PRINCIPALS
+from adhocracy_core.schema import ACM
 
 
 CREATOR_ROLEID = 'role:creator'
 
 god_all_permission_ace = (Allow, 'role:god', ALL_PERMISSIONS)
+
+root_acm_asset = 'adhocracy_core.authorization:root_permissions.yaml'
+
+
+class IRootACMExtension(Interface):
+    """Marker interface for extension :term:`acm` of the  application root."""
+
+
+@implementer(IRootACMExtension)
+def acm_extension_adapter(context: IResource) -> dict:
+    """Dummy adpater to extend the `root_acm`."""
+    return ACM().deserialize({})
 
 
 @implementer(IRoleACLAuthorizationPolicy)
@@ -103,7 +117,7 @@ def get_local_roles_all(resource) -> dict:
     return local_roles_all
 
 
-def acm_to_acl(acm: dict, registry: Registry) -> [str]:
+def acm_to_acl(acm: dict) -> [str]:
     """Convert an Access Control Matrix into a pyramid ACL.
 
     To avoid generating too many ACE, action which are None will not
@@ -143,38 +157,47 @@ def _sort_by_principal_priority(acl: list) -> list:
     return acl
 
 
-def set_acms_for_app_root(app: Router, acms: tuple=()):
-    """
-    Set the :term:`acm`s for the `app`s root object.
+def set_acms_for_app_root(event):
+    """Set/update :term:`acm`s for the root object of the pyramid application.
+
+    :param event: this function should be used as a subscriber for the
+                  :class:`pyramid.interfaces.IApplicationCreated` event.
+                  That way everytime the application starts the root `acm`
+                  is updated.
+
+    The `root_acm`(:func:`root_acm_asset`) is extended by the :term:`acm`
+    returned by the :class:`adhocracy_core.authorization.IRootACMExtension`
+    adapter.
 
     In addition all permissions are granted the god user.
-
-    :param app: The pyramid wsgi application
-    :param acms: :class:`adhocracy_core.schema.ACM` dictionaries.
-                 :term:`acm`s with overriding permissions should be put
-                 before :term:`acm`s with default permissions.
     """
-    new_acl = [god_all_permission_ace]
-    for acm in acms:
-        new_acl += acm_to_acl(acm, app.registry)
-    root = get_root(app)
-    old_acl = get_acl(root)
-    if old_acl == new_acl:
+    root, closer = get_root(event.app)
+    acl = [god_all_permission_ace]
+    acl += _get_root_extension_acl(root, event.app.registry)
+    acl += _get_root_base_acl()
+    old_acl = get_acl(root, [])
+    if old_acl == acl:
         return
-    set_acl(root, new_acl, app.registry)
+    set_acl(root, acl, event.app.registry)
     transaction.commit()
+    closer()
 
 
-def set_acl(resource: IResource, acl: list, registry=None) -> bool:
-    """Set the acl and mark the resource as dirty."""
-    substanced.util.set_acl(resource, acl, registry)
+def _get_root_base_acl() -> []:
+    cstruct = render(root_acm_asset, {})
+    acm = ACM().deserialize(cstruct)
+    acl = acm_to_acl(acm)
+    return acl
 
 
-def set_god_all_permissions(resource: IResource, registry=None) -> bool:
-    """Set the god's permissions on the resource."""
-    old_acl = get_acl(resource)
-    new_acl = [god_all_permission_ace] + old_acl
-    set_acl(resource, new_acl, registry)
+def _get_root_extension_acl(context: IResource, registry: Registry) -> []:
+    acm_cstruct = registry.queryAdapter(context, IRootACMExtension)
+    if acm_cstruct is None:
+        return []
+    else:
+        acm = ACM().deserialize(acm_cstruct)
+        acl = acm_to_acl(acm)
+        return acl
 
 
 def create_fake_god_request(registry):
@@ -183,3 +206,10 @@ def create_fake_god_request(registry):
     request.registry = registry
     request.__cached_principals__ = ['role:god']
     return request
+
+
+def includeme(config):
+    """Register adapter to extend the root acm."""
+    config.registry.registerAdapter(acm_extension_adapter,
+                                    (Interface,),
+                                    IRootACMExtension)

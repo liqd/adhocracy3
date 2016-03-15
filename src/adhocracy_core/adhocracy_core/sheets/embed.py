@@ -45,7 +45,7 @@ def embed_code_config_adapter(context: IResource,
 
 
 @deferred
-def deferred_embed_code(node: MappingSchema, kw: dict) -> str:
+def deferred_default_embed_code(node: MappingSchema, kw: dict) -> str:
     """Return html code to embed the current `context` resource."""
     context = kw['context']
     request = kw.get('request', None)
@@ -65,7 +65,7 @@ class EmbedSchema(MappingSchema):
     """
 
     embed_code = Text(readonly=True,
-                      default=deferred_embed_code,
+                      default=deferred_default_embed_code,
                       )
     external_url = URL()
 

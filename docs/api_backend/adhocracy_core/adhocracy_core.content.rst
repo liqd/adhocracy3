@@ -6,10 +6,3 @@ adhocracy_core.content package
     :undoc-members:
     :show-inheritance:
 
-Submodules
-----------
-
-.. toctree::
-
-   adhocracy_core.content.test_init
-

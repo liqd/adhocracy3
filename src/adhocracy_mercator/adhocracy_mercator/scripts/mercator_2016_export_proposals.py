@@ -14,10 +14,10 @@ from pyramid.paster import bootstrap
 from substanced.util import find_service
 from adhocracy_core.utils import create_filename
 
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.interfaces import search_query
 
 from pyramid.traversal import resource_path
+from pyramid.traversal import get_current_registry
 
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.metadata import IMetadata
@@ -84,6 +84,7 @@ def _export_proposals(root, registry, limited):
 
     include_field = True
     exclude_field = False
+    get_sheet_field = registry.content.get_sheet_field
     fields = \
         [('URL', include_field,
           partial(_get_proposal_url, registry)),
@@ -235,21 +236,19 @@ def _export_proposals(root, registry, limited):
     print('Exported mercator proposals to %s' % filename)
 
 
-def _get_user_fields(proposal):
-    creator = get_sheet_field(proposal, IMetadata, 'creator')
-    name = get_sheet_field(creator, IUserBasic, 'name')
-    email = get_sheet_field(creator, IUserExtended, 'email')
-    return name, email
-
-
 def _get_sheet_field_from_subresource(sheet,
                                       sheet_field,
                                       sub_sheet_field,
-                                      proposal):
-    sub_resource = get_sheet_field(proposal,
-                                   IMercatorSubResources,
-                                   sheet_field)
-    return get_sheet_field(sub_resource, sheet, sub_sheet_field)
+                                      proposal,
+                                      ):
+    registry = get_current_registry(proposal)
+    sub_resource = registry.content.get_sheet_field(proposal,
+                                                    IMercatorSubResources,
+                                                    sheet_field)
+    sub_field = registry.content.get_sheet_field(sub_resource,
+                                                 sheet,
+                                                 sub_sheet_field)
+    return sub_field
 
 
 def _normalize_text(s: str) -> str:
@@ -262,7 +261,8 @@ def _append_field(result, content):
 
 
 def _get_date(sheet, field, resource):
-    value = get_sheet_field(resource, sheet, field)
+    registry = get_current_registry(resource)
+    value = registry.content.get_sheet_field(resource, sheet, field)
     if not value:
         return ''
     date = value.date().strftime('%d.%m.%Y')
@@ -270,10 +270,10 @@ def _get_date(sheet, field, resource):
 
 
 def _get_creation_date(proposal):
-    creation_date = get_sheet_field(
-        proposal,
-        IMetadata,
-        'item_creation_date')
+    registry = get_current_registry(proposal)
+    creation_date = registry.content.get_sheet_field(proposal,
+                                                     IMetadata,
+                                                     'item_creation_date')
     date = creation_date.date().strftime('%d.%m.%Y')
     return date
 
@@ -286,16 +286,19 @@ def _get_proposal_url(registry: Registry,
 
 
 def _get_sheet_field(sheet, field, resource):
-    return get_sheet_field(resource, sheet, field)
+    registry = get_current_registry(resource)
+    return registry.content.get_sheet_field(resource, sheet, field)
 
 
 def _get_creator_name(proposal):
-    creator = get_sheet_field(proposal, IMetadata, 'creator')
-    name = get_sheet_field(creator, IUserBasic, 'name')
+    registry = get_current_registry(proposal)
+    creator = registry.content.get_sheet_field(proposal, IMetadata, 'creator')
+    name = registry.content.get_sheet_field(creator, IUserBasic, 'name')
     return name
 
 
 def _get_creator_email(proposal):
-    creator = get_sheet_field(proposal, IMetadata, 'creator')
-    email = get_sheet_field(creator, IUserExtended, 'email')
+    registry = get_current_registry(proposal)
+    creator = registry.content.get_sheet_field(proposal, IMetadata, 'creator')
+    email = registry.content.get_sheet_field(creator, IUserExtended, 'email')
     return email

@@ -52,19 +52,18 @@ There are 5 base types of resources:
 * `Simple`: Anything that is neither versionable/item nor a pool.
 
 To model the application domain we have some frequently use derived types with
-semantics::
+semantics:
 
-* `Organisation`: a subtype of Pool to do basic structuring for the resource
-                  hierarchy. Typical subtypes are other Organisations or
-                  `Process`.
+* `Organisation`: a subtype of Pool to do basic structuring for the :term:`Resource tree`.
+  Typical subtypes are other Organisations or `Process`.
 
 * `Process`: a subtype of Pool to add configuration and resources for a specific
-             participation process. Typical subtypes are `Proposal`s
+  participation process. Typical subtypes are `Proposal`.
 
 * `Proposal`: a subtype of Item, this is normally content created by participants
-              during a paticipation process.
+  during a paticipation process.
 
-Example resource hierarchy::
+Example :term:`resource tree`::
 
     Pool:         locations
     Simple:       locations/berlin
@@ -1324,9 +1323,9 @@ To list child elements you have to do a search query with `elements=paths`
     {'count': '3',
      'elements': ['http://localhost...]}
 
-It's possible to filter and aggregate the elements listed in the IPool sheet
+It is possible to filter and aggregate the elements listed in the IPool sheet
 by additional GET parameters. For example, we can only retrieve children
-that have specific resource type (*content_type'):
+that have specific resource type (`content_type`):
 
     >>> resp_data = testapp.get('/Documents/document_0000000',
     ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraph'}).json
@@ -1552,7 +1551,8 @@ custom filters:
 
     >>> resp_data = testapp.get('/Documents', params={'creator': god_path}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/']
+    ['http://localhost/Documents/badges/',
+     'http://localhost/Documents/document_0000000/']
 
 * *item_creation_date* the the item_creation_date value of resources with :class:`adhocracy_core.sheets.metadata.IMetadata`.
   Valid query comparable: 'eq', 'noteq', 'lt', 'le', 'gt', 'ge', 'any', 'notany'

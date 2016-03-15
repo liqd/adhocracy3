@@ -1,4 +1,4 @@
-/// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
+/// <reference path="../../../lib2/types/jasmine.d.ts"/>
 
 import * as q from "q";
 
@@ -21,7 +21,8 @@ export var register = () => {
                 providerMock = {
                     defaults: {},
                     specifics: {},
-                    templates: {}
+                    templates: {},
+                    customHeaders: {}
                 };
 
                 adhHttpMock = jasmine.createSpyObj("adhHttp", ["get", "withTransaction"]);

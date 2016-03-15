@@ -6,4 +6,3 @@ def includeme(config):
     config.include('.root')
     config.include('.mercator')
     config.include('.mercator2')
-    config.include('.subscriber')

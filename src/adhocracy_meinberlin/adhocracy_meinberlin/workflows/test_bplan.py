@@ -3,8 +3,8 @@ from pytest import fixture
 from pytest import mark
 from webtest import TestResponse
 
-from adhocracy_core.utils.testing import add_resources
-from adhocracy_core.utils.testing import do_transition_to
+from adhocracy_core.testing import add_resources
+from adhocracy_core.testing import do_transition_to
 
 
 @fixture(scope='class')
@@ -30,12 +30,6 @@ def app_admin(app_admin):
     return app_admin
 
 
-@fixture
-def integration(config):
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_meinberlin.workflows')
-
 @mark.usefixtures('integration')
 def test_includeme_add_bplan_private_workflow(registry):
     from adhocracy_core.workflows import AdhocracyACLWorkflow
@@ -49,7 +43,7 @@ def test_initiate_bplan_private_workflow(registry, context):
     workflow = registry.content.workflows['bplan_private']
     assert workflow.state_of(context) is None
     workflow.initialize(context)
-    assert workflow.state_of(context) is 'private'
+    assert workflow.state_of(context) == 'private'
     local_acl = get_acl(context)
     assert ('Deny', 'system.Anonymous', 'view') in local_acl
 
@@ -83,30 +77,36 @@ def _post_proposal_itemversion(app_user, path='') -> TestResponse:
 @mark.functional
 class TestBPlanWorkflow:
 
-    def _set_workflow_assignment(self,
-                                 app_admin):
-        import transaction
+    @fixture(scope='class')
+    def app_router(self, app_settings):
+        """Set workflow assingment data for bplan process."""
+        # FIXME allow to set workflow assignment data with import script
+        from adhocracy_core.testing import make_configurator
+        from adhocracy_core.resources import add_resource_type_to_registry
+        from adhocracy_meinberlin.resources.bplan import process_meta
+        import adhocracy_meinberlin
+        configurator = make_configurator(app_settings, adhocracy_meinberlin)
+        process_meta = process_meta._add(
+            after_creation=(self._set_workflow_assignment,))
+        add_resource_type_to_registry(process_meta, configurator)
+        app_router = configurator.make_wsgi_app()
+        return app_router
+
+    @staticmethod
+    def _set_workflow_assignment(context, registry, options={}):
         import datetime
-        from adhocracy_core.utils import get_root
-        from adhocracy_core.utils import get_sheet
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
-        from pyramid.traversal import find_resource
-        root = get_root(app_admin.app_router)
-        bplan = find_resource(root,'/organisation/bplan/')
-        content = app_admin.app_router.registry.content
-        workflowassigment = content.get_sheet(bplan, IWorkflowAssignment)
-        workflowassigment.set({'state_data': [
+        assigment = registry.content.get_sheet(context, IWorkflowAssignment)
+        assigment.set({'state_data': [
             {'name': 'participate','description': '',
              'start_date': datetime.date(2015, 5, 5),
              'end_date': datetime.date(2015, 6, 11)}]})
-        transaction.commit()
 
     def test_create_resources(self,
                               datadir,
                               app_admin):
         json_file = str(datadir.join('resources.json'))
         add_resources(app_admin.app_router, json_file)
-        self._set_workflow_assignment(app_admin)
         resp = app_admin.get('/bplan')
         assert resp.status_code == 200
 

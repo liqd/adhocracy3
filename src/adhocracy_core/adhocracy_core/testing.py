@@ -13,6 +13,7 @@ from pyramid.config import Configurator
 from pyramid import testing
 from pyramid.util import DottedNameResolver
 from pyramid.router import Router
+from pyramid.scripting import get_root
 from pyramid_mailer.mailer import DummyMailer
 from pytest import fixture
 from ZODB import FileStorage
@@ -21,6 +22,7 @@ from webtest import TestApp
 from webtest import TestResponse
 from zope.interface.interfaces import IInterface
 import colander
+import transaction
 
 from adhocracy_core.interfaces import SheetMetadata
 from adhocracy_core.interfaces import ChangelogMetadata
@@ -29,6 +31,9 @@ from adhocracy_core.interfaces import SearchResult
 from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.resources.root import IRootPool
+from adhocracy_core.scripts import import_resources
+from adhocracy_core.scripts import import_local_roles
+
 
 #####################################
 # Integration/Function test helper  #
@@ -74,8 +79,8 @@ participant2_path = '/principals/users/0000005'
 participant2_login = 'participant2'
 participant2_password = 'password'
 
-authenticated_header = {'X-User-Path': '/principals/users/0000006',
-                        'X-User-Token': 'SECRET_AUTHENTICATED'}
+authenticated_header = {'X-User-Token': 'SECRET_AUTHENTICATED'}
+authenticated_path = '/principals/users/0000006'
 authenticated_login = 'authenticated'
 authenticated_password = 'password'
 
@@ -178,6 +183,8 @@ def integration(config) -> Configurator:
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.graph')
     config.include('adhocracy_core.catalog')
+    config.include('adhocracy_core.authorization')
+    config.include('adhocracy_core.renderers')
     config.include('adhocracy_core.sheets')
     config.include('adhocracy_core.resources')
     config.include('adhocracy_core.workflows')
@@ -397,10 +404,7 @@ def mock_content_registry() -> Mock:
     mock.get_sheets_edit.return_value = []
     mock.get_sheets_create.return_value = []
     mock.get_sheet.return_value = None
-    mock.sheets_read = {}
-    mock.sheets_edit = {}
-    mock.sheets_create = {}
-    mock.sheets_create_mandatory = {}
+    mock.get_sheet_field = lambda x, y, z: mock.get_sheet(x, y).get()[z]
     return mock
 
 
@@ -423,6 +427,23 @@ def config(request) -> Configurator:
 def registry(config) -> object:
     """Return dummy registry."""
     return config.registry
+
+
+@fixture
+def kw(context, registry, request_) -> dict:
+    """Return default keyword arguments for schema binding.
+
+    Available kwargs: request, content, registry, creating
+
+    Note: If the registry keyword is not need, this fixture should not be
+          used. This makes the tests run faster and we don't declare needless
+          dependencies.
+    """
+    return {'request': request_,
+            'registry': registry,
+            'context': context,
+            'creating': None,
+            }
 
 
 @fixture
@@ -464,7 +485,7 @@ def _get_settings(request, part, config_path_key='pyramid_config'):
     return settings
 
 
-@fixture(scope='session')
+@fixture(scope='class')
 def settings(request) -> dict:
     """Return app:main and server:main settings."""
     settings = {}
@@ -475,13 +496,11 @@ def settings(request) -> dict:
     return settings
 
 
-@fixture(scope='session')
+@fixture(scope='class')
 def app_settings(request) -> dict:
     """Return settings to start the test wsgi app."""
     settings = {}
-    # disable creating a default group, this causes
     # ZODB.POSException.InvalidObjectReference
-    settings['adhocracy.add_default_group'] = False
     # enable create test user for every :term:`role`
     settings['adhocracy.add_test_users'] = True
     # don't look for the websocket server
@@ -492,10 +511,14 @@ def app_settings(request) -> dict:
     settings['substanced.secret'] = 'secret'
     # extra dependenies
     settings['pyramid.includes'] = [
+        # database connection
+        'pyramid_zodbconn',
         # commit after request
         'pyramid_tm',
         # mock mail server
         'pyramid_mailer.testing',
+        # force error logging
+        'pyramid_exclog',
     ]
     settings['mail.default_sender'] = 'substanced_demo@example.com'
     settings['adhocracy.abuse_handler_mail'] = \
@@ -503,7 +526,7 @@ def app_settings(request) -> dict:
     return settings
 
 
-@fixture(scope='session')
+@fixture(scope='class')
 def ws_settings(request) -> Configurator:
     """Return websocket server settings."""
     return _get_settings(request, 'websockets')
@@ -659,13 +682,13 @@ def add_test_users(root, registry):
     add_user(root, login=participant2_login, password=participant2_password,
              email='participant2@example.org', roles=['participant'],
              registry=registry)
+    add_user_token(root,
+                   authenticated_path,
+                   authenticated_header['X-User-Token'],
+                   registry)
     add_user(root, login=authenticated_login, password=authenticated_password,
              email='authenticated@example.org', roles=[],
              registry=registry)
-    add_user_token(root,
-                   authenticated_header['X-User-Path'],
-                   authenticated_header['X-User-Token'],
-                   registry)
 
 
 def add_create_test_users_subscriber(configurator):
@@ -687,22 +710,10 @@ def app_router(app_settings) -> Router:
 
 def make_configurator(app_settings: dict, package) -> Configurator:
     """Make the pyramid configurator."""
-    # from pyramid.events import ApplicationCreated
-    # from adhocracy_core.authorization import set_acms_for_app_root
-    # from adhocracy_core.resources.root import root_acm
     configurator = Configurator(settings=app_settings,
                                 root_factory=package.root_factory)
     configurator.include(package)
     add_create_test_users_subscriber(configurator)
-    # TODO
-    # The following subscriber is a workaround to prevent ComponentLookupError:
-    # (<InterfaceClass substanced.interfaces.ICatalogFactory>, 'system')
-    # in functional tests.
-
-    # FIXME  this creates a problem by euth, since euth override the root acl
-    # def set_acm_subscriber(event):
-    #     set_acms_for_app_root(event.app, (root_acm,))
-    # configurator.add_subscriber(set_acm_subscriber, ApplicationCreated)
     return configurator
 
 
@@ -914,7 +925,9 @@ def app_participant2(app_router) -> TestApp:
 @fixture(scope='class')
 def app_authenticated(app_router) -> TestApp:
     """Return backend test app wrapper with authenticated authentication."""
-    return AppUser(app_router, header=authenticated_header)
+    return AppUser(app_router,
+                   header=authenticated_header,
+                   user_path=authenticated_path)
 
 
 @fixture(scope='class')
@@ -968,3 +981,31 @@ def datadir(tmpdir, request):
         dir_util.copy_tree(test_dir, str(tmpdir))
 
     return tmpdir
+
+
+def add_resources(app_router: Router, filename: str):
+    """Add resources from a JSON file to the app."""
+    _run_import_function(import_resources, app_router, filename)
+
+
+def add_local_roles(app_router: Router, filename: str):
+    """Add local roles from a JSON file to resources."""
+    _run_import_function(import_local_roles, app_router, filename)
+
+
+def _run_import_function(func: callable, app_router: Router, filename: str):
+    root, closer = get_root(app_router)
+    try:
+        func(root, app_router.registry, filename)
+        transaction.commit()
+    finally:
+        closer()
+
+
+def do_transition_to(app_user, path, state) -> TestResponse:
+    """Transition to a new workflow state by sending a PUT request."""
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
+    data = {'data': {IWorkflowAssignment.__identifier__:
+                     {'workflow_state': state}}}
+    resp = app_user.put(path, data)
+    return resp
