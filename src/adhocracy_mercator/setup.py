@@ -46,6 +46,8 @@ setup(name='adhocracy_mercator',
           adhocracy_mercator.scripts.export_ae_proposals_2015:export_proposals
       export_ae_proposals_2016 =\
           adhocracy_mercator.scripts.export_ae_proposals_2016:export_proposals
+      export_comments =\
+          adhocracy_mercator.scripts.export_comments:export_comments
       export_mercator_lost_rates =\
           adhocracy_mercator.scripts.export_lost_rates:export_lost_rates
       export_mercator_users =\
