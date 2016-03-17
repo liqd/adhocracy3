@@ -29,6 +29,7 @@ __pycache__
 /src/*/current
 etc/scss-lint.yml
 etc/tslint.json
+/etc/zeo.conf
 /etc/development.ini
 /etc/frontend_development.ini
 /etc/test.ini
