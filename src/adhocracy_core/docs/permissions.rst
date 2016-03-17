@@ -250,10 +250,10 @@ Cannot create rate annotations for participation process content::
 #    >>> 'POST' in admin.options(participant_proposal_rates).json
 #    False
 
-Cannot edit annotations for participation process content::
+Can edit annotations for participation process content::
 
     >>> 'POST' in admin.options(participant_comment).json
-    False
+    True
 
 Can create process structure::
 

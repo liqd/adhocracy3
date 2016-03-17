@@ -6,20 +6,20 @@ states:
     acm:
       principals:               [anonymous, participant, moderator, creator, initiator, admin]
       permissions:
-        - [edit_proposal,        ~,         ~,           ~,         D,       ~,         ~]
+        - [edit,                 ~,         ~,           ~,         D,       ~,         ~]
         - [create_rate,          ~,         D,           ~,         D,       ~,         ~]
         - [edit_rate,            ~,         ~,           ~,         D,       ~,         ~]
         - [create_comment,       ~,         D,           D,         ~,       D,         ~]
-        - [edit_comment,         ~,         ~,           ~,         D,       ~,         ~]
+        - [edit,                 ~,         ~,           ~,         D,       ~,         ~]
   rejected:
     acm:
       principals:               [anonymous, participant, moderator, creator, initiator, admin]
       permissions:
-        - [edit_proposal,        ~,         ~,           ~,         D,       ~,         ~]
+        - [edit,                 ~,         ~,           ~,         D,       ~,         ~]
         - [create_rate,          ~,         D,           ~,         D,       ~,         ~]
         - [edit_rate,            ~,         ~,           ~,         D,       ~,         ~]
         - [create_comment,       ~,         D,           D,         ~,       D,         ~]
-        - [edit_comment,         ~,         ~,           ~,         D,       ~,         ~]
+        - [edit,                 ~,         ~,           ~,         D,       ~,         ~]
 transitions:
   to_voteable:
     from_state: proposed

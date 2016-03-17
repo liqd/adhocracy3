@@ -27,7 +27,7 @@ commentversion_meta = itemversion_meta._replace(
                      adhocracy_core.sheets.rate.IRateable,
                      adhocracy_core.sheets.relation.ICanPolarize,
                      ),
-    permission_create='edit_comment',
+    permission_create='edit',
 )
 
 
