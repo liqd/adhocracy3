@@ -201,24 +201,6 @@ class TestValidateRequest:
             self.call_fut(context, request_, schema=CountSchema())
         assert request_.validated == {}
 
-    def test_valid_with_extra_validator(self, context, request_):
-        def validator1(context, request_):
-            request_.validated = {"validator": "1"}
-        self.call_fut(context, request_, extra_validators=[validator1])
-        assert request_.validated == {"validator": "1"}
-
-    def test_valid_with_extra_validator_and_wrong_schema_data(self, context,
-                                                              request_):
-        from pyramid.httpexceptions import HTTPBadRequest
-        def validator1(context, request_):
-            request_._validator_called = True
-        request_.body = '{"count": "wrong"}'
-        request_.method = 'POST'
-        with pytest.raises(HTTPBadRequest):
-            self.call_fut(context, request_, schema=CountSchema(),
-                           extra_validators=[validator1])
-        assert hasattr(request_, '_validator_called') is False
-
     def test_valid_with_sequence_schema(self, context, request_):
         class TestListSchema(colander.SequenceSchema):
             elements = colander.SchemaNode(colander.String())
@@ -330,11 +312,11 @@ class TestRESTView:
         from . import views
         block_mock = mocker.patch.object(views, 'respond_if_blocked')
         inst = self.make_one(context, request_)
-        assert inst.validation_GET == (None, [])
-        assert inst.validation_HEAD == (None, [])
-        assert inst.validation_OPTIONS == (None, [])
-        assert inst.validation_PUT == (None, [])
-        assert inst.validation_POST == (None, [])
+        assert inst.schema_GET is None
+        assert inst.schema_HEAD is None
+        assert inst.schema_OPTIONS is None
+        assert inst.schema_PUT is None
+        assert inst.schema_POST is None
         assert inst.context is context
         assert inst.request is request_
         assert inst.request.errors == []
@@ -525,7 +507,7 @@ class TestSimpleRESTView:
         from adhocracy_core.rest.schemas import PUTResourceRequestSchema
         inst = self.make_one(context, request_)
         assert issubclass(inst.__class__, ResourceRESTView)
-        assert inst.validation_PUT == (PUTResourceRequestSchema, [])
+        assert inst.schema_PUT == PUTResourceRequestSchema
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
@@ -567,7 +549,7 @@ class TestPoolRESTView:
         from adhocracy_core.rest.schemas import POSTResourceRequestSchema
         inst = self.make_one(context, request_)
         assert issubclass(inst.__class__, SimpleRESTView)
-        assert inst.validation_POST == (POSTResourceRequestSchema, [])
+        assert inst.schema_POST == POSTResourceRequestSchema
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
@@ -704,8 +686,7 @@ class TestItemRESTView:
         from adhocracy_core.rest.schemas import POSTItemRequestSchema
         inst = self.make_one(context, request_)
         assert issubclass(inst.__class__, SimpleRESTView)
-        assert inst.validation_POST == (POSTItemRequestSchema,
-                                        [])
+        assert inst.schema_POST == POSTItemRequestSchema
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
@@ -1326,7 +1307,7 @@ class TestAssetsServiceRESTView:
         from .schemas import POSTAssetRequestSchema
         inst = self.make_one(context, request_)
         assert issubclass(inst.__class__, SimpleRESTView)
-        assert inst.validation_POST == (POSTAssetRequestSchema, [])
+        assert inst.schema_POST == POSTAssetRequestSchema
 
     def test_post_valid(self, request_, context):
         request_.root = context
@@ -1355,7 +1336,7 @@ class TestAssetRESTView:
         from .schemas import PUTAssetRequestSchema
         inst = self.make_one(context, request_)
         assert issubclass(inst.__class__, SimpleRESTView)
-        assert inst.validation_PUT == (PUTAssetRequestSchema, [])
+        assert inst.schema_PUT == PUTAssetRequestSchema
 
     def test_put_valid_no_sheets(self, request_, context):
         inst = self.make_one(context, request_)
@@ -1422,8 +1403,7 @@ class TestCreatePasswordResetView:
     def test_create(self, context, request_):
         from .schemas import POSTCreatePasswordResetRequestSchema
         inst = self.make_one(context, request_)
-        assert inst.validation_POST == (POSTCreatePasswordResetRequestSchema,
-                                        [])
+        assert inst.schema_POST == POSTCreatePasswordResetRequestSchema
 
     def test_post(self, request_, context, registry, resets):
         from adhocracy_core.resources.principal import IPasswordReset
@@ -1459,8 +1439,7 @@ class TestPasswordResetView:
     def test_create(self, context, request_):
         from .schemas import POSTPasswordResetRequestSchema
         inst = self.make_one(context, request_)
-        assert inst.validation_POST == (POSTPasswordResetRequestSchema,
-                                        [])
+        assert inst.schema_POST == POSTPasswordResetRequestSchema
 
     def test_post(self, request_, context, mock_remember):
         from adhocracy_core.resources.principal import PasswordReset

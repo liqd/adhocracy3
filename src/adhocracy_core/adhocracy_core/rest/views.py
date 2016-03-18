@@ -107,11 +107,6 @@ def validate_request_data(context: ILocation, request: Request,
                    The validated data (dict or list) is stored in the
                    `request.validated` attribute.
                    The `None` value is allowed to disable schema validation.
-    :param extra_validators: Functions called after schema validation.
-                             The passed arguments are `context` and  `request`.
-                             The should append errors to `request.errors` and
-                             validated data to `request.validated`.
-
     :raises HTTPBadRequest: HTTP 400 for bad request data.
     """
     body = {}
@@ -122,7 +117,6 @@ def validate_request_data(context: ILocation, request: Request,
     validate_user_headers(request)
     qs = _extract_querystring(request)
     validate_body_or_querystring(body, qs, schema, context, request)
-    _validate_extra_validators(extra_validators, context, request)
     if request.errors:
         request.validated = {}
         raise HTTPBadRequest()
@@ -239,14 +233,6 @@ def _add_colander_invalid_error_to_request(error: Invalid, request: Request,
         request.errors.append(error_entry(location, name, msg))
 
 
-def _validate_extra_validators(validators: list, context, request: Request):
-    """Run `validators` functions. Assuming schema validation run before."""
-    if request.errors:
-        return
-    for val in validators:
-        val(context, request)
-
-
 class RESTView:
     """Class stub with request data validation support.
 
@@ -258,18 +244,18 @@ class RESTView:
             context=IResource,
         )
         class MySubClass(RESTView):
-            validation_GET = (MyColanderSchema, [my_extra_validation_function])
+            validation_GET = MyColanderSchema
 
             @view_config(request_method='GET')
             def get(self):
             ...
     """
 
-    validation_OPTIONS = (None, [])
-    validation_HEAD = (None, [])
-    validation_GET = (None, [])
-    validation_PUT = (None, [])
-    validation_POST = (None, [])
+    schema_OPTIONS = None
+    schema_HEAD = None
+    schema_GET = None
+    schema_PUT = None
+    schema_POST = None
 
     def __init__(self, context, request):
         """Initialize self."""
@@ -282,12 +268,11 @@ class RESTView:
         with statsd_timer('validate', rate=.1, registry=self.registry):
             respond_if_blocked(context, request)
             set_cache_header(context, request)
-            schema_class, validators = _get_schema_and_validators(self,
-                                                                  request)
+            schema_class = _get_schema(self, request)
             schema = self._create_schema(schema_class, context)
             validate_request_data(context, request,
                                   schema=schema,
-                                  extra_validators=validators)
+                                  )
 
     def _create_schema(self, schema_class, context) -> MappingSchema:
         schema = schema_class().bind(request=self.request,
@@ -334,11 +319,11 @@ class RESTView:
         return result
 
 
-def _get_schema_and_validators(view_class, request: Request) -> tuple:
+def _get_schema(view_class, request: Request) -> tuple:
     http_method = request.method.upper()
-    validation_attr = 'validation_' + http_method
-    schema, validators = getattr(view_class, validation_attr, (None, []))
-    return schema or MappingSchema, validators
+    validation_attr = 'schema_' + http_method
+    schema = getattr(view_class, validation_attr, None)
+    return schema or MappingSchema
 
 
 @view_defaults(
@@ -476,7 +461,7 @@ class ResourceRESTView(RESTView):
 class SimpleRESTView(ResourceRESTView):
     """View for simples (non versionable), implements get, options and put."""
 
-    validation_PUT = (PUTResourceRequestSchema, [])
+    schema_PUT = PUTResourceRequestSchema
 
     @view_config(request_method='PUT',
                  permission='edit_some',
@@ -506,9 +491,9 @@ class SimpleRESTView(ResourceRESTView):
 class PoolRESTView(SimpleRESTView):
     """View for Pools, implements get, options, put and post."""
 
-    validation_GET = (GETPoolRequestSchema, [])
+    schema_GET = GETPoolRequestSchema
 
-    validation_POST = (POSTResourceRequestSchema, [])
+    schema_POST = POSTResourceRequestSchema
 
     @view_config(request_method='GET',
                  permission='view')
@@ -582,7 +567,7 @@ class PoolRESTView(SimpleRESTView):
 class ItemRESTView(PoolRESTView):
     """View for Items and ItemVersions, overwrites GET and  POST handling."""
 
-    validation_POST = (POSTItemRequestSchema, [])
+    schema_POST = POSTItemRequestSchema
 
     @view_config(request_method='GET',
                  permission='view')
@@ -693,7 +678,7 @@ class BadgeAssignmentsRESTView(PoolRESTView):
 class UsersRESTView(PoolRESTView):
     """View the IUsersService pool overwrites POST handling."""
 
-    validation_POST = (POSTResourceRequestSchema, [])
+    schema_POST = POSTResourceRequestSchema
 
     @view_config(request_method='POST',
                  permission='create_user',
@@ -710,7 +695,7 @@ class UsersRESTView(PoolRESTView):
 class AssetsServiceRESTView(PoolRESTView):
     """View allowing multipart requests for asset upload."""
 
-    validation_POST = (POSTAssetRequestSchema, [])
+    schema_POST = POSTAssetRequestSchema
 
     @view_config(request_method='POST',
                  permission='create_asset',
@@ -727,7 +712,7 @@ class AssetsServiceRESTView(PoolRESTView):
 class AssetRESTView(SimpleRESTView):
     """View for assets, allows PUTting new versions via multipart."""
 
-    validation_PUT = (PUTAssetRequestSchema, [])
+    schema_PUT = PUTAssetRequestSchema
 
     @view_config(request_method='PUT',
                  permission='create_asset',
@@ -1015,8 +1000,7 @@ def validate_account_active(context, request: Request):
 class LoginUsernameView(RESTView):
     """Log in a user via their name."""
 
-    validation_POST = (POSTLoginUsernameRequestSchema,
-                       [])
+    schema_POST = POSTLoginUsernameRequestSchema
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -1050,8 +1034,7 @@ def _login_user(request: Request) -> dict:
 class LoginEmailView(RESTView):
     """Log in a user via their email address."""
 
-    validation_POST = (POSTLoginEmailRequestSchema,
-                       [])
+    schema_POST = POSTLoginEmailRequestSchema
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -1073,8 +1056,7 @@ class LoginEmailView(RESTView):
 class ActivateAccountView(RESTView):
     """Log in a user via their name."""
 
-    validation_POST = (POSTActivateAccountViewRequestSchema,
-                       [])
+    schema_POST = POSTActivateAccountViewRequestSchema
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -1096,7 +1078,7 @@ class ActivateAccountView(RESTView):
 class ReportAbuseView(RESTView):
     """Receive and process an abuse complaint."""
 
-    validation_POST = (POSTReportAbuseViewRequestSchema, [])
+    schema_POST = POSTReportAbuseViewRequestSchema
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -1122,7 +1104,7 @@ class ReportAbuseView(RESTView):
 class MessageUserView(RESTView):
     """Send a message to another user."""
 
-    validation_POST = (POSTMessageUserViewRequestSchema, [])
+    schema_POST = POSTMessageUserViewRequestSchema
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -1157,7 +1139,7 @@ class MessageUserView(RESTView):
 class CreatePasswordResetView(RESTView):
     """Create a password reset resource."""
 
-    validation_POST = (POSTCreatePasswordResetRequestSchema, [])
+    schema_POST = POSTCreatePasswordResetRequestSchema
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -1185,7 +1167,7 @@ class CreatePasswordResetView(RESTView):
 class PasswordResetView(RESTView):
     """Reset a user password."""
 
-    validation_POST = (POSTPasswordResetRequestSchema, [])
+    schema_POST = POSTPasswordResetRequestSchema
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:

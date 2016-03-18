@@ -413,7 +413,7 @@ def create_validate_login_password(request: Request,
 
 
 def create_validate_account_active(request: Request,
-                                   child_node_name: str):
+                                   child_node_name: str) -> callable:
     """Return validator to check the user account is already active.
 
     :param `child_node_name`: The name of the child node to raise error.
