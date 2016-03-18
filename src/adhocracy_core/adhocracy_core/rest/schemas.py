@@ -57,7 +57,6 @@ from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.catalog import ICatalogsService
 from adhocracy_core.catalog.index import ReferenceIndex
 from adhocracy_core.utils import now
-from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import unflatten_multipart_request
 
 resolver = DottedNameResolver()
@@ -562,11 +561,13 @@ def _is_reference_filter(name: str, registry: Registry) -> bool:
     try:
         isheet, field, node = resolve(name)
     except ValueError:
-        raise_colander_style_error(None, name, 'No such sheet or field')
+        dummy_node = colander.SchemaNode(colander.String(), name=name)
+        raise colander.Invalid(dummy_node, 'No such sheet or field')
     if isinstance(node, (Reference, References)):
         return True
     else:
-        raise_colander_style_error(None, name, 'Not a reference node')
+        dummy_node = colander.SchemaNode(colander.String(), name=name)
+        raise colander.Invalid(dummy_node, 'Not a reference node')
 
 
 def _is_arbitrary_filter(name: str, catalogs: ICatalogsService) -> bool:

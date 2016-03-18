@@ -20,7 +20,6 @@ from adhocracy_core.utils import log_compatible_datetime
 from adhocracy_core.utils import named_object
 from adhocracy_core.sheets.metadata import view_blocked_by_metadata
 from adhocracy_core.sheets.principal import IPasswordAuthentication
-from adhocracy_core.rest.schemas import BlockExplanationResponseSchema
 
 
 logger = logging.getLogger(__name__)
@@ -233,6 +232,7 @@ def handle_error_400_url_decode_error(error, request):
              )
 def handle_error_410_exception(error, request):
     """Add json body with explanation to 410 errors."""
+    from adhocracy_core.rest.schemas import BlockExplanationResponseSchema
     context = request.context
     registry = request.registry
     reason = error.detail or ''
