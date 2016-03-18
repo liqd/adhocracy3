@@ -17,7 +17,6 @@ from pyramid.request import Request
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
 from adhocracy_core.utils import exception_to_str
 from adhocracy_core.utils import log_compatible_datetime
-from adhocracy_core.utils import named_object
 from adhocracy_core.sheets.metadata import view_blocked_by_metadata
 from adhocracy_core.sheets.principal import IPasswordAuthentication
 
@@ -206,7 +205,7 @@ def handle_error_400_auto_update_no_fork_allowed(error, request):
     description = '- The auto update tried to create a fork for: {0} caused'\
                   ' by isheet: {1} field: {2} with old_reference: {3} and new'\
                   ' reference: {4}. Try another root_version.'.format(*args)
-    dummy_node = named_object('root_versions')
+    dummy_node = colander.SchemaNode(colander.List(), name='root_versions')
     error_colander = colander.Invalid(dummy_node, msg + description)
     return handle_error_400_colander_invalid(error_colander, request)
 

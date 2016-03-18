@@ -165,10 +165,6 @@ def to_dotted_name(context) -> str:
         return get_dotted_name(context)
 
 
-named_object = namedtuple('NamedObject', ['name'])
-"""An object that has a name (and nothing else)."""
-
-
 def remove_keys_from_dict(dictionary: dict, keys_to_remove=()) -> dict:
     """Remove keys from `dictionary`.
 
