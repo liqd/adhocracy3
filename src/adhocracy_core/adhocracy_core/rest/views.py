@@ -22,7 +22,6 @@ from zope.interface.interfaces import IInterface
 from zope.interface import Interface
 
 from adhocracy_core.caching import set_cache_header
-from adhocracy_core.events import ResourceSheetModified
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -63,12 +62,10 @@ from adhocracy_core.schema import References
 from adhocracy_core.sheets.badge import get_assignable_badges
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_core.sheets.metadata import is_older_than
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.sheets.pool import IPool as IPoolSheet
 from adhocracy_core.sheets.versions import IVersionable
-from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.tags import ITags
 from adhocracy_core.utils import extract_events_from_changelog_metadata
 from adhocracy_core.utils import get_reason_if_blocked
@@ -1072,31 +1069,6 @@ class LoginEmailView(RESTView):
         return _login_user(self.request)
 
 
-def validate_activation_path(context, request: Request):
-    """Validate the user name of a login request.
-
-    If valid and activated, the user object is added as 'user' to
-    `request.validated`.
-    """
-    path = request.validated['path']
-    locator = request.registry.getMultiAdapter((context, request),
-                                               IUserLocator)
-    user = locator.get_user_by_activation_path(path)
-    error = error_entry('body', 'path', 'Unknown or expired activation path')
-    if user is None:
-        request.errors.append(error)
-    elif is_older_than(user, days=8):
-        request.errors.append(error)
-        user.activation_path = None
-    else:
-        user.activate()
-        user.activation_path = None
-        request.validated['user'] = user
-        event = ResourceSheetModified(user, IUserBasic, request.registry, {},
-                                      {}, request)
-        request.registry.notify(event)  # trigger reindex activation_path index
-
-
 @view_defaults(
     renderer='json',
     context=IRootPool,
@@ -1106,7 +1078,7 @@ class ActivateAccountView(RESTView):
     """Log in a user via their name."""
 
     validation_POST = (POSTActivateAccountViewRequestSchema,
-                       [validate_activation_path])
+                       [])
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:

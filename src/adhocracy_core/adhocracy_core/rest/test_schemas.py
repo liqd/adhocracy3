@@ -296,6 +296,7 @@ class TestPUTResourceRequestSchema:
         inst = self.make_one()
         assert inst['data'].after_bind is add_put_data_subschemas
 
+
 def test_put_asset_request_schema():
     from . import schemas
     schema_class = schemas.PUTAssetRequestSchema
@@ -1281,3 +1282,57 @@ class TestValidatePasswordResetPath:
 
         with raises(colander.Invalid):
             validator(node, reset)
+
+
+class TestPostActivateAccountViewRequestSchema:
+
+    def make_one(self, kw):
+        from .schemas import POSTActivateAccountViewRequestSchema
+        return POSTActivateAccountViewRequestSchema().bind(**kw)
+
+    def test_create(self, mocker, kw):
+        mock_val = mocker.patch('adhocracy_core.rest.schemas.'
+                                'create_validate_activation_path')
+        inst = self.make_one(kw)
+        assert inst['path'].required
+        validators = inst['path'].validator.validators
+        assert validators[1] == mock_val.return_value
+        mock_val.assert_called_with(kw['context'], kw['request'],
+                                    kw['registry'])
+        assert isinstance(validators[0], colander.Regex)
+
+
+class TestCreateValidateActivationPath:
+
+    def call_fut(self, *args):
+        from adhocracy_core.rest.schemas import create_validate_activation_path
+        return create_validate_activation_path(*args)
+
+    def test_raise_if_wrong_path(self, node, request_, context, registry,
+                           mock_user_locator):
+        mock_user_locator.get_user_by_activation_path.return_value = None
+        validator = self.call_fut(context, request_, registry)
+        with raises(colander.Invalid):
+            validator(node, 'activate')
+
+    def test_raise_if_outdated_path(self, node, request_, context, registry,
+                                    mock_user_locator, mocker):
+        mocker.patch('adhocracy_core.rest.schemas.is_older_than',
+                     return_value=True)
+        user = testing.DummyResource(active=False,
+                                     activate=mocker.Mock())
+        mock_user_locator.get_user_by_activation_path.return_value = user
+        validator = self.call_fut(context, request_, registry)
+        with raises(colander.Invalid):
+            validator(node, 'activate')
+
+    def test_activate_user(self, node, request_, context, registry,
+                           mock_user_locator, mocker):
+        mocker.patch('adhocracy_core.rest.schemas.is_older_than',
+                     return_value=False)
+        user = testing.DummyResource(active=False,
+                                     activate=mocker.Mock())
+        mock_user_locator.get_user_by_activation_path.return_value = user
+        validator = self.call_fut(context, request_, registry)
+        assert validator(node, 'activate') is None
+        assert user.activate.called

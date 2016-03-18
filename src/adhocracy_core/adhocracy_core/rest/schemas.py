@@ -16,6 +16,7 @@ from substanced.util import find_service
 from hypatia.field import FieldIndex
 from hypatia.keyword import KeywordIndex
 from zope import interface
+from adhocracy_core.events import ResourceSheetModified
 from adhocracy_core.interfaces import FieldComparator
 from adhocracy_core.interfaces import FieldSequenceComparator
 from adhocracy_core.interfaces import IItemVersion
@@ -28,9 +29,10 @@ from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.resources.base import Base
-from adhocracy_core.rest.exceptions import error_entry
 from adhocracy_core.sheets.asset import IAssetData
 from adhocracy_core.sheets.asset import IAssetMetadata
+from adhocracy_core.sheets.metadata import is_older_than
+from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import Boolean
@@ -295,12 +297,57 @@ class POSTLoginUsernameRequestSchema(colander.Schema):
     password = Password(missing=colander.required)
 
 
+def create_validate_activation_path(context,
+                                    request: Request,
+                                    registry: Registry) -> callable:
+    """Validate the users activation `path`.
+
+    If valid and activated, the user object is added as 'user' to
+    `request.validated`.
+    """
+    def validate_activation_path(node, value):
+        locator = request.registry.getMultiAdapter((context, request),
+                                                   IUserLocator)
+        user = locator.get_user_by_activation_path(value)
+        error_msg = 'Unknown or expired activation path'
+        if user is None:
+            raise colander.Invalid(node, error_msg)
+        elif is_older_than(user, days=8):
+            user.activation_path = None
+            raise colander.Invalid(node, error_msg)
+        else:
+            request.validated['user'] = user
+            # TODO we should use a sheet to activate the user.
+            user.activate()
+            user.activation_path = None
+            event = ResourceSheetModified(user, IUserBasic, request.registry, {},
+                                          {}, request)
+            registry.notify(event)  # trigger reindex activation_path index
+    return validate_activation_path
+
+
+@colander.deferred
+def deferred_validate_activation_path(node: SchemaNode,
+                                      kw: dict) -> colander.All:
+    """Validate activation path and add user."""
+    context = kw['context']
+    request = kw['request']
+    registry = kw['registry']
+    return colander.All(colander.Regex('^/activate/'),
+                        create_validate_activation_path(context,
+                                                        request,
+                                                        registry,
+                                                        ),
+                        )
+
+
 class POSTActivateAccountViewRequestSchema(colander.Schema):
     """Schema for account activation."""
 
     path = SchemaNode(colander.String(),
                       missing=colander.required,
-                      validator=colander.Regex('^/activate/'))
+                      validator=deferred_validate_activation_path)
+
 
 
 class POSTLoginEmailRequestSchema(colander.Schema):

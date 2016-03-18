@@ -1268,31 +1268,6 @@ class TestValidateLoginPasswordUnitTest:
         assert request_.errors == []
 
 
-class TestValidateAccountActiveUnitTest:
-
-    def call_fut(self, context, request):
-        from adhocracy_core.rest.views import validate_account_active
-        return validate_account_active(context, request)
-
-    def test_valid(self, request_, context):
-        user = testing.DummyResource(active=True)
-        request_.validated['user'] = user
-        self.call_fut(context, request_)
-        assert not request_.errors
-
-    def test_invalid(self, request_, context):
-        user = testing.DummyResource(active=False)
-        request_.validated['user'] = user
-        self.call_fut(context, request_)
-        assert 'not yet activated' in request_.errors[0].description
-
-    def test_no_error_added_after_other_errors(self, request_, context):
-        user = testing.DummyResource(active=False)
-        request_.validated['user'] = user
-        request_.errors.append(('blah', 'blah', 'blah'))
-        assert len(request_.errors) == 1
-        self.call_fut(context, request_)
-        assert len(request_.errors) == 1
 
 
 class TestLoginUserName:
@@ -1351,50 +1326,6 @@ class TestLoginEmailView:
         inst = self.make_one(context, request)
         assert inst.options() == {}
 
-
-
-class TestValidateActivationPathUnitTest:
-
-    @fixture
-    def _request(self, request_, registry):
-        request_.registry = registry
-        request_.validated['path'] = '/foo'
-        return request_
-
-    @fixture
-    def user(self):
-        user = testing.DummyResource()
-        user.activate = Mock()
-        return user
-
-    def call_fut(self, context, _request):
-        from adhocracy_core.rest.views import validate_activation_path
-        return validate_activation_path(context, _request)
-
-    def test_valid(self, _request, user, context,
-                   mock_user_locator):
-        from datetime import datetime
-        from datetime import timezone
-        mock_user_locator.get_user_by_activation_path.return_value = user
-        user.creation_date = datetime.now(timezone.utc)
-        self.call_fut(context, _request)
-        assert _request.validated['user'] == user
-        assert user.activate.called
-
-    def test_not_found(self, _request, context, mock_user_locator):
-        mock_user_locator.get_user_by_activation_path.return_value = None
-        self.call_fut(context, _request)
-        assert 'Unknown or expired activation path' == _request.errors[0].description
-
-    def test_found_but_expired(self, _request, user, context,
-                               mock_user_locator):
-        from datetime import datetime
-        from datetime import timezone
-        mock_user_locator.get_user_by_activation_path.return_value = user
-        user.creation_date = datetime(year=2010, month=1, day=1, tzinfo=timezone.utc)
-        self.call_fut(context, _request)
-        self.call_fut(context, _request)
-        assert 'Unknown or expired activation path' == _request.errors[0].description
 
 
 class TestActivateAccountView:
