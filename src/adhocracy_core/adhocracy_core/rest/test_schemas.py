@@ -220,7 +220,7 @@ class TestAddPostRequestSubSchemas:
             self.call_fut(node, kw)
 
 
-class TestPOSTItemRequestSchemaUnitTest:
+class TestPOSTItemRequestSchema:
 
     @fixture
     def request_(self, request_):
@@ -232,26 +232,41 @@ class TestPOSTItemRequestSchemaUnitTest:
         registry.content.get_resources_meta_addable.return_value = [resource_meta]
         return registry
 
-    def make_one(self):
-        from adhocracy_core.rest.schemas import POSTItemRequestSchema
-        return POSTItemRequestSchema()
+    @fixture
+    def version(self, context):
+        from adhocracy_core.interfaces import IItemVersion
+        version = testing.DummyResource(__provides__=IItemVersion)
+        context['version'] = version
+        return version
 
-    def test_deserialize_without_binding(self):
-        inst = self.make_one()
+    @fixture
+    def inst(self, kw):
+        from adhocracy_core.rest.schemas import POSTItemRequestSchema
+        return POSTItemRequestSchema().bind(**kw)
+
+    def test_deserialize_empty(self, inst):
         result = inst.deserialize({'content_type': IResource.__identifier__,
                                    'data': {}})
         assert result == {'content_type': IResource,
                           'data': {},
                           'root_versions': []}
 
-    def test_deserialize_with_binding_and_root_versions(self, kw, request_):
-        inst = self.make_one().bind(**kw)
-        root_version_path = request_.resource_url(kw['context'])
+    def test_deserialize_with_root_versions(self, inst, request_, version):
+        root_version_path = request_.resource_url(version)
         result = inst.deserialize({'content_type': IResource.__identifier__,
                                    'data': {},
                                    'root_versions': [root_version_path]})
-        assert result == {'content_type': IResource, 'data': {},
-                          'root_versions': [kw['context']]}
+        assert result == {'content_type': IResource,
+                          'data': {},
+                          'root_versions': [version]}
+
+    def test_deserialize_raise_if_non_version_root_versions(
+       self, inst, request_, context):
+        root_version_path = request_.resource_url(context)
+        with raises(colander.Invalid):
+            inst.deserialize({'content_type': IResource.__identifier__,
+                              'data': {},
+                              'root_versions': [root_version_path]})
 
 
 class TestPUTResourceRequestSchema:

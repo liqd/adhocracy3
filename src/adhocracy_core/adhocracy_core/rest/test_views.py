@@ -284,42 +284,6 @@ class TestValidateRequest:
         assert request_.validated == {}
 
 
-class TestValidatePOSTRootVersions:
-
-    def make_one(self, context, request_):
-        from adhocracy_core.rest.views import validate_post_root_versions
-        validate_post_root_versions(context, request_)
-
-    def test_valid_no_value(self, request_, context):
-        self.make_one(context, request_)
-        assert request_.errors == []
-
-    def test_valid_empty_value(self, request_, context):
-        self.make_one(context, request_)
-        request_.validated = {'root_versions': []}
-        assert request_.errors == []
-
-    def test_valid_with_value(self, request_, context):
-        from adhocracy_core.interfaces import IItemVersion
-        from adhocracy_core.interfaces import ISheet
-        root = testing.DummyResource(__provides__=(IItemVersion, ISheet))
-        request_.validated = {'root_versions': [root]}
-
-        self.make_one(context, request_)
-
-        assert request_.errors == []
-        assert request_.validated == {'root_versions': [root]}
-
-    def test_non_valid_value_has_wrong_iface(self, request_, context):
-        from adhocracy_core.interfaces import ISheet
-        root = testing.DummyResource(__provides__=(IResourceX, ISheet))
-        request_.validated = {'root_versions': [root]}
-
-        self.make_one(context, request_)
-
-        assert request_.errors != []
-        assert request_.validated == {'root_versions': []}
-
 
 class TestRespondIfBlocked:
 
@@ -736,13 +700,12 @@ class TestItemRESTView:
         return ItemRESTView(context, request_)
 
     def test_create(self, request_, context):
-        from adhocracy_core.rest.views import validate_post_root_versions
         from adhocracy_core.rest.views import SimpleRESTView
         from adhocracy_core.rest.schemas import POSTItemRequestSchema
         inst = self.make_one(context, request_)
         assert issubclass(inst.__class__, SimpleRESTView)
         assert inst.validation_POST == (POSTItemRequestSchema,
-                                        [validate_post_root_versions])
+                                        [])
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)

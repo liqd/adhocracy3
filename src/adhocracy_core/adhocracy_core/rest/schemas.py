@@ -8,6 +8,7 @@ from hypatia.interfaces import IIndexSort
 from multipledispatch import dispatch
 from pyramid.registry import Registry
 from pyramid.request import Request
+from pyramid.traversal import resource_path
 from pyramid.util import DottedNameResolver
 from substanced.catalog.indexes import SDIndex
 from substanced.util import find_catalog
@@ -17,6 +18,7 @@ from hypatia.keyword import KeywordIndex
 from zope import interface
 from adhocracy_core.interfaces import FieldComparator
 from adhocracy_core.interfaces import FieldSequenceComparator
+from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IUserLocator
 from adhocracy_core.interfaces import KeywordComparator
@@ -26,6 +28,7 @@ from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.resources.base import Base
+from adhocracy_core.rest.exceptions import error_entry
 from adhocracy_core.sheets.asset import IAssetData
 from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.schema import AbsolutePath
@@ -241,10 +244,20 @@ class AbsolutePaths(colander.SequenceSchema):
     path = AbsolutePath()
 
 
+def validate_root_versions(node: SchemaNode,  value: list):
+    """Validate root versions."""
+    for root_version in value:
+        if not IItemVersion.providedBy(root_version):
+            msg = 'This resource is not a valid ' \
+                  'root version: {}'.format(resource_path(root_version))
+            raise colander.Invalid(node, msg=msg)
+
+
 class POSTItemRequestSchema(POSTResourceRequestSchema):
     """Data structure for Item and ItemVersion POST requests."""
 
-    root_versions = Resources(missing=[])
+    root_versions = Resources(missing=[],
+                              validator=validate_root_versions)
 
 
 class POSTResourceRequestSchemaList(colander.List):

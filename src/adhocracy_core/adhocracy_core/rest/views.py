@@ -98,22 +98,6 @@ def respond_if_blocked(context, request):
         raise HTTPGone(detail=block_reason)
 
 
-def validate_post_root_versions(context, request: Request):
-    """Check and transform the 'root_version' paths to resources."""
-    # TODO: make this a colander validator and move to schema.py
-    root_versions = request.validated.get('root_versions', [])
-    valid_root_versions = []
-    for root in root_versions:
-        if not IItemVersion.providedBy(root):
-            error = 'This resource is not a valid ' \
-                    'root version: {}'.format(request.resource_url(root))
-            request.errors.append(error_entry('body', 'root_versions', error))
-            continue
-        valid_root_versions.append(root)
-
-    request.validated['root_versions'] = valid_root_versions
-
-
 def validate_request_data(context: ILocation, request: Request,
                           schema=MappingSchema(), extra_validators=[]):
     """Validate request data.
@@ -601,7 +585,7 @@ class PoolRESTView(SimpleRESTView):
 class ItemRESTView(PoolRESTView):
     """View for Items and ItemVersions, overwrites GET and  POST handling."""
 
-    validation_POST = (POSTItemRequestSchema, [validate_post_root_versions])
+    validation_POST = (POSTItemRequestSchema, [])
 
     @view_config(request_method='GET',
                  permission='view')
