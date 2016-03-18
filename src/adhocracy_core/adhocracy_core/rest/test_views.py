@@ -1174,102 +1174,6 @@ class TestMetaApiView:
                                              'states': {},
                                              'transitions': {}}}
 
-
-class TestValidateLoginEmail:
-
-    @fixture
-    def request_(self, request_):
-        request_.validated['email'] = 'user@example.org'
-        return request_
-
-    def call_fut(self, context, request_):
-        from adhocracy_core.rest.views import validate_login_email
-        return validate_login_email(context, request_)
-
-    def test_valid(self, request_, context, mock_user_locator):
-        user = testing.DummyResource()
-        mock_user_locator.get_user_by_email.return_value = user
-        self.call_fut(context, request_)
-        assert request_.validated['user'] == user
-
-    def test_valid_email_with_capital_letters(self, request_, context, mock_user_locator):
-        request_.validated['email'] = 'usER@example.org'
-        user = testing.DummyResource()
-        mock_user_locator.get_user_by_email.return_value = user
-        self.call_fut(context, request_)
-        mock_user_locator.get_user_by_email.assert_called_with('user@example.org')
-        assert request_.validated['user'] == user
-
-    def test_invalid(self, request_, context, mock_user_locator):
-        mock_user_locator.get_user_by_email.return_value = None
-        self.call_fut(context, request_)
-        assert 'user' not in request_.validated
-        assert 'User doesn\'t exist' in request_.errors[0].description
-
-
-class TestValidateLoginNameUnitTest:
-
-    @fixture
-    def request_(self, request_):
-        request_.validated['name'] = 'user'
-        return request_
-
-    def call_fut(self, context, request_):
-        from adhocracy_core.rest.views import validate_login_name
-        return validate_login_name(context, request_)
-
-    def test_invalid(self, request_, context, mock_user_locator):
-        mock_user_locator.get_user_by_login.return_value = None
-        self.call_fut(context, request_)
-        assert 'User doesn\'t exist' in request_.errors[0].description
-
-    def test_valid(self, request_, context, mock_user_locator):
-        user = testing.DummyResource()
-        mock_user_locator.get_user_by_login.return_value = user
-        self.call_fut(context, request_)
-        assert request_.validated['user'] == user
-
-
-class TestValidateLoginPasswordUnitTest:
-
-    @fixture
-    def request_(self, request_):
-        from adhocracy_core.sheets.principal import IPasswordAuthentication
-        user = testing.DummyResource(__provides__=IPasswordAuthentication)
-        request_.validated['user'] = user
-        request_.validated['password'] = 'lalala'
-        return request_
-
-    def call_fut(self, context, request_):
-        from adhocracy_core.rest.views import validate_login_password
-        return validate_login_password(context, request_)
-
-    def test_valid(self, request_, context, mock_password_sheet):
-        sheet = mock_password_sheet
-        sheet.check_plaintext_password.return_value = True
-        self.call_fut(context, request_)
-        assert request_.errors == []
-
-    def test_invalid(self, request_, context, mock_password_sheet):
-        sheet = mock_password_sheet
-        sheet.check_plaintext_password.return_value = False
-        self.call_fut(context, request_)
-        assert 'password is wrong' in request_.errors[0].description
-
-    def test_invalid_with_ValueError(self, request_, context, mock_password_sheet):
-        sheet = mock_password_sheet
-        sheet.check_plaintext_password.side_effect = ValueError
-        self.call_fut(context, request_)
-        assert 'password is wrong' in request_.errors[0].description
-
-    def test_user_is_None(self, request_, context):
-        request_.validated['user'] = None
-        self.call_fut(context, request_)
-        assert request_.errors == []
-
-
-
-
 class TestLoginUserName:
 
     @fixture
@@ -1325,7 +1229,6 @@ class TestLoginEmailView:
     def test_options(self, request, context):
         inst = self.make_one(context, request)
         assert inst.options() == {}
-
 
 
 class TestActivateAccountView:

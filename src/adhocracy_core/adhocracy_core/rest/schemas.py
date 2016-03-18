@@ -296,6 +296,18 @@ class POSTLoginUsernameRequestSchema(colander.Schema):
     name = SchemaNode(colander.String(), missing=colander.required)
     password = Password(missing=colander.required)
 
+    @colander.deferred
+    def validator(node: SchemaNode, kw: dict) -> colander.All:
+        request = kw['request']
+        context = kw['context']
+        registry = kw['registry']
+        return colander.All(create_validate_login(context,
+                                                  request,
+                                                  registry,
+                                                  'name'),
+                            create_validate_login_password(request, registry),
+                            create_validate_account_active(request, 'name'),
+                            )
 
 def create_validate_activation_path(context,
                                     request: Request,
@@ -349,12 +361,95 @@ class POSTActivateAccountViewRequestSchema(colander.Schema):
                       validator=deferred_validate_activation_path)
 
 
+error_msg_wrong_login = 'User doesn\'t exist or password is wrong'
+
+
+def create_validate_login(context,
+                          request: Request,
+                          registry: Registry,
+                          child_node_name: str):
+    """Return validator to check the email address of a login request.
+
+    :param `child_node_name`: child node to get the login (`email` or `name`)
+
+    If valid, the user object is added as 'user' to `request.validated`.
+    """
+    def validate_login(node: SchemaNode, value: dict):
+        login = value[child_node_name]
+        locator = registry.getMultiAdapter((context, request), IUserLocator)
+        if child_node_name == 'email':
+            login = login.lower().strip()
+            user = locator.get_user_by_email(login)
+        else:
+            user = locator.get_user_by_login(login)
+        if user is None:
+            error = Invalid(node)
+            error.add(Invalid(node['password'], msg=error_msg_wrong_login))
+            raise error
+        else:
+            request.validated['user'] = user
+    return validate_login
+
+
+def create_validate_login_password(request: Request,
+                                   registry: Registry) -> callable:
+    """Return validator to check the password of a login request.
+
+    Requires the user object as `user` in `request.validated`.
+    """
+    def validate_login_password(node: SchemaNode, value: dict):
+        password = value['password']
+        user = request.validated.get('user', None)
+        if user is None:
+            return
+        sheet = registry.content.get_sheet(user, IPasswordAuthentication)
+        try:
+            sheet.check_plaintext_password(password)
+        except ValueError:
+            error = Invalid(node)
+            error.add(Invalid(node['password'], msg=error_msg_wrong_login))
+            raise error
+    return validate_login_password
+
+
+def create_validate_account_active(request: Request,
+                                   child_node_name: str):
+    """Return validator to check the user account is already active.
+
+    :param `child_node_name`: The name of the child node to raise error.
+
+    Requires the user object as `user` in `request.validated`.
+    """
+    def validate_user_is_active(node: SchemaNode, value: dict):
+        user = request.validated.get('user', None)
+        if user is None:
+            return
+        elif not user.active:
+            error = Invalid(node)
+            error.add(Invalid(node[child_node_name],
+                              msg='User account not yet activated'))
+            raise error
+    return validate_user_is_active
+
 
 class POSTLoginEmailRequestSchema(colander.Schema):
     """Schema for login requests via email and password."""
 
     email = Email(missing=colander.required)
     password = Password(missing=colander.required)
+
+    @colander.deferred
+    def validator(node: SchemaNode, kw: dict) -> colander.All:
+        request = kw['request']
+        context = kw['context']
+        registry = kw['registry']
+        return colander.All(create_validate_login(context,
+                                                  request,
+                                                  registry,
+                                                  'email'),
+                            create_validate_login_password(request, registry),
+                            create_validate_account_active(request, 'email'),
+                            )
 
 
 class POSTReportAbuseViewRequestSchema(colander.Schema):

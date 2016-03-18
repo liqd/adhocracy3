@@ -1016,9 +1016,7 @@ class LoginUsernameView(RESTView):
     """Log in a user via their name."""
 
     validation_POST = (POSTLoginUsernameRequestSchema,
-                       [validate_login_name,
-                        validate_login_password,
-                        validate_account_active])
+                       [])
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -1053,9 +1051,7 @@ class LoginEmailView(RESTView):
     """Log in a user via their email address."""
 
     validation_POST = (POSTLoginEmailRequestSchema,
-                       [validate_login_email,
-                        validate_login_password,
-                        validate_account_active])
+                       [])
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
