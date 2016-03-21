@@ -32,7 +32,7 @@ proposal_version_meta = itemversion_meta._replace(
                      IPolarizable,
                      IImageReference,
                      ),
-    permission_create='edit_proposal',
+    permission_create='edit',
 )
 
 

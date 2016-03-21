@@ -5,34 +5,28 @@ states:
     acm:
       principals:               [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [create_proposal,      ~,        A,           ~,         ~,       A,         ~]
-        - [edit_proposal,        ~,        ~,           ~,         A,       ~,         ~]
-        - [create_comment,       ~,        A,           A,         ~,       A,         ~]
-        - [edit_comment,         ~,        ~,           ~,         A,       ~,         ~]
-        - [create_rate,          ~,        A,           ~,         ~,       ~,         ~]
-        - [edit_rate,            ~,        ~,           ~,         A,       ~,         ~]
+        - [create_proposal,      ~,         A,           ~,         ~,       A,         ~]
+        - [create_comment,       ~,         A,           A,         ~,       A,         ~]
+        - [create_rate,          ~,         A,           ~,         ~,       ~,         ~]
+        - [edit_rate,            ~,         ~,           ~,         A,       ~,         ~]
   select:
     title: Evaluate
     acm:
       principals:               [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [create_proposal,      ~,        A,           ~,         ~,       A,         ~]
-        - [edit_proposal,        ~,        ~,           ~,         A,       ~,         ~]
-        - [create_rate,          ~,        A,           ~,         ~,       ~,         ~]
-        - [edit_rate,            ~,        ~,           ~,         A,       ~,         ~]
-        - [create_comment,       ~,        A,           A,         ~,       A,         ~]
-        - [edit_comment,         ~,        ~,           ~,         A,       ~,         ~]
+        - [create_proposal,      ~,         A,           ~,         ~,       A,         ~]
+        - [create_rate,          ~,         A,           ~,         ~,       ~,         ~]
+        - [edit_rate,            ~,         ~,           ~,         A,       ~,         ~]
+        - [create_comment,       ~,         A,           A,         ~,       A,         ~]
   result:
     title: Result
     acm:
       principals:               [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [create_proposal,      ~,        A,           ~,         ~,       A,         ~]
-        - [edit_proposal,        ~,        ~,           ~,         A,       ~,         ~]
-        - [create_comment,       ~,        A,           A,         ~,       A,         ~]
-        - [edit_comment,         ~,        ~,           ~,         A,       ~,         ~]
-        - [create_rate,          ~,        A,           ~,         ~,       ~,         ~]
-        - [edit_rate,            ~,        ~,           ~,         A,       ~,         ~]
+        - [create_proposal,      ~,         A,           ~,         ~,       A,         ~]
+        - [create_comment,       ~,         A,           A,         ~,       A,         ~]
+        - [create_rate,          ~,         A,           ~,         ~,       ~,         ~]
+        - [edit_rate,            ~,         ~,           ~,         A,       ~,         ~]
 transitions:
   to_select:
     from_state: propose

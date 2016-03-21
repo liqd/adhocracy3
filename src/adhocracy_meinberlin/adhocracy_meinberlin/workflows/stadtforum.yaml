@@ -4,5 +4,5 @@ states:
     acm:
       principals:           [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [create_proposal,  ~,        ~,           ~,         ~,       A,         ~]
-        - [edit_proposal,    ~,        ~,           ~,         A,       ~,         ~]
+        - [create_proposal,  ~,         ~,           ~,         ~,       A,         ~]
+
