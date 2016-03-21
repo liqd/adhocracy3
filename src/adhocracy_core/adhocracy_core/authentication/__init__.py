@@ -7,7 +7,6 @@ from pyramid.authentication import CallbackAuthenticationPolicy
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.interfaces import IRequest
 from pyramid.traversal import resource_path
-from pyramid.security import Everyone
 from pyramid.settings import asbool
 from zope.interface import implementer
 from zope.interface import Interface
@@ -223,10 +222,7 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         cached_principals = getattr(request, '__cached_principals__', None)
         if cached_principals:
             return cached_principals
-        if self.authenticated_userid(request) is None:
-            principals = [Everyone]
-        else:
-            principals = super().effective_principals(request)
+        principals = super().effective_principals(request)
         request.__cached_principals__ = principals
         return principals
 
