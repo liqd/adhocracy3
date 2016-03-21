@@ -8,6 +8,7 @@ import os
 from pyramid.request import Request
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
+from pyramid.traversal import get_current_registry
 from pyramid.traversal import resource_path
 from pyrsistent import PMap
 from pyrsistent import freeze
@@ -19,6 +20,7 @@ from adhocracy_core.authorization import create_fake_god_request
 from adhocracy_core.authorization import set_local_roles
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IPool
+from adhocracy_core.interfaces import ISheet
 from adhocracy_core.schema import ContentType
 from adhocracy_core.sheets.name import IName
 
@@ -153,3 +155,20 @@ def _deserialize_roles(roles: dict) -> dict:
     for k, v in roles.items():
         roles[k] = set(v)
     return roles
+
+
+def append_cvs_field(result: str, content: str):
+    """Normalize and append content for CVS."""
+    result.append(normalize_text_for_cvs(content))
+
+
+def normalize_text_for_cvs(s: str) -> str:
+    """Normalize text to put it in CVS."""
+    return s.replace(';', '')
+
+
+def get_sheet_field_for_partial(sheet: ISheet, field: str,
+                                resource: IResource) -> object:
+    """Get sheet field with resource as last parameter to use with partial."""
+    registry = get_current_registry(resource)
+    return registry.content.get_sheet_field(resource, sheet, field)

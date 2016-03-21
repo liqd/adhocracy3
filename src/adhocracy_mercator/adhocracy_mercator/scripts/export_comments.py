@@ -17,14 +17,16 @@ from substanced.util import find_service
 from adhocracy_core.utils import create_filename
 
 from adhocracy_core.interfaces import IItem
+from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import search_query
 
 from pyramid.traversal import resource_path
-from pyramid.traversal import get_current_registry
 
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.comment import IComment
 from adhocracy_core.resources.comment import ICommentVersion
+from adhocracy_core.scripts import append_cvs_field
+from adhocracy_core.scripts import get_sheet_field_for_partial
 from adhocracy_mercator.resources.mercator2 import IMercatorProposal
 
 
@@ -49,7 +51,7 @@ def export_comments():
     env['closer']()
 
 
-def _export_comments(root, registry):
+def _export_comments(root: IResource, registry: Registry):
     catalogs = find_service(root, 'catalogs')
     query = search_query._replace(interfaces=IMercatorProposal,
                                   resolve=True,
@@ -65,18 +67,18 @@ def _export_comments(root, registry):
 
     fields = \
         [('URL',
-          partial(_get_proposal_url, registry)),
+          partial(_get_url, registry)),
          ('Title',
-          partial(_get_sheet_field, ITitle, 'title')),
+          partial(get_sheet_field_for_partial, ITitle, 'title')),
          ('Comments',
-          partial(_get_comments))]
+          partial(_get_comments, registry))]
 
     wr.writerow([name for (name, _) in fields])
 
     for proposal in proposals:
 
         result = []
-        append_field = partial(_append_field, result)
+        append_field = partial(append_cvs_field, result)
 
         for name, get_field in fields:
             append_field(get_field(proposal))
@@ -86,28 +88,13 @@ def _export_comments(root, registry):
     print('Exported mercator comments to %s' % filename)
 
 
-def _normalize_text(s: str) -> str:
-    """Normalize text to put it in CVS."""
-    return s.replace(';', '')
-
-
-def _append_field(result, content):
-    result.append(_normalize_text(content))
-
-
-def _get_proposal_url(registry: Registry,
-                      proposal: IMercatorProposal) -> str:
-    path = resource_path(proposal)
+def _get_url(registry: Registry, context: IResource) -> str:
+    path = resource_path(context)
     frontend_url = registry.settings.get('adhocracy.frontend_url')
     return frontend_url + '/r' + path
 
 
-def _get_sheet_field(sheet, field, resource):
-    registry = get_current_registry(resource)
-    return registry.content.get_sheet_field(resource, sheet, field)
-
-
-def _get_comments(proposal):
+def _get_comments(registry: Registry, proposal: IMercatorProposal):
     item = find_interface(proposal, IItem)
     catalogs = find_service(proposal, 'catalogs')
     query = search_query._replace(root=item,
@@ -117,7 +104,8 @@ def _get_comments(proposal):
                                   )
     result = catalogs.search(query)
     comments = list(result.elements)
-    comment_content = [_get_sheet_field(IComment, 'content', comment)
+    comment_content = [registry.context.get_sheet_field(comment, IComment,
+                                                        'content')
                        for comment in comments]
     comment_content_flat = '\n----------\n'.join(comment_content)
     return comment_content_flat
