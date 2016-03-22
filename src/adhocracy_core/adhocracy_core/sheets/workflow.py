@@ -18,6 +18,7 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import AnnotationRessourceSheet
 from adhocracy_core.interfaces import IResourceSheet
+from adhocracy_core.utils import create_schema
 
 
 class ISample(ISheet):
@@ -136,12 +137,13 @@ class WorkflowAssignmentSheet(AnnotationRessourceSheet):
     """
 
     def get_schema_with_bindings(self):
-        schema = self.schema.bind(request=self.request,
-                                  registry=self.registry,
-                                  context=self.context,
-                                  creating=self.creating,
-                                  workflow=self._get_workflow()
-                                  )
+        schema = create_schema(self.meta.schema_class,
+                               self.context,
+                               self.request,
+                               registry=self.registry,
+                               creating=self.creating,
+                               workflow=self._get_workflow()
+                               )
         return schema
 
     def _get_workflow(self):
