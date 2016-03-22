@@ -5,4 +5,4 @@ states:
       principals:           [anonymous, participant, moderator, creator, initiator, admin]
       permissions:
         - [create_proposal,  ~,         ~,           ~,         ~,       A,         ~]
-        - [edit_proposal,    ~,         ~,           ~,         A,       ~,         ~]
+

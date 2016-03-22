@@ -5,9 +5,7 @@ states:
       principals:                       [anonymous, participant, moderator, creator, initiator, admin]
       permissions:
         - [create_proposal,              ~,         A,           ~,         ~,       A,         ~]
-        - [edit_proposal,                ~,         ~,           ~,         A,       ~,         ~]
         - [create_comment,               ~,         A,           A,         ~,       A,         ~]
-        - [edit_comment,                 ~,         ~,           ~,         A,       ~,         ~]
         - [create_rate,                  ~,         A,           ~,         ~,       ~,         ~]
         - [edit_rate,                    ~,         ~,           ~,         A,       ~,         ~]
         - [create_badge_assignment,      ~,         A,           ~,         ~,       ~,         ~]
@@ -27,12 +25,10 @@ states:
       principals:                       [anonymous, participant, moderator, creator, initiator, admin]
       permissions:
         - [edit,                         ~,         ~,           ~,         A,       ~,         ~]
-        - [edit_proposal,                ~,         ~,           ~,         A,       ~,         ~]
         - [view_mercator2_extra_funding, ~,         D,           A,         ~,       ~,         ~]
         - [view_mercator2_winnerinfo,    ~,         A,           A,         ~,       ~,         ~]
         - [edit_mercator2_winnerinfo,    ~,         D,           A,         ~,       ~,         ~]
         - [create_document,              ~,         ~,           ~,         A,       ~,         ~]
-        - [edit_document,                ~,         ~,           ~,         A,       ~,         ~]
   closed:
     acm:
       principals:                       [anonymous, participant, moderator, creator, initiator, admin]
