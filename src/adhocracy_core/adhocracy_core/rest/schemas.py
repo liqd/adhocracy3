@@ -403,9 +403,8 @@ def create_validate_login_password(request: Request,
         if user is None:
             return
         sheet = registry.content.get_sheet(user, IPasswordAuthentication)
-        try:
-            sheet.check_plaintext_password(password)
-        except ValueError:
+        valid = sheet.check_plaintext_password(password)
+        if not valid:
             error = Invalid(node)
             error.add(Invalid(node['password'], msg=error_msg_wrong_login))
             raise error

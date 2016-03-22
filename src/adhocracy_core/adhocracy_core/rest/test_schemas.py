@@ -1438,6 +1438,43 @@ class TestCreateValidateLogin:
             .assert_called_with('user@example.org')
 
 
+class TestCreateValidateLoginPassword:
+
+    def call_fut(self, *args):
+        from adhocracy_core.rest.schemas import create_validate_login_password
+        return create_validate_login_password(*args)
+
+    def mock_sheet(self):
+        from adhocracy_core.sheets.principal import PasswordAuthenticationSheet
+        mock = Mock(spec=PasswordAuthenticationSheet)
+        return mock
+
+    def test_ignore_if_no_user(self, node, request_, registry):
+        request_.validated = {}
+        validator = self.call_fut(request_, registry)
+        assert validator(node, {'password': 'secret'}) is None
+
+    def test_validate_password(self, node, request_, registry, mock_sheet):
+        user = testing.DummyResource()
+        request_.validated['user'] = user
+        registry.content.get_sheet.return_value = mock_sheet
+        validator = self.call_fut(request_, registry)
+        mock_sheet.check_plaintext_password.return_value = True
+        assert validator(node, {'password': 'secret'}) is None
+        mock_sheet.check_plaintext_password.assert_called_with('secret')
+
+    def test_raise_if_wrong_password(self, node, request_, registry,
+                                     mock_sheet):
+        user = testing.DummyResource()
+        request_.validated['user'] = user
+        registry.content.get_sheet.return_value = mock_sheet
+        validator = self.call_fut(request_, registry)
+        mock_sheet.check_plaintext_password.return_value = False
+        node['password'] = node.clone()  # used to raise error
+        with raises(colander.Invalid):
+            validator(node, {'password': 'secret'})
+
+
 class TestCreateValidateAccountActive:
 
     def call_fut(self, *args):
