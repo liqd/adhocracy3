@@ -22,6 +22,7 @@ from substanced.util import find_service
 from hypatia.field import FieldIndex
 from hypatia.keyword import KeywordIndex
 from zope import interface
+
 from adhocracy_core.events import ResourceSheetModified
 from adhocracy_core.rest.exceptions import error_entry
 from adhocracy_core.interfaces import FieldComparator
@@ -70,6 +71,7 @@ from adhocracy_core.catalog import ICatalogsService
 from adhocracy_core.catalog.index import ReferenceIndex
 from adhocracy_core.utils import now
 from adhocracy_core.utils import unflatten_multipart_request
+from adhocracy_core.utils import create_schema
 from adhocracy_core.utils import get_reason_if_blocked
 
 
@@ -84,6 +86,140 @@ INDEX_EXAMPLE_VALUES = {
     'rates': 1,
     'interfaces': interface.Interface,
 }
+
+
+def validate_request_data(schema_class: Schema) -> callable:
+    """Decorator for :term:`view` to validate request with `schema`."""
+    def validate_decorator(view: callable):
+        def view_wrapper(context, request):
+            schema = create_schema(schema_class, context, request)
+            _validate_request_data(context, request, schema)
+            return view(context, request)
+        return view_wrapper
+    return validate_decorator
+
+
+def _validate_request_data(context: IResource,
+                           request: IRequest,
+                           schema: Schema):
+    """Validate request data.
+
+    :param context: passed to validator functions
+    :param request: passed to validator functions
+    :param schema: Schema to validate. Data to validate is extracted from the
+                   request.body. For schema nodes with attribute `location` ==
+                   `querystring` the data is extracted from the query string.
+                   The validated data (dict or list) is stored in the
+                   `request.validated` attribute.
+    :raises HTTPBadRequest: HTTP 400 for bad request data.
+    """
+    body = {}
+    if request.content_type == 'multipart/form-data':
+        body = unflatten_multipart_request(request)
+    if request.content_type == 'application/json':
+        body = _extract_json_body(request)
+    qs = _extract_querystring(request)
+    _validate_body_or_querystring(body, qs, schema, context, request)
+    if request.errors:
+        request.validated = {}
+        raise HTTPBadRequest()
+
+
+def _extract_json_body(request: IRequest) -> object:
+    json_body = {}
+    if request.body == '':
+        request.body = '{}'
+    try:
+        json_body = request.json_body
+    except (ValueError, TypeError) as err:
+        error = error_entry('body', None,
+                            'Invalid JSON request body'.format(err))
+        request.errors.append(error)
+    return json_body
+
+
+def _extract_querystring(request: IRequest) -> dict:
+    parameters = {}
+    for key, value_encoded in request.GET.items():
+        import json
+        try:
+            value = json.loads(value_encoded)
+        except (ValueError, TypeError):
+            value = value_encoded
+        parameters[key] = value
+    return parameters
+
+
+def _validate_body_or_querystring(body, qs: dict, schema: MappingSchema,
+                                  context: IResource, request: IRequest):
+    """Validate the querystring if this is a GET request, the body otherwise.
+
+    This allows using just a single schema for all kinds of requests.
+    """
+    if isinstance(schema, GETPoolRequestSchema):
+        try:
+            schema = add_arbitrary_filter_nodes(qs,
+                                                schema,
+                                                context,
+                                                request.registry)
+        except Invalid as err:  # pragma: no cover
+            _add_colander_invalid_error(err, request,
+                                        location='querystring')
+    if request.method.upper() == 'GET':
+        _validate_schema(qs, schema, request,
+                         location='querystring')
+    else:
+        _validate_schema(body, schema, request, location='body')
+
+
+def _validate_schema(cstruct: object, schema: MappingSchema, request: IRequest,
+                     location='body'):
+    """Validate that the :term:`cstruct` data is conform to the given schema.
+
+    :param request: request with list like `errors` attribute to append errors
+                    and the dictionary attribute `validated` to add validated
+                    data.
+    :param location: filter schema nodes depending on the `location` attribute.
+                     The default value is `body`.
+    """
+    if isinstance(schema, SequenceSchema):
+        _validate_list_schema(schema, cstruct, request, location)
+    elif isinstance(schema, MappingSchema):
+        _validate_dict_schema(schema, cstruct, request, location)
+    else:
+        error = 'Validation for schema {} is unsupported.'.format(str(schema))
+        raise(Exception(error))
+
+
+def _validate_list_schema(schema: SequenceSchema, cstruct: list,
+                          request: IRequest, location='body'):
+    if location != 'body':  # for now we only support location == body
+        return
+    child_cstructs = schema.cstruct_children(cstruct)
+    try:
+        request.validated = schema.deserialize(child_cstructs)
+    except Invalid as err:
+        _add_colander_invalid_error(err, request, location)
+
+
+def _validate_dict_schema(schema: MappingSchema, cstruct: dict,
+                          request: IRequest, location='body'):
+    validated = {}
+    try:
+        validated = schema.deserialize(cstruct)
+    except Invalid as err:
+        for child in err.children:
+            _add_colander_invalid_error(child, request, location)
+        if not err.children:
+            _add_colander_invalid_error(err, request, location)
+    request.validated.update(validated)
+
+
+def _add_colander_invalid_error(error: Invalid, request: IRequest,
+                                location: str):
+    for name, msg in error.asdict().items():
+        request.errors.append(error_entry(location, name, msg))
+
 
 def validate_visibility(view: callable):
     """Decorator for :term:`view` to check if `context` is visible.
