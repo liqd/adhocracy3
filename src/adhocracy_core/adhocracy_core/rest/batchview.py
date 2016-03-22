@@ -11,6 +11,7 @@ from adhocracy_core.rest.exceptions import JSONHTTPClientError
 from adhocracy_core.rest.exceptions import get_json_body
 from pyramid.request import Request
 from pyramid.view import view_config
+from pyramid.interfaces import IRequest
 from pyramid.view import view_defaults
 
 from adhocracy_core.resources.root import IRootPool
@@ -160,7 +161,7 @@ class BatchView(RESTView):
             result = json_value
         return result
 
-    def _make_subrequest(self, nested_request: dict) -> Request:
+    def _make_subrequest(self, nested_request: dict) -> IRequest:
         path = nested_request['path']
         method = nested_request['method']
         json_body = nested_request['body']
@@ -196,7 +197,7 @@ class BatchView(RESTView):
         return request
 
     def _invoke_subrequest_and_handle_errors(
-            self, subrequest: Request) -> BatchItemResponse:
+            self, subrequest: IRequest) -> BatchItemResponse:
         try:
             subresponse = self.request.invoke_subrequest(subrequest)
         except Exception as err:
@@ -241,13 +242,13 @@ class BatchView(RESTView):
         if first_version_path:
             path_map[result_first_version_path] = first_version_path
 
-    def copy_header_if_exists(self, header: str, request: Request):
+    def copy_header_if_exists(self, header: str, request: IRequest):
         """Copy header if exists."""
         value = self.request.headers.get(header, None)
         if value is not None:
             request.headers[header] = value
 
-    def copy_attr_if_exists(self, attributename: str, request: Request):
+    def copy_attr_if_exists(self, attributename: str, request: IRequest):
         """Copy attr if exists."""
         value = getattr(self.request, attributename, None)
         if value is not None:
