@@ -311,13 +311,14 @@ def integration(config):
 @mark.usefixtures('integration')
 class TestIntegrationCaching:
 
+    from . import set_cache_header
+
     @staticmethod
+    @set_cache_header
     def dummyview(context, request):
         from adhocracy_core.rest.exceptions import JSONHTTPClientError
-        from . import set_cache_header
         if 'error' in request.params:
             raise JSONHTTPClientError([])
-        set_cache_header(context, request)
         return {}
 
     @fixture
