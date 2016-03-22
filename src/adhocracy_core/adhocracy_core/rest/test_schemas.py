@@ -29,6 +29,45 @@ def registry(registry_with_content):
     return registry_with_content
 
 
+
+class TestValidateVisibility:
+
+    @fixture
+    def mock_reason_if_blocked(self, mocker):
+        return mocker.patch('adhocracy_core.rest.schemas.get_reason_if_blocked')
+
+    def call_fut(self, *args):
+        from .schemas import validate_visibility
+        return validate_visibility(*args)
+
+    @mark.parametrize('method', [('OPTIONS',),
+                                 ('DELETE',),
+                                 ('PUT',),
+                                 ])
+    def test_ignore_if_method_options_delete_put(self, context, request_,
+                                                 method):
+        view = Mock()
+        request_.method = method
+        assert self.call_fut(view)(context, request_) is view.return_value
+        view.assert_called_with(context, request_)
+
+    def test_ignore_if_get_reason_is_none(self, context, request_,
+                                          mock_reason_if_blocked):
+        request_.method = 'GET'
+        view = Mock()
+        mock_reason_if_blocked.return_value = None
+        assert self.call_fut(view)(context, request_) is view.return_value
+
+    def test_raise_if_get_reason(self, context, request_,
+                                 mock_reason_if_blocked):
+        from pyramid.httpexceptions import HTTPGone
+        request_.method = 'GET'
+        view = Mock()
+        mock_reason_if_blocked.return_value = 'hidden'
+        with raises(HTTPGone):
+            self.call_fut(view)(context, request_)
+
+
 class TestResourceResponseSchema:
 
     def make_one(self):

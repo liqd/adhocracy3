@@ -70,6 +70,7 @@ from adhocracy_core.catalog import ICatalogsService
 from adhocracy_core.catalog.index import ReferenceIndex
 from adhocracy_core.utils import now
 from adhocracy_core.utils import unflatten_multipart_request
+from adhocracy_core.utils import get_reason_if_blocked
 
 
 resolver = DottedNameResolver()
@@ -83,6 +84,26 @@ INDEX_EXAMPLE_VALUES = {
     'rates': 1,
     'interfaces': interface.Interface,
 }
+
+def validate_visibility(view: callable):
+    """Decorator for :term:`view` to check if `context` is visible.
+
+    :raises HTTPGone: if `context` is deleted or hidden and request method
+                      is GET, HEAD, or POST.
+    """
+    def wrapped_view(context: IResource, request: IRequest):
+        _validate_visiblity(context, request)
+        return view(context, request)
+    return wrapped_view
+
+
+def _validate_visiblity(context: IResource, request: IRequest):
+    if request.method not in ['HEAD', 'GET', 'POST']:
+        return
+    block_reason = get_reason_if_blocked(context)
+    if block_reason is not None:
+        raise HTTPGone(detail=block_reason)
+
 
 class UpdatedResourcesSchema(Schema):
     """List the resources affected by a transaction."""

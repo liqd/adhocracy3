@@ -81,19 +81,6 @@ from adhocracy_core.workflows.schemas import create_workflow_meta_schema
 logger = getLogger(__name__)
 
 
-def respond_if_blocked(context, request):
-    """
-    Set 410 Gone and construct response if resource is deleted or hidden.
-
-    Otherwise or it request method is 'options' or 'put' return None
-    """
-    if request.method not in ['HEAD', 'GET', 'POST']:
-        return
-    block_reason = get_reason_if_blocked(context)
-    if block_reason is not None:
-        raise HTTPGone(detail=block_reason)
-
-
 def validate_request_data(context: ILocation, request: Request,
                           schema=MappingSchema(), extra_validators=[]):
     """Validate request data.
