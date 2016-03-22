@@ -2,14 +2,14 @@ defaults: standard
 states:
   announce:
     acm:
-      principals:                    [anonymous, moderator, participant, creator, initiator, admin]
+      principals:                    [everyone, moderator, participant, creator, initiator, admin]
       permissions:
         - [view,                      D,         A,         D,           A,       A,         ~]
         - [create_document,           ~,         A,         ~,           ~,       ~,         ~]
         - [edit,                      ~,         A,         ~,           ~,       ~,         ~]
   participate:
     acm:
-      principals:                    [anonymous, moderator, participant, creator, initiator, admin]
+      principals:                    [everyone, moderator, participant, creator, initiator, admin]
       permissions:
         - [create_proposal,           ~,         ~,         A,           ~,       ~,         ~]
         - [create_document,           ~,         A,         ~,           ~,       ~,         ~]
@@ -19,7 +19,7 @@ states:
         - [edit_rate,                 ~,         ~,         ~,           A,       ~,         ~]
   evaluate:
     acm:
-      principals:                    [anonymous, moderator, participant, creator, initiator, admin]
+      principals:                    [everyone, moderator, participant, creator, initiator, admin]
       permissions:
         - [create_proposal,           ~,         ~,         ~,           ~,       ~,         ~]
         - [create_document,           ~,         A,         ~,           ~,       ~,         ~]
@@ -27,7 +27,7 @@ states:
         - [create_comment,            ~,         A,         A,           ~,       ~,         ~]
   result:
     acm:
-      principals:                    [anonymous, moderator, participant, creator, initiator, admin]
+      principals:                    [everyone, moderator, participant, creator, initiator, admin]
       permissions:
         - [create_proposal,           ~,         ~,         ~,           ~,       ~,         ~]
         - [create_document,           ~,         A,         ~,           ~,       ~,         ~]

@@ -3,7 +3,7 @@ states:
   propose:
     title: Participate
     acm:
-      principals:               [anonymous, participant, moderator, creator, initiator, admin]
+      principals:               [everyone, participant, moderator, creator, initiator, admin]
       permissions:
         - [create_proposal,      ~,         A,           ~,         ~,       A,         ~]
         - [create_comment,       ~,         A,           A,         ~,       A,         ~]
@@ -12,7 +12,7 @@ states:
   select:
     title: Evaluate
     acm:
-      principals:               [anonymous, participant, moderator, creator, initiator, admin]
+      principals:               [everyone, participant, moderator, creator, initiator, admin]
       permissions:
         - [create_proposal,      ~,         A,           ~,         ~,       A,         ~]
         - [create_rate,          ~,         A,           ~,         ~,       ~,         ~]
@@ -21,7 +21,7 @@ states:
   result:
     title: Result
     acm:
-      principals:               [anonymous, participant, moderator, creator, initiator, admin]
+      principals:               [everyone, participant, moderator, creator, initiator, admin]
       permissions:
         - [create_proposal,      ~,         A,           ~,         ~,       A,         ~]
         - [create_comment,       ~,         A,           A,         ~,       A,         ~]

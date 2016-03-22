@@ -45,7 +45,7 @@ def test_initiate_bplan_private_workflow(registry, context):
     workflow.initialize(context)
     assert workflow.state_of(context) == 'private'
     local_acl = get_acl(context)
-    assert ('Deny', 'system.Anonymous', 'view') in local_acl
+    assert ('Deny', 'system.Everyone', 'view') in local_acl
 
 
 @mark.usefixtures('integration')
