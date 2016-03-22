@@ -362,6 +362,26 @@ class TokenHeaderAuthenticationPolicyIntegrationTest(unittest.TestCase):
         assert headers['X-User-Token'] is not None
 
 
+def test_validate_user_headers_call_view_if_authenticated(context, request_):
+    from . import validate_user_headers
+    view = Mock()
+    request_.headers['X-User-Token'] = 2
+    request_.authenticated_userid = object()
+    validate_user_headers(view)(context, request_)
+    view.assert_called_with(context, request_)
+
+
+def test_validate_user_headers_raise_if_authentication_failed(context,
+                                                               request_):
+    from pyramid.httpexceptions import HTTPBadRequest
+    from . import validate_user_headers
+    view = Mock()
+    request_.headers['X-User-Token'] = 2
+    request_.authenticated_userid = None
+    with pytest.raises(HTTPBadRequest):
+        validate_user_headers(view)(context, request_)
+
+
 class IncludemeIntegrationTest(unittest.TestCase):
 
     def setUp(self):
