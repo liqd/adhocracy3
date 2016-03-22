@@ -1,5 +1,5 @@
 """Interfaces for plugable dependencies, basic metadata structures."""
-from collections import Iterable
+from collections import Iterable, namedtuple
 from enum import Enum
 import collections
 
@@ -884,3 +884,6 @@ class IAdhocracyWorkflow(IWorkflow):  # pragma: no cover
 
     def get_next_states(context, request: IRequest) -> [str]:
         """Get states you can trigger a transition to."""
+
+
+error_entry = namedtuple('ErrorEntry', ['location', 'name', 'description'])

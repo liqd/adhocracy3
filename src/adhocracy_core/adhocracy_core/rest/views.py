@@ -7,7 +7,6 @@ from colander import Invalid
 from colander import MappingSchema
 from colander import SchemaNode
 from colander import SequenceSchema
-from substanced.interfaces import IUserLocator
 from substanced.util import find_service
 from substanced.stats import statsd_timer
 from pyramid.httpexceptions import HTTPMethodNotAllowed
@@ -56,14 +55,13 @@ from adhocracy_core.rest.schemas import GETItemResponseSchema
 from adhocracy_core.rest.schemas import GETResourceResponseSchema
 from adhocracy_core.rest.schemas import options_resource_response_data_dict
 from adhocracy_core.rest.schemas import add_arbitrary_filter_nodes
-from adhocracy_core.rest.exceptions import error_entry
+from adhocracy_core.interfaces import error_entry
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
 from adhocracy_core.sheets.badge import get_assignable_badges
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
-from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.sheets.pool import IPool as IPoolSheet
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.tags import ITags
@@ -915,81 +913,6 @@ def _get_base_ifaces(iface: IInterface, root_iface=Interface) -> [str]:
                 bases.append(base.__identifier__)
             current_bases += base.getBases()
     return bases
-
-
-def _add_no_such_user_or_wrong_password_error(request: Request):
-    error = error_entry('body', 'password',
-                        'User doesn\'t exist or password is wrong')
-    request.errors.append(error)
-
-
-def validate_login_name(context, request: Request):
-    """Validate the user name of a login request.
-
-    If valid and activated, the user object is added as 'user' to
-    `request.validated`.
-    """
-    name = request.validated['name']
-    locator = request.registry.getMultiAdapter((context, request),
-                                               IUserLocator)
-    user = locator.get_user_by_login(name)
-    if user is None:
-        _add_no_such_user_or_wrong_password_error(request)
-    else:
-        request.validated['user'] = user
-
-
-def validate_login_email(context, request: Request):
-    """Validate the email address of a login request.
-
-    If valid, the user object is added as 'user' to
-    `request.validated`.
-    """
-    email = request.validated['email']
-    locator = request.registry.getMultiAdapter((context, request),
-                                               IUserLocator)
-    normalized_email = email.lower()
-    user = locator.get_user_by_email(normalized_email)
-    if user is None:
-        _add_no_such_user_or_wrong_password_error(request)
-    else:
-        request.validated['user'] = user
-
-
-def validate_login_password(context, request: Request):
-    """Validate the password of a login request.
-
-    Requires the user object as `user` in `request.validated`.
-    """
-    user = request.validated.get('user', None)
-    if user is None:
-        return
-    registry = request.registry
-    password_sheet = registry.content.get_sheet(user, IPasswordAuthentication)
-    password = request.validated['password']
-    try:
-        valid = password_sheet.check_plaintext_password(password)
-    except ValueError:
-        valid = False
-    if not valid:
-        _add_no_such_user_or_wrong_password_error(request)
-
-
-def validate_account_active(context, request: Request):
-    """Ensure that the user account is already active.
-
-    Requires the user object as `user` in `request.validated`.
-
-    No error message is added if there were earlier errors, as that would
-    leak information (indicating that a not-yet-activated account already
-    exists).
-    """
-    user = request.validated.get('user', None)
-    if user is None or request.errors:
-        return
-    if not user.active:
-        error = error_entry('body', 'name', 'User account not yet activated')
-        request.errors.append(error)
 
 
 @view_defaults(

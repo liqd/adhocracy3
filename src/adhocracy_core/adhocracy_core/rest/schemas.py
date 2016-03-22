@@ -2,10 +2,16 @@
 from datetime import datetime
 
 import colander
+from colander import Schema
 from colander import SchemaNode
+from colander import MappingSchema
+from colander import SequenceSchema
 from colander import Invalid
 from hypatia.interfaces import IIndexSort
 from multipledispatch import dispatch
+from pyramid.interfaces import IRequest
+from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.httpexceptions import HTTPGone
 from pyramid.registry import Registry
 from pyramid.request import Request
 from pyramid.traversal import resource_path
@@ -17,6 +23,7 @@ from hypatia.field import FieldIndex
 from hypatia.keyword import KeywordIndex
 from zope import interface
 from adhocracy_core.events import ResourceSheetModified
+from adhocracy_core.rest.exceptions import error_entry
 from adhocracy_core.interfaces import FieldComparator
 from adhocracy_core.interfaces import FieldSequenceComparator
 from adhocracy_core.interfaces import IItemVersion
@@ -64,6 +71,7 @@ from adhocracy_core.catalog.index import ReferenceIndex
 from adhocracy_core.utils import now
 from adhocracy_core.utils import unflatten_multipart_request
 
+
 resolver = DottedNameResolver()
 
 
@@ -76,7 +84,7 @@ INDEX_EXAMPLE_VALUES = {
     'interfaces': interface.Interface,
 }
 
-class UpdatedResourcesSchema(colander.Schema):
+class UpdatedResourcesSchema(Schema):
     """List the resources affected by a transaction."""
 
     created = Resources()
@@ -107,7 +115,7 @@ class GETItemResponseSchema(ResourcePathAndContentSchema):
     first_version_path = Resource()
 
 
-def add_put_data_subschemas(node: colander.Schema, kw: dict):
+def add_put_data_subschemas(node: Schema, kw: dict):
     """Add the resource sheet colander schemas that are 'editable'."""
     context = kw['context']
     request = kw['request']
@@ -126,7 +134,7 @@ def add_put_data_subschemas(node: colander.Schema, kw: dict):
         node.add(schema)
 
 
-class BlockExplanationResponseSchema(colander.Schema):
+class BlockExplanationResponseSchema(Schema):
     """Data structure explaining a 410 Gone response."""
 
     reason = SingleLine()
@@ -134,7 +142,7 @@ class BlockExplanationResponseSchema(colander.Schema):
     modification_date = DateTime(default=colander.null)
 
 
-class PUTResourceRequestSchema(colander.Schema):
+class PUTResourceRequestSchema(Schema):
     """Data structure for Resource PUT requests.
 
     The subschemas for the Resource Sheets
@@ -162,8 +170,7 @@ def validate_claimed_asset_mime_type(self, node: SchemaNode, appstruct: dict):
     detected_type = file.mimetype
     if claimed_type != detected_type:
         msg = 'Claimed MIME type is {} but file content seems to be {}'
-        raise colander.Invalid(node['data'],
-                               msg.format(claimed_type, detected_type))
+        raise Invalid(node['data'], msg.format(claimed_type, detected_type))
 
 
 def _get_sheet_field(appstruct: dict, field: str) -> object:
@@ -187,7 +194,7 @@ def add_post_data_subschemas(node: SchemaNode, kw: dict):
     content_type = _get_resource_type_based_on_request_type(request)
     try:
         iresource = ContentType().deserialize(content_type)
-    except colander.Invalid:
+    except Invalid:
         return  # the content type is validated later, so we just ignore errors
     registry = request.registry.content
     creates = registry.get_sheets_create(context, request, iresource)
@@ -252,7 +259,7 @@ def validate_root_versions(node: SchemaNode,  value: list):
         if not IItemVersion.providedBy(root_version):
             msg = 'This resource is not a valid ' \
                   'root version: {}'.format(resource_path(root_version))
-            raise colander.Invalid(node, msg=msg)
+            raise Invalid(node, msg=msg)
 
 
 class POSTItemRequestSchema(POSTResourceRequestSchema):
@@ -268,7 +275,7 @@ class POSTResourceRequestSchemaList(colander.List):
     request_body = POSTResourceRequestSchema()
 
 
-class GETLocationMapping(colander.Schema):
+class GETLocationMapping(Schema):
     """Overview of GET request/response data structure."""
 
     request_querystring = SchemaNode(colander.Mapping(), default={})
@@ -276,21 +283,21 @@ class GETLocationMapping(colander.Schema):
     response_body = GETResourceResponseSchema()
 
 
-class PUTLocationMapping(colander.Schema):
+class PUTLocationMapping(Schema):
     """Overview of PUT request/response data structure."""
 
     request_body = PUTResourceRequestSchema()
     response_body = ResourceResponseSchema()
 
 
-class POSTLocationMapping(colander.Schema):
+class POSTLocationMapping(Schema):
     """Overview of POST request/response data structure."""
 
     request_body = SchemaNode(POSTResourceRequestSchemaList(), default=[])
     response_body = ResourceResponseSchema()
 
 
-class POSTLoginUsernameRequestSchema(colander.Schema):
+class POSTLoginUsernameRequestSchema(Schema):
     """Schema for login requests via username and password."""
 
     name = SchemaNode(colander.String(), missing=colander.required)
@@ -323,10 +330,10 @@ def create_validate_activation_path(context,
         user = locator.get_user_by_activation_path(value)
         error_msg = 'Unknown or expired activation path'
         if user is None:
-            raise colander.Invalid(node, error_msg)
+            raise Invalid(node, error_msg)
         elif is_older_than(user, days=8):
             user.activation_path = None
-            raise colander.Invalid(node, error_msg)
+            raise Invalid(node, error_msg)
         else:
             request.validated['user'] = user
             # TODO we should use a sheet to activate the user.
@@ -353,7 +360,7 @@ def deferred_validate_activation_path(node: SchemaNode,
                         )
 
 
-class POSTActivateAccountViewRequestSchema(colander.Schema):
+class POSTActivateAccountViewRequestSchema(Schema):
     """Schema for account activation."""
 
     path = SchemaNode(colander.String(),
@@ -368,7 +375,7 @@ def create_validate_login(context,
                           request: Request,
                           registry: Registry,
                           child_node_name: str):
-    """Return validator to check the email address of a login request.
+    """Return validator to check the user identifier of a login request.
 
     :param `child_node_name`: child node to get the login (`email` or `name`)
 
@@ -431,7 +438,7 @@ def create_validate_account_active(request: Request,
     return validate_user_is_active
 
 
-class POSTLoginEmailRequestSchema(colander.Schema):
+class POSTLoginEmailRequestSchema(Schema):
     """Schema for login requests via email and password."""
 
     email = Email(missing=colander.required)
@@ -451,7 +458,7 @@ class POSTLoginEmailRequestSchema(colander.Schema):
                             )
 
 
-class POSTReportAbuseViewRequestSchema(colander.Schema):
+class POSTReportAbuseViewRequestSchema(Schema):
     """Schema for abuse reports."""
 
     url = URL(missing=colander.required)
@@ -464,7 +471,7 @@ class MessageUserReference(SheetToSheet):
     target_isheet = IUserExtended
 
 
-class POSTMessageUserViewRequestSchema(colander.Schema):
+class POSTMessageUserViewRequestSchema(Schema):
     """Schema for messages to a user."""
 
     recipient = Reference(missing=colander.required,
@@ -501,7 +508,7 @@ class BatchRequestPath(AdhocracySchemaNode):
                              colander.Length(min=1, max=8192))
 
 
-class POSTBatchRequestItem(colander.Schema):
+class POSTBatchRequestItem(Schema):
     """A single item in a batch request, encoding a single request."""
 
     method = BatchHTTPMethod()
@@ -573,7 +580,7 @@ def _get_indexes(context) -> list:
     return indexes
 
 
-class GETPoolRequestSchema(colander.Schema):
+class GETPoolRequestSchema(Schema):
 
     """GET parameters accepted for pool queries."""
 
@@ -715,13 +722,13 @@ def _is_reference_filter(name: str, registry: Registry) -> bool:
     try:
         isheet, field, node = resolve(name)
     except ValueError:
-        dummy_node = colander.SchemaNode(colander.String(), name=name)
-        raise colander.Invalid(dummy_node, 'No such sheet or field')
+        dummy_node = SchemaNode(colander.String(), name=name)
+        raise Invalid(dummy_node, 'No such sheet or field')
     if isinstance(node, (Reference, References)):
         return True
     else:
-        dummy_node = colander.SchemaNode(colander.String(), name=name)
-        raise colander.Invalid(dummy_node, 'Not a reference node')
+        dummy_node = SchemaNode(colander.String(), name=name)
+        raise Invalid(dummy_node, 'Not a reference node')
 
 
 def _is_arbitrary_filter(name: str, catalogs: ICatalogsService) -> bool:
@@ -1073,17 +1080,17 @@ def deferred_validate_password_reset_email(node: SchemaNode, kw: dict):
         user = locator.get_user_by_email(value)
         if user is None:
             msg = 'No user exists with this email: {0}'.format(value)
-            raise colander.Invalid(node, msg)
+            raise Invalid(node, msg)
         if not IPasswordAuthentication.providedBy(user):
             msg = 'This user has no password to reset: {0}'.format(value)
-            raise colander.Invalid(node, msg)
+            raise Invalid(node, msg)
         if not user.active:
             user.activate()
         request.validated['user'] = user
     return validate_email
 
 
-class POSTCreatePasswordResetRequestSchema(colander.Schema):
+class POSTCreatePasswordResetRequestSchema(Schema):
 
     """Schema to create a user password reset."""
 
@@ -1109,7 +1116,7 @@ def validate_password_reset_path(node, kw):
 
 def _raise_if_no_password_reset(node: SchemaNode, value: IPasswordReset):
     if not IPasswordReset.providedBy(value):
-        raise colander.Invalid(node, 'This is not a valid password reset.')
+        raise Invalid(node, 'This is not a valid password reset.')
 
 
 def _raise_if_outdated(node: SchemaNode, value: IPasswordReset,
@@ -1117,10 +1124,10 @@ def _raise_if_outdated(node: SchemaNode, value: IPasswordReset,
         if (now() - creation_date).days >= 7:
             value.__parent__ = None  # commit_suicide
             msg = 'This password reset is older than 7 days.'
-            raise colander.Invalid(node, msg)
+            raise Invalid(node, msg)
 
 
-class POSTPasswordResetRequestSchema(colander.Schema):
+class POSTPasswordResetRequestSchema(Schema):
     """Schema to get a user password reset resource."""
 
     path = Resource(missing=colander.required,

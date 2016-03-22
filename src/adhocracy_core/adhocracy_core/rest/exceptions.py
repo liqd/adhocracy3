@@ -1,30 +1,26 @@
 """HTTP Exception (500, 310, 404,..) processing."""
 import json
 import logging
-import colander
-from collections import namedtuple
 
+import colander
 from pyramid.exceptions import URLDecodeError
-from pyramid.security import NO_PERMISSION_REQUIRED
-from pyramid.view import view_config
-from pyramid.traversal import resource_path
-from pyramid.httpexceptions import HTTPGone
 from pyramid.httpexceptions import HTTPBadRequest
-from pyramid.httpexceptions import HTTPException
 from pyramid.httpexceptions import HTTPClientError
+from pyramid.httpexceptions import HTTPException
+from pyramid.httpexceptions import HTTPGone
 from pyramid.request import Request
+from pyramid.security import NO_PERMISSION_REQUIRED
+from pyramid.traversal import resource_path
+from pyramid.view import view_config
 
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
-from adhocracy_core.utils import exception_to_str
-from adhocracy_core.utils import log_compatible_datetime
+from adhocracy_core.interfaces import error_entry
 from adhocracy_core.sheets.metadata import view_blocked_by_metadata
 from adhocracy_core.sheets.principal import IPasswordAuthentication
-
+from adhocracy_core.utils import exception_to_str
+from adhocracy_core.utils import log_compatible_datetime
 
 logger = logging.getLogger(__name__)
-
-
-error_entry = namedtuple('ErrorEntry', ['location', 'name', 'description'])
 
 
 class JSONHTTPClientError(HTTPClientError):

@@ -1462,9 +1462,10 @@ class TestPasswordResetView:
         assert inst.options() == {'POST': {}}
 
 
-@fixture()
+@fixture
 def integration(config):
     config.include('adhocracy_core.rest.views')
+    return config
 
 
 @mark.usefixtures('integration')
