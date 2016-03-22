@@ -1,7 +1,6 @@
 """Export users and their proposal rates.
 
-This is registered as console script 'export_mercator_users' in setup.py.
-
+This is registered as console script in setup.py.
 """
 
 import argparse

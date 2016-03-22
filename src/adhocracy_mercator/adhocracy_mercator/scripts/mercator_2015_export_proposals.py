@@ -1,7 +1,6 @@
 """Export proposal.
 
-This is registered as console script 'export_ae_proposals_2015'
-in setup.py.
+This is registered as console script in setup.py.
 """
 
 import argparse

@@ -1,6 +1,6 @@
 """Delete stale login data.
 
-This is registered as console script 'delete_stale_login_data' in setup.py.
+This is registered as console script in setup.py.
 """
 import transaction
 import argparse

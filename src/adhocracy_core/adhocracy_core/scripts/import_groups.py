@@ -1,6 +1,6 @@
 """Import/create groups into the system.
 
-This is registered as console script 'import_groups' in setup.py.
+This is registered as console script in setup.py.
 
 """
 import argparse

@@ -1,7 +1,6 @@
 """Change the salutation in german texts.
 
-The function change_german_salutation is registered in setup.py
-in setup.py.
+This console script is registered in setup.py
 """
 
 import argparse
