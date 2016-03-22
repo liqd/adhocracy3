@@ -74,10 +74,6 @@ class TestBatchView:
                 'method': method,
                 'body': body}
 
-    def _make_json_with_subrequest_cstructs(self, **kwargs) -> dict:
-        cstruct = self._make_subrequest_cstruct(**kwargs)
-        return json.dumps([cstruct])
-
     def test_post_empty(self, context, request_):
         from adhocracy_core.utils import is_batchmode
         inst = self.make_one(context, request_)
@@ -89,7 +85,7 @@ class TestBatchView:
         assert is_batchmode(request_)
 
     def test_post_successful_subrequest(self, context, request_, mock_invoke_subrequest):
-        request_.body = self._make_json_with_subrequest_cstructs()
+        request_.validated = [self._make_subrequest_cstruct()]
         inst = self.make_one(context, request_)
         paths = {'path': '/pool/item',
                  'first_version_path': '/pool/item/v1'}
@@ -106,8 +102,8 @@ class TestBatchView:
             self, context, request_, mock_invoke_subrequest):
         from pyramid.traversal import resource_path
         from adhocracy_core.utils import is_batchmode
-        request_.body = self._make_json_with_subrequest_cstructs(
-            path='http://a.org/virtual/adhocracy/blah')
+        request_.validated = [self._make_subrequest_cstruct(
+            path='http://a.org/virtual/adhocracy/blah')]
         request_.__cached_principals__ = [1]
         request_.__cached_userid__ = '/user'
         date = object()
@@ -135,7 +131,7 @@ class TestBatchView:
 
     def test_post_successful_subrequest_with_updated_resources(
             self, context, request_, mock_invoke_subrequest):
-        request_.body = self._make_json_with_subrequest_cstructs()
+        request_.validated = [self._make_subrequest_cstruct()]
         inst = self.make_one(context, request_)
         response_body = {'path': '/pool/item',
                  'first_version_path': '/pool/item/v1',
@@ -155,7 +151,7 @@ class TestBatchView:
     def test_post_successful_subrequest_resolve_result_paths(self, context, request_, mock_invoke_subrequest):
         cstruct1 = self._make_subrequest_cstruct(result_first_version_path='@item/v1')
         cstruct2 = self._make_subrequest_cstruct(body={'ISheet': {'ref': '@item/v1'}})
-        request_.body = json.dumps([cstruct1, cstruct2])
+        request_.validated = [cstruct1, cstruct2]
         inst = self.make_one(context, request_)
         paths = {'path': '/pool/item',
                  'first_version_path': '/pool/item/v1'}
@@ -169,7 +165,7 @@ class TestBatchView:
 
     def test_post_failed_subrequest(self, context, request_, mock_invoke_subrequest):
         from .exceptions import JSONHTTPClientError
-        request_.body = self._make_json_with_subrequest_cstructs()
+        request_.validated = [self._make_subrequest_cstruct()]
         mock_invoke_subrequest.return_value = DummySubresponse(code=404,
                                                                title='Not Found')
         inst = self.make_one(context, request_)
@@ -184,8 +180,7 @@ class TestBatchView:
         from pyramid.httpexceptions import HTTPUnauthorized
         from .exceptions import JSONHTTPClientError
         request_.registry = integration.registry
-        request_.body = self._make_json_with_subrequest_cstructs()
-        request_.validated = request_.json_body
+        request_.validated = [self._make_subrequest_cstruct()]
         mock_invoke_subrequest.side_effect = HTTPUnauthorized()
         inst = self.make_one(context, request_)
         with raises(JSONHTTPClientError) as err:
@@ -197,7 +192,7 @@ class TestBatchView:
         from pyramid.httpexceptions import HTTPBadRequest
         from .exceptions import JSONHTTPClientError
         request_.registry = integration.registry
-        request_.body = self._make_json_with_subrequest_cstructs()
+        request_.validated = [self._make_subrequest_cstruct()]
         mock_invoke_subrequest.side_effect = HTTPBadRequest()
         mock_invoke_subrequest.return_value.errors = [{'location': 'body'}]
         inst = self.make_one(context, request_)
@@ -210,7 +205,7 @@ class TestBatchView:
         from pyramid.httpexceptions import HTTPRedirection
         from .exceptions import JSONHTTPClientError
         request_.registry = integration.registry
-        request_.body = self._make_json_with_subrequest_cstructs()
+        request_.validated = [self._make_subrequest_cstruct()]
         error = HTTPRedirection()
         error.status = '301 Moved'
         mock_invoke_subrequest.side_effect = error
@@ -223,7 +218,7 @@ class TestBatchView:
             self, context, request_, mock_invoke_subrequest, integration):
         from .exceptions import JSONHTTPClientError
         request_.registry = integration.registry
-        request_.body = self._make_json_with_subrequest_cstructs()
+        request_.validated = [self._make_subrequest_cstruct()]
         mock_invoke_subrequest.side_effect = RuntimeError('Bad luck')
         inst = self.make_one(context, request_)
         with raises(JSONHTTPClientError) as err:

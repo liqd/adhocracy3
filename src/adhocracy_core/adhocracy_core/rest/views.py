@@ -3,31 +3,24 @@ from collections import defaultdict
 from copy import deepcopy
 from logging import getLogger
 
-from colander import Invalid
-from colander import MappingSchema
 from colander import SchemaNode
 from colander import SequenceSchema
 from substanced.util import find_service
 from substanced.stats import statsd_timer
-from pyramid.httpexceptions import HTTPMethodNotAllowed
-from pyramid.httpexceptions import HTTPGone
-from pyramid.httpexceptions import HTTPBadRequest
-from pyramid.request import Request
-from pyramid.view import view_config
+from pyramid.interfaces import IRequest
 from pyramid.view import view_defaults
 from pyramid.security import remember
 from pyramid.traversal import resource_path
+from pyramid.registry import Registry
 from zope.interface.interfaces import IInterface
 from zope.interface import Interface
 
-from adhocracy_core.caching import set_cache_header
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import ISimple
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IPool
-from adhocracy_core.interfaces import ILocation
 from adhocracy_core.resources.asset import IAsset
 from adhocracy_core.resources.asset import IAssetDownload
 from adhocracy_core.resources.asset import IAssetsService
@@ -36,6 +29,7 @@ from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.resources.proposal import IProposalVersion
 from adhocracy_core.resources.rate import IRateVersion
 from adhocracy_core.resources.badge import IBadgeAssignmentsService
+from adhocracy_core.rest import api_view
 from adhocracy_core.rest.schemas import ResourceResponseSchema
 from adhocracy_core.rest.schemas import ItemResponseSchema
 from adhocracy_core.rest.schemas import POSTActivateAccountViewRequestSchema
@@ -54,8 +48,6 @@ from adhocracy_core.rest.schemas import GETPoolRequestSchema
 from adhocracy_core.rest.schemas import GETItemResponseSchema
 from adhocracy_core.rest.schemas import GETResourceResponseSchema
 from adhocracy_core.rest.schemas import options_resource_response_data_dict
-from adhocracy_core.rest.schemas import add_arbitrary_filter_nodes
-from adhocracy_core.interfaces import error_entry
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
 from adhocracy_core.sheets.badge import get_assignable_badges
@@ -66,12 +58,10 @@ from adhocracy_core.sheets.pool import IPool as IPoolSheet
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.tags import ITags
 from adhocracy_core.utils import extract_events_from_changelog_metadata
-from adhocracy_core.utils import get_reason_if_blocked
 from adhocracy_core.utils import get_user
 from adhocracy_core.utils import is_batchmode
 from adhocracy_core.utils import strip_optional_prefix
 from adhocracy_core.utils import to_dotted_name
-from adhocracy_core.utils import unflatten_multipart_request
 from adhocracy_core.utils import is_created_in_current_transaction
 from adhocracy_core.utils import create_schema
 from adhocracy_core.resources.root import IRootPool
@@ -81,29 +71,11 @@ from adhocracy_core.workflows.schemas import create_workflow_meta_schema
 logger = getLogger(__name__)
 
 
-class RESTView:
-    """Class stub with request data validation support.
-
-    Subclasses must implement the wanted request methods
-    and configure the pyramid view::
-
-        @view_defaults(
-            renderer='json',
-            context=IResource,
-        )
-        class MySubClass(RESTView):
-            validation_GET = MyColanderSchema
-
-            @view_config(request_method='GET')
-            def get(self):
-            ...
-    """
-
-    schema_OPTIONS = None
-    schema_HEAD = None
-    schema_GET = None
-    schema_PUT = None
-    schema_POST = None
+@view_defaults(
+    context=IResource,
+)
+class ResourceRESTView:
+    """Default view for Resources, implements get and options."""
 
     def __init__(self, context, request):
         """Initialize self."""
@@ -113,88 +85,17 @@ class RESTView:
         """:class:`pyramid.request.Request`."""
         self.registry = request.registry
         """:class:`pyramid.registry.Registry`."""
-        with statsd_timer('validate', rate=.1, registry=self.registry):
-            respond_if_blocked(context, request)
-            set_cache_header(context, request)
-            schema_class = _get_schema(self, request)
-            schema = self._create_schema(schema_class, context)
-            validate_request_data(context, request,
-                                  schema=schema,
-                                  )
-
-    def _create_schema(self, schema_class, context) -> MappingSchema:
-        schema = schema_class().bind(request=self.request,
-                                     registry=self.registry,
-                                     context=context,
-                                     creating=None)
-        return schema
-
-    def options(self) -> dict:
-        """Return options for view.
-
-        Note: This default implementation currently only exist in order to
-        satisfy the preflight request, which browsers do in CORS situations
-        before doing an actual POST request. Subclasses still have to
-        configure the view and delegate to this implementation explicitly if
-        they want to use it.
-        """
-        return {}
-
-    def get(self) -> dict:
-        """HTTP GET."""
-        raise HTTPMethodNotAllowed()
-
-    def put(self) -> dict:
-        """"HTTP PUT."""
-        raise HTTPMethodNotAllowed()
-
-    def post(self) -> dict:
-        """HTTP POST."""
-        raise HTTPMethodNotAllowed()
-
-    def delete(self) -> dict:
-        """HTTP delete."""
-        raise HTTPMethodNotAllowed()
-
-    def _build_updated_resources_dict(self) -> dict:
-        """Utility method used by several subclasses."""
-        result = defaultdict(list)
-        changelog_meta = self.request.registry.changelog.values()
-        for meta in changelog_meta:
-            events = extract_events_from_changelog_metadata(meta)
-            for event in events:
-                result[event].append(meta.resource)
-        return result
-
-
-def _get_schema(view_class, request: Request) -> tuple:
-    http_method = request.method.upper()
-    validation_attr = 'schema_' + http_method
-    schema = getattr(view_class, validation_attr, None)
-    return schema or MappingSchema
-
-
-@view_defaults(
-    renderer='json',
-    context=IResource,
-)
-class ResourceRESTView(RESTView):
-    """Default view for Resources, implements get and options."""
-
-    def __init__(self, context, request):
-        """Initialize self."""
-        super().__init__(context, request)
         self.content = request.registry.content
         """:class:`adhocracy_core.content.ResourceContentRegistry`."""
 
-    @view_config(request_method='OPTIONS')
+    @api_view(request_method='OPTIONS')
     def options(self) -> dict:
         """Get possible request/response data structures and http methods."""
         with statsd_timer('process.options', rate=.1, registry=self.registry):
             cstruct = self._options(self.context, self.request)
         return cstruct
 
-    def _options(self, context: IResource, request: Request) -> dict:
+    def _options(self, context: IResource, request: IRequest) -> dict:
         empty = {}  # tiny performance tweak
         cstruct = deepcopy(options_resource_response_data_dict)
 
@@ -269,8 +170,10 @@ class ResourceRESTView(RESTView):
             isheet = sheet.meta.isheet
             cstruct[isheet.__identifier__] = {'workflow_state': states}
 
-    @view_config(request_method='GET',
-                 permission='view')
+    @api_view(
+        request_method='GET',
+        permission='view',
+    )
     def get(self) -> dict:
         """Get resource data (unless deleted or hidden)."""
         metric = self._get_get_metric_name()
@@ -303,18 +206,27 @@ class ResourceRESTView(RESTView):
         return data_cstruct
 
 
+def _build_updated_resources_dict(registry: Registry) -> dict:
+    result = defaultdict(list)
+    for meta in registry.changelog.values():
+        events = extract_events_from_changelog_metadata(meta)
+        for event in events:
+            result[event].append(meta.resource)
+    return result
+
+
 @view_defaults(
-    renderer='json',
     context=ISimple,
 )
 class SimpleRESTView(ResourceRESTView):
     """View for simples (non versionable), implements get, options and put."""
 
-    schema_PUT = PUTResourceRequestSchema
-
-    @view_config(request_method='PUT',
-                 permission='edit_some',
-                 accept='application/json')
+    @api_view(
+        request_method='PUT',
+        permission='edit_some',
+        schema=PUTResourceRequestSchema,
+        accept='application/json',
+    )
     def put(self) -> dict:
         """Edit resource and get response data."""
         with statsd_timer('process.put', rate=.1, registry=self.registry):
@@ -326,7 +238,7 @@ class SimpleRESTView(ResourceRESTView):
                     sheet.set(appstructs[name])
             appstruct = {}
             if not is_batchmode(self.request):  # pragma: no branch
-                updated = self._build_updated_resources_dict()
+                updated = _build_updated_resources_dict(self.registry)
                 appstruct['updated_resources'] = updated
             schema = create_schema(ResourceResponseSchema,
                                    self.context,
@@ -336,18 +248,16 @@ class SimpleRESTView(ResourceRESTView):
 
 
 @view_defaults(
-    renderer='json',
     context=IPool,
 )
 class PoolRESTView(SimpleRESTView):
     """View for Pools, implements get, options, put and post."""
 
-    schema_GET = GETPoolRequestSchema
-
-    schema_POST = POSTResourceRequestSchema
-
-    @view_config(request_method='GET',
-                 permission='view')
+    @api_view(
+        request_method='GET',
+        schema=GETPoolRequestSchema,
+        permission='view',
+    )
     def get(self) -> dict:
         """Get resource data."""
         # This delegation method is necessary since otherwise validation_GET
@@ -369,13 +279,16 @@ class PoolRESTView(SimpleRESTView):
                                    self.request)
 
         if not is_batchmode(self.request):
-            appstruct[
-                'updated_resources'] = self._build_updated_resources_dict()
+            updated = _build_updated_resources_dict(self.registry)
+            appstruct['updated_resources'] = updated
         return schema.serialize(appstruct)
 
-    @view_config(request_method='POST',
-                 permission='create',
-                 accept='application/json')
+    @api_view(
+        request_method='POST',
+        permission='create',
+        schema=POSTResourceRequestSchema,
+        accept='application/json',
+    )
     def post(self) -> dict:
         """Create new resource and get response data."""
         metric = self._get_post_metric_name()
@@ -405,25 +318,28 @@ class PoolRESTView(SimpleRESTView):
         iresource = validated['content_type']
         return self.content.create(iresource.__identifier__, **kwargs)
 
-    @view_config(request_method='PUT',
-                 permission='edit_some',
-                 accept='application/json')
+    @api_view(
+        request_method='PUT',
+        permission='edit_some',
+        schema=PUTResourceRequestSchema,
+        accept='application/json',
+    )
     def put(self) -> dict:
         """HTTP PUT."""
         return super().put()
 
 
 @view_defaults(
-    renderer='json',
     context=IItem,
 )
 class ItemRESTView(PoolRESTView):
     """View for Items and ItemVersions, overwrites GET and  POST handling."""
 
-    schema_POST = POSTItemRequestSchema
-
-    @view_config(request_method='GET',
-                 permission='view')
+    @api_view(
+        request_method='GET',
+        schema=GETPoolRequestSchema,
+        permission='view',
+    )
     def get(self) -> dict:
         """Get resource data."""
         with statsd_timer('process.get', rate=.1, registry=self.registry):
@@ -440,9 +356,12 @@ class ItemRESTView(PoolRESTView):
             cstruct['data'] = self._get_sheets_data_cstruct()
         return cstruct
 
-    @view_config(request_method='POST',
-                 permission='create',
-                 accept='application/json')
+    @api_view(
+        request_method='POST',
+        permission='create',
+        schema=POSTItemRequestSchema,
+        accept='application/json',
+    )
     def post(self):
         """Create new resource and get response data.
 
@@ -491,26 +410,30 @@ class ItemRESTView(PoolRESTView):
 
 
 @view_defaults(
-    renderer='json',
     context=IBadgeAssignmentsService,
 )
 class BadgeAssignmentsRESTView(PoolRESTView):
     """REST view for the badge assignment."""
 
-    @view_config(request_method='GET',
-                 permission='view')
+    @api_view(
+        request_method='GET',
+        permission='view',
+    )
     def get(self) -> dict:
         """HTTP GET."""
         return super().get()
 
-    @view_config(request_method='POST',
-                 permission='create',
-                 accept='application/json')
+    @api_view(
+        request_method='POST',
+        permission='create',
+        schema=POSTResourceRequestSchema,
+        accept='application/json',
+    )
     def post(self):
         """HTTP POST."""
         return super().post()
 
-    @view_config(request_method='OPTIONS')
+    @api_view(request_method='OPTIONS')
     def options(self) -> dict:
         """Get possible request/response data structures and http methods."""
         cstruct = super().options()
@@ -527,34 +450,34 @@ class BadgeAssignmentsRESTView(PoolRESTView):
 
 
 @view_defaults(
-    renderer='json',
     context=IUsersService,
 )
 class UsersRESTView(PoolRESTView):
     """View the IUsersService pool overwrites POST handling."""
 
-    schema_POST = POSTResourceRequestSchema
-
-    @view_config(request_method='POST',
-                 permission='create_user',
-                 accept='application/json')
+    @api_view(
+        request_method='POST',
+        permission='create_user',
+        schema=POSTResourceRequestSchema,
+        accept='application/json',
+    )
     def post(self):
         """HTTP POST."""
         return super().post()
 
 
 @view_defaults(
-    renderer='json',
     context=IAssetsService,
 )
 class AssetsServiceRESTView(PoolRESTView):
     """View allowing multipart requests for asset upload."""
 
-    schema_POST = POSTAssetRequestSchema
-
-    @view_config(request_method='POST',
-                 permission='create_asset',
-                 accept='multipart/form-data')
+    @api_view(
+        request_method='POST',
+        permission='create_asset',
+        schema=POSTAssetRequestSchema,
+        accept='multipart/form-data',
+    )
     def post(self):
         """HTTP POST."""
         return super().post()
@@ -567,25 +490,27 @@ class AssetsServiceRESTView(PoolRESTView):
 class AssetRESTView(SimpleRESTView):
     """View for assets, allows PUTting new versions via multipart."""
 
-    schema_PUT = PUTAssetRequestSchema
-
-    @view_config(request_method='PUT',
-                 permission='create_asset',
-                 accept='multipart/form-data')
+    @api_view(
+        request_method='PUT',
+        permission='create_asset',
+        schema=PUTAssetRequestSchema,
+        accept='multipart/form-data',
+    )
     def put(self) -> dict:
         """HTTP PUT."""
         return super().put()
 
 
 @view_defaults(
-    renderer='json',
     context=IAssetDownload,
 )
 class AssetDownloadRESTView(ResourceRESTView):
     """View for downloading assets as binary blobs."""
 
-    @view_config(request_method='GET',
-                 permission='view')
+    @api_view(
+        request_method='GET',
+        permission='view',
+    )
     def get(self) -> dict:
         """Get asset data."""
         response = self.context.get_response(self.request.registry)
@@ -600,15 +525,19 @@ class AssetDownloadRESTView(ResourceRESTView):
 
 
 @view_defaults(
-    renderer='json',
     context=IRootPool,
-    name='meta_api'
+    name='meta_api',
 )
-class MetaApiView(RESTView):
+class MetaApiView:
     """Access to metadata about the API specification of this installation.
 
     Returns a JSON document describing the existing resources and sheets.
     """
+
+    def __init__(self, context: IRootPool, request: IRequest):
+        self.context = context
+        self.request = request
+        self.registry = request.registry
 
     def _describe_resources(self, resources_meta):
         """Build a description of the resources registered in the system.
@@ -736,7 +665,7 @@ class MetaApiView(RESTView):
             cstructs[name] = schema.serialize(appstruct)
         return cstructs
 
-    @view_config(request_method='GET')
+    @api_view(request_method='GET')
     def get(self) -> dict:
         """Get the API specification of this installation as JSON."""
         # Collect info about all resources
@@ -773,28 +702,32 @@ def _get_base_ifaces(iface: IInterface, root_iface=Interface) -> [str]:
 
 
 @view_defaults(
-    renderer='json',
     context=IRootPool,
     name='login_username',
 )
-class LoginUsernameView(RESTView):
+class LoginUsernameView:
     """Log in a user via their name."""
 
-    schema_POST = POSTLoginUsernameRequestSchema
+    def __init__(self, context: IRootPool, request: IRequest):
+        self.context = context
+        self.request = request
 
-    @view_config(request_method='OPTIONS')
+    @api_view(request_method='OPTIONS')
     def options(self) -> dict:
         """Return options for view."""
-        return super().options()
+        return {}
 
-    @view_config(request_method='POST',
-                 accept='application/json')
+    @api_view(
+        request_method='POST',
+        schema=POSTLoginUsernameRequestSchema,
+        accept='application/json',
+    )
     def post(self) -> dict:
         """Create new resource and get response data."""
         return _login_user(self.request)
 
 
-def _login_user(request: Request) -> dict:
+def _login_user(request: IRequest) -> dict:
     """Log-in a user and return a response indicating success."""
     user = request.validated['user']
     userid = resource_path(user)
@@ -807,66 +740,76 @@ def _login_user(request: Request) -> dict:
 
 
 @view_defaults(
-    renderer='json',
     context=IRootPool,
     name='login_email',
 )
-class LoginEmailView(RESTView):
+class LoginEmailView:
     """Log in a user via their email address."""
 
-    schema_POST = POSTLoginEmailRequestSchema
+    def __init__(self, context: IRootPool, request: IRequest):
+        self.context = context
+        self.request = request
 
-    @view_config(request_method='OPTIONS')
+    @api_view(request_method='OPTIONS')
     def options(self) -> dict:
         """Return options for view."""
-        return super().options()
+        return {}
 
-    @view_config(request_method='POST',
-                 accept='application/json')
+    @api_view(request_method='POST',
+              schema=POSTLoginEmailRequestSchema,
+              accept='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
         return _login_user(self.request)
 
 
 @view_defaults(
-    renderer='json',
     context=IRootPool,
     name='activate_account',
 )
-class ActivateAccountView(RESTView):
+class ActivateAccountView:
     """Log in a user via their name."""
 
-    schema_POST = POSTActivateAccountViewRequestSchema
+    def __init__(self, context: IRootPool, request: IRequest):
+        self.context = context
+        self.request = request
 
-    @view_config(request_method='OPTIONS')
+    @api_view(request_method='OPTIONS')
     def options(self) -> dict:
         """Return options for view."""
-        return super().options()
+        return {}
 
-    @view_config(request_method='POST',
-                 accept='application/json')
+    @api_view(
+        request_method='POST',
+        schema=POSTActivateAccountViewRequestSchema,
+        accept='application/json',
+    )
     def post(self) -> dict:
         """Activate a user account and log the user in."""
         return _login_user(self.request)
 
 
 @view_defaults(
-    renderer='string',
     context=IRootPool,
     name='report_abuse',
 )
-class ReportAbuseView(RESTView):
+class ReportAbuseView:
     """Receive and process an abuse complaint."""
 
-    schema_POST = POSTReportAbuseViewRequestSchema
+    def __init__(self, context: IRootPool, request: IRequest):
+        self.context = context
+        self.request = request
 
-    @view_config(request_method='OPTIONS')
+    @api_view(request_method='OPTIONS')
     def options(self) -> dict:
         """Return options for view."""
-        return super().options()
+        return {}
 
-    @view_config(request_method='POST',
-                 accept='application/json')
+    @api_view(
+        request_method='POST',
+        schema=POSTReportAbuseViewRequestSchema,
+        accept='application/json',
+    )
     def post(self) -> dict:
         """Receive and process an abuse complaint."""
         messenger = self.request.registry.messenger
@@ -877,29 +820,34 @@ class ReportAbuseView(RESTView):
 
 
 @view_defaults(
-    renderer='json',
     context=IRootPool,
     name='message_user',
 )
-class MessageUserView(RESTView):
+class MessageUserView:
     """Send a message to another user."""
 
-    schema_POST = POSTMessageUserViewRequestSchema
+    def __init__(self, context: IRootPool, request: IRequest):
+        self.context = context
+        self.request = request
 
-    @view_config(request_method='OPTIONS')
+    @api_view(request_method='OPTIONS')
     def options(self) -> dict:
         """Return options for view."""
         result = {}
         if self.request.has_permission('message_to_user', self.context):
-            schema = POSTMessageUserViewRequestSchema().bind(
-                context=self.context)
+            schema = create_schema(POSTMessageUserViewRequestSchema,
+                                   self.context,
+                                   self.request)
             result['POST'] = {'request_body': schema.serialize({}),
                               'response_body': ''}
         return result
 
-    @view_config(request_method='POST',
-                 permission='message_to_user',
-                 accept='application/json')
+    @api_view(
+        request_method='POST',
+        permission='message_to_user',
+        schema=POSTMessageUserViewRequestSchema,
+        accept='application/json',
+    )
     def post(self) -> dict:
         """Send a message to another user."""
         messenger = self.request.registry.messenger
@@ -912,23 +860,26 @@ class MessageUserView(RESTView):
 
 
 @view_defaults(
-    renderer='json',
     context=IRootPool,
     name='create_password_reset',
 )
-class CreatePasswordResetView(RESTView):
+class CreatePasswordResetView:
     """Create a password reset resource."""
 
-    schema_POST = POSTCreatePasswordResetRequestSchema
+    def __init__(self, context: IRootPool, request: IRequest):
+        self.context = context
+        self.request = request
 
-    @view_config(request_method='OPTIONS')
+    @api_view(request_method='OPTIONS')
     def options(self) -> dict:
         """Return options for view."""
         return {'POST': {}}
 
-    @view_config(request_method='POST',
-                 accept='application/json'
-                 )
+    @api_view(
+        request_method='POST',
+        schema=POSTCreatePasswordResetRequestSchema,
+        accept='application/json',
+    )
     def post(self) -> dict:
         """Create as password reset resource."""
         resets = find_service(self.context, 'principals', 'resets')
@@ -940,23 +891,26 @@ class CreatePasswordResetView(RESTView):
 
 
 @view_defaults(
-    renderer='json',
     context=IRootPool,
     name='password_reset',
 )
-class PasswordResetView(RESTView):
+class PasswordResetView:
     """Reset a user password."""
 
-    schema_POST = POSTPasswordResetRequestSchema
+    def __init__(self, context: IRootPool, request: IRequest):
+        self.context = context
+        self.request = request
 
-    @view_config(request_method='OPTIONS')
+    @api_view(request_method='OPTIONS')
     def options(self) -> dict:
         """Return options for view."""
         return {'POST': {}}
 
-    @view_config(request_method='POST',
-                 accept='application/json',
-                 )
+    @api_view(
+        request_method='POST',
+        schema=POSTPasswordResetRequestSchema,
+        accept='application/json',
+    )
     def post(self) -> dict:
         """Reset password."""
         reset = self.request.validated['path']

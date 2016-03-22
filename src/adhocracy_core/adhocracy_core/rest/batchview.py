@@ -10,14 +10,14 @@ from adhocracy_core.rest.exceptions import handle_error_500_exception
 from adhocracy_core.rest.exceptions import JSONHTTPClientError
 from adhocracy_core.rest.exceptions import get_json_body
 from pyramid.request import Request
-from pyramid.view import view_config
 from pyramid.interfaces import IRequest
 from pyramid.view import view_defaults
 
 from adhocracy_core.resources.root import IRootPool
+from adhocracy_core.rest import api_view
 from adhocracy_core.rest.schemas import POSTBatchRequestSchema
 from adhocracy_core.rest.schemas import UpdatedResourcesSchema
-from adhocracy_core.rest.views import RESTView
+from adhocracy_core.rest.views import _build_updated_resources_dict
 from adhocracy_core.utils import set_batchmode
 from adhocracy_core.utils import create_schema
 
@@ -51,18 +51,22 @@ class BatchItemResponse:
 
 
 @view_defaults(
-    renderer='json',
     context=IRootPool,
-    http_cache=0,
+    name='batch',
 )
-class BatchView(RESTView):
+class BatchView:
     """Process batch requests."""
 
-    schema_POST = POSTBatchRequestSchema
+    def __init__(self, context: IRootPool, request: IRequest):
+        self.context = context
+        self.request = request
+        self.registry = request.registry
 
-    @view_config(name='batch',
-                 request_method='POST',
-                 accept='application/json')
+    @api_view(
+        request_method='POST',
+        schema=POSTBatchRequestSchema,
+        accept='application/json',
+    )
     def post(self) -> dict:
         """Create new resource and get response data."""
         response_list = []
@@ -89,8 +93,7 @@ class BatchView(RESTView):
         response = self._response_list_to_json(response_list)
         return response
 
-    @view_config(name='batch',
-                 request_method='OPTIONS')
+    @api_view(request_method='OPTIONS')
     def options(self) -> dict:
         """Return options for batch view.
 
@@ -130,7 +133,7 @@ class BatchView(RESTView):
             if 'updated_resources' in response.body:
                 del response.body['updated_resources']
             responses.append(response.to_dict())
-        updated_resources = self._build_updated_resources_dict()
+        updated_resources = _build_updated_resources_dict(self.registry)
         schema = create_schema(UpdatedResourcesSchema,
                                self.context,
                                self.request)
