@@ -2,26 +2,26 @@ defaults: standard
 states:
   announce:
     acm:
-      principals:      [anonymous,  participant, moderator, creator, initiator, admin]
+      principals:      [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [view,        D,          ~,           ~,         ~,        ~,        ~]
+        - [view,        D,        ~,           ~,         ~,        ~,        ~]
   participate:
     acm:
-      principals:      [anonymous,  participant, moderator, creator, initiator, admin]
+      principals:      [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [view,        D,          ~,           ~,         ~,        ~,        ~]
+        - [view,        D,        ~,           ~,         ~,        ~,        ~]
   evaluate:
     acm:
-      principals:      [anonymous,  participant, moderator, creator, initiator, admin]
+      principals:      [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [view,        D,          ~,           ~,         ~,        ~,        ~]
+        - [view,        D,        ~,           ~,         ~,        ~,        ~]
   result:
     acm:
-      principals:      [anonymous,  participant, moderator, creator, initiator, admin]
+      principals:      [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [view,        D,          ~,           ~,         ~,        ~,        ~]
+        - [view,        D,        ~,           ~,         ~,        ~,        ~]
   closed:
     acm:
-      principals:      [anonymous,  participant, moderator, creator, initiator, admin]
+      principals:      [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [view,        D,          ~,           ~,         ~,        ~,        ~]
+        - [view,        D,        ~,           ~,         ~,        ~,        ~]

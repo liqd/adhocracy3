@@ -52,5 +52,7 @@ setup(name='adhocracy_mercator',
           adhocracy_mercator.scripts.mercator_2015_export_users:export_users
       ad_mercator_2015_delete_users =\
           adhocracy_mercator.scripts.mercator_2015_delete_users:delete_users
+      ad_delete_users =\
+          adhocracy_mercator.scripts.delete_users:delete_users
       """,
       )

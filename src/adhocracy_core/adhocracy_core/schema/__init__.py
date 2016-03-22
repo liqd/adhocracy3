@@ -209,7 +209,6 @@ ROLE_PRINCIPALS = ['participant',
 
 SYSTEM_PRINCIPALS = ['everyone',
                      'authenticated',
-                     'anonymous'
                      ]
 
 

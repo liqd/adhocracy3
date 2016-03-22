@@ -2,7 +2,7 @@ defaults: standard
 states:
   participate:
     acm:
-      principals:                       [anonymous, participant, moderator, creator, initiator, admin]
+      principals:                       [everyone, participant, moderator, creator, initiator, admin]
       permissions:
         - [create_proposal,              ~,         A,           ~,         ~,       A,         ~]
         - [create_comment,               ~,         A,           A,         ~,       A,         ~]
@@ -14,15 +14,15 @@ states:
         - [edit_mercator2_winnerinfo,    ~,         D,           D,         ~,       ~,         ~]
   evaluate:
     acm:
-      principals:                       [anonymous, participant, moderator, creator, initiator, admin]
+      principals:                       [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [edit,                         ~,         ~,           ~,       D,         ~,         ~]
-        - [view_mercator2_extra_funding, ~,         D,           A,      ~,          ~,         ~]
-        - [view_mercator2_winnerinfo,    ~,         D,           A,      ~,          ~,         ~]
-        - [edit_mercator2_winnerinfo,    ~,         D,           A,      ~,          ~,         ~]
+        - [edit,                         ~,        ~,           ~,       D,         ~,         ~]
+        - [view_mercator2_extra_funding, ~,        D,           A,      ~,          ~,         ~]
+        - [view_mercator2_winnerinfo,    ~,        D,           A,      ~,          ~,         ~]
+        - [edit_mercator2_winnerinfo,    ~,        D,           A,      ~,          ~,         ~]
   result:
     acm:
-      principals:                       [anonymous, participant, moderator, creator, initiator, admin]
+      principals:                       [everyone, participant, moderator, creator, initiator, admin]
       permissions:
         - [edit,                         ~,         ~,           ~,         A,       ~,         ~]
         - [view_mercator2_extra_funding, ~,         D,           A,         ~,       ~,         ~]
@@ -31,7 +31,7 @@ states:
         - [create_document,              ~,         ~,           ~,         A,       ~,         ~]
   closed:
     acm:
-      principals:                       [anonymous, participant, moderator, creator, initiator, admin]
+      principals:                       [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [edit,                         ~,         ~,           ~,         D,       ~,         ~]
+        - [edit,                         ~,        ~,           ~,         D,       ~,         ~]
 

@@ -1105,9 +1105,6 @@ class TestACLPrincipalType:
     def test_deserialize_system_user_everyone(self, node, inst):
         assert inst.deserialize(node, 'everyone') == 'system.Everyone'
 
-    def test_deserialize_system_user_anonymous(self, node, inst):
-        assert inst.deserialize(node, 'anonymous') == 'system.Anonymous'
-
     def test_deserialize_raise_if_raise_else(self, node, inst):
         with raises(colander.Invalid):
             inst.deserialize(node, 'WRONG')

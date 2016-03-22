@@ -4,7 +4,7 @@ states:
     title: Draft
     description: This phase is for internal review.
     acm:
-      principals:                 [anonymous, participant, moderator, creator, initiator, admin]
+      principals:                 [everyone, participant, moderator, creator, initiator, admin]
       permissions:
         - [view,                   D,         D,           A,         A,       A,         A]
         - [create_document,        ~,         ~,           A,         ~,       ~,         ~]
@@ -13,13 +13,13 @@ states:
   announce:
     title: Announce
     acm:
-      principals:             [anonymous, participant, moderator, creator, initiator, admin]
+      principals:             [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [view,               ~,         ~,           ~,         ~,       ~,         ~]
+        - [view,               ~,        ~,           ~,         ~,       ~,         ~]
   participate:
     title: Participate
     acm:
-      principals:                   [anonymous, participant, moderator, creator, initiator, admin]
+      principals:                   [everyone, participant, moderator, creator, initiator, admin]
       permissions:
         - [view,                     ~,         A,           A,         A,       A,         ~]
         - [create_proposal,          ~,         A,           ~,         ~,       ~,         ~]
@@ -32,7 +32,7 @@ states:
   evaluate:
     title: Evaluate
     acm:
-      principals:             [anonymous, participant, moderator, creator, initiator, admin]
+      principals:             [everyone, participant, moderator, creator, initiator, admin]
       permissions:
         - [view,               ~,         ~,           ~,         ~,       ~,         ~]
         - [create_proposal,    ~,         ~,           ~,         ~,       ~,         ~]
@@ -40,7 +40,7 @@ states:
   result:
     title: Result
     acm:
-      principals:             [anonymous, participant, moderator, creator, initiator, admin]
+      principals:             [everyone, participant, moderator, creator, initiator, admin]
       permissions:
         - [view,               ~,         ~,           ~,         ~,       ~,         ~]
         - [create_proposal,    ~,         ~,           ~,         ~,       ~,         ~]
@@ -48,9 +48,9 @@ states:
   closed:
     title: Closed
     acm:
-      principals:             [anonymous, participant, moderator, creator, initiator, admin]
+      principals:             [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [view,               ~,         ~,           ~,         ~,       ~,         ~]
+        - [view,               ~,        ~,           ~,         ~,       ~,         ~]
 transitions:
   to_announce:
     from_state: draft
