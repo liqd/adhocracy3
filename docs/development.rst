@@ -206,11 +206,11 @@ Update translations backend
 
 create new language::
 
-   bin/i18n en
+   bin/ad_i18n en
 
 extract message ids, update po and create mo files::
 
-   bin/i18n
+   bin/ad_i18n
 
 compile custom po file in extension package::
 
