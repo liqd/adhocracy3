@@ -73,6 +73,7 @@ from adhocracy_core.utils import strip_optional_prefix
 from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import unflatten_multipart_request
 from adhocracy_core.utils import is_created_in_current_transaction
+from adhocracy_core.utils import create_schema
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.workflows.schemas import create_workflow_meta_schema
 
@@ -425,8 +426,9 @@ class ResourceRESTView(RESTView):
         """Get resource data (unless deleted or hidden)."""
         metric = self._get_get_metric_name()
         with statsd_timer(metric, rate=.1, registry=self.registry):
-            schema = self._create_schema(GETResourceResponseSchema,
-                                         self.context)
+            schema = create_schema(GETResourceResponseSchema,
+                                   self.context,
+                                   self.request)
             cstruct = schema.serialize()
             cstruct['data'] = self._get_sheets_data_cstruct()
         return cstruct
@@ -477,7 +479,9 @@ class SimpleRESTView(ResourceRESTView):
             if not is_batchmode(self.request):  # pragma: no branch
                 updated = self._build_updated_resources_dict()
                 appstruct['updated_resources'] = updated
-            schema = self._create_schema(ResourceResponseSchema, self.context)
+            schema = create_schema(ResourceResponseSchema,
+                                   self.context,
+                                   self.request)
             cstruct = schema.serialize(appstruct)
         return cstruct
 
@@ -509,9 +513,11 @@ class PoolRESTView(SimpleRESTView):
                                                           ITags,
                                                           'FIRST')
             appstruct['first_version_path'] = first
-            schema = self._create_schema(ItemResponseSchema, resource)
+            schema = create_schema(ItemResponseSchema, resource, self.request)
         else:
-            schema = self._create_schema(ResourceResponseSchema, resource)
+            schema = create_schema(ResourceResponseSchema,
+                                   resource,
+                                   self.request)
 
         if not is_batchmode(self.request):
             appstruct[
@@ -578,7 +584,9 @@ class ItemRESTView(PoolRESTView):
             appstruct = {}
             if first_version is not None:
                 appstruct['first_version_path'] = first_version
-            schema = self._create_schema(GETItemResponseSchema, self.context)
+            schema = create_schema(GETItemResponseSchema,
+                                   self.context,
+                                   self.request)
             cstruct = schema.serialize(appstruct)
             cstruct['data'] = self._get_sheets_data_cstruct()
         return cstruct

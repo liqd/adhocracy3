@@ -12,6 +12,7 @@ from zope.interface import implementer
 from zope.interface import Interface
 from zope.component import ComponentLookupError
 
+from adhocracy_core.utils import create_schema
 from adhocracy_core.interfaces import ITokenManger
 from adhocracy_core.schema import Resource
 
@@ -187,9 +188,8 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         """Return normalised X-User-Path request header or None."""
         user_path_header = request.headers.get(UserPathHeader, None)
         user_path = None
-        if user_path_header is not None:
-            schema = Resource().bind(request=request,
-                                     context=request.context)
+        if user_path_header is not None:  # pragma: no branch
+            schema = create_schema(Resource, request.context, request)
             user = schema.deserialize(user_path_header)
             user_path = resource_path(user)
         return user_path

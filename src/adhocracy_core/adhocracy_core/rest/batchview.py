@@ -18,6 +18,7 @@ from adhocracy_core.rest.schemas import POSTBatchRequestSchema
 from adhocracy_core.rest.schemas import UpdatedResourcesSchema
 from adhocracy_core.rest.views import RESTView
 from adhocracy_core.utils import set_batchmode
+from adhocracy_core.utils import create_schema
 
 
 logger = getLogger(__name__)
@@ -129,8 +130,9 @@ class BatchView(RESTView):
                 del response.body['updated_resources']
             responses.append(response.to_dict())
         updated_resources = self._build_updated_resources_dict()
-        schema = UpdatedResourcesSchema().bind(request=self.request,
-                                               context=self.context)
+        schema = create_schema(UpdatedResourcesSchema,
+                               self.context,
+                               self.request)
         return {'responses': responses,
                 'updated_resources': schema.serialize(updated_resources)}
 
