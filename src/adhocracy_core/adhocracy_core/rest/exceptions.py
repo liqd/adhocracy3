@@ -1,32 +1,26 @@
 """HTTP Exception (500, 310, 404,..) processing."""
 import json
 import logging
-import colander
-from collections import namedtuple
 
+import colander
 from pyramid.exceptions import URLDecodeError
-from pyramid.security import NO_PERMISSION_REQUIRED
-from pyramid.view import view_config
-from pyramid.traversal import resource_path
-from pyramid.httpexceptions import HTTPGone
 from pyramid.httpexceptions import HTTPBadRequest
-from pyramid.httpexceptions import HTTPException
 from pyramid.httpexceptions import HTTPClientError
+from pyramid.httpexceptions import HTTPException
+from pyramid.httpexceptions import HTTPGone
 from pyramid.request import Request
+from pyramid.security import NO_PERMISSION_REQUIRED
+from pyramid.traversal import resource_path
+from pyramid.view import view_config
 
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
-from adhocracy_core.utils import exception_to_str
-from adhocracy_core.utils import log_compatible_datetime
-from adhocracy_core.utils import named_object
+from adhocracy_core.interfaces import error_entry
 from adhocracy_core.sheets.metadata import view_blocked_by_metadata
 from adhocracy_core.sheets.principal import IPasswordAuthentication
-from adhocracy_core.rest.schemas import BlockExplanationResponseSchema
-
+from adhocracy_core.utils import exception_to_str
+from adhocracy_core.utils import log_compatible_datetime
 
 logger = logging.getLogger(__name__)
-
-
-error_entry = namedtuple('ErrorEntry', ['location', 'name', 'description'])
 
 
 class JSONHTTPClientError(HTTPClientError):
@@ -207,7 +201,7 @@ def handle_error_400_auto_update_no_fork_allowed(error, request):
     description = '- The auto update tried to create a fork for: {0} caused'\
                   ' by isheet: {1} field: {2} with old_reference: {3} and new'\
                   ' reference: {4}. Try another root_version.'.format(*args)
-    dummy_node = named_object('root_versions')
+    dummy_node = colander.SchemaNode(colander.List(), name='root_versions')
     error_colander = colander.Invalid(dummy_node, msg + description)
     return handle_error_400_colander_invalid(error_colander, request)
 
@@ -233,6 +227,7 @@ def handle_error_400_url_decode_error(error, request):
              )
 def handle_error_410_exception(error, request):
     """Add json body with explanation to 410 errors."""
+    from adhocracy_core.rest.schemas import BlockExplanationResponseSchema
     context = request.context
     registry = request.registry
     reason = error.detail or ''

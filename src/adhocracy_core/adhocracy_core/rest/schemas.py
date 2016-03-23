@@ -2,12 +2,19 @@
 from datetime import datetime
 
 import colander
+from colander import Schema
 from colander import SchemaNode
+from colander import MappingSchema
+from colander import SequenceSchema
 from colander import Invalid
 from hypatia.interfaces import IIndexSort
 from multipledispatch import dispatch
+from pyramid.interfaces import IRequest
+from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.httpexceptions import HTTPGone
 from pyramid.registry import Registry
 from pyramid.request import Request
+from pyramid.traversal import resource_path
 from pyramid.util import DottedNameResolver
 from substanced.catalog.indexes import SDIndex
 from substanced.util import find_catalog
@@ -15,8 +22,11 @@ from substanced.util import find_service
 from hypatia.field import FieldIndex
 from hypatia.keyword import KeywordIndex
 from zope import interface
+from adhocracy_core.events import ResourceSheetModified
+from adhocracy_core.rest.exceptions import error_entry
 from adhocracy_core.interfaces import FieldComparator
 from adhocracy_core.interfaces import FieldSequenceComparator
+from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IUserLocator
 from adhocracy_core.interfaces import KeywordComparator
@@ -28,6 +38,8 @@ from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.resources.base import Base
 from adhocracy_core.sheets.asset import IAssetData
 from adhocracy_core.sheets.asset import IAssetMetadata
+from adhocracy_core.sheets.metadata import is_older_than
+from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import Boolean
@@ -57,8 +69,8 @@ from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.catalog import ICatalogsService
 from adhocracy_core.catalog.index import ReferenceIndex
 from adhocracy_core.utils import now
-from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import unflatten_multipart_request
+
 
 resolver = DottedNameResolver()
 
@@ -72,7 +84,7 @@ INDEX_EXAMPLE_VALUES = {
     'interfaces': interface.Interface,
 }
 
-class UpdatedResourcesSchema(colander.Schema):
+class UpdatedResourcesSchema(Schema):
     """List the resources affected by a transaction."""
 
     created = Resources()
@@ -103,7 +115,7 @@ class GETItemResponseSchema(ResourcePathAndContentSchema):
     first_version_path = Resource()
 
 
-def add_put_data_subschemas(node: colander.Schema, kw: dict):
+def add_put_data_subschemas(node: Schema, kw: dict):
     """Add the resource sheet colander schemas that are 'editable'."""
     context = kw['context']
     request = kw['request']
@@ -122,7 +134,7 @@ def add_put_data_subschemas(node: colander.Schema, kw: dict):
         node.add(schema)
 
 
-class BlockExplanationResponseSchema(colander.Schema):
+class BlockExplanationResponseSchema(Schema):
     """Data structure explaining a 410 Gone response."""
 
     reason = SingleLine()
@@ -130,7 +142,7 @@ class BlockExplanationResponseSchema(colander.Schema):
     modification_date = DateTime(default=colander.null)
 
 
-class PUTResourceRequestSchema(colander.Schema):
+class PUTResourceRequestSchema(Schema):
     """Data structure for Resource PUT requests.
 
     The subschemas for the Resource Sheets
@@ -158,8 +170,7 @@ def validate_claimed_asset_mime_type(self, node: SchemaNode, appstruct: dict):
     detected_type = file.mimetype
     if claimed_type != detected_type:
         msg = 'Claimed MIME type is {} but file content seems to be {}'
-        raise colander.Invalid(node['data'],
-                               msg.format(claimed_type, detected_type))
+        raise Invalid(node['data'], msg.format(claimed_type, detected_type))
 
 
 def _get_sheet_field(appstruct: dict, field: str) -> object:
@@ -183,7 +194,7 @@ def add_post_data_subschemas(node: SchemaNode, kw: dict):
     content_type = _get_resource_type_based_on_request_type(request)
     try:
         iresource = ContentType().deserialize(content_type)
-    except colander.Invalid:
+    except Invalid:
         return  # the content type is validated later, so we just ignore errors
     registry = request.registry.content
     creates = registry.get_sheets_create(context, request, iresource)
@@ -242,10 +253,20 @@ class AbsolutePaths(colander.SequenceSchema):
     path = AbsolutePath()
 
 
+def validate_root_versions(node: SchemaNode,  value: list):
+    """Validate root versions."""
+    for root_version in value:
+        if not IItemVersion.providedBy(root_version):
+            msg = 'This resource is not a valid ' \
+                  'root version: {}'.format(resource_path(root_version))
+            raise Invalid(node, msg=msg)
+
+
 class POSTItemRequestSchema(POSTResourceRequestSchema):
     """Data structure for Item and ItemVersion POST requests."""
 
-    root_versions = Resources(missing=[])
+    root_versions = Resources(missing=[],
+                              validator=validate_root_versions)
 
 
 class POSTResourceRequestSchemaList(colander.List):
@@ -254,7 +275,7 @@ class POSTResourceRequestSchemaList(colander.List):
     request_body = POSTResourceRequestSchema()
 
 
-class GETLocationMapping(colander.Schema):
+class GETLocationMapping(Schema):
     """Overview of GET request/response data structure."""
 
     request_querystring = SchemaNode(colander.Mapping(), default={})
@@ -262,43 +283,182 @@ class GETLocationMapping(colander.Schema):
     response_body = GETResourceResponseSchema()
 
 
-class PUTLocationMapping(colander.Schema):
+class PUTLocationMapping(Schema):
     """Overview of PUT request/response data structure."""
 
     request_body = PUTResourceRequestSchema()
     response_body = ResourceResponseSchema()
 
 
-class POSTLocationMapping(colander.Schema):
+class POSTLocationMapping(Schema):
     """Overview of POST request/response data structure."""
 
     request_body = SchemaNode(POSTResourceRequestSchemaList(), default=[])
     response_body = ResourceResponseSchema()
 
 
-class POSTLoginUsernameRequestSchema(colander.Schema):
+class POSTLoginUsernameRequestSchema(Schema):
     """Schema for login requests via username and password."""
 
     name = SchemaNode(colander.String(), missing=colander.required)
     password = Password(missing=colander.required)
 
+    @colander.deferred
+    def validator(node: SchemaNode, kw: dict) -> colander.All:
+        request = kw['request']
+        context = kw['context']
+        registry = kw['registry']
+        return colander.All(create_validate_login(context,
+                                                  request,
+                                                  registry,
+                                                  'name'),
+                            create_validate_login_password(request, registry),
+                            create_validate_account_active(request, 'name'),
+                            )
 
-class POSTActivateAccountViewRequestSchema(colander.Schema):
+def create_validate_activation_path(context,
+                                    request: Request,
+                                    registry: Registry) -> callable:
+    """Validate the users activation `path`.
+
+    If valid and activated, the user object is added as 'user' to
+    `request.validated`.
+    """
+    def validate_activation_path(node, value):
+        locator = request.registry.getMultiAdapter((context, request),
+                                                   IUserLocator)
+        user = locator.get_user_by_activation_path(value)
+        error_msg = 'Unknown or expired activation path'
+        if user is None:
+            raise Invalid(node, error_msg)
+        elif is_older_than(user, days=8):
+            user.activation_path = None
+            raise Invalid(node, error_msg)
+        else:
+            request.validated['user'] = user
+            # TODO we should use a sheet to activate the user.
+            user.activate()
+            user.activation_path = None
+            event = ResourceSheetModified(user, IUserBasic, request.registry, {},
+                                          {}, request)
+            registry.notify(event)  # trigger reindex activation_path index
+    return validate_activation_path
+
+
+@colander.deferred
+def deferred_validate_activation_path(node: SchemaNode,
+                                      kw: dict) -> colander.All:
+    """Validate activation path and add user."""
+    context = kw['context']
+    request = kw['request']
+    registry = kw['registry']
+    return colander.All(colander.Regex('^/activate/'),
+                        create_validate_activation_path(context,
+                                                        request,
+                                                        registry,
+                                                        ),
+                        )
+
+
+class POSTActivateAccountViewRequestSchema(Schema):
     """Schema for account activation."""
 
     path = SchemaNode(colander.String(),
                       missing=colander.required,
-                      validator=colander.Regex('^/activate/'))
+                      validator=deferred_validate_activation_path)
 
 
-class POSTLoginEmailRequestSchema(colander.Schema):
+error_msg_wrong_login = 'User doesn\'t exist or password is wrong'
+
+
+def create_validate_login(context,
+                          request: Request,
+                          registry: Registry,
+                          child_node_name: str):
+    """Return validator to check the user identifier of a login request.
+
+    :param `child_node_name`: child node to get the login (`email` or `name`)
+
+    If valid, the user object is added as 'user' to `request.validated`.
+    """
+    def validate_login(node: SchemaNode, value: dict):
+        login = value[child_node_name]
+        locator = registry.getMultiAdapter((context, request), IUserLocator)
+        if child_node_name == 'email':
+            login = login.lower().strip()
+            user = locator.get_user_by_email(login)
+        else:
+            user = locator.get_user_by_login(login)
+        if user is None:
+            error = Invalid(node)
+            error.add(Invalid(node['password'], msg=error_msg_wrong_login))
+            raise error
+        else:
+            request.validated['user'] = user
+    return validate_login
+
+
+def create_validate_login_password(request: Request,
+                                   registry: Registry) -> callable:
+    """Return validator to check the password of a login request.
+
+    Requires the user object as `user` in `request.validated`.
+    """
+    def validate_login_password(node: SchemaNode, value: dict):
+        password = value['password']
+        user = request.validated.get('user', None)
+        if user is None:
+            return
+        sheet = registry.content.get_sheet(user, IPasswordAuthentication)
+        valid = sheet.check_plaintext_password(password)
+        if not valid:
+            error = Invalid(node)
+            error.add(Invalid(node['password'], msg=error_msg_wrong_login))
+            raise error
+    return validate_login_password
+
+
+def create_validate_account_active(request: Request,
+                                   child_node_name: str) -> callable:
+    """Return validator to check the user account is already active.
+
+    :param `child_node_name`: The name of the child node to raise error.
+
+    Requires the user object as `user` in `request.validated`.
+    """
+    def validate_user_is_active(node: SchemaNode, value: dict):
+        user = request.validated.get('user', None)
+        if user is None:
+            return
+        elif not user.active:
+            error = Invalid(node)
+            error.add(Invalid(node[child_node_name],
+                              msg='User account not yet activated'))
+            raise error
+    return validate_user_is_active
+
+
+class POSTLoginEmailRequestSchema(Schema):
     """Schema for login requests via email and password."""
 
     email = Email(missing=colander.required)
     password = Password(missing=colander.required)
 
+    @colander.deferred
+    def validator(node: SchemaNode, kw: dict) -> colander.All:
+        request = kw['request']
+        context = kw['context']
+        registry = kw['registry']
+        return colander.All(create_validate_login(context,
+                                                  request,
+                                                  registry,
+                                                  'email'),
+                            create_validate_login_password(request, registry),
+                            create_validate_account_active(request, 'email'),
+                            )
 
-class POSTReportAbuseViewRequestSchema(colander.Schema):
+
+class POSTReportAbuseViewRequestSchema(Schema):
     """Schema for abuse reports."""
 
     url = URL(missing=colander.required)
@@ -311,7 +471,7 @@ class MessageUserReference(SheetToSheet):
     target_isheet = IUserExtended
 
 
-class POSTMessageUserViewRequestSchema(colander.Schema):
+class POSTMessageUserViewRequestSchema(Schema):
     """Schema for messages to a user."""
 
     recipient = Reference(missing=colander.required,
@@ -348,7 +508,7 @@ class BatchRequestPath(AdhocracySchemaNode):
                              colander.Length(min=1, max=8192))
 
 
-class POSTBatchRequestItem(colander.Schema):
+class POSTBatchRequestItem(Schema):
     """A single item in a batch request, encoding a single request."""
 
     method = BatchHTTPMethod()
@@ -420,7 +580,7 @@ def _get_indexes(context) -> list:
     return indexes
 
 
-class GETPoolRequestSchema(colander.Schema):
+class GETPoolRequestSchema(Schema):
 
     """GET parameters accepted for pool queries."""
 
@@ -562,11 +722,13 @@ def _is_reference_filter(name: str, registry: Registry) -> bool:
     try:
         isheet, field, node = resolve(name)
     except ValueError:
-        raise_colander_style_error(None, name, 'No such sheet or field')
+        dummy_node = SchemaNode(colander.String(), name=name)
+        raise Invalid(dummy_node, 'No such sheet or field')
     if isinstance(node, (Reference, References)):
         return True
     else:
-        raise_colander_style_error(None, name, 'Not a reference node')
+        dummy_node = SchemaNode(colander.String(), name=name)
+        raise Invalid(dummy_node, 'Not a reference node')
 
 
 def _is_arbitrary_filter(name: str, catalogs: ICatalogsService) -> bool:
@@ -918,17 +1080,17 @@ def deferred_validate_password_reset_email(node: SchemaNode, kw: dict):
         user = locator.get_user_by_email(value)
         if user is None:
             msg = 'No user exists with this email: {0}'.format(value)
-            raise colander.Invalid(node, msg)
+            raise Invalid(node, msg)
         if not IPasswordAuthentication.providedBy(user):
             msg = 'This user has no password to reset: {0}'.format(value)
-            raise colander.Invalid(node, msg)
+            raise Invalid(node, msg)
         if not user.active:
             user.activate()
         request.validated['user'] = user
     return validate_email
 
 
-class POSTCreatePasswordResetRequestSchema(colander.Schema):
+class POSTCreatePasswordResetRequestSchema(Schema):
 
     """Schema to create a user password reset."""
 
@@ -954,7 +1116,7 @@ def validate_password_reset_path(node, kw):
 
 def _raise_if_no_password_reset(node: SchemaNode, value: IPasswordReset):
     if not IPasswordReset.providedBy(value):
-        raise colander.Invalid(node, 'This is not a valid password reset.')
+        raise Invalid(node, 'This is not a valid password reset.')
 
 
 def _raise_if_outdated(node: SchemaNode, value: IPasswordReset,
@@ -962,10 +1124,10 @@ def _raise_if_outdated(node: SchemaNode, value: IPasswordReset,
         if (now() - creation_date).days >= 7:
             value.__parent__ = None  # commit_suicide
             msg = 'This password reset is older than 7 days.'
-            raise colander.Invalid(node, msg)
+            raise Invalid(node, msg)
 
 
-class POSTPasswordResetRequestSchema(colander.Schema):
+class POSTPasswordResetRequestSchema(Schema):
     """Schema to get a user password reset resource."""
 
     path = Resource(missing=colander.required,
