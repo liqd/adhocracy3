@@ -385,6 +385,12 @@ class TestAddPutRequestSubSchemasUnitTest:
         self.call_fut(node, kw)
         assert node.children[0].name == ISheet.__identifier__
 
+    def test_data_and_missing_sheet_data(self, node, kw, mock_sheet):
+        kw['registry'].content.get_sheets_edit.return_value = [mock_sheet]
+        kw['request'].body = json.dumps({'data': {}})
+        self.call_fut(node, kw)
+        assert len(node.children) == 0
+
     def test_multipart_formdata_request(self, node, kw, mock_sheet):
         kw['request'].content_type = 'multipart/form-data'
         kw['request'].registry.content.get_sheets_edit.return_value = [mock_sheet]

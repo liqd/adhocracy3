@@ -259,3 +259,21 @@ class TestImportLocalRoles:
 
         assert root['alt-treptow'].__local_roles__ == \
             {'initiators-treptow-koepenick': set(['role:initiator'])}
+
+
+def test_append_cvs_field():
+    from . import append_cvs_field
+    result = []
+    append_cvs_field(result, 'content;')
+    assert result == ['content']
+
+def test_get_sheet_field_for_partial(context, registry, mocker):
+    from adhocracy_core.interfaces import ISheet
+    from . import get_sheet_field_for_partial
+    registry.content = mocker.Mock()
+    assert get_sheet_field_for_partial(ISheet, 'field', context) ==\
+           registry.content.get_sheet_field.return_value
+    registry.content.get_sheet_field.assert_called_with(context, ISheet,
+                                                        'field')
+
+

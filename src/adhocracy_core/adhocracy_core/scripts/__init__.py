@@ -157,7 +157,7 @@ def _deserialize_roles(roles: dict) -> dict:
     return roles
 
 
-def append_cvs_field(result: str, content: str):
+def append_cvs_field(result: list, content: str):
     """Normalize and append content for CVS."""
     result.append(normalize_text_for_cvs(content))
 
@@ -167,7 +167,8 @@ def normalize_text_for_cvs(s: str) -> str:
     return s.replace(';', '')
 
 
-def get_sheet_field_for_partial(sheet: ISheet, field: str,
+def get_sheet_field_for_partial(sheet: ISheet,
+                                field: str,
                                 resource: IResource) -> object:
     """Get sheet field with resource as last parameter to use with partial."""
     registry = get_current_registry(resource)
