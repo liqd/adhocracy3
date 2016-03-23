@@ -16,7 +16,7 @@ class TestEmbedCodeConfigBplanAdapter:
         assert result == {'sdk_url': 'http://localhost:6551/AdhocracySDK.js',
                           'frontend_url': 'http://localhost:6551',
                           'path': 'http://example.com/',
-                          'widget': 'mein-berlin-bplan-proposal-embed',
+                          'widget': 'mein-berlin-bplaene-proposal-embed',
                           'autoresize': 'false',
                           'locale': 'en',
                           'autourl': 'false',
