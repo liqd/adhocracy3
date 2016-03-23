@@ -173,7 +173,7 @@ required fields.
     </script>
     <div class="adhocracy_marker"
          data-path="http://localhost/orga/1-23/"
-         data-widget="mein-berlin-bplaene-proposal-embed"
+         data-widget="mein-berlin-bplan-proposal-embed"
          data-autoresize="false"
          data-locale="en"
          data-autourl="false"
