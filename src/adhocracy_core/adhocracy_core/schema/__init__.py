@@ -7,12 +7,22 @@ import io
 import os
 import re
 
+from colander import All
 from colander import Boolean as BooleanType
 from colander import DateTime as DateTimeType
 from colander import Decimal as DecimalType
+from colander import Function
 from colander import Integer as IntegerType
+from colander import Invalid
+from colander import Length
 from colander import Mapping as MappingType
+from colander import OneOf
+from colander import Regex
+from colander import SchemaType
 from colander import String as StringType
+from colander import deferred
+from colander import drop
+from colander import null
 from pyramid.path import DottedNameResolver
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
@@ -36,8 +46,8 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IResource
 
 
-class AdhocracySchemaNode(colander.SchemaNode):
-    """Subclass of :class: `colander.SchemaNode` with extended keyword support.
+class SchemaNode(colander.SchemaNode):
+    """Subclass of :class: `SchemaNode` with extended keyword support.
 
     The constructor accepts these additional keyword arguments:
 
@@ -46,32 +56,40 @@ class AdhocracySchemaNode(colander.SchemaNode):
 
     readonly = False
 
-    def deserialize(self, cstruct=colander.null):
+    def deserialize(self, cstruct=null):
         """Deserialize the :term:`cstruct` into an :term:`appstruct`."""
-        if self.readonly and cstruct != colander.null:
-            raise colander.Invalid(self, 'This field is ``readonly``.')
+        if self.readonly and cstruct != null:
+            raise Invalid(self, 'This field is ``readonly``.')
         return super().deserialize(cstruct)
 
-    def serialize(self, appstruct=colander.null):
+    def serialize(self, appstruct=null):
         """Serialize the :term:`appstruct` to a :term:`cstruct`.
 
         If the appstruct is None and None is the default value, serialize
-        to None instead of :class:`colander.null`.
+        to None instead of :class:`null`.
         """
-        if appstruct in (None, colander.null) and self.default is None:
+        if appstruct in (None, null) and self.default is None:
             return None
         return super().serialize(appstruct)
 
 
-class AdhocracySequenceNode(colander.SequenceSchema, AdhocracySchemaNode):
-    """Subclass of :class: `AdhocracySchema` with Sequence type.
+class SequenceSchema(colander.SequenceSchema, SchemaNode):
+    """Subclass of :class: `SchemaNode` with Sequence type.
 
     The default value is a deferred returning [] to prevent modify it.
     """
 
-    @colander.deferred
-    def default(node: colander.Schema, kw: dict) -> list:
+    @deferred
+    def default(node: SchemaNode, kw: dict) -> list:
         return []
+
+
+class MappingSchema(colander.MappingSchema, SchemaNode):
+    """Subclass of :class: `SchemaNode` with dictionary type."""
+
+
+class TupleSchema(colander.TupleSchema, SchemaNode):
+    """Subclass of :class: `SchemaNode` with tuple type."""
 
 
 def raise_attribute_error_if_not_location_aware(context) -> None:
@@ -83,10 +101,10 @@ def raise_attribute_error_if_not_location_aware(context) -> None:
     context.__name__
 
 
-def deferred_validate_name_is_unique(node: colander.SchemaNode, kw: dict):
+def deferred_validate_name_is_unique(node: SchemaNode, kw: dict):
     """Validate if `value` is name that does not exists in the parent object.
 
-    :raises colander.Invalid: if `name` already exists in the parent or parent
+    :raises Invalid: if `name` already exists in the parent or parent
                               is None.
     """
     context = kw['context']
@@ -101,17 +119,17 @@ def deferred_validate_name_is_unique(node: colander.SchemaNode, kw: dict):
             parent.check_name(value)
         except AttributeError:
             msg = 'This resource has no parent pool to validate the name.'
-            raise colander.Invalid(node, msg)
+            raise Invalid(node, msg)
         except KeyError:
             msg = 'The name already exists in the parent pool.'
-            raise colander.Invalid(node, msg, value=value)
+            raise Invalid(node, msg, value=value)
         except ValueError:
             msg = 'The name has forbidden characters or is not a string.'
-            raise colander.Invalid(node, msg, value=value)
+            raise Invalid(node, msg, value=value)
     return validate_name
 
 
-class Identifier(AdhocracySchemaNode):
+class Identifier(SchemaNode):
     """Like :class:`Name`, but doesn't check uniqueness..
 
     Example value: blu.ABC_12-3
@@ -119,20 +137,20 @@ class Identifier(AdhocracySchemaNode):
 
     schema_type = StringType
     default = ''
-    missing = colander.drop
+    missing = drop
     relative_regex = '[a-zA-Z0-9\_\-\.]+'
-    validator = colander.All(colander.Regex('^' + relative_regex + '$'),
+    validator = All(Regex('^' + relative_regex + '$'),
                     Length(min=1, max=100))
 
 
-@colander.deferred
-def deferred_validate_name(node: colander.SchemaNode, kw: dict) -> callable:
+@deferred
+def deferred_validate_name(node: SchemaNode, kw: dict) -> callable:
     """Check that the node value is a valid child name."""
-    return colander.All(deferred_validate_name_is_unique(node, kw),
+    return All(deferred_validate_name_is_unique(node, kw),
                *Identifier.validator.validators)
 
 
-class Name(AdhocracySchemaNode):
+class Name(SchemaNode):
     """The unique `name` of a resource inside the parent pool.
 
     Allowed characters are: "alpha" "numeric" "_"  "-" "."
@@ -145,11 +163,11 @@ class Name(AdhocracySchemaNode):
 
     schema_type = StringType
     default = ''
-    missing = colander.drop
+    missing = drop
     validator = deferred_validate_name
 
 
-class Email(AdhocracySchemaNode):
+class Email(SchemaNode):
     """String with email address.
 
     Example value: test@test.de
@@ -157,18 +175,18 @@ class Email(AdhocracySchemaNode):
 
     @staticmethod
     def _lower_case_email(email):
-        if email is colander.null:
+        if email is null:
             return email
         return email.lower()
 
     schema_type = StringType
     default = ''
-    missing = colander.drop
+    missing = drop
     preparer = _lower_case_email
     validator = colander.Email()
 
 
-class URL(AdhocracySchemaNode):
+class URL(SchemaNode):
     """String with a URL.
 
     Example value: http://colander.readthedocs.org/en/latest/
@@ -176,8 +194,8 @@ class URL(AdhocracySchemaNode):
 
     schema_type = StringType
     default = ''
-    missing = colander.drop
-    # Note: colander.url doesn't work, hence we use a regex adapted from
+    missing = drop
+    # Note: url doesn't work, hence we use a regex adapted from
     # django.core.validators.URLValidator
     regex = re.compile(
         r'^(http|ftp)s?://'  # scheme
@@ -188,13 +206,13 @@ class URL(AdhocracySchemaNode):
         r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  # ...or ipv6
         r'(?::\d+)?'  # optional port
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-    validator = colander.Regex(regex, 'Must be a URL')
+    validator = Regex(regex, 'Must be a URL')
 
 
 _ZONES = pytz.all_timezones
 
 
-class TimeZoneName(AdhocracySchemaNode):
+class TimeZoneName(SchemaNode):
     """String with time zone.
 
     Example value: UTC
@@ -202,8 +220,8 @@ class TimeZoneName(AdhocracySchemaNode):
 
     schema_type = StringType
     default = 'UTC'
-    missing = colander.drop
-    validator = colander.OneOf(_ZONES)
+    missing = drop
+    validator = OneOf(_ZONES)
 
 ROLE_PRINCIPALS = ['participant',
                    'moderator',
@@ -218,7 +236,7 @@ SYSTEM_PRINCIPALS = ['everyone',
                      ]
 
 
-class Role(AdhocracySchemaNode):
+class Role(SchemaNode):
     """Permission :term:`role` name.
 
     Example value: 'reader'
@@ -226,30 +244,30 @@ class Role(AdhocracySchemaNode):
 
     schema_type = StringType
     default = 'creator'
-    missing = colander.drop
-    validator = colander.OneOf(ROLE_PRINCIPALS)
+    missing = drop
+    validator = OneOf(ROLE_PRINCIPALS)
 
 
-class Roles(AdhocracySequenceNode):
+class Roles(SequenceSchema):
     """List of Permssion :term:`role` names.
 
     Example value: ['initiator']
     """
 
-    missing = colander.drop
-    validator = colander.Length(min=0, max=6)
+    missing = drop
+    validator = Length(min=0, max=6)
 
     role = Role()
 
     def preparer(self, value: Sequence) -> list:
         """Preparer for the roles."""
-        if value is colander.null:
+        if value is null:
             return value
         value_dict = OrderedDict.fromkeys(value)
         return list(value_dict)
 
 
-class InterfaceType(colander.SchemaType):
+class InterfaceType(SchemaType):
     """A ZOPE interface in dotted name notation.
 
     Example value: adhocracy_core.sheets.name.IName
@@ -257,31 +275,31 @@ class InterfaceType(colander.SchemaType):
 
     def serialize(self, node, value):
         """Serialize interface to dotted name."""
-        if value in (colander.null, ''):
+        if value in (null, ''):
             return value
         return get_dotted_name(value)
 
     def deserialize(self, node, value):
         """Deserialize path to object."""
-        if value in (colander.null, ''):
+        if value in (null, ''):
             return value
         try:
             return DottedNameResolver().resolve(value)
         except Exception as err:
-            raise colander.Invalid(node, msg=str(err), value=value)
+            raise Invalid(node, msg=str(err), value=value)
 
 
-class Interface(AdhocracySchemaNode):
+class Interface(SchemaNode):
 
     schema_type = InterfaceType
 
 
-class Interfaces(AdhocracySequenceNode):
+class Interfaces(SequenceSchema):
 
     interface = Interface()
 
 
-class AbsolutePath(AdhocracySchemaNode):
+class AbsolutePath(SchemaNode):
     """Absolute path made with  Identifier Strings.
 
     Example value: /bluaABC/_123/3
@@ -289,7 +307,7 @@ class AbsolutePath(AdhocracySchemaNode):
 
     schema_type = StringType
     relative_regex = '/[a-zA-Z0-9\_\-\.\/]+'
-    validator = colander.Regex('^' + relative_regex + '$')
+    validator = Regex('^' + relative_regex + '$')
 
 
 def string_has_no_newlines_validator(value: str) -> bool:
@@ -297,7 +315,7 @@ def string_has_no_newlines_validator(value: str) -> bool:
     return False if '\n' in value or '\r' in value else True
 
 
-class SingleLine(AdhocracySchemaNode):
+class SingleLine(SchemaNode):
     r"""UTF-8 encoded String without line breaks.
 
     Disallowed characters are linebreaks like: \n, \r.
@@ -306,13 +324,13 @@ class SingleLine(AdhocracySchemaNode):
 
     schema_type = StringType
     default = ''
-    missing = colander.drop
-    validator = colander.Function(string_has_no_newlines_validator,
-                                  msg='New line characters are not allowed.')
+    missing = drop
+    validator = Function(string_has_no_newlines_validator,
+                         msg='New line characters are not allowed.')
 
 
-@colander.deferred
-def deferred_content_type_default(node: colander.MappingSchema,
+@deferred
+def deferred_content_type_default(node: MappingSchema,
                                   kw: dict) -> str:
     """Return the content_type for the given `context`."""
     creating = kw['creating']
@@ -323,13 +341,13 @@ def deferred_content_type_default(node: colander.MappingSchema,
         return get_iresource(context) or IResource
 
 
-class Boolean(AdhocracySchemaNode):
+class Boolean(SchemaNode):
     """SchemaNode for boolean values.
 
     Example value: false
     """
 
-    def schema_type(self) -> colander.SchemaType:
+    def schema_type(self) -> SchemaType:
         """Return the schema type."""
         return BooleanType(true_choices=('true', '1'))
 
@@ -337,12 +355,12 @@ class Boolean(AdhocracySchemaNode):
     missing = False
 
 
-class Booleans(AdhocracySequenceNode):
+class Booleans(SequenceSchema):
 
     bool = Boolean()
 
 
-class ContentType(AdhocracySchemaNode):
+class ContentType(SchemaNode):
     """ContentType schema."""
 
     schema_type = InterfaceType
@@ -359,7 +377,7 @@ def get_sheet_cstructs(context: IResource, registry, request) -> dict:
     return cstructs
 
 
-class CurrencyAmount(AdhocracySchemaNode):
+class CurrencyAmount(SchemaNode):
     """SchemaNode for currency amounts.
 
     Values are stored precisely with 2 fractional digits.
@@ -369,15 +387,15 @@ class CurrencyAmount(AdhocracySchemaNode):
     Example value: 1.99
     """
 
-    def schema_type(self) -> colander.SchemaType:
+    def schema_type(self) -> SchemaType:
         """Return schema type."""
         return DecimalType(quant='.01')
 
     default = decimal.Decimal(0)
-    missing = colander.drop
+    missing = drop
 
 
-class ISOCountryCode(AdhocracySchemaNode):
+class ISOCountryCode(SchemaNode):
     """An ISO 3166-1 alpha-2 country code (two uppercase ASCII letters).
 
     Example value: US
@@ -385,17 +403,17 @@ class ISOCountryCode(AdhocracySchemaNode):
 
     schema_type = StringType
     default = ''
-    missing = colander.drop
-    validator = colander.Regex(r'^[A-Z][A-Z]$|^$')
+    missing = drop
+    validator = Regex(r'^[A-Z][A-Z]$|^$')
 
-    def deserialize(self, cstruct=colander.null):
+    def deserialize(self, cstruct=null):
         """Deserialize the :term:`cstruct` into an :term:`appstruct`."""
         if cstruct == '':
             return cstruct
         return super().deserialize(cstruct)
 
 
-class ResourceObjectType(colander.SchemaType):
+class ResourceObjectType(SchemaType):
     """Schema type that de/serialized a :term:`location`-aware object.
 
     Example values:  'http://a.org/bluaABC/_123/3' '/blua/ABC/'
@@ -430,12 +448,12 @@ class ResourceObjectType(colander.SchemaType):
         :param value: the resource to serialize
         :return: the url or path of that resource
         """
-        if value in (colander.null, '', None):
+        if value in (null, '', None):
             return ''
         try:
             raise_attribute_error_if_not_location_aware(value)
         except AttributeError:
-            raise colander.Invalid(node,
+            raise Invalid(node,
                           msg='This resource is not location aware',
                           value=value)
         return self._serialize_location_or_url_or_content(node, value)
@@ -462,15 +480,15 @@ class ResourceObjectType(colander.SchemaType):
         :param node: the Colander node.
         :param value: the url or path :term:`Resource Location` to deserialize
         :return: the resource registered under that path
-        :raise colander.Invalid: if the object does not exist.
+        :raise Invalid: if the object does not exist.
         """
-        if value in (colander.null, None):
+        if value in (null, None):
             return value
         try:
             resource = self._deserialize_location_or_url(node, value)
             raise_attribute_error_if_not_location_aware(resource)
         except (KeyError, AttributeError):
-            raise colander.Invalid(
+            raise Invalid(
                 node,
                 msg='This resource path does not exist.', value=value)
         return resource
@@ -490,24 +508,24 @@ class ResourceObjectType(colander.SchemaType):
             return find_resource(context, path)
 
 
-class Resource(AdhocracySchemaNode):
+class Resource(SchemaNode):
     """A resource SchemaNode.
 
     Example value:  'http://a.org/bluaABC/_123/3'
     """
 
     default = None
-    missing = colander.drop
+    missing = drop
     schema_type = ResourceObjectType
 
 
-@colander.deferred
-def deferred_path_default(node: colander.MappingSchema, kw: dict) -> str:
+@deferred
+def deferred_path_default(node: MappingSchema, kw: dict) -> str:
     """Return the `context`."""
     return kw['context']
 
 
-class ResourcePathSchema(colander.MappingSchema):
+class ResourcePathSchema(MappingSchema):
     """Resource Path schema."""
 
     content_type = ContentType()
@@ -522,14 +540,14 @@ class ResourcePathAndContentSchema(ResourcePathSchema):
                       default={})
 
 
-def validate_reftype(node: colander.SchemaNode, value: IResource):
+def validate_reftype(node: SchemaNode, value: IResource):
     """Raise if `value` doesn`t provide the ISheet set by `node.reftype`."""
     reftype = node.reftype
     isheet = reftype.getTaggedValue('target_isheet')
     if not isheet.providedBy(value):
         error = 'This Resource does not provide interface %s' % \
                 (isheet.__identifier__)
-        raise colander.Invalid(node, msg=error, value=value)
+        raise Invalid(node, msg=error, value=value)
 
 
 class Reference(Resource):
@@ -550,10 +568,10 @@ class Reference(Resource):
 
     reftype = SheetReference
     backref = False
-    validator = colander.All(validate_reftype)
+    validator = All(validate_reftype)
 
 
-class Resources(AdhocracySequenceNode):
+class Resources(SequenceSchema):
     """List of :class:`Resource:`s."""
 
     missing = []
@@ -561,7 +579,7 @@ class Resources(AdhocracySequenceNode):
     resource = Resource()
 
 
-def _validate_reftypes(node: colander.SchemaNode, value: Sequence):
+def _validate_reftypes(node: SchemaNode, value: Sequence):
     for resource in value:
         validate_reftype(node, resource)
 
@@ -584,7 +602,7 @@ class References(Resources):
 
     reftype = SheetReference
     backref = False
-    validator = colander.All(_validate_reftypes)
+    validator = All(_validate_reftypes)
 
 
 class UniqueReferences(References):
@@ -597,13 +615,13 @@ class UniqueReferences(References):
 
     def preparer(self, value: Sequence) -> list:
         """Preparer for the schema."""
-        if value is colander.null:
+        if value is null:
             return value
         value_dict = OrderedDict.fromkeys(value)
         return list(value_dict)
 
 
-class Text(AdhocracySchemaNode):
+class Text(SchemaNode):
     """UTF-8 encoded String with line breaks.
 
     Example value: This is a something
@@ -612,10 +630,10 @@ class Text(AdhocracySchemaNode):
 
     schema_type = StringType
     default = ''
-    missing = colander.drop
+    missing = drop
 
 
-class Password(AdhocracySchemaNode):
+class Password(SchemaNode):
     """UTF-8 encoded text.
 
     Minimal length=6, maximal length=100 characters.
@@ -624,17 +642,17 @@ class Password(AdhocracySchemaNode):
 
     schema_type = StringType
     default = ''
-    missing = colander.drop
-    validator = colander.Length(min=6, max=100)
+    missing = drop
+    validator = Length(min=6, max=100)
 
 
-@colander.deferred
-def deferred_date_default(node: colander.MappingSchema, kw: dict) -> datetime:
+@deferred
+def deferred_date_default(node: MappingSchema, kw: dict) -> datetime:
     """Return current date."""
     return now()
 
 
-class DateTime(AdhocracySchemaNode):
+class DateTime(SchemaNode):
     """DateTime object.
 
     This type serializes python ``datetime.datetime`` objects to a
@@ -652,18 +670,18 @@ class DateTime(AdhocracySchemaNode):
                      the tzinfo. Defaults to UTC
     """
 
-    schema_type = colander.DateTime
+    schema_type = DateTimeType
     default = deferred_date_default
     missing = deferred_date_default
 
 
-class DateTimes(colander.SequenceSchema):
+class DateTimes(SequenceSchema):
 
     date = DateTime()
 
 
-@colander.deferred
-def deferred_get_post_pool(node: colander.MappingSchema, kw: dict) -> IPool:
+@deferred
+def deferred_get_post_pool(node: MappingSchema, kw: dict) -> IPool:
     """Return the post_pool path for the given `context`.
 
     :raises adhocracy_core.excecptions.RuntimeConfigurationError:
@@ -705,7 +723,7 @@ class PostPool(Reference):
 
     readonly = True
     default = deferred_get_post_pool
-    missing = colander.drop
+    missing = drop
     schema_type = ResourceObjectType
     iresource_or_service_name = IPool
 
@@ -732,7 +750,7 @@ def create_post_pool_validator(child_node: Reference, kw: dict) -> callable:
     return validator
 
 
-def _get_post_pool_type(node: colander.SchemaNode) -> str:
+def _get_post_pool_type(node: SchemaNode) -> str:
     post_pool_nodes = [child for child in node if isinstance(child, PostPool)]
     if post_pool_nodes == []:
         return None
@@ -745,10 +763,10 @@ def _validate_post_pool(node, resources: list, post_pool: IPool):
             continue
         post_pool_path = resource_path(post_pool)
         msg = 'You can only add references inside {}'.format(post_pool_path)
-        raise colander.Invalid(node, msg)
+        raise Invalid(node, msg)
 
 
-class Integer(AdhocracySchemaNode):
+class Integer(SchemaNode):
     """SchemaNode for Integer values.
 
     Example value: 1
@@ -756,10 +774,10 @@ class Integer(AdhocracySchemaNode):
 
     schema_type = IntegerType
     default = 0
-    missing = colander.drop
+    missing = drop
 
 
-class Integers(AdhocracySequenceNode):
+class Integers(SequenceSchema):
     """SchemaNode for a list of Integer values.
 
     Example value: [1,2]
@@ -768,20 +786,20 @@ class Integers(AdhocracySequenceNode):
     integer = Integer()
 
 
-class FileStoreType(colander.SchemaType):
+class FileStoreType(SchemaType):
     """Accepts raw file data as per as 'multipart/form-data' upload."""
 
     SIZE_LIMIT = 16 * 1024 ** 2  # 16 MB
 
     def serialize(self, node, value):
         """Serialization is not supported."""
-        raise colander.Invalid(node,
+        raise Invalid(node,
                       msg='Cannot serialize FileStore',
                       value=value)
 
     def deserialize(self, node, value):
         """Deserialize into a File."""
-        if value == colander.null:
+        if value == null:
             return None
         try:
             result = File(stream=value.file,
@@ -794,28 +812,28 @@ class FileStoreType(colander.SchemaType):
             else:
                 result.size = os.fstat(value.file.fileno()).st_size
         except Exception as err:
-            raise colander.Invalid(node, msg=str(err), value=value)
+            raise Invalid(node, msg=str(err), value=value)
         if result.size > self.SIZE_LIMIT:
             msg = 'Asset too large: {} bytes'.format(result.size)
-            raise colander.Invalid(node, msg=msg, value=value)
+            raise Invalid(node, msg=msg, value=value)
         return result
 
 
-class FileStore(AdhocracySchemaNode):
+class FileStore(SchemaNode):
     """SchemaNode wrapping :class:`FileStoreType`."""
 
     schema_type = FileStoreType
     default = None
-    missing = colander.drop
+    missing = drop
 
 
-class SingleLines(colander.SequenceSchema):
+class SingleLines(SequenceSchema):
     """List of SingleLines."""
 
     item = SingleLine()
 
 
-class ACEPrincipalType(colander.SchemaType):
+class ACEPrincipalType(SchemaType):
     """Adhocracy :term:`role` or pyramid system principal."""
 
     valid_principals = ROLE_PRINCIPALS + SYSTEM_PRINCIPALS
@@ -826,7 +844,7 @@ class ACEPrincipalType(colander.SchemaType):
 
         :raises ValueError: if value has no '.' or ':' char
         """
-        if value in (colander.null, ''):
+        if value in (null, ''):
             return value
         if '.' in value:
             prefix, name = value.split('.')
@@ -839,7 +857,7 @@ class ACEPrincipalType(colander.SchemaType):
 
     def deserialize(self, node, value) -> str:
         """Deserialize principal and add prefix ("system." or "role:")."""
-        if value in (colander.null, ''):
+        if value in (null, ''):
             return value
         if value in ROLE_PRINCIPALS:
             return 'role:' + value
@@ -847,19 +865,19 @@ class ACEPrincipalType(colander.SchemaType):
             return 'system.' + value.capitalize()
         else:
             msg = '{0} is not one of {1}'.format(value, self.valid_principals)
-            raise colander.Invalid(node, msg=msg, value=value)
+            raise Invalid(node, msg=msg, value=value)
 
 
-class ACEPrincipal(colander.SchemaNode):
+class ACEPrincipal(SchemaNode):
     """Adhocracy :term:`role` or pyramid system principal."""
 
     schema_type = ACEPrincipalType
 
 
-class ACMCell(colander.SchemaNode):
+class ACMCell(SchemaNode):
     """ACM Cell."""
 
-    schema_type = colander.String
+    schema_type = StringType
     missing = None
 
     def preparer(node, value):
@@ -871,12 +889,12 @@ class ACMCell(colander.SchemaNode):
             return value
 
 
-class ACMRow(colander.SequenceSchema):
+class ACMRow(SequenceSchema):
     """ACM Row."""
 
     item = ACMCell()
 
-    @colander.deferred
+    @deferred
     def validator(node, kw):
         """Validator."""
         registry = kw['registry']
@@ -885,19 +903,19 @@ class ACMRow(colander.SequenceSchema):
             permission_name = value[0]
             if permission_name not in registry.content.permissions():
                 msg = 'No such permission: {0}'.format(permission_name)
-                raise colander.Invalid(node, msg, value=permission_name)
+                raise Invalid(node, msg, value=permission_name)
 
         def validate_actions_names(node, value):
             for action in value[1:]:
                 if action not in [security.Allow, security.Deny, None]:
                     msg = 'Invalid action: {0}'.format(action)
-                    raise colander.Invalid(node, msg, value=action)
+                    raise Invalid(node, msg, value=action)
 
-        return colander.All(validate_permission_name,
+        return All(validate_permission_name,
                    validate_actions_names)
 
 
-class ACMPrincipals(colander.SequenceSchema):
+class ACMPrincipals(SequenceSchema):
     """ACM Principals."""
 
     principal = ACEPrincipal()
@@ -905,7 +923,7 @@ class ACMPrincipals(colander.SequenceSchema):
     missing = []
 
 
-class ACMPermissions(colander.SequenceSchema):
+class ACMPermissions(SequenceSchema):
     """ACM Permissions."""
 
     row = ACMRow()
@@ -913,7 +931,7 @@ class ACMPermissions(colander.SequenceSchema):
     missing = []
 
 
-class ACM(colander.MappingSchema):
+class ACM(MappingSchema):
     """Access Control Matrix."""
 
     principals = ACMPrincipals()

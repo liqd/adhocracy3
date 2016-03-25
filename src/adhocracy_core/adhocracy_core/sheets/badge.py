@@ -1,5 +1,7 @@
 """Badge sheet."""
-import colander
+from colander import deferred
+from colander import All
+from colander import Invalid
 from pyramid.request import Request
 from pyramid.traversal import lineage
 from pyramid.traversal import resource_path
@@ -9,6 +11,8 @@ from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.interfaces import search_query
+from adhocracy_core.schema import SchemaNode
+from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import PostPool
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import UniqueReferences
@@ -72,8 +76,8 @@ class BadgeGroupReference(SheetToSheet):
     target_isheet = IPool  # TODO add special sheet for badge groups
 
 
-@colander.deferred
-def deferred_groups_default(node: colander.SchemaNode, kw: dict) -> []:
+@deferred
+def deferred_groups_default(node: SchemaNode, kw: dict) -> []:
     """Return badge groups."""
     from adhocracy_core.resources.badge import IBadgeGroup  # no circle imports
     context = kw['context']
@@ -87,7 +91,7 @@ def deferred_groups_default(node: colander.SchemaNode, kw: dict) -> []:
     return groups
 
 
-class BadgeSchema(colander.MappingSchema):
+class BadgeSchema(MappingSchema):
     """Badge sheet data structure."""
 
     groups = UniqueReferences(reftype=BadgeGroupReference,
@@ -101,7 +105,7 @@ badge_meta = sheet_meta._replace(isheet=IBadge,
                                  )
 
 
-class HasBadgesPoolSchema(colander.MappingSchema):
+class HasBadgesPoolSchema(MappingSchema):
     """Data structure pointing to a badges post pool."""
 
     badges_pool = PostPool(iresource_or_service_name='badges')
@@ -115,7 +119,7 @@ has_badges_pool_meta = sheet_meta._replace(
 )
 
 
-class CanBadgeSchema(colander.MappingSchema):
+class CanBadgeSchema(MappingSchema):
     """CanBadge sheet data structure."""
 
 
@@ -127,7 +131,7 @@ can_badge_meta = sheet_meta._replace(
 )
 
 
-class BadgeableSchema(colander.MappingSchema):
+class BadgeableSchema(MappingSchema):
     """Badgeable sheet data structure.
 
     `post_pool`: Pool to post new
@@ -182,12 +186,12 @@ def create_unique_badge_assignment_validator(badge_ref: Reference,
             if new_badge_name == badge_name \
                and new_object == obj \
                and not updating_current_assignment:
-                raise colander.Invalid(badge_ref, 'Badge already assigned')
+                raise Invalid(badge_ref, 'Badge already assigned')
 
     return validator
 
 
-@colander.deferred
+@deferred
 def deferred_validate_badge(node, kw):
     """Check `assign_badge` permission and ISheet interface of `badge` node."""
     request = kw['request']
@@ -195,14 +199,14 @@ def deferred_validate_badge(node, kw):
     def check_assign_badge_permisson(node, value):
         if not request.has_permission('assign_badge', value):
             badge_path = resource_path(value)
-            raise colander.Invalid(node, 'Your are missing the `assign_badge` '
-                                         ' permission for: ' + badge_path)
-    return colander.All(validate_reftype,
-                        check_assign_badge_permisson,
-                        )
+            raise Invalid(node, 'Your are missing the `assign_badge` '
+                                ' permission for: ' + badge_path)
+    return All(validate_reftype,
+               check_assign_badge_permisson,
+               )
 
 
-class BadgeAssignmentSchema(colander.MappingSchema):
+class BadgeAssignmentSchema(MappingSchema):
     """Badge sheet data structure."""
 
     subject = Reference(reftype=BadgeSubjectReference)
@@ -211,13 +215,13 @@ class BadgeAssignmentSchema(colander.MappingSchema):
                       )
     object = Reference(reftype=BadgeObjectReference)
 
-    @colander.deferred
+    @deferred
     def validator(self, kw: dict) -> callable:
         """Validate the :term:`post_pool` for the object reference."""
         object_validator = create_post_pool_validator(self['object'], kw)
         badge_assignment_validator = create_unique_badge_assignment_validator(
             self['badge'], self['object'], kw)
-        return colander.All(object_validator, badge_assignment_validator)
+        return All(object_validator, badge_assignment_validator)
 
 
 badge_assignment_meta = sheet_meta._replace(

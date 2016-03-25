@@ -1,5 +1,10 @@
 """Sheets for Mercator proposals."""
-import colander
+from colander import Length
+from colander import OneOf
+from colander import drop
+from colander import required
+from colander import Invalid
+from colander import Range
 from zope.deprecation import deprecated
 
 from adhocracy_core.interfaces import Dimensions
@@ -13,7 +18,8 @@ from adhocracy_core.sheets.image import IImageMetadata
 from adhocracy_core.sheets.image import ImageMetadataSchema
 from adhocracy_core.sheets.image import image_metadata_meta
 from adhocracy_core.sheets.subresources import ISubResources
-from adhocracy_core.schema import AdhocracySchemaNode
+from adhocracy_core.schema import MappingSchema
+from adhocracy_core.schema import SchemaNode
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import CurrencyAmount
 from adhocracy_core.schema import ISOCountryCode
@@ -88,10 +94,10 @@ class IHeardFrom(ISheet, ISheetReferenceAutoUpdateMarker):
     """Marker interface for heard from fields."""
 
 
-class TitleSchema(colander.MappingSchema):
+class TitleSchema(MappingSchema):
     """Data structure for the proposal title."""
 
-    title = SingleLine(validator=colander.Length(min=1, max=100))
+    title = SingleLine(validator=Length(min=1, max=100))
 
 
 deprecated('TitleSchema', 'moved to adhocracy_core.sheets.title')
@@ -101,10 +107,10 @@ title_meta = sheet_meta._replace(isheet=ITitle,
                                  schema_class=TitleSchema)
 
 
-class UserInfoSchema(colander.MappingSchema):
+class UserInfoSchema(MappingSchema):
     """Data structure for information about the proposal submitter."""
 
-    personal_name = SingleLine(missing=colander.required)
+    personal_name = SingleLine(missing=required)
     family_name = SingleLine()
     country = ISOCountryCode()
 
@@ -188,7 +194,7 @@ class ExperienceReference(SheetToSheet):
     target_isheet = IExperience
 
 
-class MercatorSubResourcesSchema(colander.MappingSchema):
+class MercatorSubResourcesSchema(MappingSchema):
 
     organization_info = Reference(reftype=OrganizationInfoReference)
     introduction = Reference(reftype=IntroductionReference)
@@ -208,30 +214,29 @@ mercator_sub_resources_meta = sheet_meta._replace(
     schema_class=MercatorSubResourcesSchema)
 
 
-class StatusEnum(AdhocracySchemaNode):
+class StatusEnum(SingleLine):
     """Enum of organizational statuses."""
 
-    schema_type = colander.String
     default = 'other'
-    missing = colander.required
-    validator = colander.OneOf(['registered_nonprofit',
+    missing = required
+    validator = OneOf(['registered_nonprofit',
                                 'planned_nonprofit',
                                 'support_needed',
                                 'other',
                                 ])
 
 
-class OrganizationInfoSchema(colander.MappingSchema):
+class OrganizationInfoSchema(MappingSchema):
     """Data structure for organizational information."""
 
     name = SingleLine()
     country = ISOCountryCode()
     status = StatusEnum()
-    status_other = Text(validator=colander.Length(max=500))
+    status_other = Text(validator=Length(max=500))
     """Custom description for status == other."""
     website = URL()
-    planned_date = DateTime(missing=colander.drop, default=None)
-    help_request = Text(validator=colander.Length(max=500))
+    planned_date = DateTime(missing=drop, default=None)
+    help_request = Text(validator=Length(max=500))
 
     def validator(self, node, value):
         """Make `status_other` required if `status` == `other`."""
@@ -239,17 +244,17 @@ class OrganizationInfoSchema(colander.MappingSchema):
         if status == 'other':
             if not value.get('status_other', None):
                 status_other = node['status_other']
-                raise colander.Invalid(status_other,
+                raise Invalid(status_other,
                                        msg='Required iff status == other')
         else:
             # TODO: Allow multiple errors at the same time
             name = node['name']
             if not value.get('name', None):
-                raise colander.Invalid(name,
+                raise Invalid(name,
                                        msg='Required iff status != other')
             country = node['country']
             if not value.get('country', None):
-                raise colander.Invalid(country,
+                raise Invalid(country,
                                        msg='Required iff status != other')
 
 
@@ -281,10 +286,10 @@ class IntroImageReference(SheetToSheet):
     target_isheet = IIntroImageMetadata
 
 
-class IntroductionSchema(colander.MappingSchema):
+class IntroductionSchema(MappingSchema):
     """Data structure for the proposal introduction."""
 
-    teaser = Text(validator=colander.Length(min=1, max=300))
+    teaser = Text(validator=Length(min=1, max=300))
     picture = Reference(reftype=IntroImageReference)
 
 
@@ -292,17 +297,17 @@ introduction_meta = sheet_meta._replace(
     isheet=IIntroduction, schema_class=IntroductionSchema)
 
 
-class DescriptionSchema(colander.MappingSchema):
+class DescriptionSchema(MappingSchema):
     """Data structure for for proposal description."""
 
-    description = Text(validator=colander.Length(min=1, max=1000))
+    description = Text(validator=Length(min=1, max=1000))
 
 
 description_meta = sheet_meta._replace(
     isheet=IDescription, schema_class=DescriptionSchema)
 
 
-class LocationSchema(colander.MappingSchema):
+class LocationSchema(MappingSchema):
     """Data structure for for proposal location."""
 
     location_is_specific = Boolean()
@@ -317,53 +322,53 @@ location_meta = sheet_meta._replace(isheet=ILocation,
                                     schema_class=LocationSchema)
 
 
-class StorySchema(colander.MappingSchema):
-    story = Text(validator=colander.Length(min=1, max=800))
+class StorySchema(MappingSchema):
+    story = Text(validator=Length(min=1, max=800))
 
 
 story_meta = sheet_meta._replace(isheet=IStory,
                                  schema_class=StorySchema)
 
 
-class OutcomeSchema(colander.MappingSchema):
-    outcome = Text(validator=colander.Length(min=1, max=800))
+class OutcomeSchema(MappingSchema):
+    outcome = Text(validator=Length(min=1, max=800))
 
 
 outcome_meta = sheet_meta._replace(
     isheet=IOutcome, schema_class=OutcomeSchema)
 
 
-class StepsSchema(colander.MappingSchema):
-    steps = Text(validator=colander.Length(min=1, max=800))
+class StepsSchema(MappingSchema):
+    steps = Text(validator=Length(min=1, max=800))
 
 
 steps_meta = sheet_meta._replace(
     isheet=ISteps, schema_class=StepsSchema)
 
 
-class ValueSchema(colander.MappingSchema):
-    value = Text(validator=colander.Length(min=1, max=800))
+class ValueSchema(MappingSchema):
+    value = Text(validator=Length(min=1, max=800))
 
 
 values_meta = sheet_meta._replace(
     isheet=IValue, schema_class=ValueSchema)
 
 
-class PartnersSchema(colander.MappingSchema):
-    partners = Text(validator=colander.Length(min=1, max=800))
+class PartnersSchema(MappingSchema):
+    partners = Text(validator=Length(min=1, max=800))
 
 
 partners_meta = sheet_meta._replace(
     isheet=IPartners, schema_class=PartnersSchema)
 
 
-class FinanceSchema(colander.MappingSchema):
+class FinanceSchema(MappingSchema):
     """Data structure for financial aspects."""
 
-    budget = CurrencyAmount(missing=colander.required)
+    budget = CurrencyAmount(missing=required)
     requested_funding = CurrencyAmount(
-        missing=colander.required,
-        validator=colander.Range(min=0, max=50000))
+        missing=required,
+        validator=Range(min=0, max=50000))
     other_sources = SingleLine()
     granted = Boolean()
 
@@ -372,7 +377,7 @@ finance_meta = sheet_meta._replace(isheet=IFinance,
                                    schema_class=FinanceSchema)
 
 
-class ExperienceSchema(colander.MappingSchema):
+class ExperienceSchema(MappingSchema):
     """Data structure for additional fields."""
 
     experience = Text()
@@ -383,7 +388,7 @@ experience_meta = sheet_meta._replace(
     schema_class=ExperienceSchema)
 
 
-class HeardFromSchema(colander.MappingSchema):
+class HeardFromSchema(MappingSchema):
 
     heard_from_colleague = Boolean()
     heard_from_website = Boolean()

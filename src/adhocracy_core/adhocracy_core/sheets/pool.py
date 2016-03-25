@@ -1,14 +1,18 @@
 """List, search and filter child resources."""
 from copy import deepcopy
+
+from colander import drop
 from pyramid.settings import asbool
-import colander
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import AnnotationRessourceSheet
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import add_sheet_to_registry
+from adhocracy_core.schema import Integer
+from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import MappingType
+from adhocracy_core.schema import SchemaNode
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.interfaces import search_result
@@ -120,7 +124,7 @@ class PoolSheet(AnnotationRessourceSheet):
         cstruct = schema.serialize(appstruct)
         return cstruct
 
-    def _add_additional_nodes(self, schema: colander.MappingSchema,
+    def _add_additional_nodes(self, schema: MappingSchema,
                               params: dict):
         if params.get('serialization_form', False) == 'content':
             elements = schema['elements']
@@ -128,16 +132,15 @@ class PoolSheet(AnnotationRessourceSheet):
             typ_copy.serialization_form = 'content'
             elements.children[0].typ = typ_copy
         if params.get('show_count', True):
-            child = colander.SchemaNode(colander.Integer(),
-                                        default=0,
-                                        missing=colander.drop,
-                                        name='count')
+            child = Integer(default=0,
+                            missing=drop,
+                            name='count')
             schema.add(child)
         if params.get('show_frequency', False):
             child = SchemaNode(MappingType(unknown='preserve'),
-                                        default={},
-                                        missing=colander.drop,
-                                        name='aggregateby')
+                               default={},
+                               missing=drop,
+                               name='aggregateby')
             schema.add(child)
         return schema
 
@@ -154,7 +157,7 @@ class PoolElementsReference(SheetToSheet):
     target_isheet = ISheet
 
 
-class PoolSchema(colander.MappingSchema):
+class PoolSchema(MappingSchema):
     """Pool sheet data structure.
 
     `elements`: children of this resource (object hierarchy).

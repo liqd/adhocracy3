@@ -4,7 +4,6 @@ from pyramid import testing
 from pytest import raises
 from pytest import fixture
 from pytest import mark
-import colander
 
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion

@@ -4,9 +4,6 @@ from copy import deepcopy
 from logging import getLogger
 
 from colander import Invalid
-from colander import MappingSchema
-from colander import SchemaNode
-from colander import SequenceSchema
 from substanced.util import find_service
 from substanced.stats import statsd_timer
 from pyramid.httpexceptions import HTTPMethodNotAllowed
@@ -19,6 +16,7 @@ from pyramid.security import remember
 from pyramid.traversal import resource_path
 from zope.interface.interfaces import IInterface
 from zope.interface import Interface
+import colander
 
 from adhocracy_core.caching import set_cache_header
 from adhocracy_core.interfaces import IResource
@@ -56,6 +54,9 @@ from adhocracy_core.rest.schemas import GETResourceResponseSchema
 from adhocracy_core.rest.schemas import options_resource_response_data_dict
 from adhocracy_core.rest.schemas import add_arbitrary_filter_nodes
 from adhocracy_core.interfaces import error_entry
+from adhocracy_core.schema import SchemaNode
+from adhocracy_core.schema import MappingSchema
+from adhocracy_core.schema import SequenceSchema
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
 from adhocracy_core.sheets.badge import get_assignable_badges
@@ -192,9 +193,9 @@ def _validate_schema(cstruct: object, schema: MappingSchema, request: Request,
     :param location: filter schema nodes depending on the `location` attribute.
                      The default value is `body`.
     """
-    if isinstance(schema, SequenceSchema):
+    if isinstance(schema, colander.SequenceSchema):
         _validate_list_schema(schema, cstruct, request, location)
-    elif isinstance(schema, MappingSchema):
+    elif isinstance(schema, colander.MappingSchema):
         _validate_dict_schema(schema, cstruct, request, location)
     else:
         error = 'Validation for schema {} is unsupported.'.format(str(schema))
@@ -825,13 +826,13 @@ class MetaApiView(RESTView):
                 targetsheet = None
                 readonly = getattr(node, 'readonly', False)
 
-                if issubclass(valuetype, References):
+                if isinstance(node, References):
                     containertype = 'list'
                     typ = to_dotted_name(AbsolutePath)
-                elif isinstance(node, SequenceSchema):
+                elif isinstance(node, colander.SequenceSchema):
                     containertype = 'list'
                     typ = to_dotted_name(type(node.children[0]))
-                elif valuetype is not SchemaNode:
+                elif valuetype not in (colander.SchemaNode, SchemaNode):
                     # If the outer type is not a container and it's not
                     # just a generic SchemaNode, we use the outer type
                     # as "valuetype" since it provides most specific

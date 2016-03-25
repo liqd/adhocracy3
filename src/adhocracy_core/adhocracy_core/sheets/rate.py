@@ -1,10 +1,11 @@
 """Rate sheet."""
+from colander import All
+from colander import Invalid
+from colander import deferred
 from pyramid.traversal import find_interface
 from pyramid.registry import Registry
 from substanced.util import find_service
 from zope.interface import implementer
-from colander import Invalid
-import colander
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IPredicateSheet
@@ -15,6 +16,7 @@ from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.interfaces import Reference
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import AttributeResourceSheet
+from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import Integer
 from adhocracy_core.schema import Reference as ReferenceSchema
 from adhocracy_core.schema import PostPool
@@ -95,21 +97,21 @@ class RateObjectReference(SheetToSheet):
     target_isheet = IRateable
 
 
-class RateSchema(colander.MappingSchema):
+class RateSchema(MappingSchema):
     """Rate sheet data structure."""
 
     subject = ReferenceSchema(reftype=RateSubjectReference)
     object = ReferenceSchema(reftype=RateObjectReference)
     rate = Integer()
 
-    @colander.deferred
+    @deferred
     def validator(self, kw: dict) -> callable:
         """Validate the rate."""
         # TODO add post_pool validator
         context = kw['context']
         request = kw['request']
         registry = kw['registry']
-        return colander.All(create_validate_rate_value(registry),
+        return All(create_validate_rate_value(registry),
                             create_validate_subject(request),
                             create_validate_is_unique(context, registry),
                             )
@@ -182,7 +184,7 @@ rate_meta = sheet_meta._replace(isheet=IRate,
                                 create_mandatory=True)
 
 
-class CanRateSchema(colander.MappingSchema):
+class CanRateSchema(MappingSchema):
     """CanRate sheet data structure."""
 
 
@@ -190,7 +192,7 @@ can_rate_meta = sheet_meta._replace(isheet=ICanRate,
                                     schema_class=CanRateSchema)
 
 
-class RateableSchema(colander.MappingSchema):
+class RateableSchema(MappingSchema):
     """Commentable sheet data structure.
 
     `post_pool`: Pool to post new :class:`adhocracy_sample.resource.IRate`.

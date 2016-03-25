@@ -1,6 +1,8 @@
 """Sheets to work with versionable resources."""
+from colander import deferred
+from colander import Invalid
+from colander import All
 from pyramid.traversal import resource_path
-import colander
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
@@ -8,6 +10,8 @@ from adhocracy_core.interfaces import NewVersionToOldVersion
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.pool import PoolSheet
+from adhocracy_core.schema import MappingSchema
+from adhocracy_core.schema import SchemaNode
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.utils import is_created_in_current_transaction
 from adhocracy_core.utils import is_batchmode
@@ -25,21 +29,20 @@ class VersionableFollowsReference(NewVersionToOldVersion):
     target_isheet = IVersionable
 
 
-def validate_linear_history_no_merge(node: colander.SchemaNode, value: list):
+def validate_linear_history_no_merge(node: SchemaNode, value: list):
     """Validate lineare history (no merge) for the `follows` field.
 
-    :raises colander.Invalid: if len(value) != 1
+    :raises Invalid: if len(value) != 1
     """
     if len(value) != 1:
         msg = 'No merge allowed - you must set only one follows reference'
-        raise colander.Invalid(node, msg, value=value)
+        raise Invalid(node, msg, value=value)
 
 
-def deferred_validate_linear_history_no_fork(node: colander.SchemaNode,
-                                             kw: dict):
+def deferred_validate_linear_history_no_fork(node: SchemaNode, kw: dict):
     """Validate lineare history (no fork) for the follows field.
 
-    :raises colander.Invalid: if value does not reference the last version.
+    :raises Invalid: if value does not reference the last version.
     """
     from adhocracy_core.sheets.tags import ITags  # prevent circle dependencies
     context = kw['context']
@@ -59,26 +62,25 @@ def deferred_validate_linear_history_no_fork(node: colander.SchemaNode,
     return validate_linear_history
 
 
-def _assert_follows_last_version(node: colander.SchemaNode, value: list,
-                                 last: object):
+def _assert_follows_last_version(node: SchemaNode, value: list, last: object):
     follows = value[0]
     if follows is not last:
         last_path = resource_path(last)
         msg = 'No fork allowed - valid follows resources are: {0}'
         msg = msg.format(str(last_path))
-        raise colander.Invalid(node, msg, value=value)
+        raise Invalid(node, msg, value=value)
 
 
-@colander.deferred
-def deferred_validate_follows(node: colander.SchemaNode, kw: dict) -> callable:
+@deferred
+def deferred_validate_follows(node: SchemaNode, kw: dict) -> callable:
     """Validate lineare history for the `follows` field."""
     # TODO add validation for ForkableVersionables
-    return colander.All(validate_linear_history_no_merge,
+    return All(validate_linear_history_no_merge,
                         deferred_validate_linear_history_no_fork(node, kw),
                         )
 
 
-class VersionableSchema(colander.MappingSchema):
+class VersionableSchema(MappingSchema):
     """Versionable sheet data structure.
 
     Set/get predecessor (`follows`) versions of this resource.
@@ -119,14 +121,13 @@ class IVersionsElementsReference(SheetToSheet):
     target_isheet = IVersionable
 
 
-class VersionsSchema(colander.MappingSchema):
+class VersionsSchema(MappingSchema):
     """Versions sheet data structure.
 
     `elements`: Dag for collecting all versions of one item.
     """
 
-    elements = UniqueReferences(
-        reftype=IVersionsElementsReference)
+    elements = UniqueReferences(reftype=IVersionsElementsReference)
 
 
 versions_meta = sheet_meta._replace(

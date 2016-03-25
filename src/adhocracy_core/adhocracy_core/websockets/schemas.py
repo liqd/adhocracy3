@@ -1,29 +1,31 @@
 """Colander schemas to validate and (de)serialize Websocket messages."""
-import colander
+from colander import OneOf
+from colander import required
 
+from adhocracy_core.schema import SingleLine
+from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import ResourceObjectType
 from adhocracy_core.schema import Resource
+from adhocracy_core.schema import SchemaNode
 
 
-class Action(colander.SchemaNode):
+class Action(SingleLine):
     """An action requested by a client."""
 
-    schema_type = colander.String
-    validator = colander.OneOf(['subscribe', 'unsubscribe'])
+    validator = OneOf(['subscribe', 'unsubscribe'])
 
 
-class ClientRequestSchema(colander.MappingSchema):
+class ClientRequestSchema(MappingSchema):
     """Data structure for client requests."""
 
-    action = Action(missing=colander.required)
-    resource = Resource(missing=colander.required)
+    action = Action(missing=required)
+    resource = Resource(missing=required)
 
 
-class Status(colander.SchemaNode):
+class Status(SingleLine):
     """A status sent to the client."""
 
-    schema_type = colander.String
-    validator = colander.OneOf(['ok', 'redundant'])
+    validator = OneOf(['ok', 'redundant'])
     default = 'ok'
 
 
@@ -33,30 +35,28 @@ class StatusConfirmation(ClientRequestSchema):
     status = Status()
 
 
-class Event(colander.SchemaNode):
+class Event(SingleLine):
     """The type of event notifications sent to the client."""
 
-    schema_type = colander.String
-    validator = colander.OneOf(['modified',            # Used internally
-                                'removed',             # and for
-                                'changed_descendants',  # the client
-                                'new_child',
-                                'removed_child',
-                                'modified_child',
-                                'new_version',
-                                'created'])   # Only used internally
+    validator = OneOf(['modified',            # Used internally
+                       'removed',             # and for
+                       'changed_descendants',  # the client
+                       'new_child',
+                       'removed_child',
+                       'modified_child',
+                       'new_version',
+                       'created'])   # Only used internally
     default = 'modified'
 
 
-class ServerNotification(colander.MappingSchema):
+class ServerNotification(MappingSchema):
     """Notification sent to the server from the Pyramid WS client."""
 
     event = Event()
-    resource = colander.SchemaNode(
-        ResourceObjectType(serialization_form='path'))
+    resource = SchemaNode(ResourceObjectType(serialization_form='path'))
 
 
-class Notification(colander.MappingSchema):
+class Notification(MappingSchema):
     """Notification sent to a client if a resource has changed."""
 
     event = Event()

@@ -1,13 +1,15 @@
 """Sheets for statements about relations between process content/comments."""
-import colander
+from colander import drop
+from colander import OneOf
 
 from adhocracy_core.interfaces import IPredicateSheet
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
-from adhocracy_core.schema import AdhocracySchemaNode
+from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import PostPool
 from adhocracy_core.schema import Reference
+from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
@@ -25,13 +27,12 @@ class ICanPolarize(ISheet):
     """Marker interface for resources that can polarize."""
 
 
-class Position(AdhocracySchemaNode):
+class Position(SingleLine):
     """Schema node for the side (pro or contra)."""
 
-    schema_type = colander.String
-    missing = colander.drop
+    missing = drop
     default = 'pro'
-    validator = colander.OneOf(['pro', 'contra'])
+    validator = OneOf(['pro', 'contra'])
 
 
 class PolarizationSubjectReference(SheetToSheet):
@@ -50,7 +51,7 @@ class PolarizationObjectReference(SheetToSheet):
     target_isheet = IPolarizable
 
 
-class PolarizationSchema(colander.MappingSchema):
+class PolarizationSchema(MappingSchema):
     """Polarizable sheet data structure.
 
     `position`: the position in the debate, 'pro' or 'contra'.
@@ -65,7 +66,7 @@ polarization_meta = sheet_meta._replace(isheet=IPolarization,
                                         create_mandatory=True)
 
 
-class CanPolarizeSchema(colander.MappingSchema):
+class CanPolarizeSchema(MappingSchema):
     """CanPolarize sheet data structure."""
 
     polarization = Reference(reftype=PolarizationSubjectReference,
@@ -76,7 +77,7 @@ can_polarize_meta = sheet_meta._replace(isheet=ICanPolarize,
                                         schema_class=CanPolarizeSchema)
 
 
-class PolarizableSchema(colander.MappingSchema):
+class PolarizableSchema(MappingSchema):
     """Polarizable sheet data structure.
 
     `post_pool`: Pool to post :class:`adhocracy_core.resource.IPolarization`.

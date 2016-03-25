@@ -1,12 +1,14 @@
 """Sheets for :term:`principal`s."""
-import colander
-import requests
-
+from colander import required
+from colander import deferred
+from colander import Invalid
+from colander import All
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from pyramid.settings import asbool
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
 from urllib.parse import urljoin
+import requests
 
 from adhocracy_core.interfaces import ISheet
 from substanced.interfaces import IUserLocator
@@ -16,6 +18,8 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import AnnotationRessourceSheet
 from adhocracy_core.sheets import AttributeResourceSheet
+from adhocracy_core.schema import MappingSchema
+from adhocracy_core.schema import SchemaNode
 from adhocracy_core.schema import Email
 from adhocracy_core.schema import Password
 from adhocracy_core.schema import SingleLine
@@ -52,7 +56,7 @@ class PermissionsGroupsReference(SheetToSheet):
     target_isheet = IGroup
 
 
-class GroupSchema(colander.MappingSchema):
+class GroupSchema(MappingSchema):
     """Group sheet data structure."""
 
     users = UniqueReferences(readonly=True,
@@ -68,15 +72,15 @@ group_meta = sheet_meta._replace(
 )
 
 
-@colander.deferred
-def deferred_validate_user_name(node: colander.SchemaNode, kw: dict)\
+@deferred
+def deferred_validate_user_name(node: SchemaNode, kw: dict)\
         -> callable:
     """Return validator to check that the user login `name` is unique or None.
 
     :param kw: dictionary with 'request' key and
                :class:`pyramid.request.Request` object.
                If this is not available the validator is None.
-    :raise: colander.Invalid: if name is not unique.
+    :raise: Invalid: if name is not unique.
     """
     request = kw['request']
     registry = kw['registry']
@@ -85,20 +89,19 @@ def deferred_validate_user_name(node: colander.SchemaNode, kw: dict)\
 
     def validate_user_name_is_unique(node, value):
         if locator.get_user_by_login(value):
-            raise colander.Invalid(node, 'The user login name is not unique',
+            raise Invalid(node, 'The user login name is not unique',
                                    value=value)
     return validate_user_name_is_unique
 
 
-@colander.deferred
-def deferred_validate_user_email(node: colander.SchemaNode, kw: dict)\
-        -> callable:
+@deferred
+def deferred_validate_user_email(node: SchemaNode, kw: dict) -> callable:
     """Return validator to check that the `email` is unique and valid or None.
 
     :param kw: dictionary with 'request' key and
                :class:`pyramid.request.Request` object
                If this is not available the validator is None.
-    :raise: colander.Invalid: if name is not unique or not an email address.
+    :raise: Invalid: if name is not unique or not an email address.
     """
     request = kw['request']
     registry = kw['registry']
@@ -107,13 +110,13 @@ def deferred_validate_user_email(node: colander.SchemaNode, kw: dict)\
 
     def validate_user_email_is_unique(node, value):
         if locator.get_user_by_email(value):
-            raise colander.Invalid(node, 'The user login email is not unique',
+            raise Invalid(node, 'The user login email is not unique',
                                    value=value)
     validate_email = Email.validator
-    return colander.All(validate_email, validate_user_email_is_unique)
+    return All(validate_email, validate_user_email_is_unique)
 
 
-class UserBasicSchema(colander.MappingSchema):
+class UserBasicSchema(MappingSchema):
     """Basic user sheet data structure.
 
     This sheet must only store public information, as everyone can see it.
@@ -121,7 +124,7 @@ class UserBasicSchema(colander.MappingSchema):
     `name`: visible name
     """
 
-    name = SingleLine(missing=colander.required,
+    name = SingleLine(missing=required,
                       validator=deferred_validate_user_name)
 
 
@@ -133,7 +136,7 @@ userbasic_meta = sheet_meta._replace(
 )
 
 
-class UserExtendedSchema(colander.MappingSchema):
+class UserExtendedSchema(MappingSchema):
     """Extended user sheet data structure.
 
     Sensitive information (not for everyone's eyes) should be stored here.
@@ -156,7 +159,7 @@ userextended_meta = sheet_meta._replace(
 )
 
 
-class CaptchaSchema(colander.MappingSchema):
+class CaptchaSchema(MappingSchema):
     """Wraps user-submitted captcha data.
 
     This sheet may be required when creating a new user (if captchas are turned
@@ -166,8 +169,8 @@ class CaptchaSchema(colander.MappingSchema):
     `solution`: solution to the captcha (entered by a human user)
     """
 
-    id = SingleLine(missing=colander.required)
-    solution = SingleLine(missing=colander.required)
+    id = SingleLine(missing=required)
+    solution = SingleLine(missing=required)
 
     def validator(self, node, value):
         """
@@ -180,7 +183,7 @@ class CaptchaSchema(colander.MappingSchema):
         request = node.bindings['request']
         settings = request.registry.settings
         if not self._captcha_is_correct(settings, value):
-            err = colander.Invalid(node)
+            err = Invalid(node)
             err['solution'] = 'Captcha solution is wrong'
             raise err
 
@@ -216,9 +219,8 @@ captcha_meta = sheet_meta._replace(
 )
 
 
-@colander.deferred
-def deferred_roles_and_group_roles(node: colander.SchemaNode, kw: dict)\
-        -> list:
+@deferred
+def deferred_roles_and_group_roles(node: SchemaNode, kw: dict) -> list:
     """Return roles and groups roles for `context`.
 
     :param kw: dictionary with 'context' key and
@@ -234,7 +236,7 @@ def deferred_roles_and_group_roles(node: colander.SchemaNode, kw: dict)\
     return sorted(list(roles_and_group_roles))
 
 
-class PermissionsSchema(colander.MappingSchema):
+class PermissionsSchema(MappingSchema):
     """Permissions sheet data structure.
 
     `groups`: groups this user joined
@@ -271,13 +273,13 @@ class IPasswordAuthentication(ISheet):
     """Marker interface for the password sheet."""
 
 
-class PasswordAuthenticationSchema(colander.MappingSchema):
+class PasswordAuthenticationSchema(MappingSchema):
     """Data structure for password based user authentication.
 
     `password`: plaintext password :class:`adhocracy_core.schema.Password`.
     """
 
-    password = Password(missing=colander.required)
+    password = Password(missing=required)
 
 
 class PasswordAuthenticationSheet(AnnotationRessourceSheet):

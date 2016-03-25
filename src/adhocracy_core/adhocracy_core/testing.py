@@ -21,7 +21,6 @@ from testfixtures import LogCapture
 from webtest import TestApp
 from webtest import TestResponse
 from zope.interface.interfaces import IInterface
-import colander
 import transaction
 
 from adhocracy_core.interfaces import SheetMetadata
@@ -31,6 +30,7 @@ from adhocracy_core.interfaces import SearchResult
 from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.resources.root import IRootPool
+from adhocracy_core.schema import MappingSchema
 from adhocracy_core.scripts import import_resources
 from adhocracy_core.scripts import import_local_roles
 
@@ -205,7 +205,7 @@ def sheet_meta() -> SheetMetadata:
     from adhocracy_core.sheets import sheet_meta
     from adhocracy_core.interfaces import ISheet
     return sheet_meta._replace(isheet=ISheet,
-                               schema_class=colander.MappingSchema)
+                               schema_class=MappingSchema)
 
 
 class DummyRequest(testing.DummyRequest):
@@ -288,9 +288,9 @@ def item() -> DummyPool:
 
 
 @fixture
-def node() -> colander.MappingSchema:
+def node() -> MappingSchema:
     """Return dummy node."""
-    return colander.MappingSchema()
+    return MappingSchema()
 
 
 @fixture
@@ -317,8 +317,8 @@ def mock_sheet() -> Mock:
     # however this fails if the object is deepcopied.
     sheet = Mock()
     sheet.meta = sheet_meta._replace(isheet=ISheet,
-                                     schema_class=colander.MappingSchema)
-    sheet.schema = colander.MappingSchema()
+                                     schema_class=MappingSchema)
+    sheet.schema = MappingSchema()
     sheet.get.return_value = {}
     return sheet
 

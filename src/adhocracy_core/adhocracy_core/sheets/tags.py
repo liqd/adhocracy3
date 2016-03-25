@@ -2,13 +2,12 @@
 from logging import getLogger
 from zope.deprecation import deprecated
 
-import colander
-
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.versions import IVersionable
+from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import Reference
 
 
@@ -51,7 +50,7 @@ class TagsLastReference(SheetToSheet):
     target_isheet = IVersionable
 
 
-class TagsSchema(colander.MappingSchema):
+class TagsSchema(MappingSchema):
     """Tags sheet data structure."""
 
     LAST = Reference(reftype=TagsLastReference)

@@ -56,8 +56,8 @@ def _add_other_node(inst: colander.Schema):
 class AdhocracySchemaNodeUnitTest(unittest.TestCase):
 
     def make_one(self, *args, **kwargs):
-        from adhocracy_core.schema import AdhocracySchemaNode
-        return AdhocracySchemaNode(*args, **kwargs)
+        from adhocracy_core.schema import SchemaNode
+        return SchemaNode(*args, **kwargs)
 
     def test_serialize_non_readonly(self):
         inst = self.make_one(colander.String())
@@ -84,17 +84,17 @@ class AdhocracySchemaNodeUnitTest(unittest.TestCase):
 class TestAdhocracySchemaNode:
 
     def make_one(self, **kwargs):
-        from adhocracy_core.schema import AdhocracySequenceNode
+        from adhocracy_core.schema import SequenceSchema
 
-        class AdhocracySequenceExample(AdhocracySequenceNode):
+        class AdhocracySequenceExample(SequenceSchema):
             child1 = colander.Schema(typ=colander.Int())
         return AdhocracySequenceExample().bind()
 
     def test_create(self):
-        from . import AdhocracySchemaNode
+        from . import SchemaNode
         inst = self.make_one()
         assert isinstance(inst, colander.SequenceSchema)
-        assert isinstance(inst, AdhocracySchemaNode)
+        assert isinstance(inst, SchemaNode)
         assert inst.schema_type == colander.Sequence
         assert inst.default == []
 

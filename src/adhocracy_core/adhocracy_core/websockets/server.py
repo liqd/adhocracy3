@@ -9,9 +9,9 @@ import logging
 
 from autobahn.asyncio.websocket import WebSocketServerProtocol
 from autobahn.websocket.protocol import ConnectionRequest
+from colander import Invalid
 from pyramid.traversal import resource_path
 from ZODB import Connection
-import colander
 
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItemVersion
@@ -140,7 +140,7 @@ class ClientCommunicator(WebSocketServerProtocol):
     # url the adhocracy frontend is using to communicate with the rest server.
     rest_url = 'http://localhost:6541'
 
-    def _create_schema(self, schema_class: colander.Schema):
+    def _create_schema(self, schema_class: object):
         """Create schema object and bind `context` and `request`."""
         context = self._get_root()
         request = self._get_dummy_request()
@@ -237,7 +237,7 @@ class ClientCommunicator(WebSocketServerProtocol):
         try:
             schema = self._create_schema(schema_class)
             return schema.deserialize(json_object)
-        except colander.Invalid as err:
+        except Invalid as err:
             self._raise_if_unknown_field_value('action', err, json_object)
             self._raise_if_unknown_field_value('resource', err, json_object)
             self._raise_invalid_json_from_colander_invalid(err)
@@ -281,7 +281,7 @@ class ClientCommunicator(WebSocketServerProtocol):
             raise WebSocketError('invalid_json', details)
 
     def _raise_if_unknown_field_value(self, field_name: str,
-                                      err: colander.Invalid,
+                                      err: Invalid,
                                       json_object: dict):
         """Raise an 'unknown_xxx' WebSocketError error if appropriate."""
         errdict = err.asdict()
@@ -293,7 +293,7 @@ class ClientCommunicator(WebSocketServerProtocol):
     def _is_only_key(self, d: dict, key: str) -> bool:
         return key in d and len(d) == 1
 
-    def _raise_invalid_json_from_colander_invalid(self, err: colander.Invalid):
+    def _raise_invalid_json_from_colander_invalid(self, err: Invalid):
         errdict = err.asdict()
         errlist = ['{}: {}'.format(k, errdict[k]) for k in errdict.keys()]
         details = ' / '.join(sorted(errlist))

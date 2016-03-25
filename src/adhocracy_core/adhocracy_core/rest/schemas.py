@@ -4,6 +4,7 @@ from datetime import datetime
 from colander import All
 from colander import Invalid
 from colander import Length
+from colander import Mapping
 from colander import OneOf
 from colander import Range
 from colander import Regex
@@ -48,7 +49,10 @@ from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.sheets.metadata import is_older_than
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.schema import AbsolutePath
-from adhocracy_core.schema import AdhocracySchemaNode
+from adhocracy_core.schema import SchemaNode
+from adhocracy_core.schema import MappingSchema
+from adhocracy_core.schema import SequenceSchema
+from adhocracy_core.schema import TupleSchema
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import Booleans
 from adhocracy_core.schema import ContentType
@@ -92,7 +96,7 @@ INDEX_EXAMPLE_VALUES = {
     'interfaces': interface.Interface,
 }
 
-class UpdatedResourcesSchema(Schema):
+class UpdatedResourcesSchema(MappingSchema):
     """List the resources affected by a transaction."""
 
     created = Resources()
@@ -123,8 +127,8 @@ class GETItemResponseSchema(ResourcePathAndContentSchema):
     first_version_path = Resource()
 
 
-def add_put_data_subschemas(node: Schema, kw: dict):
-    """Add the resource sheet colander schemas that are 'editable'."""
+def add_put_data_subschemas(node: MappingSchema, kw: dict):
+    """Add the resource sheet schemas that are 'editable'."""
     context = kw['context']
     request = kw['request']
     sheets = request.registry.content.get_sheets_edit(context, request)
@@ -142,15 +146,15 @@ def add_put_data_subschemas(node: Schema, kw: dict):
         node.add(schema)
 
 
-class BlockExplanationResponseSchema(Schema):
+class BlockExplanationResponseSchema(MappingSchema):
     """Data structure explaining a 410 Gone response."""
 
     reason = SingleLine()
     modified_by = Reference()
-    modification_date = DateTime(default=colander.null)
+    modification_date = DateTime(default=null)
 
 
-class PUTResourceRequestSchema(Schema):
+class PUTResourceRequestSchema(MappingSchema):
     """Data structure for Resource PUT requests.
 
     The subschemas for the Resource Sheets
@@ -196,7 +200,7 @@ class PUTAssetRequestSchema(PUTResourceRequestSchema):
 
 
 def add_post_data_subschemas(node: SchemaNode, kw: dict):
-    """Add the resource sheet colander schemas that are 'creatable'."""
+    """Add the resource sheet schemas that are 'creatable'."""
     context = kw['context']
     request = kw['request']
     content_type = _get_resource_type_based_on_request_type(request)
@@ -209,7 +213,7 @@ def add_post_data_subschemas(node: SchemaNode, kw: dict):
     for sheet in creates:
         name = sheet.meta.isheet.__identifier__
         is_mandatory = sheet.meta.create_mandatory
-        missing = colander.required if is_mandatory else colander.drop
+        missing = required if is_mandatory else drop
         schema = sheet.get_schema_with_bindings()
         schema.name = name
         schema.missing = missing
@@ -226,7 +230,7 @@ def _get_resource_type_based_on_request_type(request: Request) -> str:
             request.content_type))
 
 
-@colander.deferred
+@deferred
 def deferred_validate_post_content_type(node, kw):
     """Validate the addable content type for post requests."""
     context = kw['context']
@@ -234,14 +238,14 @@ def deferred_validate_post_content_type(node, kw):
     request = kw['request']
     addables = registry.content.get_resources_meta_addable(context, request)
     addable_iresources = [r.iresource for r in addables]
-    return colander.OneOf(addable_iresources)
+    return OneOf(addable_iresources)
 
 
 class POSTResourceRequestSchema(PUTResourceRequestSchema):
     """Data structure for Resource POST requests."""
 
     content_type = ContentType(validator=deferred_validate_post_content_type,
-                               missing=colander.required)
+                               missing=required)
 
     data = SchemaNode(MappingType(unknown='raise'),
                       after_bind=add_post_data_subschemas,
@@ -255,7 +259,7 @@ class POSTAssetRequestSchema(POSTResourceRequestSchema):
     validator = validate_claimed_asset_mime_type
 
 
-class AbsolutePaths(colander.SequenceSchema):
+class AbsolutePaths(SequenceSchema):
     """List of resource paths."""
 
     path = AbsolutePath()
@@ -277,13 +281,13 @@ class POSTItemRequestSchema(POSTResourceRequestSchema):
                               validator=validate_root_versions)
 
 
-class POSTResourceRequestSchemaList(colander.List):
+class POSTResourceRequestSchemaList(SequenceSchema):
     """Overview of POST request/response data structure."""
 
     request_body = POSTResourceRequestSchema()
 
 
-class GETLocationMapping(Schema):
+class GETLocationMapping(MappingSchema):
     """Overview of GET request/response data structure."""
 
     request_querystring = SchemaNode(MappingType(), default={})
@@ -291,38 +295,38 @@ class GETLocationMapping(Schema):
     response_body = GETResourceResponseSchema()
 
 
-class PUTLocationMapping(Schema):
+class PUTLocationMapping(MappingSchema):
     """Overview of PUT request/response data structure."""
 
     request_body = PUTResourceRequestSchema()
     response_body = ResourceResponseSchema()
 
 
-class POSTLocationMapping(Schema):
+class POSTLocationMapping(MappingSchema):
     """Overview of POST request/response data structure."""
 
     request_body = SchemaNode(POSTResourceRequestSchemaList(), default=[])
     response_body = ResourceResponseSchema()
 
 
-class POSTLoginUsernameRequestSchema(Schema):
+class POSTLoginUsernameRequestSchema(MappingSchema):
     """Schema for login requests via username and password."""
 
-    name = SchemaNode(colander.String(), missing=colander.required)
-    password = Password(missing=colander.required)
+    name = SingleLine(missing=required)
+    password = Password(missing=required)
 
-    @colander.deferred
-    def validator(node: SchemaNode, kw: dict) -> colander.All:
+    @deferred
+    def validator(node: SchemaNode, kw: dict) -> All:
         request = kw['request']
         context = kw['context']
         registry = kw['registry']
-        return colander.All(create_validate_login(context,
-                                                  request,
-                                                  registry,
-                                                  'name'),
-                            create_validate_login_password(request, registry),
-                            create_validate_account_active(request, 'name'),
-                            )
+        return All(create_validate_login(context,
+                                         request,
+                                         registry,
+                                         'name'),
+                   create_validate_login_password(request, registry),
+                   create_validate_account_active(request, 'name'),
+                   )
 
 def create_validate_activation_path(context,
                                     request: Request,
@@ -353,26 +357,25 @@ def create_validate_activation_path(context,
     return validate_activation_path
 
 
-@colander.deferred
+@deferred
 def deferred_validate_activation_path(node: SchemaNode,
-                                      kw: dict) -> colander.All:
+                                      kw: dict) -> All:
     """Validate activation path and add user."""
     context = kw['context']
     request = kw['request']
     registry = kw['registry']
-    return colander.All(colander.Regex('^/activate/'),
-                        create_validate_activation_path(context,
-                                                        request,
-                                                        registry,
-                                                        ),
-                        )
+    return All(Regex('^/activate/'),
+               create_validate_activation_path(context,
+                                               request,
+                                               registry,
+                                               ),
+               )
 
 
-class POSTActivateAccountViewRequestSchema(Schema):
+class POSTActivateAccountViewRequestSchema(MappingSchema):
     """Schema for account activation."""
 
-    path = SchemaNode(colander.String(),
-                      missing=colander.required,
+    path = SingleLine(missing=required,
                       validator=deferred_validate_activation_path)
 
 
@@ -446,30 +449,30 @@ def create_validate_account_active(request: Request,
     return validate_user_is_active
 
 
-class POSTLoginEmailRequestSchema(Schema):
+class POSTLoginEmailRequestSchema(MappingSchema):
     """Schema for login requests via email and password."""
 
-    email = Email(missing=colander.required)
-    password = Password(missing=colander.required)
+    email = Email(missing=required)
+    password = Password(missing=required)
 
-    @colander.deferred
-    def validator(node: SchemaNode, kw: dict) -> colander.All:
+    @deferred
+    def validator(node: SchemaNode, kw: dict) -> All:
         request = kw['request']
         context = kw['context']
         registry = kw['registry']
-        return colander.All(create_validate_login(context,
-                                                  request,
-                                                  registry,
-                                                  'email'),
-                            create_validate_login_password(request, registry),
-                            create_validate_account_active(request, 'email'),
-                            )
+        return All(create_validate_login(context,
+                                         request,
+                                         registry,
+                                         'email'),
+                   create_validate_login_password(request, registry),
+                   create_validate_account_active(request, 'email'),
+                   )
 
 
-class POSTReportAbuseViewRequestSchema(Schema):
+class POSTReportAbuseViewRequestSchema(MappingSchema):
     """Schema for abuse reports."""
 
-    url = URL(missing=colander.required)
+    url = URL(missing=required)
     remark = Text(missing='')
 
 
@@ -479,24 +482,23 @@ class MessageUserReference(SheetToSheet):
     target_isheet = IUserExtended
 
 
-class POSTMessageUserViewRequestSchema(Schema):
+class POSTMessageUserViewRequestSchema(MappingSchema):
     """Schema for messages to a user."""
 
-    recipient = Reference(missing=colander.required,
+    recipient = Reference(missing=required,
                           reftype=MessageUserReference)
-    title = SingleLine(missing=colander.required)
-    text = Text(missing=colander.required)
+    title = SingleLine(missing=required)
+    text = Text(missing=required)
 
 
-class BatchHTTPMethod(SchemaNode):
+class BatchHTTPMethod(SingleLine):
     """An HTTP method in a batch request."""
 
-    schema_type = colander.String
-    validator = colander.OneOf(['GET', 'POST', 'PUT', 'OPTIONS'])
-    missing = colander.required
+    validator = OneOf(['GET', 'POST', 'PUT', 'OPTIONS'])
+    missing = required
 
 
-class BatchRequestPath(AdhocracySchemaNode):
+class BatchRequestPath(SingleLine):
     """A path in a batch request.
 
     Either a resource url or a preliminary resource path (a relative path
@@ -505,18 +507,21 @@ class BatchRequestPath(AdhocracySchemaNode):
     Example values: '@item/v1', 'http://a.org/adhocracy/item/v1', '/item/v1/'
     """
 
-    schema_type = colander.String
     default = ''
-    missing = colander.required
+    missing = required
     absolutpath = AbsolutePath.relative_regex
     preliminarypath = '[a-zA-Z0-9\_\-\.\/]+'
-    validator = colander.All(colander.Regex('^(' + colander.URL_REGEX + '|'
-                                            + absolutpath + '|@'
-                                            + preliminarypath + ')$'),
-                             colander.Length(min=1, max=8192))
+    validator = All(Regex('^(' + URL_REGEX + '|'
+                          + absolutpath + '|@'
+                          + preliminarypath + ')$'),
+                    Length(min=1, max=8192))
 
 
-class POSTBatchRequestItem(Schema):
+class POSTBatchRequestItem(MappingSchema):
+    """A single item in a batch request, encoding a single request."""
+
+    method = BatchHTTPMethod()
+    path = BatchRequestPath()
     """A single item in a batch request, encoding a single request."""
 
     method = BatchHTTPMethod()
@@ -527,33 +532,31 @@ class POSTBatchRequestItem(Schema):
     result_first_version_path = BatchRequestPath(missing='')
 
 
-class POSTBatchRequestSchema(colander.SequenceSchema):
+class POSTBatchRequestSchema(SequenceSchema):
     """Schema for batch requests (list of POSTBatchRequestItem's)."""
 
     items = POSTBatchRequestItem()
 
 
-class PoolElementsForm(SchemaNode):
+class PoolElementsForm(SingleLine):
     """The form of the elements attribute returned by the pool sheet."""
 
-    schema_type = colander.String
-    validator = colander.OneOf(['paths', 'content', 'omit'])
+    validator = OneOf(['paths', 'content', 'omit'])
     missing = 'paths'
 
 
-class PoolQueryDepth(SchemaNode):
+class PoolQueryDepth(Integer):
     """The nesting depth of descendants in a pool response.
 
     Either a positive number or the string 'all' to return descendants of
     arbitrary depth.
     """
 
-    schema_type = colander.Integer
-    missing = colander.drop
-    validator = colander.Range(min=1)
+    missing = drop
+    validator = Range(min=1)
 
 
-@colander.deferred
+@deferred
 def deferred_validate_aggregateby(node: SchemaNode, kw):
     """Validate if `value` is an catalog index name`."""
     # TODO In the future we may have indexes where aggregateby doesn't make
@@ -563,10 +566,10 @@ def deferred_validate_aggregateby(node: SchemaNode, kw):
     indexes = _get_indexes(context)
     index_names = [x.__name__ for x in indexes
                    if hasattr(x, 'unique_values')]
-    return colander.OneOf(index_names)
+    return OneOf(index_names)
 
 
-@colander.deferred
+@deferred
 def deferred_validate_sort(node: SchemaNode, kw: dict):
     """Validate if value is an index name that support sorting."""
     context = kw['context']
@@ -576,7 +579,7 @@ def deferred_validate_sort(node: SchemaNode, kw: dict):
     valid_indexes = [x.__name__ for x in indexes
                      if IIndexSort.providedBy(x)
                      or 'sort' in x.__dir__()]
-    return colander.OneOf(valid_indexes)
+    return OneOf(valid_indexes)
 
 
 def _get_indexes(context) -> list:
@@ -588,7 +591,7 @@ def _get_indexes(context) -> list:
     return indexes
 
 
-class GETPoolRequestSchema(Schema):
+class GETPoolRequestSchema(MappingSchema):
 
     """GET parameters accepted for pool queries."""
 
@@ -611,20 +614,18 @@ class GETPoolRequestSchema(Schema):
     # sheet, aggregateby, tag.
 
     depth = PoolQueryDepth()
-    elements = PoolElementsForm(missing=colander.drop)
-    count = SchemaNode(colander.Boolean(), missing=colander.drop)
-    sort = SchemaNode(colander.String(),
-                      missing=colander.drop,
+    elements = PoolElementsForm(missing=drop)
+    count = Boolean(missing=drop)
+    sort = SingleLine(missing=drop,
                       validator=deferred_validate_sort)
-    reverse = SchemaNode(colander.Boolean(), missing=colander.drop)
+    reverse = Boolean(missing=drop)
     # TODO: validate limit, offset to be multiple of 10, 20, 50, 100, 200, 500
-    limit = SchemaNode(colander.Int(), missing=colander.drop)
-    offset = SchemaNode(colander.Int(), missing=colander.drop)
-    aggregateby = SchemaNode(colander.String(),
-                             missing=colander.drop,
+    limit = Integer(missing=drop)
+    offset = Integer(missing=drop)
+    aggregateby = SingleLine(missing=drop,
                              validator=deferred_validate_aggregateby)
 
-    def deserialize(self, cstruct=colander.null):  # noqa
+    def deserialize(self, cstruct=null):  # noqa
         """ Deserialize the :term:`cstruct` into an :term:`appstruct`.
 
         Adapt key/values to :class:`adhocracy_core.interfaces.SearchQuery`. for
@@ -730,12 +731,12 @@ def _is_reference_filter(name: str, registry: Registry) -> bool:
     try:
         isheet, field, node = resolve(name)
     except ValueError:
-        dummy_node = SchemaNode(colander.String(), name=name)
+        dummy_node = SingleLine(name=name)
         raise Invalid(dummy_node, 'No such sheet or field')
     if isinstance(node, (Reference, References)):
         return True
     else:
-        dummy_node = SchemaNode(colander.String(), name=name)
+        dummy_node = SingleLine(name=name)
         raise Invalid(dummy_node, 'Not a reference node')
 
 
@@ -761,7 +762,7 @@ def _get_index_example_value(index: SDIndex) -> object:
         return INDEX_EXAMPLE_VALUES['default']
 
 
-def _add_node(schema: SchemaNode, node: SchemaNode, name: str):
+def _add_node(schema: MappingSchema, node: SchemaNode, name: str):
     node = node.bind(**schema.bindings)
     node.name = name
     schema.add(node)
@@ -856,32 +857,32 @@ def create_arbitrary_filter_node(index, example_value, query):
 class KeywordComparableSchema(SingleLine):
     """SingleLine of KeywordComparable value."""
 
-    validator = colander.OneOf(
+    validator = OneOf(
         [x for x in KeywordComparator.__members__])
 
 
 class FieldComparableSchema(SingleLine):
     """SingleLine of FieldComparable value."""
 
-    validator = colander.OneOf(
+    validator = OneOf(
         [x for x in FieldComparator.__members__])
 
 
 class KeywordSequenceComparableSchema(SingleLine):
     """SingleLine of KeywordSequenceComparable value."""
 
-    validator = colander.OneOf(
+    validator = OneOf(
         [x for x in KeywordSequenceComparator.__members__])
 
 
 class FieldSequenceComparableSchema(SingleLine):
     """SingleLine of FieldSequenceComparable value."""
 
-    validator = colander.OneOf(
+    validator = OneOf(
         [x for x in FieldSequenceComparator.__members__])
 
 
-class KeywordComparableSequenceBase(colander.TupleSchema):
+class KeywordComparableSequenceBase(TupleSchema):
     """Tuple with value KeywordSequenceComparable."""
 
     comparable = KeywordSequenceComparableSchema()
@@ -917,7 +918,7 @@ class KeywordComparableBooleans(KeywordComparableSequenceBase):
     value = Booleans()
 
 
-class KeywordComparableBase(colander.TupleSchema):
+class KeywordComparableBase(TupleSchema):
     """Tuple with value KeywordComparable."""
 
     comparable = KeywordComparableSchema()
@@ -956,32 +957,32 @@ class KeywordComparableDateTime(KeywordComparableBase):
 class FieldComparableSchema(SingleLine):
     """SingleLine of FieldComparable value."""
 
-    validator = colander.OneOf(
+    validator = OneOf(
         [x for x in FieldComparator.__members__])
 
 
 class FieldComparableSchema(SingleLine):
     """SingleLine of FieldComparable value."""
 
-    validator = colander.OneOf(
+    validator = OneOf(
         [x for x in FieldComparator.__members__])
 
 
 class FieldSequenceComparableSchema(SingleLine):
     """SingleLine of FieldSequenceComparable value."""
 
-    validator = colander.OneOf(
+    validator = OneOf(
         [x for x in FieldSequenceComparator.__members__])
 
 
 class FieldSequenceComparableSchema(SingleLine):
     """SingleLine of FieldSequenceComparable value."""
 
-    validator = colander.OneOf(
+    validator = OneOf(
         [x for x in FieldSequenceComparator.__members__])
 
 
-class FieldComparableSequenceBase(colander.TupleSchema):
+class FieldComparableSequenceBase(TupleSchema):
     """Tuple with value FieldSequenceComparable."""
 
     comparable = FieldSequenceComparableSchema()
@@ -1017,7 +1018,7 @@ class FieldComparableBooleans(FieldComparableSequenceBase):
     value = Booleans()
 
 
-class FieldComparableBase(colander.TupleSchema):
+class FieldComparableBase(TupleSchema):
     """Tuple with value FieldComparable."""
 
     comparable = FieldComparableSchema()
@@ -1070,14 +1071,14 @@ options_resource_response_data_dict =\
                                'path': ''}}}
 
 
-@colander.deferred
+@deferred
 def deferred_validate_password_reset_email(node: SchemaNode, kw: dict):
     """Validate the email address of a password reset request.
 
     If valid, the user object is added as 'user' to
     `request.validated`.
 
-    :raise colander.Invalid: if no user with this email exists.
+    :raise Invalid: if no user with this email exists.
     """
     context = kw['context']
     request = kw['request']
@@ -1098,15 +1099,15 @@ def deferred_validate_password_reset_email(node: SchemaNode, kw: dict):
     return validate_email
 
 
-class POSTCreatePasswordResetRequestSchema(Schema):
+class POSTCreatePasswordResetRequestSchema(MappingSchema):
 
     """Schema to create a user password reset."""
 
-    email = Email(missing=colander.required,
+    email = Email(missing=required,
                   validator=deferred_validate_password_reset_email)
 
 
-@colander.deferred
+@deferred
 def validate_password_reset_path(node, kw):
     """Validate password reset and add the user needing password reset."""
     request = kw['request']
@@ -1135,10 +1136,10 @@ def _raise_if_outdated(node: SchemaNode, value: IPasswordReset,
             raise Invalid(node, msg)
 
 
-class POSTPasswordResetRequestSchema(Schema):
+class POSTPasswordResetRequestSchema(MappingSchema):
     """Schema to get a user password reset resource."""
 
-    path = Resource(missing=colander.required,
+    path = Resource(missing=required,
                     validator=validate_password_reset_path,
                     )
-    password = Password(missing=colander.required)
+    password = Password(missing=required)
