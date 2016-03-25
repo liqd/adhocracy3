@@ -32,8 +32,7 @@ class TestReference:
     @fixture
     def catalog(self):
         from substanced.interfaces import IService
-        catalog = testing.DummyResource(__provides__=IService,
-                                        __is_service__=True)
+        catalog = testing.DummyResource(__provides__=IService)
         return catalog
 
     @fixture
