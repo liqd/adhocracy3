@@ -7,6 +7,12 @@ import io
 import os
 import re
 
+from colander import Boolean as BooleanType
+from colander import DateTime as DateTimeType
+from colander import Decimal as DecimalType
+from colander import Integer as IntegerType
+from colander import Mapping as MappingType
+from colander import String as StringType
 from pyramid.path import DottedNameResolver
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
@@ -111,19 +117,19 @@ class Identifier(AdhocracySchemaNode):
     Example value: blu.ABC_12-3
     """
 
-    schema_type = colander.String
+    schema_type = StringType
     default = ''
     missing = colander.drop
     relative_regex = '[a-zA-Z0-9\_\-\.]+'
     validator = colander.All(colander.Regex('^' + relative_regex + '$'),
-                             colander.Length(min=1, max=100))
+                    Length(min=1, max=100))
 
 
 @colander.deferred
 def deferred_validate_name(node: colander.SchemaNode, kw: dict) -> callable:
     """Check that the node value is a valid child name."""
     return colander.All(deferred_validate_name_is_unique(node, kw),
-                        *Identifier.validator.validators)
+               *Identifier.validator.validators)
 
 
 class Name(AdhocracySchemaNode):
@@ -137,7 +143,7 @@ class Name(AdhocracySchemaNode):
     This node needs a `parent_pool` binding to validate.
     """
 
-    schema_type = colander.String
+    schema_type = StringType
     default = ''
     missing = colander.drop
     validator = deferred_validate_name
@@ -155,7 +161,7 @@ class Email(AdhocracySchemaNode):
             return email
         return email.lower()
 
-    schema_type = colander.String
+    schema_type = StringType
     default = ''
     missing = colander.drop
     preparer = _lower_case_email
@@ -168,7 +174,7 @@ class URL(AdhocracySchemaNode):
     Example value: http://colander.readthedocs.org/en/latest/
     """
 
-    schema_type = colander.String
+    schema_type = StringType
     default = ''
     missing = colander.drop
     # Note: colander.url doesn't work, hence we use a regex adapted from
@@ -194,7 +200,7 @@ class TimeZoneName(AdhocracySchemaNode):
     Example value: UTC
     """
 
-    schema_type = colander.String
+    schema_type = StringType
     default = 'UTC'
     missing = colander.drop
     validator = colander.OneOf(_ZONES)
@@ -218,7 +224,7 @@ class Role(AdhocracySchemaNode):
     Example value: 'reader'
     """
 
-    schema_type = colander.String
+    schema_type = StringType
     default = 'creator'
     missing = colander.drop
     validator = colander.OneOf(ROLE_PRINCIPALS)
@@ -281,7 +287,7 @@ class AbsolutePath(AdhocracySchemaNode):
     Example value: /bluaABC/_123/3
     """
 
-    schema_type = colander.String
+    schema_type = StringType
     relative_regex = '/[a-zA-Z0-9\_\-\.\/]+'
     validator = colander.Regex('^' + relative_regex + '$')
 
@@ -298,7 +304,7 @@ class SingleLine(AdhocracySchemaNode):
     Example value: This is a something.
     """
 
-    schema_type = colander.String
+    schema_type = StringType
     default = ''
     missing = colander.drop
     validator = colander.Function(string_has_no_newlines_validator,
@@ -325,7 +331,7 @@ class Boolean(AdhocracySchemaNode):
 
     def schema_type(self) -> colander.SchemaType:
         """Return the schema type."""
-        return colander.Boolean(true_choices=('true', '1'))
+        return BooleanType(true_choices=('true', '1'))
 
     default = False
     missing = False
@@ -365,7 +371,7 @@ class CurrencyAmount(AdhocracySchemaNode):
 
     def schema_type(self) -> colander.SchemaType:
         """Return schema type."""
-        return colander.Decimal(quant='.01')
+        return DecimalType(quant='.01')
 
     default = decimal.Decimal(0)
     missing = colander.drop
@@ -377,7 +383,7 @@ class ISOCountryCode(AdhocracySchemaNode):
     Example value: US
     """
 
-    schema_type = colander.String
+    schema_type = StringType
     default = ''
     missing = colander.drop
     validator = colander.Regex(r'^[A-Z][A-Z]$|^$')
@@ -389,7 +395,7 @@ class ISOCountryCode(AdhocracySchemaNode):
         return super().deserialize(cstruct)
 
 
-class ResourceObject(colander.SchemaType):
+class ResourceObjectType(colander.SchemaType):
     """Schema type that de/serialized a :term:`location`-aware object.
 
     Example values:  'http://a.org/bluaABC/_123/3' '/blua/ABC/'
@@ -430,8 +436,8 @@ class ResourceObject(colander.SchemaType):
             raise_attribute_error_if_not_location_aware(value)
         except AttributeError:
             raise colander.Invalid(node,
-                                   msg='This resource is not location aware',
-                                   value=value)
+                          msg='This resource is not location aware',
+                          value=value)
         return self._serialize_location_or_url_or_content(node, value)
 
     def _serialize_location_or_url_or_content(self, node, value):
@@ -492,7 +498,7 @@ class Resource(AdhocracySchemaNode):
 
     default = None
     missing = colander.drop
-    schema_type = ResourceObject
+    schema_type = ResourceObjectType
 
 
 @colander.deferred
@@ -512,8 +518,8 @@ class ResourcePathSchema(colander.MappingSchema):
 class ResourcePathAndContentSchema(ResourcePathSchema):
     """Resource Path with content schema."""
 
-    data = colander.SchemaNode(colander.Mapping(unknown='preserve'),
-                               default={})
+    data = SchemaNode(MappingType(unknown='preserve'),
+                      default={})
 
 
 def validate_reftype(node: colander.SchemaNode, value: IResource):
@@ -604,7 +610,7 @@ class Text(AdhocracySchemaNode):
                    with new lines.
     """
 
-    schema_type = colander.String
+    schema_type = StringType
     default = ''
     missing = colander.drop
 
@@ -616,7 +622,7 @@ class Password(AdhocracySchemaNode):
     Example value: secret password?
     """
 
-    schema_type = colander.String
+    schema_type = StringType
     default = ''
     missing = colander.drop
     validator = colander.Length(min=6, max=100)
@@ -700,7 +706,7 @@ class PostPool(Reference):
     readonly = True
     default = deferred_get_post_pool
     missing = colander.drop
-    schema_type = ResourceObject
+    schema_type = ResourceObjectType
     iresource_or_service_name = IPool
 
 
@@ -748,7 +754,7 @@ class Integer(AdhocracySchemaNode):
     Example value: 1
     """
 
-    schema_type = colander.Integer
+    schema_type = IntegerType
     default = 0
     missing = colander.drop
 
@@ -770,8 +776,8 @@ class FileStoreType(colander.SchemaType):
     def serialize(self, node, value):
         """Serialization is not supported."""
         raise colander.Invalid(node,
-                               msg='Cannot serialize FileStore',
-                               value=value)
+                      msg='Cannot serialize FileStore',
+                      value=value)
 
     def deserialize(self, node, value):
         """Deserialize into a File."""
@@ -888,7 +894,7 @@ class ACMRow(colander.SequenceSchema):
                     raise colander.Invalid(node, msg, value=action)
 
         return colander.All(validate_permission_name,
-                            validate_actions_names)
+                   validate_actions_names)
 
 
 class ACMPrincipals(colander.SequenceSchema):

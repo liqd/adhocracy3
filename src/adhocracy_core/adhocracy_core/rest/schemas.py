@@ -1,12 +1,17 @@
 """Data structures / validation specific to rest api requests."""
 from datetime import datetime
 
-import colander
-from colander import Schema
-from colander import SchemaNode
-from colander import MappingSchema
-from colander import SequenceSchema
+from colander import All
 from colander import Invalid
+from colander import Length
+from colander import OneOf
+from colander import Range
+from colander import Regex
+from colander import URL_REGEX
+from colander import deferred
+from colander import drop
+from colander import null
+from colander import required
 from hypatia.interfaces import IIndexSort
 from multipledispatch import dispatch
 from pyramid.interfaces import IRequest
@@ -22,6 +27,8 @@ from substanced.util import find_service
 from hypatia.field import FieldIndex
 from hypatia.keyword import KeywordIndex
 from zope import interface
+import colander
+
 from adhocracy_core.events import ResourceSheetModified
 from adhocracy_core.rest.exceptions import error_entry
 from adhocracy_core.interfaces import FieldComparator
@@ -52,6 +59,7 @@ from adhocracy_core.schema import Integer
 from adhocracy_core.schema import Integers
 from adhocracy_core.schema import Interface
 from adhocracy_core.schema import Interfaces
+from adhocracy_core.schema import MappingType
 from adhocracy_core.schema import Password
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import References
@@ -148,7 +156,7 @@ class PUTResourceRequestSchema(Schema):
     The subschemas for the Resource Sheets
     """
 
-    data = SchemaNode(colander.Mapping(unknown='raise'),
+    data = SchemaNode(MappingType(unknown='raise'),
                       after_bind=add_put_data_subschemas,
                       default={})
 
@@ -235,7 +243,7 @@ class POSTResourceRequestSchema(PUTResourceRequestSchema):
     content_type = ContentType(validator=deferred_validate_post_content_type,
                                missing=colander.required)
 
-    data = SchemaNode(colander.Mapping(unknown='raise'),
+    data = SchemaNode(MappingType(unknown='raise'),
                       after_bind=add_post_data_subschemas,
                       default={})
 
@@ -278,8 +286,8 @@ class POSTResourceRequestSchemaList(colander.List):
 class GETLocationMapping(Schema):
     """Overview of GET request/response data structure."""
 
-    request_querystring = SchemaNode(colander.Mapping(), default={})
-    request_body = SchemaNode(colander.Mapping(), default={})
+    request_querystring = SchemaNode(MappingType(), default={})
+    request_body = SchemaNode(MappingType(), default={})
     response_body = GETResourceResponseSchema()
 
 
@@ -513,7 +521,7 @@ class POSTBatchRequestItem(Schema):
 
     method = BatchHTTPMethod()
     path = BatchRequestPath()
-    body = SchemaNode(colander.Mapping(unknown='preserve'),
+    body = SchemaNode(MappingType(unknown='preserve'),
                       missing={})
     result_path = BatchRequestPath(missing='')
     result_first_version_path = BatchRequestPath(missing='')

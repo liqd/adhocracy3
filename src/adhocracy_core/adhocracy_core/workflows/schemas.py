@@ -1,11 +1,11 @@
 """Data structures for Workflows."""
 from colander import GlobalObject
-from colander import Mapping
 from colander import MappingSchema
 from colander import SchemaNode
 from colander import null
 from colander import drop
 from colander import required
+from adhocracy_core.schema import MappingType
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import ACM
@@ -62,9 +62,9 @@ class WorkflowMeta(MappingSchema):
 
     initial_state = SingleLine(missing=drop)
     defaults = SingleLine(missing=drop)
-    states = SchemaNode(Mapping(unknown='preserve'),
+    states = SchemaNode(MappingType(unknown='preserve'),
                         missing=drop)
-    transitions = SchemaNode(Mapping(unknown='preserve'),
+    transitions = SchemaNode(MappingType(unknown='preserve'),
                              missing=drop)
     # TODO validate there is only on transition between two states
 

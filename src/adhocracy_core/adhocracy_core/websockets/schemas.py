@@ -1,7 +1,7 @@
 """Colander schemas to validate and (de)serialize Websocket messages."""
 import colander
 
-from adhocracy_core.schema import ResourceObject
+from adhocracy_core.schema import ResourceObjectType
 from adhocracy_core.schema import Resource
 
 
@@ -52,7 +52,8 @@ class ServerNotification(colander.MappingSchema):
     """Notification sent to the server from the Pyramid WS client."""
 
     event = Event()
-    resource = colander.SchemaNode(ResourceObject(serialization_form='path'))
+    resource = colander.SchemaNode(
+        ResourceObjectType(serialization_form='path'))
 
 
 class Notification(colander.MappingSchema):

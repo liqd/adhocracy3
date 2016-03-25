@@ -8,6 +8,7 @@ from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import AnnotationRessourceSheet
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import add_sheet_to_registry
+from adhocracy_core.schema import MappingType
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.interfaces import search_result
@@ -133,7 +134,7 @@ class PoolSheet(AnnotationRessourceSheet):
                                         name='count')
             schema.add(child)
         if params.get('show_frequency', False):
-            child = colander.SchemaNode(colander.Mapping(unknown='preserve'),
+            child = SchemaNode(MappingType(unknown='preserve'),
                                         default={},
                                         missing=colander.drop,
                                         name='aggregateby')
