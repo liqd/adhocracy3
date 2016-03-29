@@ -437,7 +437,8 @@ var moderate = (
 ) => (scope) => {
     var badges = {
         winning: adhTopLevelState.get("processUrl") + "badges/winning/",
-        community: adhTopLevelState.get("processUrl") + "badges/community/"
+        community: adhTopLevelState.get("processUrl") + "badges/community/",
+        shortlist: adhTopLevelState.get("processUrl") + "badges/shortlist/",
     };
 
     return adhHttp.get(scope.path).then((oldProposal) => {
