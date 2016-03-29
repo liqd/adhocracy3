@@ -26,7 +26,7 @@ var extractErrorItems = (code : number, error : IBackendError) : IBackendErrorIt
             code: code
         }];
     } else {
-        _.forEach(error.errors, function(value){
+        _.forEach(error.errors, (value) => {
             value.code = code;
         });
         return error.errors;

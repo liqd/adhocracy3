@@ -5,6 +5,7 @@ import * as ResourcesBase from "../../ResourcesBase";
 import * as AdhConfig from "../Config/Config";
 import * as AdhEmbed from "../Embed/Embed";
 import * as AdhHttp from "../Http/Http";
+import * as AdhHttpError from "../Http/Error";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 import * as AdhCredentials from "../User/Credentials";
@@ -376,10 +377,10 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
                 return _.extend(defaults, meta, specifics, search);
             });
-        }, (error) => {
+        }, (errors : AdhHttpError.IBackendErrorItem[]) => {
 
-            _.forEach(error, function(value) {
-                if ((<any>value).code === 403) {
+            _.forEach(errors, (error) => {
+                if (error.code === 403) {
                     if (self.adhcredentials.loggedIn) {
                         throw 403;
                     } else {
