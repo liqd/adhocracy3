@@ -1,4 +1,11 @@
-<div class="section-jump" id="section-jump-top">
+<div
+    class="section-jump"
+    id="section-jump-top"
+    data-ng-class="{
+        'has-rosette': data.winner.name,
+        'm-winner': data.winner.name === 'winning',
+        'm-community-award': data.winner.name === 'community'
+    }">
     <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
 
     <div class="section-jump-cover">
