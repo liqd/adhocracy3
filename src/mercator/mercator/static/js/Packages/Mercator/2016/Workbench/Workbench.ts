@@ -204,6 +204,7 @@ export var proposalListingColumnDirective = (
                             items: [
                                 {key: "winning", name: "TR__MERCATOR_BADGE_WINNERS", enabled: true},
                                 {key: "community", name: "TR__MERCATOR_BADGE_COMMUNITY_AWARD"}
+                                {key: "shortlist", name: "TR__MERCATOR_BADGE_SHORTLIST"}
                             ]
                         });
                     }
