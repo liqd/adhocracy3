@@ -856,7 +856,7 @@ export var listItem = (
                     introduction: data.introduction,
                     commentCountTotal: data.commentCountTotal,
                     supporterCount: data.supporterCount,
-                    winnerBadgeAssignment: data.winner
+                    winnerBadgeAssignment: data.winner.name ? data.winner : null
                 };
 
                 scope.$on("$destroy", adhTopLevelState.bind("processState", scope.data, "currentPhase"));
