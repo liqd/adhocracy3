@@ -12,16 +12,18 @@ Angular
 -------
 
 `AngularJS <https://angularjs.org/>`__ is an open source JavaScript
-framework mainly developed by google.
+framework mainly developed by Google.
 
 In contrast to traditional frameworks like jQuery, you do not directly
 interact with the DOM. Instead, you only interact with data structures
 in JavaScript. The DOM is *bound* to these data structures and updates
 automatically.
 
-Other notable features are *services* (singleton objects), *dependency
-injection* (a way to decouple your code), and *promise based APIs* (as
-opposed to callbacks).
+Other notable features are `services
+<https://docs.angularjs.org/guide/services>`_ (singleton objects),
+`dependency injection <https://docs.angularjs.org/guide/di>`_ (a way
+to decouple your code), and *promise based APIs* (as opposed to
+callbacks).
 
 Angular is somewhat similar to other client-side rendering frameworks
 like `ember.js <http://emberjs.com/>`__ or
@@ -31,7 +33,7 @@ TypeScript
 ----------
 
 `TypeScript <http://www.typescriptlang.org/>`__ is an open-source
-language mainly developed by microsoft.
+language mainly developed by Microsoft.
 
 It contains many features of upcoming JavaScript versions (ES6/7) as
 well as static typing while staying compatible with ES5. Notable
@@ -97,7 +99,7 @@ however has the risk that you end up with an inconsistent state because
 one of the later requests fails.
 
 For this case, the adhocracy backend allows to encode several requests
-in a single :ref:`batch request <batch-requests>` that is then processes
+in a single :ref:`batch request <batch-requests>` that is then processed
 in a single database transaction. This way the whole batch is rolled
 back if a single request fails.
 
@@ -115,7 +117,7 @@ Websockets
 ++++++++++
 
 The backend uses :ref:`websockets <api-websockets>` to notify the
-frontend whenever a resource changes. This can be use to update the UI
+frontend whenever a resource changes. This can be used to update the UI
 automatically.
 
 .. NOTE::
@@ -144,13 +146,12 @@ Backend         Frontend            Backend        Frontend
 adhocracy_core  adhocracy_frontend  adhocracy_foo  foo
 ==============  ==================  =============  ========
 
-The ``static`` directories from both frontend packages are merged into
-a single one called ``build`` that is located next to ``static`` in the
-customization package. This is done by a script called
-``bin/merge_static_directories``. Merging in this case means that files
-from both directories are symlinked into the build directory. If a file
-exists in both packages, the one from the customization is overwrites
-the one from core.
+When bin/buildout is run, the ``static`` directories from both frontend
+packages are merged into a single one called ``build`` that is located
+next to ``static`` in the customization package.  Merging in this case
+means that files from both directories are symlinked into the build
+directory. If a file exists in both packages, the one from the
+customization overwrites the one from core.
 
 .. NOTE::
 
@@ -169,4 +170,5 @@ parameters.
 For example, a proposal directive would only get the ``path`` of a
 resource instead of relying on some parent directive to fetch it first.
 This of course means that many directives may trigger the same HTTP
-requests. This is mitigated by a build in caching system.
+requests. This is mitigated by a caching system that is built into the
+``adhHttp`` service.
