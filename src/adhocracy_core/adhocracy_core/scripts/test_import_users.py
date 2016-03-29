@@ -10,8 +10,6 @@ from tempfile import mkstemp
 import pytest
 
 from adhocracy_core.resources.root import IRootPool
-from adhocracy_core.utils import get_sheet
-from adhocracy_core.utils import get_sheet_field
 
 
 @mark.usefixtures('integration')
@@ -244,13 +242,16 @@ class TestImportUsers:
         assert len(assignments) == 1
 
         assignment = assignments[0]
-        assignment_sheet = get_sheet(assignment, sheets.badge.IBadgeAssignment)
+        assignment_sheet = registry.content.get_sheet(
+            assignment,
+            sheets.badge.IBadgeAssignment)
         badge = context['principals']['badges']['expert']
         assert assignment_sheet.get() == {'object': alice,
                                           'badge': badge,
                                           'subject': alice}
 
-    def test_create_and_send_invitation_mail(self, context, registry, mock_messenger):
+    def test_create_and_send_invitation_mail(self, context, registry,
+                                             mock_messenger):
         registry.messenger = mock_messenger
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
@@ -293,22 +294,32 @@ class TestImportUsers:
         self.call_fut(context, registry, filename)
 
         alice = locator.get_user_by_login('Alice')
-        assignments = get_sheet_field(alice, sheets.badge.IBadgeable, 'assignments')
+        assignments = registry.content.get_sheet_field(alice,
+                                                       sheets.badge.IBadgeable,
+                                                       'assignments')
         assignment = assignments[0]
-        assignment_sheet = get_sheet(assignment, sheets.badge.IBadgeAssignment)
+        assignment_sheet = registry.content.get_sheet(
+            assignment,
+            sheets.badge.IBadgeAssignment)
         badge = context['principals']['badges']['expert']
         assert assignment_sheet.get() == {'object': alice,
                                           'badge': badge,
                                           'subject': alice}
         bob = locator.get_user_by_login('Alice')
-        assignments = get_sheet_field(bob, sheets.badge.IBadgeable, 'assignments')
+        assignments = registry.content.get_sheet_field(bob,
+                                                       sheets.badge.IBadgeable,
+                                                       'assignments')
         assignment = assignments[0]
-        assignment_sheet = get_sheet(assignment, sheets.badge.IBadgeAssignment)
+        assignment_sheet = registry.content.get_sheet(
+            assignment,
+            sheets.badge.IBadgeAssignment)
         badge = context['principals']['badges']['expert']
         assert assignment_sheet.get() == {'object': bob,
                                           'badge': badge,
                                           'subject': bob}
-        title = get_sheet_field(badge, sheets.title.ITitle, 'title')
+        title = registry.content.get_sheet_field(badge,
+                                                 sheets.title.ITitle,
+                                                 'title')
         assert title == 'Expert'
 
     def test_create_and_send_invitation_mail_with_custom_subject(

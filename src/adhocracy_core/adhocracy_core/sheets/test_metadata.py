@@ -40,8 +40,8 @@ class TestIMetadataSchema:
         assert result['deleted'] == 'false'
         assert result['hidden'] == 'false'
 
-    def test_serialize_empty_and_bind(self, context, mock_now):
-        inst = self.make_one().bind(context=context)
+    def test_serialize_empty_and_bind(self, context, mock_now, request_):
+        inst = self.make_one().bind(context=context, request=request_)
         result = inst.serialize({})
         now_str = mock_now.isoformat()
         assert result['creation_date'] == now_str
@@ -76,7 +76,7 @@ class TestMetadataSheet:
         from adhocracy_core.sheets.metadata import IMetadata
         from adhocracy_core.sheets.metadata import MetadataSchema
         from . import AttributeResourceSheet
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.meta.isheet == IMetadata
         assert inst.meta.schema_class == MetadataSchema
         assert inst.meta.editable is True
@@ -85,10 +85,9 @@ class TestMetadataSheet:
         assert inst.meta.sheet_class is AttributeResourceSheet
 
     @mark.usefixtures('integration')
-    def test_includeme_register_metadata_sheet(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register_sheet(self, meta, config):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert config.registry.content.get_sheet(context, meta.isheet)
 
 
 class TestVisibility:

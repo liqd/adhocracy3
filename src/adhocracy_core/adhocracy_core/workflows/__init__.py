@@ -1,11 +1,13 @@
 """Finite state machines for resources."""
 from colander import Invalid
-
 from pyramid.interfaces import IRequest
 from pyramid.registry import Registry
+from pyramid.renderers import render
+from pyramid.request import Request
+from pyrsistent import freeze
+from pyrsistent import PMap
 from substanced.workflow import ACLWorkflow
 from substanced.workflow import WorkflowError
-from substanced.workflow import IWorkflow
 from zope.deprecation import deprecated
 from zope.interface import implementer
 from zope.interface import Interface
@@ -36,28 +38,103 @@ class AdhocracyACLWorkflow(ACLWorkflow):
         return list(set(states))
 
 
-def add_workflow(registry: Registry, cstruct: dict, name: str):
+def add_workflow(registry: Registry, workflow_asset: str, name: str):
     """Create and add workflow to registry.
 
     :param registry: registry to register the workflow and store meta data.
-    :param cstruct: meta data :term:`cstruct` to create the workflow. The data
-        schema is :class:`adhocracy_core.workflows.schemas.Workflow`.
+    :param workfow_asset: yaml asset file to import the workflow metadata.
+        The data schema is :class:`adhocracy_core.workflows.schemas.Workflow`.
     :param name: identifier for the workflow
     :raises adhocracy_core.exceptions.ConfigurationError: if the validation
-        for :term:`cstruct` and the sanity checks in
-        class:`substanced.workflow.Workflow` fails.
+        for :term:`cstruct` or the sanity checks in
+        class:`substanced.workflow.Workflow` fail.
     """
-    error_msg = 'Cannot create workflow {0}: {1}'
+    cstruct = _get_meta(workflow_asset, registry)
+    appstruct = _deserialize_meta(cstruct, name)
+    appstruct = _add_defaults(appstruct, registry)
+    registry.content.workflows_meta[name] = appstruct
+    workflow = _create_workflow(appstruct, name)
+    registry.content.workflows[name] = workflow
+
+
+def _get_meta(workflow_asset: str, registry: Registry) -> dict:
+    dummy_request = Request.blank('/')  # pass the local registry in tests
+    dummy_request.registry = registry
+    cstruct = render(workflow_asset, {}, request=dummy_request)
+    return cstruct
+
+
+def _deserialize_meta(cstruct: dict, name: str) -> PMap:
+    schema = create_workflow_meta_schema(cstruct)
     try:
-        appstruct = _validate_workflow_cstruct(cstruct)
-        workflow = _create_workflow(registry, appstruct, name)
-    except Invalid as error:
-        msg = error_msg.format(name, str(error.asdict()))
-        raise ConfigurationError(msg)
-    except WorkflowError as error:
-        msg = error_msg.format(name, str(error))
-        raise ConfigurationError(msg)
-    _add_workflow_to_registry(registry, appstruct, workflow, name)
+        appstruct = schema.deserialize(cstruct)
+    except Invalid as err:
+        msg = 'Error add workflow with name {0}: {1}'
+        raise ConfigurationError(msg.format(name, str(err.asdict())))
+    return freeze(appstruct)
+
+
+def _add_defaults(appstruct: PMap, registry: Registry) -> PMap:
+    """Add values form default workflow to `appstruct`."""
+    default_name = appstruct.get('defaults', '')
+    if not default_name:
+        return appstruct
+    updated = registry.content.workflows_meta[default_name]
+    for key, value in appstruct.items():
+        if key in ['initial_state', 'defaults']:
+            updated = updated.transform([key], value)
+        elif key == 'transitions':
+            for transition_name, transition in value.items():
+                updated = updated.transform(['transitions', transition_name],
+                                            transition)
+        elif key == 'states':
+            for state_name, state in value.items():
+                for permission in state.get('acm', {}).get('permissions', []):
+                    name = permission[0]
+                    permissions = \
+                        updated['states'][state_name]['acm']['permissions']
+                    overwriting = name in [p[0] for p in permissions]
+                    if overwriting:
+                        updated = updated.transform(
+                            ['states', state_name, 'acm', 'permissions',
+                             match_permission(updated, state_name, name)],
+                            permission)
+                    else:
+                        updated_permissions = permissions.append(permission)
+                        updated = updated.transform(
+                            ['states', state_name, 'acm', 'permissions'],
+                            updated_permissions)
+    return updated
+
+
+def _create_workflow(appstruct: PMap,
+                     name: str) -> ACLWorkflow:
+    initial_state = appstruct['initial_state']
+    workflow = AdhocracyACLWorkflow(initial_state=initial_state, type=name)
+    for name, data in appstruct['states'].items():
+        acm = data.get('acm', {})
+        acl = acm and acm_to_acl(acm) or []
+        workflow.add_state(name, callback=None, acl=acl)
+    for name, data in appstruct['transitions'].items():
+        workflow.add_transition(name, **data)
+    try:
+        workflow.check()
+    except WorkflowError as err:
+        msg = 'Error add workflow with name {0}: {1}'
+        raise ConfigurationError(msg.format(name, str(err)))
+    return workflow
+
+
+def add_workflow_directive(config, workflow: str, name: str):
+    """Create `add_workflow` pyramid config directive.
+
+    Example usage::
+
+        config.add_workflow('mypackage:myworkflow.yaml', 'myworkflow)
+    """
+    config.action(('add_workflow', name),
+                  add_workflow,
+                  args=(config.registry, workflow, name))
 
 
 def transition_to_states(context, states: [str], registry: Registry,
@@ -89,38 +166,12 @@ def match_permission(acm, state, permission):
     return matcher
 
 
-def _validate_workflow_cstruct(cstruct: dict) -> dict:
-    """Deserialize workflow :term:`cstruct` and return :term:`appstruct`."""
-    schema = create_workflow_meta_schema(cstruct)
-    appstruct = schema.deserialize(cstruct)
-    return appstruct
-
-
-def _create_workflow(registry: Registry,
-                     appstruct: dict,
-                     name: str) -> ACLWorkflow:
-    initial_state = appstruct['initial_state']
-    workflow = AdhocracyACLWorkflow(initial_state=initial_state, type=name)
-    for name, data in appstruct['states'].items():
-        acl = acm_to_acl(data['acm'], registry)
-        workflow.add_state(name, callback=None, acl=acl)
-    for name, data in appstruct['transitions'].items():
-        workflow.add_transition(name, **data)
-    workflow.check()
-    return workflow
-
-
-def _add_workflow_to_registry(registry: Registry, appstruct: dict,
-                              workflow: IWorkflow,
-                              name: str):
-    registry.content.workflows_meta[name] = appstruct
-    registry.content.workflows[name] = workflow
-
-
 def includeme(config):  # pragma: no cover
-    """Include workflows."""
+    """Include workflows and add 'add_workflow' config directive."""
+    config.add_directive('add_workflow', add_workflow_directive)
     config.include('.sample')
     config.include('.standard')
+    config.include('.badge_assignment')
     config.include('.standard_private')
     config.include('.debate')
     config.include('.debate_private')

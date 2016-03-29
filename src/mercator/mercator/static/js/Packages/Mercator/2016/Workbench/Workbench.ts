@@ -1,4 +1,4 @@
-/// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../../../lib2/types/angular.d.ts"/>
 
 import * as AdhConfig from "../../../Config/Config";
 import * as AdhHttp from "../../../Http/Http";
@@ -371,7 +371,7 @@ export var registerRoutes = (
                     };
                 }
             );
-    }).value();
+    });
 };
 
 export var addProposalButton = (

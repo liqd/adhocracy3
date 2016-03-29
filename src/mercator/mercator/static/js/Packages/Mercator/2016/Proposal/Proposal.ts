@@ -1,5 +1,5 @@
-/// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
-/// <reference path="../../../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
+/// <reference path="../../../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../../../lib2/types/moment.d.ts"/>
 
 import * as AdhBadge from "../../../Badge/Badge";
 import * as AdhConfig from "../../../Config/Config";
@@ -857,6 +857,18 @@ export var listItem = (
                     commentCountTotal: data.commentCountTotal,
                     supporterCount: data.supporterCount
                 };
+
+                scope.$on("$destroy", adhTopLevelState.bind("processState", scope.data, "currentPhase"));
+
+                scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
+                    if (!proposalVersionUrl) {
+                        scope.selectedState = "";
+                    } else if (proposalVersionUrl === scope.path) {
+                        scope.selectedState = "is-selected";
+                    } else {
+                        scope.selectedState = "is-not-selected";
+                    }
+                }));
             });
         }
     };
@@ -1007,7 +1019,7 @@ export var detailDirective = (
             adhPermissions.bindScope(scope, () => scope.path);
             // FIXME, waa
             scope.isModerator = scope.options.PUT;
-
+            scope.$on("$destroy", adhTopLevelState.bind("processState", scope));
             get($q, adhHttp, adhTopLevelState, adhGetBadges)(scope.path).then((data) => {
                 scope.data = data;
             });

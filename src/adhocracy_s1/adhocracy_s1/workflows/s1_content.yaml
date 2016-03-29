@@ -1,0 +1,30 @@
+initial_state: proposed
+states:
+  proposed: {}
+  voteable: {}
+  selected:
+    acm:
+      principals:               [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [edit,                 ~,         ~,           ~,         D,       ~,         ~]
+        - [create_rate,          ~,         D,           ~,         D,       ~,         ~]
+        - [edit_rate,            ~,         ~,           ~,         D,       ~,         ~]
+        - [create_comment,       ~,         D,           D,         ~,       D,         ~]
+  rejected:
+    acm:
+      principals:               [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [edit,                 ~,         ~,           ~,         D,       ~,         ~]
+        - [create_rate,          ~,         D,           ~,         D,       ~,         ~]
+        - [edit_rate,            ~,         ~,           ~,         D,       ~,         ~]
+        - [create_comment,       ~,         D,           D,         ~,       D,         ~]
+transitions:
+  to_voteable:
+    from_state: proposed
+    to_state: voteable
+  to_selected:
+    from_state: voteable
+    to_state: selected
+  to_rejected:
+    from_state: voteable
+    to_state: rejected

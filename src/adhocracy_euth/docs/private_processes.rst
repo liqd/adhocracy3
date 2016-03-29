@@ -23,4 +23,4 @@ Following local roles must be created for every private processes::
      {"name-of-process-participants": ["role:participant"]}
 
 The users of the process must be assigned to the
-"name-of-process-participants" group via the `import_users` script.
+"name-of-process-participants" group via the `ad_import_users` script.

@@ -1,6 +1,6 @@
 """Export adhocracy3 users to CSV.
 
-This is registered as console script 'export_users' in setup.py.
+This is registered as console script in setup.py.
 
 """
 import argparse
@@ -15,7 +15,6 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import create_filename
-from adhocracy_core.utils import get_sheet_field
 
 
 def export_users():  # pragma: no cover
@@ -43,7 +42,7 @@ def _export_users(root, registry, filename):  # pragma: no cover
     with open(filename, 'w', newline='') as result_file:
         wr = csv.writer(result_file, delimiter=';', quotechar='"',
                         quoting=csv.QUOTE_MINIMAL)
-        _write_users_to_csv(users, wr)
+        _write_users_to_csv(users, wr, registry)
     print('Users exported to {}'.format(filename))
 
 
@@ -53,8 +52,10 @@ def _get_users(root: IResource, registry: Registry) -> [IUser]:
     return locator.get_users()
 
 
-def _write_users_to_csv(users: [IUser], writer: object) -> None:
+def _write_users_to_csv(users: [IUser], writer: object, registry: Registry):
     writer.writerow(['Username', 'Email', 'Creation date'])
     for user in users:
-        creation_date = get_sheet_field(user, IMetadata, 'creation_date')
+        creation_date = registry.content.get_sheet_field(user,
+                                                         IMetadata,
+                                                         'creation_date')
         writer.writerow([user.name, user.email, creation_date])

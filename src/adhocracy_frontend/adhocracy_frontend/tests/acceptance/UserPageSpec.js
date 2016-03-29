@@ -58,7 +58,7 @@ describe("user page", function() {
                 // console.log('mail', mail);
                 expect(mail.text).toContain(content);
                 expect(mail.subject).toContain(subject);
-                expect(mail.from[0].address).toContain("participant2");
+                expect(mail.from[0].address).toContain("noreply");
                 expect(mail.to[0].address).toContain("participant");
             });
         });

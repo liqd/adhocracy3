@@ -132,7 +132,7 @@ export var bindPath = (
                         title: documentVersion.data[SITitle.nick].title,
                         paragraphs: paragraphs,
                         // FIXME: DefinitelyTyped
-                        commentCountTotal: (<any>_).sum(_.map(paragraphs, "commentCount")),
+                        commentCountTotal: (<any>_).sumBy(paragraphs, "commentCount"),
                         modificationDate: documentVersion.data[SIMetadata.nick].modification_date,
                         creationDate: documentVersion.data[SIMetadata.nick].creation_date,
                         creator: documentVersion.data[SIMetadata.nick].creator,

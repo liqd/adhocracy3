@@ -104,12 +104,12 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
 
     def setUp(self):
         context = testing.DummyResource()
+        self.context = context
         user = testing.DummyResource()
         self.user = user
         context['user'] = user
         self.config = testing.setUp()
-        self.request = testing.DummyRequest(root=context,
-
+        self.request = testing.DummyRequest(context=context,
                                             registry=self.config.registry)
         self.user_url = self.request.application_url + '/user/'
         self.userid = '/user'
@@ -194,17 +194,15 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
 
     def test_effective_principals_without_headers(self):
         from pyramid.security import Everyone
-        from . import Anonymous
         inst = self.make_one('')
-        assert inst.effective_principals(self.request) == [Everyone, Anonymous]
+        assert inst.effective_principals(self.request) == [Everyone]
 
     def test_effective_principals_without_headers_and_groupfinder_returns_None(self):
         from pyramid.security import Everyone
-        from . import Anonymous
         def groupfinder(userid, request):
             return None
         inst = self.make_one('', groupfinder=groupfinder)
-        assert inst.effective_principals(self.request) == [Everyone, Anonymous]
+        assert inst.effective_principals(self.request) == [Everyone]
 
     def test_effective_principals_with_headers_and_grougfinder_returns_groups(self):
         from pyramid.security import Everyone
@@ -221,7 +219,6 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
 
     def test_effective_principals_with_only_user_header_and_groupfinder_returns_groups(self):
         from pyramid.security import Everyone
-        from . import Anonymous
         def groupfinder(userid, request):
             return ['group']
         self.request.headers = {}
@@ -230,7 +227,7 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         inst = self.make_one('', get_tokenmanager=lambda x: tokenmanager,
                               groupfinder=groupfinder)
         result = inst.effective_principals(self.request)
-        assert result == [Everyone, Anonymous]
+        assert result == [Everyone]
 
     def test_effective_principals_set_cache(self):
         from pyramid.security import Authenticated

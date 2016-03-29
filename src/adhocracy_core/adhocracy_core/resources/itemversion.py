@@ -9,7 +9,6 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import resource_meta
 from adhocracy_core.resources.base import Base
 from adhocracy_core.sheets.versions import IVersionable
-from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import find_graph
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.versions
@@ -27,10 +26,11 @@ def update_last_tag(version, registry, options):
     item = find_interface(version, IItem)
     if item is None:  # ease tests
         return
-    tags_sheet = registry.content.get_sheet(item,
-                                            adhocracy_core.sheets.tags.ITags)
     request = options.get('request', None)
-    tags_sheet.set({'LAST': version}, request=request)
+    tags_sheet = registry.content.get_sheet(item,
+                                            adhocracy_core.sheets.tags.ITags,
+                                            request=request)
+    tags_sheet.set({'LAST': version})
 
 
 def notify_new_itemversion_created(context, registry, options):
@@ -54,7 +54,7 @@ def notify_new_itemversion_created(context, registry, options):
     creator = options.get('creator', None)
     is_batchmode = options.get('is_batchmode', False)
     old_versions = []
-    versionable = get_sheet(context, IVersionable, registry=registry)
+    versionable = registry.content.get_sheet(context, IVersionable)
     follows = versionable.get()['follows']
     for old_version in follows:
         old_versions.append(old_version)

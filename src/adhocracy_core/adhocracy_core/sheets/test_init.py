@@ -10,10 +10,11 @@ import colander
 def sheet_meta(sheet_meta):
     from adhocracy_core.sheets import AnnotationRessourceSheet
     from adhocracy_core.interfaces import ISheet
+
     class SheetASchema(colander.MappingSchema):
         count = colander.SchemaNode(colander.Int(),
-            missing=colander.drop,
-            default=0)
+                                    missing=colander.drop,
+                                    default=0)
     meta = sheet_meta._replace(isheet=ISheet,
                                schema_class=SheetASchema,
                                sheet_class=AnnotationRessourceSheet,
@@ -58,7 +59,7 @@ class TestBaseResourceSheet:
 
     @fixture
     def inst(self, sheet_meta, context, registry):
-        inst = self.get_class()(sheet_meta, context, registry=registry)
+        inst = self.get_class()(sheet_meta, context, registry)
         inst._get_data_appstruct = Mock(spec=inst._get_data_appstruct)
         inst._get_data_appstruct.return_value = {}
         inst._store_data = Mock(spec=inst._store_data)
@@ -68,26 +69,55 @@ class TestBaseResourceSheet:
         from adhocracy_core.sheets import BaseResourceSheet
         return BaseResourceSheet
 
-    def test_create_valid(self, inst, sheet_meta, context):
+    def test_create_valid(self, registry, sheet_meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
+        inst = self.get_class()(sheet_meta, context, registry)
         assert inst.context == context
         assert inst.meta == sheet_meta
+        assert inst.registry == registry
+        assert inst.request is None
+        assert inst.creating is None
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
 
-    def test_create_valid_set_registry_if_available(self, sheet_meta, context,
-                                                    registry):
-        inst = self.get_class()(sheet_meta, context)
-        assert inst.registry is registry
+    def test_create_valid_with_request(self, registry, sheet_meta, context,
+                                       request_):
+        inst = self.get_class()(sheet_meta, context, registry,
+                                request=request_)
+        assert inst.request == request_
 
-    def test_create_valid_set_registry_manually(self, sheet_meta, context):
-        registry = testing.DummyResource()
-        inst = self.get_class()(sheet_meta, context, registry=registry)
-        assert inst.registry is registry
+    def test_create_valid_with_creating(self, registry, sheet_meta, context,
+                                        resource_meta):
+        inst = self.get_class()(sheet_meta, context, registry,
+                                creating=resource_meta)
+        assert inst.creating == resource_meta
 
-    def test_get_empty(self, inst):
+    def test_get_schema_with_bindings(self, inst):
+        schema = inst.get_schema_with_bindings()
+        assert schema.bindings == {'context': inst.context,
+                                   'request': inst.request,
+                                   'registry': inst.registry,
+                                   'creating': inst.creating,
+                                   }
+
+    def test_get_with_default(self, inst):
         assert inst.get() == {'count': 0}
+
+    def test_get_with_deferred_default(self, inst):
+        """A dictionary with 'registry' and 'context' is passed to deferred
+        default functions.
+        """
+        schema = inst.schema.bind()
+        @colander.deferred
+        def default(node, kw):
+            return len(kw)
+        schema['count'].default = default
+        inst.schema = schema
+        assert inst.get() == {'count': 2}
+
+    def test_get_with_omit_defaults(self, inst):
+        assert inst.get(omit_defaults=True) == {}
 
     def test_get_non_empty(self, inst):
         inst._get_data_appstruct.return_value = {'count': 11}
@@ -270,42 +300,56 @@ class TestBaseResourceSheet:
         assert events[0].old_appstruct == {'count': 0}
         assert events[0].new_appstruct == {'count': 2}
 
-    def test_get_cstruct(self, inst, request_):
-        inst._get_data_appstruct.return_value = {'count': 2}
-        assert inst.get_cstruct(request_) == {'count': '2'}
+    def test_serialize(self, inst, request_):
+        from . import BaseResourceSheet
+        inst.request = request_
+        inst.get = Mock(spec=BaseResourceSheet.get)
+        inst.get.return_value = {'elements': [],
+                                 'count': 2}
+        assert inst.serialize() == {'count': '2'}
+        default_params = {'only_visible': True,
+                          'allows': (request_.effective_principals, 'view'),
+                          }
+        assert inst.get.call_args[1]['params'] == default_params
+        assert inst.get.call_args[1]['omit_defaults'] is True
 
-    def test_get_cstruct_with_params(self, inst, request_):
+    def test_serialize_with_params(self, inst, request_):
+        inst.request = request_
         inst.get = Mock()
         inst.get.return_value = {'elements': []}
-        cstruct = inst.get_cstruct(request_, params={'name': 'child'})
+        cstruct = inst.serialize(params={'name': 'child'})
         assert 'name' in inst.get.call_args[1]['params']
 
-    def test_get_cstruct_filter_by_view_permission(self, inst, request_):
+    def test_serialize_filter_by_view_permission(self, inst, request_):
+        inst.request = request_
         inst.get = Mock()
         inst.get.return_value = {}
-        cstruct = inst.get_cstruct(request_)
+        cstruct = inst.serialize()
         assert inst.get.call_args[1]['params']['allows'] == \
-               (request_.effective_principals, 'view')
+                (request_.effective_principals, 'view')
 
-    def test_get_cstruct_filter_by_view_permission_disabled(self, inst,
+    def test_serialize_filter_by_view_permission_disabled(self, inst,
                                                             request_):
+        inst.request = request_
         inst.registry.settings['adhocracy.filter_by_view_permission'] = "False"
         inst.get = Mock()
         inst.get.return_value = {}
-        cstruct = inst.get_cstruct(request_)
+        cstruct = inst.serialize()
         assert 'allows' not in inst.get.call_args[1]['params']
 
-    def test_get_cstruct_filter_by_only_visible(self, inst, request_):
+    def test_serialize_filter_by_only_visible(self, inst, request_):
+        inst.request = request_
         inst.get = Mock()
         inst.get.return_value = {}
-        cstruct = inst.get_cstruct(request_)
+        cstruct = inst.serialize()
         assert inst.get.call_args[1]['params']['only_visible']
 
-    def test_get_cstruct_filter_by_only_visible_disabled(self, inst, request_):
+    def test_serialize_filter_by_only_visible_disabled(self, inst, request_):
+        inst.request = request_
         inst.registry.settings['adhocracy.filter_by_visible'] = "False"
         inst.get = Mock()
         inst.get.return_value = {}
-        cstruct = inst.get_cstruct(request_)
+        cstruct = inst.serialize()
         assert 'only_visible' not in inst.get.call_args[1]['params']
 
 
@@ -325,9 +369,9 @@ class TestAnnotationRessourceSheet:
                                    schema_class=SheetASchema)
 
     @fixture
-    def inst(self, sheet_meta, context):
+    def inst(self, sheet_meta, context, registry):
         from . import AnnotationRessourceSheet
-        return AnnotationRessourceSheet(sheet_meta, context)
+        return AnnotationRessourceSheet(sheet_meta, context, registry)
 
     def test_create(self, inst, context, sheet_meta):
         from . import BaseResourceSheet
@@ -362,7 +406,7 @@ class TestAnnotationRessourceSheet:
         assert inst.delete_field_values(['count']) is None
 
     def test_set_with_other_sheet_name_conflicts(self, inst, sheet_meta,
-                                                       context):
+                                                 context, registry):
         from adhocracy_core.interfaces import ISheet
 
         class ISheetB(ISheet):
@@ -370,12 +414,12 @@ class TestAnnotationRessourceSheet:
 
         class SheetBSchema(sheet_meta.schema_class):
             count = colander.SchemaNode(colander.Int(),
-                missing=colander.drop,
-                default=0)
+                                        missing=colander.drop,
+                                        default=0)
 
         sheet_b_meta = sheet_meta._replace(isheet=ISheetB,
                                            schema_class=SheetBSchema)
-        inst_b = sheet_meta.sheet_class(sheet_b_meta, context)
+        inst_b = sheet_meta.sheet_class(sheet_b_meta, context, registry)
 
         inst.set({'count': 1})
         inst_b.set({'count': 2})
@@ -384,7 +428,7 @@ class TestAnnotationRessourceSheet:
         assert inst_b.get() == {'count': 2, 'other': 0}
 
     def test_set_with_subtype_and_name_conflicts(self, inst,  sheet_meta,
-                                                       context):
+                                                 context, registry):
         class ISheetB(sheet_meta.isheet):
             pass
 
@@ -395,7 +439,7 @@ class TestAnnotationRessourceSheet:
 
         sheet_b_meta = sheet_meta._replace(isheet=ISheetB,
                                            schema_class=SheetBSchema)
-        inst_b = sheet_meta.sheet_class(sheet_b_meta, context)
+        inst_b = sheet_meta.sheet_class(sheet_b_meta, context, registry)
 
         inst.set({'count': 1, 'other': 0})
         inst_b.set({'count': 2})
@@ -412,9 +456,9 @@ class TestAttributeResourceSheet:
         return sheet_meta._replace(sheet_class=AttributeResourceSheet)
 
     @fixture
-    def inst(self, sheet_meta, context):
+    def inst(self, sheet_meta, context, registry):
         from . import AttributeResourceSheet
-        return AttributeResourceSheet(sheet_meta, context)
+        return AttributeResourceSheet(sheet_meta, context, registry)
 
     def test_create(self, inst, context, sheet_meta):
         from . import BaseResourceSheet
@@ -439,7 +483,7 @@ class TestAttributeResourceSheet:
         assert inst.context._p_changed is True
 
     def test_set_with_other_sheet_name_conflicts(self, inst, sheet_meta,
-                                                       context):
+                                                 context, registry):
         """Different sheets with equalt field names override each other.
            This should never happen.
         """
@@ -455,8 +499,7 @@ class TestAttributeResourceSheet:
 
         sheet_b_meta = sheet_meta._replace(isheet=ISheetB,
                                            schema_class=SheetBSchema)
-        inst_b = sheet_meta.sheet_class(sheet_b_meta, context)
-
+        inst_b = sheet_meta.sheet_class(sheet_b_meta, context, registry)
         inst.set({'count': 1})
         inst_b.set({'count': 2})
 

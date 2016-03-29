@@ -25,6 +25,7 @@ requires = [
     'requests',
     'pyrsistent',
     'multipledispatch',
+    'PyYAML',
 ]
 
 if sys.version_info < (3, 4):
@@ -87,22 +88,22 @@ setup(name='adhocracy_core',
       [pytest11]
       adhocracy_core = adhocracy_core.testing
       [console_scripts]
-      start_ws_server = adhocracy_core.websockets.start_ws_server:main
-      import_users = adhocracy_core.scripts.import_users:import_users
-      import_groups = adhocracy_core.scripts.import_groups:import_groups
-      import_resources =\
+      ad_start_ws_server = adhocracy_core.websockets.start_ws_server:main
+      ad_import_users = adhocracy_core.scripts.import_users:import_users
+      ad_import_groups = adhocracy_core.scripts.import_groups:import_groups
+      ad_import_resources =\
           adhocracy_core.scripts.import_resources:import_resources
-      import_local_roles = \
+      ad_import_local_roles = \
           adhocracy_core.scripts.import_local_roles:import_local_roles
-      assign_badges =\
+      ad_assign_badges =\
           adhocracy_core.scripts.assign_badges:assign_badges
-      set_workflow_state =\
+      ad_set_workflow_state =\
           adhocracy_core.scripts.set_workflow_state:set_workflow_state
-      delete_stale_login_data =\
+      ad_delete_stale_login_data =\
           adhocracy_core.scripts.delete_stale_login_data:delete_stale_login_data
-      delete_not_referenced_images =\
+      ad_delete_not_referenced_images =\
           adhocracy_core.scripts.delete_images:delete_not_referenced_images
-      export_users =\
+      ad_export_users =\
           adhocracy_core.scripts.export_users:export_users
       [pyramid.scaffold]
       adhocracy=adhocracy_core.scaffolds:AdhocracyExtensionTemplate

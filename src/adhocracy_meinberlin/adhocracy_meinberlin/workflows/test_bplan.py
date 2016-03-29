@@ -3,8 +3,8 @@ from pytest import fixture
 from pytest import mark
 from webtest import TestResponse
 
-from adhocracy_core.utils.testing import add_resources
-from adhocracy_core.utils.testing import do_transition_to
+from adhocracy_core.testing import add_resources
+from adhocracy_core.testing import do_transition_to
 
 
 @fixture(scope='class')
@@ -30,12 +30,6 @@ def app_admin(app_admin):
     return app_admin
 
 
-@fixture
-def integration(config):
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_meinberlin.workflows')
-
 @mark.usefixtures('integration')
 def test_includeme_add_bplan_private_workflow(registry):
     from adhocracy_core.workflows import AdhocracyACLWorkflow
@@ -49,9 +43,9 @@ def test_initiate_bplan_private_workflow(registry, context):
     workflow = registry.content.workflows['bplan_private']
     assert workflow.state_of(context) is None
     workflow.initialize(context)
-    assert workflow.state_of(context) is 'private'
+    assert workflow.state_of(context) == 'private'
     local_acl = get_acl(context)
-    assert ('Deny', 'system.Anonymous', 'view') in local_acl
+    assert ('Deny', 'system.Everyone', 'view') in local_acl
 
 
 @mark.usefixtures('integration')

@@ -14,7 +14,6 @@ from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Reference
-from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import now
 
 
@@ -45,11 +44,9 @@ class MetadataModifiedByReference(SheetToSheet):
 def deferred_validate_hidden(node, kw):
     """Check hide_permission."""
     context = kw['context']
-    request = kw.get('request', None)
-    if request is None:
-        return
+    request = kw['request']
 
-    def check_hide_permisison(node, cstruct):
+    def check_hide_permisison(node, value):
         if not request.has_permission('hide', context):
             raise colander.Invalid(node, 'Changing this field is not allowed')
     return check_hide_permisison
@@ -113,7 +110,7 @@ def view_blocked_by_metadata(resource: IResource, registry: Registry,
     result = {'reason': block_reason}
     if not IMetadata.providedBy(resource):
         return result
-    metadata = get_sheet(resource, IMetadata, registry=registry)
+    metadata = registry.content.get_sheet(resource, IMetadata)
     appstruct = metadata.get()
     result['modification_date'] = appstruct['modification_date']
     result['modified_by'] = appstruct['modified_by']

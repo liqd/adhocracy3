@@ -9,7 +9,7 @@ def test_paragraphversion_meta():
     from .paragraph import IParagraphVersion
     meta = paragraphversion_meta
     assert meta.iresource is IParagraphVersion
-    assert meta.permission_create == 'edit_document'
+    assert meta.permission_create == 'edit'
     assert meta.extended_sheets == (sheets.document.IParagraph,
                                     sheets.comment.ICommentable,
                                     )
@@ -24,7 +24,7 @@ def test_paragraph_meta():
     meta = paragraph_meta
     assert meta.iresource is IParagraph
     assert meta.item_type == IParagraphVersion
-    assert meta.permission_create == 'edit_document'
+    assert meta.permission_create == 'edit'
     assert meta.use_autonaming
     assert meta.autonaming_prefix == 'PARAGRAPH_'
     assert add_commentsservice in meta.after_creation

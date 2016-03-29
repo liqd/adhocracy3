@@ -1,0 +1,37 @@
+defaults: standard
+states:
+  participate:
+    acm:
+      principals:                       [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [create_proposal,              ~,         A,           ~,         ~,       A,         ~]
+        - [create_comment,               ~,         A,           A,         ~,       A,         ~]
+        - [create_rate,                  ~,         A,           ~,         ~,       ~,         ~]
+        - [edit_rate,                    ~,         ~,           ~,         A,       ~,         ~]
+        - [create_badge_assignment,      ~,         A,           ~,         ~,       ~,         ~]
+        - [view_mercator2_extra_funding, ~,         D,           A,         A,       ~,         ~]
+        - [view_mercator2_winnerinfo,    ~,         D,           D,         ~,       ~,         ~]
+        - [edit_mercator2_winnerinfo,    ~,         D,           D,         ~,       ~,         ~]
+  evaluate:
+    acm:
+      principals:                       [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [edit,                         ~,        ~,           ~,       D,         ~,         ~]
+        - [view_mercator2_extra_funding, ~,        D,           A,      ~,          ~,         ~]
+        - [view_mercator2_winnerinfo,    ~,        D,           A,      ~,          ~,         ~]
+        - [edit_mercator2_winnerinfo,    ~,        D,           A,      ~,          ~,         ~]
+  result:
+    acm:
+      principals:                       [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [edit,                         ~,         ~,           ~,         A,       ~,         ~]
+        - [view_mercator2_extra_funding, ~,         D,           A,         ~,       ~,         ~]
+        - [view_mercator2_winnerinfo,    ~,         A,           A,         ~,       ~,         ~]
+        - [edit_mercator2_winnerinfo,    ~,         D,           A,         ~,       ~,         ~]
+        - [create_document,              ~,         ~,           ~,         A,       ~,         ~]
+  closed:
+    acm:
+      principals:                       [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [edit,                         ~,        ~,           ~,         D,       ~,         ~]
+

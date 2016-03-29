@@ -5,8 +5,8 @@ from pytest import mark
 
 from webtest import TestResponse
 
-from adhocracy_core.utils.testing import add_resources
-from adhocracy_core.utils.testing import do_transition_to
+from adhocracy_core.testing import add_resources
+from adhocracy_core.testing import do_transition_to
 
 @fixture
 def integration(integration):

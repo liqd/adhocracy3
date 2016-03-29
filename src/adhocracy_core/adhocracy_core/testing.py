@@ -13,6 +13,7 @@ from pyramid.config import Configurator
 from pyramid import testing
 from pyramid.util import DottedNameResolver
 from pyramid.router import Router
+from pyramid.scripting import get_root
 from pyramid_mailer.mailer import DummyMailer
 from pytest import fixture
 from ZODB import FileStorage
@@ -21,6 +22,7 @@ from webtest import TestApp
 from webtest import TestResponse
 from zope.interface.interfaces import IInterface
 import colander
+import transaction
 
 from adhocracy_core.interfaces import SheetMetadata
 from adhocracy_core.interfaces import ChangelogMetadata
@@ -29,6 +31,9 @@ from adhocracy_core.interfaces import SearchResult
 from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.resources.root import IRootPool
+from adhocracy_core.scripts import import_resources
+from adhocracy_core.scripts import import_local_roles
+
 
 #####################################
 # Integration/Function test helper  #
@@ -178,6 +183,8 @@ def integration(config) -> Configurator:
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.graph')
     config.include('adhocracy_core.catalog')
+    config.include('adhocracy_core.authorization')
+    config.include('adhocracy_core.renderers')
     config.include('adhocracy_core.sheets')
     config.include('adhocracy_core.resources')
     config.include('adhocracy_core.workflows')
@@ -397,10 +404,7 @@ def mock_content_registry() -> Mock:
     mock.get_sheets_edit.return_value = []
     mock.get_sheets_create.return_value = []
     mock.get_sheet.return_value = None
-    mock.sheets_read = {}
-    mock.sheets_edit = {}
-    mock.sheets_create = {}
-    mock.sheets_create_mandatory = {}
+    mock.get_sheet_field = lambda x, y, z: mock.get_sheet(x, y).get()[z]
     return mock
 
 
@@ -423,6 +427,23 @@ def config(request) -> Configurator:
 def registry(config) -> object:
     """Return dummy registry."""
     return config.registry
+
+
+@fixture
+def kw(context, registry, request_) -> dict:
+    """Return default keyword arguments for schema binding.
+
+    Available kwargs: request, content, registry, creating
+
+    Note: If the registry keyword is not need, this fixture should not be
+          used. This makes the tests run faster and we don't declare needless
+          dependencies.
+    """
+    return {'request': request_,
+            'registry': registry,
+            'context': context,
+            'creating': None,
+            }
 
 
 @fixture
@@ -496,6 +517,8 @@ def app_settings(request) -> dict:
         'pyramid_tm',
         # mock mail server
         'pyramid_mailer.testing',
+        # force error logging
+        'pyramid_exclog',
     ]
     settings['mail.default_sender'] = 'substanced_demo@example.com'
     settings['adhocracy.abuse_handler_mail'] = \
@@ -958,3 +981,31 @@ def datadir(tmpdir, request):
         dir_util.copy_tree(test_dir, str(tmpdir))
 
     return tmpdir
+
+
+def add_resources(app_router: Router, filename: str):
+    """Add resources from a JSON file to the app."""
+    _run_import_function(import_resources, app_router, filename)
+
+
+def add_local_roles(app_router: Router, filename: str):
+    """Add local roles from a JSON file to resources."""
+    _run_import_function(import_local_roles, app_router, filename)
+
+
+def _run_import_function(func: callable, app_router: Router, filename: str):
+    root, closer = get_root(app_router)
+    try:
+        func(root, app_router.registry, filename)
+        transaction.commit()
+    finally:
+        closer()
+
+
+def do_transition_to(app_user, path, state) -> TestResponse:
+    """Transition to a new workflow state by sending a PUT request."""
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
+    data = {'data': {IWorkflowAssignment.__identifier__:
+                     {'workflow_state': state}}}
+    resp = app_user.put(path, data)
+    return resp

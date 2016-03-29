@@ -1,4 +1,4 @@
-/// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
+/// <reference path="../../../lib2/types/lodash.d.ts"/>
 
 import * as _ from "lodash";
 
@@ -118,7 +118,7 @@ export class Transaction {
             (response) => {
                 var imported = AdhConvert.importBatchContent(
                     response.data.responses, this.adhMetaApi, this.adhPreliminaryNames, this.adhCache);
-                _self.adhCache.invalidateUpdated(response.data.updated_resources, _.pluck(imported, "path"));
+                _self.adhCache.invalidateUpdated(response.data.updated_resources, <string[]>_.map(imported, "path"));
                 return imported;
             },
             AdhError.logBackendBatchError);

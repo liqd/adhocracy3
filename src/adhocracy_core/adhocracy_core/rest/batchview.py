@@ -56,7 +56,7 @@ class BatchItemResponse:
 class BatchView(RESTView):
     """Process batch requests."""
 
-    validation_POST = (POSTBatchRequestSchema, [])
+    schema_POST = POSTBatchRequestSchema
 
     @view_config(name='batch',
                  request_method='POST',

@@ -1,8 +1,6 @@
-/// <reference path="../lib/DefinitelyTyped/requirejs/require.d.ts"/>
-/// <reference path="../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
-/// <reference path="../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
-/// <reference path="../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
-/// <reference path="../lib/DefinitelyTyped/moment/moment.d.ts"/>
+/// <reference path="../lib2/types/angular.d.ts"/>
+/// <reference path="../lib2/types/lodash.d.ts"/>
+/// <reference path="../lib2/types/moment.d.ts"/>
 /// <reference path="./_all.d.ts"/>
 
 import * as angular from "angular";
@@ -38,7 +36,6 @@ import * as AdhImageModule from "./Packages/Image/Module";
 import * as AdhInjectModule from "./Packages/Inject/Module";
 import * as AdhListingModule from "./Packages/Listing/Module";
 import * as AdhLocaleModule from "./Packages/Locale/Module";
-import * as AdhLocalSocketModule from "./Packages/LocalSocket/Module";
 import * as AdhMarkdownModule from "./Packages/Markdown/Module";
 import * as AdhMercatorModule from "./Packages/Mercator/Module";
 import * as AdhMovingColumnsModule from "./Packages/MovingColumns/Module";
@@ -178,7 +175,6 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhInjectModule.register(angular);
     AdhListingModule.register(angular);
     AdhLocaleModule.register(angular);
-    AdhLocalSocketModule.register(angular);
     AdhMarkdownModule.register(angular);
     AdhMercatorModule.register(angular);
     AdhMovingColumnsModule.register(angular);

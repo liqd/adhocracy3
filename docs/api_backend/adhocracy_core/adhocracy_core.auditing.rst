@@ -6,10 +6,3 @@ adhocracy_core.auditing package
     :undoc-members:
     :show-inheritance:
 
-Submodules
-----------
-
-.. toctree::
-
-   adhocracy_core.auditing.test_init
-

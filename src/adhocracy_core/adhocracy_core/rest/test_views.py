@@ -201,24 +201,6 @@ class TestValidateRequest:
             self.call_fut(context, request_, schema=CountSchema())
         assert request_.validated == {}
 
-    def test_valid_with_extra_validator(self, context, request_):
-        def validator1(context, request_):
-            request_.validated = {"validator": "1"}
-        self.call_fut(context, request_, extra_validators=[validator1])
-        assert request_.validated == {"validator": "1"}
-
-    def test_valid_with_extra_validator_and_wrong_schema_data(self, context,
-                                                              request_):
-        from pyramid.httpexceptions import HTTPBadRequest
-        def validator1(context, request_):
-            request_._validator_called = True
-        request_.body = '{"count": "wrong"}'
-        request_.method = 'POST'
-        with pytest.raises(HTTPBadRequest):
-            self.call_fut(context, request_, schema=CountSchema(),
-                           extra_validators=[validator1])
-        assert hasattr(request_, '_validator_called') is False
-
     def test_valid_with_sequence_schema(self, context, request_):
         class TestListSchema(colander.SequenceSchema):
             elements = colander.SchemaNode(colander.String())
@@ -284,42 +266,6 @@ class TestValidateRequest:
         assert request_.validated == {}
 
 
-class TestValidatePOSTRootVersions:
-
-    def make_one(self, context, request_):
-        from adhocracy_core.rest.views import validate_post_root_versions
-        validate_post_root_versions(context, request_)
-
-    def test_valid_no_value(self, request_, context):
-        self.make_one(context, request_)
-        assert request_.errors == []
-
-    def test_valid_empty_value(self, request_, context):
-        self.make_one(context, request_)
-        request_.validated = {'root_versions': []}
-        assert request_.errors == []
-
-    def test_valid_with_value(self, request_, context):
-        from adhocracy_core.interfaces import IItemVersion
-        from adhocracy_core.interfaces import ISheet
-        root = testing.DummyResource(__provides__=(IItemVersion, ISheet))
-        request_.validated = {'root_versions': [root]}
-
-        self.make_one(context, request_)
-
-        assert request_.errors == []
-        assert request_.validated == {'root_versions': [root]}
-
-    def test_non_valid_value_has_wrong_iface(self, request_, context):
-        from adhocracy_core.interfaces import ISheet
-        root = testing.DummyResource(__provides__=(IResourceX, ISheet))
-        request_.validated = {'root_versions': [root]}
-
-        self.make_one(context, request_)
-
-        assert request_.errors != []
-        assert request_.validated == {'root_versions': []}
-
 
 class TestRespondIfBlocked:
 
@@ -366,11 +312,11 @@ class TestRESTView:
         from . import views
         block_mock = mocker.patch.object(views, 'respond_if_blocked')
         inst = self.make_one(context, request_)
-        assert inst.validation_GET == (None, [])
-        assert inst.validation_HEAD == (None, [])
-        assert inst.validation_OPTIONS == (None, [])
-        assert inst.validation_PUT == (None, [])
-        assert inst.validation_POST == (None, [])
+        assert inst.schema_GET is None
+        assert inst.schema_HEAD is None
+        assert inst.schema_OPTIONS is None
+        assert inst.schema_PUT is None
+        assert inst.schema_POST is None
         assert inst.context is context
         assert inst.request is request_
         assert inst.request.errors == []
@@ -543,7 +489,7 @@ class TestResourceRESTView:
         assert wanted == response
 
     def test_get_with_sheets(self, request_, context, mock_sheet):
-        mock_sheet.get_cstruct.return_value = {'name': '1'}
+        mock_sheet.serialize.return_value = {'name': '1'}
         mock_sheet.schema.add(colander.SchemaNode(colander.Int(), name='name'))
         request_.registry.content.get_sheets_read.return_value = [mock_sheet]
         inst = self.make_one(context, request_)
@@ -561,7 +507,7 @@ class TestSimpleRESTView:
         from adhocracy_core.rest.schemas import PUTResourceRequestSchema
         inst = self.make_one(context, request_)
         assert issubclass(inst.__class__, ResourceRESTView)
-        assert inst.validation_PUT == (PUTResourceRequestSchema, [])
+        assert inst.schema_PUT == PUTResourceRequestSchema
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
@@ -603,7 +549,7 @@ class TestPoolRESTView:
         from adhocracy_core.rest.schemas import POSTResourceRequestSchema
         inst = self.make_one(context, request_)
         assert issubclass(inst.__class__, SimpleRESTView)
-        assert inst.validation_POST == (POSTResourceRequestSchema, [])
+        assert inst.schema_POST == POSTResourceRequestSchema
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
@@ -624,7 +570,7 @@ class TestPoolRESTView:
                                                     mock_sheet):
         from adhocracy_core.sheets.pool import IPool
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
-        mock_sheet.get_cstruct.return_value = {}
+        mock_sheet.serialize.return_value = {}
         request_.registry.content.get_sheets_read.return_value = [mock_sheet]
         request_.validated['param1'] = 1
 
@@ -632,8 +578,8 @@ class TestPoolRESTView:
         response = inst.get()
 
         assert response['data'] == {IPool.__identifier__: {}}
-        assert mock_sheet.get_cstruct.call_args[1] == {'params': {'param1': 1,
-                                                       }}
+        assert mock_sheet.serialize.call_args[1] == {'params': {'param1': 1,
+                                                                }}
 
     def test_post(self, request_, context):
         request_.root = context
@@ -682,55 +628,6 @@ class TestPoolRESTView:
                                         'modified': [],
                                         'removed': []}}
         assert wanted == response
-
-
-class TestGetWorkflow:
-
-    def call_fut(self, *args):
-        from .views import _get_workflow
-        return _get_workflow(*args)
-
-    @fixture
-    def request_(self, request_):
-        request_.content_type = 'application/json'
-        return request_
-
-    def test_return_none_if_no_json_content_type(self, request_, context):
-        request_.content_type = 'NOT_JSON'
-        assert self.call_fut(context, request_) is None
-
-    def test_return_none_if_no_json_dict_body(self, request_, context):
-        request_.json = []
-        assert self.call_fut(context, request_) is None
-
-    def test_return_context_workflow_if_put_request(self, request_, context):
-        request_.method = 'PUT'
-        request_.registry.content.get_workflow.return_value = None
-        assert self.call_fut(context, request_) is None
-
-    def test_return_context_workflow_if_get_request(self, request_, context):
-        request_.method = 'GET'
-        request_.registry.content.get_workflow.return_value = None
-        assert self.call_fut(context, request_) is None
-
-    def test_return_none_if_post_request_without_content_type_field(
-        self, request_, context):
-        request_.method = 'POST'
-        request_.json = {}
-        assert self.call_fut(context, request_) is None
-
-    def test_return_none_if_post_request_with_broken_content_type(
-        self, request_, context):
-        request_.method = 'POST'
-        request_.json = {'content_type': 'brocken'}
-        assert self.call_fut(context, request_) is None
-
-    def test_return_none_if_post_request_with_wrong_content_type(
-        self, request_, context):
-        request_.method = 'POST'
-        request_.json = {'content_type': 'adhocracy_core.interfaces.ISheet'}
-        assert self.call_fut(context, request_) is None
-
 
 
 class TestUsersRESTView:
@@ -785,13 +682,11 @@ class TestItemRESTView:
         return ItemRESTView(context, request_)
 
     def test_create(self, request_, context):
-        from adhocracy_core.rest.views import validate_post_root_versions
         from adhocracy_core.rest.views import SimpleRESTView
         from adhocracy_core.rest.schemas import POSTItemRequestSchema
         inst = self.make_one(context, request_)
         assert issubclass(inst.__class__, SimpleRESTView)
-        assert inst.validation_POST == (POSTItemRequestSchema,
-                                        [validate_post_root_versions])
+        assert inst.schema_POST == POSTItemRequestSchema
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
@@ -919,7 +814,7 @@ class TestItemRESTView:
         inst = self.make_one(context, request_)
         response = inst.post()
 
-        mock_other_sheet.set.assert_called_with({'x': 'y'}, request=request_)
+        mock_other_sheet.set.assert_called_with({'x': 'y'})
         assert response['path'] == request_.application_url + '/last_version/'
 
     def test_post_itemversion_batchmode_first_and_last_version_in_transaction(
@@ -952,7 +847,7 @@ class TestItemRESTView:
         inst = self.make_one(context, request_)
         response = inst.post()
 
-        mock_other_sheet.set.assert_called_with({'x': 'y'}, request=request_)
+        mock_other_sheet.set.assert_called_with({'x': 'y'})
         assert response['path'] == request_.application_url + '/last_version/'
 
     def test_put_no_sheets(self, request_, context, mock_sheet):
@@ -1253,132 +1148,12 @@ class TestMetaApiView:
     def test_get_workflows(self, request_, context):
         inst = self.make_one(request_, context)
         request_.registry.content.workflows_meta['sample'] = {'states': {},
-                                                             'transitions': {}}
+                                                              'transitions': {}}
         workflows_meta = inst.get()['workflows']
         assert workflows_meta == {'sample': {'initial_state': '',
+                                             'defaults': '',
                                              'states': {},
                                              'transitions': {}}}
-
-
-class TestValidateLoginEmail:
-
-    @fixture
-    def request_(self, request_):
-        request_.validated['email'] = 'user@example.org'
-        return request_
-
-    def call_fut(self, context, request_):
-        from adhocracy_core.rest.views import validate_login_email
-        return validate_login_email(context, request_)
-
-    def test_valid(self, request_, context, mock_user_locator):
-        user = testing.DummyResource()
-        mock_user_locator.get_user_by_email.return_value = user
-        self.call_fut(context, request_)
-        assert request_.validated['user'] == user
-
-    def test_valid_email_with_capital_letters(self, request_, context, mock_user_locator):
-        request_.validated['email'] = 'usER@example.org'
-        user = testing.DummyResource()
-        mock_user_locator.get_user_by_email.return_value = user
-        self.call_fut(context, request_)
-        mock_user_locator.get_user_by_email.assert_called_with('user@example.org')
-        assert request_.validated['user'] == user
-
-    def test_invalid(self, request_, context, mock_user_locator):
-        mock_user_locator.get_user_by_email.return_value = None
-        self.call_fut(context, request_)
-        assert 'user' not in request_.validated
-        assert 'User doesn\'t exist' in request_.errors[0].description
-
-
-class TestValidateLoginNameUnitTest:
-
-    @fixture
-    def request_(self, request_):
-        request_.validated['name'] = 'user'
-        return request_
-
-    def call_fut(self, context, request_):
-        from adhocracy_core.rest.views import validate_login_name
-        return validate_login_name(context, request_)
-
-    def test_invalid(self, request_, context, mock_user_locator):
-        mock_user_locator.get_user_by_login.return_value = None
-        self.call_fut(context, request_)
-        assert 'User doesn\'t exist' in request_.errors[0].description
-
-    def test_valid(self, request_, context, mock_user_locator):
-        user = testing.DummyResource()
-        mock_user_locator.get_user_by_login.return_value = user
-        self.call_fut(context, request_)
-        assert request_.validated['user'] == user
-
-
-class TestValidateLoginPasswordUnitTest:
-
-    @fixture
-    def request_(self, request_):
-        from adhocracy_core.sheets.principal import IPasswordAuthentication
-        user = testing.DummyResource(__provides__=IPasswordAuthentication)
-        request_.validated['user'] = user
-        request_.validated['password'] = 'lalala'
-        return request_
-
-    def call_fut(self, context, request_):
-        from adhocracy_core.rest.views import validate_login_password
-        return validate_login_password(context, request_)
-
-    def test_valid(self, request_, context, mock_password_sheet):
-        sheet = mock_password_sheet
-        sheet.check_plaintext_password.return_value = True
-        self.call_fut(context, request_)
-        assert request_.errors == []
-
-    def test_invalid(self, request_, context, mock_password_sheet):
-        sheet = mock_password_sheet
-        sheet.check_plaintext_password.return_value = False
-        self.call_fut(context, request_)
-        assert 'password is wrong' in request_.errors[0].description
-
-    def test_invalid_with_ValueError(self, request_, context, mock_password_sheet):
-        sheet = mock_password_sheet
-        sheet.check_plaintext_password.side_effect = ValueError
-        self.call_fut(context, request_)
-        assert 'password is wrong' in request_.errors[0].description
-
-    def test_user_is_None(self, request_, context):
-        request_.validated['user'] = None
-        self.call_fut(context, request_)
-        assert request_.errors == []
-
-
-class TestValidateAccountActiveUnitTest:
-
-    def call_fut(self, context, request):
-        from adhocracy_core.rest.views import validate_account_active
-        return validate_account_active(context, request)
-
-    def test_valid(self, request_, context):
-        user = testing.DummyResource(active=True)
-        request_.validated['user'] = user
-        self.call_fut(context, request_)
-        assert not request_.errors
-
-    def test_invalid(self, request_, context):
-        user = testing.DummyResource(active=False)
-        request_.validated['user'] = user
-        self.call_fut(context, request_)
-        assert 'not yet activated' in request_.errors[0].description
-
-    def test_no_error_added_after_other_errors(self, request_, context):
-        user = testing.DummyResource(active=False)
-        request_.validated['user'] = user
-        request_.errors.append(('blah', 'blah', 'blah'))
-        assert len(request_.errors) == 1
-        self.call_fut(context, request_)
-        assert len(request_.errors) == 1
-
 
 class TestLoginUserName:
 
@@ -1435,51 +1210,6 @@ class TestLoginEmailView:
     def test_options(self, request, context):
         inst = self.make_one(context, request)
         assert inst.options() == {}
-
-
-
-class TestValidateActivationPathUnitTest:
-
-    @fixture
-    def _request(self, request_, registry):
-        request_.registry = registry
-        request_.validated['path'] = '/foo'
-        return request_
-
-    @fixture
-    def user(self):
-        user = testing.DummyResource()
-        user.activate = Mock()
-        return user
-
-    def call_fut(self, context, _request):
-        from adhocracy_core.rest.views import validate_activation_path
-        return validate_activation_path(context, _request)
-
-    def test_valid(self, _request, user, context,
-                   mock_user_locator):
-        from datetime import datetime
-        from datetime import timezone
-        mock_user_locator.get_user_by_activation_path.return_value = user
-        user.creation_date = datetime.now(timezone.utc)
-        self.call_fut(context, _request)
-        assert _request.validated['user'] == user
-        assert user.activate.called
-
-    def test_not_found(self, _request, context, mock_user_locator):
-        mock_user_locator.get_user_by_activation_path.return_value = None
-        self.call_fut(context, _request)
-        assert 'Unknown or expired activation path' == _request.errors[0].description
-
-    def test_found_but_expired(self, _request, user, context,
-                               mock_user_locator):
-        from datetime import datetime
-        from datetime import timezone
-        mock_user_locator.get_user_by_activation_path.return_value = user
-        user.creation_date = datetime(year=2010, month=1, day=1, tzinfo=timezone.utc)
-        self.call_fut(context, _request)
-        self.call_fut(context, _request)
-        assert 'Unknown or expired activation path' == _request.errors[0].description
 
 
 class TestActivateAccountView:
@@ -1577,7 +1307,7 @@ class TestAssetsServiceRESTView:
         from .schemas import POSTAssetRequestSchema
         inst = self.make_one(context, request_)
         assert issubclass(inst.__class__, SimpleRESTView)
-        assert inst.validation_POST == (POSTAssetRequestSchema, [])
+        assert inst.schema_POST == POSTAssetRequestSchema
 
     def test_post_valid(self, request_, context):
         request_.root = context
@@ -1606,7 +1336,7 @@ class TestAssetRESTView:
         from .schemas import PUTAssetRequestSchema
         inst = self.make_one(context, request_)
         assert issubclass(inst.__class__, SimpleRESTView)
-        assert inst.validation_PUT == (PUTAssetRequestSchema, [])
+        assert inst.schema_PUT == PUTAssetRequestSchema
 
     def test_put_valid_no_sheets(self, request_, context):
         inst = self.make_one(context, request_)
@@ -1673,8 +1403,7 @@ class TestCreatePasswordResetView:
     def test_create(self, context, request_):
         from .schemas import POSTCreatePasswordResetRequestSchema
         inst = self.make_one(context, request_)
-        assert inst.validation_POST == (POSTCreatePasswordResetRequestSchema,
-                                        [])
+        assert inst.schema_POST == POSTCreatePasswordResetRequestSchema
 
     def test_post(self, request_, context, registry, resets):
         from adhocracy_core.resources.principal import IPasswordReset
@@ -1710,8 +1439,7 @@ class TestPasswordResetView:
     def test_create(self, context, request_):
         from .schemas import POSTPasswordResetRequestSchema
         inst = self.make_one(context, request_)
-        assert inst.validation_POST == (POSTPasswordResetRequestSchema,
-                                        [])
+        assert inst.schema_POST == POSTPasswordResetRequestSchema
 
     def test_post(self, request_, context, mock_remember):
         from adhocracy_core.resources.principal import PasswordReset
@@ -1734,9 +1462,10 @@ class TestPasswordResetView:
         assert inst.options() == {'POST': {}}
 
 
-@fixture()
+@fixture
 def integration(config):
     config.include('adhocracy_core.rest.views')
+    return config
 
 
 @mark.usefixtures('integration')

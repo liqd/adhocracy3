@@ -9,7 +9,7 @@ Use test driven development and check code style bevore pushing commits
 
 Manually check pyflake, pep257::
 
-    bin/check_code src/adhocracy src/adhocracy_sample
+    bin/ad_check_code src/adhocracy src/adhocracy_sample
 
 Example Vim config according to coding guideline::
 
@@ -85,11 +85,11 @@ Generate html documentation
 
 Recreate api documentation source files::
 
-    bin/sphinx_api_adhocracy
+    bin/ad_build_api_rst_files
 
 Generate html documentation::
 
-    bin/sphinx_build_adhocracy
+    bin/ad_build_doc
 
 Open html documentation::
 
@@ -206,11 +206,11 @@ Update translations backend
 
 create new language::
 
-   bin/i18n en
+   bin/ad_i18n en
 
 extract message ids, update po and create mo files::
 
-   bin/i18n
+   bin/ad_i18n
 
 compile custom po file in extension package::
 

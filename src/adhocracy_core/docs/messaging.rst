@@ -45,6 +45,7 @@ The fields are all required and have the following semantics:
 
         The backend checks that the user has sufficient permissions to send the
         message -- only users with the *message_to_user* permission (typically granted
+
 to the contributor role) may do so. If this is the case, it sends the message
 per e-mail to the specified user, or to every user in the specified group.
 

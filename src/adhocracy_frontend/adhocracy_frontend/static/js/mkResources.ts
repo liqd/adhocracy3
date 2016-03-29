@@ -1,15 +1,12 @@
-/// <reference path="../lib/DefinitelyTyped/requirejs/require.d.ts"/>
-/// <reference path="../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
-
-/* tslint:disable:no-var-requires */
-var http : any = require("http");
-var fs : any = require("fs");
-var _fs : any = require("node-fs");
-var _s : any = require("underscore.string");
-/* tslint:enable:no-var-requires */
+/// <reference path="../lib2/types/lodash.d.ts"/>
+/// <reference path="./mkResources/node.d.ts"/>
 
 declare var process : any;
 
+import * as http from "http";
+import * as fs from "fs";
+import * as _fs from "node-fs";
+import * as _ from "lodash";
 import * as Base from "./ResourcesBase";
 import * as UtilR from "./mkResources/Util";
 import * as MetaApi from "./Packages/Http/MetaApi";
@@ -382,7 +379,7 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
             s += "\n";
             s += "        // FIXME: workaround for #261.  Remove if ticket is closed.\n";
             s += "        _.forOwn(args, (value, key) => {\n";
-            s += "            if (!_.contains(" + JSON.stringify(sheet.fields.map((fieldName) => fieldName.name)) + ", key)) {\n";
+            s += "            if (!_.includes(" + JSON.stringify(sheet.fields.map((fieldName) => fieldName.name)) + ", key)) {\n";
             s += "                this[key] = value;\n";
             s += "            }\n";
             s += "        });\n";
@@ -435,7 +432,7 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
             s += "\n";
             s += "        // FIXME: workaround for #261.  Remove if ticket is closed.\n";
             s += "        _.forOwn(args, (value, key) => {\n";
-            s += "            if (!_.contains(" + JSON.stringify(sheet.fields.map((fieldName) => fieldName.name)) + ", key)) {\n";
+            s += "            if (!_.includes(" + JSON.stringify(sheet.fields.map((fieldName) => fieldName.name)) + ", key)) {\n";
             s += "                parsedArgs[key] = value;\n";
             s += "            }\n";
             s += "        });\n";
@@ -1026,20 +1023,20 @@ isWriteableField = (field) => field.editable || field.creatable || field.create_
  */
 
 mkdirForFile = (filepath : string) : void => {
-    var dirpath : string[] = _s.words(filepath, "/");
+    var dirpath : string[] = _.split(filepath, "/");
     dirpath.pop();
     _fs.mkdirSync(dirpath.join("/"), 0o755, true);
 };
 
 pyModuleToTsModule = (filepath : string) : string =>
-    "./" + _s.words(filepath, "\.").join("/");
+    "./" + _.split(filepath, ".").join("/");
 
 /**
  * The `relativeRoot` always points from file containing contents to
  * `.../Resources_/`.  The trailing `/` is important!
  */
 mkRelativeRoot = (source : string) : string => {
-    var arr = _s.words(source, "/");
+    var arr = _.split(source, "/");
     arr.pop();  // don't count leading `.`.
     arr.pop();  // just count directories, not the file name.
     return arr.map(() => "..").join("/") + "/";

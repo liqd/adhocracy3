@@ -125,7 +125,7 @@ export class Service implements IService {
     private sendAuthMessages() {
         var _self : Service = this;
 
-        return typeof _self.adhUser !== "undefined" && _.contains(_self.trustedDomains, _self.embedderOrigin);
+        return typeof _self.adhUser !== "undefined" && _.includes(_self.trustedDomains, _self.embedderOrigin);
     }
 
     private sendLoginState(loggedIn) {

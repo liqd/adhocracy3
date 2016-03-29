@@ -1,8 +1,9 @@
 """Interfaces for plugable dependencies, basic metadata structures."""
-from collections import Iterable
+from collections import Iterable, namedtuple
 from enum import Enum
 import collections
 
+from colander import MappingSchema
 from pyramid.interfaces import ILocation
 from pyramid.interfaces import IAuthorizationPolicy
 from pyramid.interfaces import IRequest
@@ -70,8 +71,10 @@ class SheetMetadata(namedtuple('SheetMetadata',
     sheet_class:
         :class:`IResourceSheet` implementation for this sheet
     schema_class:
-        :class:`colander.MappingSchema` to define the sheet data structure.
-        Subtype must preserve the super type data structure.
+        :class:`colander.MappingSchema` to define the sheet data structure,
+        default values and validators. Subtype must preserve the super
+        type data structure.
+        See :class:`IResourceSheet.schema` for more documentation.
     permission_view:
         Permission to view or search for this data.
     permission_edit:
@@ -121,43 +124,117 @@ class IPredicateSheet(ISheet):
 
 
 class IResourceSheet(IPropertySheet):  # pragma: no cover
-    """Sheet for resources to get/set the sheet data structure."""
+    """Sheet object to get/set resource data defined by a term:`schema`.
 
-    meta = Attribute('SheetMetadata')
-    registry = Attribute('pyramid registry')
+    :var SheetMetadata meta:
+
+        The sheet configuration
+
+    :var IResource context:
+
+        Resource to set/get data, find services, traverse object hierarchy.
+
+        If `creating` this should be the
+        `parent` of the to be created resource.
+
+    :var registry:
+
+        Pyramid registry to get Adapters, sheets, metadata, settings, ...
+
+    :var pyramid.interfaces.IRequest request:
+
+        The current `request` or None.
+
+        Use for permission checks, serialize/deserialize Resource-URLs, get
+        user (:meth:`IResourceSheet.deserialze` and
+        :meth:`IResourceSheet.serialize` depend `request`).
+
+    :var ResourceMetadata creating:
+
+        The configuration of the to be created resource.
+
+        If not `None` the `context` attribute should be the `parent` of the
+        new resource and set/get methods should not be used.
+
+        Used by deferred validators to allow different behavior when creating.
+
+    :var colander.MappingSchema schema:
+
+        :term:`schema` to define the data structure (without bindings).
+
+        Deferred schema validators and defaults values are not executed yet.
+        To the the schema with bindings use:
+        :func:`IResourceSheet.get_schema_with_bindings`.
+
+        Deferred default values can rely on the following bindings:
+
+            `context`, `registry`
+
+        Deferred validators can rely on the following bindings:
+
+            `context`, `registry`, `request`, `creating`
+    """
+
+    meta = Attribute('meta')
+    context = Attribute('context')
+    registry = Attribute('registry')
+    request = Attribute('request')
+    creating = Attribute('creating')
+    schema = Attribute('schema')
+
+    def get_schema_with_bindings() -> MappingSchema:
+        """Return :term:`schema` for serialization/deserialization.
+
+        Deferred validators/defaults are executed with the following bindings:
+
+            `context`, `registry`, `request`, `creating`
+        """
 
     def set(appstruct,
             omit=(),
             send_event=True,
-            request=None,
             send_reference_event=True,
             omit_readonly=True) -> bool:
         """Store ``appstruct`` dictionary data.
 
         :param send_event: raise resource sheet edited event.
-        :param request: the current pyramid request for additional permission
-                        checks, may be None.
         :param omit_readonly: do not store readonly ``appstruct`` data.
         :param send_reference_event: raise backreference added/removed events.
         """
 
-    def get(params: dict={}, add_back_references=True) -> dict:
-        """Get ``appstruct`` dictionary data.
+    def get(params: dict={},
+            add_back_references=True,
+            omit_defaults=False) -> dict:
+        """Get `appstruct` data.
 
         :param params: optional parameters that can modify the appearance
-        of the returned dictionary. Valid keys/values are defined in
-        :class:`adhocracy_core.interfaces.SearchQuery`.
-        :param add_backrefs: allow to omit back references
+            of the returned dictionary. Valid keys/values are defined in
+            :class:`adhocracy_core.interfaces.SearchQuery`.
+        :param add_back_references: allow to omit back references
+        :param omit_defaults: omit fields with default values only
+
+        Deferred defaults are executed with the following bindings:
+
+            `context`, `registry`
         """
 
-    def get_cstruct(request, params: dict={}):
-        """Return cstruct data.
+    def serialize(params: dict={}) -> dict:
+        """Get sheet appstruct data and serialize with `schema`.
 
-        Bind `request` and `context` (self.context) to colander schema
-        (self.schema). Get sheet appstruct data and serialize.
+        :param params:
 
-        :param params: optional parameters that can modify the appearance
-        of the returned dictionary, e.g. query parameters in a GET request
+            parameters passed to :func:`IResourceSheet.get`.
+
+            If empty the following parameters set:
+            `only_visible=True` and `allows` with the view permission.
+
+        :raises ValueError: If the `request` attribute is None.
+        """
+
+    def deserialize(cstruct: dict) -> dict:
+        """Deserialize `cstruct` with `schema` from `get_schema_with_bindings`.
+
+        :raises colander.Invalid: If schema validation fails.
         """
 
     def delete_field_values(fields: [str]):
@@ -632,9 +709,9 @@ class SearchQuery(namedtuple('Query', ['interfaces',
     -----------------
 
     interfaces (IInterface or (IInterface)
-    or (KeywordSearchComparator, IInterface)
-    or (KeywordSearchComparator, (IInterface)):
-        Resource type (iresource) or sheet (isheet) interfaces
+        or (KeywordSearchComparator, IInterface)
+        or (KeywordSearchComparator, (IInterface)):
+            Resource type (iresource) or sheet (isheet) interfaces
     indexes ({str:object}
     or {str:(SearchComparator, object)}
     or {str:(SearchComparator, (object))}
@@ -807,3 +884,6 @@ class IAdhocracyWorkflow(IWorkflow):  # pragma: no cover
 
     def get_next_states(context, request: IRequest) -> [str]:
         """Get states you can trigger a transition to."""
+
+
+error_entry = namedtuple('ErrorEntry', ['location', 'name', 'description'])

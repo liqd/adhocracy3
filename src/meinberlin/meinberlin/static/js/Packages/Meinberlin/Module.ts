@@ -4,6 +4,7 @@ import * as AdhMeinberlinAlexanderplatzModule from "./Alexanderplatz/Module";
 import * as AdhMeinberlinBuergerhaushaltModule from "./Buergerhaushalt/Module";
 import * as AdhMeinberlinPhaseModule from "./Phase/Module";
 import * as AdhMeinberlinStadtforumModule from "./Stadtforum/Module";
+import * as AdhMeinberlinDe from "./MeinberlinDe/Module";
 
 
 export var moduleName = "adhMeinberlin";
@@ -15,6 +16,7 @@ export var register = (angular) => {
     AdhMeinberlinBuergerhaushaltModule.register(angular);
     AdhMeinberlinPhaseModule.register(angular);
     AdhMeinberlinStadtforumModule.register(angular);
+    AdhMeinberlinDe.register(angular);
 
     angular
         .module(moduleName, [
@@ -22,6 +24,7 @@ export var register = (angular) => {
             AdhMeinberlinBplanModule.moduleName,
             AdhMeinberlinKiezkasseModule.moduleName,
             AdhMeinberlinBuergerhaushaltModule.moduleName,
-            AdhMeinberlinStadtforumModule.moduleName
+            AdhMeinberlinStadtforumModule.moduleName,
+            AdhMeinberlinDe.moduleName
         ]);
 };

@@ -41,10 +41,10 @@ class TestUpdateElasticsearchPolicycompass:
             })
         return comment
 
-    def delete_comment(self, comment, registry, context):
-        from adhocracy_core import utils, resources, sheets
-
-        metadata = utils.get_sheet(comment, sheets.metadata.IMetadata, registry)
+    def delete_comment(self, comment, registry):
+        from adhocracy_core import sheets
+        metadata = registry.content.get_sheet(comment,
+                                              sheets.metadata.IMetadata)
         metadata.set({ 'hidden': True })
 
     def requests_post(self, status_code=200):
@@ -67,7 +67,7 @@ class TestUpdateElasticsearchPolicycompass:
         monkeypatch.setattr(requests, 'post', requests_post)
         comment = self.make_comment(registry, context)
 
-        self.delete_comment(comment, registry, context)
+        self.delete_comment(comment, registry)
         requests_post.assert_called_with(
             'http://localhost:8000/api/v1/searchmanager/updateindexitem/' \
             'dataset/478')

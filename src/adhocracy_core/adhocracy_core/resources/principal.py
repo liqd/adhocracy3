@@ -3,6 +3,7 @@ from logging import getLogger
 
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
+from pyramid.traversal import get_current_registry
 from pyramid.request import Request
 from pyramid.i18n import TranslationStringFactory
 from substanced.util import find_service
@@ -29,8 +30,6 @@ from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.resources.asset import add_assets_service
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.metadata import is_older_than
-from adhocracy_core.utils import get_sheet
-from adhocracy_core.utils import get_sheet_field
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.pool
@@ -127,7 +126,8 @@ class User(Pool):
         Inactivate users are always hidden.
         """
         self.active = active
-        sheet = get_sheet(self, IMetadata)
+        registry = get_current_registry(self)
+        sheet = registry.content.get_sheet(self, IMetadata)
         appstruct = sheet.get()
         appstruct['hidden'] = not active
         statsd_incr('users.activated', 1)
@@ -217,7 +217,7 @@ def deny_view_permission(context: IResource, registry: Registry,
 
 def hide(context: IResource, registry: Registry, options: dict):
     """Hide `context`."""
-    metadata = get_sheet(context, IMetadata)
+    metadata = registry.content.get_sheet(context, IMetadata)
     metadata.set({'hidden': True})
 
 
@@ -231,8 +231,9 @@ class PasswordReset(Base):
 
     def reset_password(self, password):
         """Set `password` for creator user and delete itself."""
-        user = get_sheet_field(self, IMetadata, 'creator')
-        password_sheet = get_sheet(
+        registry = get_current_registry(self)
+        user = registry.content.get_sheet_field(self, IMetadata, 'creator')
+        password_sheet = registry.content.get_sheet(
             user, adhocracy_core.sheets.principal.IPasswordAuthentication)
         password_sheet.set({'password': password}, send_event=False)
         if not user.active:  # pragma: no cover
@@ -272,6 +273,7 @@ class UserLocatorAdapter(object):
         """Initialize self."""
         self.context = context
         self.request = request
+        self.registry = request.registry
 
     def get_user_by_login(self, login: str) -> IUser:
         """Find user per `login` name or return None."""
@@ -331,9 +333,9 @@ class UserLocatorAdapter(object):
         user = self.get_user_by_userid(userid)
         if user is None:
             return
-        user_sheet = get_sheet(user,
-                               adhocracy_core.sheets.principal.IPermissions,
-                               registry=self.request.registry)
+        user_sheet = self.registry.content.get_sheet(
+            user,
+            adhocracy_core.sheets.principal.IPermissions)
         groups = user_sheet.get()['groups']
         return groups
 

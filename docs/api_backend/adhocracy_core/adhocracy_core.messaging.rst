@@ -6,10 +6,3 @@ adhocracy_core.messaging package
     :undoc-members:
     :show-inheritance:
 
-Submodules
-----------
-
-.. toctree::
-
-   adhocracy_core.messaging.test_init
-

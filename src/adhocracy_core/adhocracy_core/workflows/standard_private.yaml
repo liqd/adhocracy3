@@ -1,0 +1,27 @@
+defaults: standard
+states:
+  announce:
+    acm:
+      principals:      [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [view,        D,        ~,           ~,         ~,        ~,        ~]
+  participate:
+    acm:
+      principals:      [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [view,        D,        ~,           ~,         ~,        ~,        ~]
+  evaluate:
+    acm:
+      principals:      [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [view,        D,        ~,           ~,         ~,        ~,        ~]
+  result:
+    acm:
+      principals:      [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [view,        D,        ~,           ~,         ~,        ~,        ~]
+  closed:
+    acm:
+      principals:      [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [view,        D,        ~,           ~,         ~,        ~,        ~]

@@ -6,8 +6,8 @@ from pytest import mark
 from webtest import TestResponse
 import transaction
 
-from adhocracy_core.utils.testing import add_resources
-from adhocracy_core.utils.testing import do_transition_to
+from adhocracy_core.testing import add_resources
+from adhocracy_core.testing import do_transition_to
 
 
 @fixture
@@ -29,17 +29,17 @@ def test_initiate_and_transition_to_announce(registry, context):
     request = testing.DummyRequest()
     assert workflow.state_of(context) is None
     workflow.initialize(context)
-    assert workflow.state_of(context) is 'draft'
+    assert workflow.state_of(context) == 'draft'
     workflow.transition_to_state(context, request, 'announce')
-    assert workflow.state_of(context) is 'announce'
+    assert workflow.state_of(context) == 'announce'
     workflow.transition_to_state(context, request, 'participate')
-    assert workflow.state_of(context) is 'participate'
+    assert workflow.state_of(context) == 'participate'
     workflow.transition_to_state(context, request, 'evaluate')
-    assert workflow.state_of(context) is 'evaluate'
+    assert workflow.state_of(context) == 'evaluate'
     workflow.transition_to_state(context, request, 'result')
-    assert workflow.state_of(context) is 'result'
+    assert workflow.state_of(context) == 'result'
     workflow.transition_to_state(context, request, 'closed')
-    assert workflow.state_of(context) is 'closed'
+    assert workflow.state_of(context) == 'closed'
 
 
 def _post_document_item(app_user, path='') -> TestResponse:

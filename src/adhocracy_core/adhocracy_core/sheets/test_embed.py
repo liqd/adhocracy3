@@ -53,22 +53,14 @@ class TestDeferredEmbedCode:
         return mocker.patch('pyramid.registry.Registry.getMultiAdapter')
 
     def call_fut(self, *args):
-        from .embed import deferred_embed_code
-        return deferred_embed_code(*args)
-
-    def test_raise_if_no_context(self, node):
-        with raises(KeyError):
-            self.call_fut(node, {})
-
-    def test_ignore_if_no_request(self, node, context):
-        result = self.call_fut(node, {'context': context})
-        assert result == ''
+        from .embed import deferred_default_embed_code
+        return deferred_default_embed_code(*args)
 
     def test_render_embed_code_html_with_default_mapping(
-            self, mock_config_adapter, config, node, context, request_):
+            self, mock_config_adapter, config, node, kw):
         config.include('pyramid_mako')
         mock_config_adapter.return_value = {'path': 'http:localhost/1'}
-        result = self.call_fut(node, {'context': context, 'request': request_})
+        result = self.call_fut(node, kw)
         assert 'data-path="http:localhost/1"' in result
 
 
@@ -88,20 +80,19 @@ class TestEmbedSheet:
         assert meta.readable is True
 
     def test_create(self, meta, context):
-        from .embed import deferred_embed_code
-        inst = meta.sheet_class(meta, context)
+        from .embed import deferred_default_embed_code
+        inst = meta.sheet_class(meta, context, None)
         assert inst
         assert inst.schema['embed_code'].readonly
         assert inst.schema['embed_code'].default \
-            == deferred_embed_code
+               == deferred_default_embed_code
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'embed_code': '',
                               'external_url': ''}
 
     @mark.usefixtures('integration')
-    def test_includeme_register(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)

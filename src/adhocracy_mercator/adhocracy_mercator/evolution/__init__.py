@@ -17,7 +17,6 @@ from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.badge import IHasBadgesPool
 from adhocracy_core.sheets.logbook import IHasLogbookPool
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_mercator.resources.mercator import IMercatorProposal
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from adhocracy_mercator.sheets.mercator import IIntroduction
@@ -41,8 +40,9 @@ def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
     catalogs = find_service(root, 'catalogs')
     for proposal in proposals:
         logger.info('updating {0}'.format(proposal))
-        introduction = get_sheet_field(proposal, IMercatorSubResources,
-                                       'introduction')
+        introduction = registry.content.get_sheet_field(proposal,
+                                                        IMercatorSubResources,
+                                                        'introduction')
         if introduction == '' or introduction is None:
             continue
         alsoProvides(proposal, ITitle)
@@ -122,7 +122,9 @@ def add_logbook_service_to_proposal_items(root):  # pragma: no cover
     for proposal in proposals:
         if find_service(proposal, 'logbook') is None:
             logger.info('add logbook service to {0}'.format(proposal))
-            creator = get_sheet_field(proposal, IMetadata, 'creator')
+            creator = registry.content.get_sheet_field(proposal,
+                                                       IMetadata,
+                                                       'creator')
             add_logbook_service(proposal, registry, {'creator': creator})
 
 

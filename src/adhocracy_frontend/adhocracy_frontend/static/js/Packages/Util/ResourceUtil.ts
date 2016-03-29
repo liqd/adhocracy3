@@ -58,7 +58,7 @@ export function sortResourcesTopologically(resources : ResourcesBase.Resource[],
     // prepare DAG
     // sources are resource paths without incoming references
     // FIXME: DefinitelyTyped
-    var dag : AdhUtil.IDag<ResourcesBase.Resource> = (<any>_).object(_.map(resources, (resource) => [resource.path, {
+    var dag : AdhUtil.IDag<ResourcesBase.Resource> = (<any>_).fromPairs(_.map(resources, (resource) => [resource.path, {
             content: resource, incoming: [], outgoing: [], done: false
     }]));
     var sources : string[] = [];

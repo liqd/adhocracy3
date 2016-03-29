@@ -5,27 +5,32 @@ from pytest import mark
 
 def _make_mercator_resource(context,
                             location_appstruct={},
-                            finance_appstruct={}):
+                            finance_appstruct={},
+                            ):
+    from pyramid.threadlocal import get_current_registry
     from adhocracy_core.interfaces import IResource
     from adhocracy_mercator.sheets.mercator import IMercatorSubResources
     from adhocracy_mercator.sheets.mercator import ILocation
     from adhocracy_mercator.sheets.mercator import IFinance
-    from adhocracy_core.utils import get_sheet
+    registry = get_current_registry(context)
     resource = testing.DummyResource(__provides__=[IResource,
                                                    IMercatorSubResources])
     context['res'] = resource
-    sub_resources_sheet = get_sheet(resource, IMercatorSubResources)
+    sub_resources_sheet = registry.content.get_sheet(resource,
+                                                     IMercatorSubResources)
     if location_appstruct:
         location_resource = testing.DummyResource(__provides__=[IResource,
                                                                ILocation])
-        location_sheet = get_sheet(location_resource, ILocation)
+        location_sheet = registry.content.get_sheet(location_resource,
+                                                    ILocation)
         location_sheet.set(location_appstruct)
         context['location'] = location_resource
         sub_resources_sheet.set({'location': location_resource})
     if finance_appstruct:
         finance_resource = testing.DummyResource(__provides__=[IResource,
                                                                IFinance])
-        finance_sheet = get_sheet(finance_resource, IFinance)
+        finance_sheet = registry.content.get_sheet(finance_resource,
+                                                   IFinance)
         finance_sheet.set(finance_appstruct)
         context['finance'] = finance_resource
         sub_resources_sheet.set({'finance': finance_resource})
@@ -218,17 +223,20 @@ class TestMercatorBudgetIndex:
 def _make_mercator2_resource(context,
                              location_appstruct={},
                              financial_planning_appstruct={}):
+    from pyramid.threadlocal import get_current_registry
     from adhocracy_core.interfaces import IResource
     from adhocracy_mercator.sheets.mercator2 import ILocation
     from adhocracy_mercator.sheets.mercator2 import IFinancialPlanning
-    from adhocracy_core.utils import get_sheet
     resource = testing.DummyResource(__provides__=[IResource,
                                                    ILocation,
                                                    IFinancialPlanning])
+    registry = get_current_registry()
     context['res'] = resource
-    location_sheet = get_sheet(resource, ILocation)
+    location_sheet = registry.content.get_sheet(resource,
+                                                ILocation)
     location_sheet.set(location_appstruct)
-    financial_planning_sheet = get_sheet(resource, IFinancialPlanning)
+    financial_planning_sheet = registry.content.get_sheet(resource,
+                                                          IFinancialPlanning)
     financial_planning_sheet.set(financial_planning_appstruct)
     return resource
 

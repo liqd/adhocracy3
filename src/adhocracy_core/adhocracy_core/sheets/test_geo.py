@@ -83,17 +83,16 @@ class TestMultiPolygonSheet:
         assert meta.create_mandatory is True
 
     def test_create(self, meta, context):
-        assert meta.sheet_class(meta, context)
+        assert meta.sheet_class(meta, context, None)
 
     def test_get_empty(self, meta, context, multipolygon_default):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == multipolygon_default
 
     @mark.usefixtures('integration')
-    def test_includeme_register(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestPointSchema:
@@ -136,18 +135,17 @@ class TestPointSheet:
         assert meta.create_mandatory is False
 
     def test_create(self, meta, context):
-        assert meta.sheet_class(meta, context)
+        assert meta.sheet_class(meta, context, None)
 
     def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'coordinates': (0, 0),
                               'type': 'Point'}
 
     @mark.usefixtures('integration')
-    def test_includeme_register(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 
 class TestLocationReferenceSheet:
@@ -168,16 +166,15 @@ class TestLocationReferenceSheet:
         assert meta.create_mandatory is False
 
     def test_create(self, meta, context):
-        assert meta.sheet_class(meta, context)
+        assert meta.sheet_class(meta, context, None)
 
     def test_get_empty(self, meta, context, sheet_catalogs):
-        inst = meta.sheet_class(meta, context)
+        inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'location': None}
 
     @mark.usefixtures('integration')
-    def test_includeme_register(self, meta):
-        from adhocracy_core.utils import get_sheet
+    def test_includeme_register(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
-        assert get_sheet(context, meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
 
 

@@ -37,7 +37,7 @@ require.config({
         markdownit: "../lib/markdown-it/dist/markdown-it.min",
         flow: "../lib/flow.js/dist/flow.min",
         leaflet: "../lib/leaflet/dist/leaflet",
-        lodash: "../lib/lodash/lodash.min",
+        lodash: "../lib/lodash/dist/lodash.min",
         q: "../lib/q/q",
         modernizr: "../lib2/modernizr/modernizr-2.8.3.min",
         moment: "../lib/moment/min/moment-with-locales.min",

@@ -7,14 +7,12 @@ from colander import Invalid
 from colander import MappingSchema
 from colander import SchemaNode
 from colander import SequenceSchema
-from substanced.interfaces import IUserLocator
 from substanced.util import find_service
 from substanced.stats import statsd_timer
 from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.httpexceptions import HTTPGone
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.request import Request
-from pyramid.util import DottedNameResolver
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.security import remember
@@ -23,7 +21,6 @@ from zope.interface.interfaces import IInterface
 from zope.interface import Interface
 
 from adhocracy_core.caching import set_cache_header
-from adhocracy_core.events import ResourceSheetModified
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -58,22 +55,17 @@ from adhocracy_core.rest.schemas import GETItemResponseSchema
 from adhocracy_core.rest.schemas import GETResourceResponseSchema
 from adhocracy_core.rest.schemas import options_resource_response_data_dict
 from adhocracy_core.rest.schemas import add_arbitrary_filter_nodes
-from adhocracy_core.rest.exceptions import error_entry
+from adhocracy_core.interfaces import error_entry
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
 from adhocracy_core.sheets.badge import get_assignable_badges
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_core.sheets.metadata import is_older_than
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
-from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.sheets.pool import IPool as IPoolSheet
 from adhocracy_core.sheets.versions import IVersionable
-from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.tags import ITags
 from adhocracy_core.utils import extract_events_from_changelog_metadata
-from adhocracy_core.utils import get_sheet
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import get_reason_if_blocked
 from adhocracy_core.utils import get_user
 from adhocracy_core.utils import is_batchmode
@@ -83,7 +75,6 @@ from adhocracy_core.utils import unflatten_multipart_request
 from adhocracy_core.utils import is_created_in_current_transaction
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.workflows.schemas import create_workflow_meta_schema
-from adhocracy_core.workflows import IWorkflow
 
 
 logger = getLogger(__name__)
@@ -102,22 +93,6 @@ def respond_if_blocked(context, request):
         raise HTTPGone(detail=block_reason)
 
 
-def validate_post_root_versions(context, request: Request):
-    """Check and transform the 'root_version' paths to resources."""
-    # TODO: make this a colander validator and move to schema.py
-    root_versions = request.validated.get('root_versions', [])
-    valid_root_versions = []
-    for root in root_versions:
-        if not IItemVersion.providedBy(root):
-            error = 'This resource is not a valid ' \
-                    'root version: {}'.format(request.resource_url(root))
-            request.errors.append(error_entry('body', 'root_versions', error))
-            continue
-        valid_root_versions.append(root)
-
-    request.validated['root_versions'] = valid_root_versions
-
-
 def validate_request_data(context: ILocation, request: Request,
                           schema=MappingSchema(), extra_validators=[]):
     """Validate request data.
@@ -130,20 +105,8 @@ def validate_request_data(context: ILocation, request: Request,
                    The validated data (dict or list) is stored in the
                    `request.validated` attribute.
                    The `None` value is allowed to disable schema validation.
-    :param extra_validators: Functions called after schema validation.
-                             The passed arguments are `context` and  `request`.
-                             The should append errors to `request.errors` and
-                             validated data to `request.validated`.
-
     :raises HTTPBadRequest: HTTP 400 for bad request data.
     """
-    parent = context if request.method == 'POST' else context.__parent__
-    workflow = _get_workflow(context, request)
-    schema_with_binding = schema.bind(context=context,
-                                      request=request,
-                                      registry=request.registry,
-                                      workflow=workflow,
-                                      parent_pool=parent)
     body = {}
     if request.content_type == 'multipart/form-data':
         body = unflatten_multipart_request(request)
@@ -151,37 +114,10 @@ def validate_request_data(context: ILocation, request: Request,
         body = _extract_json_body(request)
     validate_user_headers(request)
     qs = _extract_querystring(request)
-    validate_body_or_querystring(body, qs, schema_with_binding, context,
-                                 request)
-    _validate_extra_validators(extra_validators, context, request)
+    validate_body_or_querystring(body, qs, schema, context, request)
     if request.errors:
         request.validated = {}
         raise HTTPBadRequest()
-
-
-def _get_workflow(context: IResource, request: Request) -> IWorkflow:
-    if request.content_type != 'application/json':
-        return None
-    elif not isinstance(request.json, dict):
-        return None
-    elif request.method == 'POST':
-        # for post request we need to get the workflow for the resource type
-        # that is going to be created, but before any validation has been done.
-        # TODO refactor, not dry at all
-        resource_type = request.json.get('content_type', None)
-        try:
-            iresource = DottedNameResolver().resolve(resource_type)
-        except (ValueError, ImportError, KeyError):
-            return None  # we don't want to validate the content type here
-        try:
-            iresource_meta = request.registry.content.resources_meta[iresource]
-        except KeyError:
-            return None
-        name = iresource_meta.workflow_name
-        workflow = request.registry.content.workflows.get(name, None)
-    else:
-        workflow = request.registry.content.get_workflow(context)
-    return workflow
 
 
 def _extract_json_body(request: Request) -> object:
@@ -217,6 +153,7 @@ def validate_user_headers(request: Request):
     ensure that the session takes belongs to the user and is not expired.
     """
     headers = request.headers
+    # TODO broken SRP, adhocracy_core.authentication is responsible instead
     if 'X-User-Path' in headers or 'X-User-Token' in headers:
         if get_user(request) is None:
             error = error_entry('header', 'X-User-Token', 'Invalid user token')
@@ -294,14 +231,6 @@ def _add_colander_invalid_error_to_request(error: Invalid, request: Request,
         request.errors.append(error_entry(location, name, msg))
 
 
-def _validate_extra_validators(validators: list, context, request: Request):
-    """Run `validators` functions. Assuming schema validation run before."""
-    if request.errors:
-        return
-    for val in validators:
-        val(context, request)
-
-
 class RESTView:
     """Class stub with request data validation support.
 
@@ -313,18 +242,18 @@ class RESTView:
             context=IResource,
         )
         class MySubClass(RESTView):
-            validation_GET = (MyColanderSchema, [my_extra_validation_function])
+            validation_GET = MyColanderSchema
 
             @view_config(request_method='GET')
             def get(self):
             ...
     """
 
-    validation_OPTIONS = (None, [])
-    validation_HEAD = (None, [])
-    validation_GET = (None, [])
-    validation_PUT = (None, [])
-    validation_POST = (None, [])
+    schema_OPTIONS = None
+    schema_HEAD = None
+    schema_GET = None
+    schema_PUT = None
+    schema_POST = None
 
     def __init__(self, context, request):
         """Initialize self."""
@@ -337,11 +266,18 @@ class RESTView:
         with statsd_timer('validate', rate=.1, registry=self.registry):
             respond_if_blocked(context, request)
             set_cache_header(context, request)
-            schema_class, validators = _get_schema_and_validators(self,
-                                                                  request)
+            schema_class = _get_schema(self, request)
+            schema = self._create_schema(schema_class, context)
             validate_request_data(context, request,
-                                  schema=schema_class(),
-                                  extra_validators=validators)
+                                  schema=schema,
+                                  )
+
+    def _create_schema(self, schema_class, context) -> MappingSchema:
+        schema = schema_class().bind(request=self.request,
+                                     registry=self.registry,
+                                     context=context,
+                                     creating=None)
+        return schema
 
     def options(self) -> dict:
         """Return options for view.
@@ -381,11 +317,11 @@ class RESTView:
         return result
 
 
-def _get_schema_and_validators(view_class, request: Request) -> tuple:
+def _get_schema(view_class, request: Request) -> tuple:
     http_method = request.method.upper()
-    validation_attr = 'validation_' + http_method
-    schema, validators = getattr(view_class, validation_attr, (None, []))
-    return schema or MappingSchema, validators
+    validation_attr = 'schema_' + http_method
+    schema = getattr(view_class, validation_attr, None)
+    return schema or MappingSchema
 
 
 @view_defaults(
@@ -489,8 +425,8 @@ class ResourceRESTView(RESTView):
         """Get resource data (unless deleted or hidden)."""
         metric = self._get_get_metric_name()
         with statsd_timer(metric, rate=.1, registry=self.registry):
-            schema = GETResourceResponseSchema().bind(request=self.request,
-                                                      context=self.context)
+            schema = self._create_schema(GETResourceResponseSchema,
+                                         self.context)
             cstruct = schema.serialize()
             cstruct['data'] = self._get_sheets_data_cstruct()
         return cstruct
@@ -509,9 +445,9 @@ class ResourceRESTView(RESTView):
         for sheet in sheets_view:
             key = sheet.meta.isheet.__identifier__
             if sheet.meta.isheet is IPoolSheet:
-                cstruct = sheet.get_cstruct(self.request, params=queryparams)
+                cstruct = sheet.serialize(params=queryparams)
             else:
-                cstruct = sheet.get_cstruct(self.request)
+                cstruct = sheet.serialize()
             data_cstruct[key] = cstruct
         return data_cstruct
 
@@ -523,7 +459,7 @@ class ResourceRESTView(RESTView):
 class SimpleRESTView(ResourceRESTView):
     """View for simples (non versionable), implements get, options and put."""
 
-    validation_PUT = (PUTResourceRequestSchema, [])
+    schema_PUT = PUTResourceRequestSchema
 
     @view_config(request_method='PUT',
                  permission='edit_some',
@@ -536,14 +472,12 @@ class SimpleRESTView(ResourceRESTView):
             for sheet in sheets:
                 name = sheet.meta.isheet.__identifier__
                 if name in appstructs:
-                    sheet.set(appstructs[name],
-                              request=self.request)
+                    sheet.set(appstructs[name])
             appstruct = {}
             if not is_batchmode(self.request):  # pragma: no branch
                 updated = self._build_updated_resources_dict()
                 appstruct['updated_resources'] = updated
-            schema = ResourceResponseSchema().bind(request=self.request,
-                                                   context=self.context)
+            schema = self._create_schema(ResourceResponseSchema, self.context)
             cstruct = schema.serialize(appstruct)
         return cstruct
 
@@ -555,9 +489,9 @@ class SimpleRESTView(ResourceRESTView):
 class PoolRESTView(SimpleRESTView):
     """View for Pools, implements get, options, put and post."""
 
-    validation_GET = (GETPoolRequestSchema, [])
+    schema_GET = GETPoolRequestSchema
 
-    validation_POST = (POSTResourceRequestSchema, [])
+    schema_POST = POSTResourceRequestSchema
 
     @view_config(request_method='GET',
                  permission='view')
@@ -571,14 +505,13 @@ class PoolRESTView(SimpleRESTView):
         """Build response data structure for a POST request."""
         appstruct = {}
         if IItem.providedBy(resource):
-            first = get_sheet_field(resource, ITags, 'FIRST',
-                                    registry=self.registry)
+            first = self.registry.content.get_sheet_field(resource,
+                                                          ITags,
+                                                          'FIRST')
             appstruct['first_version_path'] = first
-            schema = ItemResponseSchema().bind(request=self.request,
-                                               context=resource)
+            schema = self._create_schema(ItemResponseSchema, resource)
         else:
-            schema = ResourceResponseSchema().bind(request=self.request,
-                                                   context=resource)
+            schema = self._create_schema(ResourceResponseSchema, resource)
 
         if not is_batchmode(self.request):
             appstruct[
@@ -632,20 +565,20 @@ class PoolRESTView(SimpleRESTView):
 class ItemRESTView(PoolRESTView):
     """View for Items and ItemVersions, overwrites GET and  POST handling."""
 
-    validation_POST = (POSTItemRequestSchema, [validate_post_root_versions])
+    schema_POST = POSTItemRequestSchema
 
     @view_config(request_method='GET',
                  permission='view')
     def get(self) -> dict:
         """Get resource data."""
         with statsd_timer('process.get', rate=.1, registry=self.registry):
-            schema = GETItemResponseSchema().bind(request=self.request,
-                                                  context=self.context)
+            first_version = self.registry.content.get_sheet_field(self.context,
+                                                                  ITags,
+                                                                  'FIRST')
             appstruct = {}
-            first_version = get_sheet_field(self.context, ITags, 'FIRST',
-                                            registry=self.registry)
             if first_version is not None:
                 appstruct['first_version_path'] = first_version
+            schema = self._create_schema(GETItemResponseSchema, self.context)
             cstruct = schema.serialize(appstruct)
             cstruct['data'] = self._get_sheets_data_cstruct()
         return cstruct
@@ -667,8 +600,9 @@ class ItemRESTView(PoolRESTView):
         metric = self._get_post_metric_name()
         with statsd_timer(metric, rate=1, registry=self.registry):
             if is_batchmode(self.request) and self._creating_new_version():
-                last = get_sheet_field(self.context, ITags, 'LAST',
-                                       registry=self.registry)
+                last = self.registry.content.get_sheet_field(self.context,
+                                                             ITags,
+                                                             'LAST')
                 if is_created_in_current_transaction(last, self.registry):
                     self._update_version(last)
                     resource = last
@@ -685,7 +619,9 @@ class ItemRESTView(PoolRESTView):
 
     def _update_version(self, resource: IVersionable):
         create_sheets = self.content.get_sheets_create(resource, self.request)
-        is_first = get_sheet_field(self.context, ITags, 'FIRST') == resource
+        is_first = self.registry.content.get_sheet_field(self.context,
+                                                         ITags,
+                                                         'FIRST')
         appstructs = self.request.validated.get('data', {})
         for sheet in create_sheets:
             isheet = sheet.meta.isheet
@@ -694,8 +630,7 @@ class ItemRESTView(PoolRESTView):
                 continue
             isheet_name = isheet.__identifier__
             if isheet_name in appstructs:  # pragma: no branch
-                sheet.set(appstructs[isheet.__identifier__],
-                          request=self.request)
+                sheet.set(appstructs[isheet.__identifier__])
 
 
 @view_defaults(
@@ -741,7 +676,7 @@ class BadgeAssignmentsRESTView(PoolRESTView):
 class UsersRESTView(PoolRESTView):
     """View the IUsersService pool overwrites POST handling."""
 
-    validation_POST = (POSTResourceRequestSchema, [])
+    schema_POST = POSTResourceRequestSchema
 
     @view_config(request_method='POST',
                  permission='create_user',
@@ -758,7 +693,7 @@ class UsersRESTView(PoolRESTView):
 class AssetsServiceRESTView(PoolRESTView):
     """View allowing multipart requests for asset upload."""
 
-    validation_POST = (POSTAssetRequestSchema, [])
+    schema_POST = POSTAssetRequestSchema
 
     @view_config(request_method='POST',
                  permission='create_asset',
@@ -775,7 +710,7 @@ class AssetsServiceRESTView(PoolRESTView):
 class AssetRESTView(SimpleRESTView):
     """View for assets, allows PUTting new versions via multipart."""
 
-    validation_PUT = (PUTAssetRequestSchema, [])
+    schema_PUT = PUTAssetRequestSchema
 
     @view_config(request_method='PUT',
                  permission='create_asset',
@@ -891,8 +826,7 @@ class MetaApiView(RESTView):
                 readonly = getattr(node, 'readonly', False)
 
                 if issubclass(valuetype, References):
-                    empty_appstruct = node.bind().default
-                    containertype = empty_appstruct.__class__.__name__
+                    containertype = 'list'
                     typ = to_dotted_name(AbsolutePath)
                 elif isinstance(node, SequenceSchema):
                     containertype = 'list'
@@ -981,81 +915,6 @@ def _get_base_ifaces(iface: IInterface, root_iface=Interface) -> [str]:
     return bases
 
 
-def _add_no_such_user_or_wrong_password_error(request: Request):
-    error = error_entry('body', 'password',
-                        'User doesn\'t exist or password is wrong')
-    request.errors.append(error)
-
-
-def validate_login_name(context, request: Request):
-    """Validate the user name of a login request.
-
-    If valid and activated, the user object is added as 'user' to
-    `request.validated`.
-    """
-    name = request.validated['name']
-    locator = request.registry.getMultiAdapter((context, request),
-                                               IUserLocator)
-    user = locator.get_user_by_login(name)
-    if user is None:
-        _add_no_such_user_or_wrong_password_error(request)
-    else:
-        request.validated['user'] = user
-
-
-def validate_login_email(context, request: Request):
-    """Validate the email address of a login request.
-
-    If valid, the user object is added as 'user' to
-    `request.validated`.
-    """
-    email = request.validated['email']
-    locator = request.registry.getMultiAdapter((context, request),
-                                               IUserLocator)
-    normalized_email = email.lower()
-    user = locator.get_user_by_email(normalized_email)
-    if user is None:
-        _add_no_such_user_or_wrong_password_error(request)
-    else:
-        request.validated['user'] = user
-
-
-def validate_login_password(context, request: Request):
-    """Validate the password of a login request.
-
-    Requires the user object as `user` in `request.validated`.
-    """
-    user = request.validated.get('user', None)
-    if user is None:
-        return
-    password_sheet = get_sheet(user, IPasswordAuthentication,
-                               registry=request.registry)
-    password = request.validated['password']
-    try:
-        valid = password_sheet.check_plaintext_password(password)
-    except ValueError:
-        valid = False
-    if not valid:
-        _add_no_such_user_or_wrong_password_error(request)
-
-
-def validate_account_active(context, request: Request):
-    """Ensure that the user account is already active.
-
-    Requires the user object as `user` in `request.validated`.
-
-    No error message is added if there were earlier errors, as that would
-    leak information (indicating that a not-yet-activated account already
-    exists).
-    """
-    user = request.validated.get('user', None)
-    if user is None or request.errors:
-        return
-    if not user.active:
-        error = error_entry('body', 'name', 'User account not yet activated')
-        request.errors.append(error)
-
-
 @view_defaults(
     renderer='json',
     context=IRootPool,
@@ -1064,10 +923,7 @@ def validate_account_active(context, request: Request):
 class LoginUsernameView(RESTView):
     """Log in a user via their name."""
 
-    validation_POST = (POSTLoginUsernameRequestSchema,
-                       [validate_login_name,
-                        validate_login_password,
-                        validate_account_active])
+    schema_POST = POSTLoginUsernameRequestSchema
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -1101,10 +957,7 @@ def _login_user(request: Request) -> dict:
 class LoginEmailView(RESTView):
     """Log in a user via their email address."""
 
-    validation_POST = (POSTLoginEmailRequestSchema,
-                       [validate_login_email,
-                        validate_login_password,
-                        validate_account_active])
+    schema_POST = POSTLoginEmailRequestSchema
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -1118,31 +971,6 @@ class LoginEmailView(RESTView):
         return _login_user(self.request)
 
 
-def validate_activation_path(context, request: Request):
-    """Validate the user name of a login request.
-
-    If valid and activated, the user object is added as 'user' to
-    `request.validated`.
-    """
-    path = request.validated['path']
-    locator = request.registry.getMultiAdapter((context, request),
-                                               IUserLocator)
-    user = locator.get_user_by_activation_path(path)
-    error = error_entry('body', 'path', 'Unknown or expired activation path')
-    if user is None:
-        request.errors.append(error)
-    elif is_older_than(user, days=8):
-        request.errors.append(error)
-        user.activation_path = None
-    else:
-        user.activate()
-        user.activation_path = None
-        request.validated['user'] = user
-        event = ResourceSheetModified(user, IUserBasic, request.registry, {},
-                                      {}, request)
-        request.registry.notify(event)  # trigger reindex activation_path index
-
-
 @view_defaults(
     renderer='json',
     context=IRootPool,
@@ -1151,8 +979,7 @@ def validate_activation_path(context, request: Request):
 class ActivateAccountView(RESTView):
     """Log in a user via their name."""
 
-    validation_POST = (POSTActivateAccountViewRequestSchema,
-                       [validate_activation_path])
+    schema_POST = POSTActivateAccountViewRequestSchema
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -1174,7 +1001,7 @@ class ActivateAccountView(RESTView):
 class ReportAbuseView(RESTView):
     """Receive and process an abuse complaint."""
 
-    validation_POST = (POSTReportAbuseViewRequestSchema, [])
+    schema_POST = POSTReportAbuseViewRequestSchema
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -1200,7 +1027,7 @@ class ReportAbuseView(RESTView):
 class MessageUserView(RESTView):
     """Send a message to another user."""
 
-    validation_POST = (POSTMessageUserViewRequestSchema, [])
+    schema_POST = POSTMessageUserViewRequestSchema
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -1235,7 +1062,7 @@ class MessageUserView(RESTView):
 class CreatePasswordResetView(RESTView):
     """Create a password reset resource."""
 
-    validation_POST = (POSTCreatePasswordResetRequestSchema, [])
+    schema_POST = POSTCreatePasswordResetRequestSchema
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -1263,7 +1090,7 @@ class CreatePasswordResetView(RESTView):
 class PasswordResetView(RESTView):
     """Reset a user password."""
 
-    validation_POST = (POSTPasswordResetRequestSchema, [])
+    schema_POST = POSTPasswordResetRequestSchema
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:

@@ -1,0 +1,21 @@
+%define INSTANCE .
+
+<zeo>
+  address 127.0.0.1:9963
+  read-only false
+  invalidation-queue-size 100
+  pid-filename $INSTANCE/var/ZEO.pid
+  # monitor-address PORT
+  # transaction-timeout SECONDS
+</zeo>
+
+<blobstorage main>
+  <filestorage>
+    path $INSTANCE/var/db/${adhocracy:backend_package_name}/Data.fs
+    # keep old objects when running bin/zeopack
+    pack-keep-old false
+    # do garbage collection when running bin/zeopack (slow)
+    pack-gc true
+  </filestorage>
+  blob-dir $INSTANCE/var/db/${adhocracy:backend_package_name}/blobs
+</blobstorage>

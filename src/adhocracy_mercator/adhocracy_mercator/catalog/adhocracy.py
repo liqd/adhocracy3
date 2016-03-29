@@ -1,10 +1,10 @@
 """Adhocracy catalog extensions."""
+from pyramid.threadlocal import get_current_registry
 from substanced.catalog import Keyword
 
 from adhocracy_core.catalog.adhocracy import AdhocracyCatalogIndexes
 from adhocracy_core.rest.schemas import INDEX_EXAMPLE_VALUES
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_mercator.sheets.mercator import IMercatorSubResources
 from adhocracy_mercator.sheets.mercator import IFinance
 from adhocracy_mercator.sheets.mercator import ILocation
@@ -28,14 +28,20 @@ LOCATION_INDEX_KEYWORDS = ['specific', 'online', 'linked_to_ruhr']
 
 def index_location(resource, default) -> list:
     """Return search index keywords based on the "location_is_..." fields."""
-    location = get_sheet_field(resource, IMercatorSubResources, 'location')
+    registry = get_current_registry(resource)
+    location = registry.content.get_sheet_field(resource,
+                                                IMercatorSubResources,
+                                                'location')
     # TODO: Why is location '' in the first pass of that function
     # during MercatorProposal create?
     if location is None or location == '':
         return default
     locations = []
     for keyword in LOCATION_INDEX_KEYWORDS:
-        if get_sheet_field(location, ILocation, 'location_is_' + keyword):
+        is_used = registry.content.get_sheet_field(location,
+                                                   ILocation,
+                                                   'location_is_' + keyword)
+        if is_used:
             locations.append(keyword)
     return locations if locations else default
 
@@ -47,10 +53,15 @@ def index_requested_funding(resource: IResource, default) -> int:
     # TODO: Why is finance '' in the first pass of that function
     # during MercatorProposal create?
     # This sounds like a bug, the default value for References is None,
-    finance = get_sheet_field(resource, IMercatorSubResources, 'finance')
+    registry = get_current_registry(resource)
+    finance = registry.content.get_sheet_field(resource,
+                                               IMercatorSubResources,
+                                               'finance')
     if finance is None or finance == '':
         return default
-    funding = get_sheet_field(finance, IFinance, 'requested_funding')
+    funding = registry.content.get_sheet_field(finance,
+                                               IFinance,
+                                               'requested_funding')
     for limit in BUDGET_INDEX_LIMIT_KEYWORDS:
         if funding <= limit:
             return [limit]
@@ -63,10 +74,15 @@ def index_budget(resource: IResource, default) -> str:
     The returned values are the same values as per the "requested_funding"
     field, or "above_50000" if the total budget value is more than 50,000 euro.
     """
-    finance = get_sheet_field(resource, IMercatorSubResources, 'finance')
+    registry = get_current_registry(resource)
+    finance = registry.content.get_sheet_field(resource,
+                                               IMercatorSubResources,
+                                               'finance')
     if finance is None or finance == '':
         return default
-    funding = get_sheet_field(finance, IFinance, 'budget')
+    funding = registry.content.get_sheet_field(finance,
+                                               IFinance,
+                                               'budget')
     for limit in BUDGET_INDEX_LIMIT_KEYWORDS:
         if funding <= limit:
             return [str(limit)]
@@ -75,27 +91,30 @@ def index_budget(resource: IResource, default) -> str:
 
 def mercator2_index_location(resource, default) -> list:
     """Return search index keywords based on the location's fields."""
+    registry = get_current_registry(resource)
     locations = []
-    if get_sheet_field(resource,
-                       sheets.mercator2.ILocation,
-                       'is_online'):
+    if registry.content.get_sheet_field(resource,
+                                        sheets.mercator2.ILocation,
+                                        'is_online'):
         locations.append('online')
-    if get_sheet_field(resource,
-                       sheets.mercator2.ILocation,
-                       'has_link_to_ruhr'):
+    if registry.content.get_sheet_field(resource,
+                                        sheets.mercator2.ILocation,
+                                        'has_link_to_ruhr'):
         locations.append('linked_to_ruhr')
-    if get_sheet_field(resource,
-                       sheets.mercator2.ILocation,
-                       'location') is not '':
+    if registry.content.get_sheet_field(resource,
+                                        sheets.mercator2.ILocation,
+                                        'location') is not '':
         locations.append('specific')
     return locations if locations else default
 
 
 def mercator2_index_requested_funding(resource: IResource, default) -> int:
     """Return search index keyword based on the "requested_funding" field."""
-    requested_funding = get_sheet_field(resource,
-                                        sheets.mercator2.IFinancialPlanning,
-                                        'requested_funding')
+    registry = get_current_registry(resource)
+    requested_funding = registry.content.get_sheet_field(
+        resource,
+        sheets.mercator2.IFinancialPlanning,
+        'requested_funding')
     for limit in BUDGET_INDEX_LIMIT_KEYWORDS:
         if requested_funding <= limit:
             return [limit]
@@ -108,8 +127,11 @@ def mercator2_index_budget(resource: IResource, default) -> str:
     The returned values are the same values as per the "requested_funding"
     field, or "above_50000" if the total budget value is more than 50,000 euro.
     """
-    budget = get_sheet_field(resource,
-                             sheets.mercator2.IFinancialPlanning, 'budget')
+    registry = get_current_registry(resource)
+    budget = registry.content.get_sheet_field(
+        resource,
+        sheets.mercator2.IFinancialPlanning,
+        'budget')
     for limit in BUDGET_INDEX_LIMIT_KEYWORDS:
         if budget <= limit:
             return [str(limit)]
@@ -118,7 +140,10 @@ def mercator2_index_budget(resource: IResource, default) -> str:
 
 def mercator2_index_topic(resource: IResource, default) -> [str]:
     """Return search index keywords based on the "topic" field."""
-    topic = get_sheet_field(resource, sheets.mercator2.ITopic, 'topic')
+    registry = get_current_registry(resource)
+    topic = registry.content.get_sheet_field(resource,
+                                             sheets.mercator2.ITopic,
+                                             'topic')
     if topic == []:
         return default
     return topic

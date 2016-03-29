@@ -1,0 +1,25 @@
+defaults: standard
+states:
+  participate:
+    acm:
+      principals:                    [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [create_mercator_proposal,  ~,         A,           ~,         ~,       A,         ~]
+        - [edit_mercator_proposal,    ~,         ~,           ~,         A,       ~,         ~]
+        - [create_comment,            ~,         A,           A,         ~,       A,         ~]
+        - [create_rate,               ~,         A,           ~,         ~,       ~,         ~]
+        - [edit_rate,                 ~,         ~,           ~,         A,       ~,         ~]
+  evaluate:
+    acm:
+      principals:                    [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [create_mercator_proposal,  ~,        ~,          ~,          ~,       A,         ~]
+        - [edit_mercator_proposal,    ~,        ~,          ~,          ~,       A,         ~]
+  result:
+    acm:
+      principals:                    [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [create_mercator_proposal,  ~,         ~,          ~,          ~,       A,         ~]
+        - [edit_mercator_proposal,    ~,         ~,          ~,          A,       A,         ~]
+        - [create_document,           ~,         ~,          ~,          A,       A,         ~]
+

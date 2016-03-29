@@ -1,4 +1,4 @@
-/// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../../../lib2/types/angular.d.ts"/>
 
 import * as AdhBadge from "../../../Badge/Badge";
 import * as AdhConfig from "../../../Config/Config";
@@ -6,6 +6,7 @@ import * as AdhHttp from "../../../Http/Http";
 import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
 import * as AdhRate from "../../../Rate/Rate";
+import * as AdhResourceUtil from "../../../Util/ResourceUtil";
 import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
 import * as AdhUtil from "../../../Util/Util";
 
@@ -108,18 +109,18 @@ var postCreate = (
     scope: IScope,
     poolPath: string
 ) => {
-        var proposal = new RIProposal({ preliminaryNames: adhPreliminaryNames });
-        proposal.parent = poolPath;
-        var proposalVersion = new RIProposalVersion({ preliminaryNames: adhPreliminaryNames });
+    var proposal = new RIProposal({ preliminaryNames: adhPreliminaryNames });
+    proposal.parent = poolPath;
+    var proposalVersion = new RIProposalVersion({ preliminaryNames: adhPreliminaryNames });
 
-        proposalVersion.parent = proposal.path;
-        proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
-            follows: [proposal.first_version_path]
-        });
-        fill(scope, proposalVersion);
+    proposalVersion.parent = proposal.path;
+    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+        follows: [proposal.first_version_path]
+    });
+    fill(scope, proposalVersion);
 
-        return adhHttp.deepPost([proposal, proposalVersion]);
-    };
+    return adhHttp.deepPost([proposal, proposalVersion]);
+};
 
 var postEdit = (
     adhHttp: AdhHttp.Service<any>,
@@ -128,15 +129,12 @@ var postEdit = (
     scope: IScope,
     oldVersion: RIProposalVersion
 ) => {
-        var proposalVersion = new RIProposalVersion({ preliminaryNames: adhPreliminaryNames });
-        proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
-        proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
-            follows: [oldVersion.path]
-        });
-        fill(scope, proposalVersion);
+    var proposalVersion = AdhResourceUtil.derive(oldVersion, { preliminaryNames: adhPreliminaryNames });
+    proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
+    fill(scope, proposalVersion);
 
-        return adhHttp.deepPost([proposalVersion]);
-    };
+    return adhHttp.deepPost([proposalVersion]);
+};
 
 
 export var detailDirective = (

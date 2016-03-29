@@ -1,0 +1,8 @@
+defaults: standard
+states:
+  participate:
+    acm:
+      principals:           [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [create_proposal,  ~,         ~,           ~,         ~,       A,         ~]
+

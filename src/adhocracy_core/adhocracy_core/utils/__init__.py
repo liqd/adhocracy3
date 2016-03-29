@@ -1,5 +1,4 @@
 """Helper functions shared between modules."""
-from collections import namedtuple
 from collections.abc import Iterable
 from collections.abc import Sequence
 from datetime import datetime
@@ -11,26 +10,21 @@ import copy
 import json
 import pprint
 
-
 from pyramid.compat import is_nonstr_iter
 from pyramid.location import lineage
 from pyramid.request import Request
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
-from pyramid.threadlocal import get_current_registry
 from substanced.util import acquire
 from substanced.util import find_catalog
 from substanced.util import get_dotted_name
 from zope.interface import directlyProvidedBy
-from zope.interface import Interface
 from zope.interface import providedBy
 from zope.interface.interfaces import IInterface
-import colander
 
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.interfaces import IResourceSheet
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.interfaces import IResourceSheetModified
@@ -74,19 +68,6 @@ def get_matching_isheet(context, isheet: IInterface) -> IInterface:
         if iface.isOrExtends(isheet):
             return iface
     return None
-
-
-def get_sheet(context, isheet: IInterface, registry: Registry=None)\
-        -> IResourceSheet:
-    """Get sheet adapter for the `isheet` interface.
-
-    :raises adhocracy_core.exceptions.RuntimeConfigurationError:
-        if there is no `isheet` sheet registered for context.
-
-    """
-    if registry is None:
-        registry = get_current_registry(context)
-    return registry.content.get_sheet(context, isheet)
 
 
 def get_all_taggedvalues(iface: IInterface) -> dict:
@@ -184,30 +165,6 @@ def to_dotted_name(context) -> str:
         return get_dotted_name(context)
 
 
-named_object = namedtuple('NamedObject', ['name'])
-"""An object that has a name (and nothing else)."""
-
-
-def raise_colander_style_error(sheet: Interface, field_name: str,
-                               description: str):
-    """Raise a Colander Invalid error without requiring a node object.
-
-    :param sheet: the error will be located within this sheet; set to `None`
-        to create a error outside of the "data" element, e.g. in a query string
-    :param field_name: the error will be located within this field in the sheet
-    :param description: the description of the error
-    :raises colander.Invalid: constructed from the given parameters
-
-    NOTE: You should always prefer to use the colander schemas to validate
-    request data.
-    """
-    if sheet is not None:
-        name = 'data.{}.{}'.format(sheet.__identifier__, field_name)
-    else:
-        name = field_name
-    raise colander.Invalid(named_object(name), description)
-
-
 def remove_keys_from_dict(dictionary: dict, keys_to_remove=()) -> dict:
     """Remove keys from `dictionary`.
 
@@ -280,20 +237,6 @@ def nested_dict_set(d: dict, keys: list, value: object):
     for key in keys[:-1]:
         d = d.setdefault(key, {})
     d[keys[-1]] = value
-
-
-def get_sheet_field(resource, isheet: ISheet, field_name: str,
-                    registry: Registry=None) -> object:
-    """Return value of `isheet` field `field_name` for `resource`.
-
-    :raise KeyError: if `field_name` does not exists for `isheet` sheets.
-    :raises adhocracy_core.exceptions.RuntimeConfigurationError:
-        if there is no `isheet` sheet registered for context.
-
-    """
-    sheet = get_sheet(resource, isheet, registry=registry)
-    field = sheet.get()[field_name]
-    return field
 
 
 def unflatten_multipart_request(request: Request) -> dict:

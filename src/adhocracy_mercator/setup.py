@@ -42,15 +42,17 @@ setup(name='adhocracy_mercator',
       [paste.app_factory]
       main = adhocracy_mercator:main
       [console_scripts]
-      export_ae_proposals_2015 =\
-          adhocracy_mercator.scripts.export_ae_proposals_2015:export_proposals
-      export_ae_proposals_2016 =\
-          adhocracy_mercator.scripts.export_ae_proposals_2016:export_proposals
-      export_mercator_lost_rates =\
-          adhocracy_mercator.scripts.export_lost_rates:export_lost_rates
-      export_mercator_users =\
-          adhocracy_mercator.scripts.export_users:export_users
-      delete_users =\
+      ad_mercator_2015_export_proposals =\
+          adhocracy_mercator.scripts.mercator_2015_export_proposals:export_proposals
+      ad_mercator_2016_export_proposals =\
+          adhocracy_mercator.scripts.mercator_2016_export_proposals:export_proposals
+      ad_mercator_2015_export_lost_rates =\
+          adhocracy_mercator.scripts.mercator_2015_export_lost_rates:export_lost_rates
+      ad_mercator_2015_export_users_and_proposals =\
+          adhocracy_mercator.scripts.mercator_2015_export_users:export_users
+      ad_mercator_2015_delete_users =\
+          adhocracy_mercator.scripts.mercator_2015_delete_users:delete_users
+      ad_delete_users =\
           adhocracy_mercator.scripts.delete_users:delete_users
       """,
       )

@@ -1,4 +1,4 @@
-/// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../../../lib2/types/angular.d.ts"/>
 
 import * as AdhConfig from "../../../Config/Config";
 import * as AdhHttp from "../../../Http/Http";
@@ -16,7 +16,7 @@ import RIProposalVersion from "../../../../Resources_/adhocracy_meinberlin/resou
 import * as SIComment from "../../../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/Meinberlin/Kiezkasse/Workbench";
+export var pkgLocation = "/Meinberlin/Kiezkasse/Workbench";
 
 
 export var kiezkasseWorkbenchDirective = (
@@ -132,6 +132,26 @@ export var kiezkasseEditColumnDirective = (
             column.bindVariablesAndClear(scope, ["processUrl"]);
         }
     };
+};
+
+export var addProposalButtonDirective = (
+    adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/AddProposalButton.html",
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
+
+            scope.setCameFrom = () => {
+                adhTopLevelState.setCameFrom();
+            };
+        }
+    };
+
 };
 
 export var registerRoutes = (

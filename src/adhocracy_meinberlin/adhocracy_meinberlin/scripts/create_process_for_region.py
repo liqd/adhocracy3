@@ -1,4 +1,7 @@
-"""Create Process for region."""
+"""Create Process for region.
+
+This console script is registered in setup.py.
+"""
 
 import sys
 import argparse
@@ -10,8 +13,6 @@ from pyramid.traversal import find_resource
 
 import transaction
 
-from adhocracy_core.utils import get_sheet
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.geo import IMultiPolygon
 from adhocracy_core.sheets.name import IName
@@ -34,21 +35,22 @@ def create_process_for_region():
     root = env['root']
     registry = env['registry']
 
-    district = _fetch_district_by_name(root, args.region_name)
+    district = _fetch_district_by_name(root, args.region_name, registry)
     organisation = _fetch_organisation_by_name(root, args.organisation_name)
 
     _create_process(root, registry, organisation, district)
 
 
-def _fetch_district_by_name(root, district):
-    pool = get_sheet(root, IPool)
+def _fetch_district_by_name(root, district, registry):
+    pool = registry.content.get_sheet(root, IPool)
     params = {'depth': 3,
               'interfaces': IMultiPolygon,
               }
     results = pool.get(params)
     locations = results['elements']
     for location in locations:
-        if get_sheet_field(location, IName, 'name') == district:
+        name = registry.content.get_sheet_field(location, IName, 'name')
+        if name == district:
             return location
 
     print('could not find district %s' % (district))
@@ -66,8 +68,8 @@ def _fetch_organisation_by_name(root, organisation_path):
 
 def _create_process(root, registry, organisation, district):
 
-    name = get_sheet_field(district, IName, 'name')
-    title = get_sheet_field(district, ITitle, 'title')
+    name = registry.content.get_sheet_field(district, IName, 'name')
+    title = registry.content.get_sheet_field(district, ITitle, 'title')
 
     appstructs = {IName.__identifier__:
                   {'name': name},

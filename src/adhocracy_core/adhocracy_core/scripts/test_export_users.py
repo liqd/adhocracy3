@@ -18,7 +18,6 @@ class TestGetUsers:
 
     @fixture
     def context(self, pool, service, user1):
-        from substanced.interfaces import IFolder
         pool['principals'] = deepcopy(service)
         pool['principals']['users'] = deepcopy(service)
         pool['principals']['users']['0000000'] = user1
@@ -51,14 +50,14 @@ class TestWriteUsersToCSV:
         user.email = "ana@example.org"
         return user
 
-    def call_fut(self, users, writer):
+    def call_fut(self, *args):
         from .export_users import _write_users_to_csv
-        return _write_users_to_csv(users, writer)
+        return _write_users_to_csv(*args)
 
     def test_write_users_to_csv(self, registry, mock_sheet, user1):
         writer = Mock()
         mock_sheet.get.return_value = {'creation_date': '2016-01-01'}
-        result = self.call_fut([user1], writer)
+        result = self.call_fut([user1], writer, registry)
         calls = [call(['Username', 'Email', 'Creation date']),
                  call([user1.name, user1.email, '2016-01-01'])]
         writer.writerow.assert_has_calls(calls)
