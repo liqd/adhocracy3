@@ -1,4 +1,7 @@
-"""Create Process for region."""
+"""Create Process for region.
+
+This console script is registered in setup.py.
+"""
 
 import sys
 import argparse

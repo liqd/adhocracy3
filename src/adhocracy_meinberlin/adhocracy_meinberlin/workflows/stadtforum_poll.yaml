@@ -2,12 +2,10 @@ defaults: standard
 states:
   participate:
     acm:
-      principals:            [anonymous, participant, moderator, creator, initiator, admin]
+      principals:            [everyone, participant, moderator, creator, initiator, admin]
       permissions:
         - [create_proposal,   ~,         ~,           ~,         ~,       ~,         ~]
-        - [edit_proposal,     ~,         ~,           ~,         ~,       ~,         ~]
         - [create_comment,    ~,         A,           A,         ~,       ~,         ~]
-        - [edit_comment,      ~,         ~,           ~,         A,       ~,         ~]
         - [create_rate,       ~,         A,           ~,         ~,       ~,         ~]
         - [edit_rate,         ~,         ~,           ~,         A,       ~,         ~]
         - [create_relation,   ~,         A,           ~,         ~,       ~,         ~]

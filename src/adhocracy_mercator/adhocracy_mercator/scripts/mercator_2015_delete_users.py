@@ -2,9 +2,7 @@
 
 Votes from the users are also deleted.
 
-This script is registered as console script 'delete_users' in
-setup.py.
-
+This script is registered as console script in setup.py.
 """
 
 import argparse

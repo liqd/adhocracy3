@@ -101,8 +101,23 @@ class TestBaseResourceSheet:
                                    'creating': inst.creating,
                                    }
 
-    def test_get_empty(self, inst):
+    def test_get_with_default(self, inst):
         assert inst.get() == {'count': 0}
+
+    def test_get_with_deferred_default(self, inst):
+        """A dictionary with 'registry' and 'context' is passed to deferred
+        default functions.
+        """
+        schema = inst.schema.bind()
+        @colander.deferred
+        def default(node, kw):
+            return len(kw)
+        schema['count'].default = default
+        inst.schema = schema
+        assert inst.get() == {'count': 2}
+
+    def test_get_with_omit_defaults(self, inst):
+        assert inst.get(omit_defaults=True) == {}
 
     def test_get_non_empty(self, inst):
         inst._get_data_appstruct.return_value = {'count': 11}
@@ -285,27 +300,35 @@ class TestBaseResourceSheet:
         assert events[0].old_appstruct == {'count': 0}
         assert events[0].new_appstruct == {'count': 2}
 
-    def test_deserialize(self, inst, request_):
+    def test_serialize(self, inst, request_):
+        from . import BaseResourceSheet
         inst.request = request_
-        inst._get_data_appstruct.return_value = {'count': 2}
+        inst.get = Mock(spec=BaseResourceSheet.get)
+        inst.get.return_value = {'elements': [],
+                                 'count': 2}
         assert inst.serialize() == {'count': '2'}
+        default_params = {'only_visible': True,
+                          'allows': (request_.effective_principals, 'view'),
+                          }
+        assert inst.get.call_args[1]['params'] == default_params
+        assert inst.get.call_args[1]['omit_defaults'] is True
 
-    def test_deserialize_with_params(self, inst, request_):
+    def test_serialize_with_params(self, inst, request_):
         inst.request = request_
         inst.get = Mock()
         inst.get.return_value = {'elements': []}
         cstruct = inst.serialize(params={'name': 'child'})
         assert 'name' in inst.get.call_args[1]['params']
 
-    def test_deserialize_filter_by_view_permission(self, inst, request_):
+    def test_serialize_filter_by_view_permission(self, inst, request_):
         inst.request = request_
         inst.get = Mock()
         inst.get.return_value = {}
         cstruct = inst.serialize()
         assert inst.get.call_args[1]['params']['allows'] == \
-               (request_.effective_principals, 'view')
+                (request_.effective_principals, 'view')
 
-    def test_deserialize_filter_by_view_permission_disabled(self, inst,
+    def test_serialize_filter_by_view_permission_disabled(self, inst,
                                                             request_):
         inst.request = request_
         inst.registry.settings['adhocracy.filter_by_view_permission'] = "False"
@@ -314,14 +337,14 @@ class TestBaseResourceSheet:
         cstruct = inst.serialize()
         assert 'allows' not in inst.get.call_args[1]['params']
 
-    def test_deserialize_filter_by_only_visible(self, inst, request_):
+    def test_serialize_filter_by_only_visible(self, inst, request_):
         inst.request = request_
         inst.get = Mock()
         inst.get.return_value = {}
         cstruct = inst.serialize()
         assert inst.get.call_args[1]['params']['only_visible']
 
-    def test_deserialize_filter_by_only_visible_disabled(self, inst, request_):
+    def test_serialize_filter_by_only_visible_disabled(self, inst, request_):
         inst.request = request_
         inst.registry.settings['adhocracy.filter_by_visible'] = "False"
         inst.get = Mock()

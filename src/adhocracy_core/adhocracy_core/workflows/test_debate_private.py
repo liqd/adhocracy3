@@ -1,8 +1,8 @@
 from pytest import fixture
 from pytest import mark
 
-from adhocracy_core.utils.testing import add_resources
-from adhocracy_core.utils.testing import do_transition_to
+from adhocracy_core.testing import add_resources
+from adhocracy_core.testing import do_transition_to
 
 
 @fixture
@@ -60,7 +60,7 @@ class TestDebatePrivateProcess:
     @staticmethod
     def _get_root_acm_extension(context):
         acm = \
-            {'principals':            ['anonymous', 'authenticated', 'participant', 'moderator',  'creator', 'initiator', 'admin'],
+            {'principals':            ['everyone', 'authenticated', 'participant', 'moderator',  'creator', 'initiator', 'admin'],
              'permissions': [['view',  'Allow',      'Deny',          'Allow',       'Allow',      'Allow',   'Allow',     'Allow'],
              ]}
         return acm

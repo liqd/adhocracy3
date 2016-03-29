@@ -1,6 +1,6 @@
 """Delete not referenced images.
 
-This is registered as console script 'removed_not_referenced_images'.
+This is registered as console script.
 """
 from datetime import timedelta
 import transaction

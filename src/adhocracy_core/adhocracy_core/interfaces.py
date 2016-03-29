@@ -1,5 +1,5 @@
 """Interfaces for plugable dependencies, basic metadata structures."""
-from collections import Iterable
+from collections import Iterable, namedtuple
 from enum import Enum
 import collections
 
@@ -204,14 +204,14 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
 
     def get(params: dict={},
             add_back_references=True,
-            omit_readonly=False) -> dict:
+            omit_defaults=False) -> dict:
         """Get `appstruct` data.
 
         :param params: optional parameters that can modify the appearance
             of the returned dictionary. Valid keys/values are defined in
             :class:`adhocracy_core.interfaces.SearchQuery`.
         :param add_back_references: allow to omit back references
-        :param omit_readonly: omit readonly fields
+        :param omit_defaults: omit fields with default values only
 
         Deferred defaults are executed with the following bindings:
 
@@ -884,3 +884,6 @@ class IAdhocracyWorkflow(IWorkflow):  # pragma: no cover
 
     def get_next_states(context, request: IRequest) -> [str]:
         """Get states you can trigger a transition to."""
+
+
+error_entry = namedtuple('ErrorEntry', ['location', 'name', 'description'])

@@ -8,7 +8,6 @@
              nocenter='true',
              style='',
              "/>
-
 <script src="${sdk_url}"></script>
 <script> adhocracy.init('${frontend_url}',
                         function(adhocracy) {adhocracy.embed('.adhocracy_marker');

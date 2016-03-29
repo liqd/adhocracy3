@@ -44,7 +44,7 @@ class TestProposalVersion:
                 burgerhaushalt.IProposal,
                 adhocracy_core.sheets.geo.IPoint,
                 )
-        assert meta.permission_create == 'edit_proposal'
+        assert meta.permission_create == 'edit'
 
     @mark.usefixtures('integration')
     def test_create(self, meta, registry):

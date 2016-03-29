@@ -2,8 +2,8 @@ from pyramid.traversal import find_resource
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
-from adhocracy_core.utils.testing import add_resources
-from adhocracy_core.utils.testing import do_transition_to
+from adhocracy_core.testing import add_resources
+from adhocracy_core.testing import do_transition_to
 
 
 @fixture

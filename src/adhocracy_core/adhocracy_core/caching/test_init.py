@@ -478,7 +478,7 @@ class TestPurgeVarnishAfterCommitHook:
                                            changed_descendants=True)
         purge_varnish_after_commit_hook(True, registry_for_varnish, request_)
         assert mock_requests.request.call_args[1]['headers']['X-Purge-Regex']\
-            == '/?\??.*$'
+            == '/?\??[^/]*$'
 
     def test_non_empty_changelog_but_unchanged_resource(
             self, monkeypatch, registry_for_varnish, changelog_meta, context,

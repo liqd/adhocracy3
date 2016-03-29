@@ -56,7 +56,7 @@ Documentation
 
 Build sphinx documentation ::
 
-    bin/sphinx_build_adhocracy
+    bin/ad_sphinx_build_adhocracy
     xdg-open docs/build/html/index.html  # (alternatively, cut & paste the url into your browser)
 
 
@@ -75,15 +75,15 @@ Check that everything is running smoothly::
 
 Get information about the current workflow::
 
-  ./bin/set_workflow_state --info etc/development.ini <path-to-process>
+  ./bin/ad_set_workflow_state --info etc/development.ini <path-to-process>
   # Example
-  ./bin/set_workflow_state --info etc/development.ini /mercator
+  ./bin/ad_set_workflow_state --info etc/development.ini /mercator
 
 Change the workflow state (most actions are not allowed for a normal user in the initial 'draft' state)::
 
-  ./bin/set_workflow_state etc/development.ini <path-to-process> <states-to-transition>
+  ./bin/ad_set_workflow_state etc/development.ini <path-to-process> <states-to-transition>
   # Example
-  ./bin/set_workflow_state etc/development.ini /mercator announce participate
+  ./bin/ad_set_workflow_state etc/development.ini /mercator announce participate
 
 Open the javascript front-end with your web browser::
 

@@ -81,12 +81,14 @@ class BaseResourceSheet:
 
     def get(self, params: dict={},
             add_back_references=True,
-            omit_readonly=False) -> dict:
+            omit_defaults=False) -> dict:
         """Return appstruct data.
 
         Read :func:`adhocracy_core.interfaces.IResourceSheet.get`
         """
-        appstruct = self._get_default_appstruct(omit_readonly=omit_readonly)
+        appstruct = {}
+        if not omit_defaults:
+            appstruct.update(self._get_default_appstruct())
         appstruct.update(self._get_data_appstruct())
         query = self._get_references_query(params)
         appstruct.update(self._get_reference_appstruct(query))
@@ -94,18 +96,15 @@ class BaseResourceSheet:
             appstruct.update(self._get_back_reference_appstruct(query))
         return appstruct
 
-    def _get_default_appstruct(self, omit_readonly=False) -> dict:
+    def _get_default_appstruct(self) -> dict:
         appstruct = {}
         for node in self.schema:
-            if node.name in self._fields['readonly'] and omit_readonly:
-                continue
+            if isinstance(node.default, deferred):
+                default = node.default(node, {'context': self.context,
+                                              'registry': self.registry})
             else:
-                if isinstance(node.default, deferred):
-                    default = node.default(node, {'context': self.context,
-                                                  'registry': self.registry})
-                else:
-                    default = node.default
-                appstruct[node.name] = default
+                default = node.default
+            appstruct[node.name] = default
         return appstruct
 
     def _get_data_appstruct(self) -> dict:
@@ -225,7 +224,7 @@ class BaseResourceSheet:
             'adhocracy.filter_by_visible', True))
         if filter_visible:
             params['only_visible'] = True
-        appstruct = self.get(params=params)
+        appstruct = self.get(params=params, omit_defaults=True)
         schema = self.get_schema_with_bindings()
         cstruct = schema.serialize(appstruct)
         return cstruct

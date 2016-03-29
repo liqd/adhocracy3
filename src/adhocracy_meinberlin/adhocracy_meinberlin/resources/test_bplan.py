@@ -38,7 +38,7 @@ class TestProposalVersion:
         assert meta.extended_sheets == \
                (sheets.bplan.IProposal,
                )
-        assert meta.permission_create == 'edit_proposal'
+        assert meta.permission_create == 'edit'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

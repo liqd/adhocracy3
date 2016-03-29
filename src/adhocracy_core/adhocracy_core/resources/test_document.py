@@ -51,7 +51,7 @@ class TestDocumentVersion:
                                         sheets.image.IImageReference,
                                         sheets.title.ITitle,
                                         )
-        assert meta.permission_create == 'edit_document'
+        assert meta.permission_create == 'edit'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

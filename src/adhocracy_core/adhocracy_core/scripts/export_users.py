@@ -1,6 +1,6 @@
 """Export adhocracy3 users to CSV.
 
-This is registered as console script 'export_users' in setup.py.
+This is registered as console script in setup.py.
 
 """
 import argparse

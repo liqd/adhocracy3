@@ -29,7 +29,7 @@ class TestJSONHTTPException:
         assert inst.status == '402 Bad Bad'
 
     def test_add_error_entries_to_json_body(self):
-        from .exceptions import error_entry
+        from adhocracy_core.interfaces import error_entry
         error_entries = [error_entry('header', 'a', 'b')]
         inst = self.make_one(error_entries)
         assert inst.json_body['errors'] == [{'location': 'header',
@@ -346,7 +346,7 @@ class TestHandleError400:
         return handle_error_400_bad_request(error, request)
 
     def test_return_json_error_with_error_listing(self, error, request_):
-        from .exceptions import error_entry
+        from adhocracy_core.interfaces import error_entry
         request_.errors = [error_entry('b', '', '')]
         inst = self.call_fut(error, request_)
         assert inst.content_type == 'application/json'

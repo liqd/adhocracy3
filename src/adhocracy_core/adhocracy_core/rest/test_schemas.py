@@ -220,7 +220,7 @@ class TestAddPostRequestSubSchemas:
             self.call_fut(node, kw)
 
 
-class TestPOSTItemRequestSchemaUnitTest:
+class TestPOSTItemRequestSchema:
 
     @fixture
     def request_(self, request_):
@@ -232,26 +232,41 @@ class TestPOSTItemRequestSchemaUnitTest:
         registry.content.get_resources_meta_addable.return_value = [resource_meta]
         return registry
 
-    def make_one(self):
-        from adhocracy_core.rest.schemas import POSTItemRequestSchema
-        return POSTItemRequestSchema()
+    @fixture
+    def version(self, context):
+        from adhocracy_core.interfaces import IItemVersion
+        version = testing.DummyResource(__provides__=IItemVersion)
+        context['version'] = version
+        return version
 
-    def test_deserialize_without_binding(self):
-        inst = self.make_one()
+    @fixture
+    def inst(self, kw):
+        from adhocracy_core.rest.schemas import POSTItemRequestSchema
+        return POSTItemRequestSchema().bind(**kw)
+
+    def test_deserialize_empty(self, inst):
         result = inst.deserialize({'content_type': IResource.__identifier__,
                                    'data': {}})
         assert result == {'content_type': IResource,
                           'data': {},
                           'root_versions': []}
 
-    def test_deserialize_with_binding_and_root_versions(self, kw, request_):
-        inst = self.make_one().bind(**kw)
-        root_version_path = request_.resource_url(kw['context'])
+    def test_deserialize_with_root_versions(self, inst, request_, version):
+        root_version_path = request_.resource_url(version)
         result = inst.deserialize({'content_type': IResource.__identifier__,
                                    'data': {},
                                    'root_versions': [root_version_path]})
-        assert result == {'content_type': IResource, 'data': {},
-                          'root_versions': [kw['context']]}
+        assert result == {'content_type': IResource,
+                          'data': {},
+                          'root_versions': [version]}
+
+    def test_deserialize_raise_if_non_version_root_versions(
+       self, inst, request_, context):
+        root_version_path = request_.resource_url(context)
+        with raises(colander.Invalid):
+            inst.deserialize({'content_type': IResource.__identifier__,
+                              'data': {},
+                              'root_versions': [root_version_path]})
 
 
 class TestPUTResourceRequestSchema:
@@ -280,6 +295,7 @@ class TestPUTResourceRequestSchema:
         from adhocracy_core.rest.schemas import add_put_data_subschemas
         inst = self.make_one()
         assert inst['data'].after_bind is add_put_data_subschemas
+
 
 def test_put_asset_request_schema():
     from . import schemas
@@ -1266,3 +1282,220 @@ class TestValidatePasswordResetPath:
 
         with raises(colander.Invalid):
             validator(node, reset)
+
+
+class TestPostActivateAccountViewRequestSchema:
+
+    def make_one(self, kw):
+        from .schemas import POSTActivateAccountViewRequestSchema
+        return POSTActivateAccountViewRequestSchema().bind(**kw)
+
+    def test_create(self, mocker, kw):
+        mock_val = mocker.patch('adhocracy_core.rest.schemas.'
+                                'create_validate_activation_path')
+        inst = self.make_one(kw)
+        assert inst['path'].required
+        validators = inst['path'].validator.validators
+        assert validators[1] == mock_val.return_value
+        mock_val.assert_called_with(kw['context'], kw['request'],
+                                    kw['registry'])
+        assert isinstance(validators[0], colander.Regex)
+
+
+class TestCreateValidateActivationPath:
+
+    def call_fut(self, *args):
+        from adhocracy_core.rest.schemas import create_validate_activation_path
+        return create_validate_activation_path(*args)
+
+    def test_raise_if_wrong_path(self, node, request_, context, registry,
+                           mock_user_locator):
+        mock_user_locator.get_user_by_activation_path.return_value = None
+        validator = self.call_fut(context, request_, registry)
+        with raises(colander.Invalid):
+            validator(node, 'activate')
+
+    def test_raise_if_outdated_path(self, node, request_, context, registry,
+                                    mock_user_locator, mocker):
+        mocker.patch('adhocracy_core.rest.schemas.is_older_than',
+                     return_value=True)
+        user = testing.DummyResource(active=False,
+                                     activate=mocker.Mock())
+        mock_user_locator.get_user_by_activation_path.return_value = user
+        validator = self.call_fut(context, request_, registry)
+        with raises(colander.Invalid):
+            validator(node, 'activate')
+
+    def test_activate_user(self, node, request_, context, registry,
+                           mock_user_locator, mocker):
+        mocker.patch('adhocracy_core.rest.schemas.is_older_than',
+                     return_value=False)
+        user = testing.DummyResource(active=False,
+                                     activate=mocker.Mock())
+        mock_user_locator.get_user_by_activation_path.return_value = user
+        validator = self.call_fut(context, request_, registry)
+        assert validator(node, 'activate') is None
+        assert user.activate.called
+
+
+class TestPostLoginEmailRequestSchemma:
+
+    def make_one(self, kw):
+        from .schemas import POSTLoginEmailRequestSchema
+        return POSTLoginEmailRequestSchema().bind(**kw)
+
+    def test_create(self, mocker, kw):
+        val_login = mocker.patch('adhocracy_core.rest.schemas.'
+                                 'create_validate_login')
+        val_pwd = mocker.patch('adhocracy_core.rest.schemas.'
+                               'create_validate_login_password')
+        val_active = mocker.patch('adhocracy_core.rest.schemas.'
+                                  'create_validate_account_active')
+        inst = self.make_one(kw)
+        assert inst['email'].required
+        assert inst['password'].required
+        validators = inst.validator.validators
+        assert validators[0] == val_login.return_value
+        val_login.assert_called_with(kw['context'],
+                                     kw['request'],
+                                     kw['registry'],
+                                     'email')
+        assert validators[1] == val_pwd.return_value
+        val_pwd.assert_called_with(kw['request'], kw['registry'])
+        assert validators[2] == val_active.return_value
+        val_active.assert_called_with(kw['request'], 'email')
+
+
+class TestPostLoginNameRequestSchemma:
+
+    def make_one(self, kw):
+        from .schemas import POSTLoginUsernameRequestSchema
+        return POSTLoginUsernameRequestSchema().bind(**kw)
+
+    def test_create(self, mocker, kw):
+        val_login = mocker.patch('adhocracy_core.rest.schemas.'
+                                 'create_validate_login')
+        val_pwd = mocker.patch('adhocracy_core.rest.schemas.'
+                               'create_validate_login_password')
+        val_active = mocker.patch('adhocracy_core.rest.schemas.'
+                                  'create_validate_account_active')
+        inst = self.make_one(kw)
+        assert inst['name'].required
+        assert inst['password'].required
+        validators = inst.validator.validators
+        assert validators[0] == val_login.return_value
+        val_login.assert_called_with(kw['context'],
+                                     kw['request'],
+                                     kw['registry'],
+                                     'name')
+        assert validators[1] == val_pwd.return_value
+        val_pwd.assert_called_with(kw['request'], kw['registry'])
+        assert validators[2] == val_active.return_value
+        val_active.assert_called_with(kw['request'], 'name')
+
+
+class TestCreateValidateLogin:
+
+    def call_fut(self, *args):
+        from adhocracy_core.rest.schemas import create_validate_login
+        return create_validate_login(*args)
+
+    def test_add_user_by_name(self, node, context, request_, registry,
+                               mock_user_locator):
+        user = testing.DummyResource()
+        mock_user_locator.get_user_by_login.return_value = user
+        validator = self.call_fut(context, request_, registry, 'name')
+        validator(node, {'name': 'username'})
+        assert request_.validated['user'] == user
+
+    def test_add_user_by_email(self, node, context, request_, registry,
+                      mock_user_locator):
+        user = testing.DummyResource()
+        mock_user_locator.get_user_by_email.return_value = user
+        validator = self.call_fut(context, request_, registry, 'email')
+        validator(node, {'email': 'user@example.org'})
+        assert request_.validated['user'] == user
+
+    def test_raise_if_wrong_login(self, node, context, request_, registry,
+                                  mock_user_locator):
+        mock_user_locator.get_user_by_email.return_value = None
+        validator = self.call_fut(context, request_, registry, 'email')
+        node['password'] = node.clone()  # used to create error,
+                                         # hide if password or login is wrong
+        with raises(colander.Invalid) as error_info:
+            validator(node, {'email': 'user@example.org'})
+        assert error_info.value.asdict() == \
+            {'password': 'User doesn\'t exist or password is wrong'}
+        assert 'user' not in request_.validated
+
+    def test_normalise_email(self, node, context, request_, registry,
+                             mock_user_locator):
+        user = testing.DummyResource()
+        mock_user_locator.get_user_by_email.return_value = user
+        validator = self.call_fut(context, request_, registry, 'email')
+        validator(node, {'email': ' USeR@example.org'})
+        mock_user_locator.get_user_by_email\
+            .assert_called_with('user@example.org')
+
+
+class TestCreateValidateLoginPassword:
+
+    def call_fut(self, *args):
+        from adhocracy_core.rest.schemas import create_validate_login_password
+        return create_validate_login_password(*args)
+
+    def mock_sheet(self):
+        from adhocracy_core.sheets.principal import PasswordAuthenticationSheet
+        mock = Mock(spec=PasswordAuthenticationSheet)
+        return mock
+
+    def test_ignore_if_no_user(self, node, request_, registry):
+        request_.validated = {}
+        validator = self.call_fut(request_, registry)
+        assert validator(node, {'password': 'secret'}) is None
+
+    def test_validate_password(self, node, request_, registry, mock_sheet):
+        user = testing.DummyResource()
+        request_.validated['user'] = user
+        registry.content.get_sheet.return_value = mock_sheet
+        validator = self.call_fut(request_, registry)
+        mock_sheet.check_plaintext_password.return_value = True
+        assert validator(node, {'password': 'secret'}) is None
+        mock_sheet.check_plaintext_password.assert_called_with('secret')
+
+    def test_raise_if_wrong_password(self, node, request_, registry,
+                                     mock_sheet):
+        user = testing.DummyResource()
+        request_.validated['user'] = user
+        registry.content.get_sheet.return_value = mock_sheet
+        validator = self.call_fut(request_, registry)
+        mock_sheet.check_plaintext_password.return_value = False
+        node['password'] = node.clone()  # used to raise error
+        with raises(colander.Invalid):
+            validator(node, {'password': 'secret'})
+
+
+class TestCreateValidateAccountActive:
+
+    def call_fut(self, *args):
+        from adhocracy_core.rest.schemas import create_validate_account_active
+        return create_validate_account_active(*args)
+
+    def test_ignore_if_no_user(self, node, request_):
+        request_.validated = {}
+        validator = self.call_fut(request_, 'child_node')
+        assert validator(node, {}) is None
+
+    def test_ignore_if_user_active(self, node, request_):
+        request_.validated = {'user': testing.DummyResource(active=True)}
+        validator = self.call_fut(request_, registry)
+        assert validator(node, {}) is None
+
+    def test_raise_if_user_not_active(self, node, request_):
+        request_.validated = {'user': testing.DummyResource(active=False)}
+        validator = self.call_fut(request_, 'child_node')
+        node['child_node'] = node.clone()  # used to create error
+        with raises(colander.Invalid) as error_info:
+            validator(node, {'password': 'secret'})
+        assert error_info.value.asdict() == \
+               {'child_node': 'User account not yet activated'}

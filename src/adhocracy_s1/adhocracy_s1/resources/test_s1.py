@@ -66,7 +66,7 @@ class TestProposalVersion:
             adhocracy_core.resources.proposal.IProposalVersion)
         assert adhocracy_core.sheets.logbook.IHasLogbookPool in\
             meta.extended_sheets
-        assert meta.permission_create == 'edit_proposal'
+        assert meta.permission_create == 'edit'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

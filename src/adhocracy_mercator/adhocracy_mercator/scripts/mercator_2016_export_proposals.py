@@ -1,7 +1,6 @@
 """Export advocate europe 2016 proposal.
 
-This is registered as console script 'export_ae_proposals_2016'
-in setup.py.
+This is registered as console script in setup.py.
 """
 
 import argparse
@@ -20,6 +19,8 @@ from adhocracy_core.interfaces import search_query
 from pyramid.traversal import resource_path
 from pyramid.traversal import get_current_registry
 
+from adhocracy_core.scripts import append_cvs_field
+from adhocracy_core.scripts import get_sheet_field_for_partial
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_mercator.resources.mercator2 import IMercatorProposal
@@ -92,31 +93,33 @@ def _export_proposals(root, registry, limited):
          ('Creation date', include_field,
           partial(_get_creation_date)),
          ('Title', include_field,
-          partial(_get_sheet_field, ITitle, 'title')),
+          partial(get_sheet_field_for_partial, ITitle, 'title')),
          ('Creator name', include_field,
           partial(_get_creator_name)),
          ('Creator email', include_field,
           partial(_get_creator_email)),
          ('First name', include_field,
-          partial(_get_sheet_field, IUserInfo, 'first_name')),
+          partial(get_sheet_field_for_partial, IUserInfo, 'first_name')),
          ('Last name', include_field,
-          partial(_get_sheet_field, IUserInfo, 'last_name')),
+          partial(get_sheet_field_for_partial, IUserInfo, 'last_name')),
          ('Organisation name', exclude_field,
-          partial(_get_sheet_field, IOrganizationInfo, 'name')),
+          partial(get_sheet_field_for_partial, IOrganizationInfo, 'name')),
          ('Organisation city', exclude_field,
-          partial(_get_sheet_field, IOrganizationInfo, 'city')),
+          partial(get_sheet_field_for_partial, IOrganizationInfo, 'city')),
          ('Organisation country', include_field,
-          partial(_get_sheet_field, IOrganizationInfo, 'country')),
+          partial(get_sheet_field_for_partial, IOrganizationInfo, 'country')),
          ('Organisation help request', exclude_field,
-          partial(_get_sheet_field, IOrganizationInfo, 'help_request')),
+          partial(get_sheet_field_for_partial, IOrganizationInfo,
+                  'help_request')),
          ('Organisation registration date', exclude_field,
           partial(_get_date, IOrganizationInfo, 'registration_date')),
          ('Organisation website', exclude_field,
-          partial(_get_sheet_field, IOrganizationInfo, 'website')),
+          partial(get_sheet_field_for_partial, IOrganizationInfo, 'website')),
          ('Organisation status', exclude_field,
-          partial(_get_sheet_field, IOrganizationInfo, 'status')),
+          partial(get_sheet_field_for_partial, IOrganizationInfo, 'status')),
          ('Organisation status other', exclude_field,
-          partial(_get_sheet_field, IOrganizationInfo, 'status_other')),
+          partial(get_sheet_field_for_partial, IOrganizationInfo,
+                  'status_other')),
          ('Pitch', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IPitch, 'pitch', 'pitch')),
@@ -154,19 +157,19 @@ def _export_proposals(root, registry, limited):
           lambda proposal: ' '.join(
               get_sheet_field(proposal, ITopic, 'topic'))),
          ('Topic other', exclude_field,
-          partial(_get_sheet_field, ITopic, 'topic_other')),
+          partial(get_sheet_field_for_partial, ITopic, 'topic_other')),
          ('Duration', exclude_field,
           lambda proposal: str(_get_sheet_field_from_subresource(
               IDuration, 'duration', 'duration', proposal))),
          ('Location', exclude_field,
-          partial(_get_sheet_field, ILocation, 'location')),
+          partial(get_sheet_field_for_partial, ILocation, 'location')),
          ('Is online', exclude_field,
           lambda proposal: str(
               get_sheet_field(proposal, ILocation, 'is_online'))),
          ('Link to Ruhr', exclude_field,
-          partial(_get_sheet_field, ILocation, 'link_to_ruhr')),
+          partial(get_sheet_field_for_partial, ILocation, 'link_to_ruhr')),
          ('Status', exclude_field,
-          partial(_get_sheet_field, IStatus, 'status')),
+          partial(get_sheet_field_for_partial, IStatus, 'status')),
          ('Challenge', exclude_field,
           partial(_get_sheet_field_from_subresource,
                   IChallenge, 'challenge', 'challenge')),
@@ -204,15 +207,17 @@ def _export_proposals(root, registry, limited):
           lambda proposal: str(get_sheet_field(
               proposal, IFinancialPlanning, 'requested_funding'))),
          ('Major expenses', exclude_field,
-          partial(_get_sheet_field,
+          partial(get_sheet_field_for_partial,
                   IFinancialPlanning, 'major_expenses')),
          ('Other sources of income', exclude_field,
-          partial(_get_sheet_field, IExtraFunding, 'other_sources')),
+          partial(get_sheet_field_for_partial, IExtraFunding,
+                  'other_sources')),
          ('Secured', exclude_field,
           lambda proposal: str(get_sheet_field(
               proposal, IExtraFunding, 'secured'))),
          ('Reach out', exclude_field,
-          partial(_get_sheet_field, ICommunity, 'expected_feedback')),
+          partial(get_sheet_field_for_partial, ICommunity,
+                  'expected_feedback')),
          ('Heard from', exclude_field,
           lambda proposal: ' '.join(get_sheet_field(
               proposal, ICommunity, 'heard_froms'))),
@@ -226,7 +231,7 @@ def _export_proposals(root, registry, limited):
     for proposal in proposals:
 
         result = []
-        append_field = partial(_append_field, result)
+        append_field = partial(append_cvs_field, result)
 
         for name, is_included, get_field in fields:
             if is_included or not limited:
@@ -252,15 +257,6 @@ def _get_sheet_field_from_subresource(sheet,
     return sub_field
 
 
-def _normalize_text(s: str) -> str:
-    """Normalize text to put it in CVS."""
-    return s.replace(';', '')
-
-
-def _append_field(result, content):
-    result.append(_normalize_text(content))
-
-
 def _get_date(sheet, field, resource):
     registry = get_current_registry(resource)
     value = registry.content.get_sheet_field(resource, sheet, field)
@@ -284,11 +280,6 @@ def _get_proposal_url(registry: Registry,
     path = resource_path(proposal)
     frontend_url = registry.settings.get('adhocracy.frontend_url')
     return frontend_url + '/r' + path
-
-
-def _get_sheet_field(sheet, field, resource):
-    registry = get_current_registry(resource)
-    return registry.content.get_sheet_field(resource, sheet, field)
 
 
 def _get_creator_name(proposal):
