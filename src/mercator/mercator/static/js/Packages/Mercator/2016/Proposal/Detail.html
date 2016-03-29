@@ -25,6 +25,12 @@
             <li class="meta-list-item meta-list-item-rate">
                 <adh-like data-refers-to="{{path}}" data-disabled="processState != 'participate'"></adh-like>
             </li>
+            <li data-ng-if="data.winner.name === 'winning'" class="meta-list-item meta-list-item-badge">
+                <span class="badge m-winner">{{ "TR__MERCATOR_BADGE_WINNERS" | translate }}</span>
+            </li>
+            <li data-ng-if="data.winner.name === 'community'" class="meta-list-item meta-list-item-badge">
+                <span class="badge m-community-award">{{ "TR__MERCATOR_BADGE_COMMUNITY_AWARD" | translate }}</span>
+            </li>
         </ul>
 
         <h1 class="section-jump-cover-header screen-only">{{ data.title }}
