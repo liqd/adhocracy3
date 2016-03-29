@@ -2,7 +2,7 @@
     class="section-jump"
     id="section-jump-top"
     data-ng-class="{
-        'has-rosette': data.winner.name,
+        'has-rosette': data.winner.name === 'winning' || data.winner.name === 'community',
         'm-winner': data.winner.name === 'winning',
         'm-community-award': data.winner.name === 'community'
     }">

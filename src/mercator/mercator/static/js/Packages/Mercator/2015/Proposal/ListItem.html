@@ -1,7 +1,7 @@
 <a
     data-ng-href="{{ path | adhResourceUrl }}"
     data-ng-class="{
-        'has-rosette': data.winnerBadgeAssignment,
+        'has-rosette': data.winnerBadgeAssignment.name === 'winning' || data.winnerBadgeAssignment.name === 'community',
         'm-winner': data.winnerBadgeAssignment.name === 'winning',
         'm-community-award': data.winnerBadgeAssignment.name === 'community'
     }"
