@@ -524,8 +524,9 @@ var get = (
             adhGetBadges(proposal).then((assignments : AdhBadge.IBadge[]) => {
                 var communityAssignment = _.find(assignments, (a) => a.name === "community");
                 var winningAssignment = _.find(assignments, (a) => a.name === "winning");
+                var shortlistAssignment = _.find(assignments, (a) => a.name === "shortlist");
 
-                return communityAssignment || winningAssignment;
+                return communityAssignment || winningAssignment || shortlistAssignment;
             })
         ])).then((args : any[]) : IDetailData => {
             var commentCounts = {
