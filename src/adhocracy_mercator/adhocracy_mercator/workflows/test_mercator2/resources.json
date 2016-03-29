@@ -29,5 +29,15 @@
               {"title" : "Community"},
               "adhocracy_core.sheets.description.IDescription" :
               {"description" : "This is the badge for proposal which won the community award"}
+           }},
+  {"path": "/organisation/advocate-europe2/badges",
+   "creator": "/principals/users/0000000",
+   "content_type": "adhocracy_core.resources.badge.IBadge",
+   "data": {"adhocracy_core.sheets.name.IName":
+              {"name": "shortlist"},
+              "adhocracy_core.sheets.title.ITitle":
+              {"title" : "Shortlist"},
+              "adhocracy_core.sheets.description.IDescription" :
+              {"description" : "This is the badge for proposal which is on the shortlist"}
            }}
 ]
