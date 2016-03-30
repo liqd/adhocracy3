@@ -297,7 +297,7 @@ def update_image_downloads(event):
 
 
 def increase_comments_count(event):
-    """Increase comments_count for commentables in :term:`lineage`."""
+    """Increase comments_count for commentables in :term:`lineage`.
     comment_version = event.reference.source
     first_version = _get_first_version(comment_version, event.registry)
     if comment_version == first_version:
