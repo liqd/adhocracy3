@@ -563,17 +563,22 @@ class TestUpdateCommentsCount:
                                                           'comments_count')
         return comments_count
 
-    def test_call(self, registry, pool_with_catalogs, service):
+    def test_call(self, registry, pool_with_catalogs):
+        from adhocracy_core.resources.comment import IComment
         from adhocracy_core.resources.comment import ICommentVersion
+        from adhocracy_core.resources.comment import ICommentsService
         from adhocracy_core.resources.paragraph import IParagraphVersion
         from adhocracy_core.resources.document import IDocumentVersion
         from adhocracy_core.resources.rate import IRateVersion
         from adhocracy_core import sheets
         pool = pool_with_catalogs
-        pool['comments'] = service  # the IComment sheet needs a post pool
-        comment1 = self._make_resource(pool, ICommentVersion, registry)
-        comment2 = self._make_resource(pool, ICommentVersion, registry)
-        comment3 = self._make_resource(pool, ICommentVersion, registry)
+        registry.content.create(ICommentsService.__identifier__,
+                                parent=pool_with_catalogs)
+        comments = pool['comments']
+        comment = self._make_resource(comments, IComment, registry)
+        comment1 = self._make_resource(comment, ICommentVersion, registry)
+        comment2 = self._make_resource(comment, ICommentVersion, registry)
+        comment3 = self._make_resource(comment, ICommentVersion, registry)
         non_commentable = self._make_resource(pool, IRateVersion, registry)
         sub_commentable = self._make_resource(pool, IParagraphVersion, registry)
         main_commentable = self._make_resource(pool, IDocumentVersion, registry)
