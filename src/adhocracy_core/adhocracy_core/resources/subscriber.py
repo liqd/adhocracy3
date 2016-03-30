@@ -298,6 +298,9 @@ def update_image_downloads(event):
 
 def increase_comments_count(event):
     """Increase comments_count for commentables in :term:`lineage`.
+
+    The incrementation occurs only on the first version.
+    """
     comment_version = event.reference.source
     first_version = _get_first_version(comment_version, event.registry)
     if comment_version == first_version:
@@ -305,9 +308,14 @@ def increase_comments_count(event):
 
 
 def decrease_comments_count(event):
-    """Decrease comments_count for commentables in :term:`lineage`."""
+    """Decrease comments_count for commentables in :term:`lineage`.
+
+    The decrementation occurs only on the last version.
+    """
     comment_version = event.reference.source
-    update_comments_count(comment_version, -1, event.registry)
+    first_version = _get_first_version(comment_version, event.registry)
+    if comment_version == first_version:
+        update_comments_count(comment_version, -1, event.registry)
 
 
 def update_comments_count_after_visibility_change(event):
