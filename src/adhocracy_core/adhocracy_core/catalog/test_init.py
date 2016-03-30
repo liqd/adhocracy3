@@ -356,14 +356,19 @@ class TestCatalogsServiceAdhocracy:
                                                  inst, query):
         from adhocracy_core.interfaces import Reference
         from adhocracy_core.interfaces import ReferenceComparator
+        from adhocracy_core.resources.comment import IComment
         from adhocracy_core.resources.comment import ICommentVersion
+        from adhocracy_core.resources.comment import ICommentsService
         from adhocracy_core import sheets
-        pool['comments'] = service  # the IComment sheet needs a post pool
-        referencing = self._make_resource(registry, parent=pool,
+        registry.content.create(ICommentsService.__identifier__,
+                                parent=pool)
+        comments = pool['comments']
+        comment = self._make_resource(registry, parent=comments, iresource=IComment)
+        referencing = self._make_resource(registry, parent=comment,
                                           iresource=ICommentVersion)
-        referenced1 = self._make_resource(registry, parent=pool,
+        referenced1 = self._make_resource(registry, parent=comment,
                                           iresource=ICommentVersion)
-        referenced2 = self._make_resource(registry, parent=pool,
+        referenced2 = self._make_resource(registry, parent=comment,
                                           iresource=ICommentVersion)
         sheet = registry.content.get_sheet(referencing, sheets.comment.IComment)
         sheet.set({'refers_to': referenced1})
