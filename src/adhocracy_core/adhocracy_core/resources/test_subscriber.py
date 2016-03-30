@@ -519,22 +519,6 @@ class TestUpdateImageDownload:
         assert mock.called_with(event.object, event.registry)
 
 
-def test_increase_count(mocker, event):
-    from . import subscriber
-    event.reference = Mock()
-    mock = mocker.patch.object(subscriber, 'update_comments_count')
-    subscriber.increase_comments_count(event)
-    mock.assert_called_with(event.reference.source, 1, event.registry)
-
-
-def test_decrease_count(mocker, event):
-    from . import subscriber
-    event.reference = Mock()
-    mock = mocker.patch.object(subscriber, 'update_comments_count')
-    subscriber.decrease_comments_count(event)
-    mock.assert_called_with(event.reference.source, -1, event.registry)
-
-
 @fixture
 def mock_commentable_sheet(event, registry, mock_sheet):
     event.registry = registry
