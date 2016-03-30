@@ -543,6 +543,46 @@ def mock_commentable_sheet(event, registry, mock_sheet):
     return mock_sheet
 
 
+class TestIncreaseCommentsCount:
+
+    def call_fut(self, *args):
+        from .subscriber import increase_comments_count
+        return increase_comments_count(*args)
+
+    @fixture
+    def mock_event(self):
+        return Mock()
+
+    @fixture
+    def mock_update(self, mocker):
+        from . import subscriber
+        return mocker.patch.object(subscriber, 'update_comments_count')
+
+    @fixture
+    def mock_parent_version_sheet(self, mock_sheet, registry):
+        registry.content.get_sheet.return_value = mock_sheet
+        return mock_sheet
+
+    def test_increase_when_first_version_created(self,
+                                                 registry,
+                                                 mock_event,
+                                                 mock_update,
+                                                 mock_parent_version_sheet):
+        mock_comment_version = Mock()
+        mock_event.reference.source = mock_comment_version
+        mock_event.registry = registry
+        mock_parent_version_sheet.get.return_value = {'FIRST': mock_comment_version}
+        self.call_fut(mock_event)
+        assert mock_update.called
+
+    def test_no_increase_when_not_first_version_created(self, mock_event, mock_update):
+        mock_comment_version = Mock()
+        mock_event.reference.source = mock_comment_version
+        self.call_fut(mock_event)
+        assert not mock_update.called
+
+
+
 class TestUpdateCommentsCount:
 
     def call_fut(self, *args):
