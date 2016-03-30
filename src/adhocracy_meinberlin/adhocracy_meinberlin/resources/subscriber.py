@@ -73,8 +73,8 @@ def _get_all_process_settings(proposal_version, registry):
 
 def _get_workflow_state_data(state_data_list: [],
                              workflow_name: str):
-    for state_data in state_data_list:
-        if state_data['name'] == workflow_name:
+    for state_data in state_data_list:  # pragma: no branch
+        if state_data['name'] == workflow_name:  # pragma: no branch
             return state_data
 
 

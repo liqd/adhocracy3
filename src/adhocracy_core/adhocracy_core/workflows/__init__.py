@@ -87,7 +87,7 @@ def _add_defaults(appstruct: PMap, registry: Registry) -> PMap:
             for transition_name, transition in value.items():
                 updated = updated.transform(['transitions', transition_name],
                                             transition)
-        elif key == 'states':
+        elif key == 'states':  # pragma: no branch
             for state_name, state in value.items():
                 for permission in state.get('acm', {}).get('permissions', []):
                     name = permission[0]

@@ -126,7 +126,7 @@ class PoolSheet(AnnotationRessourceSheet):
             typ_copy = deepcopy(elements.children[0].typ)
             typ_copy.serialization_form = 'content'
             elements.children[0].typ = typ_copy
-        if params.get('show_count', True):
+        if params.get('show_count', True):  # pragma: no branch
             child = colander.SchemaNode(colander.Integer(),
                                         default=0,
                                         missing=colander.drop,

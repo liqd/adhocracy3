@@ -166,6 +166,25 @@ class TestWorkflowAssignmentSheet:
                                     'workflow_state': 'draft',
                                     'state_data': []}
 
+    def test_get_schema_with_bindings(
+        self, meta, context, registry, mock_workflow, request_):
+        registry.content.get_workflow.return_value = mock_workflow
+        inst = meta.sheet_class(meta, context, registry, request=request_)
+        schema = inst.get_schema_with_bindings()
+        assert schema.bindings['workflow'] is mock_workflow
+        assert schema.bindings['context'] is context
+        assert schema.bindings['request'] is request_
+        assert schema.bindings['registry'] is registry
+
+    def test_get_schema_with_bindings_with_creating(
+        self, meta, context, registry, mock_workflow, request_, resource_meta):
+        resource_meta = resource_meta._replace(workflow_name='w')
+        registry.content.workflows['w'] = mock_workflow
+        inst = meta.sheet_class(meta, context, registry, request=request_,
+                                creating=resource_meta)
+        schema = inst.get_schema_with_bindings()
+        assert schema.bindings['workflow'] is mock_workflow
+
     def test_set_workflow_state(self, meta, context, registry, mock_workflow):
         registry.content.get_workflow.return_value = mock_workflow
         mock_workflow._states = {'announced': {}}
