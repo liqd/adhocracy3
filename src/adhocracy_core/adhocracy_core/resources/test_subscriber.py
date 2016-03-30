@@ -715,7 +715,7 @@ class TestUpdateCommentsCountAfterVisibilityChange:
         from . import subscriber
         event.registry = registry
         comment_v0 = testing.DummyResource()
-        mock_versions_sheet.get.return_value = {'elements': [comment_v0]}
+        mock_versions_sheet.get.return_value = {'FIRST': [comment_v0]}
         mock_visibility = mocker.patch.object(subscriber, 'get_visibility_change')
         mock_visibility.return_value = VisibilityChange.concealed
         self.call_fut(event)
@@ -727,7 +727,7 @@ class TestUpdateCommentsCountAfterVisibilityChange:
         from . import subscriber
         event.registry = registry
         comment_v0 = testing.DummyResource()
-        mock_versions_sheet.get.return_value = {'elements': [comment_v0]}
+        mock_versions_sheet.get.return_value = {'FIRST': [comment_v0]}
         mock_visibility = mocker.patch.object(subscriber, 'get_visibility_change')
         mock_visibility.return_value = VisibilityChange.revealed
         self.call_fut(event)
