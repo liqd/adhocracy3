@@ -13,7 +13,7 @@ import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as AdhCache from "./Cache";
 
 
-var sanityCheck = (obj : ResourcesBase.Resource) : void => {
+var sanityCheck = (obj : ResourcesBase.IResource) : void => {
     if (typeof obj !== "object") {
         throw ("unexpected type: " + (typeof obj).toString() + "\nin object:\n" + JSON.stringify(obj, null, 2));
     }
@@ -31,7 +31,7 @@ var sanityCheck = (obj : ResourcesBase.Resource) : void => {
 /**
  * transform objects on the way in (all request methods)
  */
-export var importContent = <Content extends ResourcesBase.Resource>(
+export var importContent = <Content extends ResourcesBase.IResource>(
     response : {data : Content},
     metaApi : AdhMetaApi.Service,
     preliminaryNames : AdhPreliminaryNames.Service,
@@ -166,7 +166,7 @@ export var importContent = <Content extends ResourcesBase.Resource>(
  * functions simultaneously and has not been deemed worthwhile so
  * far.
  */
-export var importBatchContent = <Content extends ResourcesBase.Resource>(
+export var importBatchContent = <Content extends ResourcesBase.IResource>(
     responses,
     metaApi : AdhMetaApi.Service,
     preliminaryNames : AdhPreliminaryNames.Service,
@@ -191,7 +191,7 @@ export var importBatchContent = <Content extends ResourcesBase.Resource>(
  * also, fields with create_mandatory should not be missing from the
  * posted object.
  */
-export var exportContent = <Rs extends ResourcesBase.Resource>(
+export var exportContent = <Rs extends ResourcesBase.IResource>(
     adhMetaApi : AdhMetaApi.Service,
     obj : Rs,
     keepMetadata : boolean = false

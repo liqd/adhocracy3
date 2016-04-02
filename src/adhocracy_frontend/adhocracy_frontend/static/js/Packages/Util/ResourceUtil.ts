@@ -12,7 +12,7 @@ import * as AdhUtil from "./Util";
 /**
  * Create a new version following an existing one.
  */
-export var derive = <R extends ResourcesBase.Resource>(oldVersion : R, settings) : R => {
+export var derive = <R extends ResourcesBase.IResource>(oldVersion : R, settings) : R => {
     var resource = new (<any>oldVersion).constructor(settings);
 
     _.forOwn(oldVersion.data, (sheet, key) => {
@@ -29,7 +29,7 @@ export var derive = <R extends ResourcesBase.Resource>(oldVersion : R, settings)
 };
 
 
-export var hasEqualContent = <R extends ResourcesBase.Resource>(resource1 : R, resource2 : R) : boolean => {
+export var hasEqualContent = <R extends ResourcesBase.IResource>(resource1 : R, resource2 : R) : boolean => {
     // note: this assumes that both resources share the same set of sheets, as it's currently
     // always used after derive.
 
@@ -50,7 +50,7 @@ export var hasEqualContent = <R extends ResourcesBase.Resource>(resource1 : R, r
 
 
 export var isInstanceOf = (
-    resource : ResourcesBase.Resource,
+    resource : ResourcesBase.IResource,
     resourceType : string,
     adhMetaApi : AdhMetaApi.Service
 ) : boolean => {
@@ -59,7 +59,7 @@ export var isInstanceOf = (
 };
 
 
-export var getReferences = (resource : ResourcesBase.Resource, adhMetaApi : AdhMetaApi.Service) : string[] => {
+export var getReferences = (resource : ResourcesBase.IResource, adhMetaApi : AdhMetaApi.Service) : string[] => {
     var results : string[] = [];
 
     _.forOwn(resource.data, (sheet, sheetName : string) => {
@@ -81,20 +81,20 @@ export var getReferences = (resource : ResourcesBase.Resource, adhMetaApi : AdhM
  * FIXME: this should probably go into something like ResourcesUtil or Packages/Resources/Util
  */
 export var sortResourcesTopologically = (
-    resources : ResourcesBase.Resource[],
+    resources : ResourcesBase.IResource[],
     adhPreliminaryNames,
     adhMetaApi : AdhMetaApi.Service
-) : ResourcesBase.Resource[] => {
+) : ResourcesBase.IResource[] => {
     // prepare DAG
     // sources are resource paths without incoming references
     // FIXME: DefinitelyTyped
-    var dag : AdhUtil.IDag<ResourcesBase.Resource> = (<any>_).fromPairs(_.map(resources, (resource) => [resource.path, {
+    var dag : AdhUtil.IDag<ResourcesBase.IResource> = (<any>_).fromPairs(_.map(resources, (resource) => [resource.path, {
             content: resource, incoming: [], outgoing: [], done: false
     }]));
     var sources : string[] = [];
 
     // fill edges, determine possible starter sources
-    _.forEach(dag, (vertex : AdhUtil.IVertex<ResourcesBase.Resource>, key, l) => {
+    _.forEach(dag, (vertex : AdhUtil.IVertex<ResourcesBase.IResource>, key, l) => {
         var references = getReferences(vertex.content, adhMetaApi);
 
         if (typeof vertex.content.parent !== "undefined") {

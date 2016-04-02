@@ -61,7 +61,7 @@ export class Transaction {
         };
     }
 
-    public put(path : string, obj : ResourcesBase.Resource) : ITransactionResult {
+    public put(path : string, obj : ResourcesBase.IResource) : ITransactionResult {
         this.checkNotCommitted();
         this.requests.push({
             method: "PUT",
@@ -74,7 +74,7 @@ export class Transaction {
         };
     }
 
-    public post(path : string, obj : ResourcesBase.Resource) : ITransactionResult {
+    public post(path : string, obj : ResourcesBase.IResource) : ITransactionResult {
         this.checkNotCommitted();
         var preliminaryPath;
         if (typeof obj.path === "string") {
@@ -102,7 +102,7 @@ export class Transaction {
         };
     }
 
-    public commit(config = {}) : angular.IPromise<ResourcesBase.Resource[]> {
+    public commit(config = {}) : angular.IPromise<ResourcesBase.IResource[]> {
         var _self = this;
 
         this.checkNotCommitted();

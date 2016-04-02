@@ -242,7 +242,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
      *
      * If `fail` is false, it promises undefined instead of failing.
      */
-    public getProcess(resourceUrl : string, fail = true) : angular.IPromise<ResourcesBase.Resource> {
+    public getProcess(resourceUrl : string, fail = true) : angular.IPromise<ResourcesBase.IResource> {
         var paths = [];
         var path = resourceUrl;
 
@@ -259,7 +259,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
         return this.$q.all(_.map(paths, (path) => {
             return this.adhHttp.get(this.adhConfig.rest_url + path);
-        })).then((resources : ResourcesBase.Resource[]) => {
+        })).then((resources : ResourcesBase.IResource[]) => {
             for (var i = 0; i < resources.length; i++) {
                 if (AdhResourceUtil.isInstanceOf(resources[i], RIProcess.content_type, this.adhMetaApi)) {
                     return resources[i];
@@ -277,7 +277,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         return self.$q.all([
             self.adhHttp.get(resourceUrl),
             self.adhHttp.get(AdhUtil.parentPath(resourceUrl))
-        ]).then((args : ResourcesBase.Resource[]) => {
+        ]).then((args : ResourcesBase.IResource[]) => {
             var version = args[0];
             var item = args[1];
             if (version.data.hasOwnProperty(SIVersionable.nick) && item.data.hasOwnProperty(SITags.nick)) {
@@ -332,8 +332,8 @@ export class Service implements AdhTopLevelState.IAreaInput {
             self.getProcess(resourceUrl, false),
             self.conditionallyRedirectVersionToLast(resourceUrl, view)
         ]).then((values : any[]) => {
-            var resource : ResourcesBase.Resource = values[0];
-            var process : ResourcesBase.Resource = values[1];
+            var resource : ResourcesBase.IResource = values[0];
+            var process : ResourcesBase.IResource = values[1];
             var hasRedirected : boolean = values[2];
 
             var processType = process ? process.content_type : "";

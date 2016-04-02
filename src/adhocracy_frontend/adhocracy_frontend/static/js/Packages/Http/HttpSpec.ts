@@ -529,7 +529,7 @@ export var register = () => {
             });
 
             it("returns response.data if it is an object", () => {
-                var obj : ResourcesBase.Resource = <any>{
+                var obj : ResourcesBase.IResource = <any>{
                     content_type: "adhocracy_core.resources.pool.IBasicPool",
                     path: "p",
                     data: {}

@@ -31,6 +31,7 @@ export interface IResourceClass {
 export interface IResource {
     data : Object;
     path : string;
+    content_type : string;
     parent : string;
     first_version_path : string;
     root_versions : string[];

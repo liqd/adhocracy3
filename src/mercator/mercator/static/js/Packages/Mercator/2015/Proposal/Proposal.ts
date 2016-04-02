@@ -206,7 +206,7 @@ export var countSupporters = (adhHttp : AdhHttp.Service<any>, postPoolPath : str
 };
 
 
-export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IScope> {
+export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidgets.ResourceWidget<R, IScope> {
     constructor(
         public adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
@@ -355,7 +355,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         instance.scope.$on("$destroy", <any>this.adhTopLevelState.bind("processState", data, "currentPhase"));
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
-        var subResourcePromises : angular.IPromise<ResourcesBase.Resource[]> = this.$q.all([
+        var subResourcePromises : angular.IPromise<ResourcesBase.IResource[]> = this.$q.all([
             this.adhHttp.get(subResourcePaths.organization_info),
             this.adhHttp.get(subResourcePaths.introduction),
             this.adhHttp.get(subResourcePaths.description),
@@ -369,8 +369,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             this.adhHttp.get(subResourcePaths.experience)
         ]);
 
-        return subResourcePromises.then((subResources : ResourcesBase.Resource[]) => {
-            subResources.forEach((subResource : ResourcesBase.Resource) => {
+        return subResourcePromises.then((subResources : ResourcesBase.IResource[]) => {
+            subResources.forEach((subResource : ResourcesBase.IResource) => {
                 switch (subResource.content_type) {
                     case RIMercatorOrganizationInfoVersion.content_type: (() => {
                         var scope = data.organization_info;
@@ -724,7 +724,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 }
 
 
-export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
+export class CreateWidget<R extends ResourcesBase.IResource> extends Widget<R> {
     constructor(
         adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
@@ -786,7 +786,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
 }
 
 
-export class DetailWidget<R extends ResourcesBase.Resource> extends Widget<R> {
+export class DetailWidget<R extends ResourcesBase.IResource> extends Widget<R> {
     constructor(
         adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,

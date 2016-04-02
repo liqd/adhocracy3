@@ -97,7 +97,7 @@ export var nonResourcePaths : string[] = [
 // FIXME: This service should be able to handle any type, not just subtypes of
 // ``Resources.Content``.  Methods like ``postNewVersion`` may need additional
 // constraints (e.g. by moving them to subclasses).
-export class Service<Content extends ResourcesBase.Resource> {
+export class Service<Content extends ResourcesBase.IResource> {
 
     constructor(
         private $http : angular.IHttpService,
@@ -366,15 +366,15 @@ export class Service<Content extends ResourcesBase.Resource> {
      * errors) are passed back to the caller.
      */
     public deepPost(
-        resources : ResourcesBase.Resource[],
+        resources : ResourcesBase.IResource[],
         config : IHttpConfig = {}
-    ) : angular.IPromise<ResourcesBase.Resource[]> {
+    ) : angular.IPromise<ResourcesBase.IResource[]> {
 
-        var sortedResources : ResourcesBase.Resource[] = AdhResourceUtil.sortResourcesTopologically(
+        var sortedResources : ResourcesBase.IResource[] = AdhResourceUtil.sortResourcesTopologically(
             resources, this.adhPreliminaryNames, this.adhMetaApi);
 
         // post stuff
-        return this.withTransaction((transaction) : angular.IPromise<ResourcesBase.Resource[]> => {
+        return this.withTransaction((transaction) : angular.IPromise<ResourcesBase.IResource[]> => {
             _.forEach(sortedResources, (resource) => {
                 transaction.post(resource.parent, resource);
             });
