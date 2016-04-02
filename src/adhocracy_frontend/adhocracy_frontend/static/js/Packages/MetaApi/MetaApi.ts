@@ -58,6 +58,10 @@ export class Service {
         feedFieldDicts(data);
     }
 
+    public $get() : Service {
+        return this;
+    }
+
     public resource(name : string) : IResource {
         var _self : Service = this;
 
