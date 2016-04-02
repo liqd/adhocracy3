@@ -49,6 +49,16 @@ export var hasEqualContent = <R extends ResourcesBase.Resource>(resource1 : R, r
 };
 
 
+export var isInstanceOf = (
+    resource : ResourcesBase.Resource,
+    resourceType : string,
+    adhMetaApi : AdhMetaApi.Service
+) : boolean => {
+    var resourceMeta = adhMetaApi.resource(resource.content_type);
+    return resourceType === resource.content_type || _.includes(resourceMeta.super_types, resourceType);
+};
+
+
 export var getReferences = (resource : ResourcesBase.Resource, adhMetaApi : AdhMetaApi.Service) : string[] => {
     var results : string[] = [];
 

@@ -34,8 +34,6 @@ export interface IResource {
     parent : string;
     first_version_path : string;
     root_versions : string[];
-
-    isInstanceOf(resourceType : string) : boolean;
 }
 
 
@@ -55,16 +53,4 @@ export class Resource implements IResource {
         this.data = {};
     }
     /* tslint:enable:variable-name */
-
-    public isInstanceOf(resourceType : string) : boolean {
-        var _class : IResourceClass = <any>this.constructor;
-
-        if (resourceType === this.content_type) {
-            return true;
-        } else if (_.includes(_class.super_types, resourceType)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 }
