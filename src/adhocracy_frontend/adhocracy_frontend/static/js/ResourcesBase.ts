@@ -37,7 +37,6 @@ export interface IResource {
 
     getReferences() : string[];
     isInstanceOf(resourceType : string) : boolean;
-    hasSheet(sheet : string) : boolean;
 }
 
 
@@ -82,11 +81,5 @@ export class Resource implements IResource {
         } else {
             return false;
         }
-    }
-
-    public hasSheet(sheet : string) : boolean {
-        var _class : IResourceClass = <any>this.constructor;
-
-        return _.includes(_class.sheets, sheet);
     }
 }
