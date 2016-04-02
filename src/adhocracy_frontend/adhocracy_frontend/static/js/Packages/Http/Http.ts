@@ -370,7 +370,8 @@ export class Service<Content extends ResourcesBase.Resource> {
         config : IHttpConfig = {}
     ) : angular.IPromise<ResourcesBase.Resource[]> {
 
-        var sortedResources : ResourcesBase.Resource[] = AdhResourceUtil.sortResourcesTopologically(resources, this.adhPreliminaryNames);
+        var sortedResources : ResourcesBase.Resource[] = AdhResourceUtil.sortResourcesTopologically(
+            resources, this.adhPreliminaryNames, this.adhMetaApi);
 
         // post stuff
         return this.withTransaction((transaction) : angular.IPromise<ResourcesBase.Resource[]> => {

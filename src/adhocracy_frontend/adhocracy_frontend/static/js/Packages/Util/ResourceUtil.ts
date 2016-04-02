@@ -1,5 +1,7 @@
 import * as _ from "lodash";
 
+import * as AdhMetaApi from "../MetaApi/MetaApi";
+
 import * as ResourcesBase from "../../ResourcesBase";
 
 import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
@@ -47,12 +49,32 @@ export var hasEqualContent = <R extends ResourcesBase.Resource>(resource1 : R, r
 };
 
 
+export var getReferences = (resource : ResourcesBase.Resource, adhMetaApi : AdhMetaApi.Service) : string[] => {
+    var results : string[] = [];
+
+    _.forOwn(resource.data, (sheet, sheetName : string) => {
+        _.forOwn(sheet, (value, fieldName : string) => {
+            var fieldMeta = adhMetaApi.field(sheetName, fieldName);
+            if (fieldMeta.valuetype === "adhocracy_core.schema.AbsolutePath") {
+                results.push(fieldName);
+            }
+        });
+    });
+
+    return results;
+};
+
+
 /**
  * Create an IDag<Resource> out of given resources.
  *
  * FIXME: this should probably go into something like ResourcesUtil or Packages/Resources/Util
  */
-export var sortResourcesTopologically = (resources : ResourcesBase.Resource[], adhPreliminaryNames) : ResourcesBase.Resource[] => {
+export var sortResourcesTopologically = (
+    resources : ResourcesBase.Resource[],
+    adhPreliminaryNames,
+    adhMetaApi : AdhMetaApi.Service
+) : ResourcesBase.Resource[] => {
     // prepare DAG
     // sources are resource paths without incoming references
     // FIXME: DefinitelyTyped
@@ -63,7 +85,7 @@ export var sortResourcesTopologically = (resources : ResourcesBase.Resource[], a
 
     // fill edges, determine possible starter sources
     _.forEach(dag, (vertex : AdhUtil.IVertex<ResourcesBase.Resource>, key, l) => {
-        var references = vertex.content.getReferences();
+        var references = getReferences(vertex.content, adhMetaApi);
 
         if (typeof vertex.content.parent !== "undefined") {
             references.push(vertex.content.parent);

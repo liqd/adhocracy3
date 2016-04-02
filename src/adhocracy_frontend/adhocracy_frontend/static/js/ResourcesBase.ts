@@ -35,7 +35,6 @@ export interface IResource {
     first_version_path : string;
     root_versions : string[];
 
-    getReferences() : string[];
     isInstanceOf(resourceType : string) : boolean;
 }
 
@@ -56,20 +55,6 @@ export class Resource implements IResource {
         this.data = {};
     }
     /* tslint:enable:variable-name */
-
-    public getReferences() : string[] {
-        var _self = this;
-        var result : string[] = [];
-
-        for (var x in _self.data) {
-            if (_self.data.hasOwnProperty(x)) {
-                var sheet = _self.data[x];
-                result.push.apply(result, sheet.getMeta().references);
-            }
-        }
-
-        return result;
-    }
 
     public isInstanceOf(resourceType : string) : boolean {
         var _class : IResourceClass = <any>this.constructor;
