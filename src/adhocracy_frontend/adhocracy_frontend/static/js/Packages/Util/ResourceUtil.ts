@@ -56,7 +56,7 @@ export var getReferences = (resource : ResourcesBase.Resource, adhMetaApi : AdhM
         _.forOwn(sheet, (value, fieldName : string) => {
             var fieldMeta = adhMetaApi.field(sheetName, fieldName);
             if (fieldMeta.valuetype === "adhocracy_core.schema.AbsolutePath") {
-                results.push(fieldName);
+                results.push(value);
             }
         });
     });

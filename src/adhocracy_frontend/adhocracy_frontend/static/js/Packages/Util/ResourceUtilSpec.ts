@@ -19,7 +19,7 @@ export var register = () => {
         });
 
         describe("getReferences", () => {
-            it("returns the list of all fieldNames from all sheets that have valuetype AbsolutePath", () => {
+            it("returns the list of all fields from all sheets that have valuetype AbsolutePath", () => {
                 var actual = AdhResourceUtil.getReferences(<any>{
                     path: "r1",
                     data: {
@@ -34,7 +34,7 @@ export var register = () => {
                     }
                 }, adhMetaApiMock);
 
-                expect(actual).toEqual(["ref2", "ref3", "ref4"]);
+                expect(actual).toEqual(["value2", "value3", "value4"]);
             });
         });
 
