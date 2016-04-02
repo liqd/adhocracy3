@@ -104,7 +104,7 @@ export class Service<Content extends ResourcesBase.Resource> {
         private $q : angular.IQService,
         private $timeout : angular.ITimeoutService,
         private adhCredentials : AdhCredentials.Service,
-        private adhMetaApi : AdhMetaApi.MetaApiQuery,
+        private adhMetaApi : AdhMetaApi.Service,
         private adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhConfig : AdhConfig.IService,
         private adhCache? : AdhCache.Service

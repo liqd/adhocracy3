@@ -26,6 +26,6 @@ export var register = (angular, config, metaApi) => {
         .service("adhHttp", [
             "$http", "$q", "$timeout", "adhCredentials", "adhMetaApi", "adhPreliminaryNames", "adhConfig", "adhCache", AdhHttp.Service])
         .service("adhCache", ["$q", "adhConfig", "adhWebSocket", "CacheFactory", AdhCache.Service])
-        .factory("adhMetaApi", () => new AdhMetaApi.MetaApiQuery(metaApi))
+        .factory("adhMetaApi", () => new AdhMetaApi.Service(metaApi))
         .filter("adhFormatError", () => AdhError.formatError);
 };

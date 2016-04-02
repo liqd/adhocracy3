@@ -33,7 +33,7 @@ var sanityCheck = (obj : ResourcesBase.Resource) : void => {
  */
 export var importContent = <Content extends ResourcesBase.Resource>(
     response : {data : Content},
-    metaApi : AdhMetaApi.MetaApiQuery,
+    metaApi : AdhMetaApi.Service,
     preliminaryNames : AdhPreliminaryNames.Service,
     adhCache : AdhCache.Service,
     warmupPoolCache : boolean = false,
@@ -168,7 +168,7 @@ export var importContent = <Content extends ResourcesBase.Resource>(
  */
 export var importBatchContent = <Content extends ResourcesBase.Resource>(
     responses,
-    metaApi : AdhMetaApi.MetaApiQuery,
+    metaApi : AdhMetaApi.Service,
     preliminaryNames : AdhPreliminaryNames.Service,
     adhCache : AdhCache.Service
 ) : Content[] => {
@@ -192,7 +192,7 @@ export var importBatchContent = <Content extends ResourcesBase.Resource>(
  * posted object.
  */
 export var exportContent = <Rs extends ResourcesBase.Resource>(
-    adhMetaApi : AdhMetaApi.MetaApiQuery,
+    adhMetaApi : AdhMetaApi.Service,
     obj : Rs,
     keepMetadata : boolean = false
 ) : Rs => {

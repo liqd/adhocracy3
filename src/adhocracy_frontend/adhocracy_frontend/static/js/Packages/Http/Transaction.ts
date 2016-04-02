@@ -35,7 +35,7 @@ export class Transaction {
     constructor(
         private adhHttp : AdhHttp.Service<any>,
         private adhCache : AdhCache.Service,
-        private adhMetaApi : AdhMetaApi.MetaApiQuery,
+        private adhMetaApi : AdhMetaApi.Service,
         private adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhConfig : AdhConfig.IService
     ) {
