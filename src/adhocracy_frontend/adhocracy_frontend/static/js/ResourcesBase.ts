@@ -12,13 +12,6 @@ export interface ISheetMetaApi {
 }
 
 
-export class Sheet {
-    public getMeta() : ISheetMetaApi {
-        return (<any>this).constructor._meta;
-    }
-}
-
-
 export interface IResourceClass {
     /* tslint:disable:variable-name */
     content_type : string;

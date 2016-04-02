@@ -369,7 +369,6 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
 
         var s = "";
         s += "    constructor(" + args.join("\n") + ") {\n";
-        s += "        super();\n";
         if (lines.length > 0) {
             s += lines.join("\n") + "\n";
         }
@@ -460,7 +459,7 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
 
     sheetI += "export var nick : string = \"" + sheet.nick + "\";\n\n";
 
-    sheetI += "export class Sheet extends Base.Sheet {\n";
+    sheetI += "export class Sheet {\n";
 
     sheetI += "    public static _meta : Base.ISheetMetaApi = {\n";
     sheetI += "        readable: " + showList(sheetMetaApi.readable) + ",\n";
