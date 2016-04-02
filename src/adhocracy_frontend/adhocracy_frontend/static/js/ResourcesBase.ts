@@ -3,9 +3,7 @@ export interface ISheetMetaApi {
     readable : string[];
     editable : string[];
     creatable : string[];
-    /* tslint:disable:variable-name */
     create_mandatory : string[];
-    /* tslint:enable:variable-name */
 
     // computed information
     references : string[];
@@ -13,11 +11,7 @@ export interface ISheetMetaApi {
 
 
 export interface IResourceClass {
-    /* tslint:disable:variable-name */
     content_type : string;
-    super_types : string[];
-    sheets : string[];
-    /* tslint:enable:variable-name */
 }
 
 
@@ -25,9 +19,9 @@ export interface IResource {
     data : Object;
     path : string;
     content_type : string;
-    parent : string;
-    first_version_path : string;
-    root_versions : string[];
+    parent? : string;
+    first_version_path? : string;
+    root_versions? : string[];
 }
 
 
