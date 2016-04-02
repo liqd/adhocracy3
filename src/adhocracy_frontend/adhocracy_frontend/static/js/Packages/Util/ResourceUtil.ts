@@ -10,7 +10,7 @@ import * as AdhUtil from "./Util";
 /**
  * Create a new version following an existing one.
  */
-export var derive = function<R extends ResourcesBase.Resource>(oldVersion : R, settings) : R {
+export var derive = <R extends ResourcesBase.Resource>(oldVersion : R, settings) : R => {
     var resource = new (<any>oldVersion).constructor(settings);
 
     _.forOwn(oldVersion.data, (sheet, key) => {
@@ -27,7 +27,7 @@ export var derive = function<R extends ResourcesBase.Resource>(oldVersion : R, s
 };
 
 
-export var hasEqualContent = function<R extends ResourcesBase.Resource>(resource1 : R, resource2 : R) : boolean {
+export var hasEqualContent = <R extends ResourcesBase.Resource>(resource1 : R, resource2 : R) : boolean => {
     // note: this assumes that both resources share the same set of sheets, as it's currently
     // always used after derive.
 
@@ -52,9 +52,7 @@ export var hasEqualContent = function<R extends ResourcesBase.Resource>(resource
  *
  * FIXME: this should probably go into something like ResourcesUtil or Packages/Resources/Util
  */
-export function sortResourcesTopologically(resources : ResourcesBase.Resource[], adhPreliminaryNames) : ResourcesBase.Resource[] {
-    "use strict";
-
+export var sortResourcesTopologically = (resources : ResourcesBase.Resource[], adhPreliminaryNames) : ResourcesBase.Resource[] => {
     // prepare DAG
     // sources are resource paths without incoming references
     // FIXME: DefinitelyTyped
@@ -86,4 +84,4 @@ export function sortResourcesTopologically(resources : ResourcesBase.Resource[],
     });
 
     return AdhUtil.sortDagTopologically(dag, sources);
-}
+};
