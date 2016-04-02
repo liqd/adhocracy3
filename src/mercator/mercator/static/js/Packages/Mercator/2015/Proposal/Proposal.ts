@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import * as AdhBadge from "../../../Badge/Badge";
 import * as AdhConfig from "../../../Config/Config";
 import * as AdhHttp from "../../../Http/Http";
+import * as AdhMetaApi from "../../../MetaApi/MetaApi";
 import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
 import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
@@ -1048,7 +1049,10 @@ export var mercatorProposalFormController = ($scope : IControllerScope, $element
 export var registerRoutes = (
     processType : string = "",
     context : string = ""
-) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
+) => (
+    adhResourceAreaProvider : AdhResourceArea.Provider,
+    adhMetaApi : AdhMetaApi.Service
+) => {
     adhResourceAreaProvider
         .default(RIMercatorProposalVersion, "", processType, context, {
             space: "content",
@@ -1100,7 +1104,8 @@ export var registerRoutes = (
             };
         });
 
-    _(SIMercatorSubResources.Sheet._meta.readable).forEach((section : string) => {
+    var sections = _.map(adhMetaApi.sheet(SIMercatorSubResources.nick).fields, "name");
+    _.forEach(sections, (section : string) => {
         adhResourceAreaProvider
             .default(RIMercatorProposalVersion, "comments:" + section, processType, context, {
                 space: "content",
