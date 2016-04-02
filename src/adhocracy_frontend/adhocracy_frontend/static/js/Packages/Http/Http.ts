@@ -6,6 +6,7 @@ import * as _ from "lodash";
 
 import * as AdhConfig from "../Config/Config";
 import * as AdhCredentials from "../User/Credentials";
+import * as AdhMetaApi from "../MetaApi/MetaApi";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as AdhResourceUtil from "../Util/ResourceUtil";
 import * as AdhUtil from "../Util/Util";
@@ -19,7 +20,6 @@ import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/
 import * as AdhCache from "./Cache";
 import * as AdhConvert from "./Convert";
 import * as AdhError from "./Error";
-import * as AdhMetaApi from "./MetaApi";
 import * as AdhTransaction from "./Transaction";
 
 // re-exports

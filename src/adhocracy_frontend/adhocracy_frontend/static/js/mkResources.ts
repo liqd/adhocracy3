@@ -9,7 +9,7 @@ import * as _fs from "node-fs";
 import * as _ from "lodash";
 import * as Base from "./ResourcesBase";
 import * as UtilR from "./mkResources/Util";
-import * as MetaApi from "./Packages/Http/MetaApi";
+import * as MetaApi from "./Packages/MetaApi/MetaApi";
 
 
 
