@@ -26,7 +26,7 @@ export interface ITransactionResult {
  * This should be used via adhHttp.withTransaction.
  */
 export class Transaction {
-    // FIXME: importContent, exportContent and logBackendError need yet to be
+    // FIXME: importResource, exportResource and logBackendError need yet to be
     // incorporated.
 
     private requests : any[];
@@ -66,7 +66,7 @@ export class Transaction {
         this.requests.push({
             method: "PUT",
             path: path,
-            body: AdhConvert.exportContent(this.adhMetaApi, obj)
+            body: AdhConvert.exportResource(this.adhMetaApi, obj)
         });
         return {
             index: this.requests.length - 1,
@@ -91,7 +91,7 @@ export class Transaction {
         this.requests.push({
             method: "POST",
             path: path,
-            body: AdhConvert.exportContent(this.adhMetaApi, obj),
+            body: AdhConvert.exportResource(this.adhMetaApi, obj),
             result_path: preliminaryPath,
             result_first_version_path: preliminaryFirstVersionPath
         });
@@ -109,14 +109,14 @@ export class Transaction {
         this.committed = true;
         var conv = (request) => {
             if (request.hasOwnProperty("body")) {
-                request.body = AdhConvert.exportContent(this.adhMetaApi, request.body);
+                request.body = AdhConvert.exportResource(this.adhMetaApi, request.body);
             }
             return request;
         };
 
         return this.adhHttp.postRaw("/batch", this.requests.map(conv), config).then(
             (response) => {
-                var imported = AdhConvert.importBatchContent(
+                var imported = AdhConvert.importBatchResources(
                     response.data.responses, this.adhMetaApi, this.adhPreliminaryNames, this.adhCache);
                 _self.adhCache.invalidateUpdated(response.data.updated_resources, <string[]>_.map(imported, "path"));
                 return imported;

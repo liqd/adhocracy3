@@ -29,7 +29,7 @@ export var derive = <R extends ResourcesBase.IResource>(oldVersion : R, settings
 };
 
 
-export var hasEqualContent = <R extends ResourcesBase.IResource>(resource1 : R, resource2 : R) : boolean => {
+export var hasEqualContent = (resource1 : ResourcesBase.IResource, resource2 : ResourcesBase.IResource) : boolean => {
     // note: this assumes that both resources share the same set of sheets, as it's currently
     // always used after derive.
 

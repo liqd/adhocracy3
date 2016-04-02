@@ -31,14 +31,14 @@ var sanityCheck = (obj : ResourcesBase.IResource) : void => {
 /**
  * transform objects on the way in (all request methods)
  */
-export var importContent = <Content extends ResourcesBase.IResource>(
-    response : {data : Content},
+export var importResource = <R extends ResourcesBase.IResource>(
+    response : {data : R},
     metaApi : AdhMetaApi.Service,
     preliminaryNames : AdhPreliminaryNames.Service,
     adhCache : AdhCache.Service,
     warmupPoolCache : boolean = false,
     originalElements : string = "omit"
-) : Content => {
+) : R => {
     "use strict";
 
     var obj = response.data;
@@ -78,7 +78,7 @@ export var importContent = <Content extends ResourcesBase.IResource>(
                 var pseudoResponse = {
                     data: rawSubresource
                 };
-                var subresource = importContent(pseudoResponse, metaApi, preliminaryNames, adhCache);
+                var subresource = importResource(pseudoResponse, metaApi, preliminaryNames, adhCache);
                 adhCache.putCached(rawSubresource.path, "", subresource);
                 elementsPaths.push(rawSubresource.path);
             });
@@ -112,7 +112,7 @@ export var importContent = <Content extends ResourcesBase.IResource>(
 
     // FIXME: it would be nice if this function could throw an
     // exception at run-time if the type of obj does not match
-    // Content.  however, not only is Content a compile-time entity,
+    // R.  however, not only is R a compile-time entity,
     // but it may very well be based on an interface that has no
     // run-time entity anywhere.  two options:
     //
@@ -155,28 +155,28 @@ export var importContent = <Content extends ResourcesBase.IResource>(
 
 
 /**
- * transform batch request response into Content array
+ * transform batch request response into resource array
  *
  * NOTE: The single batched http requests listed in the response array
  * of the batch request confusingly call the response body 'body',
  * while $http calls it 'data'.  `logBackendBatchError` and
- * `importBatchContent` are (the only two) places where this requires
+ * `importBatchResources` are (the only two) places where this requires
  * writing a few lines of awkward code.  Fixing it would require
  * changes to /docs/source/rest_api.rst, backend, and these two
  * functions simultaneously and has not been deemed worthwhile so
  * far.
  */
-export var importBatchContent = <Content extends ResourcesBase.IResource>(
+export var importBatchResources = (
     responses,
     metaApi : AdhMetaApi.Service,
     preliminaryNames : AdhPreliminaryNames.Service,
     adhCache : AdhCache.Service
-) : Content[] => {
+) : ResourcesBase.IResource[] => {
 
     return responses.map((response) => {
         response.data = response.body;
         delete response.body;
-        return importContent(response, metaApi, preliminaryNames, adhCache);
+        return importResource(response, metaApi, preliminaryNames, adhCache);
     });
 };
 
@@ -191,15 +191,15 @@ export var importBatchContent = <Content extends ResourcesBase.IResource>(
  * also, fields with create_mandatory should not be missing from the
  * posted object.
  */
-export var exportContent = <Rs extends ResourcesBase.IResource>(
+export var exportResource = <R extends ResourcesBase.IResource>(
     adhMetaApi : AdhMetaApi.Service,
-    obj : Rs,
+    obj : R,
     keepMetadata : boolean = false
-) : Rs => {
+) : R => {
     "use strict";
 
     sanityCheck(obj);
-    var newobj : Rs = _.cloneDeep(obj);
+    var newobj : R = _.cloneDeep(obj);
 
     // remove some fields from newobj.data[*] and empty sheets from
     // newobj.data.
