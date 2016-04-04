@@ -19,7 +19,6 @@ from adhocracy_core.sheets.image import ImageMetadataSchema
 from adhocracy_core.sheets.image import image_metadata_meta
 from adhocracy_core.sheets.subresources import ISubResources
 from adhocracy_core.schema import MappingSchema
-from adhocracy_core.schema import SchemaNode
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import CurrencyAmount
 from adhocracy_core.schema import ISOCountryCode
@@ -220,10 +219,10 @@ class StatusEnum(SingleLine):
     default = 'other'
     missing = required
     validator = OneOf(['registered_nonprofit',
-                                'planned_nonprofit',
-                                'support_needed',
-                                'other',
-                                ])
+                       'planned_nonprofit',
+                       'support_needed',
+                       'other',
+                       ])
 
 
 class OrganizationInfoSchema(MappingSchema):
@@ -245,17 +244,17 @@ class OrganizationInfoSchema(MappingSchema):
             if not value.get('status_other', None):
                 status_other = node['status_other']
                 raise Invalid(status_other,
-                                       msg='Required iff status == other')
+                              msg='Required iff status == other')
         else:
             # TODO: Allow multiple errors at the same time
             name = node['name']
             if not value.get('name', None):
                 raise Invalid(name,
-                                       msg='Required iff status != other')
+                              msg='Required iff status != other')
             country = node['country']
             if not value.get('country', None):
                 raise Invalid(country,
-                                       msg='Required iff status != other')
+                              msg='Required iff status != other')
 
 
 organizationinfo_meta = sheet_meta._replace(

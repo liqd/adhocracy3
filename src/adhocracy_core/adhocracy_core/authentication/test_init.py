@@ -332,13 +332,10 @@ class TokenHeaderAuthenticationPolicyIntegrationTest(unittest.TestCase):
         config.include('adhocracy_core.resources.principal')
         config.include('adhocracy_core.authentication')
         self.config = config
-        context = testing.DummyResource(__provides__=IService,
-                                        __is_service__=True)
-        context['principals'] = testing.DummyResource(__provides__=IService,
-                                                      __is_service__=True)
+        context = testing.DummyResource(__provides__=IService)
+        context['principals'] = testing.DummyResource(__provides__=IService)
         context['principals']['users'] = testing.DummyResource(
-            __provides__=IService,
-            __is_service__=True)
+            __provides__=IService)
         user = testing.DummyResource()
         context['principals']['users']['1'] = user
         self.user_id = '/principals/users/1'
@@ -360,6 +357,26 @@ class TokenHeaderAuthenticationPolicyIntegrationTest(unittest.TestCase):
         self._register_authentication_policy()
         headers = dict(remember(self.request, self.user_id))
         assert headers['X-User-Token'] is not None
+
+
+def test_validate_user_headers_call_view_if_authenticated(context, request_):
+    from . import validate_user_headers
+    view = Mock()
+    request_.headers['X-User-Token'] = 2
+    request_.authenticated_userid = object()
+    validate_user_headers(view)(context, request_)
+    view.assert_called_with(context, request_)
+
+
+def test_validate_user_headers_raise_if_authentication_failed(context,
+                                                               request_):
+    from pyramid.httpexceptions import HTTPBadRequest
+    from . import validate_user_headers
+    view = Mock()
+    request_.headers['X-User-Token'] = 2
+    request_.authenticated_userid = None
+    with pytest.raises(HTTPBadRequest):
+        validate_user_headers(view)(context, request_)
 
 
 class IncludemeIntegrationTest(unittest.TestCase):

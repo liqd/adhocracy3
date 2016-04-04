@@ -90,7 +90,7 @@ def deferred_validate_user_name(node: SchemaNode, kw: dict)\
     def validate_user_name_is_unique(node, value):
         if locator.get_user_by_login(value):
             raise Invalid(node, 'The user login name is not unique',
-                                   value=value)
+                          value=value)
     return validate_user_name_is_unique
 
 
@@ -111,7 +111,7 @@ def deferred_validate_user_email(node: SchemaNode, kw: dict) -> callable:
     def validate_user_email_is_unique(node, value):
         if locator.get_user_by_email(value):
             raise Invalid(node, 'The user login email is not unique',
-                                   value=value)
+                          value=value)
     validate_email = Email.validator
     return All(validate_email, validate_user_email_is_unique)
 

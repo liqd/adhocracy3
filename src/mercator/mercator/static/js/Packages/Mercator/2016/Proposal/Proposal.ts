@@ -640,7 +640,7 @@ var get = (
                     practical: subs.practicalrelevance.data[SIPracticalRelevance.nick].practicalrelevance
                 },
                 commentCounts: commentCounts,
-                commentCountTotal: _.sum(<any>commentCounts)
+                commentCountTotal: _.sum(_.values(commentCounts))
             };
         });
     });

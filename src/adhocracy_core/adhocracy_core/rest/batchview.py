@@ -10,14 +10,16 @@ from adhocracy_core.rest.exceptions import handle_error_500_exception
 from adhocracy_core.rest.exceptions import JSONHTTPClientError
 from adhocracy_core.rest.exceptions import get_json_body
 from pyramid.request import Request
-from pyramid.view import view_config
+from pyramid.interfaces import IRequest
 from pyramid.view import view_defaults
 
 from adhocracy_core.resources.root import IRootPool
+from adhocracy_core.rest import api_view
 from adhocracy_core.rest.schemas import POSTBatchRequestSchema
 from adhocracy_core.rest.schemas import UpdatedResourcesSchema
-from adhocracy_core.rest.views import RESTView
+from adhocracy_core.rest.views import _build_updated_resources_dict
 from adhocracy_core.utils import set_batchmode
+from adhocracy_core.utils import create_schema
 
 
 logger = getLogger(__name__)
@@ -49,18 +51,22 @@ class BatchItemResponse:
 
 
 @view_defaults(
-    renderer='json',
     context=IRootPool,
-    http_cache=0,
+    name='batch',
 )
-class BatchView(RESTView):
+class BatchView:
     """Process batch requests."""
 
-    schema_POST = POSTBatchRequestSchema
+    def __init__(self, context: IRootPool, request: IRequest):
+        self.context = context
+        self.request = request
+        self.registry = request.registry
 
-    @view_config(name='batch',
-                 request_method='POST',
-                 accept='application/json')
+    @api_view(
+        request_method='POST',
+        schema=POSTBatchRequestSchema,
+        accept='application/json',
+    )
     def post(self) -> dict:
         """Create new resource and get response data."""
         response_list = []
@@ -87,8 +93,7 @@ class BatchView(RESTView):
         response = self._response_list_to_json(response_list)
         return response
 
-    @view_config(name='batch',
-                 request_method='OPTIONS')
+    @api_view(request_method='OPTIONS')
     def options(self) -> dict:
         """Return options for batch view.
 
@@ -128,9 +133,10 @@ class BatchView(RESTView):
             if 'updated_resources' in response.body:
                 del response.body['updated_resources']
             responses.append(response.to_dict())
-        updated_resources = self._build_updated_resources_dict()
-        schema = UpdatedResourcesSchema().bind(request=self.request,
-                                               context=self.context)
+        updated_resources = _build_updated_resources_dict(self.registry)
+        schema = create_schema(UpdatedResourcesSchema,
+                               self.context,
+                               self.request)
         return {'responses': responses,
                 'updated_resources': schema.serialize(updated_resources)}
 
@@ -158,7 +164,7 @@ class BatchView(RESTView):
             result = json_value
         return result
 
-    def _make_subrequest(self, nested_request: dict) -> Request:
+    def _make_subrequest(self, nested_request: dict) -> IRequest:
         path = nested_request['path']
         method = nested_request['method']
         json_body = nested_request['body']
@@ -194,7 +200,7 @@ class BatchView(RESTView):
         return request
 
     def _invoke_subrequest_and_handle_errors(
-            self, subrequest: Request) -> BatchItemResponse:
+            self, subrequest: IRequest) -> BatchItemResponse:
         try:
             subresponse = self.request.invoke_subrequest(subrequest)
         except Exception as err:
@@ -239,13 +245,13 @@ class BatchView(RESTView):
         if first_version_path:
             path_map[result_first_version_path] = first_version_path
 
-    def copy_header_if_exists(self, header: str, request: Request):
+    def copy_header_if_exists(self, header: str, request: IRequest):
         """Copy header if exists."""
         value = self.request.headers.get(header, None)
         if value is not None:
             request.headers[header] = value
 
-    def copy_attr_if_exists(self, attributename: str, request: Request):
+    def copy_attr_if_exists(self, attributename: str, request: IRequest):
         """Copy attr if exists."""
         value = getattr(self.request, attributename, None)
         if value is not None:

@@ -76,8 +76,8 @@ def deferred_validate_follows(node: SchemaNode, kw: dict) -> callable:
     """Validate lineare history for the `follows` field."""
     # TODO add validation for ForkableVersionables
     return All(validate_linear_history_no_merge,
-                        deferred_validate_linear_history_no_fork(node, kw),
-                        )
+               deferred_validate_linear_history_no_fork(node, kw),
+               )
 
 
 class VersionableSchema(MappingSchema):

@@ -21,6 +21,7 @@ from adhocracy_core.sheets.metadata import view_blocked_by_metadata
 from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.utils import exception_to_str
 from adhocracy_core.utils import log_compatible_datetime
+from adhocracy_core.utils import create_schema
 
 logger = logging.getLogger(__name__)
 
@@ -234,8 +235,7 @@ def handle_error_410_exception(error, request):
     registry = request.registry
     reason = error.detail or ''
     explanation = view_blocked_by_metadata(context, registry, reason)
-    schema = BlockExplanationResponseSchema().bind(request=request,
-                                                   context=context)
+    schema = create_schema(BlockExplanationResponseSchema, context, request)
     cstruct = schema.serialize(explanation)
     if cstruct['modification_date'] is null:
         cstruct['modification_date'] = ''

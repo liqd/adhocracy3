@@ -59,11 +59,11 @@ class OrganizationInfoSchema(MappingSchema):
     """Data structure for organizational information."""
 
     name = SingleLine(missing=drop)
-    validator= OneOf(['registered_nonprofit',
-                      'planned_nonprofit',
-                      'support_needed',
-                      'other',
-                      ])
+    validator = OneOf(['registered_nonprofit',
+                       'planned_nonprofit',
+                       'support_needed',
+                       'other',
+                       ])
 
     city = SingleLine(missing=drop)
     country = ISOCountryCode(missing=drop)
@@ -83,14 +83,13 @@ class OrganizationInfoSchema(MappingSchema):
         if status == 'support_needed':
             if not value.get('help_request', None):
                 help_request = node['help_request']
-                raise Invalid(
-                    help_request,
-                    msg='Required iff status == support_needed')
+                raise Invalid(help_request,
+                              msg='Required iff status == support_needed')
         elif status == 'other':
             if not value.get('status_other', None):
                 status_other = node['status_other']
                 raise Invalid(status_other,
-                                       msg='Required iff status == other')
+                              msg='Required iff status == other')
 
 
 organizationinfo_meta = sheet_meta._replace(
@@ -139,15 +138,15 @@ class TopicEnum(SingleLine):
     default = 'other'
     missing = required
     validator = OneOf(['democracy_and_participation',
-                                'arts_and_cultural_activities',
-                                'environment',
-                                'social_inclusion',
-                                'migration',
-                                'communities',
-                                'urban_development',
-                                'education',
-                                'other',
-                                ])
+                       'arts_and_cultural_activities',
+                       'environment',
+                       'social_inclusion',
+                       'migration',
+                       'communities',
+                       'urban_development',
+                       'education',
+                       'other',
+                       ])
 
 
 class TopicEnums(SequenceSchema):
@@ -171,10 +170,10 @@ class TopicSchema(MappingSchema):
         if 'other' in topics:
             if not value.get('topic_other', None):
                 raise Invalid(node['topic_other'],
-                                       msg='Required if "other" in topic')
+                              msg='Required if "other" in topic')
         if _has_duplicates(topics):
             raise Invalid(node['topic'],
-                                   msg='Duplicates are not allowed')
+                          msg='Duplicates are not allowed')
 
 
 def _has_duplicates(iterable: list) -> bool:
@@ -218,9 +217,8 @@ class LocationSchema(MappingSchema):
         if has_link_to_ruhr:
             if not value.get('link_to_ruhr', None):
                 link_to_ruhr = node['link_to_ruhr']
-                raise Invalid(
-                    link_to_ruhr,
-                    msg='Required iff has_link_to_ruhr == True')
+                raise Invalid(link_to_ruhr,
+                              msg='Required iff has_link_to_ruhr == True')
 
 
 location_meta = sheet_meta._replace(
@@ -467,12 +465,11 @@ class CommunitySchema(MappingSchema):
         heard_froms = value.get('heard_froms', [])
         if 'other' in heard_froms:
             if not value.get('heard_from_other', None):
-                raise Invalid(
-                    node['heard_from_other'],
-                    msg='Required if "other" in heard_froms')
+                raise Invalid(node['heard_from_other'],
+                              msg='Required if "other" in heard_froms')
         if _has_duplicates(heard_froms):
             raise Invalid(node['heard_froms'],
-                                   msg='Duplicates are not allowed')
+                          msg='Duplicates are not allowed')
 
 community_meta = sheet_meta._replace(
     isheet=ICommunity,

@@ -63,6 +63,7 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         self._child = app_root['child']
         rest_url = 'http://localhost:6541'
         request = testing.DummyRequest()
+        request.registry = object()
         request.root = app_root
         request.application_url = rest_url
         self.request = request
@@ -89,6 +90,7 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         if peer is None:
             peer = self._peer
         request = DummyConnectionRequest(peer)
+        request.registry = object()
         self._comm.onConnect(request)
 
     def test_onOpen(self):
@@ -274,6 +276,7 @@ class EventDispatchUnitTests(unittest.TestCase):
         self._grandchild = app_root['child']['grandchild']
         rest_url = 'http://localhost:6541'
         request = testing.DummyRequest()
+        request.registry = object()
         request.root = app_root
         request.application_url = rest_url
         self.request = request

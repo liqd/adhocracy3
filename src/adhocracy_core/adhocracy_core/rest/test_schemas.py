@@ -15,6 +15,13 @@ class ISheetA(ISheet):
     pass
 
 
+class CountSchema(colander.MappingSchema):
+
+    count = colander.SchemaNode(colander.Int(),
+                                default=0,
+                                missing=colander.drop)
+
+
 @fixture
 def sheet_metas():
     from adhocracy_core.sheets import sheet_meta
@@ -27,6 +34,215 @@ def sheet_metas():
 @fixture
 def registry(registry_with_content):
     return registry_with_content
+
+
+class TestValidateRequestData:
+
+    def call_fut(self, *args):
+        from .schemas import _validate_request_data
+        _validate_request_data(*args)
+
+    def test_valid_with_data_wrong_method(self, context, request_):
+        request_.body = '{"wilddata": "1"}'
+        request_.method = 'wrong_method'
+        self.call_fut(context, request_, CountSchema())
+        assert request_.validated == {}
+
+    def test_valid_no_data(self, context, request_):
+        request_.body = ''
+        self.call_fut(context, request_, CountSchema())
+        assert request_.validated == {}
+
+    def test_valid_no_data_empty_dict(self, context, request_):
+        request_.body = '{}'
+        self.call_fut(context, request_, CountSchema())
+        assert request_.validated == {}
+
+    def test_valid_no_data_and_defaults(self, context, request_):
+        class DefaultDataSchema(colander.MappingSchema):
+            count = colander.SchemaNode(colander.Int(),
+                                        missing=1)
+        request_.body = ''
+        self.call_fut(context, request_, DefaultDataSchema())
+        assert request_.validated == {'count': 1}
+
+    def test_valid_with_data(self, context, request_):
+        request_.body = '{"count": "1"}'
+        request_.method = 'PUT'
+        self.call_fut(context, request_, CountSchema())
+        assert request_.validated == {'count': 1}
+
+    def test_valid_with_data_in_querystring(self, context,
+                                                        request_):
+        class QueryStringSchema(colander.MappingSchema):
+            count = colander.SchemaNode(colander.Int())
+        request_.GET = {'count': 1}
+        self.call_fut(context, request_, QueryStringSchema())
+        assert request_.validated == {'count': 1}
+
+    def test_valid_schema_with_extra_fields_in_querystring_discarded(
+            self, context, request_):
+        class QueryStringSchema(colander.MappingSchema):
+            count = colander.SchemaNode(colander.Int())
+        request_.GET = {'count': 1, 'extraflag': 'extra value'}
+        self.call_fut(context, request_, QueryStringSchema())
+        assert request_.validated == {'count': 1}
+
+    def test_valid_schema_with_extra_fields_in_querystring_preserved(
+            self, context, request_):
+
+        class PreservingQueryStringSchema(colander.MappingSchema):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.typ.unknown = 'preserve'
+            count = colander.SchemaNode(colander.Int())
+
+        request_.GET = {'count': 1, 'extraflag': 'extra value'}
+        self.call_fut(context, request_, PreservingQueryStringSchema())
+        assert request_.validated == {'count': 1, 'extraflag': 'extra value'}
+
+    def test_valid_multipart_formdata(self, context, request_):
+        request_.content_type = 'multipart/form-data'
+        request_.method = 'POST'
+        request_.POST['count'] = '1'
+        self.call_fut(context, request_, CountSchema())
+        assert request_.validated == {'count': 1}
+
+    def test_non_valid_wrong_data_value(self, context, request_):
+        from pyramid.httpexceptions import HTTPBadRequest
+        from .exceptions import error_entry
+        request_.body = '{"count": "wrong_value"}'
+        request_.method = 'POST'
+        with raises(HTTPBadRequest):
+            self.call_fut(context, request_, CountSchema())
+        assert request_.errors == [error_entry('body',
+                                                'count',
+                                                '"wrong_value" is not a number')]
+
+    def test_non_valid_wrong_data_key_ignore(self, context, request_):
+        request_.body = '{"wrong_key": "1"}'
+        request_.method = 'POST'
+        schema = CountSchema().clone()
+        schema.typ.unknown = 'ignore'
+        self.call_fut(context, request_, schema)
+        assert request_.errors == []
+        assert request_.validated == {}
+
+    def test_non_valid_wrong_data_key_raise(self, context, request_):
+        from pyramid.httpexceptions import HTTPBadRequest
+        from .exceptions import error_entry
+        request_.body = '{"wrong_key": "1"}'
+        request_.method = 'POST'
+        schema = CountSchema().clone()
+        schema.typ.unknown = 'raise'
+        with raises(HTTPBadRequest):
+            self.call_fut(context, request_, schema)
+        assert request_.errors == [error_entry('body',
+                                               '',
+                                               'Unrecognized keys in mapping: "{\'wrong_key\': \'1\'}"')]
+
+    def test_non_valid_with_non_json_data(self, context, request_):
+        from pyramid.httpexceptions import HTTPBadRequest
+        from .exceptions import error_entry
+        request_.body = b'WRONG'
+        request_.method = 'POST'
+        with raises(HTTPBadRequest):
+            self.call_fut(context, request_, CountSchema())
+        assert request_.errors == [error_entry('body',
+                                                None,
+                                                'Invalid JSON request body')]
+
+    def test_non_valid__wrong_data_cleanup(self, context, request_):
+        from pyramid.httpexceptions import HTTPBadRequest
+        request_.validated = {'secret_data': 'buh'}
+        request_.body = '{"count": "wrong_value"}'
+        request_.method = 'POST'
+        with raises(HTTPBadRequest):
+            self.call_fut(context, request_, CountSchema())
+        assert request_.validated == {}
+
+    def test_valid_with_sequence_schema(self, context, request_):
+        class TestListSchema(colander.SequenceSchema):
+            elements = colander.SchemaNode(colander.String())
+
+        request_.body = '["alpha", "beta", "gamma"]'
+        request_.method = 'POST'
+        self.call_fut(context, request_, TestListSchema())
+        assert request_.validated == ['alpha', 'beta', 'gamma']
+
+    def test_valid_with_sequence_schema_in_querystring(self, context,
+                                                       request_):
+        class TestListSchema(colander.SequenceSchema):
+            elements = colander.SchemaNode(colander.String())
+        self.call_fut(context, request_, TestListSchema())
+        # since this doesn't make much sense, the validator is just a no-op
+        assert request_.validated == {}
+
+    def test_with_invalid_sequence_schema(self, context, request_):
+        class TestListSchema(colander.SequenceSchema):
+            elements = colander.SchemaNode(colander.String())
+            nonsense_node = colander.SchemaNode(colander.String())
+
+        request_.body = '["alpha", "beta", "gamma"]'
+        request_.method = 'POST'
+        with raises(colander.Invalid):
+            self.call_fut(context, request_, TestListSchema())
+        assert request_.validated == {}
+
+    def test_invalid_with_sequence_schema(self, context, request_):
+        class TestListSchema(colander.SequenceSchema):
+            elements = colander.SchemaNode(colander.Integer())
+
+        from pyramid.httpexceptions import HTTPBadRequest
+        request_.body = '[1, 2, "three"]'
+        request_.method = 'POST'
+        with raises(HTTPBadRequest):
+            self.call_fut(context, request_, TestListSchema())
+        assert request_.validated == {}
+
+    def test_invalid_with_not_sequence_and_not_mapping_schema(self, context,
+                                                              request_):
+        schema = colander.SchemaNode(colander.Int())
+        with raises(Exception):
+            self.call_fut(context, request_, schema)
+
+
+class TestValidateVisibility:
+
+    @fixture
+    def mock_reason_if_blocked(self, mocker):
+        return mocker.patch('adhocracy_core.rest.schemas.get_reason_if_blocked')
+
+    def call_fut(self, *args):
+        from .schemas import validate_visibility
+        return validate_visibility(*args)
+
+    @mark.parametrize('method', [('OPTIONS',),
+                                 ('DELETE',),
+                                 ('PUT',),
+                                 ])
+    def test_ignore_if_method_options_delete_put(self, context, request_,
+                                                 method):
+        view = Mock()
+        request_.method = method
+        assert self.call_fut(view)(context, request_) is view.return_value
+        view.assert_called_with(context, request_)
+
+    def test_ignore_if_get_reason_is_none(self, context, request_,
+                                          mock_reason_if_blocked):
+        request_.method = 'GET'
+        view = Mock()
+        mock_reason_if_blocked.return_value = None
+        assert self.call_fut(view)(context, request_) is view.return_value
+
+    def test_raise_if_get_reason(self, context, request_,
+                                 mock_reason_if_blocked):
+        from pyramid.httpexceptions import HTTPGone
+        request_.method = 'GET'
+        view = Mock()
+        mock_reason_if_blocked.return_value = 'hidden'
+        with raises(HTTPGone):
+            self.call_fut(view)(context, request_)
 
 
 class TestResourceResponseSchema:
@@ -627,12 +843,9 @@ class TestGETPoolRequestSchema:
     @fixture
     def context(self, pool):
         from substanced.interfaces import IService
-        pool['catalogs'] = testing.DummyResource(__is_service__=True,
-                                                 __provides__=IService)
-        pool['catalogs']['adhocracy'] = testing.DummyResource(__is_service__=True,
-                                                              __provides__=IService)
-        pool['catalogs']['system'] = testing.DummyResource(__is_service__=True,
-                                                           __provides__=IService)
+        pool['catalogs'] = testing.DummyResource(__provides__=IService)
+        pool['catalogs']['adhocracy'] = testing.DummyResource(__provides__=IService)
+        pool['catalogs']['system'] = testing.DummyResource(__provides__=IService)
         return pool
 
     @fixture
@@ -1505,3 +1718,4 @@ class TestCreateValidateAccountActive:
             validator(node, {'password': 'secret'})
         assert error_info.value.asdict() == \
                {'child_node': 'User account not yet activated'}
+

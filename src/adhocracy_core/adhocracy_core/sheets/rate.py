@@ -112,9 +112,9 @@ class RateSchema(MappingSchema):
         request = kw['request']
         registry = kw['registry']
         return All(create_validate_rate_value(registry),
-                            create_validate_subject(request),
-                            create_validate_is_unique(context, registry),
-                            )
+                   create_validate_subject(request),
+                   create_validate_is_unique(context, registry),
+                   )
 
 
 def create_validate_subject(request) -> callable:

@@ -25,10 +25,11 @@ from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import UniqueReferences
+from adhocracy_core.schema import Reference as ReferenceSchema
 from adhocracy_core.utils import remove_keys_from_dict
 from adhocracy_core.utils import normalize_to_tuple
 from adhocracy_core.utils import find_graph
-from adhocracy_core import schema
+from adhocracy_core.utils import create_schema
 
 logger = getLogger(__name__)
 
@@ -50,12 +51,13 @@ class BaseResourceSheet:
         self.creating = creating
         self.schema = meta.schema_class()
 
-    def get_schema_with_bindings(self) -> MappingSchema:
-        schema = self.schema.bind(request=self.request,
-                                  registry=self.registry,
-                                  context=self.context,
-                                  creating=self.creating,
-                                  )
+    def get_schema_with_bindings(self) -> colander.MappingSchema:
+        schema = create_schema(self.meta.schema_class,
+                               self.context,
+                               self.request,
+                               registry=self.registry,
+                               creating=self.creating
+                               )
         return schema
 
     @reify
@@ -158,7 +160,7 @@ class BaseResourceSheet:
             elements = self._catalogs.search(query_field).elements
             if len(elements) == 0:
                 continue
-            if isinstance(node, schema.Reference):
+            if isinstance(node, ReferenceSchema):
                 yield(field, elements[0])
             else:
                 yield(field, elements)

@@ -22,6 +22,7 @@ from adhocracy_core.websockets.schemas import Notification
 from adhocracy_core.websockets.schemas import StatusConfirmation
 from adhocracy_core.websockets.schemas import ChildNotification
 from adhocracy_core.websockets.schemas import VersionNotification
+from adhocracy_core.utils import create_schema
 
 
 logger = logging.getLogger(__name__)
@@ -144,8 +145,9 @@ class ClientCommunicator(WebSocketServerProtocol):
         """Create schema object and bind `context` and `request`."""
         context = self._get_root()
         request = self._get_dummy_request()
-        schema = schema_class()
-        return schema.bind(context=context, request=request)
+        request.registry = object()
+        schema = create_schema(schema_class, context, request)
+        return schema
 
     def _get_dummy_request(self) -> DummyRequest:
         """Return a dummy :term:`request` object to resolve resource paths."""
