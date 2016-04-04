@@ -1,5 +1,5 @@
 """Interfaces for plugable dependencies, basic metadata structures."""
-from collections import Iterable, namedtuple
+from collections import Iterable
 from enum import Enum
 import collections
 

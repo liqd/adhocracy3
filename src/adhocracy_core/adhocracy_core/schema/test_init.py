@@ -160,6 +160,12 @@ class TestName:
         with raises(colander.Invalid):
             inst.validator(inst, '')
 
+    def test_non_valid_missing_parent(self, context):
+        context.__parent__ = None
+        inst = self.make_one().bind(context=context, creating=None)
+        with raises(colander.Invalid):
+            inst.validator(inst, '')
+
     def test_non_valid_to_long(self, context):
         inst = self.make_one().bind(context=context, creating=None)
         with raises(colander.Invalid):
@@ -398,15 +404,18 @@ class TestResourceObjectUnitTests:
         assert result == context['child']
 
     def test_deserialize_value_url_invalid_path_wrong_child_name(
-            self, request_, node):
+            self, request_, node, context):
         inst = self.make_one()
-        node = node.bind(request_=request_)
+        node = node.bind(request_=request_,
+                         context=context)
         with raises(colander.Invalid):
             inst.deserialize(node, request_.application_url + '/wrong_child')
 
-    def test_deserialize_value_url_invalid_path_to_short(self, request_, node):
+    def test_deserialize_value_url_invalid_path_to_short(self, request_, node,
+                                                         context):
         inst = self.make_one()
-        node = node.bind(request=request_)
+        node = node.bind(request=request_,
+                         context=context)
         with raises(colander.Invalid):
             inst.deserialize(node, 'htp://x.x')
 

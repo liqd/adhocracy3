@@ -630,6 +630,37 @@ def add_image_reference_to_proposals(root):  # pragma: no cover
     migrate_new_sheet(root, IProposalVersion, IImageReference)
 
 
+def reset_comment_count(root):  # pragma: no cover
+    """Reset comment_count for all ICommentables - See #2194, #2188."""
+    from adhocracy_core.resources.comment import ICommentVersion
+    from adhocracy_core.sheets.comment import ICommentable
+    from adhocracy_core.resources.subscriber import update_comments_count
+    registry = get_current_registry(root)
+    catalogs = find_service(root, 'catalogs')
+    query = search_query._replace(interfaces=ICommentable,
+                                  only_visible=True,
+                                  resolve=True)
+    commentables = catalogs.search(query).elements
+    count = len(commentables)
+    for index, comment in enumerate(commentables):
+        logger.info('Set comment_count to 0 for resource {0} of {1}'
+                    .format(index + 1, count))
+        commentable_sheet = registry.content.get_sheet(comment,
+                                                       ICommentable)
+        commentable_sheet.set({'comments_count': 0}, omit_readonly=False)
+
+    query = search_query._replace(interfaces=ICommentVersion,
+                                  only_visible=True,
+                                  resolve=True,
+                                  indexes={'tag': 'FIRST'})
+    comment_versions = catalogs.search(query).elements
+    count = len(comment_versions)
+    for index, comment in enumerate(comment_versions):
+        logger.info('Recalculate comment_count for resource {0} of {1}'
+                    .format(index + 1, count))
+        update_comments_count(comment, 1, registry)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -661,3 +692,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(set_comment_count)
     config.add_evolution_step(remove_duplicated_group_ids)
     config.add_evolution_step(add_image_reference_to_proposals)
+    config.add_evolution_step(reset_comment_count)
