@@ -22,5 +22,4 @@ class TestService:
         from substanced.interfaces import IService
         res = registry.content.create(IBasicService.__identifier__, pool)
         assert IService.providedBy(res)
-        assert res.__is_service__
         assert pool['service']

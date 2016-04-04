@@ -1,14 +1,12 @@
 """Scripts to migrate legacy objects in existing databases."""
+# pragma: no cover
 import logging  # pragma: no cover
 
-from pyramid.traversal import get_current_registry
 from substanced.util import find_service
 from zope.interface import alsoProvides
 from zope.interface import directlyProvides
 
 from adhocracy_core.interfaces import search_query
-
-
 from adhocracy_core.evolution import log_migration
 from adhocracy_core.evolution import migrate_new_sheet
 from adhocracy_core.evolution import _search_for_interfaces
@@ -16,10 +14,11 @@ from adhocracy_meinberlin.resources.kiezkassen import IProposalVersion
 import adhocracy_core.sheets
 import adhocracy_meinberlin.sheets
 
-logger = logging.getLogger(__name__)  # pragma: no cover
+
+logger = logging.getLogger(__name__)
 
 
-def use_adhocracy_core_title_sheet(root):  # pragma: no cover
+def use_adhocracy_core_title_sheet(root, registry):
     """Migrate kiezkassen proposal to adhocracy_core title sheet.
 
     Add title sheet.
@@ -32,7 +31,7 @@ def use_adhocracy_core_title_sheet(root):  # pragma: no cover
                       fields_mapping=[('title', 'title')])
 
 
-def use_adhocracy_core_description_sheet(root):  # pragma: no cover
+def use_adhocracy_core_description_sheet(root, registry):
     """Migrate kiezkassen proposal to description sheet.
 
     Add description sheet.
@@ -46,7 +45,7 @@ def use_adhocracy_core_description_sheet(root):  # pragma: no cover
 
 
 @log_migration
-def remove_meinberlin_workflow_assignment_sheets(root):  # pragma: no cover
+def remove_meinberlin_workflow_assignment_sheets(root, registry):
     """Remove deprecated sheets.bplan/kiezkasse.IWorkflowAssignment."""
     from adhocracy_core.interfaces import IResource
     from adhocracy_core.sheets.workflow import IWorkflowAssignment
@@ -72,7 +71,7 @@ def remove_meinberlin_workflow_assignment_sheets(root):  # pragma: no cover
 
 
 @log_migration
-def add_embed_sheet_to_bplan_processes(root):  # pragma: no cover
+def add_embed_sheet_to_bplan_processes(root, registry):
     """Add embed sheet to bplan processes."""
     from adhocracy_core.sheets.embed import IEmbed
     from adhocracy_meinberlin.resources.bplan import IProcess
@@ -80,7 +79,7 @@ def add_embed_sheet_to_bplan_processes(root):  # pragma: no cover
 
 
 @log_migration
-def migrate_stadtforum_proposals_to_ipolls(root):  # pragma: no cover
+def migrate_stadtforum_proposals_to_ipolls(root, registry):
     """Migrate stadtforum proposals to ipolls."""
     from adhocracy_core.resources.proposal import IProposal
     from adhocracy_meinberlin.resources.stadtforum import IProcess
@@ -102,7 +101,7 @@ def migrate_stadtforum_proposals_to_ipolls(root):  # pragma: no cover
             catalogs.reindex_index(proposal, 'interfaces')
 
 
-def change_bplan_officeworker_email_representation(root):  # pragma: no cover
+def change_bplan_officeworker_email_representation(root, registry):
     """Change bplan officeworker email representation."""
     from substanced.util import find_objectmap
     from adhocracy_core.utils import find_graph
@@ -110,7 +109,6 @@ def change_bplan_officeworker_email_representation(root):  # pragma: no cover
     from adhocracy_meinberlin.sheets.bplan import IProcessSettings
     from adhocracy_meinberlin.sheets.bplan import IProcessPrivateSettings
     from adhocracy_meinberlin.sheets.bplan import OfficeWorkerUserReference
-    registry = get_current_registry(root)
     migrate_new_sheet(root, IProcess, IProcessPrivateSettings)
     catalogs = find_service(root, 'catalogs')
     bplaene = _search_for_interfaces(catalogs, IProcess)
@@ -131,12 +129,11 @@ def change_bplan_officeworker_email_representation(root):  # pragma: no cover
 
 
 @log_migration
-def use_workflow_state_for_participation_time_range(root):  # pragma: no cover
+def use_workflow_state_for_participation_time_range(root, registry):
     """use workflow state data for participation start and end."""
     from adhocracy_core.sheets.workflow import IWorkflowAssignment
     from adhocracy_meinberlin.resources.bplan import IProcess
     from adhocracy_meinberlin.sheets.bplan import IProcessSettings
-    registry = get_current_registry(root)
     catalogs = find_service(root, 'catalogs')
     bplaene = _search_for_interfaces(catalogs, IProcess)
     for bplan in bplaene:
@@ -162,7 +159,7 @@ def use_workflow_state_for_participation_time_range(root):  # pragma: no cover
 
 
 @log_migration
-def add_image_reference_to_blplan(root):  # pragma: no cover
+def add_image_reference_to_blplan(root, registry):
     """Add image reference sheet to bplan process."""
     from adhocracy_meinberlin.resources.bplan import IProcess
     from adhocracy_core.sheets.image import IImageReference

@@ -627,12 +627,9 @@ class TestGETPoolRequestSchema:
     @fixture
     def context(self, pool):
         from substanced.interfaces import IService
-        pool['catalogs'] = testing.DummyResource(__is_service__=True,
-                                                 __provides__=IService)
-        pool['catalogs']['adhocracy'] = testing.DummyResource(__is_service__=True,
-                                                              __provides__=IService)
-        pool['catalogs']['system'] = testing.DummyResource(__is_service__=True,
-                                                           __provides__=IService)
+        pool['catalogs'] = testing.DummyResource(__provides__=IService)
+        pool['catalogs']['adhocracy'] = testing.DummyResource(__provides__=IService)
+        pool['catalogs']['system'] = testing.DummyResource(__provides__=IService)
         return pool
 
     @fixture
