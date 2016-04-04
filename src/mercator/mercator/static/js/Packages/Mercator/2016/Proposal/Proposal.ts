@@ -857,6 +857,18 @@ export var listItem = (
                     commentCountTotal: data.commentCountTotal,
                     supporterCount: data.supporterCount
                 };
+
+                scope.$on("$destroy", adhTopLevelState.bind("processState", scope.data, "currentPhase"));
+
+                scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
+                    if (!proposalVersionUrl) {
+                        scope.selectedState = "";
+                    } else if (proposalVersionUrl === scope.path) {
+                        scope.selectedState = "is-selected";
+                    } else {
+                        scope.selectedState = "is-not-selected";
+                    }
+                }));
             });
         }
     };

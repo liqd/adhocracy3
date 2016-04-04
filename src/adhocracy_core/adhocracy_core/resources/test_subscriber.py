@@ -519,28 +519,90 @@ class TestUpdateImageDownload:
         assert mock.called_with(event.object, event.registry)
 
 
-def test_increase_count(mocker, event):
-    from . import subscriber
-    event.reference = Mock()
-    mock = mocker.patch.object(subscriber, 'update_comments_count')
-    subscriber.increase_comments_count(event)
-    mock.assert_called_with(event.reference.source, 1, event.registry)
-
-
-def test_decrease_count(mocker, event):
-    from . import subscriber
-    event.reference = Mock()
-    mock = mocker.patch.object(subscriber, 'update_comments_count')
-    subscriber.decrease_comments_count(event)
-    mock.assert_called_with(event.reference.source, -1, event.registry)
-
-
 @fixture
 def mock_commentable_sheet(event, registry, mock_sheet):
     event.registry = registry
     registry.content.get_sheet.return_value = mock_sheet
     mock_sheet.get.return_value = {'comments_count': 1}
     return mock_sheet
+
+
+class TestIncreaseCommentsCount:
+
+    def call_fut(self, *args):
+        from .subscriber import increase_comments_count
+        return increase_comments_count(*args)
+
+    @fixture
+    def mock_event(self):
+        return Mock()
+
+    @fixture
+    def mock_update(self, mocker):
+        from . import subscriber
+        return mocker.patch.object(subscriber, 'update_comments_count')
+
+    @fixture
+    def mock_parent_version_sheet(self, mock_sheet, registry):
+        registry.content.get_sheet.return_value = mock_sheet
+        return mock_sheet
+
+    def test_increase_when_first_version_created(self,
+                                                 registry,
+                                                 mock_event,
+                                                 mock_update,
+                                                 mock_parent_version_sheet):
+        mock_comment_version = Mock()
+        mock_event.reference.source = mock_comment_version
+        mock_event.registry = registry
+        mock_parent_version_sheet.get.return_value = {'FIRST': mock_comment_version}
+        self.call_fut(mock_event)
+        assert mock_update.called
+
+    def test_no_increase_when_not_first_version_created(self, mock_event, mock_update):
+        mock_comment_version = Mock()
+        mock_event.reference.source = mock_comment_version
+        self.call_fut(mock_event)
+        assert not mock_update.called
+
+
+class TestDecreaseCommentsCount:
+
+    def call_fut(self, *args):
+        from .subscriber import decrease_comments_count
+        return decrease_comments_count(*args)
+
+    @fixture
+    def mock_event(self):
+        return Mock()
+
+    @fixture
+    def mock_update(self, mocker):
+        from . import subscriber
+        return mocker.patch.object(subscriber, 'update_comments_count')
+
+    @fixture
+    def mock_parent_version_sheet(self, mock_sheet, registry):
+        registry.content.get_sheet.return_value = mock_sheet
+        return mock_sheet
+
+    def test_decrease_when_first_version_deleted(self,
+                                                registry,
+                                                mock_event,
+                                                mock_update,
+                                                mock_parent_version_sheet):
+        mock_comment_version = Mock()
+        mock_event.reference.source = mock_comment_version
+        mock_event.registry = registry
+        mock_parent_version_sheet.get.return_value = {'FIRST': mock_comment_version}
+        self.call_fut(mock_event)
+        assert mock_update.called
+
+    def test_no_decrease_when_not_first_version_deleted(self, mock_event, mock_update):
+        mock_comment_version = Mock()
+        mock_event.reference.source = mock_comment_version
+        self.call_fut(mock_event)
+        assert not mock_update.called
 
 
 class TestUpdateCommentsCount:
@@ -563,17 +625,22 @@ class TestUpdateCommentsCount:
                                                           'comments_count')
         return comments_count
 
-    def test_call(self, registry, pool_with_catalogs, service):
+    def test_call(self, registry, pool_with_catalogs):
+        from adhocracy_core.resources.comment import IComment
         from adhocracy_core.resources.comment import ICommentVersion
+        from adhocracy_core.resources.comment import ICommentsService
         from adhocracy_core.resources.paragraph import IParagraphVersion
         from adhocracy_core.resources.document import IDocumentVersion
         from adhocracy_core.resources.rate import IRateVersion
         from adhocracy_core import sheets
         pool = pool_with_catalogs
-        pool['comments'] = service  # the IComment sheet needs a post pool
-        comment1 = self._make_resource(pool, ICommentVersion, registry)
-        comment2 = self._make_resource(pool, ICommentVersion, registry)
-        comment3 = self._make_resource(pool, ICommentVersion, registry)
+        registry.content.create(ICommentsService.__identifier__,
+                                parent=pool_with_catalogs)
+        comments = pool['comments']
+        comment = self._make_resource(comments, IComment, registry)
+        comment1 = self._make_resource(comment, ICommentVersion, registry)
+        comment2 = self._make_resource(comment, ICommentVersion, registry)
+        comment3 = self._make_resource(comment, ICommentVersion, registry)
         non_commentable = self._make_resource(pool, IRateVersion, registry)
         sub_commentable = self._make_resource(pool, IParagraphVersion, registry)
         main_commentable = self._make_resource(pool, IDocumentVersion, registry)
@@ -632,7 +699,7 @@ class TestUpdateCommentsCountAfterVisibilityChange:
         from . import subscriber
         event.registry = registry
         comment_v0 = testing.DummyResource()
-        mock_versions_sheet.get.return_value = {'elements': [comment_v0]}
+        mock_versions_sheet.get.return_value = {'FIRST': [comment_v0]}
         mock_visibility = mocker.patch.object(subscriber, 'get_visibility_change')
         mock_visibility.return_value = VisibilityChange.concealed
         self.call_fut(event)
@@ -644,7 +711,7 @@ class TestUpdateCommentsCountAfterVisibilityChange:
         from . import subscriber
         event.registry = registry
         comment_v0 = testing.DummyResource()
-        mock_versions_sheet.get.return_value = {'elements': [comment_v0]}
+        mock_versions_sheet.get.return_value = {'FIRST': [comment_v0]}
         mock_visibility = mocker.patch.object(subscriber, 'get_visibility_change')
         mock_visibility.return_value = VisibilityChange.revealed
         self.call_fut(event)

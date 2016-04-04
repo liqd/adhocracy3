@@ -282,7 +282,7 @@ def purge_varnish_after_commit_hook(success: bool, registry: Registry,
         url = varnish_url + request.script_name + path
         for event in events:
             headers = {'X-Purge-Host': request.host}
-            headers['X-Purge-Regex'] = '/?\??[^/]*$'
+            headers['X-Purge-Regex'] = '/?\??[^/]*'
             try:
                 resp = requests.request('PURGE', url, headers=headers)
                 if resp.status_code != 200:

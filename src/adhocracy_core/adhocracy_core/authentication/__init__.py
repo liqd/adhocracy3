@@ -187,7 +187,7 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         """Return normalised X-User-Path request header or None."""
         user_path_header = request.headers.get(UserPathHeader, None)
         user_path = None
-        if user_path_header is not None:
+        if user_path_header is not None:  # pragma: no branch
             schema = Resource().bind(request=request,
                                      context=request.context)
             user = schema.deserialize(user_path_header)
