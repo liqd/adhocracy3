@@ -1,9 +1,8 @@
 """Name Sheet."""
-import colander
-
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
+from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import Name
 
 
@@ -11,7 +10,7 @@ class IName(ISheet):
     """Market interface for the name sheet."""
 
 
-class NameSchema(colander.MappingSchema):
+class NameSchema(MappingSchema):
     """Name sheet data structure.
 
     `name`: a human readable resource Identifier

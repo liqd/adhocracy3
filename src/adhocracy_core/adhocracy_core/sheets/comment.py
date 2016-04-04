@@ -1,11 +1,11 @@
 """Comment sheet."""
 from BTrees.Length import Length
-import colander
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
+from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import Integer
 from adhocracy_core.schema import PostPool
 from adhocracy_core.schema import Reference
@@ -30,7 +30,7 @@ class CommentRefersToReference(SheetToSheet):
     target_isheet = ICommentable
 
 
-class CommentSchema(colander.MappingSchema):
+class CommentSchema(MappingSchema):
     """Comment sheet data structure.
 
     `content`:  Text
@@ -45,7 +45,7 @@ comment_meta = sheet_meta._replace(isheet=IComment,
                                    schema_class=CommentSchema)
 
 
-class CommentableSchema(colander.MappingSchema):
+class CommentableSchema(MappingSchema):
     """Commentable sheet data structure.
 
     `post_pool`: Pool to post new :class:`adhocracy_sample.resource.IComment`.

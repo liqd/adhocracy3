@@ -3,12 +3,14 @@
 from logging import getLogger
 from collections import defaultdict
 
+from colander import deferred
+from colander import drop
+from colander import null
 from persistent.mapping import PersistentMapping
 from pyramid.decorator import reify
 from pyramid.registry import Registry
 from pyramid.settings import asbool
 from pyramid.interfaces import IRequest
-from colander import deferred
 from substanced.util import find_service
 from zope.interface import implementer
 import colander
@@ -21,7 +23,9 @@ from adhocracy_core.interfaces import SheetMetadata
 from adhocracy_core.interfaces import Reference
 from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.interfaces import search_query
-from adhocracy_core import schema
+from adhocracy_core.schema import MappingSchema
+from adhocracy_core.schema import UniqueReferences
+from adhocracy_core.schema import Reference as ReferenceSchema
 from adhocracy_core.utils import remove_keys_from_dict
 from adhocracy_core.utils import normalize_to_tuple
 from adhocracy_core.utils import find_graph
@@ -146,7 +150,7 @@ class BaseResourceSheet:
             return iter([])  # ease testing
         for field, node in fields:
             reference = create_ref(node)
-            is_references_node = isinstance(node, schema.UniqueReferences)\
+            is_references_node = isinstance(node, UniqueReferences)\
                 and not getattr(node, 'backref', False)
             if is_references_node:  # search references and preserve order
                 query_field = query._replace(references=[reference],
@@ -156,7 +160,7 @@ class BaseResourceSheet:
             elements = self._catalogs.search(query_field).elements
             if len(elements) == 0:
                 continue
-            if isinstance(node, schema.Reference):
+            if isinstance(node, ReferenceSchema):
                 yield(field, elements[0])
             else:
                 yield(field, elements)
@@ -309,7 +313,7 @@ class AttributeResourceSheet(BaseResourceSheet):
 
 sheet_meta = SheetMetadata(isheet=ISheet,
                            sheet_class=AnnotationRessourceSheet,
-                           schema_class=colander.MappingSchema,
+                           schema_class=MappingSchema,
                            permission_view='view',
                            permission_edit='edit',
                            permission_create='create',
@@ -332,15 +336,14 @@ def add_sheet_to_registry(metadata: SheetMetadata, registry: Registry):
         assert metadata.creatable and metadata.create_mandatory
     schema = metadata.schema_class()
     for child in schema.children:
-        assert child.default != colander.null
-        assert child.default != colander.drop
+        assert child.default != null
+        assert child.default != drop
     assert issubclass(schema.__class__, colander.MappingSchema)
     _assert_schema_preserves_super_type_data_structure(schema)
     registry.content.sheets_meta[isheet] = metadata
 
 
-def _assert_schema_preserves_super_type_data_structure(
-        schema: colander.MappingSchema):
+def _assert_schema_preserves_super_type_data_structure(schema: MappingSchema):
     super_defaults = []
     for super_schema in schema.__class__.__bases__:
         for child in super_schema().children:

@@ -1,12 +1,15 @@
 """Sheets for BPlan proposals."""
+from colander import required
+from colander import Length
 from zope.deprecation import deprecated
-import colander
 
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import workflow
+from adhocracy_core.schema import MappingSchema
+from adhocracy_core.schema import Email
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
 from adhocracy_core.sheets.principal import IUserBasic
@@ -16,15 +19,15 @@ class IProposal(ISheet):
     """Marker interface for the BPlan proposal sheet."""
 
 
-class ProposalSchema(colander.MappingSchema):
+class ProposalSchema(MappingSchema):
     """Data structure for plan stellungsname information."""
 
-    name = SingleLine(missing=colander.required)
-    street_number = SingleLine(missing=colander.required)
-    postal_code_city = SingleLine(missing=colander.required)
-    email = SingleLine(validator=colander.Email())
-    statement = Text(missing=colander.required,
-                     validator=colander.Length(max=17500))
+    name = SingleLine(missing=required)
+    street_number = SingleLine(missing=required)
+    postal_code_city = SingleLine(missing=required)
+    email = Email()
+    statement = Text(missing=required,
+                     validator=Length(max=17500))
 
 
 proposal_meta = sheet_meta._replace(isheet=IProposal,
@@ -63,11 +66,11 @@ deprecated('OfficeWorkerUserReference',
            'Office worker email is not stored via an user anymore')
 
 
-class ProcessSettingsSchema(colander.MappingSchema):
+class ProcessSettingsSchema(MappingSchema):
     """Settings for the B-Plan process."""
 
-    plan_number = SingleLine(missing=colander.required)
-    participation_kind = SingleLine(missing=colander.required)
+    plan_number = SingleLine(missing=required)
+    participation_kind = SingleLine(missing=required)
 
 process_settings_meta = sheet_meta._replace(
     isheet=IProcessSettings,
@@ -80,11 +83,10 @@ class IProcessPrivateSettings(ISheet):
     """Marker interface for the process private settings."""
 
 
-class ProcessPrivateSettingsSchema(colander.MappingSchema):
+class ProcessPrivateSettingsSchema(MappingSchema):
     """Private Settings for the B-Plan process."""
 
-    office_worker_email = SingleLine(validator=colander.Email(),
-                                     missing=colander.required)
+    office_worker_email = Email(missing=required)
 
 
 process_private_settings_meta = sheet_meta._replace(

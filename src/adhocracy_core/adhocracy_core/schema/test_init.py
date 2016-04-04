@@ -56,8 +56,8 @@ def _add_other_node(inst: colander.Schema):
 class AdhocracySchemaNodeUnitTest(unittest.TestCase):
 
     def make_one(self, *args, **kwargs):
-        from adhocracy_core.schema import AdhocracySchemaNode
-        return AdhocracySchemaNode(*args, **kwargs)
+        from adhocracy_core.schema import SchemaNode
+        return SchemaNode(*args, **kwargs)
 
     def test_serialize_non_readonly(self):
         inst = self.make_one(colander.String())
@@ -84,17 +84,17 @@ class AdhocracySchemaNodeUnitTest(unittest.TestCase):
 class TestAdhocracySchemaNode:
 
     def make_one(self, **kwargs):
-        from adhocracy_core.schema import AdhocracySequenceNode
+        from adhocracy_core.schema import SequenceSchema
 
-        class AdhocracySequenceExample(AdhocracySequenceNode):
+        class AdhocracySequenceExample(SequenceSchema):
             child1 = colander.Schema(typ=colander.Int())
         return AdhocracySequenceExample().bind()
 
     def test_create(self):
-        from . import AdhocracySchemaNode
+        from . import SchemaNode
         inst = self.make_one()
         assert isinstance(inst, colander.SequenceSchema)
-        assert isinstance(inst, AdhocracySchemaNode)
+        assert isinstance(inst, SchemaNode)
         assert inst.schema_type == colander.Sequence
         assert inst.default == []
 
@@ -337,8 +337,8 @@ class TestGetSheetCstructs:
 class TestResourceObjectUnitTests:
 
     def make_one(self, **kwargs):
-        from adhocracy_core.schema import ResourceObject
-        return ResourceObject(**kwargs)
+        from adhocracy_core.schema import ResourceObjectType
+        return ResourceObjectType(**kwargs)
 
     def test_serialize_colander_null(self):
         inst = self.make_one()
@@ -435,11 +435,11 @@ class TestResource:
         return Resource()
 
     def test_create(self):
-        from adhocracy_core.schema import ResourceObject
+        from adhocracy_core.schema import ResourceObjectType
         inst = self.make_one()
         assert inst.default is None
         assert inst.missing == colander.drop
-        assert inst.schema_type == ResourceObject
+        assert inst.schema_type == ResourceObjectType
 
 
 class ReferenceUnitTest(unittest.TestCase):
@@ -489,11 +489,11 @@ class TestResources:
         return Resources(**kwargs).bind()
 
     def test_create(self):
-        from adhocracy_core.schema import ResourceObject
+        from adhocracy_core.schema import ResourceObjectType
         inst = self.make_one()
         assert isinstance(inst, colander.SequenceSchema)
         assert inst.default == []
-        assert inst['resource'].schema_type == ResourceObject
+        assert inst['resource'].schema_type == ResourceObjectType
 
     def test_create_with_custom_default(self):
         inst = self.make_one(default=[1])

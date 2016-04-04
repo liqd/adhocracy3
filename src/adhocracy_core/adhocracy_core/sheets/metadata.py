@@ -1,8 +1,10 @@
 """Metadata Sheet."""
 from logging import getLogger
 
+from colander import Invalid
+from colander import deferred
+from colander import drop
 from pyramid.registry import Registry
-import colander
 
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ISheet
@@ -11,6 +13,7 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import AttributeResourceSheet
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Reference
@@ -40,7 +43,7 @@ class MetadataModifiedByReference(SheetToSheet):
     target_isheet = IUserBasic
 
 
-@colander.deferred
+@deferred
 def deferred_validate_hidden(node, kw):
     """Check hide_permission."""
     context = kw['context']
@@ -48,11 +51,11 @@ def deferred_validate_hidden(node, kw):
 
     def check_hide_permisison(node, value):
         if not request.has_permission('hide', context):
-            raise colander.Invalid(node, 'Changing this field is not allowed')
+            raise Invalid(node, 'Changing this field is not allowed')
     return check_hide_permisison
 
 
-class MetadataSchema(colander.MappingSchema):
+class MetadataSchema(MappingSchema):
     """Metadata sheet data structure.
 
     `creation_date`: Creation date of this resource. defaults to now.
@@ -80,10 +83,10 @@ class MetadataSchema(colander.MappingSchema):
     """
 
     creator = Reference(reftype=MetadataCreatorsReference, readonly=True)
-    creation_date = DateTime(missing=colander.drop, readonly=True)
-    item_creation_date = DateTime(missing=colander.drop, readonly=True)
+    creation_date = DateTime(missing=drop, readonly=True)
+    item_creation_date = DateTime(missing=drop, readonly=True)
     modified_by = Reference(reftype=MetadataModifiedByReference, readonly=True)
-    modification_date = DateTime(missing=colander.drop, readonly=True)
+    modification_date = DateTime(missing=drop, readonly=True)
     deleted = Boolean()
     hidden = Boolean(validator=deferred_validate_hidden)
 

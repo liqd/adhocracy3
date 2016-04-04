@@ -1,6 +1,10 @@
 """Sheets related to geographical information."""
 from enum import Enum
-import colander
+
+from colander import Float
+from colander import drop
+from colander import Range
+from colander import OneOf
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
@@ -8,34 +12,36 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import SingleLine
-from adhocracy_core.schema import AdhocracySequenceNode
+from adhocracy_core.schema import MappingSchema
+from adhocracy_core.schema import SequenceSchema
+from adhocracy_core.schema import TupleSchema
 
 
-class WebMercatorLongitude(colander.SchemaNode):
+class WebMercatorLongitude(MappingSchema):
     """A a web mercator longitude value.
 
     Validation values taken from http://epsg.io/3857.
     """
 
-    schema_type = colander.Float
+    schema_type = Float
     default = 0
-    missing = colander.drop
-    validator = colander.Range(min=-20026376.3, max=20026376.3)
+    missing = drop
+    validator = Range(min=-20026376.3, max=20026376.3)
 
 
-class WebMercatorLatitude(colander.SchemaNode):
+class WebMercatorLatitude(MappingSchema):
     """A a web mercator latitude value.
 
     Validation values taken from http://epsg.io/3857.
     """
 
-    schema_type = colander.Float
+    schema_type = Float
     default = 0
-    missing = colander.drop
-    validator = colander.Range(min=-20048966.10, max=20048966.10)
+    missing = drop
+    validator = Range(min=-20048966.10, max=20048966.10)
 
 
-class Point(colander.TupleSchema):
+class Point(TupleSchema):
     """A geographical point on the earth.
 
     `x`: longitude in web mercator
@@ -43,13 +49,13 @@ class Point(colander.TupleSchema):
     """
 
     default = (0, 0)
-    missing = colander.drop
+    missing = drop
 
     x = WebMercatorLongitude()
     y = WebMercatorLatitude()
 
 
-class LineString(AdhocracySequenceNode):
+class LineString(SequenceSchema):
     """List of geographical points on the earth."""
 
     missing = []
@@ -57,7 +63,7 @@ class LineString(AdhocracySequenceNode):
     point = Point()
 
 
-class Polygon(AdhocracySequenceNode):
+class Polygon(SequenceSchema):
     """List of geographical lines on the earth."""
 
     missing = []
@@ -65,7 +71,7 @@ class Polygon(AdhocracySequenceNode):
     line = LineString()
 
 
-class MultiPolygon(AdhocracySequenceNode):
+class MultiPolygon(SequenceSchema):
     """List of geographical polygons on the earth."""
 
     missing = []
@@ -107,10 +113,10 @@ class AdministrativeDivisionName(SingleLine):
     def validator(self, node, cstruct):
         """Validator."""
         division_names = GermanAdministrativeDivisions.__members__.keys()
-        return colander.OneOf(division_names)(node, cstruct)
+        return OneOf(division_names)(node, cstruct)
 
 
-class MultiPolygonSchema(colander.MappingSchema):
+class MultiPolygonSchema(MappingSchema):
     """A geographical MultiPolygon object.
 
     GeoJSON like geometry object fields:
@@ -151,7 +157,7 @@ class LocationReference(SheetToSheet):
     target_isheet = IMultiPolygon
 
 
-class LocationReferenceSchema(colander.MappingSchema):
+class LocationReferenceSchema(MappingSchema):
     """Data structure for the location reference sheet."""
 
     location = Reference(reftype=LocationReference)
@@ -167,7 +173,7 @@ class IPoint(ISheet):
     """Market interface for the point sheet."""
 
 
-class PointSchema(colander.MappingSchema):
+class PointSchema(MappingSchema):
     """A geographical Point object.
 
     GeoJSON like geometry object fields:

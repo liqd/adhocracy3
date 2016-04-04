@@ -23,8 +23,8 @@ class TestWorkflow:
         return Workflow()
 
     def test_create(self, inst):
-        from adhocracy_core.schema import AdhocracySchemaNode
-        assert isinstance(inst, AdhocracySchemaNode)
+        from adhocracy_core.schema import SchemaNode
+        assert isinstance(inst, SchemaNode)
         assert inst.readonly
 
     def test_serialize_empty(self, inst):
