@@ -23,7 +23,7 @@ Start adhocracy app and log in some users::
 
 Test that the relevant resources and sheets exist:
 
-    >>> resp = anonymous.get("http://localhost/meta_api/").json
+    >>> resp = anonymous.get('http://localhost/meta_api/').json
     >>> 'adhocracy_core.sheets.versions.IVersions' in resp['sheets']
     True
     >>> 'adhocracy_core.sheets.principal.IUserBasic' in resp['sheets']
@@ -48,10 +48,10 @@ path of the new user::
     ...                  'email': 'anna@example.org'},
     ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
     ...                  'password': 'EckVocUbs3'}}}
-    >>> resp = anonymous.post("http://localhost/principals/users", data).json
-    >>> resp["content_type"]
+    >>> resp = anonymous.post('http://localhost/principals/users', data).json
+    >>> resp['content_type']
     'adhocracy_core.resources.principal.IUser'
-    >>> user_path = resp["path"]
+    >>> user_path = resp['path']
     >>> user_path
     '.../principals/users/00...
 
@@ -278,9 +278,9 @@ the wrong password is specified. For security reasons, the same error message
 A different error message is given if username and password are valid but
 the user account hasn't been activated yet::
 
-    {"description": "User account not yet activated",
-     "location": "body",
-     "name": "name"}
+    {'description': 'User account not yet activated',
+     'location': 'body',
+     'name': 'name'}
 
 
 User Authentication
@@ -295,13 +295,13 @@ of the logged-in user.
 
 Without authentication we may not post anything::
 
-    >>> resp = anonymous.options("/").json
+    >>> resp = anonymous.options('/').json
     >>> 'POST' not in resp
     True
 
 With authentication instead we may::
 
-    >>> resp = admin.options("/").json
+    >>> resp = admin.options('/').json
     >>> pprint(resp['POST']['request_body'])
     [...'adhocracy_core.resources.organisation.IOrganisation',...]
 

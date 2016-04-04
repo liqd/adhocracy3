@@ -130,7 +130,7 @@ references it. But first we have to create a proposal::
     >>> prop_data = {'content_type': 'adhocracy_core.resources.document.IDocument',
     ...              'data': {}}
     >>> resp = admin.post(proposal_pool_path, prop_data)
-    >>> prop_path = resp.json["path"]
+    >>> prop_path = resp.json['path']
     >>> prop_v0_path = resp.json['first_version_path']
 
 Now we can upload a sample picture::
@@ -144,9 +144,9 @@ Now we can upload a sample picture::
 In response, the backend sends a JSON document with the resource type and
 path of the new resource (just as with other resource types)::
 
-    >>> resp_data["content_type"]
+    >>> resp_data['content_type']
     'adhocracy_core.resources.image.IImage'
-    >>> pic_path = resp_data["path"]
+    >>> pic_path = resp_data['path']
     >>> pic_path
     'http://localhost/process/assets/0000000/'
 
@@ -225,7 +225,7 @@ Lets post a new proposal version that refers to the image::
     ...                     'follows': [prop_v0_path]}},
     ...          'root_versions': [prop_v0_path]}
     >>> resp = admin.post(prop_path, vers_data)
-    >>> prop_v1_path = resp.json["path"]
+    >>> prop_v1_path = resp.json['path']
     >>> prop_v1_path
     '...0/VERSION_0000001/'
 

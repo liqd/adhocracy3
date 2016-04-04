@@ -79,9 +79,9 @@ The effect of these flags is as follows:
   than *hidden*). It also shows who made the last change to the resource
   and when::
 
-      { "reason": "hidden",
-        "modified_by:" "<path-to-user>",
-        "modification_date": "<timestamp>"}
+      { 'reason': 'hidden',
+        'modified_by': '<path-to-user>',
+        'modification_date': '<timestamp>'}
 
   Often the last modification will have been the hiding of the resource,
   but there is no guarantee that this is always the case.  Especially,
@@ -143,19 +143,19 @@ Lets create some content::
 
     >>> data = {'content_type': 'adhocracy_core.resources.organisation.IOrganisation',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name':  'pool2'}}}
-    >>> resp = admin.post("/", data)
+    >>> resp = admin.post('/', data)
     >>> data = {'content_type': 'adhocracy_core.resources.process.IProcess',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'child'}}}
-    >>> resp = admin.post("/pool2", data)
+    >>> resp = admin.post('/pool2', data)
     >>> data = {'content_type': 'adhocracy_core.resources.organisation.IOrganisation',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'pool1'}}}
-    >>> resp = admin.post("/", data)
+    >>> resp = admin.post('/', data)
     >>> data = {'content_type': 'adhocracy_core.resources.process.IProcess',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'child'}}}
-    >>> resp = admin.post("/pool1", data)
+    >>> resp = admin.post('/pool1', data)
     >>> data = {'content_type': 'adhocracy_core.resources.document.IDocument',
     ...         'data': {}}
-    >>> resp = participant.post("/pool1/child", data)
+    >>> resp = participant.post('/pool1/child', data)
     >>> document_creator = participant.user_path
     >>> document_item = resp.json['path']
     >>> document_first_version = resp.json['first_version_path']
@@ -163,16 +163,16 @@ Lets create some content::
 
 As expected, we can retrieve the pool and its child::
 
-    >>> resp = anonymous.get("/pool2").json
+    >>> resp = anonymous.get('/pool2').json
     >>> 'data' in resp
     True
-    >>> resp = anonymous.get("/pool2/child").json
+    >>> resp = anonymous.get('/pool2/child').json
     >>> 'data' in resp
     True
 
 Both pools show up in the pool sheet::
 
-    >>> resp = anonymous.get("/",  params={'elements': 'paths'}).json
+    >>> resp = anonymous.get('/',  params={'elements': 'paths'}).json
     >>> pprint(sorted(resp['data']['adhocracy_core.sheets.pool.IPool']
     ...                        ['elements']))
     ['.../pool1/',.../pool2/'...
@@ -214,7 +214,7 @@ Lets hide pool2::
     >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
     ...         'data': {'adhocracy_core.sheets.metadata.IMetadata':
     ...                      {'hidden': True}}}
-    >>> resp = admin.put("/pool2", data).json
+    >>> resp = admin.put('/pool2', data).json
 
 Inspecting the 'updated_resources' listing in the response, we see that
 pool2 was removed::
@@ -224,7 +224,7 @@ pool2 was removed::
 
 Now we get an error message when trying to retrieve the pool2::
 
-    >>> resp = anonymous.get("/pool2")
+    >>> resp = anonymous.get('/pool2')
     >>> resp.status_code
     410
     >>> resp.json['reason']
@@ -237,7 +237,7 @@ Now we get an error message when trying to retrieve the pool2::
 Nested resources inherit the hidden flag from their ancestors. Hence
 the child of the pool2 is now hidden too::
 
-    >>> resp = anonymous.get("/pool2/child")
+    >>> resp = anonymous.get('/pool2/child')
     >>> resp.status_code
     410
     >>> resp.json['reason']
@@ -245,7 +245,7 @@ the child of the pool2 is now hidden too::
 
 Only the pool1 is still visible in the pool::
 
-    >>> resp = anonymous.get("/", params={'elements': 'paths'}).json
+    >>> resp = anonymous.get('/', params={'elements': 'paths'}).json
     >>> 'http://localhost/pool1/' in resp['data']['adhocracy_core.sheets.pool.IPool']['elements']
     True
     >>> 'http://localhost/pool2/' in resp['data']['adhocracy_core.sheets.pool.IPool']['elements']
@@ -255,7 +255,7 @@ Sanity check: internally, the backend uses a *private_visibility* index to keep
 track of the visibility/deletion status of resources. But this filter is
 private and cannot be directly queried from the frontend::
 
-    >>> resp = anonymous.get("/", {'private_visibility': 'hidden'})
+    >>> resp = anonymous.get('/', {'private_visibility': 'hidden'})
     >>> resp.status_code
     400
     >>> resp.json['errors'][0]['description']
