@@ -108,7 +108,7 @@ Global Info
 The dedicated prefix defaults to "/meta_api/", but can be customized. The
 result is a JSON object with two main keys, "resources" and "sheets"::
 
-    >>> resp_data = testapp.get("/meta_api/").json
+    >>> resp_data = testapp.get('/meta_api/').json
     >>> sorted(resp_data.keys())
     ['resources', 'sheets', 'workflows']
 
@@ -258,7 +258,7 @@ Returns possible methods for this resource, example request/response data
 structures and available interfaces with resource data. The result is a
 JSON object that has the allowed request methods as keys::
 
-    >>> resp_data = testapp.options(rest_url + "/", headers=admin_header).json
+    >>> resp_data = testapp.options(rest_url + '/', headers=admin_header).json
     >>> sorted(resp_data.keys())
     ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
 
@@ -283,7 +283,7 @@ the actual response body that will be returned::
 GET request. "data" points to an object whose keys are the property sheets
 that are part of the returned resource. The corresponding values will be
 filled during actual GET requests; the stub contains just empty objects
-("{}") instead.
+('{}') instead.
 
 If the current user has the right to post new versions of the resource or
 add new details to it, the "request_body" sub-key returned for POST points
@@ -296,7 +296,7 @@ to a array of stub views of allowed requests::
     ...                            'adhocracy_core.sheets.description.IDescription': {},
     ...                            'adhocracy_core.sheets.image.IImageReference': {},
     ...                            'adhocracy_core.sheets.workflow.IWorkflowAssignment': {}}}
-    >>> data_post_pool in resp_data["POST"]["request_body"]
+    >>> data_post_pool in resp_data['POST']['request_body']
     True
 
 The "response_body" sub-key again gives a stub view of the response
@@ -333,7 +333,7 @@ HEAD
 
 Returns only http headers::
 
-    >>> resp = testapp.head(rest_url + "/adhocracy")
+    >>> resp = testapp.head(rest_url + '/adhocracy')
     >>> resp.headerlist
     [...('Content-Type', 'application/json; charset=UTF-8'), ...
     >>> resp.text
@@ -349,8 +349,8 @@ GET
 
 Returns resource and child elements meta data and all sheet with data::
 
-    >>> resp_data = testapp.get(rest_url + "/").json
-    >>> pprint(resp_data["data"])
+    >>> resp_data = testapp.get(rest_url + '/').json
+    >>> pprint(resp_data['data'])
     {...'adhocracy_core.sheets.metadata.IMetadata': ...
 
 POST
@@ -360,8 +360,8 @@ Create a new resource ::
 
     >>> prop = {'content_type': 'adhocracy_core.resources.process.IProcess',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'Documents'}}}
-    >>> resp_data = testapp.post_json(rest_url + "/", prop, headers=admin_header).json
-    >>> resp_data["content_type"]
+    >>> resp_data = testapp.post_json(rest_url + '/', prop, headers=admin_header).json
+    >>> resp_data['content_type']
     'adhocracy_core.resources.process.IProcess'
 
 The response object has 3 top-level entries:
@@ -423,15 +423,15 @@ Modify data of an existing resource ::
 
 ...    >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
 ...    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'youdidntexpectthis'}}}
-...    >>> resp_data = testapp.put_json(rest_url + "/Documents", data, headers=admin_header).json
+...    >>> resp_data = testapp.put_json(rest_url + '/Documents', data, headers=admin_header).json
 ...    >>> pprint(resp_data)
 ...    {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
 ...     'path': rest_url + '/Documents'}
 
 Check the changed resource ::
 
-...   >>> resp_data = testapp.get(rest_url + "/Documents").json
-...   >>> resp_data["data"]["adhocracy_core.sheets.name.IName"]["name"]
+...   >>> resp_data = testapp.get(rest_url + '/Documents').json
+...   >>> resp_data['data']['adhocracy_core.sheets.name.IName']['name']
 ...   'youdidntexpectthis'
 
 FIXME: write test cases for attributes with "create_mandatory",
@@ -450,7 +450,7 @@ The normal return code is 200 ::
     >>> data = {'content_type': 'adhocracy_core.resources.process.IProcess',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'Documents'}}}
 
-.. >>> testapp.put_json(rest_url + "/Documents", data, headers=admin_header)
+.. >>> testapp.put_json(rest_url + '/Documents', data, headers=admin_header)
 .. 200 OK application/json ...
 
 If you submit invalid data the return error code is 400 ::
@@ -458,7 +458,7 @@ If you submit invalid data the return error code is 400 ::
     >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
     ...         'data': {'adhocracy_core.sheets.example.WRONGINTERFACE': {'name': 'Documents'}}}
 
-.. >>> testapp.put_json(rest_url + "/Documents", data, headers=admin_header)
+.. >>> testapp.put_json(rest_url + '/Documents', data, headers=admin_header)
 .. Traceback (most recent call last):
 .. ...
 .. {"errors": [{"description": ...
@@ -550,8 +550,8 @@ Create a Document (a subclass of Item which pools DocumentVersions) ::
     >>> pdag = {'content_type': 'adhocracy_core.resources.document.IDocument',
     ...         'data': {},
     ...         }
-    >>> resp = testapp.post_json(rest_url + "/Documents", pdag, headers=admin_header)
-    >>> pdag_path = resp.json["path"]
+    >>> resp = testapp.post_json(rest_url + '/Documents', pdag, headers=admin_header)
+    >>> pdag_path = resp.json['path']
     >>> pdag_path
     '.../Documents/document_0000000/'
 
@@ -605,7 +605,7 @@ Create a new version of the proposal that follows the first version ::
     ...                     'follows': [pvrs0_path]}},
     ...          'root_versions': [pvrs0_path]}
     >>> resp = testapp.post_json(pdag_path, pvrs, headers=admin_header)
-    >>> pvrs1_path = resp.json["path"]
+    >>> pvrs1_path = resp.json['path']
     >>> pvrs1_path != pvrs0_path
     True
 
@@ -636,8 +636,8 @@ Create a Section item inside the Document item ::
     ...         'data': {}
     ...         }
     >>> resp = testapp.post_json(pdag_path, sdag, headers=admin_header)
-    >>> sdag_path = resp.json["path"]
-    >>> svrs0_path = resp.json["first_version_path"]
+    >>> sdag_path = resp.json['path']
+    >>> svrs0_path = resp.json['first_version_path']
 
 and a second Section ::
 
@@ -645,8 +645,8 @@ and a second Section ::
     ...         'data': {}
     ...         }
     >>> resp = testapp.post_json(pdag_path, sdag, headers=admin_header)
-    >>> s2dag_path = resp.json["path"]
-    >>> s2vrs0_path = resp.json["first_version_path"]
+    >>> s2dag_path = resp.json['path']
+    >>> s2vrs0_path = resp.json['first_version_path']
 
 Create a third Document version and add the two Sections in their
 initial versions ::
@@ -659,7 +659,7 @@ initial versions ::
     ...                 },
     ...          'root_versions': [pvrs1_path]}
     >>> resp = testapp.post_json(pdag_path, pvrs, headers=admin_header)
-    >>> pvrs2_path = resp.json["path"]
+    >>> pvrs2_path = resp.json['path']
 
 If we create a second version of kapitel1 ::
 
@@ -856,7 +856,7 @@ for more on comments and *post pools*)::
     >>> comment = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...            'data': {}}
     >>> resp = testapp.post_json(post_pool_path, comment, headers=admin_header)
-    >>> comment_path = resp.json["path"]
+    >>> comment_path = resp.json['path']
     >>> first_commvers_path = resp.json['first_version_path']
     >>> first_commvers_path
     '.../Documents/document_0000000/comments/comment_000.../VERSION_0000000/'
@@ -915,7 +915,7 @@ We can post comments to this pool only::
     >>> comment = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...            'data': {}}
     >>> resp = testapp.post_json(post_pool_path, comment, headers=admin_header)
-    >>> comment_path = resp.json["path"]
+    >>> comment_path = resp.json['path']
     >>> comment_path
     '.../Documents/document_0000000/comments/comment_000...'
     >>> first_commvers_path = resp.json['first_version_path']
@@ -945,7 +945,7 @@ it's also possible to write a comment about another comment::
     >>> metacomment = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...                 'data': {}}
     >>> resp = testapp.post_json(post_pool_path, metacomment, headers=admin_header)
-    >>> metacomment_path = resp.json["path"]
+    >>> metacomment_path = resp.json['path']
     >>> metacomment_path
     '.../Documents/document_0000000/comments/comment_000...'
     >>> comment_path != metacomment_path
@@ -1008,7 +1008,7 @@ resource and then post a `IRateVersion` resource below it::
     >>> rate = {'content_type': 'adhocracy_core.resources.rate.IRate',
     ...         'data': {}}
     >>> resp = testapp.post_json(rateable_post_pool, rate, headers=admin_header)
-    >>> rate_path = resp.json["path"]
+    >>> rate_path = resp.json['path']
     >>> first_ratevers_path = resp.json['first_version_path']
     >>> ratevers = {'content_type': 'adhocracy_core.resources.rate.IRateVersion',
     ...             'data': {
@@ -1038,7 +1038,7 @@ But creating a second rate is not allowed to prevent people from voting
 multiple times::
 
     >>> resp = testapp.post_json(rateable_post_pool, rate, headers=admin_header)
-    >>> rate2_path = resp.json["path"]
+    >>> rate2_path = resp.json['path']
     >>> first_rate2vers_path = resp.json['first_version_path']
     >>> ratevers['data']['adhocracy_core.sheets.versions.IVersionable']['follows'] = [first_rate2vers_path]
     >>> ratevers['root_versions'] = [first_rate2vers_path]
@@ -1243,7 +1243,7 @@ The follow reference points to None:
 
 The LAST tag should point to the last version we created within the batch request::
 
-    >>> resp_data = testapp.get(rest_url + "/Documents/document_0000000/PARAGRAPH_0000002").json
+    >>> resp_data = testapp.get(rest_url + '/Documents/document_0000000/PARAGRAPH_0000002').json
     >>> resp_data['data']['adhocracy_core.sheets.tags.ITags']['LAST']
     '.../Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/'
 
@@ -1601,7 +1601,7 @@ First we create more paragraphs versions::
     ...          'root_versions': [pvrs0_path]}
     >>> resp = testapp.post_json('http://localhost/Documents/document_0000000/PARAGRAPH_0000002',
     ...                           pvrs, headers=admin_header)
-    >>> pvrs1_path = resp.json["path"]
+    >>> pvrs1_path = resp.json['path']
 
 Now we can search references::
 

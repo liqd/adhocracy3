@@ -107,6 +107,6 @@ The backend responds with an empty string or an error message, as above.
 
     ...>>> data = {'title': 'Call for participation',
     ......        'text': 'With great power comes great responsibility!'}
-    ...>>> resp = moderator.post("./../message_all", data)
+    ...>>> resp = moderator.post('./../message_all', data)
     ...>>> resp.text
     ...403
