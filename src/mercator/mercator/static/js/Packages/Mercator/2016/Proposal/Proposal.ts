@@ -437,7 +437,8 @@ var moderate = (
 ) => (scope) => {
     var badges = {
         winning: adhTopLevelState.get("processUrl") + "badges/winning/",
-        community: adhTopLevelState.get("processUrl") + "badges/community/"
+        community: adhTopLevelState.get("processUrl") + "badges/community/",
+        shortlist: adhTopLevelState.get("processUrl") + "badges/shortlist/",
     };
 
     return adhHttp.get(scope.path).then((oldProposal) => {
@@ -523,8 +524,9 @@ var get = (
             adhGetBadges(proposal).then((assignments : AdhBadge.IBadge[]) => {
                 var communityAssignment = _.find(assignments, (a) => a.name === "community");
                 var winningAssignment = _.find(assignments, (a) => a.name === "winning");
+                var shortlistAssignment = _.find(assignments, (a) => a.name === "shortlist");
 
-                return communityAssignment || winningAssignment;
+                return communityAssignment || winningAssignment || shortlistAssignment;
             })
         ])).then((args : any[]) : IDetailData => {
             var commentCounts = {
@@ -855,7 +857,8 @@ export var listItem = (
                     },
                     introduction: data.introduction,
                     commentCountTotal: data.commentCountTotal,
-                    supporterCount: data.supporterCount
+                    supporterCount: data.supporterCount,
+                    winnerBadgeAssignment: data.winner.name ? data.winner : null
                 };
 
                 scope.$on("$destroy", adhTopLevelState.bind("processState", scope.data, "currentPhase"));
