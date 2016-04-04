@@ -228,12 +228,12 @@ def validate_visibility(view: callable):
                       is GET, HEAD, or POST.
     """
     def wrapped_view(context: IResource, request: IRequest):
-        _validate_visiblity(context, request)
+        _validate_visibility(context, request)
         return view(context, request)
     return wrapped_view
 
 
-def _validate_visiblity(context: IResource, request: IRequest):
+def _validate_visibility(context: IResource, request: IRequest):
     if request.method not in ['HEAD', 'GET', 'POST']:
         return
     block_reason = get_reason_if_blocked(context)
