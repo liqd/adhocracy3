@@ -54,11 +54,14 @@ def export_users():
 
 def _export_users_and_proposals_rates(root: IResource, filename: str,
                                       registry: Registry, args):
-    if not args.min_rate:
-        args.min_rate = 0
     proposals = get_most_rated_proposals(root, args.min_rate, registry)
     proposals_titles = get_titles(proposals, registry)
-    column_names = ['Username', 'Email', 'Creation date'] + proposals_titles
+    if args.include_passwords:
+        column_names = ['Username', 'Email', 'Creation date',
+                        'Password Hash'] + proposals_titles
+    else:
+        column_names = ['Username', 'Email',
+                        'Creation date'] + proposals_titles
     with open(filename, 'w', newline='') as result_file:
         wr = csv.writer(result_file, delimiter=';', quotechar='"',
                         quoting=csv.QUOTE_MINIMAL)
@@ -138,9 +141,9 @@ def _append_user_data(user: IUser, row: [str], include_passwords: bool,
     creation_date_str = creation_date.strftime('%Y-%m-%d_%H:%M:%S')
     if include_passwords:
         passw = get_sheet_field(user, IPasswordAuthentication, 'password')
+        row.extend([name, email, creation_date_str, passw])
     else:
-        passw = ''
-    row.extend([name, email, creation_date_str, passw])
+        row.extend([name, email, creation_date_str])
 
 
 def _append_rate_dates(user: IUser, rateables: [(IRateable, set(IUser))],
