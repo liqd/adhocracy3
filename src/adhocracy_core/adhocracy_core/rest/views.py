@@ -397,7 +397,7 @@ class ItemRESTView(PoolRESTView):
         create_sheets = self.content.get_sheets_create(resource, self.request)
         is_first = self.registry.content.get_sheet_field(self.context,
                                                          ITags,
-                                                         'FIRST')
+                                                         'FIRST') == resource
         appstructs = self.request.validated.get('data', {})
         for sheet in create_sheets:
             isheet = sheet.meta.isheet
