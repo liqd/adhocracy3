@@ -1,5 +1,5 @@
-Frontend translation
-====================
+Translation
+===========
 
 Markup translatable strings
 ---------------------------
@@ -98,13 +98,6 @@ translations to formal ones.  Note that you will need to extend that
 script whenever the translation changes. The common workflow for this
 is: Iteratively run the script, check the output and add new rules until
 everything is fine.
-
-
-Missing Features
-----------------
-
--  There is currently no mechanism to translate stuff from the backend
-   (e.g. mail templates)
 
 
 .. _angular-translate: https://angular-translate.github.io

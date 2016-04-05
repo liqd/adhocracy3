@@ -17,7 +17,7 @@ Contents
    architecture/index
    coding_guides/index
    api/index
-   translation
+   frontend/index
    projects/index
    drafts/index
    attic/index

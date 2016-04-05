@@ -1,3 +1,5 @@
+.. _api-deletion:
+
 Deleting and Hiding Resources
 =============================
 

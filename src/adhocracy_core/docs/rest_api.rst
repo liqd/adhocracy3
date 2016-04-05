@@ -26,6 +26,8 @@ Start Adhocracy testapp::
     >>> testapp = TestApp(app_router)
     >>> rest_url = 'http://localhost'
 
+.. _api-resource-structure:
+
 Resource structure
 ------------------
 
@@ -75,6 +77,7 @@ Example :term:`resource tree`::
     Item:         proposals/proposal1/document1
     ItemVersion:  proposals/proposal1/document1/v1
 
+.. _meta-api:
 
 Meta-API
 --------
@@ -239,6 +242,8 @@ In addition we get the listing of sheet super types (excluding ISheet)::
     >>> pprint(resp_data['sheets']['adhocracy_core.sheets.comment.IComment']['super_types'])
     ['adhocracy_core.interfaces.ISheetReferenceAutoUpdateMarker']
 
+
+.. _meta-api-options:
 
 OPTIONS
 ~~~~~~~
@@ -1056,6 +1061,8 @@ it's not possible to vote for other users::
     '; Must be the currently logged-in user'
 
 
+.. _batch-requests:
+
 Batch requests
 --------------
 
@@ -1300,6 +1307,8 @@ any), but not for any further failed requests. The backend stops processing
 encoded requests once the first of them has failed, since further processing
 would probably only lead to further errors.
 
+
+.. _api-pool-queries:
 
 Filtering Pools / Search
 ------------------------

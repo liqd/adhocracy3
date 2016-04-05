@@ -1,5 +1,5 @@
-Frontend Routing
-================
+Routing
+=======
 
 As Adhocracy 3 is a single page application, the routing is done in the
 frontend.  Unfortunately, the obvious choice `angular-route`_ does not
@@ -101,6 +101,10 @@ roles and permissions for that subtree.
 In the frontend it also defines which template should be used.  The
 directive ``adhProcessView`` is used to render that template.  It is
 currently used in the resource area's content space.
+
+.. NOTE::
+
+   The UI for a process is sometimes refered to as a *workbench*.
 
 Embed Context
 -------------

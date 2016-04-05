@@ -1,5 +1,5 @@
-Frontend Structure
-==================
+Modules
+=======
 
 Module Systems
 --------------
@@ -61,7 +61,8 @@ feature. A package may contain services, directives and filters. Each
 package has its own folder in ``Packages/``.
 
 A package may contain arbitrary TypeScript modules. These must not
-import any other TypeScript modules except for type-checking.
+import any other TypeScript modules except for type-checking. There are
+few exceptions to that rules, e.g. ``Util``.
 
 In addition, there must be a TypeScript module named ``Module.ts`` that
 defines an angular module by exporting a variable ``moduleName`` and a
@@ -79,8 +80,6 @@ is also made sure that requirejs will actually load the code.
 
 .. FIXME: Packages should also include all CSS and other static content
    they depend on.
-
-.. FIXME: We might want to have exceptions, e.g. Util
 
 Resources
 +++++++++
