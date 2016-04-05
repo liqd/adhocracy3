@@ -1,5 +1,8 @@
 /// <reference path="../../../lib2/types/angular.d.ts"/>
 
+import * as _ from "lodash";
+
+
 // Error responses in the Adhocracy REST API contain json objects in
 // the body that have the following form:
 export interface IBackendError {
@@ -11,6 +14,7 @@ export interface IBackendErrorItem {
     name : string;
     location : string;
     description : string;
+    code: number;
 }
 
 var extractErrorItems = (code : number, error : IBackendError) : IBackendErrorItem[] => {
@@ -18,9 +22,13 @@ var extractErrorItems = (code : number, error : IBackendError) : IBackendErrorIt
         return [{
             location: "url",
             name: "GET",
-            description: (<any>error).reason
+            description: (<any>error).reason,
+            code: code
         }];
     } else {
+        _.forEach(error.errors, (value) => {
+            value.code = code;
+        });
         return error.errors;
     }
 };

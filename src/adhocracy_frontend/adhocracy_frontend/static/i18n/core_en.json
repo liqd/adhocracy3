@@ -37,7 +37,7 @@
     "TR__ENTER_CAPTCHA": "Enter Captcha solution",
     "TR__ERROR_FORMAT_EMAIL": "Email format is incorrect.",
     "TR__ERROR_HTTP_BAD_REQUEST": "Bad Request",
-    "TR__ERROR_HTTP_FORBIDDEN": "Forbidden",
+    "TR__ERROR_HTTP_FORBIDDEN": "You don't have permissions to see this resource.",
     "TR__ERROR_HTTP_GONE": "Gone",
     "TR__ERROR_HTTP_NOT_FOUND": "Not Found",
     "TR__ERROR_INVALID_DATE": "Please enter a valid date (yyyy-mm-dd).",

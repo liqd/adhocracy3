@@ -10,8 +10,9 @@ export var register = () => {
         describe("Service", () => {
             var providerMock;
             var adhHttpMock;
-            var adhEmbedMock;
             var adhConfigMock;
+            var adhCredentialsMock;
+            var adhEmbedMock;
             var $injectorMock;
             var $locationMock;
             var adhResourceUrlFilterMock;
@@ -22,7 +23,7 @@ export var register = () => {
                     defaults: {},
                     specifics: {},
                     templates: {},
-                    customHeaders: {}
+                    customHeaders: {},
                 };
 
                 adhHttpMock = jasmine.createSpyObj("adhHttp", ["get", "withTransaction"]);
@@ -40,13 +41,23 @@ export var register = () => {
                     rest_url: "rest_url"
                 };
 
+                adhCredentialsMock = jasmine.createSpyObj("adhCredentialsMock", ["loggedIn"]);
+
                 adhEmbedMock = jasmine.createSpyObj("adhEmbed", ["getContext"]);
                 adhEmbedMock.getContext.and.returnValue("");
 
                 adhResourceUrlFilterMock = (path) => path;
 
-                service = new AdhResourceArea.Service(providerMock, <any>q, $injectorMock, $locationMock, adhHttpMock, adhConfigMock,
-                    adhEmbedMock, adhResourceUrlFilterMock);
+                service = new AdhResourceArea.Service(
+                    providerMock,
+                    <any>q,
+                    $injectorMock,
+                    $locationMock,
+                    adhHttpMock,
+                    adhConfigMock,
+                    adhCredentialsMock,
+                    adhEmbedMock, adhResourceUrlFilterMock
+                );
             });
 
             describe("route", () => {

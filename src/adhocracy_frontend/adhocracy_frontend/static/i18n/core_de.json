@@ -37,7 +37,7 @@
     "TR__ENTER_CAPTCHA": "Captcha eingeben",
     "TR__ERROR_FORMAT_EMAIL": "E-Mail-Format ist ungültig.",
     "TR__ERROR_HTTP_BAD_REQUEST": "Fehlerhafte Anfrage",
-    "TR__ERROR_HTTP_FORBIDDEN": "Verboten",
+    "TR__ERROR_HTTP_FORBIDDEN": "Du hast nicht die Berechtigung, diese Ressource anzusehen.",
     "TR__ERROR_HTTP_GONE": "Nicht mehr hier",
     "TR__ERROR_HTTP_NOT_FOUND": "Nicht gefunden",
     "TR__ERROR_INVALID_DATE": "Bitte ein gültiges Datum (jjjj-mm-tt) eingeben.",
