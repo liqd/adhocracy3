@@ -6,13 +6,16 @@ from persistent.dict import PersistentDict
 from pyramid.authentication import CallbackAuthenticationPolicy
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.interfaces import IRequest
+from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.traversal import resource_path
 from pyramid.settings import asbool
 from zope.interface import implementer
 from zope.interface import Interface
 from zope.component import ComponentLookupError
 
+from adhocracy_core.utils import create_schema
 from adhocracy_core.interfaces import ITokenManger
+from adhocracy_core.interfaces import error_entry
 from adhocracy_core.schema import Resource
 
 
@@ -187,9 +190,8 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         """Return normalised X-User-Path request header or None."""
         user_path_header = request.headers.get(UserPathHeader, None)
         user_path = None
-        if user_path_header is not None:
-            schema = Resource().bind(request=request,
-                                     context=request.context)
+        if user_path_header is not None:  # pragma: no branch
+            schema = create_schema(Resource, request.context, request)
             user = schema.deserialize(user_path_header)
             user_path = resource_path(user)
         return user_path
@@ -225,6 +227,22 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         principals = super().effective_principals(request)
         request.__cached_principals__ = principals
         return principals
+
+
+def validate_user_headers(view: callable):
+    """Decorator vor :term:`view` to check if the user token.
+
+    :raise `pyramid.httpexceptions.HTTPBadRequest: if user token is invalid
+    """
+    def wrapped_view(context, request):
+        token_is_set = UserTokenHeader in request.headers
+        authenticated_is_empty = request.authenticated_userid is None
+        if token_is_set and authenticated_is_empty:
+            error = error_entry('header', 'X-User-Token', 'Invalid user token')
+            request.errors.append(error)
+            raise HTTPBadRequest()
+        return view(context, request)
+    return wrapped_view
 
 
 def includeme(config):

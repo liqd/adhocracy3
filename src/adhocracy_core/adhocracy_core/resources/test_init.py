@@ -251,7 +251,6 @@ class TestResourceFactory:
 
         resource = self.make_one(meta)(parent=pool)
         assert 'Service' in pool
-        assert resource.__is_service__
 
 
     def test_without_creator_and_resource_implements_imetadata(

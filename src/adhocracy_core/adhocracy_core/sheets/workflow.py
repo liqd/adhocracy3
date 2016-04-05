@@ -1,5 +1,4 @@
 """Sheets to assign workflows to resources and change states."""
-from colander import MappingSchema
 from colander import deferred
 from colander import null
 from colander import OneOf
@@ -9,15 +8,17 @@ from zope.deprecation import deprecated
 from zope.interface import implementer
 
 from adhocracy_core.interfaces import ISheet
-from adhocracy_core.schema import AdhocracySchemaNode
+from adhocracy_core.schema import MappingSchema
+from adhocracy_core.schema import SchemaNode
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import SingleLine
-from adhocracy_core.schema import AdhocracySequenceNode
+from adhocracy_core.schema import SequenceSchema
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import AnnotationRessourceSheet
 from adhocracy_core.interfaces import IResourceSheet
+from adhocracy_core.utils import create_schema
 
 
 class ISample(ISheet):
@@ -27,7 +28,7 @@ class ISample(ISheet):
 deprecated('ISample', 'Backward compatible code, dont use')
 
 
-class Workflow(AdhocracySchemaNode):
+class Workflow(SchemaNode):
     """Workflow :class:`adhocracy_core.interfaces.IWorkflow`."""
 
     schema_type = SingleLine.schema_type
@@ -88,7 +89,7 @@ class StateData(MappingSchema):
                         default=None)
 
 
-class StateDataList(AdhocracySequenceNode):
+class StateDataList(SequenceSchema):
     """List of StateData."""
 
     data = StateData()
@@ -136,12 +137,13 @@ class WorkflowAssignmentSheet(AnnotationRessourceSheet):
     """
 
     def get_schema_with_bindings(self):
-        schema = self.schema.bind(request=self.request,
-                                  registry=self.registry,
-                                  context=self.context,
-                                  creating=self.creating,
-                                  workflow=self._get_workflow()
-                                  )
+        schema = create_schema(self.meta.schema_class,
+                               self.context,
+                               self.request,
+                               registry=self.registry,
+                               creating=self.creating,
+                               workflow=self._get_workflow()
+                               )
         return schema
 
     def _get_workflow(self):

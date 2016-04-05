@@ -1,9 +1,10 @@
 """Name Sheet."""
-import colander
+from colander import drop
 
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets.name import name_meta
 from adhocracy_core.sheets import AnnotationRessourceSheet
+from adhocracy_core.schema import SingleLine
 
 
 class DummyNameSheet(AnnotationRessourceSheet):
@@ -22,9 +23,8 @@ class IExtendedName(name_meta.isheet):
 class ExtendedNameSchema(name_meta.schema_class):
     """Data structure for the extended name sheet."""
 
-    description_x = colander.SchemaNode(colander.String(),
-                                        default='',
-                                        missing=colander.drop)
+    description_x = SingleLine(default='',
+                               missing=drop)
 
 
 extended_name_metadata = name_meta._replace(

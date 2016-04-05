@@ -1,7 +1,6 @@
 """Embed Sheet."""
 import os.path
 
-from colander import MappingSchema
 from colander import deferred
 from pyramid.interfaces import IRequest
 from pyramid.renderers import render
@@ -11,6 +10,7 @@ from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
+from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import URL
 

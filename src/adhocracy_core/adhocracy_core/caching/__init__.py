@@ -25,11 +25,15 @@ DISABLED_VIEWS_OR_METHODS = ['PATCH', 'POST', 'PUT']
 logger = logging.getLogger(__name__)
 
 
-def set_cache_header(context: IResource, request: IRequest):
-    """Set caching headers for the response of `request`.
+def set_cache_header(view: callable):
+    """Decorator for :term:`view` to set http cache headers of the response."""
+    def wrapped_view(context: IResource, request: IRequest):
+        _set_cache_header(context, request)
+        return view(context, request)
+    return wrapped_view
 
-    You have to call this functions with the current request/context object.
-    """
+
+def _set_cache_header(context: IResource, request: IRequest):
     mode = _get_cache_mode(request.registry)
     strategy = _get_cache_strategy(context, request)
     if strategy is None:
@@ -282,7 +286,7 @@ def purge_varnish_after_commit_hook(success: bool, registry: Registry,
         url = varnish_url + request.script_name + path
         for event in events:
             headers = {'X-Purge-Host': request.host}
-            headers['X-Purge-Regex'] = '/?\??[^/]*$'
+            headers['X-Purge-Regex'] = '/?\??[^/]*'
             try:
                 resp = requests.request('PURGE', url, headers=headers)
                 if resp.status_code != 200:

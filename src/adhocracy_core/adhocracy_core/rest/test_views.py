@@ -8,7 +8,7 @@ from pytest import raises
 import colander
 import pytest
 
-from adhocracy_core.interfaces import ISheet
+from adhocracy_core.interfaces import ISheet, error_entry
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.testing import register_sheet
 
@@ -19,13 +19,6 @@ class IResourceX(IResource):
 
 class ISheetB(ISheet):
     pass
-
-
-class CountSchema(colander.MappingSchema):
-
-    count = colander.SchemaNode(colander.Int(),
-                                default=0,
-                                missing=colander.drop)
 
 
 @fixture
@@ -67,295 +60,48 @@ def make_resource(parent, name, iresource):
         return resource
 
 
-class TestValidateRequest:
 
-    def call_fut(self, context, request_, **kw):
-        from adhocracy_core.rest.views import validate_request_data
-        validate_request_data(context, request_, **kw)
-
-    def test_valid_wrong_method_with_data(self, context, request_):
-        request_.body = '{"wilddata": "1"}'
-        request_.method = 'wrong_method'
-        self.call_fut(context, request_)
-        assert request_.validated == {}
-
-    def test_valid_no_schema_with_data(self, context, request_):
-        request_.body = '{"wilddata": "1"}'
-        self.call_fut(context, request_)
-        assert request_.validated == {}
-
-    def test_valid_with_schema_no_data(self, context, request_):
-        request_.body = ''
-        self.call_fut(context, request_, schema=CountSchema())
-        assert request_.validated == {}
-
-    def test_valid_with_schema_no_data_empty_dict(self, context, request_):
-        request_.body = '{}'
-        self.call_fut(context, request_, schema=CountSchema())
-        assert request_.validated == {}
-
-    def test_valid_with_schema_no_data_and_defaults(self, context, request_):
-        class DefaultDataSchema(colander.MappingSchema):
-            count = colander.SchemaNode(colander.Int(),
-                                        missing=1)
-        request_.body = ''
-        self.call_fut(context, request_, schema=DefaultDataSchema())
-        assert request_.validated == {'count': 1}
-
-    def test_valid_with_schema_with_data(self, context, request_):
-        request_.body = '{"count": "1"}'
-        request_.method = 'PUT'
-        self.call_fut(context, request_, schema=CountSchema())
-        assert request_.validated == {'count': 1}
-
-    def test_valid_with_schema_with_data_in_querystring(self, context,
-                                                        request_):
-        class QueryStringSchema(colander.MappingSchema):
-            count = colander.SchemaNode(colander.Int())
-        request_.GET = {'count': 1}
-        self.call_fut(context, request_, schema=QueryStringSchema())
-        assert request_.validated == {'count': 1}
-
-    def test_valid_with_schema_with_extra_fields_in_querystring_discarded(
-            self, context, request_):
-        class QueryStringSchema(colander.MappingSchema):
-            count = colander.SchemaNode(colander.Int())
-        request_.GET = {'count': 1, 'extraflag': 'extra value'}
-        self.call_fut(context, request_, schema=QueryStringSchema())
-        assert request_.validated == {'count': 1}
-
-    def test_valid_with_schema_with_extra_fields_in_querystring_preserved(
-            self, context, request_):
-
-        class PreservingQueryStringSchema(colander.MappingSchema):
-            def __init__(self, *args, **kwargs):
-                super().__init__(*args, **kwargs)
-                self.typ.unknown = 'preserve'
-            count = colander.SchemaNode(colander.Int())
-
-        request_.GET = {'count': 1, 'extraflag': 'extra value'}
-        self.call_fut(context, request_,
-                       schema=PreservingQueryStringSchema())
-        assert request_.validated == {'count': 1, 'extraflag': 'extra value'}
-
-    def test_valid_multipart_formdata(self, context, request_):
-        request_.content_type = 'multipart/form-data'
-        request_.method = 'POST'
-        request_.POST['count'] = '1'
-        self.call_fut(context, request_, schema=CountSchema())
-        assert request_.validated == {'count': 1}
-
-    def test_non_valid_with_schema_wrong_data_value(self, context, request_):
-        from pyramid.httpexceptions import HTTPBadRequest
-        from .exceptions import error_entry
-        request_.body = '{"count": "wrong_value"}'
-        request_.method = 'POST'
-        with pytest.raises(HTTPBadRequest):
-            self.call_fut(context, request_, schema=CountSchema())
-        assert request_.errors == [error_entry('body',
-                                                'count',
-                                                '"wrong_value" is not a number')]
-
-    def test_non_valid_with_schema_wrong_data_key_ignore(self, context,
-                                                         request_):
-        request_.body = '{"wrong_key": "1"}'
-        request_.method = 'POST'
-        schema = CountSchema().clone()
-        schema.typ.unknown = 'ignore'
-        self.call_fut(context, request_, schema=schema)
-        assert request_.errors == []
-        assert request_.validated == {}
-
-    def test_non_valid_with_schema_wrong_data_key_raise(self, context,
-                                                        request_):
-        from pyramid.httpexceptions import HTTPBadRequest
-        from .exceptions import error_entry
-        request_.body = '{"wrong_key": "1"}'
-        request_.method = 'POST'
-        schema = CountSchema().clone()
-        schema.typ.unknown = 'raise'
-        with pytest.raises(HTTPBadRequest):
-            self.call_fut(context, request_, schema=schema)
-        assert request_.errors == [error_entry('body',
-                                               '',
-                                               'Unrecognized keys in mapping: "{\'wrong_key\': \'1\'}"')]
-
-    def test_non_valid_with_non_json_data(self, context, request_):
-        from pyramid.httpexceptions import HTTPBadRequest
-        from .exceptions import error_entry
-        request_.body = b'WRONG'
-        request_.method = 'POST'
-        with pytest.raises(HTTPBadRequest):
-            self.call_fut(context, request_, schema=CountSchema())
-        assert request_.errors == [error_entry('body',
-                                                None,
-                                                'Invalid JSON request body')]
-
-    def test_non_valid_with_schema_wrong_data_cleanup(self, context,
-                                                      request_):
-        from pyramid.httpexceptions import HTTPBadRequest
-        request_.validated = {'secret_data': 'buh'}
-        request_.body = '{"count": "wrong_value"}'
-        request_.method = 'POST'
-        with pytest.raises(HTTPBadRequest):
-            self.call_fut(context, request_, schema=CountSchema())
-        assert request_.validated == {}
-
-    def test_valid_with_sequence_schema(self, context, request_):
-        class TestListSchema(colander.SequenceSchema):
-            elements = colander.SchemaNode(colander.String())
-
-        request_.body = '["alpha", "beta", "gamma"]'
-        request_.method = 'POST'
-        self.call_fut(context, request_, schema=TestListSchema())
-        assert request_.validated == ['alpha', 'beta', 'gamma']
-
-    def test_valid_with_sequence_schema_in_querystring(self, context,
-                                                       request_):
-        class TestListSchema(colander.SequenceSchema):
-            elements = colander.SchemaNode(colander.String())
-        self.call_fut(context, request_, schema=TestListSchema())
-        # since this doesn't make much sense, the validator is just a no-op
-        assert request_.validated == {}
-
-    def test_with_invalid_sequence_schema(self, context, request_):
-        class TestListSchema(colander.SequenceSchema):
-            elements = colander.SchemaNode(colander.String())
-            nonsense_node = colander.SchemaNode(colander.String())
-
-        request_.body = '["alpha", "beta", "gamma"]'
-        request_.method = 'POST'
-        with pytest.raises(colander.Invalid):
-            self.call_fut(context, request_, schema=TestListSchema())
-        assert request_.validated == {}
-
-    def test_invalid_with_sequence_schema(self, context, request_):
-        class TestListSchema(colander.SequenceSchema):
-            elements = colander.SchemaNode(colander.Integer())
-
-        from pyramid.httpexceptions import HTTPBadRequest
-        request_.body = '[1, 2, "three"]'
-        request_.method = 'POST'
-        with pytest.raises(HTTPBadRequest):
-            self.call_fut(context, request_, schema=TestListSchema())
-        assert request_.validated == {}
-
-    def test_invalid_with_not_sequence_and_not_mapping_schema(self, context,
-                                                              request_):
-        schema = colander.SchemaNode(colander.Int())
-        with pytest.raises(Exception):
-            self.call_fut(context, request_, schema=schema)
-
-    def test_valid_user_headers_and_authenticated_user(
-            self, context, request_, monkeypatch):
-        from unittest.mock import Mock
-        from adhocracy_core.rest import views
-        request_.headers['X-User-Path'] = 2
-        request_.headers['X-User-Token'] = 3
-        monkeypatch.setattr(views, 'get_user', Mock(return_value='user'))
-        self.call_fut(context, request_)
-        assert request_.validated == {}
-
-    def test_invalid_user_headers_but_no_authenticated_user(self, context,
-                                                            request_):
-        from pyramid.httpexceptions import HTTPBadRequest
-        request_.headers['X-User-Path'] = 2
-        request_.headers['X-User-Token'] = 3
-        with pytest.raises(HTTPBadRequest):
-            self.call_fut(context, request_)
-        assert request_.validated == {}
-
-
-
-class TestRespondIfBlocked:
+class TestBuildUpdatedResourcesDict:
 
     @fixture
-    def mock_reason_if_blocked(self, mocker):
-        from . import views
-        return mocker.patch.object(views, 'get_reason_if_blocked', autospec=True)
+    def registry(self, registry):
+        registry.changelog = {}
+        return registry
 
     def call_fut(self, *args):
-        from .views import respond_if_blocked
-        return respond_if_blocked(*args)
+        from .views import _build_updated_resources_dict
+        return _build_updated_resources_dict(*args)
 
-    @mark.parametrize('method,expected', [('OPTIONS', None),
-                                          ('DELETE', None),
-                                          ('PUT', None),
-                                          ])
-    def test_ignore_if_method_options_delete_put(self, context, request_,
-                                                 method, expected):
-        request_.method = method
-        assert self.call_fut(context, request_) is expected
-
-    def test_ignore_if_get_reason_is_none(self, context, request_,
-                                          mock_reason_if_blocked):
-        request_.method = 'GET'
-        mock_reason_if_blocked.return_value = None
-        assert self.call_fut(context, request_) is None
-
-    def test_raise_if_get_reason(self, context, request_,
-                                 mock_reason_if_blocked):
-        from pyramid.httpexceptions import HTTPGone
-        request_.method = 'GET'
-        mock_reason_if_blocked.return_value = 'hidden'
-        with raises(HTTPGone):
-            self.call_fut(context, request_)
-
-
-class TestRESTView:
-
-    def make_one(self, context, request):
-        from adhocracy_core.rest.views import RESTView
-        return RESTView(context, request)
-
-    def test_create(self, request_, context, mocker):
-        from . import views
-        block_mock = mocker.patch.object(views, 'respond_if_blocked')
-        inst = self.make_one(context, request_)
-        assert inst.schema_GET is None
-        assert inst.schema_HEAD is None
-        assert inst.schema_OPTIONS is None
-        assert inst.schema_PUT is None
-        assert inst.schema_POST is None
-        assert inst.context is context
-        assert inst.request is request_
-        assert inst.request.errors == []
-        assert inst.request.validated == {}
-        assert block_mock.called
-
-    def test_build_updated_resources_dict_empty(self, request_, context):
-        inst = self.make_one(context, request_)
-        result = inst._build_updated_resources_dict()
+    def test_build_updated_resources_dict_empty(self, registry):
+        result = self.call_fut(registry)
         assert result == {}
 
     def test_build_updated_resources_dict_one_resource(
-            self, request_, context, changelog_meta):
+            self, registry, changelog_meta):
         res = testing.DummyResource()
-        request_.registry.changelog[res] = changelog_meta._replace(resource=res,
-                                                                   created=True)
-        inst = self.make_one(context, request_)
-        result = inst._build_updated_resources_dict()
+        registry.changelog[res] = changelog_meta._replace(resource=res,
+                                                          created=True)
+        result = self.call_fut(registry)
         assert result == {'created': [res]}
 
     def test_build_updated_resources_dict_one_resource_two_events(
-            self, request_, context, changelog_meta):
+            self, registry, changelog_meta):
         res = testing.DummyResource()
-        request_.registry.changelog[res] = changelog_meta._replace(
-            resource=res, created=True, changed_descendants=True)
-        inst = self.make_one(context, request_)
-        result = inst._build_updated_resources_dict()
+        registry.changelog[res] = changelog_meta._replace(resource=res,
+                                                          created=True,
+                                                          changed_descendants=True)
+        result = self.call_fut(registry)
         assert result == {'changed_descendants': [res], 'created': [res]}
 
     def test_build_updated_resources_dict_two_resources(
-            self, request_, context, changelog_meta):
+            self, registry, changelog_meta):
         res1 = testing.DummyResource()
         res2 = testing.DummyResource()
-        request_.registry.changelog[res1] = \
-            changelog_meta._replace(resource=res1, created=True)
-        request_.registry.changelog[res2] =\
-            changelog_meta._replace(resource=res2, created=True)
-        inst = self.make_one(context, request_)
-        result = inst._build_updated_resources_dict()
+        registry.changelog[res1] = changelog_meta._replace(resource=res1,
+                                                           created=True)
+        registry.changelog[res2] = changelog_meta._replace(resource=res2,
+                                                           created=True)
+        result = self.call_fut(registry)
         assert list(result.keys()) == ['created']
         assert set(result['created']) == {res1, res2}
 
@@ -367,9 +113,10 @@ class TestResourceRESTView:
         return ResourceRESTView(context, request_)
 
     def test_create(self, request_, context):
-        from adhocracy_core.rest.views import RESTView
         inst = self.make_one(context, request_)
-        assert isinstance(inst, RESTView)
+        assert inst.registry is request_.registry
+        assert inst.request is request_
+        assert inst.context is context
         assert inst.content is request_.registry.content
 
     def test_options_with_sheets_and_addables(
@@ -504,10 +251,8 @@ class TestSimpleRESTView:
 
     def test_create(self, context, request_):
         from adhocracy_core.rest.views import ResourceRESTView
-        from adhocracy_core.rest.schemas import PUTResourceRequestSchema
         inst = self.make_one(context, request_)
         assert issubclass(inst.__class__, ResourceRESTView)
-        assert inst.schema_PUT == PUTResourceRequestSchema
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
@@ -546,10 +291,8 @@ class TestPoolRESTView:
 
     def test_create(self, request_, context):
         from adhocracy_core.rest.views import SimpleRESTView
-        from adhocracy_core.rest.schemas import POSTResourceRequestSchema
         inst = self.make_one(context, request_)
         assert issubclass(inst.__class__, SimpleRESTView)
-        assert inst.schema_POST == POSTResourceRequestSchema
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
@@ -683,10 +426,8 @@ class TestItemRESTView:
 
     def test_create(self, request_, context):
         from adhocracy_core.rest.views import SimpleRESTView
-        from adhocracy_core.rest.schemas import POSTItemRequestSchema
         inst = self.make_one(context, request_)
         assert issubclass(inst.__class__, SimpleRESTView)
-        assert inst.schema_POST == POSTItemRequestSchema
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
@@ -1304,10 +1045,8 @@ class TestAssetsServiceRESTView:
 
     def test_create(self, context, request_):
         from .views import SimpleRESTView
-        from .schemas import POSTAssetRequestSchema
         inst = self.make_one(context, request_)
         assert issubclass(inst.__class__, SimpleRESTView)
-        assert inst.schema_POST == POSTAssetRequestSchema
 
     def test_post_valid(self, request_, context):
         request_.root = context
@@ -1333,10 +1072,8 @@ class TestAssetRESTView:
 
     def test_create(self, context, request_):
         from .views import SimpleRESTView
-        from .schemas import PUTAssetRequestSchema
         inst = self.make_one(context, request_)
         assert issubclass(inst.__class__, SimpleRESTView)
-        assert inst.schema_PUT == PUTAssetRequestSchema
 
     def test_put_valid_no_sheets(self, request_, context):
         inst = self.make_one(context, request_)
@@ -1401,9 +1138,9 @@ class TestCreatePasswordResetView:
         return CreatePasswordResetView(context, request)
 
     def test_create(self, context, request_):
-        from .schemas import POSTCreatePasswordResetRequestSchema
         inst = self.make_one(context, request_)
-        assert inst.schema_POST == POSTCreatePasswordResetRequestSchema
+        assert inst.context is context
+        assert inst.request is request_
 
     def test_post(self, request_, context, registry, resets):
         from adhocracy_core.resources.principal import IPasswordReset
@@ -1437,9 +1174,9 @@ class TestPasswordResetView:
         return PasswordResetView(context, request)
 
     def test_create(self, context, request_):
-        from .schemas import POSTPasswordResetRequestSchema
         inst = self.make_one(context, request_)
-        assert inst.schema_POST == POSTPasswordResetRequestSchema
+        assert inst.context is context
+        assert inst.request is request_
 
     def test_post(self, request_, context, mock_remember):
         from adhocracy_core.resources.principal import PasswordReset

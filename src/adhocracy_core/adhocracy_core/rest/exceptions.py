@@ -2,7 +2,8 @@
 import json
 import logging
 
-import colander
+from colander import Invalid
+from colander import null
 from pyramid.exceptions import URLDecodeError
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.httpexceptions import HTTPClientError
@@ -15,10 +16,12 @@ from pyramid.view import view_config
 
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
 from adhocracy_core.interfaces import error_entry
+from adhocracy_core.schema import References
 from adhocracy_core.sheets.metadata import view_blocked_by_metadata
 from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.utils import exception_to_str
 from adhocracy_core.utils import log_compatible_datetime
+from adhocracy_core.utils import create_schema
 
 logger = logging.getLogger(__name__)
 
@@ -109,7 +112,7 @@ def handle_error_40x_exception(error, request):
 
 
 @view_config(
-    context=colander.Invalid,
+    context=Invalid,
     permission=NO_PERMISSION_REQUIRED,
 )
 def handle_error_400_colander_invalid(invalid, request):
@@ -201,8 +204,8 @@ def handle_error_400_auto_update_no_fork_allowed(error, request):
     description = '- The auto update tried to create a fork for: {0} caused'\
                   ' by isheet: {1} field: {2} with old_reference: {3} and new'\
                   ' reference: {4}. Try another root_version.'.format(*args)
-    dummy_node = colander.SchemaNode(colander.List(), name='root_versions')
-    error_colander = colander.Invalid(dummy_node, msg + description)
+    dummy_node = References(name='root_versions')
+    error_colander = Invalid(dummy_node, msg + description)
     return handle_error_400_colander_invalid(error_colander, request)
 
 
@@ -232,10 +235,9 @@ def handle_error_410_exception(error, request):
     registry = request.registry
     reason = error.detail or ''
     explanation = view_blocked_by_metadata(context, registry, reason)
-    schema = BlockExplanationResponseSchema().bind(request=request,
-                                                   context=context)
+    schema = create_schema(BlockExplanationResponseSchema, context, request)
     cstruct = schema.serialize(explanation)
-    if cstruct['modification_date'] is colander.null:
+    if cstruct['modification_date'] is null:
         cstruct['modification_date'] = ''
     json_error = JSONHTTPClientError([],
                                      request=request,

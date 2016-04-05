@@ -1,5 +1,4 @@
 """image sheet."""
-from colander import MappingSchema
 from colander import OneOf
 from colander import required
 from adhocracy_core.interfaces import Dimensions
@@ -7,6 +6,7 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.sheets.asset import AssetMetadataSchema
 from adhocracy_core.sheets.asset import asset_metadata_meta
+from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import Resource
 from adhocracy_core.schema import SingleLine

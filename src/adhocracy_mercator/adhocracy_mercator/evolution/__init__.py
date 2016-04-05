@@ -1,7 +1,7 @@
 """Scripts to migrate legacy objects in existing databases."""
+# pragma: no cover
 import logging  # pragma: no cover
 
-from pyramid.threadlocal import get_current_registry
 from substanced.util import find_catalog  # pragma: no cover
 from substanced.util import find_service
 from zope.interface import alsoProvides
@@ -27,9 +27,8 @@ logger = logging.getLogger(__name__)  # pragma: no cover
 
 
 @log_migration
-def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
+def evolve1_add_ititle_sheet_to_proposals(root, registry):  # pragma: no cover
     """Migrate title value from ole IIntroduction sheet to ITitle sheet."""
-    registry = get_current_registry()
     catalog = find_catalog(root, 'system')
     path = catalog['path']
     interfaces = catalog['interfaces']
@@ -56,12 +55,12 @@ def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
         sheet.delete_field_values(['title'])
 
 
-def evolve2_disable_add_proposal_permission(root):  # pragma: no cover
+def evolve2_disable_add_proposal_permission(root, registry):
     """(disabled) Disable add_proposal permissions."""
 
 
 @log_migration
-def evolve3_use_adhocracy_core_title_sheet(root):  # pragma: no cover
+def evolve3_use_adhocracy_core_title_sheet(root, registry):
     """Migrate mercator title sheet to adhocracy_core title sheet."""
     from adhocracy_core.sheets.title import ITitle
     from adhocracy_mercator.sheets import mercator
@@ -70,30 +69,28 @@ def evolve3_use_adhocracy_core_title_sheet(root):  # pragma: no cover
                       fields_mapping=[('title', 'title')])
 
 
-def evolve4_disable_voting_and_commenting(root):  # pragma: no cover
+def evolve4_disable_voting_and_commenting(root, registry):
     """(disabled) Disable rate and comment permissions."""
 
 
 @log_migration
-def change_mercator_type_to_iprocess(root):  # pragma: no cover
+def change_mercator_type_to_iprocess(root, registry):
     """Change mercator type from IBasicPoolWithAssets to IProcess."""
     from adhocracy_mercator.resources.mercator import IProcess
     from adhocracy_core.resources.asset import IPoolWithAssets
     from adhocracy_core.resources.badge import add_badges_service
     migrate_new_iresource(root, IPoolWithAssets, IProcess)
-    registry = get_current_registry()
     mercator = root['mercator']
     if find_service(mercator, 'badges') is None:
         add_badges_service(mercator, registry, {})
 
 
 @log_migration
-def add_badge_assignments_services_to_proposal_items(root):  # pragma: no cover
+def add_badge_assignments_services_to_proposal_items(root, registry):
     """Add badge assignments services to proposals."""
     catalogs = find_service(root, 'catalogs')
     query = search_query._replace(interfaces=IMercatorProposal)
     proposals = catalogs.search(query).elements
-    registry = get_current_registry(root)
     for proposal in proposals:
         if find_service(proposal, 'badge_assignments') is None:
             logger.info('add badge assignments to {0}'.format(proposal))
@@ -101,24 +98,23 @@ def add_badge_assignments_services_to_proposal_items(root):  # pragma: no cover
 
 
 @log_migration
-def add_badgeable_sheet_to_proposal_versions(root):  # pragma: no cover
+def add_badgeable_sheet_to_proposal_versions(root, registry):
     """Add badgeable sheet to proposals versions."""
     migrate_new_sheet(root, IMercatorProposalVersion, IBadgeable)
 
 
 @log_migration
-def reset_workflow_state_to_result(root):  # pragma: no cover
+def reset_workflow_state_to_result(root, registry):  # pragma: no cover
     """Reset workflow state to 'result'."""
     pass  # set workflow state manually if needed
 
 
 @log_migration
-def add_logbook_service_to_proposal_items(root):  # pragma: no cover
+def add_logbook_service_to_proposal_items(root, registry):
     """Add logbook service to proposals."""
     catalogs = find_service(root, 'catalogs')
     query = search_query._replace(interfaces=IMercatorProposal)
     proposals = catalogs.search(query).elements
-    registry = get_current_registry(root)
     for proposal in proposals:
         if find_service(proposal, 'logbook') is None:
             logger.info('add logbook service to {0}'.format(proposal))
@@ -129,13 +125,13 @@ def add_logbook_service_to_proposal_items(root):  # pragma: no cover
 
 
 @log_migration
-def add_haslogbookpool_sheet_to_proposal_versions(root):  # pragma: no cover
+def add_haslogbookpool_sheet_to_proposal_versions(root, registry):
     """Add IHasLogbookPool sheet to proposals versions."""
     migrate_new_sheet(root, IMercatorProposalVersion, IHasLogbookPool)
 
 
 @log_migration
-def remove_mercator_workflow_assignment_sheet(root):  # pragma: no cover
+def remove_mercator_workflow_assignment_sheet(root, registry):
     """Remove deprecated sheets.mercator.IWorkflowAssignment interface."""
     from adhocracy_core.sheets.workflow import IWorkflowAssignment
     from adhocracy_mercator import resources
@@ -149,13 +145,12 @@ def remove_mercator_workflow_assignment_sheet(root):  # pragma: no cover
 
 
 @log_migration
-def make_mercator_proposals_badgeable(root):  # pragma: no cover
+def make_mercator_proposals_badgeable(root, registry):
     """Add badge services processes and make mercator proposals badgeable."""
     from adhocracy_core.evolution import _search_for_interfaces
     from adhocracy_mercator.resources.mercator import IProcess
     catalogs = find_service(root, 'catalogs')
     proposals = _search_for_interfaces(catalogs, IMercatorProposal)
-    registry = get_current_registry(root)
     for proposal in proposals:
         if not IBadgeable.providedBy(proposal):
             logger.info('add badgeable interface to {0}'.format(proposal))
@@ -172,7 +167,7 @@ def make_mercator_proposals_badgeable(root):  # pragma: no cover
 
 
 @log_migration
-def reindex_requested_funding(root):  # pragma: no cover
+def reindex_requested_funding(root, registry):
     """Reindex requested funding index for proposals (stores integer now)."""
     from adhocracy_core.evolution import _search_for_interfaces
     from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
@@ -184,7 +179,7 @@ def reindex_requested_funding(root):  # pragma: no cover
         catalogs.reindex_index(proposal, 'mercator_requested_funding')
 
 
-def includeme(config):  # pragma: no cover
+def includeme(config):
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(evolve1_add_ititle_sheet_to_proposals)
     config.add_evolution_step(evolve2_disable_add_proposal_permission)

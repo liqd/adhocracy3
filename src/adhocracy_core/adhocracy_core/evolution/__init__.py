@@ -193,7 +193,8 @@ def _get_used_autonaming_prefixes(pool: IPool,  # pragma: no cover
 
 
 @log_migration
-def evolve1_add_title_sheet_to_pools(root: IPool):  # pragma: no cover
+def evolve1_add_title_sheet_to_pools(root: IPool,
+                                     registry: Registry):  # pragma: no cover
     """Add title sheet to basic pools and asset pools."""
     migrate_new_sheet(root, IBasicPool, ITitle)
     migrate_new_sheet(root, IPoolWithAssets, ITitle)
@@ -204,9 +205,8 @@ def add_kiezkassen_permissions(root):  # pragma: no cover
 
 
 @log_migration
-def upgrade_catalogs(root):  # pragma: no cover
+def upgrade_catalogs(root, registry):  # pragma: no cover
     """Upgrade catalogs."""
-    registry = get_current_registry()
     old_catalogs = root['catalogs']
 
     old_catalogs.move('system', root, 'old_system_catalog')
@@ -224,9 +224,8 @@ def upgrade_catalogs(root):  # pragma: no cover
 
 
 @log_migration
-def make_users_badgeable(root):  # pragma: no cover
+def make_users_badgeable(root, registry):  # pragma: no cover
     """Add badge services and make user badgeable."""
-    registry = get_current_registry(root)
     principals = find_service(root, 'principals')
     if not IHasBadgesPool.providedBy(principals):
         logger.info('Add badges service to {0}'.format(principals))
@@ -241,11 +240,10 @@ def make_users_badgeable(root):  # pragma: no cover
 
 
 @log_migration
-def make_proposals_badgeable(root):  # pragma: no cover
+def make_proposals_badgeable(root, registry):  # pragma: no cover
     """Add badge services processes and make proposals badgeable."""
     catalogs = find_service(root, 'catalogs')
     proposals = _search_for_interfaces(catalogs, IProposal)
-    registry = get_current_registry(root)
     for proposal in proposals:
         if not IBadgeable.providedBy(proposal):
             logger.info('add badgeable interface to {0}'.format(proposal))
@@ -262,9 +260,8 @@ def make_proposals_badgeable(root):  # pragma: no cover
 
 
 @log_migration
-def change_pools_autonaming_scheme(root):  # pragma: no cover
+def change_pools_autonaming_scheme(root, registry):  # pragma: no cover
     """Change pool autonaming scheme."""
-    registry = get_current_registry(root)
     prefixes = _get_autonaming_prefixes(registry)
     catalogs = find_service(root, 'catalogs')
     pools = _search_for_interfaces(catalogs, (IPool, IFolder))
@@ -294,11 +291,10 @@ def change_pools_autonaming_scheme(root):  # pragma: no cover
 
 
 @log_migration
-def hide_password_resets(root):  # pragma: no cover
+def hide_password_resets(root, registry):  # pragma: no cover
     """Add hide all password reset objects."""
     from adhocracy_core.resources.principal import hide
     from adhocracy_core.resources.principal import deny_view_permission
-    registry = get_current_registry(root)
     resets = find_service(root, 'principals', 'resets')
     hidden = getattr(resets, 'hidden', False)
     if not hidden:
@@ -310,9 +306,8 @@ def hide_password_resets(root):  # pragma: no cover
 
 
 @log_migration
-def lower_case_users_emails(root):  # pragma: no cover
+def lower_case_users_emails(root, registry):  # pragma: no cover
     """Lower case users email, add 'private_user_email'/'user_name' index."""
-    registry = get_current_registry(root)
     _update_adhocracy_catalog(root)
     catalogs = find_service(root, 'catalogs')
     users = find_service(root, 'principals', 'users')
@@ -332,7 +327,7 @@ def _update_adhocracy_catalog(root):  # pragma: no cover
 
 
 @log_migration
-def remove_name_sheet_from_items(root):  # pragma: no cover
+def remove_name_sheet_from_items(root, registry):  # pragma: no cover
     """Remove name sheet from items and items subtypes."""
     from adhocracy_core.sheets.name import IName
     from adhocracy_core.interfaces import IItem
@@ -347,18 +342,18 @@ def remove_name_sheet_from_items(root):  # pragma: no cover
 
 
 @log_migration
-def add_workflow_assignment_sheet_to_pools_simples(root):  # pragma: no cover
+def add_workflow_assignment_sheet_to_pools_simples(root,    # pragma: no cover
+                                                   registry):
     """Add generic workflow sheet to pools and simples."""
     migrate_new_sheet(root, IPool, IWorkflowAssignment)
     migrate_new_sheet(root, ISimple, IWorkflowAssignment)
 
 
 @log_migration
-def make_proposalversions_polarizable(root):  # pragma: no cover
+def make_proposalversions_polarizable(root, registry):  # pragma: no cover
     """Make proposals polarizable and add relations pool."""
     catalogs = find_service(root, 'catalogs')
     proposals = _search_for_interfaces(catalogs, IProposal)
-    registry = get_current_registry(root)
     for proposal in proposals:
         if 'relations' not in proposal:
             logger.info('add relations pool to {0}'.format(proposal))
@@ -367,27 +362,28 @@ def make_proposalversions_polarizable(root):  # pragma: no cover
 
 
 @log_migration
-def add_icanpolarize_sheet_to_comments(root):  # pragma: no cover
+def add_icanpolarize_sheet_to_comments(root, registry):  # pragma: no cover
     """Make comments ICanPolarize."""
     migrate_new_sheet(root, ICommentVersion, ICanPolarize)
 
 
 @log_migration
-def migrate_rate_sheet_to_attribute_storage(root):  # pragma: no cover
+def migrate_rate_sheet_to_attribute_storage(root,
+                                            registry):  # pragma: no cover
     """Migrate rate sheet to attribute storage."""
     import adhocracy_core.sheets.rate
     migrate_to_attribute_storage(root, adhocracy_core.sheets.rate.IRate)
 
 
 @log_migration
-def move_autoname_last_counters_to_attributes(root):  # pragma: no cover
+def move_autoname_last_counters_to_attributes(root,
+                                              registry):  # pragma: no cover
     """Move autoname last counters of pools to attributes.
 
     Remove _autoname_lasts attribute.
     Instead add private attributes to store autoname last counter objects.
     Cleanup needless counter objects.
     """
-    registry = get_current_registry(root)
     prefixes = _get_autonaming_prefixes(registry)
     catalogs = find_service(root, 'catalogs')
     pools = _search_for_interfaces(catalogs, (IPool, IFolder))
@@ -415,7 +411,8 @@ def move_autoname_last_counters_to_attributes(root):  # pragma: no cover
 
 
 @log_migration
-def move_sheet_annotation_data_to_attributes(root):  # pragma: no cover
+def move_sheet_annotation_data_to_attributes(root,
+                                             registry):  # pragma: no cover
     """Move sheet annotation data to resource attributes.
 
     Remove `_sheets` dictionary to store sheets data annotations.
@@ -437,9 +434,8 @@ def move_sheet_annotation_data_to_attributes(root):  # pragma: no cover
 
 
 @log_migration
-def add_image_reference_to_users(root):  # pragma: no cover
+def add_image_reference_to_users(root, registry):  # pragma: no cover
     """Add image reference to users and add assets service to users service."""
-    registry = get_current_registry(root)
     users = find_service(root, 'principals', 'users')
     if not IHasAssetPool.providedBy(users):
         logger.info('Add assets service to {0}'.format(users))
@@ -449,9 +445,8 @@ def add_image_reference_to_users(root):  # pragma: no cover
 
 
 @log_migration
-def remove_empty_first_versions(root):  # pragma: no cover
+def remove_empty_first_versions(root, registry):  # pragma: no cover
     """Remove empty first versions."""
-    registry = get_current_registry(root)
     catalogs = find_service(root, 'catalogs')
     items = _search_for_interfaces(catalogs, IItem)
     count = len(items)
@@ -488,13 +483,12 @@ def _has_follower(version: IItemVersion,
 
 
 @log_migration
-def update_asset_download_children(root):  # pragma: no cover
+def update_asset_download_children(root, registry):  # pragma: no cover
     """Add asset downloads and update IAssetMetadata sheet."""
     from adhocracy_core.sheets.asset import IAssetMetadata
     from adhocracy_core.sheets.image import IImageMetadata
     from adhocracy_core.resources.asset import add_metadata
     from adhocracy_core.resources.image import add_image_size_downloads
-    registry = get_current_registry(root)
     catalogs = find_service(root, 'catalogs')
     assets = _search_for_interfaces(catalogs, IAsset)
     count = len(assets)
@@ -513,13 +507,12 @@ def update_asset_download_children(root):  # pragma: no cover
 
 
 @log_migration
-def recreate_all_image_size_downloads(root):  # pragma: no cover
+def recreate_all_image_size_downloads(root, registry):  # pragma: no cover
     """Recreate all image size downloads to optimize file size."""
     from adhocracy_core.sheets.asset import IAssetMetadata
     from adhocracy_core.sheets.image import IImageMetadata
     from adhocracy_core.resources.image import add_image_size_downloads
     from adhocracy_core.resources.image import IImageDownload
-    registry = get_current_registry(root)
     catalogs = find_service(root, 'catalogs')
     assets = _search_for_interfaces(catalogs, IAssetMetadata)
     images = [x for x in assets if IImageMetadata.providedBy(x)]
@@ -534,11 +527,10 @@ def recreate_all_image_size_downloads(root):  # pragma: no cover
 
 
 @log_migration
-def remove_tag_resources(root):  # pragma: no cover
+def remove_tag_resources(root, registry):  # pragma: no cover
     """Remove all ITag resources, create ITags sheet references instead."""
     from adhocracy_core.sheets.tags import ITags
     from adhocracy_core.interfaces import IItem
-    registry = get_current_registry(root)
     catalogs = find_service(root, 'catalogs')
     items = _search_for_interfaces(catalogs, IItem)
     items_with_tags = [x for x in items if 'FIRST' in x]
@@ -558,28 +550,27 @@ def remove_tag_resources(root):  # pragma: no cover
 
 
 @log_migration
-def reindex_interfaces_catalog_for_root(root):  # pragma: no cover
+def reindex_interfaces_catalog_for_root(root, registry):  # pragma: no cover
     """Reindex 'interfaces' catalog for root."""
     catalogs = find_service(root, 'catalogs')
     catalogs.reindex_index(root, 'interfaces')
 
 
 @log_migration
-def add_description_sheet_to_organisations(root):  # pragma: no cover
+def add_description_sheet_to_organisations(root, registry):  # pragma: no cover
     """Add description sheet to organisations."""
     migrate_new_sheet(root, IOrganisation, IDescription)
 
 
 @log_migration
-def add_description_sheet_to_processes(root):  # pragma: no cover
+def add_description_sheet_to_processes(root, registry):  # pragma: no cover
     """Add description sheet to processes."""
     migrate_new_sheet(root, IProcess, IDescription)
 
 
 @log_migration
-def add_image_reference_to_organisations(root):  # pragma: no cover
+def add_image_reference_to_organisations(root, registry):  # pragma: no cover
     """Add image reference to organisations and add assets service."""
-    registry = get_current_registry(root)
     catalogs = find_service(root, 'catalogs')
     query = search_query._replace(interfaces=(IOrganisation,), resolve=True)
     organisations = catalogs.search(query).elements
@@ -591,10 +582,9 @@ def add_image_reference_to_organisations(root):  # pragma: no cover
     migrate_new_sheet(root, IOrganisation, IImageReference)
 
 
-def set_comment_count(root):  # pragma: no cover
+def set_comment_count(root, registry):  # pragma: no cover
     """Set comment_count for all ICommentables."""
     from adhocracy_core.resources.subscriber import update_comments_count
-    registry = get_current_registry(root)
     catalogs = find_service(root, 'catalogs')
     query = search_query._replace(interfaces=ICommentVersion,
                                   only_visible=True,
@@ -607,7 +597,7 @@ def set_comment_count(root):  # pragma: no cover
         update_comments_count(comment, 1, registry)
 
 
-def remove_duplicated_group_ids(root):  # pragma: no cover
+def remove_duplicated_group_ids(root, registry):  # pragma: no cover
     """Remove duplicate group_ids from users."""
     from adhocracy_core.resources.principal import IUser
     catalogs = find_service(root, 'catalogs')
@@ -625,9 +615,55 @@ def remove_duplicated_group_ids(root):  # pragma: no cover
 
 
 @log_migration
-def add_image_reference_to_proposals(root):  # pragma: no cover
+def add_image_reference_to_proposals(root, registry):  # pragma: no cover
     """Add description sheet to proposals."""
     migrate_new_sheet(root, IProposalVersion, IImageReference)
+
+
+def reset_comment_count(root, registry):  # pragma: no cover
+    """Reset comment_count for all ICommentables - See #2194, #2188."""
+    from adhocracy_core.resources.comment import ICommentVersion
+    from adhocracy_core.sheets.comment import ICommentable
+    from adhocracy_core.resources.subscriber import update_comments_count
+    catalogs = find_service(root, 'catalogs')
+    query = search_query._replace(interfaces=ICommentable,
+                                  only_visible=True,
+                                  resolve=True)
+    commentables = catalogs.search(query).elements
+    count = len(commentables)
+    for index, comment in enumerate(commentables):
+        logger.info('Set comment_count to 0 for resource {0} of {1}'
+                    .format(index + 1, count))
+        commentable_sheet = registry.content.get_sheet(comment,
+                                                       ICommentable)
+        commentable_sheet.set({'comments_count': 0}, omit_readonly=False)
+
+    query = search_query._replace(interfaces=ICommentVersion,
+                                  only_visible=True,
+                                  resolve=True,
+                                  indexes={'tag': 'FIRST'})
+    comment_versions = catalogs.search(query).elements
+    count = len(comment_versions)
+    for index, comment in enumerate(comment_versions):
+        logger.info('Recalculate comment_count for resource {0} of {1}'
+                    .format(index + 1, count))
+        update_comments_count(comment, 1, registry)
+
+
+@log_migration
+def remove_is_service_attribute(root, registry):  # pragma: no cover
+    """Remove __is_service__ attribute, use IService interface instead."""
+    from adhocracy_core.interfaces import IServicePool
+    catalogs = find_service(root, 'catalogs')
+    for catalog in catalogs.values():
+        if hasattr(catalog, '__is_service__'):
+            delattr(catalog, '__is_service__')
+        alsoProvides(catalogs, IServicePool)
+        catalogs.reindex_index(catalog, 'interfaces')
+    services = _search_for_interfaces(catalogs, IServicePool)
+    for service in services:
+        if hasattr(service, '__is_service__'):
+            delattr(service, '__is_service__')
 
 
 def includeme(config):  # pragma: no cover
@@ -661,3 +697,5 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(set_comment_count)
     config.add_evolution_step(remove_duplicated_group_ids)
     config.add_evolution_step(add_image_reference_to_proposals)
+    config.add_evolution_step(reset_comment_count)
+    config.add_evolution_step(remove_is_service_attribute)

@@ -1,7 +1,7 @@
 <form data-ng-submit="submit()">
     <label data-ng-if="create">
         <span class="label-text">{{ "TR__MERCATOR_MODERATE_SELECT_BADGE" | translate }}</span>
-        <select data-ng-options="item for item in ['winning', 'community']" data-ng-model="data.winner.name"></select>
+        <select data-ng-options="item for item in ['winning', 'community', 'shortlist']" data-ng-model="data.winner.name"></select>
     </label>
 
     <div data-ng-if="data.winner.name">

@@ -1,4 +1,11 @@
-<div class="section-jump" id="section-jump-top">
+<div
+    class="section-jump"
+    id="section-jump-top"
+    data-ng-class="{
+        'has-rosette': data.winner.name === 'winning' || data.winner.name === 'community',
+        'm-winner': data.winner.name === 'winning',
+        'm-community-award': data.winner.name === 'community'
+    }">
     <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
 
     <div class="section-jump-cover">
@@ -17,6 +24,15 @@
             </li>
             <li class="meta-list-item meta-list-item-rate">
                 <adh-like data-refers-to="{{path}}" data-disabled="processState != 'participate'"></adh-like>
+            </li>
+            <li data-ng-if="data.winner.name === 'winning'" class="meta-list-item meta-list-item-badge">
+                <span class="badge m-winner">{{ "TR__MERCATOR_BADGE_WINNERS" | translate }}</span>
+            </li>
+            <li data-ng-if="data.winner.name === 'community'" class="meta-list-item meta-list-item-badge">
+                <span class="badge m-community-award">{{ "TR__MERCATOR_BADGE_COMMUNITY_AWARD" | translate }}</span>
+            </li>
+            <li data-ng-if="data.winner.name === 'shortlist'" class="meta-list-item meta-list-item-badge">
+                <span class="badge m-shortlist">{{ "TR__MERCATOR_BADGE_SHORTLIST" | translate }}</span>
             </li>
         </ul>
 
@@ -41,6 +57,12 @@
         <div class="section-jump-body">
             <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="">
                 <ol>
+                    <li data-ng-if="data.winner.name === 'winning' || data.winner.name === 'community'"><a
+                        href="#jury-decision"
+                        title="Jury Decision"
+                        data-du-smooth-scroll=""
+                        data-du-scrollspy=""
+                        ><i class="icon-star"></i></a></li>
                     <li><a
                         href="#mercator-proposal-brief"
                         data-du-smooth-scroll=""
@@ -71,7 +93,7 @@
             </nav>
 
             <div class="section-jump-main chapter-wrapper" data-du-spy-context="">
-                <section data-ng-if="data.winner.name" class="chapter m-jury-decision" id="jury-decision">
+                <section data-ng-if="data.winner.name === 'winning' || data.winner.name === 'community'" class="chapter m-jury-decision" id="jury-decision">
                     <section class="jury-decision-section">
                         <h2 class="chapter-header">{{ "TR__MERCATOR_JURY_STATEMENT" | translate }}</h2>
                         <p>{{ "TR__MERCATOR_PROPOSAL_FUNDING" | translate }}: {{ data.winner.funding }} &euro;</p>

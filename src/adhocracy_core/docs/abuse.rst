@@ -31,7 +31,7 @@ a URL and a remark::
     >>> resp_data.status_code
     200
     >>> resp_data.text
-    ''
+    '""'
 
 The 'url' is required and must be an URL managed by the frontend.
 If the URL is later opened in a browser, the frontend must load and show the

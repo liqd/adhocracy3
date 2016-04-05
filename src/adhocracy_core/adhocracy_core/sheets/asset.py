@@ -1,12 +1,13 @@
 """Sheets for managing assets."""
 
+from colander import required
 from persistent import Persistent
-import colander
 from zope.deprecation import deprecated
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
+from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import FileStore
 from adhocracy_core.schema import Integer
 from adhocracy_core.schema import PostPool
@@ -20,7 +21,7 @@ class IHasAssetPool(ISheet, ISheetReferenceAutoUpdateMarker):
     """Marker interface for resources that have an asset pool."""
 
 
-class HasAssetPoolSchema(colander.MappingSchema):
+class HasAssetPoolSchema(MappingSchema):
     """Data structure pointing to an asset pool."""
 
     asset_pool = PostPool(iresource_or_service_name='assets')
@@ -44,10 +45,10 @@ class AssetReference(SheetToSheet):
     target_isheet = IAssetMetadata
 
 
-class AssetMetadataSchema(colander.MappingSchema):
+class AssetMetadataSchema(MappingSchema):
     """Data structure storing asset metadata."""
 
-    mime_type = SingleLine(missing=colander.required)
+    mime_type = SingleLine(missing=required)
     size = Integer(readonly=True)
     filename = SingleLine(readonly=True)
     attached_to = UniqueReferences(readonly=True,
@@ -65,10 +66,10 @@ class IAssetData(ISheet, ISheetReferenceAutoUpdateMarker):
     """Marker interface for the actual asset data."""
 
 
-class AssetDataSchema(colander.MappingSchema):
+class AssetDataSchema(MappingSchema):
     """Data structure storing for the actual asset data."""
 
-    data = FileStore(missing=colander.required)
+    data = FileStore(missing=required)
 
 
 asset_data_meta = sheet_meta._replace(

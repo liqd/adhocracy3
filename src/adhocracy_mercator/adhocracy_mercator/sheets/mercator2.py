@@ -1,9 +1,15 @@
 """Sheets for Mercator 2 proposals."""
-import colander
+from colander import Length
+from colander import OneOf
+from colander import drop
+from colander import required
+from colander import Invalid
+from colander import Range
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
-from adhocracy_core.schema import AdhocracySchemaNode
+from adhocracy_core.schema import SchemaNode
+from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import CurrencyAmount
 from adhocracy_core.schema import DateTime
@@ -13,7 +19,7 @@ from adhocracy_core.schema import Reference
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import URL
-from adhocracy_core.schema import AdhocracySequenceNode
+from adhocracy_core.schema import SequenceSchema
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.subresources import ISubResources
@@ -23,11 +29,11 @@ class IUserInfo(ISheet):
     """Marker interface for information about the proposal submitter."""
 
 
-class UserInfoSchema(colander.MappingSchema):
+class UserInfoSchema(MappingSchema):
     """Information about the proposal submitter."""
 
-    first_name = SingleLine(missing=colander.required)
-    last_name = SingleLine(missing=colander.required)
+    first_name = SingleLine(missing=required)
+    last_name = SingleLine(missing=required)
 
 userinfo_meta = sheet_meta._replace(isheet=IUserInfo,
                                     schema_class=UserInfoSchema)
@@ -37,30 +43,35 @@ class IOrganizationInfo(ISheet):
     """Marker interface for organizational information."""
 
 
-class OrganizationStatusEnum(AdhocracySchemaNode):
+class OrganizationStatusEnum(SingleLine):
     """Enum of organizational statuses."""
 
-    schema_type = colander.String
     default = 'other'
-    missing = colander.required
-    validator = colander.OneOf(['registered_nonprofit',
-                                'planned_nonprofit',
-                                'support_needed',
-                                'other',
-                                ])
+    missing = required
+    validator = OneOf(['registered_nonprofit',
+                       'planned_nonprofit',
+                       'support_needed',
+                       'other',
+                       ])
 
 
-class OrganizationInfoSchema(colander.MappingSchema):
+class OrganizationInfoSchema(MappingSchema):
     """Data structure for organizational information."""
 
-    name = SingleLine(missing=colander.drop)
-    city = SingleLine(missing=colander.drop)
-    country = ISOCountryCode(missing=colander.drop)
-    help_request = Text(validator=colander.Length(max=300))
-    registration_date = DateTime(missing=colander.drop, default=None)
-    website = URL(missing=colander.drop)
-    status = OrganizationStatusEnum(missing=colander.required)
-    status_other = Text(validator=colander.Length(max=300))
+    name = SingleLine(missing=drop)
+    validator = OneOf(['registered_nonprofit',
+                       'planned_nonprofit',
+                       'support_needed',
+                       'other',
+                       ])
+
+    city = SingleLine(missing=drop)
+    country = ISOCountryCode(missing=drop)
+    help_request = Text(validator=Length(max=300))
+    registration_date = DateTime(missing=drop, default=None)
+    website = URL(missing=drop)
+    status = OrganizationStatusEnum(missing=required)
+    status_other = Text(validator=Length(max=300))
 
     def validator(self, node, value):
         """Extra validation depending on the status of the organisation.
@@ -72,14 +83,13 @@ class OrganizationInfoSchema(colander.MappingSchema):
         if status == 'support_needed':
             if not value.get('help_request', None):
                 help_request = node['help_request']
-                raise colander.Invalid(
-                    help_request,
-                    msg='Required iff status == support_needed')
+                raise Invalid(help_request,
+                              msg='Required iff status == support_needed')
         elif status == 'other':
             if not value.get('status_other', None):
                 status_other = node['status_other']
-                raise colander.Invalid(status_other,
-                                       msg='Required iff status == other')
+                raise Invalid(status_other,
+                              msg='Required iff status == other')
 
 
 organizationinfo_meta = sheet_meta._replace(
@@ -91,9 +101,9 @@ class IPitch(ISheet):
     """Marker interface for the pitch."""
 
 
-class PitchSchema(colander.MappingSchema):
-    pitch = Text(missing=colander.required,
-                 validator=colander.Length(min=3, max=500))
+class PitchSchema(MappingSchema):
+    pitch = Text(missing=required,
+                 validator=Length(min=3, max=500))
 
 
 pitch_meta = sheet_meta._replace(
@@ -104,7 +114,7 @@ class IPartners(ISheet):
     """Marker interface for the partner description."""
 
 
-class PartnersSchema(colander.MappingSchema):
+class PartnersSchema(MappingSchema):
     has_partners = Boolean()
     partner1_name = SingleLine()
     partner1_website = URL()
@@ -122,28 +132,27 @@ partners_meta = sheet_meta._replace(
     isheet=IPartners, schema_class=PartnersSchema)
 
 
-class TopicEnum(AdhocracySchemaNode):
+class TopicEnum(SingleLine):
     """Enum of topic domains."""
 
-    schema_type = colander.String
     default = 'other'
-    missing = colander.required
-    validator = colander.OneOf(['democracy_and_participation',
-                                'arts_and_cultural_activities',
-                                'environment',
-                                'social_inclusion',
-                                'migration',
-                                'communities',
-                                'urban_development',
-                                'education',
-                                'other',
-                                ])
+    missing = required
+    validator = OneOf(['democracy_and_participation',
+                       'arts_and_cultural_activities',
+                       'environment',
+                       'social_inclusion',
+                       'migration',
+                       'communities',
+                       'urban_development',
+                       'education',
+                       'other',
+                       ])
 
 
-class TopicEnums(AdhocracySequenceNode):
+class TopicEnums(SequenceSchema):
     """List of TopicEnums."""
 
-    missing = colander.required
+    missing = required
     topics = TopicEnum()
 
 
@@ -151,20 +160,20 @@ class ITopic(ISheet):
     """Marker interface for the topic (ex: democracy, art, environment etc)."""
 
 
-class TopicSchema(colander.MappingSchema):
-    topic = TopicEnums(validator=colander.Length(min=1, max=2))
+class TopicSchema(MappingSchema):
+    topic = TopicEnums(validator=Length(min=1, max=2))
     topic_other = Text()
 
-    def validator(self, node: colander.SchemaNode, value: dict):
+    def validator(self, node: SchemaNode, value: dict):
         """Extra validation depending on the status of the topic."""
         topics = value.get('topic', [])
         if 'other' in topics:
             if not value.get('topic_other', None):
-                raise colander.Invalid(node['topic_other'],
-                                       msg='Required if "other" in topic')
+                raise Invalid(node['topic_other'],
+                              msg='Required if "other" in topic')
         if _has_duplicates(topics):
-            raise colander.Invalid(node['topic'],
-                                   msg='Duplicates are not allowed')
+            raise Invalid(node['topic'],
+                          msg='Duplicates are not allowed')
 
 
 def _has_duplicates(iterable: list) -> bool:
@@ -180,8 +189,8 @@ class IDuration(ISheet):
     """Marker interface for the duration."""
 
 
-class DurationSchema(colander.MappingSchema):
-    duration = Integer(missing=colander.required)
+class DurationSchema(MappingSchema):
+    duration = Integer(missing=required)
 
 
 duration_meta = sheet_meta._replace(
@@ -193,10 +202,10 @@ class ILocation(ISheet):
     """Marker interface for the location."""
 
 
-class LocationSchema(colander.MappingSchema):
+class LocationSchema(MappingSchema):
     location = SingleLine()
     is_online = Boolean()
-    has_link_to_ruhr = Boolean(missing=colander.required, default=False)
+    has_link_to_ruhr = Boolean(missing=required, default=False)
     link_to_ruhr = Text()
 
     def validator(self, node, value):
@@ -208,9 +217,8 @@ class LocationSchema(colander.MappingSchema):
         if has_link_to_ruhr:
             if not value.get('link_to_ruhr', None):
                 link_to_ruhr = node['link_to_ruhr']
-                raise colander.Invalid(
-                    link_to_ruhr,
-                    msg='Required iff has_link_to_ruhr == True')
+                raise Invalid(link_to_ruhr,
+                              msg='Required iff has_link_to_ruhr == True')
 
 
 location_meta = sheet_meta._replace(
@@ -223,21 +231,20 @@ class IStatus(ISheet):
     """Marker interface for the project status."""
 
 
-class ProjectStatusEnum(AdhocracySchemaNode):
+class ProjectStatusEnum(SingleLine):
     """Enum of organizational statuses."""
 
-    schema_type = colander.String
     default = 'other'
-    missing = colander.required
-    validator = colander.OneOf(['starting',
-                                'developing',
-                                'scaling',
-                                'other',
-                                ])
+    missing = required
+    validator = OneOf(['starting',
+                       'developing',
+                       'scaling',
+                       'other',
+                       ])
 
 
-class StatusSchema(colander.MappingSchema):
-    status = ProjectStatusEnum(missing=colander.required)
+class StatusSchema(MappingSchema):
+    status = ProjectStatusEnum(missing=required)
 
 
 status_meta = sheet_meta._replace(
@@ -250,11 +257,11 @@ class IChallenge(ISheet):
     """Marker interface for the challenge in the road to impact section."""
 
 
-class ChallengeSchema(colander.MappingSchema):
+class ChallengeSchema(MappingSchema):
     """Datastruct for the challenge field."""
 
-    challenge = Text(missing=colander.required,
-                     validator=colander.Length(min=3, max=500))
+    challenge = Text(missing=required,
+                     validator=Length(min=3, max=500))
 
 challenge_meta = sheet_meta._replace(
     isheet=IChallenge,
@@ -266,11 +273,11 @@ class IGoal(ISheet):
     """Marker interface for the 'aiming for' in the road to impact section."""
 
 
-class GoalSchema(colander.MappingSchema):
+class GoalSchema(MappingSchema):
     """Datastruct for the goal."""
 
-    goal = Text(missing=colander.required,
-                validator=colander.Length(min=3, max=500))
+    goal = Text(missing=required,
+                validator=Length(min=3, max=500))
 
 goal_meta = sheet_meta._replace(
     isheet=IGoal,
@@ -282,11 +289,11 @@ class IPlan(ISheet):
     """Marker interface for the 'plan' in the road to impact section."""
 
 
-class PlanSchema(colander.MappingSchema):
+class PlanSchema(MappingSchema):
     """Datastruct for the challenge field."""
 
-    plan = Text(missing=colander.required,
-                validator=colander.Length(min=3, max=800))
+    plan = Text(missing=required,
+                validator=Length(min=3, max=800))
 
 plan_meta = sheet_meta._replace(
     isheet=IPlan,
@@ -298,11 +305,11 @@ class ITarget(ISheet):
     """Marker interface for the 'target' in the road to impact section."""
 
 
-class TargetSchema(colander.MappingSchema):
+class TargetSchema(MappingSchema):
     """Datastruct for the challenge field."""
 
-    target = Text(missing=colander.required,
-                  validator=colander.Length(min=3, max=500))
+    target = Text(missing=required,
+                  validator=Length(min=3, max=500))
 
 target_meta = sheet_meta._replace(
     isheet=ITarget,
@@ -314,11 +321,11 @@ class ITeam(ISheet):
     """Marker interface for the 'team' in the road to impact section."""
 
 
-class TeamSchema(colander.MappingSchema):
+class TeamSchema(MappingSchema):
     """Datastruct for the challenge field."""
 
-    team = Text(missing=colander.required,
-                validator=colander.Length(min=3, max=800))
+    team = Text(missing=required,
+                validator=Length(min=3, max=800))
 
 team_meta = sheet_meta._replace(
     isheet=ITeam,
@@ -330,11 +337,11 @@ class IExtraInfo(ISheet):
     """Marker interface for the 'extrainfo' in the road to impact section."""
 
 
-class ExtraInfoSchema(colander.MappingSchema):
+class ExtraInfoSchema(MappingSchema):
     """Datastruct for the extra info field."""
 
-    extrainfo = Text(missing=colander.drop,
-                     validator=colander.Length(min=3, max=500))
+    extrainfo = Text(missing=drop,
+                     validator=Length(min=3, max=500))
 
 extrainfo_meta = sheet_meta._replace(
     isheet=IExtraInfo,
@@ -346,11 +353,11 @@ class IConnectionCohesion(ISheet):
     """Marker iface for 'connection and cohesion' in the selection criteria."""
 
 
-class ConnectionCohesionSchema(colander.MappingSchema):
+class ConnectionCohesionSchema(MappingSchema):
     """Datastruct for the connection and cohesion field."""
 
-    connection_cohesion = Text(missing=colander.required,
-                               validator=colander.Length(min=3, max=500))
+    connection_cohesion = Text(missing=required,
+                               validator=Length(min=3, max=500))
 
 connectioncohesion_meta = sheet_meta._replace(
     isheet=IConnectionCohesion,
@@ -362,11 +369,11 @@ class IDifference(ISheet):
     """Marker interface for the 'difference' in the selection section."""
 
 
-class DifferenceSchema(colander.MappingSchema):
+class DifferenceSchema(MappingSchema):
     """Datastruct for the challenge field."""
 
-    difference = Text(missing=colander.required,
-                      validator=colander.Length(min=3, max=500))
+    difference = Text(missing=required,
+                      validator=Length(min=3, max=500))
 
 difference_meta = sheet_meta._replace(
     isheet=IDifference,
@@ -378,11 +385,11 @@ class IPracticalRelevance(ISheet):
     """Marker for the 'practical relevance' in the selection criteria."""
 
 
-class PracticalRelevanceSchema(colander.MappingSchema):
+class PracticalRelevanceSchema(MappingSchema):
     """Datastruct for the challenge field."""
 
-    practicalrelevance = Text(missing=colander.required,
-                              validator=colander.Length(min=3, max=500))
+    practicalrelevance = Text(missing=required,
+                              validator=Length(min=3, max=500))
 
 practicalrelevance_meta = sheet_meta._replace(
     isheet=IPracticalRelevance,
@@ -394,19 +401,18 @@ class IFinancialPlanning(ISheet):
     """Marker interface for the financial planning."""
 
 
-class FinancialPlanningSchema(colander.MappingSchema):
-    budget = CurrencyAmount(missing=colander.required)
-    requested_funding = CurrencyAmount(
-        missing=colander.required,
-        validator=colander.Range(min=1, max=50000))
-    major_expenses = Text(missing=colander.required)
+class FinancialPlanningSchema(MappingSchema):
+    budget = CurrencyAmount(missing=required)
+    requested_funding = CurrencyAmount(missing=required,
+                                       validator=Range(min=1, max=50000))
+    major_expenses = Text(missing=required)
 
 
 class IExtraFunding(ISheet):
     """Marker interface for the 'other sources of income' fie."""
 
 
-class ExtraFundingSchema(colander.MappingSchema):
+class ExtraFundingSchema(MappingSchema):
     other_sources = Text(missing='')
     secured = Boolean(default=False)
 
@@ -428,44 +434,42 @@ class ICommunity(ISheet):
     """Marker interface for the community information."""
 
 
-class HeardFromEnum(AdhocracySchemaNode):
+class HeardFromEnum(SingleLine):
     """Enum of organizational statuses."""
 
-    schema_type = colander.String
     default = 'other'
-    missing = colander.required
-    validator = colander.OneOf(['personal_contact',
-                                'website',
-                                'facebook',
-                                'twitter',
-                                'newsletter',
-                                'other',
-                                ])
+    missing = required
+    validator = OneOf(['personal_contact',
+                       'website',
+                       'facebook',
+                       'twitter',
+                       'newsletter',
+                       'other',
+                       ])
 
 
-class HeardFromEnums(AdhocracySequenceNode):
+class HeardFromEnums(SequenceSchema):
     """List of HeardFromEnums."""
 
-    missing = colander.required
+    missing = required
     heard_froms = HeardFromEnum()
 
 
-class CommunitySchema(colander.MappingSchema):
-    expected_feedback = Text(missing=colander.drop)
-    heard_froms = HeardFromEnums(validator=colander.Length(min=1))
+class CommunitySchema(MappingSchema):
+    expected_feedback = Text(missing=drop)
+    heard_froms = HeardFromEnums(validator=Length(min=1))
     heard_from_other = Text()
 
-    def validator(self, node: colander.SchemaNode, value: dict):
+    def validator(self, node: SchemaNode, value: dict):
         """Extra validation depending on the status of the heard froms."""
         heard_froms = value.get('heard_froms', [])
         if 'other' in heard_froms:
             if not value.get('heard_from_other', None):
-                raise colander.Invalid(
-                    node['heard_from_other'],
-                    msg='Required if "other" in heard_froms')
+                raise Invalid(node['heard_from_other'],
+                              msg='Required if "other" in heard_froms')
         if _has_duplicates(heard_froms):
-            raise colander.Invalid(node['heard_froms'],
-                                   msg='Duplicates are not allowed')
+            raise Invalid(node['heard_froms'],
+                          msg='Duplicates are not allowed')
 
 community_meta = sheet_meta._replace(
     isheet=ICommunity,
@@ -477,7 +481,7 @@ class IWinnerInfo(ISheet):
     """Marker interface for the winner information."""
 
 
-class WinnerInfoSchema(colander.MappingSchema):
+class WinnerInfoSchema(MappingSchema):
     funding = Integer()
 
 winnerinfo_meta = sheet_meta._replace(
@@ -588,7 +592,7 @@ class PracticalRelevanceReference(SheetToSheet):
     target_isheet = IPracticalRelevance
 
 
-class MercatorSubResourcesSchema(colander.MappingSchema):
+class MercatorSubResourcesSchema(MappingSchema):
     """Subresources of mercator."""
 
     pitch = Reference(reftype=PitchReference)

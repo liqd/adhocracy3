@@ -50,7 +50,6 @@ from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.asset import IAssetData
 from adhocracy_core.sheets.comment import ICommentable
-from adhocracy_core.sheets.versions import IVersions
 from adhocracy_core import sheets
 
 logger = getLogger(__name__)
@@ -200,6 +199,14 @@ def _get_last_version(resource: IItemVersion,
     return last
 
 
+def _get_first_version(resource: IItemVersion,
+                       registry: Registry) -> IItemVersion:
+    """Get first version of  resource' according to the last tag."""
+    item = find_interface(resource, IItem)
+    first = registry.content.get_sheet_field(item, ITags, 'FIRST')
+    return first
+
+
 def _create_new_version(event, appstruct) -> IResource:
     appstructs = _get_writable_appstructs(event.object, event.registry)
     appstructs[IVersionable.__identifier__]['follows'] = [event.object]
@@ -289,15 +296,25 @@ def update_image_downloads(event):
 
 
 def increase_comments_count(event):
-    """Increase comments_count for commentables in :term:`lineage`."""
+    """Increase comments_count for commentables in :term:`lineage`.
+
+    The incrementation occurs only on the first version.
+    """
     comment_version = event.reference.source
-    update_comments_count(comment_version, 1, event.registry)
+    first_version = _get_first_version(comment_version, event.registry)
+    if comment_version == first_version:
+        update_comments_count(comment_version, 1, event.registry)
 
 
 def decrease_comments_count(event):
-    """Decrease comments_count for commentables in :term:`lineage`."""
+    """Decrease comments_count for commentables in :term:`lineage`.
+
+    The decrementation occurs only on the last version.
+    """
     comment_version = event.reference.source
-    update_comments_count(comment_version, -1, event.registry)
+    first_version = _get_first_version(comment_version, event.registry)
+    if comment_version == first_version:
+        update_comments_count(comment_version, -1, event.registry)
 
 
 def update_comments_count_after_visibility_change(event):
@@ -310,11 +327,8 @@ def update_comments_count_after_visibility_change(event):
     else:
         delta = 0
     if delta != 0:
-        versions = event.registry.content.get_sheet_field(event.object,
-                                                          IVersions,
-                                                          'elements')
-        for version in versions:
-            update_comments_count(version, delta, event.registry)
+        first_version = _get_first_version(event.object, event.registry)
+        update_comments_count(first_version, delta, event.registry)
 
 
 def update_comments_count(resource: ICommentVersion,

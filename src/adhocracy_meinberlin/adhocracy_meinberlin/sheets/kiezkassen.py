@@ -1,11 +1,14 @@
 """Sheets for Mercator proposals."""
+from colander import Length
+from colander import Range
+from colander import required
 from zope.deprecation import deprecated
-import colander
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import workflow
+from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import CurrencyAmount
 from adhocracy_core.schema import SingleLine
@@ -15,15 +18,15 @@ class IProposal(ISheet):
     """Marker interface for the Kiezkassen proposal sheet."""
 
 
-class ProposalSchema(colander.MappingSchema):
+class ProposalSchema(MappingSchema):
     """Data structure for organizational information."""
 
     # TODO: check exact length restrictions
 
-    budget = CurrencyAmount(missing=colander.required,
-                            validator=colander.Range(min=0, max=50000))
+    budget = CurrencyAmount(missing=required,
+                            validator=Range(min=0, max=50000))
     creator_participate = Boolean()
-    location_text = SingleLine(validator=colander.Length(max=100))
+    location_text = SingleLine(validator=Length(max=100))
 
 proposal_meta = sheet_meta._replace(isheet=IProposal,
                                     schema_class=ProposalSchema)
