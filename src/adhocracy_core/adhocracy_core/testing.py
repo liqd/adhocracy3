@@ -725,8 +725,8 @@ def app_with_filestorage(app_settings: dict) -> Router:
     Any DB contents are cleared by this fixture.
     """
     import adhocracy_core
-    db_file = 'var/test_zeodata/Data.fs'
-    blob_dir = 'var/test_zeodata/blobs'
+    db_file = 'var/db/test/Data.fs'
+    blob_dir = 'var/db/test/blobs'
     # Delete old content
     storage = FileStorage.FileStorage(db_file, blob_dir=blob_dir)
     storage.cleanup()
