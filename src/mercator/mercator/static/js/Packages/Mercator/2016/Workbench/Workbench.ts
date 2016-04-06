@@ -197,7 +197,15 @@ export var proposalListingColumnDirective = (
                         ]
                     }];
 
-                    if (currentPhase === "result") {
+                    if (currentPhase === "evaluate") {
+                        scope.facets.push({
+                            key: "badge",
+                            name: "TR__MERCATOR_BADGE_AWARDS_LABEL",
+                            items: [
+                                {key: "shortlist", name: "TR__MERCATOR_BADGE_SHORTLIST"}
+                            ]
+                        });
+                    } else if (currentPhase === "result") {
                         scope.facets.push({
                             key: "badge",
                             name: "TR__MERCATOR_BADGE_AWARDS_LABEL",
