@@ -58,7 +58,7 @@ def test_get_cache_strategy_for_methodname(registry, context, request_):
 def test_get_cache_strategy_dont_get_disabled_view_names(registry, context, request_):
     from . import _get_cache_strategy
     _create_and_register_mock_strategy(registry, 'POST')
-    request_.method_name = 'POST'
+    request_.method = 'POST'
     assert _get_cache_strategy(context, request_) is None
 
 
