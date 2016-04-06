@@ -8,7 +8,7 @@ export var register = () => {
         var adhMetaApiMock;
 
         beforeEach(() => {
-            adhMetaApiMock = jasmine.createSpyObj("adhMetaApi", ["field"]);
+            adhMetaApiMock = jasmine.createSpyObj("adhMetaApi", ["field", "fieldExists"]);
             adhMetaApiMock.field.and.callFake((sheetName, fieldName) => {
                 if (fieldName[0] === "r") {
                     return {valuetype: "adhocracy_core.schema.AbsolutePath"};
@@ -16,6 +16,7 @@ export var register = () => {
                     return {valuetype: "something else"};
                 }
             });
+            adhMetaApiMock.fieldExists.and.returnValue(true);
         });
 
         describe("getReferences", () => {
