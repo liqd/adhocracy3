@@ -342,8 +342,8 @@ def remove_name_sheet_from_items(root, registry):  # pragma: no cover
 
 
 @log_migration
-def add_workflow_assignment_sheet_to_pools_simples(root,    # pragma: no cover
-                                                   registry):
+def add_workflow_assignment_sheet_to_pools_simples(
+        root, registry):  # pragma: no cover
     """Add generic workflow sheet to pools and simples."""
     migrate_new_sheet(root, IPool, IWorkflowAssignment)
     migrate_new_sheet(root, ISimple, IWorkflowAssignment)

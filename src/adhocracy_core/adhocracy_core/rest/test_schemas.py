@@ -36,6 +36,21 @@ def registry(registry_with_content):
     return registry_with_content
 
 
+def test_validate_request_data_decorator(context, request_, mocker):
+    from . import validate_request_data
+    schema_class = colander.MappingSchema
+    schema = schema_class()
+    view = mocker.Mock()
+    validate_data = mocker.patch('adhocracy_core.rest.schemas'
+                                 '._validate_request_data')
+    create_schema = mocker.patch('adhocracy_core.rest.schemas.create_schema',
+                                 return_value=schema)
+    validate_request_data(schema_class)(view)(context, request_)
+    create_schema.assert_called_with(schema_class, context, request_)
+    validate_data.assert_called_with(context, request_, schema)
+    view.assert_called_with(context, request_)
+
+
 class TestValidateRequestData:
 
     def call_fut(self, *args):
@@ -205,6 +220,15 @@ class TestValidateRequestData:
         schema = colander.SchemaNode(colander.Int())
         with raises(Exception):
             self.call_fut(context, request_, schema)
+
+    def test_valid_with_pool_request_schema(self, context, request_, mocker):
+        from .schemas import GETPoolRequestSchema
+        schema = GETPoolRequestSchema()
+        add_nodes = mocker.patch('adhocracy_core.rest.schemas.'
+                                 'add_arbitrary_filter_nodes',
+                                 return_value=schema)
+        self.call_fut(context, request_, schema)
+        add_nodes.assert_called_with({}, schema, context, request_.registry)
 
 
 class TestValidateVisibility:
