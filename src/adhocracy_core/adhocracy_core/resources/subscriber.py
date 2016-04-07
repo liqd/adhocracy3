@@ -1,8 +1,10 @@
 """Autoupdate resources."""
 from base64 import b64encode
 from collections import Sequence
+from io import BytesIO
 from logging import getLogger
 from os import urandom
+import requests
 
 from pyramid.interfaces import IApplicationCreated
 from pyramid.registry import Registry
@@ -11,6 +13,8 @@ from pyramid.settings import asbool
 from pyramid.traversal import find_interface
 from pyramid.i18n import TranslationStringFactory
 from substanced.util import find_service
+from substanced.file import File
+from substanced.file import USE_MAGIC
 
 from adhocracy_core.authorization import set_acms_for_app_root
 from adhocracy_core.interfaces import IResource
@@ -24,6 +28,7 @@ from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import ISheetReferenceNewVersion
 from adhocracy_core.interfaces import ISheetBackReferenceAdded
 from adhocracy_core.interfaces import ISheetBackReferenceRemoved
+from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.interfaces import search_query
@@ -50,6 +55,7 @@ from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.asset import IAssetData
 from adhocracy_core.sheets.comment import ICommentable
+from adhocracy_core.sheets.image import IImageReference
 from adhocracy_core import sheets
 
 logger = getLogger(__name__)
@@ -361,6 +367,78 @@ def update_comments_count(resource: ICommentVersion,
                               omit_readonly=False)
 
 
+def download_external_picture_for_created(event: IResourceCreatedAndAdded):
+    """Download external_picture_url for new resources."""
+    if IItemVersion.providedBy(event.object):
+        return  # download_external_picture_for_version takes care for it
+    registry = event.registry
+    new_url = registry.content.get_sheet_field(event.object,
+                                               IImageReference,
+                                               'external_picture_url')
+    _download_picture_url(event.object, '', new_url, registry)
+
+
+def download_external_picture_for_version(event: IItemVersionNewVersionAdded):
+    """Download external_picture_url for new item versions."""
+    registry = event.registry
+    old_url = registry.content.get_sheet_field(event.object, IImageReference,
+                                               'external_picture_url')
+    new_url = registry.content.get_sheet_field(event.new_version,
+                                               IImageReference,
+                                               'external_picture_url')
+    _download_picture_url(event.new_version, old_url, new_url, registry)
+
+
+def download_external_picture_for_edited(event: IResourceSheetModified):
+    """Download external_picture_url for edited resources."""
+    old_url = event.old_appstruct.get('external_picture_url', '')
+    new_url = event.new_appstruct.get('external_picture_url', '')
+    _download_picture_url(event.object, old_url, new_url, event.registry)
+
+
+def _download_picture_url(context: IImageReference,
+                          old_url: str,
+                          new_url: str,
+                          registry: Registry):
+    if old_url == new_url:
+        return
+    elif new_url == '':
+        _set_picture_reference(context, None, registry)
+    else:
+        file = _download(new_url)
+        image = _create_image(context, file, registry)
+        _set_picture_reference(context, image, registry)
+
+
+def _set_picture_reference(context: IResource,
+                           value: IImage,
+                           registry: Registry):
+    sheet = registry.content.get_sheet(context, IImageReference)
+    sheet.set({'picture': value})
+
+
+def _download(url: str) -> File:
+    resp = requests.get(url, timeout=5)
+    content = BytesIO(resp.content)
+    file = File(stream=content,
+                mimetype=USE_MAGIC)
+    file.size = resp.headers['Content-Length']
+    return file
+
+
+def _create_image(context: IResource,
+                  file: File,
+                  registry: Registry) -> IImage:
+    assets = find_service(context, 'assets')
+    appstructs = {IAssetData.__identifier__: {'data': file}}
+    image = registry.content.create(IImage.__identifier__,
+                                    parent=assets,
+                                    appstructs=appstructs,
+                                    registry=registry,
+                                    )
+    return image
+
+
 def includeme(config):
     """Register subscribers."""
     config.add_subscriber(set_acms_for_app_root, IApplicationCreated)
@@ -406,3 +484,12 @@ def includeme(config):
                           IResourceSheetModified,
                           object_iface=IComment,
                           event_isheet=IMetadata)
+    config.add_subscriber(download_external_picture_for_created,
+                          IResourceCreatedAndAdded,
+                          object_iface=IImageReference)
+    config.add_subscriber(download_external_picture_for_version,
+                          IItemVersionNewVersionAdded,
+                          object_iface=IImageReference)
+    config.add_subscriber(download_external_picture_for_edited,
+                          IResourceSheetModified,
+                          event_isheet=IImageReference)

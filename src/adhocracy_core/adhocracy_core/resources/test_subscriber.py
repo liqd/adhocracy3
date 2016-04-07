@@ -75,6 +75,13 @@ def registry(registry_with_content, changelog):
     return registry_with_content
 
 
+@fixture
+def mock_download(mocker):
+    mock = mocker.patch('adhocracy_core.resources.subscriber.'
+                        '_download_picture_url')
+    return mock
+
+
 class TestAutoupdateVersionableHasNewVersion:
 
     @fixture
@@ -718,6 +725,133 @@ class TestUpdateCommentsCountAfterVisibilityChange:
         assert mock_update.called_with(comment_v0, 1, event.registry)
 
 
+class TestDownloadPictureForVersion:
+
+    @fixture
+    def event(self, event, version, registry):
+        event.registry = registry
+        event.new_version = version
+        return event
+
+    def call_fut(self, *args):
+        from .subscriber import download_external_picture_for_version
+        return download_external_picture_for_version(*args)
+
+
+    def test_call_download_picture_url(self, event, mock_download, registry,
+                                       mock_sheet):
+        from copy import deepcopy
+        old_sheet = mock_sheet
+        old_sheet.get.return_value = {'external_picture_url': 'old_url'}
+        new_sheet = deepcopy(mock_sheet)
+        new_sheet.get.return_value = {'external_picture_url': 'new_url'}
+        registry.content.get_sheet.side_effect = (old_sheet, new_sheet)
+        self.call_fut(event)
+        mock_download.assert_called_with(event.new_version, 'old_url',
+                                         'new_url', registry)
+
+
+class TestDownloadPictureForCreated:
+
+    @fixture
+    def event(self, event, registry):
+        event.registry = registry
+        return event
+
+    def call_fut(self, *args):
+        from .subscriber import download_external_picture_for_created
+        return download_external_picture_for_created(*args)
+
+    def test_ignore_if_context_is_versionable(self, event, version,
+                                              mock_download):
+        event.object = version
+        self.call_fut(event)
+        assert not mock_download.called
+
+    def test_call_download_picture_url(self, event, mock_download, registry,
+                                       mock_sheet):
+        mock_sheet.get.return_value = {'external_picture_url': 'new_url'}
+        registry.content.get_sheet.return_value = mock_sheet
+        self.call_fut(event)
+        mock_download.assert_called_with(event.object, '',
+                                         'new_url', registry)
+
+
+class TestDownloadPictureForEdited:
+
+    @fixture
+    def event(self, event, registry):
+        event.registry = registry
+        return event
+
+    def call_fut(self, *args):
+        from .subscriber import download_external_picture_for_edited
+        return download_external_picture_for_edited(*args)
+
+    def test_call_download_picture_url(self, event, mock_download, registry):
+        event.old_appstruct = {'external_picture_url': 'old_url'}
+        event.new_appstruct = {'external_picture_url': 'new_url'}
+        self.call_fut(event)
+        mock_download.assert_called_with(event.object, 'old_url',
+                                         'new_url', registry)
+
+    def test_call_download_picture_url_with_empty_string_if_not_set(
+            self, event, mock_download, registry):
+        event.old_appstruct = {}
+        event.new_appstruct = {}
+        self.call_fut(event)
+        mock_download.assert_called_with(event.object, '',
+                                         '', registry)
+
+
+
+class TestDownloadExternalPictureUrl:
+
+    def call_fut(self, *args):
+        from .subscriber import _download_picture_url
+        return _download_picture_url(*args)
+
+    def test_ignore_if_picture_url_not_changed(self, context, registry):
+        old_url = 'http://x'
+        new_url = 'http://x'
+        self.call_fut(context, old_url, new_url, registry)
+        assert not registry.content.create.called
+
+    def test_remove_picture_reference_if_picture_url_changed_to_empty(
+            self, context, registry, mock_sheet):
+        registry.content.get_sheet.return_value = mock_sheet
+        old_url = 'http://x'
+        new_url = ''
+        self.call_fut(context, old_url, new_url, registry)
+        mock_sheet.set.assert_called_with({'picture': None})
+
+    def test_download_picture_url_and_reference_if_picture_url_changed(
+            self, context, registry, mock_sheet, mocker):
+        from adhocracy_core.sheets.asset import IAssetData
+        from .image import IImage
+        image = Mock()
+        file = mocker.patch('adhocracy_core.resources.subscriber.'
+                            'File').return_value
+        assets = mocker.patch('adhocracy_core.resources.subscriber.'
+                              'find_service').return_value
+        registry.content.create.return_value = image
+        registry.content.get_sheet.return_value = mock_sheet
+        resp = Mock(content=b'sdfsdf', headers={'Content-Length': 11})
+        mocker.patch('requests.get', return_value=resp)
+
+        old_url = ''
+        new_url = 'http://x'
+        self.call_fut(context, old_url, new_url, registry)
+
+        assert file.size == 11
+        registry.content.create.assert_called_with(
+            IImage.__identifier__,
+            parent=assets,
+            registry=registry,
+            appstructs={IAssetData.__identifier__: {'data': file}})
+        mock_sheet.set.assert_called_with({'picture': image})
+
+
 @mark.usefixtures('integration')
 def test_register_subscriber(registry):
     from adhocracy_core.resources import subscriber
@@ -735,5 +869,8 @@ def test_register_subscriber(registry):
     assert subscriber.increase_comments_count.__name__ in handlers
     assert subscriber.update_comments_count_after_visibility_change.__name__ in handlers
     assert set_acms_for_app_root.__name__ in handlers
+    assert subscriber.download_external_picture_for_created.__name__ in handlers
+    assert subscriber.download_external_picture_for_version.__name__ in handlers
+    assert subscriber.download_external_picture_for_edited.__name__ in handlers
 
 
