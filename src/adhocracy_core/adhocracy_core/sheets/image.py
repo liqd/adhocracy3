@@ -1,11 +1,17 @@
 """image sheet."""
 from colander import OneOf
 from colander import required
+from colander import All
+from colander import Invalid
+from requests.exceptions import ConnectionError
+import requests
+
 from adhocracy_core.interfaces import Dimensions
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.sheets.asset import AssetMetadataSchema
 from adhocracy_core.sheets.asset import asset_metadata_meta
+from adhocracy_core.schema import FileStoreType
 from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import Resource
@@ -50,12 +56,35 @@ class ImageReference(SheetToSheet):
     target_isheet = IImageMetadata
 
 
+def picture_url_validator(node, value):
+    """Validate picture url."""
+    try:
+        resp = requests.head(value, timeout=2)
+    except ConnectionError:
+        msg = 'Connection failed'.format(value)
+        raise Invalid(node, msg)
+
+    if resp.status_code != 200:
+        msg = 'Connection failed, status is {} instead of 200'
+        raise Invalid(node, msg.format(resp.status_code))
+
+    mimetype = resp.headers.get('ContentType', '')
+    image_mime_type_validator(node, mimetype)
+
+    size = int(resp.headers.get('Content-Length', '0'))
+    if size > FileStoreType.SIZE_LIMIT:
+        msg = 'Asset too large: {} bytes'.format(size)
+        raise Invalid(node, msg)
+
+
 class ImageReferenceSchema(MappingSchema):
     """Data structure for the image reference sheet."""
 
     picture = Reference(reftype=ImageReference)
     picture_description = SingleLine()
-    external_picture_url = URL()
+    external_picture_url = URL(validator=All(URL.validator,
+                                             picture_url_validator,
+                                             ))
 
 
 image_reference_meta = asset_metadata_meta._replace(

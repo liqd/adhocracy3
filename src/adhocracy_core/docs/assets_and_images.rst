@@ -66,6 +66,7 @@ And an http server to test image download:
     >>> base_path = adhocracy_core.__path__[0]
     >>> test_image_path = os.path.join(base_path, '../', 'docs', 'test_image.png')
     >>> httpserver.serve_content(open(test_image_path, 'rb').read())
+    >>> httpserver.headers['ContentType'] = 'image/png'
     >>> test_image_url = httpserver.url
 
 We need a pool with an asset pool::

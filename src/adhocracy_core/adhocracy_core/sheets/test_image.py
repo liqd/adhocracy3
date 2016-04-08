@@ -1,6 +1,7 @@
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
+from pytest import raises
 
 
 class TestImageMetadataSheet:
@@ -44,6 +45,10 @@ class TestImageReference:
         from .image import image_reference_meta
         return image_reference_meta
 
+    @fixture
+    def inst(self, meta, context):
+        return meta.sheet_class(meta, context, None)
+
     def test_meta(self, meta):
         from . import image
         from adhocracy_core.sheets import AnnotationRessourceSheet
@@ -55,8 +60,13 @@ class TestImageReference:
     def test_create(self, meta, context):
         assert meta.sheet_class(meta, context, None)
 
-    def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context, None)
+    def test_schema(self, inst):
+        from .image import picture_url_validator
+        from adhocracy_core.schema import URL
+        assert inst.schema['external_picture_url'].validator.validators == \
+               (URL.validator, picture_url_validator)
+
+    def test_get_empty(self, inst):
         assert inst.get() == {'picture': None,
                               'picture_description': '',
                               'external_picture_url': ''}
@@ -65,3 +75,56 @@ class TestImageReference:
     def test_includeme_register(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
         assert registry.content.get_sheet(context, meta.isheet)
+
+import colander
+
+class TestPictureUrlValidator:
+
+    @fixture
+    def test_image(self, httpserver):
+        import os
+        from adhocracy_core import sheets
+        test_image_path = os.path.join(sheets.__path__[0], 'test_image.png')
+        httpserver.serve_content(open(test_image_path, 'rb').read())
+        return httpserver
+
+    def call_fut(self, *args):
+        from .image import picture_url_validator
+        return picture_url_validator(*args)
+
+    def test_raise_if_connection_error(self, node, mocker):
+        from requests.exceptions import ConnectionError
+        mocker.patch('requests.head', side_effect=ConnectionError)
+        with raises(colander.Invalid) as err:
+            self.call_fut(node, 'some_url')
+        assert 'Connection failed' in err.value.msg
+
+    def test_raise_if_status_code_not_200(self, node, test_image):
+        test_image.code = 404
+        with raises(colander.Invalid) as err:
+            self.call_fut(node, test_image.url)
+        assert '404 instead of 200' in err.value.msg
+
+    @mark.parametrize('mimetype', ['image/jpeg', 'image/png', 'image/gif'])
+    def test_ignore_if_image_mimetype(self, node, test_image, mimetype):
+        test_image.headers['ContentType'] = mimetype
+        self.call_fut(node, test_image.url)
+
+    def test_raise_if_non_image_mimetype(self, node, test_image):
+        mimetype = 'no image'
+        test_image.headers['ContentType'] = mimetype
+        with raises(colander.Invalid) as err:
+            self.call_fut(node, test_image.url)
+        assert 'not one of' in err.value.msg
+
+    def test_raise_if_image_mimetype_but_size_to_big(self, node, mocker):
+        from adhocracy_core.schema import FileStoreType
+        over_max_size = FileStoreType.SIZE_LIMIT + 1
+        resp = mocker.Mock(headers={'ContentType': 'image/png',
+                                    'Content-Length':  over_max_size},
+                           status_code=200)
+        mocker.patch('requests.head', return_value=resp)
+        with raises(colander.Invalid) as err:
+            self.call_fut(node, 'image url')
+        assert 'too large' in err.value.msg
+
