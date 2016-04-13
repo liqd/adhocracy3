@@ -73,7 +73,7 @@
             </ol>
         </nav>
 
-        <div class="section-jump-main chapter-wrapper" data-du-spy-context="">
+        <div class="section-jump-main chapter-wrapper" data-du-spy-context="" data-ng-class="{'has-navigation': data.paragraphs.length > 1}">
             <section class="action-section chapter" data-ng-repeat="paragraph in data.paragraphs" data-ng-if="!paragraph.deleted" id="section-jump-chapter-{{$index}}">
                 <label>
                     <textarea
