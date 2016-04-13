@@ -23,7 +23,7 @@ import RIKiezkasseProcess from "../../../Resources_/adhocracy_meinberlin/resourc
 import * as AdhMeinberlinDe from "./MeinberlinDe";
 
 
-export var moduleName = "adhMeinberlinAlexanderplatzContext";
+export var moduleName = "adhMeinberlinDe";
 
 export var register = (angular) => {
     angular
