@@ -9,19 +9,5 @@
             {"name": "stadtforum"},
             "adhocracy_core.sheets.title.ITitle":
             {"title": "Sample Stadtforum participation process"}
-           }},
-   {"path": "/organisation/stadtforum",
-    "content_type": "adhocracy_meinberlin.resources.stadtforum.IPoll",
-    "data": {"adhocracy_core.sheets.name.IName":
-             {"name": "poll_0000000"},
-             "adhocracy_core.sheets.title.ITitle":
-             {"title": "Sample Stadtforum Poll"}
-            }},
-    {"path": "/organisation/stadtforum/poll_0000000",
-     "content_type": "adhocracy_core.resources.proposal.IProposalVersion",
-     "data": {"adhocracy_core.sheets.name.IName":
-              {"name": "VERSION_0000000"},
-              "adhocracy_core.sheets.title.ITitle":
-              {"title": "Sample Stadtforum Poll Version"}
-             }}
+           }}
 ]
