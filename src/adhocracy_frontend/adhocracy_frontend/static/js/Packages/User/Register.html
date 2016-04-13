@@ -127,7 +127,7 @@
         }"></p>
     </div>
 
-    <a class="login-cancel" href="" data-ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
+    <a data-ng-if="enableCancel" class="login-cancel" href="" data-ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
     <div class="login-info">
         {{ "TR__REGISTRATION_SUPPORT" | translate }} <br />
         <a data-ng-href="mailto:{{supportEmail}}?subject=Trouble%20with%20registration">{{ supportEmail }}</a>

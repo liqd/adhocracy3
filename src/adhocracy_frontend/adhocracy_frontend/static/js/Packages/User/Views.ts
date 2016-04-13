@@ -1,4 +1,6 @@
 /// <reference path="../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../lib2/types/lodash.d.ts"/>
+import * as _ from "lodash";
 
 import * as AdhBadge from "../Badge/Badge";
 import * as AdhConfig from "../Config/Config";
@@ -122,6 +124,7 @@ export interface IScopeRegister extends angular.IScope {
     success : boolean;
 
     register : () => angular.IPromise<void>;
+    enableCancel : boolean;
     cancel : () => void;
     showError;
     logOut : () => void;
@@ -198,8 +201,6 @@ export var loginDirective = (
             scope.supportEmail = adhConfig.support_email;
             scope.showError = adhShowError;
 
-            scope.enableCancel = adhEmbed.getContext() !== "login";
-
             adhPermissions.bindScope(scope, "/principals/users");
 
             scope.credentials = {
@@ -211,6 +212,8 @@ export var loginDirective = (
                 scope.credentials.nameOrEmail = "";
                 scope.credentials.password = "";
             };
+
+            scope.enableCancel = ! _.includes(["login", "logout", "register"], adhEmbed.getContext());
 
             scope.cancel = () => {
                  adhTopLevelState.goToCameFrom("/");
@@ -340,6 +343,7 @@ export var registerDirective = (
     adhCredentials : AdhCredentials.Service,
     adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
+    adhEmbed : AdhEmbed.Service,
     adhShowError
 ) => {
     return {
@@ -398,6 +402,8 @@ export var registerDirective = (
                 passwordRepeat: "",
                 captchaGuess: ""
             };
+
+            scope.enableCancel = ! _.includes(["login", "logout", "register"], adhEmbed.getContext());
 
             scope.cancel = scope.goBack = () => {
                 adhTopLevelState.goToCameFrom("/");
@@ -473,6 +479,7 @@ export var createPasswordResetDirective = (
     adhHttp : AdhHttp.Service<any>,
     adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
+    adhEmbed : AdhEmbed.Service,
     adhShowError
 ) => {
     return {
@@ -491,6 +498,8 @@ export var createPasswordResetDirective = (
             scope.input = {
                 email: ""
             };
+
+            scope.enableCancel = ! _.includes(["login", "logout", "register"], adhEmbed.getContext());
 
             scope.goBack = scope.cancel = () => {
                  adhTopLevelState.goToCameFrom("/");

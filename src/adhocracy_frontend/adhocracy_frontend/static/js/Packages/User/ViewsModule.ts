@@ -1,3 +1,5 @@
+/// <reference path="../../../lib2/types/lodash.d.ts"/>
+
 import * as _ from "lodash";
 
 import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
@@ -100,7 +102,7 @@ export var register = (angular) => {
             "adhShowError",
             AdhUserViews.loginDirective])
         .directive("adhPasswordReset", [
-            "adhConfig", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", AdhUserViews.passwordResetDirective])
+            "adhConfig", "adhHttp", "adhUser", "adhTopLevelState", "adhEmbed", "adhShowError", AdhUserViews.passwordResetDirective])
         .directive("adhCreatePasswordReset", [
             "adhConfig",
             "adhCredentials",
@@ -110,7 +112,15 @@ export var register = (angular) => {
             "adhShowError",
             AdhUserViews.createPasswordResetDirective])
         .directive("adhRegister", [
-            "$sce", "$http", "adhConfig", "adhCredentials", "adhUser", "adhTopLevelState", "adhShowError", AdhUserViews.registerDirective])
+            "$sce",
+            "$http",
+            "adhConfig",
+            "adhCredentials",
+            "adhUser",
+            "adhTopLevelState",
+            "adhEmbed",
+            "adhShowError",
+            AdhUserViews.registerDirective])
         .directive("adhUserIndicator", [
             "adhConfig", "adhResourceArea", "adhTopLevelState", "adhPermissions", "$location", AdhUserViews.indicatorDirective])
         .directive("adhUserMeta", ["adhConfig", "adhResourceArea", "adhGetBadges", AdhUserViews.metaDirective])
