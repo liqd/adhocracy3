@@ -62,7 +62,7 @@
     </div><!-- /.cover -->
 
     <div class="section-jump-body">
-        <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="">
+        <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="" data-ng-if="paragraphCount() > 1">
             <ol>
                 <li data-ng-repeat="paragraph in data.paragraphs | filter:{deleted: false}">
                     <a
@@ -73,7 +73,7 @@
             </ol>
         </nav>
 
-        <div class="section-jump-main chapter-wrapper" data-du-spy-context="">
+        <div class="section-jump-main chapter-wrapper" data-du-spy-context="" data-ng-class="{'has-navigation': paragraphCount() > 1}">
             <section class="action-section chapter" data-ng-repeat="paragraph in data.paragraphs" data-ng-if="!paragraph.deleted" id="section-jump-chapter-{{$index}}">
                 <label>
                     <textarea

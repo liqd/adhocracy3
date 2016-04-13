@@ -73,6 +73,7 @@ export interface IFormScope extends IScope {
     showError;
     addParagraph() : void;
     deleteParagraph(index : number) : void;
+    paragraphCount() : number;
     submit() : angular.IPromise<any>;
     cancel() : void;
     documentForm : any;
@@ -481,6 +482,8 @@ export var createDirective = (
                 scope.data.paragraphs[index].deleted = true;
             };
 
+            scope.paragraphCount = () => _.filter(scope.data.paragraphs, (p) => !p.deleted).length;
+
             scope.cancel = () => {
                 var processUrl = adhTopLevelState.get("processUrl");
                 adhTopLevelState.goToCameFrom(adhResourceUrlFilter(processUrl));
@@ -536,6 +539,8 @@ export var editDirective = (
             scope.deleteParagraph = (index) => {
                 scope.data.paragraphs[index].deleted = true;
             };
+
+            scope.paragraphCount = () => _.filter(scope.data.paragraphs, (p) => !p.deleted).length;
 
             bindPath($q, adhHttp)(scope, undefined, scope.hasMap);
 
