@@ -91,7 +91,14 @@ export var register = (angular) => {
             "adhUser",
             "adhGetBadges",
             AdhUserViews.userProfileDirective])
-        .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", "adhPermissions", "adhShowError", AdhUserViews.loginDirective])
+        .directive("adhLogin", [
+            "adhConfig",
+            "adhUser",
+            "adhTopLevelState",
+            "adhEmbed",
+            "adhPermissions",
+            "adhShowError",
+            AdhUserViews.loginDirective])
         .directive("adhPasswordReset", [
             "adhConfig", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", AdhUserViews.passwordResetDirective])
         .directive("adhCreatePasswordReset", [

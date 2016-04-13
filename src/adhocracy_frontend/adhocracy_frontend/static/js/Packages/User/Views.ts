@@ -7,6 +7,7 @@ import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhEmbed from "../Embed/Embed";
 import * as AdhUtil from "../Util/Util";
 
 import * as AdhCredentials from "./Credentials";
@@ -87,6 +88,7 @@ export interface IScopeLogin extends angular.IScope {
     supportEmail : string;
 
     resetCredentials : () => void;
+    enableCancel : boolean;
     cancel : () => void;
     logIn : () => angular.IPromise<void>;
     showError;
@@ -183,6 +185,7 @@ export var loginDirective = (
     adhConfig : AdhConfig.IService,
     adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
+    adhEmbed : AdhEmbed.Service,
     adhPermissions : AdhPermissions.Service,
     adhShowError
 ) => {
@@ -194,6 +197,8 @@ export var loginDirective = (
             scope.errors = [];
             scope.supportEmail = adhConfig.support_email;
             scope.showError = adhShowError;
+
+            scope.enableCancel = adhEmbed.getContext() !== "login";
 
             adhPermissions.bindScope(scope, "/principals/users");
 
