@@ -1,18 +1,6 @@
 Backend Structure
 -----------------
 
-The backend consists of:
-
-adhocracy_core
-   application framework to provide a rest api for participation process platforms
-
-adhocracy_sample
-   examples how to customize resource/sheet types
-
-adhocracy_mercator:
-   configuration and extensions to run the mercator rest api application
-
-
 Usage of external dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -96,7 +84,7 @@ Modules API and separation of responsibility
 
     adhocracy_core
 
-.. rubric:: Client communication Level
+.. rubric:: Client Views Level
 
 .. autosummary::
 

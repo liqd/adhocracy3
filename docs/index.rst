@@ -14,7 +14,7 @@ Contents
    installation
    development
    administration
-   architecture/index
+   backend/index
    coding_guides/index
    api/index
    frontend/index
