@@ -1,8 +1,8 @@
-Architecture
-------------
+Backend
+-------
 
 .. toctree::
    :maxdepth: 2
 
-   architecture.rst
+   overview.rst
    backend_structure.rst

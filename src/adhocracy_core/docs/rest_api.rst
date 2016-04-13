@@ -1,8 +1,8 @@
 # doctest: +ELLIPSIS
 # doctest: +NORMALIZE_WHITESPACE
 
-REST-API (with loose coupling)
-==============================
+REST-API
+========
 
 Prerequisites
 -------------
