@@ -262,7 +262,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         });
     }
 
-    private conditionallyRedirectVersionToLast(resourceUrl : string) : angular.IPromise<boolean> {
+    private conditionallyRedirectVersionToLast(resourceUrl : string, view? : string) : angular.IPromise<boolean> {
         var self : Service = this;
 
         return self.$q.all([
@@ -276,7 +276,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
                 if (lastUrl === resourceUrl) {
                     return false;
                 } else {
-                    self.$location.path(self.adhResourceUrlFilter(lastUrl));
+                    self.$location.path(self.adhResourceUrlFilter(lastUrl, view));
                     return true;
                 }
             } else {
@@ -346,7 +346,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         return self.$q.all([
             self.adhHttp.get(resourceUrl),
             self.getProcess(resourceUrl, false),
-            self.conditionallyRedirectVersionToLast(resourceUrl)
+            self.conditionallyRedirectVersionToLast(resourceUrl, view)
         ]).then((values : any[]) => {
             var resource : ResourcesBase.Resource = values[0];
             var process : ResourcesBase.Resource = values[1];
