@@ -18,6 +18,7 @@
     "TR__COMMENTS": "comments",
     "TR__COMMENTS_TOTAL": "Total Comments",
     "TR__COMMENT_EMPTY_TEXT": "No comments yet.",
+    "TR__COMMENT_PLACEHOLDER": "Add comment here",
     "TR__CONTENT": "content",
     "TR__COUNTRY": "country",
     "TR__CREATE": "create",
