@@ -76,6 +76,7 @@ class TestWorkflow:
         return \
             {'defaults': 'standard',
              'initial_state': 'announced',
+             'auto_transition': False,
              'states': {'announced': {}},
              'transitions': {'to_announced': {'from_state': 'announced',
                                               'to_state': 'announced',
@@ -90,6 +91,7 @@ class TestWorkflow:
         result = inst.deserialize(cstruct)
         assert result['defaults']
         assert result['initial_state']
+        assert result['auto_transition'] == False
         assert len(result['states']) == 1
         assert len(result['transitions']) == 1
 
