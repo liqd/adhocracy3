@@ -38,14 +38,6 @@
 
 <body>
     <script type="text/javascript">
-        // phantom.js is missing bind(), so here is a simplified polyfill
-        Function.prototype.bind = Function.prototype.bind || function(thisp) {
-            var fn = this;
-            return function() {
-                return fn.apply(thisp, arguments);
-            };
-        };
-
         require(['AdhocracySpec'], function(spec) {
             jasmine.getEnv().execute()
         });
