@@ -27,7 +27,6 @@ import * as AdhCommentModule from "./Packages/Comment/Module";
 import * as AdhConfigModule from "./Packages/Config/Module";
 import * as AdhCrossWindowMessagingModule from "./Packages/CrossWindowMessaging/Module";
 import * as AdhDateTimeModule from "./Packages/DateTime/Module";
-import * as AdhDocumentWorkbenchModule from "./Packages/DocumentWorkbench/Module";
 import * as AdhDoneModule from "./Packages/Done/Module";
 import * as AdhEmbedModule from "./Packages/Embed/Module";
 import * as AdhEventManagerModule from "./Packages/EventManager/Module";
@@ -90,7 +89,6 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "flow",
         AdhCommentModule.moduleName,
         AdhConfigModule.moduleName,
-        AdhDocumentWorkbenchModule.moduleName,
         AdhDoneModule.moduleName,
         AdhCrossWindowMessagingModule.moduleName,
         AdhEmbedModule.moduleName,
@@ -172,7 +170,6 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhConfigModule.register(angular, config);
     AdhCrossWindowMessagingModule.register(angular, config.trusted_domains !== []);
     AdhDateTimeModule.register(angular);
-    AdhDocumentWorkbenchModule.register(angular);
     AdhDoneModule.register(angular);
     AdhEmbedModule.register(angular);
     AdhEventManagerModule.register(angular);
