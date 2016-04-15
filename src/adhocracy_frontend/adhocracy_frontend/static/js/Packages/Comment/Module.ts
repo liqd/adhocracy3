@@ -10,6 +10,7 @@ import * as AdhPermissionsModule from "../Permissions/Module";
 import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
 import * as AdhRateModule from "../Rate/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
+import * as AdhAbuse from "../Abuse/Module";
 
 import * as AdhComment from "./Comment";
 
@@ -30,7 +31,8 @@ export var register = (angular) => {
             AdhPermissionsModule.moduleName,
             AdhPreliminaryNamesModule.moduleName,
             AdhRateModule.moduleName,
-            AdhTopLevelStateModule.moduleName
+            AdhTopLevelStateModule.moduleName,
+            AdhAbuse.moduleName
         ])
         .directive("adhCommentListing", [
             "adhConfig",
