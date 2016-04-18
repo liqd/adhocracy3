@@ -43,10 +43,12 @@ B.  In browser::
        Running JS unit test in the browser with blanket enabled is
        currently broken.
 
-
 protractor acceptance tests::
 
     bin/polytester acceptance
+
+.. NOTE:: You need to have chrome/chromium installed in order to run the
+acceptance tests.
 
 run backend functional tests::
 
