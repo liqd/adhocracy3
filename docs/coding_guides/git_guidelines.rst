@@ -1,8 +1,8 @@
-Git
-===
+Contribute Code with Git
+========================
 
-commits
--------
+make usefull commits
+--------------------
 
 Git commits serve different purposes:
 
@@ -87,8 +87,8 @@ Note that there's already standard messages for commits created by git
 described in the :doc:`code_review_process`.
 
 
-Branches
---------
+Add feature branch
+------------------
 
 Terminology
 ~~~~~~~~~~~
@@ -155,7 +155,6 @@ the branch point of the current branch like this::
 
 (``git show-branch`` yields more relevant data, but in a less
 machine-readable form.)
-
 
 Rebase and +n-branch logic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -237,3 +236,24 @@ Dos and Don'ts
    master without branching.  The commit must be at least mentioned to
    one more developer, who must check whether the issue qualifies as
    trivial and the commit is sound.
+
+
+Merge feature branch to master branch
+-------------------------------------
+
+Before merging your feature branch please check:
+
+- code follows general `coding style` guidelines and specific development hints
+  in `backend`, `frontend`.
+- all test pass and code coverage backend stays at 100%
+- travis test builds should pass (github hook)
+- new features are documented
+- style checks pass (or let the git after commit hook do its work):
+
+    bin/ad_check_code -a src/adhocracy src/adhocracy_sample
+
+- code reviewed by other developer
+
+
+
+

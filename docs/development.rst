@@ -7,10 +7,6 @@ General Remarks
 Use test driven development and check code style bevore pushing commits
 (see `Coding Style Guideline` ).
 
-Manually check pyflake, pep257::
-
-    bin/ad_check_code src/adhocracy src/adhocracy_sample
-
 
 When changing the api, the frontend needs to re-generate the
 TypeScript modules providing the resource classes.  This may trigger
