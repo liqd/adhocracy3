@@ -1,5 +1,5 @@
-Attic
------
+Legacy concepts
+===============
 
 This documentation is kept for historical reasons.
 
@@ -7,7 +7,9 @@ This documentation is kept for historical reasons.
    :maxdepth: 2
 
    supergraph
-   supergraph-2013-11-12
    instance_modelling_example
    no_patches
+   supergraph-2013-11-12
    random_thoughts
+   badges
+   code_review_process

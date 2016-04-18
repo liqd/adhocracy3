@@ -31,7 +31,7 @@ Suggestions:
   or ``git add --patch``, allowing for easy line-by-line staging. Interactive
   rebasing (``git rebase -i``) may help with cleaning up history in retrospect,
   i.e. splitting / combining / reordering commits. Be aware of not pushing
-  published non-volatile branches (as described in :doc:`code_review_process`).
+  published non-volatile branches (as described in :doc:`../attic/code_review_process`).
 
 * The test suite should run through successfully on every commit. Test coverage
   doesn't necessarily need to be 100% on each commit, as some developers may
