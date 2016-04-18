@@ -52,7 +52,6 @@ Contents
    api/index
    frontend/index
    projects/index
-   drafts/index
    attic/index
    CHANGES
    glossary
