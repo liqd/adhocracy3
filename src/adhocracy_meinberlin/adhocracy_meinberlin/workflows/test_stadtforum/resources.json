@@ -9,15 +9,5 @@
             {"name": "stadtforum"},
             "adhocracy_core.sheets.title.ITitle":
             {"title": "Sample Stadtforum participation process"}
-           }},
-  {"path": "/organisation/stadtforum",
-   "content_type": "adhocracy_core.resources.proposal.IProposal",
-   "data": {"adhocracy_core.sheets.name.IName":
-            {"name": "proposal_0000000"}
-           }},
-  {"path": "/organisation/stadtforum/proposal_0000000/",
-   "content_type": "adhocracy_core.resources.proposal.IProposalVersion",
-   "data": {"adhocracy_core.sheets.name.IName":
-            {"name": "VERSION_0000000"}
            }}
 ]
