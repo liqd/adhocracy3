@@ -26,13 +26,6 @@ Imports
   it might hide circular import errors. Instead use
   ``pkgresources.getdistribution`` and catch ``DistributionNotFound``.
   (http://do3.cc/blog/2010/08/20/do-not-catch-import-errors,-use-pkg_resources/)
-* must not import from upper level
-* should not import from same level
-  (pluggable: must not have imports from other modules or to other pluggable modules)
-  (pluggable: must have interface for public methods)
-* may import from bottom level
-* may import interfaces
-* you can use `bin/check_forbidden_imports` to list suspicious imports  # TODO update script
 
 Code formatting
 ---------------

@@ -5,4 +5,6 @@ Backend
    :maxdepth: 2
 
    overview.rst
-   backend_structure.rst
+   softwarestack.rst
+   architecture.rst
+   modules.rst
