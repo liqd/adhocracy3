@@ -242,7 +242,12 @@ export class Service implements AdhTopLevelState.IAreaInput {
     public getProcess(resourceUrl : string, fail = true) : angular.IPromise<ResourcesBase.Resource> {
         var paths = [];
 
-        var path = resourceUrl.substr(this.adhConfig.rest_url.length);
+        // FIXME: This if-Statement was added for the special case that resourceUrl is a URL,
+        // not a relative path. It should be erased when the archived Stadtforum processes go offline.
+        if (resourceUrl.substr(0, 4) === "http") {
+            var path = resourceUrl.substr(this.adhConfig.rest_url.length);
+        }
+
         while (path !== AdhUtil.parentPath(path)) {
             paths.push(path);
             path = AdhUtil.parentPath(path);
