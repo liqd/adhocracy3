@@ -9,7 +9,7 @@ states:
     acm:
       principals:      [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [view,        D,        A,           A,         A,        A,        ~]
+        - [view,        D,        A,           A,         A,        A,        A]
   evaluate:
     acm:
       principals:      [everyone, participant, moderator, creator, initiator, admin]
