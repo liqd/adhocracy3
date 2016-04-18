@@ -1,7 +1,6 @@
 Code Review Process
 ===================
 
-
 Preface
 -------
 
@@ -12,6 +11,7 @@ used with git alone and no other tools.
    Code reviews are currently done with `GitHub
    <https://www.github.com>`_.
 
+TODO: add good practice how to do code review
 
 Status of this document
 -----------------------
