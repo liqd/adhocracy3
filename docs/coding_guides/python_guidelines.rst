@@ -1,8 +1,8 @@
-Python Guidelines
-=================
+Python
+======
 
-Testing
--------
+Test Driven Development
+-----------------------
 
 * 100% unit test coverage (must)
 * Test driven development with functional, integration and unit test (should)

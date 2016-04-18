@@ -1,5 +1,5 @@
-Refactor Guidelines
-===================
+Refactoring & Clean Code
+========================
 
 For refactoring we follow mostly the rules from the chapter "Smells and hints"
 from the book "Clean Code" by Robert C. Martin, 2008.
@@ -9,7 +9,7 @@ Clean Code short summary:
 -------------------------
 
 Common Principles:
-++++++++++++++++++
+------------------
 
 * Single Responsibility Principle (SRP): only one reason to change behavior/code
 * Open Closed Principle (OCP): open for extensions (new classes,..), closed for modification
@@ -19,7 +19,7 @@ Common Principles:
 * You ain't gonna need it (YAGNI)
 
 Readability:
-++++++++++++
+------------
 
 * easy to understand and extend by others
 * readable code instead of comments
@@ -27,19 +27,19 @@ Readability:
 * good placed and clear responsibility (place code where the reader expects it)
 
 Variable naming:
-++++++++++++++++
+----------------
 
 * explicit, show intention and maybe context information
 * no misleading names
 * distinction between concepts (get, append, add,..)
 
 Variables:
-++++++++++
+----------
 
 * define close to where there are uses
 
 Function name/arguments:
-++++++++++++++++++++++++
+------------------------
 
 * verb with nouns (explain abstraction level and if possible arguments)
 * name shouldn't be too long; using expressive named (keyword) arguments might
@@ -49,7 +49,7 @@ Function name/arguments:
   (omitting the name)
 
 Functions:
-++++++++++
+----------
 
 * short
 * max 2 indention level
@@ -72,14 +72,14 @@ Functions:
 * prefer not to change the argument objects, never mutate default kwargs
 
 Class names:
-++++++++++++
+------------
 
 * show responsibility
 * explicit distinction of generic "concepts", if needed domain specific concepts
 * no context information (for example domain specific suffix ("Adhocracy") or type ("String")
 
 Classes:
-++++++++
+--------
 
 * SRP, OCP
 * high cohesion: all methods should share the class variables, if not split class
@@ -87,7 +87,7 @@ Classes:
 * private functions below first public function that depends on it
 
 Objects:
-++++++++
+--------
 
 * data structures: direct access to variables
 * objects: hide data structure, present public "behavior" methods for this objects
@@ -111,7 +111,7 @@ Objects:
   * no train wrecks: call().call()
 
 Exceptions:
-+++++++++++
+-----------
 
 * do not return/accept None without need or accept wrong arguments (exeption:
   ease unit tests) (makes it hard to find/debug errors)
@@ -121,23 +121,23 @@ Exceptions:
   contect information, hide third party errors
 
 Third party code:
-+++++++++++++++++
+-----------------
 
 * make Facade to access, catch errors
 * Learning Test to play around and test new versions
 
 Unit Tests:
-+++++++++++
+-----------
 
-* first draft +> test success +> refactor code and tests
-* first test with simplest statement +> code +> more tests +> code,.. (only what is needed to pass test)
+* first draft -> test success -> refactor code and tests
+* first test with simplest statement -> code -> more tests -> code,.. (only what is needed to pass test)
 
-* clean code, Domain Specific Test+API
+* clean code, Domain Specific Test-API
 * structure: Given When Then
 * assert one thing
 
 System:
-+++++++
+-------
 
 * Separation of concern
 * Split Creation (factories, start application) , Running (assume every thing is alread created)

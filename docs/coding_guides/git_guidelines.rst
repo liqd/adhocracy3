@@ -1,8 +1,8 @@
-Git Guidelines
-==============
+Git
+===
 
-Git commits
------------
+commits
+-------
 
 Git commits serve different purposes:
 
@@ -87,8 +87,8 @@ Note that there's already standard messages for commits created by git
 described in the :doc:`code_review_process`.
 
 
-Git branches
-------------
+Branches
+--------
 
 Terminology
 ~~~~~~~~~~~

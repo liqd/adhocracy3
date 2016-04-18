@@ -1,5 +1,5 @@
-JavaScript Guidelines
-=====================
+JavaScript
+==========
 
 General considerations
 ----------------------

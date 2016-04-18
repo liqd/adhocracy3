@@ -1,5 +1,5 @@
-CSS Guidelines
-==============
+CSS
+===
 
 Preface
 -------
