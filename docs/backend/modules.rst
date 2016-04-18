@@ -1,8 +1,8 @@
 Modules
 =======
 
-Structure and separation of responsibility
-------------------------------------------
+API and separation of responsibility
+------------------------------------
 
 *responsibility*
     (means reason to change code if functionality changes)
@@ -11,7 +11,7 @@ Structure and separation of responsibility
 
 *layer*
     loosly group of modules that follow these rules:
-
+    adhocracy_core.evolution
     * must not import from upper layer
     * should not import from same layer
     * may import interfaces from all layers
@@ -65,6 +65,7 @@ Structure and separation of responsibility
     adhocracy_core.messaging
     adhocracy_core.graph
     adhocracy_core.evolution
+    adhocracy_core.workflows
 
 .. rubric:: Interfaces, Utils Layer
 
@@ -86,6 +87,7 @@ Structure and separation of responsibility
     adhocracy_core.auditing
     adhocracy_core.registry
     adhocracy_core.renderers
+    adhocracy_core.templates
 
 TODO: move all scripts to adhocracy_core.scripts
 
@@ -95,13 +97,13 @@ TODO: move all scripts to adhocracy_core.scripts
 
    * :mod:`substanced.evolution` (migration, see :mod:`adhocracy_core.evolution`)
    * :mod:`substanced.catalog` (search, extended by :mod:`adhocracy_core.catalog`)
-   * :mod:`substanced.workflow` (state machines mapped to resource types)
+   * :mod:`substanced.workflow` (state machines mapped to resource types, extended by :mod:`adhocracy_core.workflows`)
    * :mod:`substanced.content` (provide content types factories, extendend by :mod:`adhocracy_core.content`)
    * :mod:`substanced.objectmap` (reference resources, extented by :mod:`adhocracy_core.graph`)
    * :mod:`substanced.folder` (Persistent implemention for :class:`adhocracy_core.interfaces.IPool` resources)
 
 Extend/Customize
-~~~~~~~~~~~~~~~~
+----------------
 
 * must follow `Rules for extensible pyramid apps <http://docs.pylonsproject.org/projects/pyramid/en/master/narr/extending.html>`_:
   configuration, configuration extentensions, view/asset overriding, event subscribers.
