@@ -9,19 +9,19 @@ states:
     acm:
       principals:      [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [view,        D,        ~,           ~,         ~,        ~,        ~]
+        - [view,        D,        A,           A,         A,        A,        A]
   evaluate:
     acm:
       principals:      [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [view,        D,        ~,           ~,         ~,        ~,        ~]
+        - [view,        D,        A,           A,         A,        A,        A]
   result:
     acm:
       principals:      [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [view,        D,        ~,           ~,         ~,        ~,        ~]
+        - [view,        D,        A,           A,         A,        A,        A]
   closed:
     acm:
       principals:      [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [view,        D,        ~,           ~,         ~,        ~,        ~]
+        - [view,        D,        A,           A,         A,        A,        A]
