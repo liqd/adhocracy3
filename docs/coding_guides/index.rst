@@ -3,6 +3,10 @@ Coding Guides
 
 General coding style definitions.
 
+Example Vim config according to coding guideline::
+
+    https://github.com/liqd/vim_config
+
 .. toctree::
    :maxdepth: 2
 

@@ -11,9 +11,6 @@ Manually check pyflake, pep257::
 
     bin/ad_check_code src/adhocracy src/adhocracy_sample
 
-Example Vim config according to coding guideline::
-
-    https://github.com/liqd/vim_config
 
 When changing the api, the frontend needs to re-generate the
 TypeScript modules providing the resource classes.  This may trigger
