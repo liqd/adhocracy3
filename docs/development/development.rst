@@ -1,12 +1,8 @@
-Development
-===========
+Development Tasks
+=================
 
 General Remarks
 ---------------
-
-Use test driven development and check code style bevore pushing commits
-(see `Coding Style Guideline` ).
-
 
 When changing the api, the frontend needs to re-generate the
 TypeScript modules providing the resource classes.  This may trigger
@@ -145,8 +141,8 @@ bower
     cd .../lib  # where bower installs the libraries
     bower list
 
-Adhocracy Releases
-------------------
+Release Adhocracy
+-----------------
 
 Adhocracy uses `semantic versions <http://semver.org/>`_ with one
 extra rule:

@@ -1,5 +1,5 @@
-Coding Guides
--------------
+Coding Style Guides
+-------------------
 
 General coding style definitions.
 
@@ -14,5 +14,4 @@ Example Vim config according to coding guideline::
    js_guidelines.rst
    css_guidelines.rst
    rst.rst
-   git_guidelines.rst
-   refactor_guidelines.rst
+

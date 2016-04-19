@@ -44,8 +44,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   installation
-   development
+   development/index
    administration
    backend/index
    coding_guides/index
