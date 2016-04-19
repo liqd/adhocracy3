@@ -213,7 +213,7 @@ export var loginDirective = (
                 scope.credentials.password = "";
             };
 
-            scope.enableCancel = ! _.includes(["login", "logout", "register"], adhEmbed.getContext());
+            scope.enableCancel = ! _.includes(["login", "register"], adhEmbed.getContext());
 
             scope.cancel = () => {
                  adhTopLevelState.goToCameFrom("/");
@@ -403,7 +403,7 @@ export var registerDirective = (
                 captchaGuess: ""
             };
 
-            scope.enableCancel = ! _.includes(["login", "logout", "register"], adhEmbed.getContext());
+            scope.enableCancel = ! _.includes(["login", "register"], adhEmbed.getContext());
 
             scope.cancel = scope.goBack = () => {
                 adhTopLevelState.goToCameFrom("/");
@@ -499,7 +499,7 @@ export var createPasswordResetDirective = (
                 email: ""
             };
 
-            scope.enableCancel = ! _.includes(["login", "logout", "register"], adhEmbed.getContext());
+            scope.enableCancel = ! _.includes(["login", "register"], adhEmbed.getContext());
 
             scope.goBack = scope.cancel = () => {
                  adhTopLevelState.goToCameFrom("/");
