@@ -10,6 +10,7 @@ import * as AdhMovingColumnsModule from "../MovingColumns/Module";
 import * as AdhPermissionsModule from "../Permissions/Module";
 import * as AdhResourceAreaModule from "../ResourceArea/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
+import * as AdhEmbed from "../Embed/Module";
 
 import * as AdhCredentialsModule from "./CredentialsModule";
 import * as AdhUserModule from "./Module";
@@ -36,7 +37,8 @@ export var register = (angular) => {
             AdhTopLevelStateModule.moduleName,
             AdhResourceAreaModule.moduleName,
             AdhUserModule.moduleName,
-            AdhImageModule.moduleName
+            AdhImageModule.moduleName,
+            AdhEmbed.moduleName
         ])
         .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
             adhTopLevelStateProvider
