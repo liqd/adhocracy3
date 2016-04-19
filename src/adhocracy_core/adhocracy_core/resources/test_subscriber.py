@@ -823,7 +823,7 @@ class TestDownloadExternalPictureUrl:
         old_url = 'http://x'
         new_url = ''
         self.call_fut(context, old_url, new_url, registry)
-        mock_sheet.set.assert_called_with({'picture': None})
+        mock_sheet.set.assert_called_with({'picture': None}, send_event=False)
 
     def test_download_picture_url_and_reference_if_picture_url_changed(
             self, context, registry, mock_sheet, mocker):
@@ -849,7 +849,7 @@ class TestDownloadExternalPictureUrl:
             parent=assets,
             registry=registry,
             appstructs={IAssetData.__identifier__: {'data': file}})
-        mock_sheet.set.assert_called_with({'picture': image})
+        mock_sheet.set.assert_called_with({'picture': image}, send_event=False)
 
 
 @mark.usefixtures('integration')

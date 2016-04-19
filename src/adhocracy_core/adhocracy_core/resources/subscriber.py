@@ -414,7 +414,7 @@ def _set_picture_reference(context: IResource,
                            value: IImage,
                            registry: Registry):
     sheet = registry.content.get_sheet(context, IImageReference)
-    sheet.set({'picture': value})
+    sheet.set({'picture': value}, send_event=False)
 
 
 def _download(url: str) -> File:
