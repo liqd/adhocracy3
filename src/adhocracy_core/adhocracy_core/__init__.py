@@ -1,5 +1,6 @@
 """Configure, add dependency packages/modules, start application."""
 from pyramid.config import Configurator
+from pyramid.interfaces import IAuthenticationPolicy
 from pyramid_zodbconn import get_connection
 from substanced.db import RootAdded
 from logging import getLogger
@@ -7,7 +8,6 @@ from logging import getLogger
 import transaction
 
 from adhocracy_core.authentication import TokenHeaderAuthenticationPolicy
-from adhocracy_core.authorization import RoleACLAuthorizationPolicy
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.resources.principal import groups_and_roles_finder
 from adhocracy_core.auditing import set_auditlog
@@ -91,14 +91,8 @@ def includeme(config):
     settings = config.registry.settings
     config.include('pyramid_zodbconn')
     config.include('pyramid_mako')
-    authz_policy = RoleACLAuthorizationPolicy()
-    config.set_authorization_policy(authz_policy)
-    authn_secret = settings.get('substanced.secret')
-    authn_timeout = 60 * 60 * 24 * 30
-    authn_policy = TokenHeaderAuthenticationPolicy(
-        authn_secret,
-        groupfinder=groups_and_roles_finder,
-        timeout=authn_timeout)
+    config.include('.authorization')
+    authn_policy = _create_authn_policy(settings)
     config.set_authentication_policy(authn_policy)
     config.include('.renderers')
     config.include('.authentication')
@@ -120,6 +114,16 @@ def includeme(config):
     if settings.get('adhocracy.add_test_users', False):
         from adhocracy_core.testing import add_create_test_users_subscriber
         add_create_test_users_subscriber(config)
+
+
+def _create_authn_policy(settings: dict) -> IAuthenticationPolicy:
+    secret = settings.get('substanced.secret')
+    groupfinder = groups_and_roles_finder
+    timeout = 60 * 60 * 24 * 30
+    token_policy = TokenHeaderAuthenticationPolicy(secret,
+                                                   groupfinder=groupfinder,
+                                                   timeout=timeout)
+    return token_policy
 
 
 def main(global_config, **settings):
