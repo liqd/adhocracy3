@@ -91,7 +91,6 @@ def includeme(config):
     settings = config.registry.settings
     config.include('pyramid_zodbconn')
     config.include('pyramid_mako')
-    config.hook_zca()  # global adapter lookup (used by adhocracy_core.utils)
     authz_policy = RoleACLAuthorizationPolicy()
     config.set_authorization_policy(authz_policy)
     authn_secret = settings.get('substanced.secret')
