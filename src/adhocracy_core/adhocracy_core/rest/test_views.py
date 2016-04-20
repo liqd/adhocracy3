@@ -892,6 +892,7 @@ class TestMetaApiView:
                                                               'transitions': {}}
         workflows_meta = inst.get()['workflows']
         assert workflows_meta == {'sample': {'initial_state': '',
+                                             'auto_transition': 'false',
                                              'defaults': '',
                                              'states': {},
                                              'transitions': {}}}
