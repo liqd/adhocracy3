@@ -45,7 +45,7 @@ class TestAutoTransitionWorkflow:
     def test_ignore_no_processes(self, context, registry, mocker,
             mock_catalogs, mock_transition_to_states):
         self.call_fut(context, registry)
-        mock_transition_to_states.assert_not_called
+        assert not mock_transition_to_states.called
 
     def test_ignore_processes_without_auto_transition(self, context, registry,
             mock_catalogs, search_result, mock_transition_to_states,
@@ -68,7 +68,7 @@ class TestAutoTransitionWorkflow:
             ]}
         registry.content.get_sheet = Mock(return_value=mock_sheet)
         self.call_fut(context, registry)
-        mock_transition_to_states.assert_not_called
+        assert not mock_transition_to_states.called
 
     def test_ignore_processes_currently_active(self, context, registry,
             mock_catalogs, search_result, mock_transition_to_states,
@@ -91,7 +91,47 @@ class TestAutoTransitionWorkflow:
             ]}
         registry.content.get_sheet = Mock(return_value=mock_sheet)
         self.call_fut(context, registry)
-        mock_transition_to_states.assert_not_called
+        assert not mock_transition_to_states.called
+
+    def test_ignore_multiple_next_states(self, context, registry,
+            mock_catalogs, search_result, mock_transition_to_states,
+            mock_sheet, mock_workflow, mock_now):
+        process = testing.DummyResource()
+        mock_catalogs.search.side_effect = [
+            search_result._replace(elements=[process]),
+            search_result]
+        registry.content.workflows_meta = {
+            'standard': {'auto_transition': True}}
+        mock_sheet.get.return_value = {
+            'workflow': 'standard',
+            'workflow_state': 'participate',
+            'state_data': [
+                {'name': 'participate',
+                 'description': '',
+                 'start_date': datetime(2016, 1, 1),
+                 'end_date': datetime(2016, 1, 2)}
+            ]}
+        registry.content.get_sheet = Mock(return_value=mock_sheet)
+        mock_workflow.get_next_states.return_value = ['evaluate1', 'evaluate2']
+        self.call_fut(context, registry)
+        assert not mock_transition_to_states.called
+
+    def test_ignore_empty_state_data(self, context, registry,
+            mock_catalogs, search_result, mock_transition_to_states,
+            mock_sheet, mock_workflow, mock_now):
+        process = testing.DummyResource()
+        mock_catalogs.search.side_effect = [
+            search_result._replace(elements=[process]),
+            search_result]
+        registry.content.workflows_meta = {
+            'standard': {'auto_transition': True}}
+        mock_sheet.get.return_value = {
+            'workflow': 'standard',
+            'workflow_state': 'participate',
+            'state_data': []}
+        registry.content.get_sheet = Mock(return_value=mock_sheet)
+        self.call_fut(context, registry)
+        assert not mock_transition_to_states.called
 
     def test_ignore_conflicting_workflow_assignment(self, context, registry,
             mock_catalogs, search_result, mock_transition_to_states,
@@ -117,7 +157,7 @@ class TestAutoTransitionWorkflow:
             ]}
         registry.content.get_sheet = Mock(return_value=mock_sheet)
         self.call_fut(context, registry)
-        mock_transition_to_states.assert_not_called
+        assert not mock_transition_to_states.called
 
     def test_transition_needed_by_current_state(self, context, registry,
             mock_catalogs, search_result, mock_transition_to_states,
