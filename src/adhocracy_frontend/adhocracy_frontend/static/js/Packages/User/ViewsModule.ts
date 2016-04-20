@@ -4,13 +4,13 @@ import * as _ from "lodash";
 
 import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
 import * as AdhBadgeModule from "../Badge/Module";
+import * as AdhEmbedModule from "../Embed/Module";
 import * as AdhHttpModule from "../Http/Module";
 import * as AdhLocaleModule from "../Locale/Module";
 import * as AdhMovingColumnsModule from "../MovingColumns/Module";
 import * as AdhPermissionsModule from "../Permissions/Module";
 import * as AdhResourceAreaModule from "../ResourceArea/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
-import * as AdhEmbed from "../Embed/Module";
 
 import * as AdhCredentialsModule from "./CredentialsModule";
 import * as AdhUserModule from "./Module";
@@ -30,6 +30,7 @@ export var register = (angular) => {
             AdhAngularHelpersModule.moduleName,
             AdhBadgeModule.moduleName,
             AdhCredentialsModule.moduleName,
+            AdhEmbedModule.moduleName,
             AdhLocaleModule.moduleName,
             AdhMovingColumnsModule.moduleName,
             AdhPermissionsModule.moduleName,
@@ -37,8 +38,7 @@ export var register = (angular) => {
             AdhTopLevelStateModule.moduleName,
             AdhResourceAreaModule.moduleName,
             AdhUserModule.moduleName,
-            AdhImageModule.moduleName,
-            AdhEmbed.moduleName
+            AdhImageModule.moduleName
         ])
         .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
             adhTopLevelStateProvider
