@@ -48,6 +48,8 @@ test_requires = [
     'Sphinx',
     'repoze.sphinx.autointerface',
     'sphinx-autodoc-annotation',
+    'sphinxcontrib-blockdiag',
+    'sphinxcontrib-actdiag',
     'sphinx-rtd-theme',
 ]
 

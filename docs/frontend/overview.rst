@@ -55,8 +55,8 @@ that it compiles to JavaScript. It is similar to
 `Babel <https://babeljs.io/>`__ in that it backports many future
 JavaScript features.
 
-`Sass <http://sass-lang.com/>`_/`Compass <http://compass-style.org/>`_ (CSS preprocessor)
-----------------------------------------------------------------------------------------
+`Sass <http://sass-lang.com/>`_ / `Compass <http://compass-style.org/>`_ (CSS preprocessor)
+-------------------------------------------------------------------------------------------
 
 Ease writing CSS with support for nesting, mixins and variables and various helper tools.
 

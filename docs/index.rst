@@ -47,7 +47,6 @@ Contents
    development/index
    administration
    backend/index
-   coding_guides/index
    api/index
    frontend/index
    projects/index
