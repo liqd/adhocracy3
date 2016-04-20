@@ -1,7 +1,10 @@
+/// <reference path="../../../lib2/types/lodash.d.ts"/>
+
 import * as _ from "lodash";
 
 import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
 import * as AdhBadgeModule from "../Badge/Module";
+import * as AdhEmbedModule from "../Embed/Module";
 import * as AdhHttpModule from "../Http/Module";
 import * as AdhLocaleModule from "../Locale/Module";
 import * as AdhMovingColumnsModule from "../MovingColumns/Module";
@@ -27,6 +30,7 @@ export var register = (angular) => {
             AdhAngularHelpersModule.moduleName,
             AdhBadgeModule.moduleName,
             AdhCredentialsModule.moduleName,
+            AdhEmbedModule.moduleName,
             AdhLocaleModule.moduleName,
             AdhMovingColumnsModule.moduleName,
             AdhPermissionsModule.moduleName,
@@ -91,7 +95,14 @@ export var register = (angular) => {
             "adhUser",
             "adhGetBadges",
             AdhUserViews.userProfileDirective])
-        .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", "adhPermissions", "adhShowError", AdhUserViews.loginDirective])
+        .directive("adhLogin", [
+            "adhConfig",
+            "adhUser",
+            "adhTopLevelState",
+            "adhEmbed",
+            "adhPermissions",
+            "adhShowError",
+            AdhUserViews.loginDirective])
         .directive("adhPasswordReset", [
             "adhConfig", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", AdhUserViews.passwordResetDirective])
         .directive("adhCreatePasswordReset", [
@@ -100,10 +111,19 @@ export var register = (angular) => {
             "adhHttp",
             "adhUser",
             "adhTopLevelState",
+            "adhEmbed",
             "adhShowError",
             AdhUserViews.createPasswordResetDirective])
         .directive("adhRegister", [
-            "$sce", "$http", "adhConfig", "adhCredentials", "adhUser", "adhTopLevelState", "adhShowError", AdhUserViews.registerDirective])
+            "$sce",
+            "$http",
+            "adhConfig",
+            "adhCredentials",
+            "adhUser",
+            "adhTopLevelState",
+            "adhEmbed",
+            "adhShowError",
+            AdhUserViews.registerDirective])
         .directive("adhUserIndicator", [
             "adhConfig", "adhResourceArea", "adhTopLevelState", "adhPermissions", "$location", AdhUserViews.indicatorDirective])
         .directive("adhUserMeta", ["adhConfig", "adhResourceArea", "adhGetBadges", AdhUserViews.metaDirective])
