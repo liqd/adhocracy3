@@ -93,7 +93,7 @@ class TestAddWorkflow:
         assert meta['states']
         assert meta['transitions']
         assert meta['initial_state']
-        assert meta['auto_transition']
+        assert meta['auto_transition'] is False
 
     def test_create(self, registry, mock_meta):
         from substanced.workflow import ACLWorkflow
