@@ -21,7 +21,6 @@ export var register = (angular) => {
             AdhTabsModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .directive("adhMeinberlinKiezkassePhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", Process.phaseHeaderDirective])
         .directive("adhMeinberlinKiezkasseDetail", ["adhConfig", "adhHttp", "adhPermissions", Process.detailDirective])
         .directive("adhMeinberlinKiezkasseEdit", [
             "adhConfig", "adhHttp", "adhShowError", "adhSubmitIfValid", "moment", Process.editDirective]);

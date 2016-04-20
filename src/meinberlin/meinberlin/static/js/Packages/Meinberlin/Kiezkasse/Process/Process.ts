@@ -8,10 +8,7 @@ import * as AdhHttp from "../../../Http/Http";
 import * as AdhMovingColumns from "../../../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhProcess from "../../../Process/Process";
-import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 import * as AdhUtil from "../../../Util/Util";
-
-import * as AdhMeinberlinPhase from "../../Phase/Phase";
 
 import * as SIImageReference from "../../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SILocationReference from "../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
@@ -52,75 +49,6 @@ export var detailDirective = (
                 }
             });
             adhPermissions.bindScope(scope, () => scope.path);
-        }
-    };
-};
-
-
-export var phaseHeaderDirective = (
-    adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhTopLevelState : AdhTopLevelState.Service
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + AdhMeinberlinPhase.pkgLocation + "/PhaseHeader.html",
-        scope: {},
-        link: (scope : AdhMeinberlinPhase.IPhaseHeaderScope) => {
-            var processUrl = adhTopLevelState.get("processUrl");
-            adhHttp.get(processUrl).then((resource) => {
-                var sheet = resource.data[SIWorkflow.nick];
-                scope.currentPhase = sheet.workflow_state;
-                scope.phases[0].startDate = AdhProcess.getStateData(sheet, "announce").start_date;
-                scope.phases[0].endDate = AdhProcess.getStateData(sheet, "participate").start_date;
-                scope.phases[1].startDate = AdhProcess.getStateData(sheet, "participate").start_date;
-                scope.phases[1].endDate = AdhProcess.getStateData(sheet, "evaluate").start_date;
-                scope.phases[2].startDate = AdhProcess.getStateData(sheet, "evaluate").start_date;
-                scope.phases[2].endDate = AdhProcess.getStateData(sheet, "result").start_date;
-                scope.phases[3].startDate = AdhProcess.getStateData(sheet, "result").start_date;
-            });
-
-            scope.phases = [{
-                name: "announce",
-                title: "Information",
-                description: "Ab dem Start der Ideensammlungsphase können alle interessierten Bürger*innen sich " +
-                    "beteiligen und Vorschläge für Projekte in der Bezirksregion einreichen, diskutieren und " +
-                    "bewerten. Am Ende der Ideensammlungsphase findet die Bürgerversammlung statt, wo Vorschläge " +
-                    "vor Ort eingereicht, vorgestellt und abgestimmt werden. In der Phase „Ergebnisse“ können alle " +
-                    "Interessierten die Vorschläge sehen, die realisiert werden.",
-                processType: "Kiezkasse",
-                votingAvailable: false,
-                commentAvailable: false
-            }, {
-                name: "participate",
-                title: "Ideensammlung",
-                description: "Alle Interessierten werden aufgerufen, Vorschläge für Projekte in der Bezirksregion " +
-                    "zu machen. Die Angabe der Kosten soll die Mehrwertsteuer enthalten. Vorschläge können aber " +
-                    "auch noch offline in der Bürgerversammlung gemacht werden. Alle Vorschläge (offline und online) " +
-                    "werden dann bei der Bürgerversammlung beschlossen.",
-                processType: "Kiezkasse",
-                votingAvailable: true,
-                commentAvailable: true
-            }, {
-                name: "evaluate",
-                title: "Bürgerversammlung",
-                description: "In dieser Phase können keine Vorschläge mehr online eingereicht, kommentiert oder " +
-                    "bewertet werden. Vorschläge können aber noch offline in der Bürgerversammlung gemacht werden. Alle " +
-                    "Vorschläge werden dann vor Ort vorgestellt und abgestimmt. Die Art und Weise der Abstimmung bestimmt " +
-                    "die Bürgerversammlung selbst. Offline-Vorschläge werden online eingereicht.",
-                processType: "Kiezkasse",
-                votingAvailable: false,
-                commentAvailable: false
-            }, {
-                name: "result",
-                title: "Ergebnisse",
-                description: "In der Ergebnisphase wird dargestellt, welche Vorschläge realisiert werden. Diese " +
-                    "werden vom zuständigen Fachamt des Bezirksamtes, ggf. gemeinsam mit den Antragstellern, umgesetzt. " +
-                    "Die Projekte müssen bis Mitte Dezember realisiert und abgerechnet werden.",
-                processType: "Kiezkasse",
-                votingAvailable: false,
-                commentAvailable: false
-            }];
         }
     };
 };
