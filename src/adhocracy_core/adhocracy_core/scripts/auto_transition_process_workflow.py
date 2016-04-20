@@ -91,6 +91,8 @@ def _get_current_state_end_date(workflow_assignment: IWorkflowAssignment,
         if next_state_data and \
                 current_state_data['end_date'] != \
                 next_state_data['start_date']:
+            print('Conflicting workflow assignment: {}.'
+                  .format(workflow_assignment))
             return None
         return current_state_data['end_date']
     if next_state_data:
@@ -102,4 +104,6 @@ def _do_workflow_auto_transition(context: IResource, registry: Registry):
     workflow = registry.content.get_workflow(context)
     next_states = workflow.get_next_states(context,
                                            create_fake_god_request(registry))
+    print('Auto-transition of {} workflow to state {}.'
+          .format(context, next_states))
     transition_to_states(context, next_states, registry)
