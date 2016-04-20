@@ -52,7 +52,6 @@ import * as AdhResourceAreaModule from "./Packages/ResourceArea/Module";
 import * as AdhResourceWidgetsModule from "./Packages/ResourceWidgets/Module";
 import * as AdhShareSocialModule from "./Packages/ShareSocial/Module";
 import * as AdhStickyModule from "./Packages/Sticky/Module";
-import * as AdhTabsModule from "./Packages/Tabs/Module";
 import * as AdhTopLevelStateModule from "./Packages/TopLevelState/Module";
 import * as AdhTrackingModule from "./Packages/Tracking/Module";
 import * as AdhUserModule from "./Packages/User/Module";
@@ -209,7 +208,6 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhResourceWidgetsModule.register(angular);
     AdhShareSocialModule.register(angular);
     AdhStickyModule.register(angular);
-    AdhTabsModule.register(angular);
     AdhTopLevelStateModule.register(angular);
     AdhTrackingModule.register(angular);
     AdhUserModule.register(angular);
