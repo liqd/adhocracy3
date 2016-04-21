@@ -174,6 +174,22 @@ class TestIndexRate:
         assert index_rates(item['rateable'], None) == 0
 
 
+@mark.usefixtures('integration')
+def test_includeme_register_index_rate(registry):
+    from adhocracy_core.sheets.rate import IRate
+    from substanced.interfaces import IIndexView
+    assert registry.adapters.lookup((IRate,), IIndexView,
+                                    name='adhocracy|rate')
+
+
+@mark.usefixtures('integration')
+def test_includeme_register_index_rates(registry):
+    from adhocracy_core.sheets.rate import IRateable
+    from substanced.interfaces import IIndexView
+    assert registry.adapters.lookup((IRateable,), IIndexView,
+                                    name='adhocracy|rates')
+
+
 class TestIndexComments:
 
     @fixture
@@ -195,22 +211,6 @@ class TestIndexComments:
                                )
         assert index_comments(item['commentable'], None) == 5
         assert mock_catalogs.search.call_args[0][0] == query
-
-
-@mark.usefixtures('integration')
-def test_includeme_register_index_rate(registry):
-    from adhocracy_core.sheets.rate import IRate
-    from substanced.interfaces import IIndexView
-    assert registry.adapters.lookup((IRate,), IIndexView,
-                                    name='adhocracy|rate')
-
-
-@mark.usefixtures('integration')
-def test_includeme_register_index_rates(registry):
-    from adhocracy_core.sheets.rate import IRateable
-    from substanced.interfaces import IIndexView
-    assert registry.adapters.lookup((IRateable,), IIndexView,
-                                    name='adhocracy|rates')
 
 
 class TestIndexTag:
