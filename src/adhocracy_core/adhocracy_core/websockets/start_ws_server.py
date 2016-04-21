@@ -7,6 +7,7 @@ from signal import SIGTERM
 import logging
 import os
 import sys
+import errno
 
 from autobahn.asyncio.websocket import WebSocketServerFactory
 from ZODB import DB
@@ -62,11 +63,16 @@ def _read_config_variable_or_die(config: ConfigParser, name: str,
 
 def _check_and_write_pid_file(pid_file: str):
     if os.path.isfile(pid_file):
-        raise RuntimeError('Pidfile already exists: ' + pid_file)
+        with open(pid_file) as f:
+            old_pid = int(f.read().split('\n')[0])
+            try:
+                os.kill(old_pid, 0)
+            except OSError as exc:
+                if exc.errno != errno.ESRCH:
+                    raise RuntimeError('Pidfile already exists: ' + pid_file)
     pid = os.getpid()
-    pidfile = open(pid_file, 'w')
-    pidfile.write('%s\n' % pid)
-    pidfile.close
+    with open(pid_file, 'w') as pidfile:
+        pidfile.write('%s\n' % pid)
 
 
 def _register_sigterm_handler(pid_file: str):
