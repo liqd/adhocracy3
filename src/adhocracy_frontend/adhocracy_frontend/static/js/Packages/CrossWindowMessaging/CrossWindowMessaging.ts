@@ -58,34 +58,78 @@ export interface IPostMessageService {
     (data : string, origin : string) : void;
 }
 
+export interface IProvider {
+    registerMessageHandler : (name : string, callback : (data : IMessageData) => void) => void;
+}
+
 export interface IService {
     registerMessageHandler : (name : string, callback : (data : IMessageData) => void) => void;
     postResize : (height : number) => void;
     dummy? : boolean;
 }
 
+export class Provider implements IProvider {
+    public $get;
+    private callbacks : { name : string, callback : (data : IMessageData) => void }[] = [];
+
+    constructor() {
+        var _self = this;
+        this.$get = [
+            "adhConfig",
+            "$location",
+            "$window",
+            "$rootScope",
+            "adhCredentials",
+            "adhUser", (
+                adhConfig : AdhConfig.IService,
+                $location : angular.ILocationService,
+                $window : Window,
+                $rootScope,
+                adhCredentials : AdhCredentials.Service,
+                adhUser : AdhUser.Service) : IService => {
+                    if (adhConfig.embedded) {
+                        var postMessageToParent = $window.parent.postMessage.bind($window.parent);
+                        return new Service(
+                            postMessageToParent, $location,
+                            $window,
+                            $rootScope,
+                            adhConfig.trusted_domains,
+                            adhCredentials,
+                            adhUser,
+                            _self.callbacks);
+                    } else {
+                        return new Dummy();
+                    }
+                }];
+    }
+
+    public registerMessageHandler(name, callback) {
+        this.callbacks.push({ name : name, callback : callback });
+    }
+}
 
 export class Service implements IService {
 
     private embedderOrigin : string = "*";
 
-    /**
-     * Injection of the User service is only required if login information shall be
-     * passed to the embedding website. In that case trustedDomains must be set.
-     */
     constructor(
         private _postMessage : IPostMessageService,
         private $location : angular.ILocationService,
         private $window : Window,
         private $rootScope,
         private trustedDomains : string[],
-        private adhCredentials? : AdhCredentials.Service,
-        private adhUser? : AdhUser.Service
+        private adhCredentials : AdhCredentials.Service,
+        private adhUser : AdhUser.Service,
+        providedMessageHandlers : { name : string, callback : (data : IMessageData) => void }[] = []
     ) {
         var _self : Service = this;
 
         _self.registerMessageHandler("setup", _self.setup.bind(_self));
         _self.manageResize();
+
+        for (var messageHandler of providedMessageHandlers) {
+            _self.registerMessageHandler(messageHandler.name, messageHandler.callback);
+        }
 
         _self.postMessage("requestSetup", {});
     }
@@ -215,21 +259,3 @@ export class Dummy implements IService {
         return;
     }
 }
-
-
-export var factory = (
-    adhConfig : AdhConfig.IService,
-    $location : angular.ILocationService,
-    $window : Window,
-    $rootScope,
-    adhCredentials? : AdhCredentials.Service,
-    adhUser? : AdhUser.Service
-) : IService => {
-    if (adhConfig.embedded) {
-        var postMessageToParent = $window.parent.postMessage.bind($window.parent);
-        return new Service(postMessageToParent, $location, $window, $rootScope, adhConfig.trusted_domains, adhCredentials, adhUser);
-    } else {
-        return new Dummy();
-    }
-};
-
