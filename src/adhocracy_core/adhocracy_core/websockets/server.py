@@ -51,6 +51,13 @@ class ClientTracker():
         if self.is_subscribed(client, resource):
             return False
         path = resource_path(resource)
+
+        # ensure that no private info leaks to the outside
+        if path.startswith('/principals/') or path.startswith('/catalogs/'):
+            logger.info('Unallowed subscribtion')
+            raise WebSocketError('forbidden', 'You are not allowed to '
+                                 'subscribe on {}'.format(path))
+
         self._clients2resource_paths[client].add(path)
         self._resource_paths2clients[path].add(client)
         return True
