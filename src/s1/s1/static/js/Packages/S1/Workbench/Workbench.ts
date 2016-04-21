@@ -69,9 +69,9 @@ export var s1CurrentColumnDirective = (
                 index: "rates",
                 reverse: true
             }, {
-                key: "comments_count",
+                key: "comments",
                 name: "TR__COMMENTS_TOTAL",
-                index: "comments_count",
+                index: "comments",
                 reverse: true
             }, {
                 key: "item_creation_date",

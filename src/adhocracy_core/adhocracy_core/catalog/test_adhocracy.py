@@ -26,6 +26,7 @@ def test_create_adhocracy_catalog(pool_graph, registry):
     assert 'reference' in catalogs['adhocracy']
     assert 'rate' in catalogs['adhocracy']
     assert 'rates' in catalogs['adhocracy']
+    assert 'comments' in catalogs['adhocracy']
     assert 'creator' in catalogs['adhocracy']
     assert 'item_creation_date' in catalogs['adhocracy']
     assert 'item_badge' in catalogs['adhocracy']
@@ -211,6 +212,14 @@ class TestIndexComments:
                                )
         assert index_comments(item['commentable'], None) == 5
         assert mock_catalogs.search.call_args[0][0] == query
+
+
+@mark.usefixtures('integration')
+def test_includeme_register_index_comments(registry):
+    from adhocracy_core.sheets.comment import ICommentable
+    from substanced.interfaces import IIndexView
+    assert registry.adapters.lookup((ICommentable,), IIndexView,
+                                    name='adhocracy|comments')
 
 
 class TestIndexTag:

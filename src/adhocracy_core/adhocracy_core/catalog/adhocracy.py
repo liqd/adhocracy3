@@ -12,6 +12,7 @@ from adhocracy_core.utils import is_hidden
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.resources.comment import ICommentVersion
+from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.sheets.rate import IRateable
@@ -45,6 +46,7 @@ class AdhocracyCatalogIndexes:
     title = catalog.Field()
     rate = catalog.Field()
     rates = catalog.Field()
+    comments = catalog.Field()
     creator = catalog.Field()
     item_creation_date = catalog.Field()
     workflow_state = catalog.Field()
@@ -259,6 +261,10 @@ def includeme(config):
                          catalog_name='adhocracy',
                          index_name='rates',
                          context=IRateable)
+    config.add_indexview(index_comments,
+                         catalog_name='adhocracy',
+                         index_name='comments',
+                         context=ICommentable)
     config.add_indexview(index_tag,
                          catalog_name='adhocracy',
                          index_name='tag',
