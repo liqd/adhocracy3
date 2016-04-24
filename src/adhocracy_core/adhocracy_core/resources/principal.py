@@ -1,5 +1,6 @@
 """Principal types (user/group) and helpers to search/get user information."""
 from logging import getLogger
+from pytz import timezone
 
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
@@ -118,6 +119,10 @@ class User(Pool):
         self.group_ids = []
         """Readonly :term:`group_id`s for this user."""
         self.hidden = True
+
+    @property
+    def timezone(self):  # be compatible to substanced
+        return timezone(self.tzname)
 
     def activate(self, active: bool=True):
         """

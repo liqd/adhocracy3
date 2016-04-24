@@ -93,6 +93,7 @@ def includeme(config):
     settings = config.registry.settings
     config.include('pyramid_zodbconn')
     config.include('pyramid_mako')
+    config.include('pyramid_chameleon')
     config.include('.authorization')
     authn_policy = _create_authn_policy(settings)
     config.set_authentication_policy(authn_policy)

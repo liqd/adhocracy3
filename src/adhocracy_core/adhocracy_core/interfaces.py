@@ -19,6 +19,10 @@ from substanced.interfaces import ReferenceClass
 from substanced.interfaces import IUserLocator
 from substanced.interfaces import IService
 from substanced.interfaces import IWorkflow
+from substanced.sdi import MANAGE_ROUTE_NAME
+
+
+SDI_ROUTE_NAME = MANAGE_ROUTE_NAME
 
 
 def namedtuple(typename, field_names, verbose=False, rename=False):
