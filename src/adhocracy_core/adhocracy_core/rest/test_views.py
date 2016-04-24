@@ -898,7 +898,7 @@ class TestLoginUserName:
 
     def test_post_without_token_authentication_policy(self, request, context):
         inst = self.make_one(context, request)
-        with pytest.raises(KeyError):
+        with pytest.raises(IndexError):
             inst.post()
 
     def test_post_with_token_authentication_policy(self, request, context, mock_authpolicy):
@@ -926,7 +926,7 @@ class TestLoginEmailView:
 
     def test_post_without_token_authentication_policy(self, request, context):
         inst = self.make_one(context, request)
-        with pytest.raises(KeyError):
+        with pytest.raises(IndexError):
             inst.post()
 
     def test_post_with_token_authentication_policy(self, request, context, mock_authpolicy):
