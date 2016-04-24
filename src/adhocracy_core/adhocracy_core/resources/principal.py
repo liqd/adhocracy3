@@ -370,6 +370,20 @@ class UserLocatorAdapter(object):
         return sorted(list(roleids))
 
 
+def get_user(request: Request) -> IUser:
+    """Get authenticated user, meant to use as request method 'user'."""
+    userid = request.authenticated_userid
+    if userid is None:
+        return None
+    adapter = request.registry.queryMultiAdapter((request.context, request),
+                                                 IRolesUserLocator)
+    if adapter is None:
+        return None
+    else:
+        user = adapter.get_user_by_userid(userid)
+        return user
+
+
 def groups_and_roles_finder(userid: str, request: Request) -> list:
     """A Pyramid authentication policy groupfinder callback."""
     with statsd_timer('authentication.groups', rate=.1):

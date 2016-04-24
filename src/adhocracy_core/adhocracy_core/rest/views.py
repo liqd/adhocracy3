@@ -58,7 +58,6 @@ from adhocracy_core.sheets.pool import IPool as IPoolSheet
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.tags import ITags
 from adhocracy_core.utils import extract_events_from_changelog_metadata
-from adhocracy_core.utils import get_user
 from adhocracy_core.utils import is_batchmode
 from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import is_created_in_current_transaction
@@ -309,7 +308,7 @@ class PoolRESTView(SimpleRESTView):
         validated = self.request.validated
         kwargs = dict(parent=self.context,
                       appstructs=validated.get('data', {}),
-                      creator=get_user(self.request),
+                      creator=self.request.user,
                       root_versions=validated.get('root_versions', []),
                       request=self.request,
                       is_batchmode=is_batchmode(self.request),
@@ -812,7 +811,7 @@ class ReportAbuseView:
         messenger = self.request.registry.messenger
         messenger.send_abuse_complaint(url=self.request.validated['url'],
                                        remark=self.request.validated['remark'],
-                                       user=get_user(self.request))
+                                       user=self.request.user)
         return ''
 
 
@@ -849,10 +848,11 @@ class MessageUserView:
         """Send a message to another user."""
         messenger = self.request.registry.messenger
         data = self.request.validated
+        user = self.request.user
         messenger.send_message_to_user(recipient=data['recipient'],
                                        title=data['title'],
                                        text=data['text'],
-                                       from_user=get_user(self.request))
+                                       from_user=user)
         return ''
 
 
