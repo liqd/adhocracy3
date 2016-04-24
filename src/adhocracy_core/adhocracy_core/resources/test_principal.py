@@ -124,6 +124,7 @@ class TestUser:
 
     @mark.usefixtures('integration')
     def test_create(self, meta, registry, principals):
+        from pytz import timezone
         from zope.interface.verify import verifyObject
         from adhocracy_core import sheets
         appstructs = {
@@ -144,6 +145,7 @@ class TestUser:
         assert user.password.startswith('$2')
         assert user.tzname == 'UTC'
         assert user.roles == []
+        assert user.timezone == timezone(user.tzname)
 
 
 class TestGroups:
