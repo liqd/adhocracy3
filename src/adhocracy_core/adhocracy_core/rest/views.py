@@ -14,6 +14,7 @@ from zope.interface.interfaces import IInterface
 from zope.interface import Interface
 import colander
 
+from adhocracy_core.authentication import UserTokenHeader
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -727,15 +728,29 @@ class LoginUsernameView:
 
 
 def _login_user(request: IRequest) -> dict:
-    """Log-in a user and return a response indicating success."""
+    """Set cookies and return a data for token header authentication."""
     user = request.validated['user']
     userid = resource_path(user)
-    authentication_headers = dict(remember(request, userid))
-    url = request.resource_url(user)
-    token = authentication_headers['X-User-Token']
+    headers = remember(request, userid)
+    _set_sdi_auth_cookies(headers, request)
+    cstruct = _get_api_auth_data(headers, request, user)
+    return cstruct
+
+
+def _set_sdi_auth_cookies(headers: [tuple], request: IRequest):
+    cookie_headers = [(x, y) for x, y in headers if x == 'Set-Cookie']
+    request.response.headers.extend(cookie_headers)
+
+
+def _get_api_auth_data(headers: [tuple], request: IRequest, user: IResource)\
+        -> dict:
+    token_header = [(x, y) for x, y in headers if x == UserTokenHeader][0]
+    user_url = request.resource_url(user)
+    # TODO: use colander schema to create cstruct
     return {'status': 'success',
-            'user_path': url,
-            'user_token': token}
+            'user_path': user_url,
+            'user_token': token_header[1],
+            }
 
 
 @view_defaults(
