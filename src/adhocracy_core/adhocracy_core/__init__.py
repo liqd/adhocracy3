@@ -10,6 +10,7 @@ import transaction
 from adhocracy_core.authentication import TokenHeaderAuthenticationPolicy
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.resources.principal import groups_and_roles_finder
+from adhocracy_core.resources.principal import get_user
 from adhocracy_core.auditing import set_auditlog
 from adhocracy_core.auditing import get_auditlog
 
@@ -95,6 +96,7 @@ def includeme(config):
     config.include('.authorization')
     authn_policy = _create_authn_policy(settings)
     config.set_authentication_policy(authn_policy)
+    config.add_request_method(get_user, name='user', reify=True)
     config.include('.renderers')
     config.include('.authentication')
     config.include('.authorization')

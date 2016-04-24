@@ -244,6 +244,7 @@ def request_():
     """
     request = DummyRequest()
     request.registry.settings = {}
+    request.user = None
     return request
 
 
