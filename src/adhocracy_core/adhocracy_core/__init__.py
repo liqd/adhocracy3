@@ -36,6 +36,7 @@ def _set_app_root_if_missing(request):
         return
     registry = request.registry
     app_root = registry.content.create(IRootPool.__identifier__,
+                                       request=request,
                                        registry=request.registry)
     zodb_root['app_root'] = app_root
     transaction.savepoint()  # give app_root a _p_jar
