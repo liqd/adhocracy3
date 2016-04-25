@@ -28,7 +28,7 @@ class SubscribableResource(Resource):  # pragma: no cover
 
     @deferred
     def validator(self, kw: dict) -> callable:
-        """Do not allow subscription on /principals and /resources."""
+        """Check that unauthorized paths are not used."""
         def avalidator(node, cstruct):
             path = resource_path(cstruct)
             forbidden_paths = ['/principals', '/catalogs']
