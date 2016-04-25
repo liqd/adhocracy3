@@ -8,8 +8,9 @@ import inspect
 from pyramid.paster import bootstrap
 
 from .mercator_export_users import export_users_and_proposals_rates
+
 from adhocracy_core.utils import create_filename
-from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
+from adhocracy_mercator.resources.mercator2 import IMercatorProposal
 
 
 def export_users():
@@ -35,7 +36,6 @@ def export_users():
     filename = create_filename(directory='./var/export/',
                                prefix='adhocracy-users',
                                suffix='.csv')
-    export_users_and_proposals_rates(env['root'], filename,
-                                     IMercatorProposalVersion,
+    export_users_and_proposals_rates(env['root'], filename, IMercatorProposal,
                                      env['registry'], args)
     env['closer']()

@@ -21,7 +21,9 @@ from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.rate import IRate
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_mercator.scripts.export_users import get_most_rated_proposals
+from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
+from adhocracy_mercator.scripts.mercator_export_users import \
+    get_most_rated_proposals
 
 
 def delete_users():
@@ -71,7 +73,8 @@ def _delete_users_and_votes(filename: str, root: IPool,
 
 
 def _reindex_proposals(catalogs: ICatalogsService, root: IPool):
-    proposals = get_most_rated_proposals(root, min_rate=0)
+    proposals = get_most_rated_proposals(
+        root, min_rate=0, proposal_interface=IMercatorProposalVersion)
     for proposal in proposals:
         catalogs.reindex_index(proposal, 'rates')
 
