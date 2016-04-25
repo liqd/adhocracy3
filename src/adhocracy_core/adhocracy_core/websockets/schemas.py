@@ -1,6 +1,9 @@
 """Colander schemas to validate and (de)serialize Websocket messages."""
 from colander import OneOf
 from colander import required
+from colander import deferred
+from colander import Invalid
+from pyramid.traversal import resource_path
 
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import MappingSchema
@@ -15,11 +18,33 @@ class Action(SingleLine):
     validator = OneOf(['subscribe', 'unsubscribe'])
 
 
+class SubscribableResource(Resource):  # pragma: no cover
+    """Temporary fix for #2244.
+
+    TODO: implement proper solution
+    """
+
+    missing = required
+
+    @deferred
+    def validator(self, kw: dict) -> callable:
+        """Do not allow subscription on /principals and /resources."""
+        def avalidator(node, cstruct):
+            path = resource_path(cstruct)
+            forbidden_paths = ['/principals', '/catalogs']
+            for forbidden in forbidden_paths:
+                if path.startswith(forbidden):
+                    raise Invalid(node, 'Unauthorized path subscription: {}'.
+                                  format(forbidden))
+
+        return avalidator
+
+
 class ClientRequestSchema(MappingSchema):
     """Data structure for client requests."""
 
     action = Action(missing=required)
-    resource = Resource(missing=required)
+    resource = SubscribableResource()
 
 
 class Status(SingleLine):
