@@ -32,10 +32,14 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
 
     @fixture
     def workflow_state_data_appstruct(self):
-        return {'state_data': [{'name': 'participate',
+        return {'state_data': [
+                {'name': 'participate',
                  'description': '',
-                 'start_date': datetime.date(2015, 5, 5),
-                 'end_date': datetime.date(2015, 6, 11)}]}
+                 'start_date': datetime.date(2015, 5, 5)},
+                {'name': 'evaluate',
+                 'description': '',
+                 'start_date': datetime.date(2015, 6, 11)}
+        ]}
 
     def _make_process(self,
                       registry,
