@@ -1,1 +1,1 @@
-"""Views for the sdi admint interface."""
+"""Views for the admin interface."""

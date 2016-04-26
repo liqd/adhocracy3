@@ -1,4 +1,4 @@
-"""Admin interface based on substanced, url prefix is 'manage'."""
+"""Admin interface based on substanced (sdi), url prefix is '/manage'."""
 from pyramid.config import Configurator
 from substanced.content import _ContentTypePredicate
 from substanced.sdi import MANAGE_ROUTE_NAME
