@@ -31,6 +31,13 @@ var extractErrorItems = (code : number, error : IBackendError) : IBackendErrorIt
             description: (<any>error).reason,
             code: code
         }];
+    } else if (!error) {
+        return [{
+            location: "client",
+            name: "abort",
+            description: "the request was aborted before it could reach the server",
+            code: code
+        }];
     } else {
         _.forEach(error.errors, (item) => {
             item.code = code;
@@ -63,8 +70,12 @@ export var logBackendBatchError = (
 
     console.log(response);
 
-    var lastResponse = _.last(response.data.responses);
-    throw extractErrorItems(lastResponse.code, lastResponse.body);
+    if (response.data) {
+        var lastResponse = _.last(response.data.responses);
+        throw extractErrorItems(lastResponse.code, lastResponse.body);
+    } else {
+        throw extractErrorItems(response.status, null);
+    }
 };
 
 
