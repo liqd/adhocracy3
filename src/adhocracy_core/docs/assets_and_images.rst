@@ -56,7 +56,7 @@ For testing, we import the needed stuff and start the Adhocracy testapp::
     >>> from webtest import TestApp
     >>> import os
     >>> import adhocracy_core
-    >>> app = getfixture('app_with_filestorage')
+    >>> app = getfixture('app_router_filestorage')
     >>> testapp = TestApp(app)
     >>> rest_url = 'http://localhost'
 
