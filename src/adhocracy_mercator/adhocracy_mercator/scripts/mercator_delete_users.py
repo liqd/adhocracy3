@@ -22,6 +22,7 @@ from adhocracy_core.resources.rate import IRate
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
+from adhocracy_mercator.resources.mercator2 import IMercatorProposal
 from adhocracy_mercator.scripts.mercator_export_users import \
     get_most_rated_proposals
 
@@ -73,8 +74,11 @@ def _delete_users_and_votes(filename: str, root: IPool,
 
 
 def _reindex_proposals(catalogs: ICatalogsService, root: IPool):
-    proposals = get_most_rated_proposals(
+    proposals_2015 = get_most_rated_proposals(
         root, min_rate=0, proposal_interface=IMercatorProposalVersion)
+    proposals_2016 = get_most_rated_proposals(
+        root, min_rate=0, proposal_interface=IMercatorProposal)
+    proposals = proposals_2015 + proposals_2016
     for proposal in proposals:
         catalogs.reindex_index(proposal, 'rates')
 
@@ -109,5 +113,6 @@ def _get_emails(filename: str) -> [str]:
 
 def _get_user_locator(context: IResource, registry: Registry) -> IUserLocator:
     request = Request.blank('/dummy')
+    request.registry = registry
     locator = registry.getMultiAdapter((context, request), IUserLocator)
     return locator
