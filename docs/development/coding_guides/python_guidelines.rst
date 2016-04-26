@@ -13,7 +13,13 @@ Test Driven Development
     1. write function/integration test
     2. write unit test (simplest statement first)
     3. switch between writing code and change/extend tests until all test pass
-    4. refactor (:doc:`refactore_guidelines`)
+    4. refactor
+
+
+Refactor towards Clean Code
+---------------------------
+
+see (:doc:`../refactor_guidelines`)
 
 
 Imports

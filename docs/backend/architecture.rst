@@ -16,9 +16,9 @@ adhocracy_frontend
    framework for the javascript frontend
 
 adhocracy_xyz
-   Backend extensions for project spezific application
+   Backend extensions for project specific application
 
-xzy
+xyz
    projects specific application with javascript frontend
 
 

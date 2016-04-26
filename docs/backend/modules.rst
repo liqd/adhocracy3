@@ -64,7 +64,6 @@ API and separation of responsibility
     adhocracy_core.authorization
     adhocracy_core.messaging
     adhocracy_core.graph
-    adhocracy_core.evolution
     adhocracy_core.workflows
 
 .. rubric:: Interfaces, Utils Layer
@@ -85,6 +84,7 @@ API and separation of responsibility
     adhocracy_core.scripts
     adhocracy_core.stats
     adhocracy_core.auditing
+    adhocracy_core.evolution
     adhocracy_core.registry
     adhocracy_core.renderers
     adhocracy_core.templates

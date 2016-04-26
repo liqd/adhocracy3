@@ -1,7 +1,7 @@
 Overview
 ========
 
-The adhocracy backend is python framework to build a REST-API *backend* for
+The adhocracy backend is a python framework to build a REST-API *backend* for
 cms-like applications.
 
 It was developed with the use cases and limitations of the policy drafing and
@@ -49,15 +49,16 @@ hierarchy :term:`traversal` .
 
 `Sheets`:
 
-    - interface to for a specific resource behaviour:
-      - api methods
-      - data structure (:class:`colander.Schema`) with following field types:
-         - data
-         - metadata
-         - computed data
-         - references
-         - backreferences
-    - encapsulate data/reference storage
+    - interface for a specific resource behaviour:
+
+       - api methods
+       - data structure (:class:`colander.Schema`) with following field types
+          - data
+          - metadata
+          - computed data
+          - references
+          - backreferences
+       - encapsulate data/reference storage
 
 TODO:: Here it would be great to have a small overview of what sheets
 do and how they work. Maybe give a concrete example of how they are
