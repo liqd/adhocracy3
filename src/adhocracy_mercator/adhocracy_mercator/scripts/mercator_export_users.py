@@ -62,8 +62,7 @@ def _get_users(root: IResource) -> [IUser]:
 
 def get_most_rated_proposals(root: IResource,
                              min_rate: int,
-                             proposal_interface: IItem,
-                             registry: Registry) -> [IItem]:
+                             proposal_interface: IItem) -> [IItem]:
     """Return child proposals of `root` with rating higher then `min_rate`."""
     catalogs = find_service(root, 'catalogs')
     query = search_query._replace(interfaces=proposal_interface,
