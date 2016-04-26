@@ -422,6 +422,12 @@ class TestMultiRouteAuthenticationPolicy:
         inst.policies = {}
         assert inst._get_matching_policy(request_) is None
 
+    def test_get_matching_policy_return_none_if_wrong_policy(
+        self, request_, inst, policy):
+        request_.matched_route = None
+        inst.policies = {'other_policy': policy}
+        assert inst._get_matching_policy(request_) is None
+
     def test_get_matching_policy_return_policy_if_none_matches(
         self, request_, inst, policy):
         request_.matched_route = None
