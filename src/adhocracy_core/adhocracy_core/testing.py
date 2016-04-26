@@ -560,8 +560,10 @@ def zeo(request, supervisor) -> str:
             'bin/supervisorctl stop adhocracy_test:test_zeo',
             shell=True,
             stderr=subprocess.STDOUT)
+        subprocess.check_output('rm -rf var/db/test/Data.fs*',
+                                shell=True,
+                                stderr=subprocess.STDOUT)
     request.addfinalizer(fin)
-
     return output
 
 

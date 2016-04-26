@@ -21,7 +21,7 @@ exports.config = {
     },
     afterLaunch: function() {
         exec("bin/supervisorctl stop adhocracy_test:test_zeo test_backend_with_ws adhocracy_test:test_autobahn adhocracy_test:test_frontend");
-        exec("rm -rf var/test_zeodata/Data.fs* var/test_zeodata/blobs var/mail/new/* ");
+        exec("rm -rf var/db/test/Data.fs* var/db/test/blobs/* var/mail/new/* ");
     },
     onPrepare: function() {
         var getMailQueuePath = function() {
