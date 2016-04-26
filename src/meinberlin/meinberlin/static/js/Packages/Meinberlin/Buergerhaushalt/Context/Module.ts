@@ -10,8 +10,6 @@ import * as AdhMeinberlinBuergerhaushaltWorkbench from "../Workbench/Workbench";
 
 import RIBuergerhaushaltProcess from "../../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
 
-import * as Context from "./Context";
-
 
 export var moduleName = "adhMeinberlinBuergerhaushaltContext";
 
@@ -26,7 +24,6 @@ export var register = (angular) => {
             adhEmbedProvider.registerContext("buergerhaushalt", ["burgerhaushalt"]);
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            adhResourceAreaProvider.template("buergerhaushalt", ["adhConfig", "$templateRequest", Context.areaTemplate]);
             AdhMeinberlinBuergerhaushaltWorkbench.registerRoutes(
                 RIBuergerhaushaltProcess.content_type,
                 "buergerhaushalt"

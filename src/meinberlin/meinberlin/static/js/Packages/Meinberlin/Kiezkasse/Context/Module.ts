@@ -10,8 +10,6 @@ import * as AdhMeinberlinKiezkasseWorkbench from "../Workbench/Workbench";
 
 import RIKiezkasseProcess from "../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
 
-import * as Context from "./Context";
-
 
 export var moduleName = "adhMeinberlinKiezkasseContext";
 
@@ -26,7 +24,6 @@ export var register = (angular) => {
             adhEmbedProvider.registerContext("kiezkasse", ["kiezkassen"]);
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            adhResourceAreaProvider.template("kiezkasse", ["adhConfig", "$templateRequest", Context.areaTemplate]);
             AdhMeinberlinKiezkasseWorkbench.registerRoutes(
                 RIKiezkasseProcess.content_type,
                 "kiezkasse"

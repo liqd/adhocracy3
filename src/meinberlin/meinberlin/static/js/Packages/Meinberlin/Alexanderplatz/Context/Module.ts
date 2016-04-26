@@ -11,8 +11,6 @@ import * as AdhMeinberlinAlexanderplatzWorkbench from "../Workbench/Workbench";
 
 import RIAlexanderplatzProcess from "../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess";
 
-import * as AdhMeinberlinAlexanderplatzContext from "./Context";
-
 
 export var moduleName = "adhMeinberlinAlexanderplatzContext";
 
@@ -29,8 +27,6 @@ export var register = (angular) => {
             adhEmbedProvider.registerContext("alexanderplatz");
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider: AdhResourceArea.Provider) => {
-            adhResourceAreaProvider
-                .template("alexanderplatz", ["adhConfig", "$templateRequest", AdhMeinberlinAlexanderplatzContext.areaTemplate]);
             AdhMeinberlinAlexanderplatzWorkbench.registerRoutes(processType, "alexanderplatz")(adhResourceAreaProvider);
         }])
         .config(["adhMapDataProvider", (adhMapDataProvider: AdhMapping.MapDataProvider) => {
