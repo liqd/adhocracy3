@@ -170,8 +170,6 @@ export class Provider implements angular.IServiceProvider {
  */
 export class Service implements AdhTopLevelState.IAreaInput {
     public template : string;
-    private hasRun : boolean;
-    private templateDeferred;
 
     constructor(
         private provider : Provider,
@@ -185,8 +183,6 @@ export class Service implements AdhTopLevelState.IAreaInput {
         private adhResourceUrlFilter
     ) {
         this.template = "<adh-resource-area></adh-resource-area>";
-        this.hasRun = false;
-        this.templateDeferred = this.$q.defer();
     }
 
     private getDefaults(resourceType : string, view : string, processType : string, embedContext : string) : Dict {
@@ -284,19 +280,11 @@ export class Service implements AdhTopLevelState.IAreaInput {
         });
     }
 
-    private resolveTemplate() : void {
+    public getTemplate() : angular.IPromise<string> {
         var templateUrl = this.adhConfig.pkg_path + pkgLocation + "/ResourceArea.html";
         var templateFn = ["$templateRequest", ($templateRequest) => $templateRequest(templateUrl)];
 
-        this.$injector.invoke(templateFn).then((template) => {
-            this.templateDeferred.resolve(template);
-        }, (reason) => {
-            this.templateDeferred.reject(reason);
-        });
-    }
-
-    public getTemplate() : angular.IPromise<string> {
-        return this.templateDeferred.promise;
+        return this.$injector.invoke(templateFn);
     }
 
     public has(resourceType : string, view : string = "", processType : string = "") : boolean {
@@ -319,11 +307,6 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
         var view : string = "";
         var embedContext = this.adhEmbed.getContext();
-
-        if (!this.hasRun) {
-            this.hasRun = true;
-            this.resolveTemplate();
-        }
 
         // if path has a view segment
         if (_.last(segs).match(/^@/)) {
