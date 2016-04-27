@@ -1,19 +1,17 @@
 Code Review Process
 ===================
 
-   
 Preface
 -------
 
 This document describes a light-weight code review process that can be
 used with git alone and no other tools.
 
-Read :doc:`git_guidelines` before reading this document.
-
 .. note::
    Code reviews are currently done with `GitHub
    <https://www.github.com>`_.
 
+TODO: add good practice how to do code review
 
 Status of this document
 -----------------------

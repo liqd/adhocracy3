@@ -22,6 +22,7 @@ Subpackages
     adhocracy_core.evolution
     adhocracy_core.graph
     adhocracy_core.messaging
+    adhocracy_core.renderers
     adhocracy_core.resources
     adhocracy_core.rest
     adhocracy_core.scaffolds

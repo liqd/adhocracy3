@@ -1,12 +1,30 @@
-Refactor Guidelines
-===================
+Refactoring & Clean Code
+========================
 
-For refactoring we follow mostly the rules from the chapter "Smells and hints"
-from the book "Clean Code" by Robert C. Martin, 2008.
-Every new developer should read this book.
+Introduction
+------------
 
-Clean Code short summary:
--------------------------
+After changing code (or tests) it must be better than before to ensure
+*Extensibility* and *Maintainability* in the long run.
+
+You should:
+
+* Extract Class\Method\Function
+
+* Move\Reuse\Rename\Remove
+
+* Replace condition with polymorphism/Strategy
+
+with the *clean code* principals in mind.
+
+Clean Code summary
+------------------
+
+We follow mostly the rules from the chapter "Smells and hints" from the
+book "Clean Code" by Robert C. Martin, 2008.
+It should be read by every new developer. For a short summary you can read this
+document or have a look at the cheat sheet:
+http://www.planetgeek.ch/wp-content/uploads/2014/11/Clean-Code-V2.4.pdf.
 
 Common Principles:
 ++++++++++++++++++

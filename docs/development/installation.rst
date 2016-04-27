@@ -51,15 +51,6 @@ Update your shell environment::
     source ./source_env
 
 
-Documentation
--------------
-
-Build sphinx documentation ::
-
-    bin/ad_sphinx_build_adhocracy
-    xdg-open docs/build/html/index.html  # (alternatively, cut & paste the url into your browser)
-
-
 Run the application
 -------------------
 
@@ -92,17 +83,6 @@ Open the javascript front-end with your web browser::
 Shutdown everything nicely::
 
     ./bin/supervisorctl shutdown
-
-
-Run test suites
----------------
-
-Run test suite::
-
-    bin/polytester
-
-.. NOTE:: You need to have chrome/chromium installed in order to run the
-   acceptance tests.
 
 
 Troubleshooting

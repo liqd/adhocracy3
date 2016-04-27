@@ -1,19 +1,8 @@
-Development
-===========
+Development Tasks
+=================
 
 General Remarks
 ---------------
-
-Use test driven development and check code style bevore pushing commits
-(see `Coding Style Guideline` ).
-
-Manually check pyflake, pep257::
-
-    bin/ad_check_code src/adhocracy src/adhocracy_sample
-
-Example Vim config according to coding guideline::
-
-    https://github.com/liqd/vim_config
 
 When changing the api, the frontend needs to re-generate the
 TypeScript modules providing the resource classes.  This may trigger
@@ -43,10 +32,12 @@ B.  In browser::
        Running JS unit test in the browser with blanket enabled is
        currently broken.
 
-
 protractor acceptance tests::
 
     bin/polytester acceptance
+
+.. NOTE:: You need to have chrome/chromium installed in order to run the
+acceptance tests.
 
 run backend functional tests::
 
@@ -150,8 +141,8 @@ bower
     cd .../lib  # where bower installs the libraries
     bower list
 
-Adhocracy Releases
-------------------
+Release Adhocracy
+-----------------
 
 Adhocracy uses `semantic versions <http://semver.org/>`_ with one
 extra rule:

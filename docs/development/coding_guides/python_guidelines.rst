@@ -1,14 +1,26 @@
-Python Guidelines
-=================
+Python
+======
 
-Testing
--------
+Test Driven Development
+-----------------------
 
 * 100% unit test coverage (must)
-* Test driven development with functional, integration and unit test (should)
-  * test driven concept: http://en.wikipedia.org/wiki/Test-driven_development
-  * programming work flow: functional/integration test <-> unit tests <-> code
-  * use `pytest <http://pytest.org/>`_ fixtures, functional tests have the `functional` marker, integration are using a fixture called `integration`.
+* use `pytest <http://pytest.org/>`_ fixtures to mock/create dependencies, functional tests have the `functional` marker, integration are using a fixture called `integration`.
+* Test driven development with functional/integration and unit test (should)
+
+    concept: http://en.wikipedia.org/wiki/Test-driven_development
+
+    1. write function/integration test
+    2. write unit test (simplest statement first)
+    3. switch between writing code and change/extend tests until all test pass
+    4. refactor
+
+
+Refactor towards Clean Code
+---------------------------
+
+see (:doc:`../refactor_guidelines`)
+
 
 Imports
 -------
@@ -20,13 +32,6 @@ Imports
   it might hide circular import errors. Instead use
   ``pkgresources.getdistribution`` and catch ``DistributionNotFound``.
   (http://do3.cc/blog/2010/08/20/do-not-catch-import-errors,-use-pkg_resources/)
-* must not import from upper level
-* should not import from same level
-  (pluggable: must not have imports from other modules or to other pluggable modules)
-  (pluggable: must have interface for public methods)
-* may import from bottom level
-* may import interfaces
-* you can use `bin/check_forbidden_imports` to list suspicious imports  # TODO update script
 
 Code formatting
 ---------------
