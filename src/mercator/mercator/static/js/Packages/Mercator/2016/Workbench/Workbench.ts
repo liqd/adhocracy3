@@ -162,6 +162,12 @@ export var proposalListingColumnDirective = (
             adhHttp.get(processUrl).then((resource) => {
                 var currentPhase = resource.data[SIWorkflow.nick].workflow_state;
 
+                scope.sort = "item_creation_date";
+                scope.setSort = (sort : string) => {
+                    scope.sort = sort;
+                };
+                scope.initialLimit = 50;
+
                 if (typeof scope.facets === "undefined") {
                     scope.facets = [{
                         key: "mercator_location",
@@ -198,6 +204,7 @@ export var proposalListingColumnDirective = (
                     }];
 
                     if (currentPhase === "evaluate") {
+                        scope.sort = "rates";
                         scope.facets.push({
                             key: "badge",
                             name: "TR__MERCATOR_BADGE_AWARDS_LABEL",
@@ -217,12 +224,6 @@ export var proposalListingColumnDirective = (
                         });
                     }
                 }
-
-                scope.sort = "item_creation_date";
-                scope.setSort = (sort : string) => {
-                    scope.sort = sort;
-                };
-                scope.initialLimit = 50;
 
                 scope.ready = true;
             });
