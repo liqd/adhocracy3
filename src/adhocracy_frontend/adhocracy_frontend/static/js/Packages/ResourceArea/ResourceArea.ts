@@ -38,8 +38,7 @@ export class Provider implements angular.IServiceProvider {
         this.specifics = {};
         this.customHeaders = {};
         this.$get = ["$q", "$injector", "$location", "adhHttp", "adhConfig", "adhCredentials", "adhEmbed", "adhResourceUrlFilter",
-            ($q, $injector, $location, adhHttp, adhConfig, adhCredentials, adhEmbed, adhResourceUrlFilter) => new Service(
-                self, $q, $injector, $location, adhHttp, adhConfig, adhCredentials, adhEmbed, adhResourceUrlFilter)];
+            (...args) => AdhUtil.construct(Service, [self].concat(args))];
     }
 
     public default(
