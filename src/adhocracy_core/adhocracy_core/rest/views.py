@@ -738,18 +738,28 @@ def _login_user(request: IRequest) -> dict:
 
 
 def _set_sdi_auth_cookies(headers: [tuple], request: IRequest):
-    cookie_headers = [(x, y) for x, y in headers if x == 'Set-Cookie']
+    cookie_headers = []
+    force_secure = request.scheme.startswith('https')
+    for name, value in headers:
+        if name != 'Set-Cookie':
+            continue
+        header = (name, value)
+        has_secure_flag = 'Secure;' in value
+        if force_secure and not has_secure_flag:  # pragma: no branch
+            header = (name, value + 'Secure;')
+        cookie_headers.append(header)
     request.response.headers.extend(cookie_headers)
 
 
 def _get_api_auth_data(headers: [tuple], request: IRequest, user: IResource)\
         -> dict:
-    token_header = [(x, y) for x, y in headers if x == UserTokenHeader][0]
+    token_headers = dict([(x, y) for x, y in headers if x == UserTokenHeader])
+    token = token_headers[UserTokenHeader]
     user_url = request.resource_url(user)
     # TODO: use colander schema to create cstruct
     return {'status': 'success',
             'user_path': user_url,
-            'user_token': token_header[1],
+            'user_token': token,
             }
 
 
