@@ -40,8 +40,6 @@ export var register = (angular) => {
             adhEmbedProvider.registerContext("mein.berlin.de");
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider: AdhResourceArea.Provider) => {
-            adhResourceAreaProvider
-                .template("mein.berlin.de", ["adhConfig", "$templateRequest", AdhMeinberlinDe.areaTemplate]);
             AdhDebateWorkbench.registerRoutes(
                 RICollaborativeTextProcess, "mein.berlin.de")(adhResourceAreaProvider);
             AdhMeinberlinAlexanderplatzWorkbench.registerRoutes(
