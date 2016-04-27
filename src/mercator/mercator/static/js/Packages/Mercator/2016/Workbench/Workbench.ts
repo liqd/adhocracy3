@@ -202,7 +202,7 @@ export var proposalListingColumnDirective = (
                             key: "badge",
                             name: "TR__MERCATOR_BADGE_AWARDS_LABEL",
                             items: [
-                                {key: "shortlist", name: "TR__MERCATOR_BADGE_SHORTLIST"}
+                                {key: "shortlist", name: "TR__MERCATOR_BADGE_SHORTLIST", enabled: true}
                             ]
                         });
                     } else if (currentPhase === "result") {
