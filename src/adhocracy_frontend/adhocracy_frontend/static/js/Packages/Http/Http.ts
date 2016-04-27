@@ -326,7 +326,7 @@ export class Service<Content extends ResourcesBase.Resource> {
      * one version in LAST, throw an exception.
      *
      * FIXME: rename to getLastVersionPathNoFork for consistency with
-     * LAST tag and adh-last-version directive.  (even though arguably
+     * LAST tag.  (even though arguably
      * there is a difference between the LAST tag and this function.)
      */
     public getNewestVersionPathNoFork(path : string, config : IHttpGetConfig = {}) : angular.IPromise<string> {
