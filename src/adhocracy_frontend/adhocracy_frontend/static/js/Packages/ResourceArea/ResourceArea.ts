@@ -37,8 +37,18 @@ export class Provider implements angular.IServiceProvider {
         this.defaults = {};
         this.specifics = {};
         this.customHeaders = {};
-        this.$get = ["$q", "$injector", "$location", "adhHttp", "adhConfig", "adhCredentials", "adhEmbed", "adhResourceUrlFilter",
-            (...args) => AdhUtil.construct(Service, [self].concat(args))];
+        this.$get = [
+            "$q",
+            "$injector",
+            "$location",
+            "$templateRequest",
+            "adhHttp",
+            "adhConfig",
+            "adhCredentials",
+            "adhEmbed",
+            "adhResourceUrlFilter",
+            (...args) => AdhUtil.construct(Service, [self].concat(args))
+            ];
     }
 
     public default(
@@ -175,6 +185,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         private $q : angular.IQService,
         private $injector : angular.auto.IInjectorService,
         private $location : angular.ILocationService,
+        private $templateRequest : angular.ITemplateRequestService,
         private adhHttp : AdhHttp.Service<any>,
         private adhConfig : AdhConfig.IService,
         private adhcredentials : AdhCredentials.Service,
@@ -281,9 +292,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
     public getTemplate() : angular.IPromise<string> {
         var templateUrl = this.adhConfig.pkg_path + pkgLocation + "/ResourceArea.html";
-        var templateFn = ["$templateRequest", ($templateRequest) => $templateRequest(templateUrl)];
-
-        return this.$injector.invoke(templateFn);
+        return this.$templateRequest(templateUrl);
     }
 
     public has(resourceType : string, view : string = "", processType : string = "") : boolean {
