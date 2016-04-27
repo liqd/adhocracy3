@@ -11,7 +11,6 @@ API and separation of responsibility
 
 *layer*
     loosly group of modules that follow these rules:
-    adhocracy_core.evolution
     * must not import from upper layer
     * should not import from same layer
     * may import interfaces from all layers
