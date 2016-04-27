@@ -25,7 +25,7 @@ def export_users_and_proposals_rates(root: IResource, filename: str,
                                      registry: Registry, args):
     """Export all users and their proposal rates to csv file."""
     proposals = get_most_rated_proposals(root, args.min_rate,
-                                         proposal_interface, registry)
+                                         proposal_interface)
     proposals_titles = get_titles(proposals, registry)
     if args.include_passwords:
         column_names = ['Username', 'Email', 'Creation date',
