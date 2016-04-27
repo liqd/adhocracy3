@@ -30,14 +30,12 @@ export class Provider implements angular.IServiceProvider {
         factory : (resource) => any;  // values return either Dict or angular.IPromise<Dict>
         type? : string;
     }};
-    public templates : {[embedContext : string]: any};
     public customHeaders : {[processType : string]: string};
 
     constructor() {
         var self = this;
         this.defaults = {};
         this.specifics = {};
-        this.templates = {};
         this.customHeaders = {};
         this.$get = ["$q", "$injector", "$location", "adhHttp", "adhConfig", "adhCredentials", "adhEmbed", "adhResourceUrlFilter",
             ($q, $injector, $location, adhHttp, adhConfig, adhCredentials, adhEmbed, adhResourceUrlFilter) => new Service(
@@ -107,11 +105,6 @@ export class Provider implements angular.IServiceProvider {
         return this
             .specific(itemType, view, processType, embedContext, factory, "item")
             .specific(versionType, view, processType, embedContext, factory, "version");
-    }
-
-    public template(embedContext : string, templateFn : any) : Provider {
-        this.templates[embedContext] = templateFn;
-        return this;
     }
 
     public customHeader(processType : string, templateUrl : string) : Provider {
@@ -292,13 +285,8 @@ export class Service implements AdhTopLevelState.IAreaInput {
     }
 
     private resolveTemplate(embedContext) : void {
-        var templateFn;
-        if (this.provider.templates.hasOwnProperty(embedContext)) {
-            templateFn = this.provider.templates[embedContext];
-        } else {
-            var templateUrl = this.adhConfig.pkg_path + pkgLocation + "/ResourceArea.html";
-            templateFn = ["$templateRequest", ($templateRequest) => $templateRequest(templateUrl)];
-        }
+        var templateUrl = this.adhConfig.pkg_path + pkgLocation + "/ResourceArea.html";
+        var templateFn = ["$templateRequest", ($templateRequest) => $templateRequest(templateUrl)];
 
         if (typeof templateFn === "string") {
             var templateString = templateFn;
