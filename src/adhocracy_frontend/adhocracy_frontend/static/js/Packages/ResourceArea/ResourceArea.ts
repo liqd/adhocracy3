@@ -284,16 +284,11 @@ export class Service implements AdhTopLevelState.IAreaInput {
         });
     }
 
-    private resolveTemplate(embedContext) : void {
+    private resolveTemplate() : void {
         var templateUrl = this.adhConfig.pkg_path + pkgLocation + "/ResourceArea.html";
         var templateFn = ["$templateRequest", ($templateRequest) => $templateRequest(templateUrl)];
 
-        if (typeof templateFn === "string") {
-            var templateString = templateFn;
-            templateFn = () => templateString;
-        }
-
-        this.$q.when(this.$injector.invoke(templateFn)).then((template) => {
+        this.$injector.invoke(templateFn).then((template) => {
             this.templateDeferred.resolve(template);
         }, (reason) => {
             this.templateDeferred.reject(reason);
@@ -327,7 +322,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
         if (!this.hasRun) {
             this.hasRun = true;
-            this.resolveTemplate(embedContext);
+            this.resolveTemplate();
         }
 
         // if path has a view segment
