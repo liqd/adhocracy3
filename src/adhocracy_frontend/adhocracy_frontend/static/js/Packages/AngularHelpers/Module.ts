@@ -22,7 +22,6 @@ export var register = (angular) => {
         .factory("adhSingleClickWrapper", ["$timeout", AdhAngularHelpers.singleClickWrapperFactory])
         .factory("adhSubmitIfValid", ["$q", AdhAngularHelpers.submitIfValid])
         .directive("adhRecompileOnChange", ["$compile", AdhAngularHelpers.recompileOnChange])
-        .directive("adhLastVersion", ["$compile", "adhHttp", AdhAngularHelpers.lastVersion])
         .directive("adhWait", AdhAngularHelpers.waitForCondition)
         .directive("adhInputSync", ["$timeout" , AdhAngularHelpers.inputSync]);
 };

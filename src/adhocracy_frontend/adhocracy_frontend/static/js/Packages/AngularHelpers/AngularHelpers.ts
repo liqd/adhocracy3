@@ -54,27 +54,6 @@ export var numberOrDashFilter = (n) : string => {
 };
 
 
-export var lastVersion = (
-    $compile : angular.ICompileService,
-    adhHttp : AdhHttp.Service<any>
-) => {
-    return {
-        restrict: "E",
-        scope: {
-            itemPath: "@"
-        },
-        transclude: true,
-        template: "<adh-inject></adh-inject>",
-        link: (scope) => {
-            adhHttp.getNewestVersionPathNoFork(scope.itemPath).then(
-                (versionPath) => {
-                    scope.versionPath = versionPath;
-                });
-        }
-    };
-};
-
-
 /**
  * Recompiles children on every change of `value`. `value` is available in
  * child scope as `key`.
