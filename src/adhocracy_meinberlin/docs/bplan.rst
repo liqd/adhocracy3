@@ -63,21 +63,34 @@ The following API calls are required to implement the process:
 
 **Initialization**::
 
+For the example API calls an organisation "orga" is created.
+The organization for the B-Plan needs to exist beforehand in the a3
+platform.
+
     >>> from webtest import TestApp
+    >>> from adhocracy_core.testing import god_header
     >>> app_router = getfixture('app_router')
     >>> testapp = TestApp(app_router)
-    >>> app_god = getfixture('app_god')
+    >>> rest_url = 'http://localhost'
     >>> data = {'content_type':
     ...                'adhocracy_core.resources.organisation.IOrganisation',
     ...         'data': {
     ...             'adhocracy_core.sheets.name.IName':
     ...                 {'name': 'orga'}
     ...         }}
-    >>> resp = app_god.post('/', data)
+    >>> resp = testapp.post_json(rest_url + '/', data, headers=god_header)
 
-For the example API calls an organisation "orga" is created.
-The organization for the B-Plan needs to exist beforehand in the a3
-platform.
+A working image url is needed to test referencing external images.
+
+    >>> import os
+    >>> import adhocracy_core
+    >>> httpserver = getfixture('httpserver')
+    >>> base_path = adhocracy_core.__path__[0]
+    >>> test_image_path = os.path.join(base_path, '../', 'docs', 'test_image.png')
+    >>> httpserver.serve_content(open(test_image_path, 'rb').read())
+    >>> httpserver.headers['ContentType'] = 'image/png'
+    >>> test_image_url = httpserver.url
+
 
 **Login**::
 
@@ -113,7 +126,7 @@ The username here is just an example, please use your credentials.
     ...                  'short_description':'Teaser text'},
     ...             'adhocracy_core.sheets.image.IImageReference':
     ...                 {'picture_description': 'copyright notice',
-    ...                  'external_picture_url': 'http://foo.bar/image.jpg'},
+    ...                  'external_picture_url': test_image_url},
     ...             'adhocracy_core.sheets.workflow.IWorkflowAssignment':
     ...                 {'state_data':
     ...                  [{'name': 'participate', 'description': '',
