@@ -105,8 +105,6 @@ def includeme(config):
     config.set_authentication_policy(authn_policy)
     config.add_request_method(get_user, name='user', reify=True)
     config.include('.renderers')
-    config.include('.authentication')
-    config.include('.authorization')
     config.include('.evolution')
     config.include('.events')
     config.include('.content')
@@ -133,7 +131,8 @@ def _create_authentication_policy(settings, config: Configurator)\
     timeout = 60 * 60 * 24 * 30
     multi_policy = MultiRouteAuthenticationPolicy()
     token_policy = TokenHeaderAuthenticationPolicy(secret,
-                                                   groupfinder=groupfinder,
+                                                   algorithm='HS512',
+                                                   callback=groupfinder,
                                                    timeout=timeout)
     multi_policy.add_policy(None, token_policy)
     session_factory = SignedCookieSessionFactory(secret,
