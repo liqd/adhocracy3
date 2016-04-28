@@ -106,6 +106,11 @@ class TestJSONHTTPException:
         self.make_one([], request_)
         assert "{'X-User-Token': '<hidden>'}" in str(log)
 
+    def test_log_but_hide_cookies_in_headers(self, request_, log):
+        request_.headers['Cookie'] = 'auth=secret'
+        self.make_one([], request_)
+        assert "{'Cookie': '<hidden>'}" in str(log)
+
 
 @mark.usefixtures('log')
 class TestHandleErrorX0XException:
