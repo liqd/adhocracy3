@@ -23,6 +23,17 @@ class TestAutoTransitionWorkflow:
         return mock_catalogs
 
     @fixture
+    def mock_process(self):
+        return testing.DummyResource()
+
+    @fixture
+    def mock_catalogs_with_process(self, search_result, mock_catalogs,
+                                   mock_process):
+        mock_catalogs.search.side_effect = [
+            search_result._replace(elements=[mock_process])]
+        return mock_catalogs
+
+    @fixture
     def mock_transition_to_states(self, registry, mocker):
         mock = mocker.patch(
             'adhocracy_core.scripts.auto_transition_process_workflow.'
@@ -31,6 +42,7 @@ class TestAutoTransitionWorkflow:
 
     @fixture
     def mock_workflow(self, registry, mock_workflow):
+        mock_workflow.type = 'standard'
         mock_workflow.get_next_states.return_value = ['evaluate']
         registry.content.get_workflow = Mock(return_value=mock_workflow)
         return mock_workflow
@@ -48,40 +60,24 @@ class TestAutoTransitionWorkflow:
         assert not mock_transition_to_states.called
 
     def test_ignore_processes_without_auto_transition(self, context, registry,
-            mock_catalogs, search_result, mock_transition_to_states,
-            mock_sheet):
-        process = testing.DummyResource()
-        context['process'] = process
-        mock_catalogs.search.side_effect = [
-            search_result._replace(elements=[process]),
-            search_result]
+            mock_catalogs_with_process, search_result,
+            mock_transition_to_states, mock_sheet, mock_workflow):
         registry.content.workflows_meta = {
                 'standard': {'auto_transition': False}}
         mock_sheet.get.return_value = {
-            'workflow': 'standard',
-            'workflow_state': 'participate',
-            'state_data': [
-                {'name': 'participate',
-                 'description': '',
-                 'start_date': datetime(2016, 1, 1),
-                 'end_date': datetime(2016, 1, 2)}
-            ]}
+            'workflow': mock_workflow
+            }
         registry.content.get_sheet = Mock(return_value=mock_sheet)
         self.call_fut(context, registry)
         assert not mock_transition_to_states.called
 
     def test_ignore_processes_currently_active(self, context, registry,
-            mock_catalogs, search_result, mock_transition_to_states,
-            mock_sheet):
-        process = testing.DummyResource()
-        context['process'] = process
-        mock_catalogs.search.side_effect = [
-            search_result._replace(elements=[process]),
-            search_result]
+            mock_catalogs_with_process, search_result,
+            mock_transition_to_states, mock_sheet, mock_workflow):
         registry.content.workflows_meta = {
             'standard': {'auto_transition': False}}
         mock_sheet.get.return_value = {
-            'workflow': 'standard',
+            'workflow': mock_workflow,
             'workflow_state': 'participate',
             'state_data': [
                 {'name': 'participate',
@@ -103,7 +99,7 @@ class TestAutoTransitionWorkflow:
         registry.content.workflows_meta = {
             'standard': {'auto_transition': True}}
         mock_sheet.get.return_value = {
-            'workflow': 'standard',
+            'workflow': mock_workflow,
             'workflow_state': 'participate',
             'state_data': [
                 {'name': 'participate',
@@ -126,7 +122,7 @@ class TestAutoTransitionWorkflow:
         registry.content.workflows_meta = {
             'standard': {'auto_transition': True}}
         mock_sheet.get.return_value = {
-            'workflow': 'standard',
+            'workflow': mock_workflow,
             'workflow_state': 'participate',
             'state_data': []}
         registry.content.get_sheet = Mock(return_value=mock_sheet)
@@ -143,7 +139,7 @@ class TestAutoTransitionWorkflow:
         registry.content.workflows_meta = {
             'standard': {'auto_transition': True}}
         mock_sheet.get.return_value = {
-            'workflow': 'standard',
+            'workflow': mock_workflow,
             'workflow_state': 'participate',
             'state_data': [
                 {'name': 'participate',
@@ -160,16 +156,12 @@ class TestAutoTransitionWorkflow:
         assert not mock_transition_to_states.called
 
     def test_transition_needed_by_current_state(self, context, registry,
-            mock_catalogs, search_result, mock_transition_to_states,
-            mock_sheet, mock_workflow, mock_now):
-        process = testing.DummyResource()
-        mock_catalogs.search.side_effect = [
-            search_result._replace(elements=[process]),
-            search_result]
+            mock_catalogs_with_process, mock_process, search_result,
+            mock_transition_to_states, mock_sheet, mock_workflow, mock_now):
         registry.content.workflows_meta = {
             'standard': {'auto_transition': True}}
         mock_sheet.get.return_value = {
-            'workflow': 'standard',
+            'workflow': mock_workflow,
             'workflow_state': 'participate',
             'state_data': [
                 {'name': 'participate',
@@ -180,19 +172,15 @@ class TestAutoTransitionWorkflow:
         registry.content.get_sheet = Mock(return_value=mock_sheet)
         self.call_fut(context, registry)
         mock_transition_to_states.assert_called_with(
-            process, ['evaluate'], registry)
+            mock_process, ['evaluate'], registry)
 
     def test_transition_needed_by_next_state(self, context, registry,
-            mock_catalogs, search_result, mock_transition_to_states,
-            mock_sheet, mock_workflow, mock_now):
-        process = testing.DummyResource()
-        mock_catalogs.search.side_effect = [
-            search_result._replace(elements=[process]),
-            search_result]
+            mock_catalogs_with_process, mock_process, search_result,
+            mock_transition_to_states, mock_sheet, mock_workflow, mock_now):
         registry.content.workflows_meta = {
             'standard': {'auto_transition': True}}
         mock_sheet.get.return_value = {
-            'workflow': 'standard',
+            'workflow': mock_workflow,
             'workflow_state': 'participate',
             'state_data': [
                 {'name': 'evaluate',
@@ -203,4 +191,4 @@ class TestAutoTransitionWorkflow:
         registry.content.get_sheet = Mock(return_value=mock_sheet)
         self.call_fut(context, registry)
         mock_transition_to_states.assert_called_with(
-            process, ['evaluate'], registry)
+            mock_process, ['evaluate'], registry)

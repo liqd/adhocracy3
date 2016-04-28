@@ -7,9 +7,11 @@ import argparse
 import inspect
 import logging
 
+from datetime import datetime
 from pyramid.paster import bootstrap
 from pyramid.registry import Registry
 from substanced.util import find_service
+from substanced.interfaces import IRoot
 
 from adhocracy_core.authorization import create_fake_god_request
 from adhocracy_core.interfaces import IResource
@@ -24,11 +26,15 @@ logger = logging.getLogger(__name__)
 
 
 def auto_transition_process_workflow():  # pragma: no cover
-    """Automatically transition workflow states.
+    """Automatically transition workflow states of processes.
+
+     The transition is decided based on the start_date value im the state_data
+     of the workflow-assignment and the auto_transition setting of the
+     workflow,
 
     usage::
 
-        bin/auto_auto_transition_process_workflow etc/development.ini
+        bin/ad_auto_auto_transition_process_workflow etc/development.ini
     """
     docstring = inspect.getdoc(auto_transition_process_workflow)
     parser = argparse.ArgumentParser(description=docstring)
@@ -41,43 +47,52 @@ def auto_transition_process_workflow():  # pragma: no cover
     env['closer']()
 
 
-def _auto_transition_process_workflow(context: IResource, registry: Registry):
-    catalogs = find_service(context, 'catalogs')
-    query = search_query._replace(interfaces=IProcess,
-                                  resolve=True
-                                  )
-    processes = catalogs.search(query).elements
+def _auto_transition_process_workflow(root: IRoot, registry: Registry):
+    date_now = now()
+    processes = _get_processes_with_auto_transition(root, registry)
     for process in processes:
-        workflow_assignment = registry.content.get_sheet(process,
-                                                         IWorkflowAssignment)
-        if _workflow_auto_transition_enabled(registry, workflow_assignment) \
-            and _workflow_auto_transition_needed(process, registry,
-                                                 workflow_assignment):
-            _do_workflow_auto_transition(process, registry)
+        is_outdated = _state_is_outdated(process, registry, date_now)
+        if is_outdated:
+            _do_auto_transition(process, registry)
 
 
-def _workflow_auto_transition_enabled(
-        registry: Registry, workflow_assignment: IWorkflowAssignment):
-    workflow_name = workflow_assignment.get()['workflow']
-    workflow_meta = registry.content.workflows_meta[workflow_name]
+def _get_processes_with_auto_transition(root: IRoot,
+                                        registry: Registry) -> [IResource]:
+    catalogs = find_service(root, 'catalogs')
+    query = search_query._replace(interfaces=IProcess)
+    processes = catalogs.search(query).elements
+    check_auto_transition_enabled = \
+        lambda r: _auto_transition_enabled(r, registry)
+    processes_with_auto_transition = filter(check_auto_transition_enabled,
+                                            processes)
+    return processes_with_auto_transition
+
+
+def _auto_transition_enabled(context: IResource, registry: Registry):
+    workflow_assignment = registry.content.get_sheet(context,
+                                                     IWorkflowAssignment)
+    workflow = workflow_assignment.get()['workflow']
+    workflow_meta = registry.content.workflows_meta[workflow.type]
     return workflow_meta['auto_transition']
 
 
-def _workflow_auto_transition_needed(context: IResource, registry: Registry,
-                                     workflow_assignment: IWorkflowAssignment):
+def _state_is_outdated(context: IResource, registry: Registry,
+                       date_now: datetime) -> bool:
     workflow = registry.content.get_workflow(context)
     next_states = workflow.get_next_states(context,
                                            create_fake_god_request(registry))
     if len(next_states) == 1:
         next_state = next_states[0]
-        end_date = _get_current_state_end_date(workflow_assignment, next_state)
+        end_date = _get_current_state_end_date(context, registry, next_state)
         if end_date:
-            return now() > end_date
+            return date_now > end_date
     return False
 
 
-def _get_current_state_end_date(workflow_assignment: IWorkflowAssignment,
-                                next_state: str):
+def _get_current_state_end_date(context: IResource, registry: Registry,
+                                next_state: str) -> datetime:
+    workflow_assignment = registry.content.get_sheet(context,
+                                                     IWorkflowAssignment)
     current_state = workflow_assignment.get()['workflow_state']
     state_data_list = workflow_assignment.get()['state_data']
     current_state_data = None
@@ -100,7 +115,7 @@ def _get_current_state_end_date(workflow_assignment: IWorkflowAssignment,
     return None
 
 
-def _do_workflow_auto_transition(context: IResource, registry: Registry):
+def _do_auto_transition(context: IResource, registry: Registry):
     workflow = registry.content.get_workflow(context)
     next_states = workflow.get_next_states(context,
                                            create_fake_god_request(registry))
