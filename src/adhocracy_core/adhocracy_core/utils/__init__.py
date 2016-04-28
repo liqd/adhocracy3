@@ -64,17 +64,6 @@ def get_matching_isheet(context, isheet: IInterface) -> IInterface:
     return None
 
 
-def get_all_taggedvalues(iface: IInterface) -> dict:
-    """Get dict with all own and all inherited taggedvalues."""
-    iro = [i for i in iface.__iro__]
-    iro.reverse()
-    taggedvalues = {}
-    for i in iro:
-        for key in i.getTaggedValueTags():
-            taggedvalues[key] = i.getTaggedValue(key)
-    return taggedvalues
-
-
 def diff_dict(old_dict, new_dict, omit=()):
     """Calculate changed keys of two dictionaries.
 

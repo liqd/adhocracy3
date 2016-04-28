@@ -88,21 +88,6 @@ def test_get_resource_interface_none_provided():
     assert result is None
 
 
-def test_get_all_taggedvalues_inheritance():
-    from zope.interface import taggedValue
-    from zope.interface import Interface
-    from . import get_all_taggedvalues
-
-    class IA(Interface):
-        taggedValue('a', 'a')
-
-    class IB(IA):
-        pass
-
-    metadata_ib = get_all_taggedvalues(IB)
-    assert 'a' in metadata_ib
-
-
 def test_to_dotted_name_module():
     from . import to_dotted_name
     import os
