@@ -20,22 +20,6 @@ def test_find_graph_graph_does_not_exists():
     assert find_graph(child) is None
 
 
-def test_diff_dict():
-    from . import diff_dict
-    old = {'foo': 5, 'bar': 6, 'kaz': 8}
-    new = {'bar': 6, 'baz': 7, 'kaz': 9, 'faz': 10}
-    diff = diff_dict(old, new)
-    assert diff == ({'baz', 'faz'}, {'kaz'}, {'foo'})
-
-
-def test_diff_dict_omit():
-    from . import diff_dict
-    old = {'foo': 5, 'bar': 6, 'kaz': 8}
-    new = {'bar': 6, 'baz': 7, 'kaz': 9, 'faz': 10}
-    diff = diff_dict(old, new, omit=('foo',))
-    assert diff == ({'baz', 'faz'}, {'kaz'}, set())
-
-
 def test_log_compatible_datetime():
     from datetime import datetime
     from . import log_compatible_datetime

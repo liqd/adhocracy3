@@ -2,11 +2,9 @@
 from collections.abc import Iterable
 from collections.abc import Sequence
 from datetime import datetime
-from functools import reduce
 from pytz import UTC
 import os
 import time
-import copy
 import json
 
 from colander import Schema
@@ -62,34 +60,6 @@ def get_matching_isheet(context, isheet: IInterface) -> IInterface:
         if iface.isOrExtends(isheet):
             return iface
     return None
-
-
-def diff_dict(old_dict, new_dict, omit=()):
-    """Calculate changed keys of two dictionaries.
-
-    Return tuple of (added, changed, removed) keys between old_dict and
-    new_dict.
-
-    """
-    old = old_dict.keys() - set(omit)
-    new = new_dict.keys() - set(omit)
-
-    added = new - old
-    removed = old - new
-
-    common = old & new
-    changed = set([key for key in common if old_dict[key] != new_dict[key]])
-
-    return (added, changed, removed)
-
-
-def _sort_dict(d, sort_paths):  # pragma: no cover
-    """Return sorted dictionary."""
-    d2 = copy.deepcopy(d)
-    for path in sort_paths:
-        base = reduce(lambda d, seg: d[seg], path[:-1], d2)
-        base[path[-1]] = sorted(base[path[-1]])
-    return d2
 
 
 def log_compatible_datetime(dt: datetime=datetime.now()):
