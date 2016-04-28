@@ -8,7 +8,6 @@ import os
 import time
 import copy
 import json
-import pprint
 
 from colander import Schema
 
@@ -119,18 +118,6 @@ def log_compatible_datetime(dt: datetime=datetime.now()):
     return '{}-{:02}-{:02} {:02}:{:02}:{:02},{:03}'.format(
         dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second,
         dt.microsecond // 1000)
-
-
-def pprint_json(json_dict):  # pragma: no cover
-    """Return sorted string representation of the dict.
-
-    WARN: Not used and not tested.
-
-    """
-    json_dict_sorted = _sort_dict(json_dict)
-    py_dict = json.dumps(json_dict_sorted, sort_keys=True,
-                         indent=4, separators=(',', ': '))
-    pprint.pprint(py_dict)
 
 
 def strip_optional_prefix(s, prefix):
