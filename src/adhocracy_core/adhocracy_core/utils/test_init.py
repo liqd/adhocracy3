@@ -88,30 +88,6 @@ def test_get_resource_interface_none_provided():
     assert result is None
 
 
-def test_get_sheet_interfaces_multiple_provided():
-    from . import get_isheets
-    from adhocracy_core.interfaces import ISheet
-    from adhocracy_core.interfaces import IResource
-    from pyramid.testing import DummyResource
-
-    class IA(ISheet):
-        pass
-
-    class IB(ISheet):
-        pass
-
-    context = DummyResource(__provides__=(IResource, IA, IB))
-    assert get_isheets(context) == [IA, IB]
-
-
-def test_get_sheet_interfaces_none_provided():
-    from . import get_isheets
-    from adhocracy_core.interfaces import IResource
-    from pyramid.testing import DummyResource
-    context = DummyResource(__provides__=IResource)
-    assert get_isheets(context) == []
-
-
 def test_get_all_taggedvalues_inheritance():
     from zope.interface import taggedValue
     from zope.interface import Interface

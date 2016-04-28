@@ -26,7 +26,6 @@ from zope.interface.interfaces import IInterface
 
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.interfaces import IResourceSheetModified
 
@@ -49,12 +48,6 @@ def get_iresource(context) -> IInterface:
     ifaces = list(directlyProvidedBy(context))
     iresources = [i for i in ifaces if i.isOrExtends(IResource)]
     return iresources[0] if iresources else None
-
-
-def get_isheets(context) -> [IInterface]:
-    """Get the :class:`adhocracy_core.interfaces.ISheet` interfaces."""
-    ifaces = list(providedBy(context))
-    return [i for i in ifaces if i.isOrExtends(ISheet)]
 
 
 def get_matching_isheet(context, isheet: IInterface) -> IInterface:
