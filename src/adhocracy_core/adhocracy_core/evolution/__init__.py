@@ -39,7 +39,6 @@ from adhocracy_core.resources.relation import add_relationsservice
 from adhocracy_core.sheets.asset import IHasAssetPool
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.badge import IHasBadgesPool
-from adhocracy_core.sheets.badge import ICanBadge
 from adhocracy_core.sheets.description import IDescription
 from adhocracy_core.sheets.image import IImageReference
 from adhocracy_core.sheets.pool import IPool
@@ -667,12 +666,6 @@ def remove_is_service_attribute(root, registry):  # pragma: no cover
             delattr(service, '__is_service__')
 
 
-@log_migration
-def add_canbadge_sheet_to_users(root, registry):  # pragma: no cover
-    """Add canbadge sheet to users."""
-    migrate_new_sheet(root, IUser, ICanBadge)
-
-
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -706,4 +699,3 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_image_reference_to_proposals)
     config.add_evolution_step(reset_comment_count)
     config.add_evolution_step(remove_is_service_attribute)
-    config.add_evolution_step(add_canbadge_sheet_to_users)
