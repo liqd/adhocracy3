@@ -31,22 +31,6 @@ def test_log_compatible_datetime():
     assert log_compatible_datetime(date) == str_date_compatible
 
 
-@mark.parametrize('string,prefix,expected_output', [
-    ('footile', 'foo', 'tile'),
-    ('futile', 'foo' , 'futile'),
-    ('footile', 'oot' , 'footile'),
-    ('footile', 'ile' , 'footile'),
-    ('', 'foo' , ''),
-    ('footile', '' , 'footile'),
-    (' footile ', 'foo' , ' footile '),
-    ('foo', 'foo' , ''),
-    ('foo', 'foot' , 'foo'),
-])
-def test_strip_optional_prefix(string, prefix, expected_output):
-    from . import strip_optional_prefix
-    assert strip_optional_prefix(string, prefix) == expected_output
-
-
 def test_get_resource_interface_multiple_provided():
     from . import get_iresource
     from adhocracy_core.interfaces import IResource

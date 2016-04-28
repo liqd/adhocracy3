@@ -72,25 +72,6 @@ def log_compatible_datetime(dt: datetime=datetime.now()):
         dt.microsecond // 1000)
 
 
-def strip_optional_prefix(s, prefix):
-    """Strip an optional prefix from a string.
-
-    Args:
-      s (str): the string to process
-      prefix (str): the prefix to strip from the string, if present
-
-    Returns:
-      str: `s` stripped of the `prefix`
-
-      If `s` doesn't start with `prefix`, it is returned unchanged.
-
-    """
-    if s.startswith(prefix):
-        return s[len(prefix):]
-    else:
-        return s
-
-
 def to_dotted_name(context) -> str:
     """Get the dotted name of `context`.
 
