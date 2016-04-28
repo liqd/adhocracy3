@@ -14,6 +14,7 @@ from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
 
+from adhocracy_core.authentication import UserTokenHeader
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
 from adhocracy_core.interfaces import error_entry
 from adhocracy_core.schema import References
@@ -179,8 +180,8 @@ def _get_filtered_request_headers(request) -> []:
     """Filter secret parts of the request headers."""
     headers = {}
     for key, value in request.headers.items():
-        if 'X-User-Token' in key:
-            headers['X-User-Token'] = '<hidden>'
+        if key in [UserTokenHeader, 'Cookie']:
+            headers[key] = '<hidden>'
         else:
             headers[key] = value
     return headers
