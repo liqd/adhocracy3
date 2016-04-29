@@ -143,7 +143,7 @@ class ResourceContentRegistry(ContentRegistry):
                 .format(isheet.__identifier__, resource_path(context))
             raise RuntimeConfigurationError(msg)
         meta = self.sheets_meta[isheet]
-        sheet = self._create_sheet(meta, context, None)
+        sheet = self._create_sheet(meta, context, request=request)
         sheet.context = context
         sheet.request = request
         sheet.registry = self.registry
