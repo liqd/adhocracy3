@@ -179,6 +179,7 @@ class BaseResourceSheet:
         appstruct = self._omit_omit_keys(appstruct, omit)
         if omit_readonly:
             appstruct = self._omit_readonly_keys(appstruct)
+        appstruct = self._filter_unchanged_data(appstruct, appstruct_old)
         self._store_data(appstruct)
         self._store_references(appstruct,
                                self.registry,
@@ -192,7 +193,13 @@ class BaseResourceSheet:
                                           self.request)
             self.registry.notify(event)
         return bool(appstruct)
-        # TODO: only store struct if values have changed
+
+    def _filter_unchanged_data(self, new: dict, old: dict) -> dict:
+        changed = {}
+        for key, value in new.items():
+            if value != old[key]:
+                changed[key] = value
+        return changed
 
     def _omit_readonly_keys(self, appstruct: dict):
         omit_keys = tuple(self._fields['readonly'])

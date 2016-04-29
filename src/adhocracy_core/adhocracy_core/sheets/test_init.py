@@ -141,6 +141,13 @@ class TestBaseResourceSheet:
         assert inst.set({'count': 11}) is True
         inst._store_data.assert_called_with({'count': 11})
 
+    def test_set_ignore_not_changed_valued(self, inst):
+        inst._get_data_appstruct.return_value = {'count': 11,
+                                                 'count2': None}
+        inst.set({'count': 11,
+                  'count2': 2})
+        inst._store_data.assert_called_with({'count2': 2})
+
     def test_set_empty(self, inst):
         assert inst.set({}) is False
         assert inst.get() == {'count': 0}
