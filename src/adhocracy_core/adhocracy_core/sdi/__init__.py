@@ -22,6 +22,7 @@ def includeme(config):
     config.scan('.views.login')
     config.scan('.views.contents')
     config.scan('.views.services')
+    config.scan('.views.sheets')
 
 
 def _add_sdi_assets(config: Configurator):

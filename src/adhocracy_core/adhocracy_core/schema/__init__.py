@@ -23,6 +23,7 @@ from colander import String as StringType
 from colander import deferred
 from colander import drop
 from colander import null
+from deform.widget import DateTimeInputWidget
 from pyramid.path import DottedNameResolver
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
@@ -673,6 +674,14 @@ class DateTime(SchemaNode):
     schema_type = DateTimeType
     default = deferred_date_default
     missing = deferred_date_default
+
+    @deferred
+    def widget(self, kw: dict):
+        widget = DateTimeInputWidget()
+        schema = widget._pstruct_schema
+        schema['date_submit'].missing = null  # Fix readonly template bug
+        schema['time_submit'].missing = null
+        return widget
 
 
 class DateTimes(SequenceSchema):

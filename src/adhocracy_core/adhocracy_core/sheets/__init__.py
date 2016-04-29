@@ -50,6 +50,7 @@ class BaseResourceSheet:
         self.request = request
         self.creating = creating
         self.schema = meta.schema_class()
+        self.extra_js_url = ''  # used for html forms :mod:`adhocracy_core.sdi`
 
     def get_schema_with_bindings(self) -> colander.MappingSchema:
         schema = create_schema(self.meta.schema_class,
