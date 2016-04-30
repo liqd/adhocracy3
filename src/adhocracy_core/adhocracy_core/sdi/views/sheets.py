@@ -1,4 +1,6 @@
-"""Sheets tab."""
+"""Sheets tab and add view for resources."""
+from collections import OrderedDict
+
 from colander import null
 from deform import Form
 from pyramid.interfaces import IRequest
@@ -11,6 +13,11 @@ from substanced.util import _
 
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IResourceSheet
+from adhocracy_core.schema import MappingSchema
+from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_core.sheets.workflow import IWorkflowAssignment
+from adhocracy_core.sheets.embed import IEmbed
+from adhocracy_core.utils import create_schema
 
 
 class FormView(SDFormView):
@@ -79,8 +86,8 @@ class FormView(SDFormView):
     tab_title=_('Sheets'),
     permission='sdi.view',
 )
-class ResourceSheetsFormView(FormView):
-    """Edit resource sheets tab."""
+class EditResourceSheets(FormView):
+    """Edit resource sheets form tab."""
 
     buttons = (_('save'),)
 
@@ -111,7 +118,7 @@ class ResourceSheetsFormView(FormView):
     def _get_editable_sheets(self) -> {}:
         sheets = self.registry.content.get_sheets_edit(self.context,
                                                        self.request)
-        return {s.meta.isheet.__identifier__: s for s in sheets}
+        return OrderedDict([(s.meta.isheet.__identifier__, s) for s in sheets])
 
     def save_success(self, appstruct: dict):
         self.active_sheet.set(appstruct)
@@ -123,3 +130,45 @@ class ResourceSheetsFormView(FormView):
         appstruct = self.active_sheet.get()
         return {'form': form.render(appstruct=appstruct,
                                     readonly=False)}
+
+
+class AddResourceSheetsBase(FormView):
+    """Add resource form, subclass and set content_type attribute."""
+
+    buttons = (_('add'),)
+    iresource = None
+    _disabled = (IMetadata, IWorkflowAssignment, IEmbed)
+    """Sheets not working with this add view yet, use sheets tabs instead."""
+
+    def __init__(self, context: IResource, request: IRequest):
+        """Setup active sheet schema."""
+        super().__init__(context, request)
+        self.registry = self.request.registry
+        self.sheets = self._get_creatable_sheets()
+        self.schema = self._get_schema_with_bindings()
+        self.title = _('Add {0}'.format(self.iresource.__identifier__))
+
+    def _get_creatable_sheets(self) -> {}:
+        sheets = self.registry.content.get_sheets_create(
+            self.context,
+            self.request,
+            iresource=self.iresource)
+        sheets = [x for x in sheets if x.meta.isheet not in self._disabled]
+        return OrderedDict([(s.meta.isheet.__identifier__, s) for s in sheets])
+
+    def _get_schema_with_bindings(self) -> MappingSchema:
+        schema = create_schema(MappingSchema, self.context, self.request,
+                               creating=True)
+        for name, sheet in self.sheets.items():
+            sheet_schema = sheet.get_schema_with_bindings()
+            schema.add(sheet_schema)
+        return schema
+
+    def add_success(self, appstructs):
+        self.registry.content.create(self.iresource.__identifier__,
+                                     parent=self.context,
+                                     appstructs=appstructs,
+                                     request=self.request,
+                                     registry=self.registry,
+                                     )
+        return HTTPFound(location=self.request.sdiapi.mgmt_path(self.context))

@@ -114,12 +114,12 @@ def includeme(config):
     config.include('.caching')
     config.include('.messaging')
     config.include('.sheets')
+    config.include('.sdi')
     config.include('.resources')
     config.include('.workflows')
     config.include('.websockets')
     config.include('.rest')
     config.include('.stats')
-    config.include('.sdi')
     if settings.get('adhocracy.add_test_users', False):
         from adhocracy_core.testing import add_create_test_users_subscriber
         add_create_test_users_subscriber(config)

@@ -38,6 +38,7 @@ resource_meta = ResourceMetadata(content_name='',
                                  use_autonaming=False,
                                  autonaming_prefix='',
                                  use_autonaming_random=False,
+                                 is_sdi_addable=False,
                                  element_types=(),
                                  workflow_name='',
                                  item_type=False,
@@ -66,9 +67,15 @@ def add_resource_type_to_registry(metadata: ResourceMetadata,
     iresource = metadata.iresource
     name = metadata.content_name or iresource.__identifier__
     meta = {'content_name': name}
+    if metadata.is_sdi_addable:
+        add_view_name = 'add_' + name
+        meta['add_view'] = add_view_name
+        if hasattr(config, 'add_sdi_add_view'):  # ease tests
+            config.add_sdi_add_view(metadata.iresource, add_view_name)
     add_content_type(config, iresource.__identifier__,
                      ResourceFactory(metadata),
                      factory_type=iresource.__identifier__, **meta)
+
 
 def _assert_sheets_are_not_duplicated(meta: ResourceMetadata):
     isheets = meta.basic_sheets + meta.extended_sheets
