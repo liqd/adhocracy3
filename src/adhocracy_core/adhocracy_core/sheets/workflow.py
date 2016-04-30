@@ -3,6 +3,7 @@ from colander import deferred
 from colander import null
 from colander import OneOf
 from colander import drop
+from colander import required
 from deform.widget import SelectWidget
 from deform.widget import Widget
 from pyramid.testing import DummyRequest
@@ -163,6 +164,9 @@ class WorkflowAssignmentSheet(AnnotationRessourceSheet):
                                creating=self.creating,
                                workflow=self._get_workflow()
                                )
+        schema.name = self.meta.isheet.__identifier__
+        is_mandatory = self.creating and self.meta.create_mandatory
+        schema.missing = required if is_mandatory else drop
         return schema
 
     def _get_workflow(self):

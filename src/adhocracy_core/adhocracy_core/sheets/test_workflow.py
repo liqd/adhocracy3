@@ -187,6 +187,22 @@ class TestWorkflowAssignmentSheet:
         schema = inst.get_schema_with_bindings()
         assert schema.bindings['workflow'] is mock_workflow
 
+    def test_get_schema_with_bindings_add_name(
+        self, meta, context, registry, mock_workflow):
+        registry.content.get_workflow.return_value = mock_workflow
+        inst = meta.sheet_class(meta, context, registry)
+        schema = inst.get_schema_with_bindings()
+        assert schema.name == inst.meta.isheet.__identifier__
+
+    def test_get_schema_with_bindings_add_required_if_create_mandatory(
+        self, meta, context, registry, mock_workflow, resource_meta):
+        import colander
+        registry.content.get_workflow.return_value = mock_workflow
+        meta = meta._replace(create_mandatory=True)
+        inst = meta.sheet_class(meta, context, registry, creating=resource_meta)
+        schema = inst.get_schema_with_bindings()
+        assert schema.missing is colander.required
+
     def test_set_workflow_state(self, meta, context, registry, mock_workflow):
         registry.content.get_workflow.return_value = mock_workflow
         mock_workflow._states = {'announced': {}}

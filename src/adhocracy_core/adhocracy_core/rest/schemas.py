@@ -362,8 +362,9 @@ def add_post_data_subschemas(node: SchemaNode, kw: dict):
         iresource = ContentType().deserialize(content_type)
     except Invalid:
         return  # the content type is validated later, so we just ignore errors
-    registry = request.registry.content
-    creates = registry.get_sheets_create(context, request, iresource)
+    creates = request.registry.content.get_sheets_create(context,
+                                                         request,
+                                                         iresource)
     for sheet in creates:
         schema = sheet.get_schema_with_bindings()
         node.add(schema)
