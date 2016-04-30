@@ -242,8 +242,7 @@ class ResourceContentRegistry(ContentRegistry):
     def _get_sheets_meta(self, iresource: IInterface,
                          filter_attr='') -> [SheetMetadata]:
         resource_meta = self.resources_meta[iresource]
-        isheets = set(resource_meta.basic_sheets
-                      + resource_meta.extended_sheets)
+        isheets = resource_meta.basic_sheets + resource_meta.extended_sheets
         for isheet in isheets:
             meta = self.sheets_meta[isheet]
             enabled = True

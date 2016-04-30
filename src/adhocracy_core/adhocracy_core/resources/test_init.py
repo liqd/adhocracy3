@@ -1,3 +1,4 @@
+from mock import MagicMock
 from pyramid import testing
 from pytest import raises
 from pytest import fixture
@@ -31,10 +32,12 @@ class TestAddResourceTypeToRegistry:
         from adhocracy_core.resources import add_resource_type_to_registry
         return add_resource_type_to_registry(*args)
 
-    def test_add_iresource_but_missing_content_registry(self, config, resource_meta):
+    def test_raise_if_duplicated_sheets(self, config, resource_meta):
+        from adhocracy_core.exceptions import ConfigurationError
         config.include('adhocracy_core.content')
-        del config.registry.content
-        with raises(AssertionError):
+        resource_meta = resource_meta._replace(basic_sheets=(ISheet,),
+                                               extended_sheets=(ISheet,))
+        with raises(ConfigurationError):
             self.make_one(resource_meta, config)
 
     def test_add_resource_type(self, config, resource_meta):

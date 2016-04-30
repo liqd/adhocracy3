@@ -20,6 +20,7 @@ from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IServicePool
+from adhocracy_core.exceptions import ConfigurationError
 from adhocracy_core.events import ResourceCreatedAndAdded
 from adhocracy_core.sheets.name import IName
 from adhocracy_core.sheets.metadata import IMetadata
@@ -58,9 +59,9 @@ def add_resource_type_to_registry(metadata: ResourceMetadata,
     `config.registry` must have an `content` attribute with
     :class:`adhocracy_core.registry.ResourceRegistry` to store the metadata.
     """
-    assert hasattr(config.registry, 'content')
     resources_meta = config.registry.content.resources_meta
     # TODO validate resources_meta.workflow_name
+    _assert_sheets_are_not_duplicated(metadata)
     resources_meta[metadata.iresource] = metadata
     iresource = metadata.iresource
     name = metadata.content_name or iresource.__identifier__
@@ -68,6 +69,12 @@ def add_resource_type_to_registry(metadata: ResourceMetadata,
     add_content_type(config, iresource.__identifier__,
                      ResourceFactory(metadata),
                      factory_type=iresource.__identifier__, **meta)
+
+def _assert_sheets_are_not_duplicated(meta: ResourceMetadata):
+    isheets = meta.basic_sheets + meta.extended_sheets
+    if len(isheets) != len(set(isheets)):
+        msg = '{0} has duplicated sheets'.format(meta.iresource.__identifier__)
+        raise ConfigurationError(details=msg)
 
 
 class ResourceFactory:
