@@ -6,6 +6,7 @@ from collections import defaultdict
 from colander import deferred
 from colander import drop
 from colander import null
+from colander import required
 from persistent.mapping import PersistentMapping
 from pyramid.decorator import reify
 from pyramid.registry import Registry
@@ -59,6 +60,9 @@ class BaseResourceSheet:
                                registry=self.registry,
                                creating=self.creating
                                )
+        schema.name = self.meta.isheet.__identifier__
+        is_mandatory = self.creating and self.meta.create_mandatory
+        schema.missing = required if is_mandatory else drop
         return schema
 
     @reify
