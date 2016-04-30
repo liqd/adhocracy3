@@ -16,6 +16,7 @@ class TestOrganisation:
         from adhocracy_core.interfaces import IPool
         assert meta.iresource is IOrganisation
         assert IOrganisation.isOrExtends(IPool)
+        assert meta.is_sdi_addable
         assert meta.is_implicit_addable is True
         assert meta.permission_create == 'create_organisation'
         assert meta.element_types == (IProcess,

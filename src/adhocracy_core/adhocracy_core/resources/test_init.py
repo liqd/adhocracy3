@@ -63,6 +63,18 @@ class TestAddResourceTypeToRegistry:
         self.make_one(metadata_a, config)
         assert config.registry.content.meta[type_id]['content_name'] == 'Name'
 
+    def test_add_sdi_view_name_if_is_sdi_addable(self, config, resource_meta):
+        from adhocracy_core.sdi import add_sdi_add_view
+        config.include('adhocracy_core.content')
+        config.add_sdi_add_view = MagicMock(spec=add_sdi_add_view)
+        type_id = IResource.__identifier__
+        resource_meta = resource_meta._replace(is_sdi_addable=True)
+        self.make_one(resource_meta, config)
+        assert config.registry.content.meta[type_id]['add_view']\
+               == 'add_' + type_id
+        config.add_sdi_add_view.assert_called_with(resource_meta.iresource,
+                                                   'add_' + type_id)
+
 
 class TestResourceFactory:
 
