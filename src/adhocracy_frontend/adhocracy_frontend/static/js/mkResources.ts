@@ -824,9 +824,6 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     };
 
     switch (field.valuetype) {
-    case "String":
-        resultType = "string";
-        break;
     case "adhocracy_core.schema.Boolean":
         resultType = "boolean";
         parser = stringToBoolean;
@@ -855,10 +852,6 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         break;
     case "adhocracy_core.schema.URL":
         resultType = "string";
-        break;
-    case "Integer":
-        resultType = "number";
-        parser = stringToInt;
         break;
     case "adhocracy_core.schema.Integer":
         resultType = "number";

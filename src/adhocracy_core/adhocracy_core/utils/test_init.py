@@ -20,22 +20,6 @@ def test_find_graph_graph_does_not_exists():
     assert find_graph(child) is None
 
 
-def test_diff_dict():
-    from . import diff_dict
-    old = {'foo': 5, 'bar': 6, 'kaz': 8}
-    new = {'bar': 6, 'baz': 7, 'kaz': 9, 'faz': 10}
-    diff = diff_dict(old, new)
-    assert diff == ({'baz', 'faz'}, {'kaz'}, {'foo'})
-
-
-def test_diff_dict_omit():
-    from . import diff_dict
-    old = {'foo': 5, 'bar': 6, 'kaz': 8}
-    new = {'bar': 6, 'baz': 7, 'kaz': 9, 'faz': 10}
-    diff = diff_dict(old, new, omit=('foo',))
-    assert diff == ({'baz', 'faz'}, {'kaz'}, set())
-
-
 def test_log_compatible_datetime():
     from datetime import datetime
     from . import log_compatible_datetime
@@ -45,22 +29,6 @@ def test_log_compatible_datetime():
     date = datetime(2013, 2, 3, 1, 2, 3, 123456)
     str_date_compatible = '2013-02-03 01:02:03,123'
     assert log_compatible_datetime(date) == str_date_compatible
-
-
-@mark.parametrize('string,prefix,expected_output', [
-    ('footile', 'foo', 'tile'),
-    ('futile', 'foo' , 'futile'),
-    ('footile', 'oot' , 'footile'),
-    ('footile', 'ile' , 'footile'),
-    ('', 'foo' , ''),
-    ('footile', '' , 'footile'),
-    (' footile ', 'foo' , ' footile '),
-    ('foo', 'foo' , ''),
-    ('foo', 'foot' , 'foo'),
-])
-def test_strip_optional_prefix(string, prefix, expected_output):
-    from . import strip_optional_prefix
-    assert strip_optional_prefix(string, prefix) == expected_output
 
 
 def test_get_resource_interface_multiple_provided():
@@ -86,45 +54,6 @@ def test_get_resource_interface_none_provided():
     context = DummyResource()
     result = get_iresource(context)
     assert result is None
-
-
-def test_get_sheet_interfaces_multiple_provided():
-    from . import get_isheets
-    from adhocracy_core.interfaces import ISheet
-    from adhocracy_core.interfaces import IResource
-    from pyramid.testing import DummyResource
-
-    class IA(ISheet):
-        pass
-
-    class IB(ISheet):
-        pass
-
-    context = DummyResource(__provides__=(IResource, IA, IB))
-    assert get_isheets(context) == [IA, IB]
-
-
-def test_get_sheet_interfaces_none_provided():
-    from . import get_isheets
-    from adhocracy_core.interfaces import IResource
-    from pyramid.testing import DummyResource
-    context = DummyResource(__provides__=IResource)
-    assert get_isheets(context) == []
-
-
-def test_get_all_taggedvalues_inheritance():
-    from zope.interface import taggedValue
-    from zope.interface import Interface
-    from . import get_all_taggedvalues
-
-    class IA(Interface):
-        taggedValue('a', 'a')
-
-    class IB(IA):
-        pass
-
-    metadata_ib = get_all_taggedvalues(IB)
-    assert 'a' in metadata_ib
 
 
 def test_to_dotted_name_module():
