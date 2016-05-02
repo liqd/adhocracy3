@@ -31,7 +31,8 @@ The following data needs to be provided to create a B-Plan:
 - *external_picture_url*: External URL to the BPlan picture
 - *picture_description*: Picture copyright notice
 - *start_date*: Start time of the praticipation phase
-- *end_date*: End of the participation phase
+- *end_date*: End of the participation phase, i.e. start time of the evaluation
+    phase
 
 Workflows
 ---------
@@ -42,7 +43,7 @@ A B-Plan process transits the following workflows:
 2. *announce*: The B-Plan information is accessible, but no statements can be
    send
 3. *participate*: B-Plan participation is active, statements can be issued
-4. *closed*: The B-Plan is not accessible anymore
+4. *evaluate*: The B-Plan is not accessible anymore
 
 The transition from the *draft* state to the *announce* state has to be done
 via an API call. The further transitions to *participate* and *closed* are
@@ -130,8 +131,9 @@ The username here is just an example, please use your credentials.
     ...             'adhocracy_core.sheets.workflow.IWorkflowAssignment':
     ...                 {'state_data':
     ...                  [{'name': 'participate', 'description': '',
-    ...                  'start_date': '2016-03-01T12:00:09',
-    ...                  'end_date': '2016-05-01T12:00:09'}]}
+    ...                    'start_date': '2016-03-01T12:00:09'},
+    ...                   {'name': 'evaluate', 'description': '',
+    ...                    'start_date': '2016-03-01T12:00:09'}]}
     ...             }}
     >>> resp = testapp.post_json('/orga/', data, headers=auth_header)
     >>> resp.status_code
@@ -218,8 +220,9 @@ E.g. Changing the participation start data::
     ...             'adhocracy_core.sheets.workflow.IWorkflowAssignment':
     ...                 {'state_data':
     ...                  [{'name': 'participate', 'description': 'test',
-    ...                  'start_date': '2016-03-03T12:00:09',
-    ...                  'end_date': '2016-05-01T12:00:09'}]}}}
+    ...                    'start_date': '2016-03-03T12:00:09'},
+    ...                   {'name': 'evaluate', 'description': 'test',
+    ...                    'start_date': '2016-05-01T12:00:09'}]}}}
     >>> resp = testapp.put_json('/orga/1-23', data, headers=auth_header)
     >>> resp.status_code
     200

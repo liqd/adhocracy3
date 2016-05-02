@@ -166,6 +166,29 @@ def add_image_reference_to_blplan(root, registry):
     migrate_new_sheet(root, IProcess, IImageReference)
 
 
+@log_migration
+def remove_workflow_state_data_end_date(root, registry):
+    """Remove end_date from state_data and add the next state."""
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
+    from adhocracy_meinberlin.resources.bplan import IProcess
+    catalogs = find_service(root, 'catalogs')
+    bplaene = _search_for_interfaces(catalogs, IProcess)
+    for bplan in bplaene:
+        workflow_assignment = registry.content.get_sheet(
+            bplan,
+            IWorkflowAssignment)
+        state_data = workflow_assignment.get()['state_data']
+        if len(state_data) > 0:
+            state_data_participate = state_data[0]
+            start_date = state_data_participate['start_date']
+            end_date = state_data_participate['end_date']
+            workflow_assignment.set(
+                {'state_data': [{'name': 'participate', 'description': '',
+                                 'start_date': start_date},
+                                {'name': 'evaluate', 'description': '',
+                                 'start_date': end_date}]})
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(use_adhocracy_core_title_sheet)
@@ -176,3 +199,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(change_bplan_officeworker_email_representation)
     config.add_evolution_step(use_workflow_state_for_participation_time_range)
     config.add_evolution_step(add_image_reference_to_blplan)
+    config.add_evolution_step(remove_workflow_state_data_end_date)
