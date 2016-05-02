@@ -273,7 +273,7 @@ class TestClient:
         assert len(self._dummy_connection.queue) == 0
 
 
-@mark.websocket
+@mark.functional
 class TestFunctionalClient:
 
     @fixture()
