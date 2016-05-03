@@ -37,6 +37,6 @@ export var register = (angular) => {
         }])
         .provider("adhEmbed", AdhEmbed.Provider)
         .directive("href", ["adhConfig", "$location", "$rootScope", AdhEmbed.hrefDirective])
-        .directive("adhHeader", AdhEmbed.headerDirective)
+        .directive("adhHeader", ["adhEmbed", AdhEmbed.headerDirective])
         .filter("adhCanonicalUrl", ["adhConfig", AdhEmbed.canonicalUrl]);
 };

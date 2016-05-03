@@ -211,10 +211,12 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScop
 };
 
 
-export var headerDirective = () => {
+export var headerDirective = (adhEmbed : Service) => {
     return {
         restrict: "E",
-        template: "<adh-default-header></adh-default-header>",
+        template: () => {
+            return adhEmbed.getContextHeader();
+        },
         scope: {}
     };
 };
