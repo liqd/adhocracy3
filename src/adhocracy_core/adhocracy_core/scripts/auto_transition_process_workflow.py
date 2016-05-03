@@ -83,35 +83,22 @@ def _state_is_outdated(context: IResource, registry: Registry,
                                            create_fake_god_request(registry))
     if len(next_states) == 1:
         next_state = next_states[0]
-        end_date = _get_current_state_end_date(context, registry, next_state)
-        if end_date:
-            return date_now > end_date
+        start_date_next = _get_next_state_start_date(context, registry,
+                                                     next_state)
+        if start_date_next:
+            return date_now > start_date_next
     return False
 
 
-def _get_current_state_end_date(context: IResource, registry: Registry,
-                                next_state: str) -> datetime:
+def _get_next_state_start_date(context: IResource, registry: Registry,
+                               next_state: str) -> datetime:
     workflow_assignment = registry.content.get_sheet(context,
                                                      IWorkflowAssignment)
-    current_state = workflow_assignment.get()['workflow_state']
     state_data_list = workflow_assignment.get()['state_data']
-    current_state_data = None
-    next_state_data = None
     for state_data in state_data_list:
-        if state_data['name'] == current_state:
-            current_state_data = state_data
         if state_data['name'] == next_state:
             next_state_data = state_data
-    if current_state_data:
-        if next_state_data and \
-                current_state_data['end_date'] != \
-                next_state_data['start_date']:
-            print('Conflicting workflow assignment: {}.'
-                  .format(workflow_assignment))
-            return None
-        return current_state_data['end_date']
-    if next_state_data:
-        return next_state_data['start_date']
+            return next_state_data['start_date']
     return None
 
 

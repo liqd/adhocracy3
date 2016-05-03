@@ -80,10 +80,10 @@ class TestAutoTransitionWorkflow:
             'workflow': mock_workflow,
             'workflow_state': 'participate',
             'state_data': [
-                {'name': 'participate',
-                 'description': '',
-                 'start_date': datetime(2016, 1, 1),
-                 'end_date': datetime(2016, 1, 10)}
+                {'name': 'participate', 'description': '',
+                 'start_date': datetime(2016, 1, 1)},
+                {'name': 'evaluate', 'description': '',
+                 'start_date': datetime(2016, 1, 10)}
             ]}
         registry.content.get_sheet = Mock(return_value=mock_sheet)
         self.call_fut(context, registry)
@@ -101,12 +101,7 @@ class TestAutoTransitionWorkflow:
         mock_sheet.get.return_value = {
             'workflow': mock_workflow,
             'workflow_state': 'participate',
-            'state_data': [
-                {'name': 'participate',
-                 'description': '',
-                 'start_date': datetime(2016, 1, 1),
-                 'end_date': datetime(2016, 1, 2)}
-            ]}
+            'state_data': []}
         registry.content.get_sheet = Mock(return_value=mock_sheet)
         mock_workflow.get_next_states.return_value = ['evaluate1', 'evaluate2']
         self.call_fut(context, registry)
@@ -129,51 +124,6 @@ class TestAutoTransitionWorkflow:
         self.call_fut(context, registry)
         assert not mock_transition_to_states.called
 
-    def test_ignore_conflicting_workflow_assignment(self, context, registry,
-            mock_catalogs, search_result, mock_transition_to_states,
-            mock_sheet, mock_workflow, mock_now):
-        process = testing.DummyResource()
-        mock_catalogs.search.side_effect = [
-            search_result._replace(elements=[process]),
-            search_result]
-        registry.content.workflows_meta = {
-            'standard': {'auto_transition': True}}
-        mock_sheet.get.return_value = {
-            'workflow': mock_workflow,
-            'workflow_state': 'participate',
-            'state_data': [
-                {'name': 'participate',
-                 'description': '',
-                 'start_date': datetime(2016, 1, 1),
-                 'end_date': datetime(2016, 1, 3)},
-                {'name': 'evaluate',
-                 'description': '',
-                 'start_date': datetime(2016, 1, 2),
-                 'end_date': datetime(2016, 1, 10)}
-            ]}
-        registry.content.get_sheet = Mock(return_value=mock_sheet)
-        self.call_fut(context, registry)
-        assert not mock_transition_to_states.called
-
-    def test_transition_needed_by_current_state(self, context, registry,
-            mock_catalogs_with_process, mock_process, search_result,
-            mock_transition_to_states, mock_sheet, mock_workflow, mock_now):
-        registry.content.workflows_meta = {
-            'standard': {'auto_transition': True}}
-        mock_sheet.get.return_value = {
-            'workflow': mock_workflow,
-            'workflow_state': 'participate',
-            'state_data': [
-                {'name': 'participate',
-                 'description': '',
-                 'start_date': datetime(2016, 1, 1),
-                 'end_date': datetime(2016, 1, 2)}
-            ]}
-        registry.content.get_sheet = Mock(return_value=mock_sheet)
-        self.call_fut(context, registry)
-        mock_transition_to_states.assert_called_with(
-            mock_process, ['evaluate'], registry)
-
     def test_transition_needed_by_next_state(self, context, registry,
             mock_catalogs_with_process, mock_process, search_result,
             mock_transition_to_states, mock_sheet, mock_workflow, mock_now):
@@ -183,10 +133,8 @@ class TestAutoTransitionWorkflow:
             'workflow': mock_workflow,
             'workflow_state': 'participate',
             'state_data': [
-                {'name': 'evaluate',
-                 'description': '',
-                 'start_date': datetime(2016, 1, 3),
-                 'end_date': datetime(2016, 1, 10)}
+                {'name': 'evaluate', 'description': '',
+                 'start_date': datetime(2016, 1, 3)}
             ]}
         registry.content.get_sheet = Mock(return_value=mock_sheet)
         self.call_fut(context, registry)
