@@ -246,6 +246,7 @@ def request_():
     request.registry.settings = {}
     request.user = None
     request.scheme = 'http'
+    request.matched_route = None
     return request
 
 

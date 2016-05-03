@@ -3,6 +3,23 @@ from pytest import fixture
 from pytest import mark
 
 
+@fixture
+def mock_route(mocker):
+    from pyramid.interfaces import IRoute
+    return mocker.Mock(spec=IRoute)
+
+
+def test_add_cors_headers_ignore_if_no_api_request(request_, mock_route):
+    from .subscriber import add_cors_headers
+    mock_route.name = 'route_name'
+    request_.matched_route = mock_route
+    response = testing.DummyResource(headers={})
+    event = testing.DummyResource(response=response,
+                                  request=request_)
+    add_cors_headers(event)
+    assert response.headers == {}
+
+
 def test_add_cors_headers(request_):
     from .subscriber import add_cors_headers
     response = testing.DummyResource(headers={})
