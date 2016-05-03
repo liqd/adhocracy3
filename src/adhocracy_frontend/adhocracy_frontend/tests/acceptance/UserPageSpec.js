@@ -19,7 +19,7 @@ describe("user page", function() {
         expect(reviewerPage.getUserName()).toBe("admin");
     });
 
-    it("is possible to send a message", function() {
+    it("is possible to send a message", function(done) {
         shared.loginOtherParticipant();
 
         var mailsBeforeMessaging =
@@ -59,6 +59,7 @@ describe("user page", function() {
                 expect(mail.subject).toContain(subject);
                 expect(mail.from[0].address).toContain("noreply");
                 expect(mail.to[0].address).toContain("participant");
+                done();
             });
         });
     });
