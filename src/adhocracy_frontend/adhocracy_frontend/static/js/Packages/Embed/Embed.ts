@@ -210,6 +210,16 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScop
     };
 };
 
+
+export var headerDirective = () => {
+    return {
+        restrict: "E",
+        template: "<adh-default-header></adh-default-header>",
+        scope: {}
+    };
+};
+
+
 export var canonicalUrl = (adhConfig : AdhConfig.IService) => {
     return (internalUrl : string) : string => {
         return adhConfig.canonical_url + internalUrl;
