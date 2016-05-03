@@ -567,7 +567,7 @@ def zeo(request, supervisor) -> str:
 
 
 @fixture(scope='class')
-def websocket(request, supervisor) -> bool:
+def websocket(request, zeo) -> bool:
     """Start websocket server with supervisor."""
     output = subprocess.check_output(
         'bin/supervisorctl restart adhocracy_test:test_autobahn',
@@ -769,46 +769,6 @@ def newest_reset_path(app_router) -> callable:
         path = unquote(path_quoted)
         return path
     return get_newest_reset_path
-
-
-@fixture(scope='class')
-def backend(request, zeo, supervisor):
-    """Start the backend server with supervisor."""
-    output = subprocess.check_output(
-        'bin/supervisorctl restart adhocracy_test:test_backend',
-        shell=True,
-        stderr=subprocess.STDOUT
-    )
-
-    def fin():
-        subprocess.check_output(
-            'bin/supervisorctl stop adhocracy_test:test_backend',
-            shell=True,
-            stderr=subprocess.STDOUT
-        )
-    request.addfinalizer(fin)
-
-    return output
-
-
-@fixture(scope='class')
-def backend_with_ws(request, zeo, websocket, supervisor):
-    """Start the backend and websocket server with supervisor."""
-    output = subprocess.check_output(
-        'bin/supervisorctl restart test_backend_with_ws',
-        shell=True,
-        stderr=subprocess.STDOUT
-    )
-
-    def fin():
-        subprocess.check_output(
-            'bin/supervisorctl stop test_backend_with_ws',
-            shell=True,
-            stderr=subprocess.STDOUT
-        )
-    request.addfinalizer(fin)
-
-    return output
 
 
 class AppUser:
