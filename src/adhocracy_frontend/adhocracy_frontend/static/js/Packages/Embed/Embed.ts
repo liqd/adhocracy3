@@ -18,6 +18,7 @@ export class Provider {
     protected contexts : string[];
     protected contextAliases : {[key : string]: string};
     protected directiveAliases : {[key : string]: string};
+    public contextHeaders : {[key : string]: string};
     public $get;
 
     /**
@@ -42,6 +43,7 @@ export class Provider {
             "plain"
         ];
         this.contextAliases = {};
+        this.contextHeaders = {};
 
         this.$get = ["adhConfig", (adhConfig) => new Service(this, adhConfig)];
     }
@@ -113,6 +115,13 @@ export class Service {
         } else {
             return this.widget;
         }
+    }
+
+    public getContextHeader() : string {
+        var context = this.getContext();
+        var template = this.provider.contextHeaders[context];
+
+        return template || "<adh-default-header></adh-default-header>";
     }
 
     public route($location : angular.ILocationService) : AdhTopLevelState.IAreaInput {
@@ -200,6 +209,18 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScop
         }
     };
 };
+
+
+export var headerDirective = (adhEmbed : Service) => {
+    return {
+        restrict: "E",
+        template: () => {
+            return adhEmbed.getContextHeader();
+        },
+        scope: {}
+    };
+};
+
 
 export var canonicalUrl = (adhConfig : AdhConfig.IService) => {
     return (internalUrl : string) : string => {
