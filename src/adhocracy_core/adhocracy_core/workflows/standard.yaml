@@ -1,3 +1,5 @@
+title: Standard
+description: Base standard worklow definition.
 initial_state: draft
 auto_transition: False
 states:
