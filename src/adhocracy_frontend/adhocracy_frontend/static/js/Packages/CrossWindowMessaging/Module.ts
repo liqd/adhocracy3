@@ -6,7 +6,7 @@ import * as AdhCrossWindowMessaging from "./CrossWindowMessaging";
 
 export var moduleName = "adhCrossWindowMessaging";
 
-export var register = (angular, trusted = false) => {
+export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhCredentialsModule.moduleName,

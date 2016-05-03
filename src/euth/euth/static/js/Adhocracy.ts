@@ -167,7 +167,7 @@ export var init = (config: AdhConfig.IService, metaApi) => {
     AdhBadgeModule.register(angular);
     AdhCommentModule.register(angular);
     AdhConfigModule.register(angular, config);
-    AdhCrossWindowMessagingModule.register(angular, config.trusted_domains !== []);
+    AdhCrossWindowMessagingModule.register(angular);
     AdhDateTimeModule.register(angular);
     AdhDocumentModule.register(angular);
     AdhDoneModule.register(angular);
