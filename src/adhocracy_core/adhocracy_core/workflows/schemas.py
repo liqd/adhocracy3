@@ -3,6 +3,7 @@ from colander import GlobalObject
 from colander import null
 from colander import drop
 from colander import required
+from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import MappingType
 from adhocracy_core.schema import SchemaNode
@@ -62,6 +63,7 @@ class WorkflowMeta(MappingSchema):
 
     initial_state = SingleLine(missing=drop)
     defaults = SingleLine(missing=drop)
+    auto_transition = Boolean(missing=drop)
     states = SchemaNode(MappingType(unknown='preserve'),
                         missing=drop)
     transitions = SchemaNode(MappingType(unknown='preserve'),
