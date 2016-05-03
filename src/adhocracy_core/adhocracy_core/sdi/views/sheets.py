@@ -23,8 +23,8 @@ from adhocracy_core.utils import create_schema
 class FormView(SDFormView):
     """View class that autogenerates forms based on :term:`schema` .
 
-    I uses :mod:`colander` schema to define the data structure and
-    validator and :mod:`deform` to render html forms.
+    Uses :mod:`colander` schema to define the data structure and
+    validators and :mod:`deform` to render html forms.
     """
 
     def _build_form(self) -> tuple:
