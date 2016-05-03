@@ -824,9 +824,6 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     };
 
     switch (field.valuetype) {
-    case "String":
-        resultType = "string";
-        break;
     case "adhocracy_core.schema.Boolean":
         resultType = "boolean";
         parser = stringToBoolean;
@@ -855,10 +852,6 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         break;
     case "adhocracy_core.schema.URL":
         resultType = "string";
-        break;
-    case "Integer":
-        resultType = "number";
-        parser = stringToInt;
         break;
     case "adhocracy_core.schema.Integer":
         resultType = "number";
@@ -941,13 +934,12 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         resultType = "string";
         break;
     case "adhocracy_core.sheets.workflow.StateData":
-        resultType = "{name : string; description : string; start_date : string; end_date : string}";
-        jsonType = "{name : string; description : string; start_date : string; end_date : string}";
+        resultType = "{name : string; description : string; start_date : string}";
+        jsonType = "{name : string; description : string; start_date : string}";
         parser = dictParser({
             name: null,
             description: stringToDate,
-            start_date: null,
-            end_date: null
+            start_date: null
         });
         break;
     case "adhocracy_core.sheets.relation.Position":

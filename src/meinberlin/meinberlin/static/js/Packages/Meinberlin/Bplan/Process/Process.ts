@@ -21,7 +21,6 @@ export interface IScope {
         title : string;
         officeWorkerEmail : string;
         startDate : string;
-        endDate : string;
         kind : string;
     };
     showError : any;
@@ -55,7 +54,6 @@ var postCreate = (
     process.data[SIWorkflowAssignment.nick] = new SIWorkflowAssignment.Sheet({
         state_data: [{
             start_date: scope.data.startDate,
-            end_date: scope.data.endDate,
             name: "participate",
             description: ""
         }]

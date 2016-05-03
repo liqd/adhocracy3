@@ -18,7 +18,6 @@ export interface IStateData {
     name : string;
     description : string;
     start_date : string;
-    end_date : string;
 }
 
 export var getStateData = (sheet : SIWorkflow.Sheet, name : string) : IStateData => {
@@ -30,8 +29,7 @@ export var getStateData = (sheet : SIWorkflow.Sheet, name : string) : IStateData
     return {
         name: null,
         description: null,
-        start_date: null,
-        end_date: null
+        start_date: null
     };
 };
 

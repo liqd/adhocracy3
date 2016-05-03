@@ -59,6 +59,7 @@ class TestAddWorkflow:
     def mock_meta(self, mocker) -> Mock:
         cstruct = \
             {'initial_state': 'draft',
+             'auto_transition': False,
              'states': {'draft': {'acm': {'principals':           ['moderator'],
                                           'permissions': [['view', 'Deny']]}},
                         'announced': {}},
@@ -92,6 +93,7 @@ class TestAddWorkflow:
         assert meta['states']
         assert meta['transitions']
         assert meta['initial_state']
+        assert meta['auto_transition'] is False
 
     def test_create(self, registry, mock_meta):
         from substanced.workflow import ACLWorkflow

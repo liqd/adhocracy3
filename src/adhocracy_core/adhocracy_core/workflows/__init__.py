@@ -81,7 +81,7 @@ def _add_defaults(appstruct: PMap, registry: Registry) -> PMap:
         return appstruct
     updated = registry.content.workflows_meta[default_name]
     for key, value in appstruct.items():
-        if key in ['initial_state', 'defaults']:
+        if key in ['initial_state', 'defaults', 'auto_transition']:
             updated = updated.transform([key], value)
         elif key == 'transitions':
             for transition_name, transition in value.items():

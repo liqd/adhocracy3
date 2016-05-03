@@ -103,8 +103,6 @@ class StateData(MappingSchema):
                        default='')
     start_date = DateTime(missing=None,
                           default=None)
-    end_date = DateTime(missing=None,
-                        default=None)
 
 
 class StateDataList(SequenceSchema):

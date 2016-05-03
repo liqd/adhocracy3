@@ -799,19 +799,6 @@ class TestMetaApiView:
         assert field_metadata['creatable'] is False
         assert field_metadata['create_mandatory'] is False
 
-    def test_get_sheets_with_field_colander_noniteratable(self, request_, context, sheet_meta):
-        class SchemaF(colander.MappingSchema):
-            test = colander.SchemaNode(colander.Int())
-        sheet_meta = sheet_meta._replace(schema_class=SchemaF)
-        request_.registry.content.sheets_meta[ISheet] = sheet_meta
-        inst = self.make_one(request_, context)
-
-        response = inst.get()['sheets'][ISheet.__identifier__]
-
-        field_metadata = response['fields'][0]
-        assert 'containertype' not in field_metadata
-        assert field_metadata['valuetype'] == 'Integer'
-
     def test_get_sheets_with_field_adhocracy_noniteratable(self, request_, context, sheet_meta):
         from adhocracy_core.schema import Name
         class SchemaF(colander.MappingSchema):
@@ -892,6 +879,7 @@ class TestMetaApiView:
                                                               'transitions': {}}
         workflows_meta = inst.get()['workflows']
         assert workflows_meta == {'sample': {'initial_state': '',
+                                             'auto_transition': 'false',
                                              'defaults': '',
                                              'states': {},
                                              'transitions': {}}}

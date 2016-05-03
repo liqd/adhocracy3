@@ -7,6 +7,7 @@
 use = egg:${adhocracy:backend_package_name}
 pyramid.prevent_http_cache = true
 pyramid.includes =
+    pyramid_exclog
     pyramid_tm
     pyramid_mailer
 zodbconn.uri = memory://
