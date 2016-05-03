@@ -26,6 +26,7 @@ def test_create_adhocracy_catalog(pool_graph, registry):
     assert 'reference' in catalogs['adhocracy']
     assert 'rate' in catalogs['adhocracy']
     assert 'rates' in catalogs['adhocracy']
+    assert 'comments' in catalogs['adhocracy']
     assert 'creator' in catalogs['adhocracy']
     assert 'item_creation_date' in catalogs['adhocracy']
     assert 'item_badge' in catalogs['adhocracy']
@@ -174,6 +175,22 @@ class TestIndexRate:
         assert index_rates(item['rateable'], None) == 0
 
 
+@mark.usefixtures('integration')
+def test_includeme_register_index_rate(registry):
+    from adhocracy_core.sheets.rate import IRate
+    from substanced.interfaces import IIndexView
+    assert registry.adapters.lookup((IRate,), IIndexView,
+                                    name='adhocracy|rate')
+
+
+@mark.usefixtures('integration')
+def test_includeme_register_index_rates(registry):
+    from adhocracy_core.sheets.rate import IRateable
+    from substanced.interfaces import IIndexView
+    assert registry.adapters.lookup((IRateable,), IIndexView,
+                                    name='adhocracy|rates')
+
+
 class TestIndexComments:
 
     @fixture
@@ -198,19 +215,11 @@ class TestIndexComments:
 
 
 @mark.usefixtures('integration')
-def test_includeme_register_index_rate(registry):
-    from adhocracy_core.sheets.rate import IRate
+def test_includeme_register_index_comments(registry):
+    from adhocracy_core.sheets.comment import ICommentable
     from substanced.interfaces import IIndexView
-    assert registry.adapters.lookup((IRate,), IIndexView,
-                                    name='adhocracy|rate')
-
-
-@mark.usefixtures('integration')
-def test_includeme_register_index_rates(registry):
-    from adhocracy_core.sheets.rate import IRateable
-    from substanced.interfaces import IIndexView
-    assert registry.adapters.lookup((IRateable,), IIndexView,
-                                    name='adhocracy|rates')
+    assert registry.adapters.lookup((ICommentable,), IIndexView,
+                                    name='adhocracy|comments')
 
 
 class TestIndexTag:

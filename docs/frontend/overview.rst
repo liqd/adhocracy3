@@ -8,8 +8,9 @@ processes of all kinds. The user interface should be consistent and
 recognizable while providing enough flexibility for a wide range of
 target audiences as well as branding.
 
-Angular
--------
+
+Angular (web framework)
+-----------------------
 
 `AngularJS <https://angularjs.org/>`__ is an open source JavaScript
 framework mainly developed by Google.
@@ -29,8 +30,8 @@ Angular is somewhat similar to other client-side rendering frameworks
 like `ember.js <http://emberjs.com/>`__ or
 `react <http://reactjs.com/>`__.
 
-TypeScript
-----------
+TypeScript (programming language)
+---------------------------------
 
 `TypeScript <http://www.typescriptlang.org/>`__ is an open-source
 language mainly developed by Microsoft.
@@ -53,6 +54,18 @@ TypeScript is similar to `CoffeeScript <http://coffeescript.org/>`__ in
 that it compiles to JavaScript. It is similar to
 `Babel <https://babeljs.io/>`__ in that it backports many future
 JavaScript features.
+
+`Sass <http://sass-lang.com/>`_ / `Compass <http://compass-style.org/>`_ (CSS preprocessor)
+-------------------------------------------------------------------------------------------
+
+Ease writing CSS with support for nesting, mixins and variables and various helper tools.
+
+`RequireJS <http://requirejs.org/>`_ (module loader)
+----------------------------------------------------
+
+Loads javascript modules and bundles javascript/css files. You can find a comparsion with
+other (younger) projects `here <http://www.slant.co/topics/1089/compare>`_.
+
 
 Backend API
 -----------

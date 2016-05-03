@@ -9,9 +9,12 @@ import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
 import * as AdhUtil from "../../Util/Util";
 
+import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
+import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RIS1Process from "../../../Resources_/adhocracy_s1/resources/s1/IProcess";
 import RIProposal from "../../../Resources_/adhocracy_s1/resources/s1/IProposal";
 import RIProposalVersion from "../../../Resources_/adhocracy_s1/resources/s1/IProposalVersion";
+import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SIWorkflowAssignment from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/S1/Workbench";
@@ -67,6 +70,11 @@ export var s1CurrentColumnDirective = (
                 key: "rates",
                 name: "TR__RATES",
                 index: "rates",
+                reverse: true
+            }, {
+                key: "comments",
+                name: "TR__COMMENTS_TOTAL",
+                index: "comments",
                 reverse: true
             }, {
                 key: "item_creation_date",
@@ -357,5 +365,32 @@ export var registerRoutes = (
                     meeting: getMeeting(item, process)
                 };
             };
-        });
+        })
+        .defaultVersionable(RIComment, RICommentVersion, "", processType, context, {
+            space: "content",
+            movingColumns: "is-collapse-show-show"
+        })
+        .specificVersionable(RIComment, RICommentVersion, "", processType, context, ["adhHttp", "$q", (
+            adhHttp : AdhHttp.Service<any>,
+            $q : angular.IQService
+        ) => {
+            var getCommentableUrl = (resource) : angular.IPromise<any> => {
+                if (resource.content_type !== RICommentVersion.content_type) {
+                    return $q.when(resource);
+                } else {
+                    var url = resource.data[SIComment.nick].refers_to;
+                    return adhHttp.get(url).then(getCommentableUrl);
+                }
+            };
+
+            return (item : RIComment, version : RICommentVersion) => {
+                return getCommentableUrl(version).then((commentable) => {
+                    return {
+                        commentableUrl: commentable.path,
+                        commentCloseUrl: commentable.path,
+                        proposalUrl: commentable.path
+                    };
+                });
+            };
+        }]);
 };

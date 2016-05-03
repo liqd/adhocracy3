@@ -40,6 +40,7 @@ test_requires = [
     'pytest-pyramid',
     'pytest-timeout',
     'pytest-mock',
+    'pytest-localserver',
     'coverage',
     'python-coveralls',
     'babel',
@@ -48,6 +49,8 @@ test_requires = [
     'Sphinx',
     'repoze.sphinx.autointerface',
     'sphinx-autodoc-annotation',
+    'sphinxcontrib-blockdiag',
+    'sphinxcontrib-actdiag',
     'sphinx-rtd-theme',
 ]
 

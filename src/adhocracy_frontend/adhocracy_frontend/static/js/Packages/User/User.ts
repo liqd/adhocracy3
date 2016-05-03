@@ -58,7 +58,12 @@ export class Service {
             }, (reason) => {
                 // The user resource that was returned by the server could not be accessed.
                 // This may happen e.g. with a network disconnect
-                _self.adhCredentials.deleteToken();
+
+                // FIXME: The request might fail because the window is
+                // closed. In that case there is no reason to delete
+                // the token. We need to be able to discern the two
+                // cases.
+                // _self.adhCredentials.deleteToken();
                 throw "failed to fetch user resource";
             });
     }

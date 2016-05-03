@@ -60,7 +60,6 @@ from adhocracy_core.sheets.tags import ITags
 from adhocracy_core.utils import extract_events_from_changelog_metadata
 from adhocracy_core.utils import get_user
 from adhocracy_core.utils import is_batchmode
-from adhocracy_core.utils import strip_optional_prefix
 from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import is_created_in_current_transaction
 from adhocracy_core.utils import create_schema
@@ -633,11 +632,9 @@ class MetaApiView:
                     isheet_ = source_isheet if node.backref else target_isheet
                     targetsheet = to_dotted_name(isheet_)
 
-                typ_stripped = strip_optional_prefix(typ, 'colander.')
-
                 fielddesc = {
                     'name': fieldname,
-                    'valuetype': typ_stripped,
+                    'valuetype': typ,
                     'create_mandatory':
                         False if readonly else sheet_meta.create_mandatory,
                     'editable': False if readonly else sheet_meta.editable,

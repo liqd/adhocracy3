@@ -3,18 +3,24 @@
 import * as _ from "lodash";
 
 
-// Error responses in the Adhocracy REST API contain json objects in
-// the body that have the following form:
 export interface IBackendError {
-    status: string;
-    errors: IBackendErrorItem[];
+    status : string;
+    errors : IBackendErrorItem[];
+}
+
+export interface IBackendBatchError {
+    updated_resources : string[];
+    responses : {
+        code : number;
+        body? : IBackendError;
+    }[];
 }
 
 export interface IBackendErrorItem {
     name : string;
     location : string;
     description : string;
-    code: number;
+    code : number;
 }
 
 var extractErrorItems = (code : number, error : IBackendError) : IBackendErrorItem[] => {
@@ -25,9 +31,16 @@ var extractErrorItems = (code : number, error : IBackendError) : IBackendErrorIt
             description: (<any>error).reason,
             code: code
         }];
+    } else if (!error) {
+        return [{
+            location: "client",
+            name: "abort",
+            description: "the request was aborted before it could reach the server",
+            code: code
+        }];
     } else {
-        _.forEach(error.errors, (value) => {
-            value.code = code;
+        _.forEach(error.errors, (item) => {
+            item.code = code;
         });
         return error.errors;
     }
@@ -52,19 +65,17 @@ export var logBackendError = (response : angular.IHttpPromiseCallbackArg<IBacken
  * NOTE: See documentation of `importBatchContent`.
  */
 export var logBackendBatchError = (
-    response : angular.IHttpPromiseCallbackArg<{
-        responses : {
-            code : number;
-            body? : IBackendError;
-        }[];
-    }>
-) : void => {
+    response : angular.IHttpPromiseCallbackArg<IBackendBatchError>) : void => {
     "use strict";
 
     console.log(response);
 
-    var lastResponse = response.data.responses[response.data.responses.length - 1];
-    throw extractErrorItems(lastResponse.code, lastResponse.body);
+    if (response.data) {
+        var lastResponse = _.last(response.data.responses);
+        throw extractErrorItems(lastResponse.code, lastResponse.body);
+    } else {
+        throw extractErrorItems(response.status, null);
+    }
 };
 
 

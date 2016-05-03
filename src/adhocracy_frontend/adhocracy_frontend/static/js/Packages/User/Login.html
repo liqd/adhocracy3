@@ -57,5 +57,5 @@
         </div>
     </form>
 
-    <a class="login-cancel" href="" ng-click="cancel()">{{ "TR__CANCEL" | translate}}</a>
+    <a data-ng-if="enableCancel" class="login-cancel" href="" ng-click="cancel()">{{ "TR__CANCEL" | translate}}</a>
 </div>

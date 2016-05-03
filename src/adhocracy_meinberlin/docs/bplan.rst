@@ -31,7 +31,8 @@ The following data needs to be provided to create a B-Plan:
 - *external_picture_url*: External URL to the BPlan picture
 - *picture_description*: Picture copyright notice
 - *start_date*: Start time of the praticipation phase
-- *end_date*: End of the participation phase
+- *end_date*: End of the participation phase, i.e. start time of the evaluation
+    phase
 
 Workflows
 ---------
@@ -42,7 +43,7 @@ A B-Plan process transits the following workflows:
 2. *announce*: The B-Plan information is accessible, but no statements can be
    send
 3. *participate*: B-Plan participation is active, statements can be issued
-4. *closed*: The B-Plan is not accessible anymore
+4. *evaluate*: The B-Plan is not accessible anymore
 
 The transition from the *draft* state to the *announce* state has to be done
 via an API call. The further transitions to *participate* and *closed* are
@@ -63,21 +64,34 @@ The following API calls are required to implement the process:
 
 **Initialization**::
 
+For the example API calls an organisation "orga" is created.
+The organization for the B-Plan needs to exist beforehand in the a3
+platform.
+
     >>> from webtest import TestApp
+    >>> from adhocracy_core.testing import god_header
     >>> app_router = getfixture('app_router')
     >>> testapp = TestApp(app_router)
-    >>> app_god = getfixture('app_god')
+    >>> rest_url = 'http://localhost'
     >>> data = {'content_type':
     ...                'adhocracy_core.resources.organisation.IOrganisation',
     ...         'data': {
     ...             'adhocracy_core.sheets.name.IName':
     ...                 {'name': 'orga'}
     ...         }}
-    >>> resp = app_god.post('/', data)
+    >>> resp = testapp.post_json(rest_url + '/', data, headers=god_header)
 
-For the example API calls an organisation "orga" is created.
-The organization for the B-Plan needs to exist beforehand in the a3
-platform.
+A working image url is needed to test referencing external images.
+
+    >>> import os
+    >>> import adhocracy_core
+    >>> httpserver = getfixture('httpserver')
+    >>> base_path = adhocracy_core.__path__[0]
+    >>> test_image_path = os.path.join(base_path, '../', 'docs', 'test_image.png')
+    >>> httpserver.serve_content(open(test_image_path, 'rb').read())
+    >>> httpserver.headers['ContentType'] = 'image/png'
+    >>> test_image_url = httpserver.url
+
 
 **Login**::
 
@@ -113,12 +127,13 @@ The username here is just an example, please use your credentials.
     ...                  'short_description':'Teaser text'},
     ...             'adhocracy_core.sheets.image.IImageReference':
     ...                 {'picture_description': 'copyright notice',
-    ...                  'external_picture_url': 'http://foo.bar/image.jpg'},
+    ...                  'external_picture_url': test_image_url},
     ...             'adhocracy_core.sheets.workflow.IWorkflowAssignment':
     ...                 {'state_data':
     ...                  [{'name': 'participate', 'description': '',
-    ...                  'start_date': '2016-03-01T12:00:09',
-    ...                  'end_date': '2016-05-01T12:00:09'}]}
+    ...                    'start_date': '2016-03-01T12:00:09'},
+    ...                   {'name': 'evaluate', 'description': '',
+    ...                    'start_date': '2016-03-01T12:00:09'}]}
     ...             }}
     >>> resp = testapp.post_json('/orga/', data, headers=auth_header)
     >>> resp.status_code
@@ -205,8 +220,9 @@ E.g. Changing the participation start data::
     ...             'adhocracy_core.sheets.workflow.IWorkflowAssignment':
     ...                 {'state_data':
     ...                  [{'name': 'participate', 'description': 'test',
-    ...                  'start_date': '2016-03-03T12:00:09',
-    ...                  'end_date': '2016-05-01T12:00:09'}]}}}
+    ...                    'start_date': '2016-03-03T12:00:09'},
+    ...                   {'name': 'evaluate', 'description': 'test',
+    ...                    'start_date': '2016-05-01T12:00:09'}]}}}
     >>> resp = testapp.put_json('/orga/1-23', data, headers=auth_header)
     >>> resp.status_code
     200

@@ -38,7 +38,7 @@ export var register = () => {
                 $locationMock = jasmine.createSpyObj("$location", ["path"]);
 
                 adhConfigMock = {
-                    rest_url: "rest_url"
+                    rest_url: "http://rest_url"
                 };
 
                 adhCredentialsMock = jasmine.createSpyObj("adhCredentialsMock", ["loggedIn"]);
@@ -97,7 +97,7 @@ export var register = () => {
 
                 it("sets resourceUrl", (done) => {
                     service.route("/platform/wlog/@blarg", {}).then((data) => {
-                        expect(data["resourceUrl"]).toBe("rest_url/platform/wlog/");
+                        expect(data["resourceUrl"]).toBe("http://rest_url/platform/wlog/");
                         done();
                     });
                 });
@@ -105,13 +105,38 @@ export var register = () => {
 
             describe("reverse", () => {
                 it("renders view correctly if specified", () => {
-                    var answer = service.reverse({ resourceUrl: "rest_url/platform/wlog", view: "blarg" });
+                    var answer = service.reverse({ resourceUrl: "http://rest_url/platform/wlog", view: "blarg" });
                     expect(answer.path).toMatch(/\/@blarg$/);
                 });
 
-                it("uses resourceUrl for path, but without rest_url", () => {
-                    var answer = service.reverse({ resourceUrl: "rest_url/platform/wlog" });
+                it("uses resourceUrl for path, but without http://rest_url", () => {
+                    var answer = service.reverse({ resourceUrl: "http://rest_url/platform/wlog" });
                     expect(answer.path).toBe("/platform/wlog/");
+                });
+            });
+
+            describe("getProcess", () => {
+                // We here create a mock adhHttp Service object. We say an input string contains a process 
+                // if it has 4 slashes. We wanted to verify that getProcess() worked both with URLs and paths.
+                beforeEach(() => {
+                    adhHttpMock.get.and.callFake((arg) => q.when({
+                        isInstanceOf: () => arg.match(/\//g).length === 4,
+                        arg: arg
+                    }));
+                });
+
+                it("works with URLs", (done) => {
+                    service.getProcess("http://rest_url/bla/fu/bar/bass").then((result) => {
+                        expect(result.arg).toBe("http://rest_url/bla/fu");
+                        done();
+                    });
+                });
+
+                it("works with paths", (done) => {
+                    service.getProcess("/bla/fu/bar/bass").then((result) => {
+                        expect(result.arg).toBe("http://rest_url/bla/fu");
+                        done();
+                    });
                 });
             });
         });

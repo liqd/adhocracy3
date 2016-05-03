@@ -11,6 +11,7 @@ Submodules
 
 .. toctree::
 
+   adhocracy_core.workflows.badge_assignment
    adhocracy_core.workflows.debate
    adhocracy_core.workflows.debate_private
    adhocracy_core.workflows.sample
