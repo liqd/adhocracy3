@@ -41,8 +41,6 @@ export var register = (angular) => {
             adhEmbedProvider.contextHeaders["mein.berlin.de"] = "<adh-meinberlin-de-header></adh-meinberlin-de-header>";
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            adhResourceAreaProvider
-                .template("mein.berlin.de", ["adhConfig", "$templateRequest", AdhMeinberlinDe.areaTemplate]);
             AdhDebateWorkbench.registerRoutes(
                 RICollaborativeTextProcess, "mein.berlin.de")(adhResourceAreaProvider);
             AdhMeinberlinAlexanderplatzWorkbench.registerRoutes(
