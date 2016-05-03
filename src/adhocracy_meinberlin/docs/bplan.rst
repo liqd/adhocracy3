@@ -31,7 +31,7 @@ The following data needs to be provided to create a B-Plan:
 - *external_picture_url*: External URL to the BPlan picture
 - *picture_description*: Picture copyright notice
 - *start_date*: Start time of the praticipation phase
-- *end_date*: End of the participation phase, i.e. start time of the evaluation
+- *end_date*: End of the participation phase, i.e. start time of the closed
     phase
 
 Workflows
@@ -43,7 +43,7 @@ A B-Plan process transits the following workflows:
 2. *announce*: The B-Plan information is accessible, but no statements can be
    send
 3. *participate*: B-Plan participation is active, statements can be issued
-4. *evaluate*: The B-Plan is not accessible anymore
+4. *closed*: The B-Plan is not accessible anymore
 
 The transition from the *draft* state to the *announce* state has to be done
 via an API call. The further transitions to *participate* and *closed* are
@@ -132,7 +132,7 @@ The username here is just an example, please use your credentials.
     ...                 {'state_data':
     ...                  [{'name': 'participate', 'description': '',
     ...                    'start_date': '2016-03-01T12:00:09'},
-    ...                   {'name': 'evaluate', 'description': '',
+    ...                   {'name': 'closed', 'description': '',
     ...                    'start_date': '2016-03-01T12:00:09'}]}
     ...             }}
     >>> resp = testapp.post_json('/orga/', data, headers=auth_header)
@@ -213,7 +213,7 @@ E.g. Changing the description::
     >>> resp.status_code
     200
 
-E.g. Changing the participation start data::
+E.g. Changing the participation dates::
 
     >>> data = {'content_type': 'adhocracy_meinberlin.resources.bplan.IProcess',
     ...         'data': {
@@ -221,7 +221,7 @@ E.g. Changing the participation start data::
     ...                 {'state_data':
     ...                  [{'name': 'participate', 'description': 'test',
     ...                    'start_date': '2016-03-03T12:00:09'},
-    ...                   {'name': 'evaluate', 'description': 'test',
+    ...                   {'name': 'closed', 'description': 'test',
     ...                    'start_date': '2016-05-01T12:00:09'}]}}}
     >>> resp = testapp.put_json('/orga/1-23', data, headers=auth_header)
     >>> resp.status_code

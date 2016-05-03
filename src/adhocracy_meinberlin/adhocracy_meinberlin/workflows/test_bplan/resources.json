@@ -13,6 +13,6 @@
            "adhocracy_core.sheets.workflow.IWorkflowAssignment":
            {"state_data": [{"name": "participate","description": "",
                             "start_date": "2015-05-26T12:40:00"},
-                           {"name": "evaluate","description": "",
+                           {"name": "closed","description": "",
                             "start_date": "2015-10-26T12:40:00"}]}}}
 ]

@@ -36,7 +36,7 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
                 {'name': 'participate',
                  'description': '',
                  'start_date': datetime.date(2015, 5, 5)},
-                {'name': 'evaluate',
+                {'name': 'closed',
                  'description': '',
                  'start_date': datetime.date(2015, 6, 11)}
         ]}

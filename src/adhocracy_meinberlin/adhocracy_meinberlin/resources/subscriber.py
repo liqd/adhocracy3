@@ -30,7 +30,7 @@ def send_bplan_submission_confirmation_email(event):
     subject = 'Ihre Stellungnahme zum Bebauungsplan {plan_number}, ' \
               '{participation_kind} von ' \
               '{participate_start_date:%d/%m/%Y} ' \
-              '- {evaluate_start_date:%d/%m/%Y}.' \
+              '- {closed_start_date:%d/%m/%Y}.' \
               .format(**process_settings)
     messenger.send_mail(subject,
                         [appstruct['email']],
@@ -69,9 +69,9 @@ def _get_all_process_settings(proposal_version, registry):
     all_process_settings.update(
         {'participate_start_date': state_data['start_date']})
     state_data = _get_workflow_state_data(workflowassignment['state_data'],
-                                          'evaluate')
+                                          'closed')
     all_process_settings.update(
-        {'evaluate_start_date': state_data['start_date']})
+        {'closed_start_date': state_data['start_date']})
     return all_process_settings
 
 
