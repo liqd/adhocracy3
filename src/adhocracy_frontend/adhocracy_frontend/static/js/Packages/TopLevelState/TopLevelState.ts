@@ -455,14 +455,6 @@ export var headerDirective = (
     };
 };
 
-export var pageWrapperDirective = (adhConfig : AdhConfig.IService) => {
-    return {
-        restrict: "E",
-        transclude: true,
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + "Wrapper.html"
-    };
-};
-
 
 export var viewFactory = (adhTopLevelState : Service, $compile : angular.ICompileService) => {
     return {

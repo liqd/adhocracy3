@@ -16,7 +16,6 @@ export var register = (angular) => {
         ])
         .provider("adhTopLevelState", AdhTopLevelState.Provider)
         .directive("adhHeader", ["adhConfig", "adhTopLevelState", AdhTopLevelState.headerDirective])
-        .directive("adhPageWrapper", ["adhConfig", AdhTopLevelState.pageWrapperDirective])
         .directive("adhRoutingError", ["adhConfig", AdhTopLevelState.routingErrorDirective])
         .directive("adhSpace", ["adhTopLevelState", AdhTopLevelState.spaceDirective])
         .directive("adhView", ["adhTopLevelState", "$compile", AdhTopLevelState.viewFactory]);
