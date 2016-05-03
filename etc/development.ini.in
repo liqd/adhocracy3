@@ -13,6 +13,7 @@ pyramid.debug_routematch = false
 pyramid.debug_templates = true
 pyramid.default_locale_name = en
 pyramid.includes =
+    pyramid_exclog
     pyramid_zodbconn
     pyramid_tm
     pyramid_mailer
