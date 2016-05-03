@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "module": "umd",
+    "removeComments": true,
+    "sourceMap": true
+  },
+  "files": [
+    "src/current/current/build/js/Adhocracy.ts",
+    "src/current/current/build/js/AdhocracySDK.ts",
+    "src/current/current/build/js/AdhocracySpec.ts"
+  ]
+}
