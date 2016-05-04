@@ -54,12 +54,13 @@ export interface IMessageData {
     url? : string;
 }
 
-export interface IPostMessageService {
-    (data : string, origin : string) : void;
+export interface ICallback {
+    name : string;
+    callback : (data : IMessageData) => void;
 }
 
-export interface IProvider {
-    registerMessageHandler : (name : string, callback : (data : IMessageData) => void) => void;
+export interface IPostMessageService {
+    (data : string, origin : string) : void;
 }
 
 export interface IService {
@@ -68,43 +69,42 @@ export interface IService {
     dummy? : boolean;
 }
 
-export class Provider implements IProvider {
+export class Provider {
     public $get;
-    private callbacks : { name : string, callback : (data : IMessageData) => void }[] = [];
+    private callbacks : ICallback[] = [];
 
     constructor() {
         var _self = this;
-        this.$get = [
-            "adhConfig",
-            "$location",
-            "$window",
-            "$rootScope",
-            "adhCredentials",
-            "adhUser", (
-                adhConfig : AdhConfig.IService,
-                $location : angular.ILocationService,
-                $window : Window,
-                $rootScope,
-                adhCredentials : AdhCredentials.Service,
-                adhUser : AdhUser.Service) : IService => {
-                    if (adhConfig.embedded) {
-                        var postMessageToParent = $window.parent.postMessage.bind($window.parent);
-                        return new Service(
-                            postMessageToParent, $location,
-                            $window,
-                            $rootScope,
-                            adhConfig.trusted_domains,
-                            adhCredentials,
-                            adhUser,
-                            _self.callbacks);
-                    } else {
-                        return new Dummy();
-                    }
-                }];
+        this.$get = ["adhConfig", "$location", "$window", "$rootScope", "adhCredentials", "adhUser", (
+            adhConfig : AdhConfig.IService,
+            $location : angular.ILocationService,
+            $window : Window,
+            $rootScope,
+            adhCredentials : AdhCredentials.Service,
+            adhUser : AdhUser.Service
+        ) : IService => {
+            if (adhConfig.embedded) {
+                var postMessageToParent = $window.parent.postMessage.bind($window.parent);
+                return new Service(
+                    postMessageToParent,
+                    $location,
+                    $window,
+                    $rootScope,
+                    adhConfig.trusted_domains,
+                    adhCredentials,
+                    adhUser,
+                    _self.callbacks);
+            } else {
+                return new Dummy();
+            }
+        }];
     }
 
-    public registerMessageHandler(name, callback) {
-        this.callbacks.push({ name : name, callback : callback });
+    public registerMessageHandler(name : string, callback) {
+        this.callbacks.push({
+            name: name,
+            callback: callback
+        });
     }
 }
 
@@ -120,7 +120,7 @@ export class Service implements IService {
         private trustedDomains : string[],
         private adhCredentials : AdhCredentials.Service,
         private adhUser : AdhUser.Service,
-        providedMessageHandlers : { name : string, callback : (data : IMessageData) => void }[] = []
+        providedMessageHandlers : ICallback[] = []
     ) {
         var _self : Service = this;
 
