@@ -199,7 +199,7 @@ export var register = () => {
                 service.postMessage(name, data);
                 expect(windowMock.parent.postMessage).toHaveBeenCalled();
             });
-            it("allows to register message handlers a configuration phase", () => {
+            it("allows to register message handlers in configuration phase", () => {
 
                 var callbackMock = jasmine.createSpy("callbackMock");
                 provider.registerMessageHandler("test", callbackMock);
