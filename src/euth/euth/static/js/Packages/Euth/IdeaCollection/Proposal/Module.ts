@@ -20,11 +20,11 @@ export var register = (angular) => {
             AdhRateModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .directive("adhProposalDetail", [
+        .directive("adhEuthProposalDetail", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.detailDirective])
-        .directive("adhProposalListItem", [
+        .directive("adhEuthProposalListItem", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.listItemDirective])
-        .directive("adhProposalCreate", [
+        .directive("adhEuthProposalCreate", [
             "adhConfig",
             "adhHttp",
             "adhPreliminaryNames",
@@ -35,7 +35,7 @@ export var register = (angular) => {
             "$location",
             Proposal.createDirective
         ])
-        .directive("adhProposalEdit", [
+        .directive("adhEuthProposalEdit", [
             "adhConfig",
             "adhHttp",
             "adhPermissions",
