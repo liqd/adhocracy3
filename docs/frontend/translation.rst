@@ -1,8 +1,16 @@
 Translation
 ===========
 
-Markup translatable strings
----------------------------
+Whenever you want to do translation of Adhocracy content, we strongly
+encorage you to do the following steps:
+
+1) if necessary: mark the content you need to translate as translatable,
+2) extract translatable strings for a translation session,
+3) translate the strings in `transifex`_,
+4) if necessary: update the change_german_salutation script.
+
+1. Markup Translatable Strings
+------------------------------
 
 For translations in the frontend we use `angular-translate`_.  It
 offers several ways of marking a string as translatable, but we
@@ -23,8 +31,8 @@ In our code we do not use actual human language. Instead, we use
 technical strings (uppercase, with underscores, prefixed with ``TR__``).
 
 
-String extraction
------------------
+2. String Extraction
+--------------------
 
 angular-translate does not provide a script to extract translatable
 strings.  So we hacked our own:
@@ -52,15 +60,34 @@ can use the following command::
    edge-cases.
 
 
-Translation
------------
+3. Translation with Transifex
+-----------------------------
 
-Translators can use `transifex`_ for translation. Note that changes in
-transifex are not instantly reflected in neither the code nor any
-running platform. In order to pull changes from transifex into the code,
-the transifex-client can be used::
+We generally use `transifex`_ for translation. Note that new strings
+in the code are not automatically displayed in transifex, and
+updates in transifex are not instantly reflected in either the code
+or any running platform.
 
-   $ cd src/adhocracy_frontend/
+Before you push local changes to transifex, please make sure that you will
+not overwrite any translations on transifex. This can be done in several
+ways, one of which is the following. Assuming you want to update the project called foo:
+
+   $ cd src/foo/
+   $ tx pull -a --force
+   $ git cola
+
+In git cola, for each line you can decide on the newer version.
+
+Then, in order to push changes from the foo project code to transifex,
+the transifex-client can be used like this::
+
+   $ cd src/foo/
+   $ tx push -a
+
+In order to pull changes from transifex into the foo project's code,
+the transifex-client can be used like this::
+
+   $ cd src/foo/
    $ tx pull -a
 
 .. NOTE:: The configuration for transifex-client is stored in
@@ -85,19 +112,19 @@ the transifex-client can be used::
    locale.
 
 
-German Du/Sie
--------------
+4. German Du/Sie
+----------------
 
 Adhocracy is currently used mostly in Germany, i.e. in German language.
 Unfortunately, there are two variants of German, a formal (Sie) and an
 informal (Du) one.
 
-All translations should use the informal variant.  The script
-``bin/change_german_salutation`` can be used to convert informal
-translations to formal ones.  Note that you will need to extend that
-script whenever the translation changes. The common workflow for this
-is: Iteratively run the script, check the output and add new rules until
-everything is fine.
+All translations should use the informal variant, except on the site
+mein.berlin.de. We use the script ``bin/change_german_salutation`` to 
+convert informal translations to formal ones.  Note that you will need 
+to extend that script whenever the translation changes. The common 
+workflow for this is: Iteratively run the script, check the output and 
+add new rules until everything is fine.
 
 
 .. _angular-translate: https://angular-translate.github.io
