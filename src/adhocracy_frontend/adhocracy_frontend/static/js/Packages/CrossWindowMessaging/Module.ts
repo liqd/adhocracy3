@@ -6,17 +6,11 @@ import * as AdhCrossWindowMessaging from "./CrossWindowMessaging";
 
 export var moduleName = "adhCrossWindowMessaging";
 
-export var register = (angular, trusted = false) => {
-    var mod = angular
+export var register = (angular) => {
+    angular
         .module(moduleName, [
             AdhCredentialsModule.moduleName,
             AdhUserModule.moduleName
-        ]);
-
-    if (trusted) {
-        mod.factory("adhCrossWindowMessaging", [
-            "adhConfig", "$location", "$window", "$rootScope", "adhCredentials", "adhUser", AdhCrossWindowMessaging.factory]);
-    } else {
-        mod.factory("adhCrossWindowMessaging", ["adhConfig", "$location", "$window", "$rootScope", AdhCrossWindowMessaging.factory]);
-    }
+        ])
+        .provider("adhCrossWindowMessaging", AdhCrossWindowMessaging.Provider);
 };

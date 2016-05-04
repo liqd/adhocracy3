@@ -17,6 +17,8 @@
  * change paths without a reload and in being more flexibel.
  */
 
+/// <reference path="../../../lib2/types/angular.d.ts"/>
+
 import * as _ from "lodash";
 
 import * as AdhConfig from "../Config/Config";
@@ -72,7 +74,7 @@ export interface IRoutingError {
 }
 
 
-export class Provider {
+export class Provider implements angular.IServiceProvider {
     public areas : {[key : string]: any};
     public default : any;
     public $get;

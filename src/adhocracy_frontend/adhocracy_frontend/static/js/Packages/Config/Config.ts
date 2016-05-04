@@ -1,3 +1,5 @@
+/// <reference path="../../../lib2/types/angular.d.ts"/>
+
 /* tslint:disable:variable-name */
 
 /**
@@ -42,7 +44,7 @@ export interface IService {
 }
 
 
-export class Provider {
+export class Provider implements angular.IServiceProvider {
     public config : IService;
 
     public $get() : IService {
