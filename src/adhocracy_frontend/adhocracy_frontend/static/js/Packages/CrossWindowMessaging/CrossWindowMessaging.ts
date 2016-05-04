@@ -33,6 +33,8 @@
  * 10 in particular, but others may be affected.)
  */
 
+/// <reference path="../../../lib2/types/angular.d.ts"/>
+
 import * as _ from "lodash";
 
 import * as AdhConfig from "../Config/Config";
@@ -69,7 +71,7 @@ export interface IService {
     dummy? : boolean;
 }
 
-export class Provider {
+export class Provider implements angular.IServiceProvider {
     public $get;
     private callbacks : ICallback[] = [];
 
