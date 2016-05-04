@@ -32,7 +32,7 @@ The following data needs to be provided to create a B-Plan:
 - *picture_description*: Picture copyright notice
 - *start_date*: Start time of the praticipation phase
 - *end_date*: End of the participation phase, i.e. start time of the closed
-    phase
+  phase
 
 Workflows
 ---------
@@ -62,7 +62,7 @@ The following API calls are required to implement the process:
 - get the B-Plan embed HTML snippet and external URL
 - edit a B-Plan process
 
-**Initialization**::
+**Initialization**
 
 For the example API calls an organisation "orga" is created.
 The organization for the B-Plan needs to exist beforehand in the a3
