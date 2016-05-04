@@ -1,4 +1,6 @@
 defaults: standard
+title: Debate
+description: Base debate workflow definition
 states:
   participate:
     acm:

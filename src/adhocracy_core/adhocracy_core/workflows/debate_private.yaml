@@ -1,4 +1,5 @@
 defaults: debate
+title: Private Debate
 states:
   announce:
     acm:

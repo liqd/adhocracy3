@@ -1,10 +1,7 @@
 from pyramid import testing
-from pyramid.threadlocal import manager
-from pyramid.traversal import find_resource
 from pytest import fixture
 from pytest import mark
 from webtest import TestResponse
-import transaction
 
 from adhocracy_core.testing import add_resources
 from adhocracy_core.testing import do_transition_to

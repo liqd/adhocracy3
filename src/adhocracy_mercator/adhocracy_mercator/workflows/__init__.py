@@ -5,4 +5,5 @@ def includeme(config):
     """Add workflow."""
     config.add_workflow('adhocracy_mercator.workflows:mercator.yaml',
                         'mercator')
-    config.include('.mercator2')
+    config.add_workflow('adhocracy_mercator.workflows:mercator2.yaml',
+                        'mercator2')
