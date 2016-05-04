@@ -1,12 +1,6 @@
 {
-    "TR__AVAILABLE_COMMENT": "Commenting allowed",
-    "TR__AVAILABLE_NONE": "No participation allowed",
-    "TR__AVAILABLE_PARTICIPATION": "Participation allowed",
-    "TR__AVAILABLE_VOTING": "Rating allowed",
-    "TR__CREATE_COMMENT": "Create comment",
     "TR__CREATE_PROPOSAL": "create proposal",
     "TR__CURRENT_STATE": "current state",
-    "TR__END_DATE": "end date",
     "TR__ERROR_MUST_BE_A_VALID_EMAIL_STRING": "Please enter a valid email address",
     "TR__ERROR_REQUIRED_DATE": "Please enter a valid date",
     "TR__ERROR_REQUIRED_OFFICE_WORKER": "Please enter the name of an office worker",
