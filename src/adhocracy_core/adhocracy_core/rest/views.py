@@ -800,10 +800,18 @@ class ReportAbuseView:
     @api_view(request_method='OPTIONS')
     def options(self) -> dict:
         """Return options for view."""
-        return {}
+        appstruct = {}
+        if self.request.has_permission('message_to_user', self.context):
+            schema = create_schema(POSTReportAbuseViewRequestSchema,
+                                   self.context,
+                                   self.request)
+            appstruct['POST'] = {'request_body': schema.serialize({}),
+                                 'response_body': ''}
+        return appstruct
 
     @api_view(
         request_method='POST',
+        permission='report_abuse',
         schema=POSTReportAbuseViewRequestSchema,
         accept='application/json',
     )

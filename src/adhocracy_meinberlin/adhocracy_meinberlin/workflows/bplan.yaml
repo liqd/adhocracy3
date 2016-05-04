@@ -1,3 +1,4 @@
+title: Bplan process
 initial_state: draft
 auto_transition: True
 states:

@@ -168,11 +168,17 @@ def match_permission(acm, state, permission):
 
 def includeme(config):  # pragma: no cover
     """Include workflows and add 'add_workflow' config directive."""
-    config.add_directive('add_workflow', add_workflow_directive)
-    config.include('.sample')
-    config.include('.standard')
-    config.include('.badge_assignment')
-    config.include('.standard_private')
-    config.include('.debate')
-    config.include('.debate_private')
     config.include('.subscriber')
+    config.add_directive('add_workflow', add_workflow_directive)
+    config.add_workflow('adhocracy_core.workflows:sample.yaml',
+                        'sample')
+    config.add_workflow('adhocracy_core.workflows:standard.yaml',
+                        'standard')
+    config.add_workflow('adhocracy_core.workflows:standard_private.yaml',
+                        'standard_private')
+    config.add_workflow('adhocracy_core.workflows:debate.yaml',
+                        'debate')
+    config.add_workflow('adhocracy_core.workflows:debate_private.yaml',
+                        'debate_private')
+    config.add_workflow('adhocracy_core.workflows:badge_assignment.yaml',
+                        'badge_assignment')

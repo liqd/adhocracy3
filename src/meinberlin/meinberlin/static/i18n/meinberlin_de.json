@@ -1,12 +1,6 @@
 {
-    "TR__AVAILABLE_COMMENT": "Kommentieren möglich",
-    "TR__AVAILABLE_NONE": "Beteiligung nicht möglich",
-    "TR__AVAILABLE_PARTICIPATION": "Beteiligung möglich",
-    "TR__AVAILABLE_VOTING": "Bewertung möglich",
-    "TR__CREATE_COMMENT": "Kommentar erstellen",
     "TR__CREATE_PROPOSAL": "Vorschlag anlegen",
     "TR__CURRENT_STATE": "Aktueller Status",
-    "TR__END_DATE": "Ende",
     "TR__ERROR_MUST_BE_A_VALID_EMAIL_STRING": "Bitte eine gültige E-Mail-Adresse angeben",
     "TR__ERROR_REQUIRED_DATE": "Bitte ein gültiges Datum angeben",
     "TR__ERROR_REQUIRED_OFFICE_WORKER": "Bitte den Namen einer Sachbearbeiter*in angeben",

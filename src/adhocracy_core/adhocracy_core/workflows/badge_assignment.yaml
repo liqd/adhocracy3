@@ -1,4 +1,6 @@
 initial_state: assign
+title: Badge Assignmet
+description: This workflow can be defined on badge resources to specify who are allowed to assign them.
 states:
   assign:
     acm:

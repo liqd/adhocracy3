@@ -17,6 +17,8 @@
  * change paths without a reload and in being more flexibel.
  */
 
+/// <reference path="../../../lib2/types/angular.d.ts"/>
+
 import * as _ from "lodash";
 
 import * as AdhConfig from "../Config/Config";
@@ -72,7 +74,7 @@ export interface IRoutingError {
 }
 
 
-export class Provider {
+export class Provider implements angular.IServiceProvider {
     public areas : {[key : string]: any};
     public default : any;
     public $get;
@@ -440,26 +442,18 @@ export var spaceDirective = (adhTopLevelState : Service) => {
 };
 
 
-export var headerDirective = (
+export var defaultHeaderDirective = (
     adhConfig : AdhConfig.IService,
     adhTopLevelState : Service
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/Header.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/defaultHeader.html",
         scope: {},
         link: (scope) => {
             scope.hideHeader = adhConfig.custom["hide_header"];
             scope.$on("$destroy", adhTopLevelState.bind("customHeader", scope));
         }
-    };
-};
-
-export var pageWrapperDirective = (adhConfig : AdhConfig.IService) => {
-    return {
-        restrict: "E",
-        transclude: true,
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + "Wrapper.html"
     };
 };
 

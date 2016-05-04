@@ -125,7 +125,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
             }])
             .otherwise(() : AdhTopLevelState.IAreaInput => {
                 return {
-                    template: "<adh-page-wrapper><h1>404 - Not Found</h1></adh-page-wrapper>"
+                    template: "<adh-header></adh-header><div class=\"l-content\"><h1>404 - Not Found</h1></div>"
                 };
             });
     }]);
@@ -182,7 +182,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhBadgeModule.register(angular);
     AdhCommentModule.register(angular);
     AdhConfigModule.register(angular, config);
-    AdhCrossWindowMessagingModule.register(angular, config.trusted_domains !== []);
+    AdhCrossWindowMessagingModule.register(angular);
     AdhDebateWorkbenchModule.register(angular);
     AdhDateTimeModule.register(angular);
     AdhDocumentModule.register(angular);
