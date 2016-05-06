@@ -213,7 +213,7 @@ Can hide and delete process content
     ['deleted', 'hidden']
 
 Can hide and delete process structure
-    >>> resp = moderator.options('/organisation').json
+    >>> resp = moderator.options('/organisation/process').json
     >>> sorted(resp['PUT']['request_body']['data']
     ...                  ['adhocracy_core.sheets.metadata.IMetadata'])
     ['deleted', 'hidden']

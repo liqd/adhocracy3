@@ -9,12 +9,14 @@ states:
         - [create_comment,            ~,         A,           A,         ~,       A,         ~]
         - [create_rate,               ~,         A,           ~,         ~,       ~,         ~]
         - [edit_rate,                 ~,         ~,           ~,         A,       ~,         ~]
+        - [hide,                      ~,         ~,           A,         ~,       ~,         A]
   evaluate:
     acm:
       principals:                    [everyone, participant, moderator, creator, initiator, admin]
       permissions:
         - [create_mercator_proposal,  ~,        ~,          ~,          ~,       A,         ~]
         - [edit_mercator_proposal,    ~,        ~,          ~,          ~,       A,         ~]
+        - [hide,                      ~,         ~,         A,          ~,       ~,         A]
   result:
     acm:
       principals:                    [everyone, participant, moderator, creator, initiator, admin]

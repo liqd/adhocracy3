@@ -204,7 +204,7 @@ Lets hide pool2::
     >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
     ...         'data': {'adhocracy_core.sheets.metadata.IMetadata':
     ...                      {'hidden': True}}}
-    >>> resp = moderator.put("/pool2", data).json
+    >>> resp = admin.put("/pool2", data).json
 
 Inspecting the 'updated_resources' listing in the response, we see that
 pool2 was removed::

@@ -32,6 +32,7 @@ states:
         - [create_relation,          ~,         A,           ~,         ~,       ~,         ~]
         - [edit_relation,            ~,         ~,           ~,         A,       ~,         ~]
         - [create_badge_assignment,  ~,         ~,           ~,         A,       ~,         ~]
+        - [hide,                     ~,         ~,           A,         ~,       ~,         A]
   evaluate:
     title: Evaluate
     acm:
@@ -40,6 +41,7 @@ states:
         - [view,               ~,         ~,           ~,         ~,       ~,         ~]
         - [create_proposal,    ~,         ~,           ~,         ~,       ~,         ~]
         - [create_comment,     ~,         A,           A,         ~,       ~,         ~]
+        - [hide,               ~,         ~,           A,         ~,       ~,         A]
   result:
     title: Result
     acm:
@@ -48,6 +50,7 @@ states:
         - [view,               ~,         ~,           ~,         ~,       ~,         ~]
         - [create_proposal,    ~,         ~,           ~,         ~,       ~,         ~]
         - [create_comment,     ~,         ~,           A,         ~,       A,         ~]
+        - [hide,               ~,         ~,           A,         ~,       ~,         A]
   closed:
     title: Closed
     acm:
