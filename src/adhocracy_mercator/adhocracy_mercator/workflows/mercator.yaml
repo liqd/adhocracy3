@@ -10,7 +10,7 @@ states:
         - [create_comment,            ~,         A,           A,         ~,       A,         ~]
         - [create_rate,               ~,         A,           ~,         ~,       ~,         ~]
         - [edit_rate,                 ~,         ~,           ~,         A,       ~,         ~]
-        - [hide,                      ~,         ~,           A,         ~,       ~,         A]
+        - [hide,                      ~,         ~,           A,         ~,       ~,         ~]
   evaluate:
     acm:
       principals:                    [everyone, participant, moderator, creator, initiator, admin]
@@ -18,7 +18,7 @@ states:
         - [create_mercator_proposal,  ~,        ~,          ~,          ~,       A,         ~]
         - [create_asset,              ~,        ~,          ~,          ~,       A,         ~]
         - [edit_mercator_proposal,    ~,        ~,          ~,          ~,       A,         ~]
-        - [hide,                      ~,         ~,         A,          ~,       ~,         A]
+        - [hide,                      ~,         ~,         A,          ~,       ~,         ~]
   result:
     acm:
       principals:                    [everyone, participant, moderator, creator, initiator, admin]

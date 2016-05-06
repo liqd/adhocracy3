@@ -241,10 +241,12 @@ class TestPasswordResets:
 
     @mark.usefixtures('integration')
     def test_remove_view_permission(self, meta, registry):
+        from pyramid.authorization import Deny
+        from pyramid.authentication import Everyone
         from adhocracy_core.authorization import get_acl
         resource = registry.content.create(meta.iresource.__identifier__)
         acl = get_acl(resource)
-        assert acl == [('deny', 'system.Everyone', 'view')]
+        assert acl == [(Deny, Everyone, 'view')]
 
     @mark.usefixtures('integration')
     def test_hide(self, meta, registry):

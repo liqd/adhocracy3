@@ -2,7 +2,9 @@
 from logging import getLogger
 
 from pyramid.authentication import Authenticated
+from pyramid.authentication import Everyone
 from pyramid.authorization import Allow
+from pyramid.authorization import Deny
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 from pyramid.traversal import get_current_registry
@@ -225,7 +227,7 @@ groups_meta = service_meta._replace(
 def deny_view_permission(context: IResource, registry: Registry,
                          options: dict):
     """Remove view permission for everyone for `context`."""
-    acl = [('deny', 'system.Everyone', 'view')]
+    acl = [(Deny, Everyone, 'view')]
     set_acl(context, acl, registry=registry)
 
 
