@@ -5,6 +5,7 @@ states:
       principals:                       [everyone, participant, moderator, creator, initiator, admin]
       permissions:
         - [create_proposal,              ~,         A,           ~,         ~,       A,         ~]
+        - [create_asset,                  ~,        A,           ~,         ~,       A,         ~]
         - [create_comment,               ~,         A,           A,         ~,       A,         ~]
         - [create_rate,                  ~,         A,           ~,         ~,       ~,         ~]
         - [edit_rate,                    ~,         ~,           ~,         A,       ~,         ~]

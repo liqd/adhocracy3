@@ -13,6 +13,7 @@ states:
        - [create_document,   A,           ~,         ~,       ~]
        - [create_comment,    A,           A,         ~,       ~]
        - [create_rate,      A,           ~,         ~,        ~]
+       - [create_asset,      A,           ~,         ~,       ~]
        - [edit_rate,         ~,           ~,         A,       ~]
        - [create_relation,   A,           ~,         ~,       ~]
        - [edit_relation,     ~,           ~,         A,       ~]

@@ -14,6 +14,7 @@ from zope.interface import directlyProvides
 from zope.interface import noLongerProvides
 from zope.interface.interfaces import IInterface
 
+from adhocracy_core.resources.principal import allow_create_asset_authenticated
 from adhocracy_core.catalog import ICatalogsService
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -673,6 +674,13 @@ def add_canbadge_sheet_to_users(root, registry):  # pragma: no cover
     migrate_new_sheet(root, IUser, ICanBadge)
 
 
+@log_migration
+def allow_create_asset_for_users(root, registry):  # pragma: no cover
+    """Allow all users to create_assets inside the users service."""
+    users = find_service(root, 'principals', 'users')
+    allow_create_asset_authenticated(users, registry, {})
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -707,3 +715,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(reset_comment_count)
     config.add_evolution_step(remove_is_service_attribute)
     config.add_evolution_step(add_canbadge_sheet_to_users)
+    config.add_evolution_step(allow_create_asset_for_users)

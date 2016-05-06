@@ -5,6 +5,7 @@ states:
       principals:                    [everyone, participant, moderator, creator, initiator, admin]
       permissions:
         - [create_mercator_proposal,  ~,         A,           ~,         ~,       A,         ~]
+        - [create_asset,              ~,         A,           ~,         ~,       A,         ~]
         - [edit_mercator_proposal,    ~,         ~,           ~,         A,       ~,         ~]
         - [create_comment,            ~,         A,           A,         ~,       A,         ~]
         - [create_rate,               ~,         A,           ~,         ~,       ~,         ~]
@@ -15,6 +16,7 @@ states:
       principals:                    [everyone, participant, moderator, creator, initiator, admin]
       permissions:
         - [create_mercator_proposal,  ~,        ~,          ~,          ~,       A,         ~]
+        - [create_asset,              ~,        ~,          ~,          ~,       A,         ~]
         - [edit_mercator_proposal,    ~,        ~,          ~,          ~,       A,         ~]
         - [hide,                      ~,         ~,         A,          ~,       ~,         A]
   result:
@@ -22,6 +24,7 @@ states:
       principals:                    [everyone, participant, moderator, creator, initiator, admin]
       permissions:
         - [create_mercator_proposal,  ~,         ~,          ~,          ~,       A,         ~]
+        - [create_asset,              ~,         ~,          ~,          ~,       A,         ~]
         - [edit_mercator_proposal,    ~,         ~,          ~,          A,       A,         ~]
         - [create_document,           ~,         ~,          ~,          A,       A,         ~]
 
