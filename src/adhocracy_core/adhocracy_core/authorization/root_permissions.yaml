@@ -11,7 +11,6 @@ permissions:
   - [message_to_user,                ~,         ~,             A,            A,         ~,       A,         A] # send message to user
   - [report_abuse,                   A,         ~,             ~,            ~,         ~,       ~,         ~] # report abuse, resources that should be hidden
   # create structure
-  - [create_pool,                    ~,         ~,             ~,            ~,         ~,       ~,         A] # create pool
   - [create_organisation,            ~,         ~,             ~,            ~,         ~,       ~,         A] # create organisation
   - [create_process,                 ~,         ~,             ~,            ~,         ~,       A,         A] # create process
   # create process content
