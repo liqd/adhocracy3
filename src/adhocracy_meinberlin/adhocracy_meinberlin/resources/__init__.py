@@ -9,5 +9,6 @@ def includeme(config):
     config.include('.alexanderplatz')
     config.include('.stadtforum')
     config.include('.collaborative_text')
+    config.include('.idea_collection')
     config.include('.root')
     config.include('.subscriber')
