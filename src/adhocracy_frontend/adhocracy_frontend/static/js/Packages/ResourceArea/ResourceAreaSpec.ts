@@ -61,8 +61,8 @@ export var register = () => {
                     adhConfigMock,
                     adhCredentialsMock,
                     adhEmbedMock,
-                    adhResourceUrlFilterMock
-                );
+                    null,
+                    adhResourceUrlFilterMock);
             });
 
             describe("route", () => {
@@ -121,7 +121,7 @@ export var register = () => {
             });
 
             describe("getProcess", () => {
-                // We here create a mock adhHttp Service object. We say an input string contains a process 
+                // We here create a mock adhHttp Service object. We say an input string contains a process
                 // if it has 4 slashes. We wanted to verify that getProcess() worked both with URLs and paths.
                 beforeEach(() => {
                     adhHttpMock.get.and.callFake((arg) => q.when({
