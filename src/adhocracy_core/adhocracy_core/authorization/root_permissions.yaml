@@ -23,7 +23,7 @@ permissions:
   - [edit_rate,                      ~,         ~,             ~,            ~,         ~,       ~,         ~] # create rate version (edit for rates)
   # badges
   - [create_badge,                   ~,         ~,             ~,            A,         ~,       A,         A] # create badge
-  - [create_badge_assignment,        ~,         ~,             ~,            A,         ~,       A,         A] # create badge assingment
+  - [create_badge_assignment,        ~,         ~,             ~,            ~,         ~,       ~,         A] # create badge assingment
   - [create_badge_group,             ~,         ~,             ~,            A,         ~,       A,         A] # create badge group
   - [assign_badge,                   ~,         ~,             ~,            A,         ~,       A,         A] # assign a specific badge with a badge assignment resource
   # user, groups, permissions

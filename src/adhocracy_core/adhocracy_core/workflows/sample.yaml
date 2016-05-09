@@ -14,6 +14,7 @@ states:
        - [create_comment,    A,           A,         ~,       ~]
        - [create_rate,      A,           ~,         ~,        ~]
        - [create_asset,      A,           ~,         ~,       ~]
+       - [create_badge_assignment,  ~,    A,         A,       ~]
        - [edit_rate,         ~,           ~,         A,       ~]
        - [create_relation,   A,           ~,         ~,       ~]
        - [edit_relation,     ~,           ~,         A,       ~]

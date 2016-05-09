@@ -32,7 +32,7 @@ states:
         - [edit_rate,                ~,        ~,           ~,         A,       ~,         ~]
         - [create_relation,          ~,        A,           ~,         ~,       ~,         ~]
         - [edit_relation,            ~,        ~,           ~,         A,       ~,         ~]
-        - [create_badge_assignment,  ~,        ~,           ~,         A,       ~,         ~]
+        - [create_badge_assignment,  ~,        ~,           A,         A,       ~,         ~]
         - [hide,                     ~,        ~,           A,         ~,       ~,         ~]
   evaluate:
     title: Evaluate
@@ -43,6 +43,7 @@ states:
         - [create_proposal,          ~,        ~,           ~,         ~,       ~,         ~]
         - [create_asset,             ~,        ~,           ~,         ~,       ~,         ~]
         - [create_comment,           ~,        A,           A,         ~,       ~,         ~]
+        - [create_badge_assignment,  ~,        ~,           A,         ~,       ~,         ~]
         - [hide,                     ~,        ~,           A,         ~,       ~,         ~]
   result:
     title: Result
@@ -53,6 +54,7 @@ states:
         - [create_proposal,          ~,        ~,           ~,         ~,       ~,         ~]
         - [create_asset,             ~,        ~,           ~,         ~,       ~,         ~]
         - [create_comment,           ~,        ~,           A,         ~,       A,         ~]
+        - [create_badge_assignment,  ~,        ~,           A,         ~,       ~,         ~]
         - [hide,                     ~,        ~,           A,         ~,       ~,         ~]
   closed:
     title: Closed
