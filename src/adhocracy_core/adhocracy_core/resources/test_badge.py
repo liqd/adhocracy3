@@ -59,6 +59,7 @@ class TestParticipantsAssignableBadgeGroup:
         from adhocracy_core import resources
         from adhocracy_core import sheets
         assert meta.iresource is resources.badge.IParticipantsAssignableBadgeGroup
+        assert meta.iresource.isOrExtends(resources.badge.IBadgeGroup)
         assert meta.extended_sheets == (sheets.description.IDescription,
                                         )
         assert meta.permission_create == 'create_badge_group'
