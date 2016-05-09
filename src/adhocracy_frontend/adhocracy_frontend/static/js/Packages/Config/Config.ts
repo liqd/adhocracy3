@@ -42,12 +42,3 @@ export interface IService {
     piwik_use_cookies : boolean;
     piwik_track_user_id : boolean;
 }
-
-
-export class Provider implements angular.IServiceProvider {
-    public config : IService;
-
-    public $get() : IService {
-        return this.config;
-    }
-}

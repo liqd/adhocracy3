@@ -31,12 +31,11 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .config(["adhResourceAreaProvider", "adhConfigProvider", "adhMetaApiProvider", (
+        .config(["adhResourceAreaProvider", "adhConfig", "adhMetaApiProvider", (
             adhResourceAreaProvider,
-            adhConfigProvider,
+            adhConfig,
             adhMetaApi
         ) => {
-            var adhConfig = adhConfigProvider.config;
             var customHeader = adhConfig.pkg_path + Workbench.pkgLocation + "/CustomHeader.html";
             adhResourceAreaProvider.customHeader(processType, customHeader);
             Workbench.registerRoutes(processType)(adhResourceAreaProvider, adhMetaApi);
