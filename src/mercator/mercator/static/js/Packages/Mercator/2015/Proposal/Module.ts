@@ -40,8 +40,7 @@ export var register = (angular) => {
             AdhStickyModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .config(["adhResourceAreaProvider", "adhConfigProvider", (adhResourceAreaProvider, adhConfigProvider) => {
-            var adhConfig = adhConfigProvider.config;
+        .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider, adhConfig) => {
             var processType = RIMercator2015Process.content_type;
             var customHeader = adhConfig.pkg_path + Proposal.pkgLocation + "/CustomHeader.html";
             adhResourceAreaProvider.customHeader(processType, customHeader);
