@@ -1,7 +1,7 @@
 principals:                         [everyone, authenticated, participant, moderator, creator, initiator, admin]
 permissions:
   # general
-  - [view,                           A,         A,             A,            A,         A,       A,         A] # default permission view resource sheets/field;  view a resource or show it in listings
+  - [view,                           A,         ~,             ~,            ~,         ~,       ~,         ~] # default permission view resource sheets/field;  view a resource or show it in listings
   - [create,                         ~,         A,             ~,            ~,         ~,       ~,         ~] # default permission to create resource sheets/fields; general guard to create resources (POST requests)
   - [edit,                           ~,         ~,             ~,            ~,         A,       ~,         A] # default permission to edit resourche sheets/fields
   - [edit_some,                      ~,         A,             ~,            ~,         ~,       ~,         ~] # General guard permission to edit non versionable resources (do put requests)
