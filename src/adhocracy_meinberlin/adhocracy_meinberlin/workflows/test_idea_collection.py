@@ -13,7 +13,7 @@ def _post_document_item(app_user, path='') -> TestResponse:
 
 
 @mark.functional
-class TestCollaborativeText:
+class TestIdeaCollection:
 
     @fixture
     def process_url(self):
