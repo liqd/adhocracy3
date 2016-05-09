@@ -9,6 +9,13 @@ TypeScript modules providing the resource classes.  This may trigger
 compiler errors that have to be resolved manually.  For more details,
 see comment in the beginning of mkResources.ts.
 
+Frontend wokflow
+----------------
+
+Run buildout once after switching project or the git branch. For changes to the
+TypeScript code it will now be sufficient to use `bin/tsc` or `bin/tsc --watch`
+(see tsconfig.json for settings used).
+
 Running the Testsuite
 ---------------------
 
