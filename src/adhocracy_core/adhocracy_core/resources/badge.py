@@ -49,7 +49,7 @@ badge_group_meta = pool_meta._replace(
 )
 
 
-class IParticipantsAssignableBadgeGroup(IPool):
+class IParticipantsAssignableBadgeGroup(IBadgeGroup):
     """A badge group pool for badges assignable by participants."""
 
 
