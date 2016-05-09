@@ -1,4 +1,5 @@
 import * as AdhHttpModule from "../../../Http/Module";
+import * as AdhMetaApiModule from "../../../MetaApi/Module";
 import * as AdhMovingColumnsModule from "../../../MovingColumns/Module";
 import * as AdhPermissionsModule from "../../../Permissions/Module";
 import * as AdhProcessModule from "../../../Process/Module";
@@ -23,16 +24,21 @@ export var register = (angular) => {
             AdhHttpModule.moduleName,
             AdhMercator2015WorkbenchModule.moduleName,
             AdhMercator2016ProposalModule.moduleName,
+            AdhMetaApiModule.moduleName,
             AdhMovingColumnsModule.moduleName,
             AdhPermissionsModule.moduleName,
             AdhProcessModule.moduleName,
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider, adhConfig) => {
+        .config(["adhResourceAreaProvider", "adhConfig", "adhMetaApiProvider", (
+            adhResourceAreaProvider,
+            adhConfig,
+            adhMetaApi
+        ) => {
             var customHeader = adhConfig.pkg_path + Workbench.pkgLocation + "/CustomHeader.html";
             adhResourceAreaProvider.customHeader(processType, customHeader);
-            Workbench.registerRoutes(processType)(adhResourceAreaProvider);
+            Workbench.registerRoutes(processType)(adhResourceAreaProvider, adhMetaApi);
         }])
         .config(["adhProcessProvider", (adhProcessProvider) => {
             adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {

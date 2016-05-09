@@ -3,12 +3,14 @@ import * as _ from "lodash";
 import * as ResourcesBase from "../../ResourcesBase";
 
 import * as AdhConfig from "../Config/Config";
+import * as AdhCredentials from "../User/Credentials";
 import * as AdhEmbed from "../Embed/Embed";
-import * as AdhHttp from "../Http/Http";
 import * as AdhHttpError from "../Http/Error";
+import * as AdhHttp from "../Http/Http";
+import * as AdhMetaApi from "../MetaApi/MetaApi";
+import * as AdhResourceUtil from "../Util/ResourceUtil";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
-import * as AdhCredentials from "../User/Credentials";
 
 import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
 import * as SITags from "../../Resources_/adhocracy_core/sheets/tags/ITags";
@@ -46,9 +48,10 @@ export class Provider implements angular.IServiceProvider {
             "adhConfig",
             "adhCredentials",
             "adhEmbed",
+            "adhMetaApi",
             "adhResourceUrlFilter",
             (...args) => AdhUtil.construct(Service, [self].concat(args))
-            ];
+        ];
     }
 
     public default(
@@ -188,8 +191,9 @@ export class Service implements AdhTopLevelState.IAreaInput {
         private $templateRequest : angular.ITemplateRequestService,
         private adhHttp : AdhHttp.Service<any>,
         private adhConfig : AdhConfig.IService,
-        private adhcredentials : AdhCredentials.Service,
+        private adhCredentials : AdhCredentials.Service,
         private adhEmbed : AdhEmbed.Service,
+        private adhMetaApi : AdhMetaApi.Service,
         private adhResourceUrlFilter
     ) {
         this.template = "<adh-resource-area></adh-resource-area>";
@@ -238,7 +242,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
      *
      * If `fail` is false, it promises undefined instead of failing.
      */
-    public getProcess(resourceUrl : string, fail = true) : angular.IPromise<ResourcesBase.Resource> {
+    public getProcess(resourceUrl : string, fail = true) : angular.IPromise<ResourcesBase.IResource> {
         var paths = [];
         var path = resourceUrl;
 
@@ -255,9 +259,9 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
         return this.$q.all(_.map(paths, (path) => {
             return this.adhHttp.get(this.adhConfig.rest_url + path);
-        })).then((resources : ResourcesBase.Resource[]) => {
+        })).then((resources : ResourcesBase.IResource[]) => {
             for (var i = 0; i < resources.length; i++) {
-                if (resources[i].isInstanceOf(RIProcess.content_type)) {
+                if (AdhResourceUtil.isInstanceOf(resources[i], RIProcess.content_type, this.adhMetaApi)) {
                     return resources[i];
                 }
             }
@@ -273,7 +277,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         return self.$q.all([
             self.adhHttp.get(resourceUrl),
             self.adhHttp.get(AdhUtil.parentPath(resourceUrl))
-        ]).then((args : ResourcesBase.Resource[]) => {
+        ]).then((args : ResourcesBase.IResource[]) => {
             var version = args[0];
             var item = args[1];
             if (version.data.hasOwnProperty(SIVersionable.nick) && item.data.hasOwnProperty(SITags.nick)) {
@@ -328,8 +332,8 @@ export class Service implements AdhTopLevelState.IAreaInput {
             self.getProcess(resourceUrl, false),
             self.conditionallyRedirectVersionToLast(resourceUrl, view)
         ]).then((values : any[]) => {
-            var resource : ResourcesBase.Resource = values[0];
-            var process : ResourcesBase.Resource = values[1];
+            var resource : ResourcesBase.IResource = values[0];
+            var process : ResourcesBase.IResource = values[1];
             var hasRedirected : boolean = values[2];
 
             var processType = process ? process.content_type : "";
@@ -361,7 +365,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
             _.forEach(errors, (error) => {
                 if (error.code === 403) {
-                    if (self.adhcredentials.loggedIn) {
+                    if (self.adhCredentials.loggedIn) {
                         throw 403;
                     } else {
                         throw 401;

@@ -2,6 +2,7 @@
 
 import * as AdhConfig from "../../../Config/Config";
 import * as AdhHttp from "../../../Http/Http";
+import * as AdhMetaApi from "../../../MetaApi/MetaApi";
 import * as AdhMovingColumns from "../../../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
@@ -235,7 +236,10 @@ export var proposalListingColumnDirective = (
 export var registerRoutes = (
     processType : string = "",
     context : string = ""
-) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
+) => (
+    adhResourceAreaProvider : AdhResourceArea.Provider,
+    adhMetaApi : AdhMetaApi.Service
+) => {
     AdhMercator2015Workbench.registerRoutes(processType, context);
 
     adhResourceAreaProvider
@@ -366,7 +370,8 @@ export var registerRoutes = (
             };
         });
 
-    _(SIMercatorSubResources.Sheet._meta.readable).forEach((section : string) => {
+    var sections = _.map(adhMetaApi.sheet(SIMercatorSubResources.nick).fields, "name");
+    _.forEach(sections, (section : string) => {
         adhResourceAreaProvider
             .default(RIProposal, "comments:" + section, processType, context, {
                 space: "content",
