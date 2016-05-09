@@ -12,11 +12,12 @@ Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 4. graphviz
 5. ruby ruby-dev
 6. gettext
+7. libmagic1
 
 If you don't use the custom compiled python (see below) you need
 some basic dependencies to build PIL (python image library):
 
-6. libjpeg8-dev zlib1g-dev (http://pillow.readthedocs.org/en/latest/installation.html)
+8. libjpeg8-dev zlib1g-dev (http://pillow.readthedocs.org/en/latest/installation.html)
 
 Create SSH key and upload to GitHub ::
 
