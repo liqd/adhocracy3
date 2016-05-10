@@ -5,7 +5,6 @@ import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
 import * as AdhDebateWorkbenchModule from "../../DebateWorkbench/Module";
 import * as AdhMeinberlinAlexanderplatzWorkbenchModule from "../Alexanderplatz/Workbench/Module";
 import * as AdhMeinberlinIdeaCollectionModule from "../IdeaCollection/Module";
-import * as AdhMeinberlinKiezkasseWorkbenchModule from "../Kiezkasse/Workbench/Module";
 
 import * as AdhEmbed from "../../Embed/Embed";
 import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
@@ -13,7 +12,6 @@ import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
 import * as AdhDebateWorkbench from "../../DebateWorkbench/DebateWorkbench";
 import * as AdhMeinberlinAlexanderplatzWorkbench from "../Alexanderplatz/Workbench/Workbench";
 import * as AdhMeinberlinIdeaCollection from "../IdeaCollection/IdeaCollection";
-import * as AdhMeinberlinKiezkasseWorkbench from "../Kiezkasse/Workbench/Workbench";
 
 import RIAlexanderplatzProcess from "../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess";
 import RIBuergerhaushaltProcess from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
@@ -32,7 +30,6 @@ export var register = (angular) => {
             AdhEmbedModule.moduleName,
             AdhMeinberlinAlexanderplatzWorkbenchModule.moduleName,
             AdhMeinberlinIdeaCollectionModule.moduleName,
-            AdhMeinberlinKiezkasseWorkbenchModule.moduleName,
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
@@ -47,7 +44,7 @@ export var register = (angular) => {
                 RIAlexanderplatzProcess.content_type, "mein.berlin.de")(adhResourceAreaProvider);
             AdhMeinberlinIdeaCollection.registerRoutes(
                 RIBuergerhaushaltProcess.content_type, "mein.berlin.de")(adhResourceAreaProvider);
-            AdhMeinberlinKiezkasseWorkbench.registerRoutes(
+            AdhMeinberlinIdeaCollection.registerRoutes(
                 RIKiezkasseProcess.content_type, "mein.berlin.de")(adhResourceAreaProvider);
         }])
         .directive("adhMeinberlinDeHeader", ["adhConfig", "adhTopLevelState", AdhMeinberlinDe.headerDirective]);

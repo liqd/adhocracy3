@@ -121,6 +121,20 @@ export var detailColumnDirective = (
     };
 };
 
+export var editColumnDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/EditColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl"]);
+        }
+    };
+};
+
+
 export var addProposalButtonDirective = (
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service,

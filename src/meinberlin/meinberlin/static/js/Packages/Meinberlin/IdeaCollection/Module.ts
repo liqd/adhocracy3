@@ -54,6 +54,7 @@ export var register = (angular) => {
             "adhConfig", IdeaCollection.proposalCreateColumnDirective])
         .directive("adhMeinberlinIdeaCollectionProposalEditColumn", ["adhConfig", IdeaCollection.proposalEditColumnDirective])
         .directive("adhMeinberlinIdeaCollectionDetailColumn", ["adhConfig", IdeaCollection.detailColumnDirective])
+        .directive("adhMeinberlinIdeaCollectionEditColumn", ["adhConfig", IdeaCollection.editColumnDirective])
         .directive("adhMeinberlinIdeaCollectionAddProposalButton", [
             "adhConfig", "adhPermissions", "adhTopLevelState", IdeaCollection.addProposalButtonDirective]);
 };
