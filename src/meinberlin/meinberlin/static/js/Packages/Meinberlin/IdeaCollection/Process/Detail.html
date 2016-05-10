@@ -1,10 +1,10 @@
-<div class="meinberlin-buergerhaushalt-detail">
+<div class="meinberlin-idea-collection-detail">
     <adh-map-switch data-model="isShowMap"></adh-map-switch>
     <div data-ng-switch="currentPhase.name">
-        <div data-ng-switch-when="announce" class="meinberlin-buergerhaushalt-detail-announce">
+        <div data-ng-switch-when="announce" class="meinberlin-idea-collection-detail-announce">
             {{ currentPhase.description }}
         </div>
-        <div data-ng-switch-default="" class="meinberlin-buergerhaushalt-detail-listing">
+        <div data-ng-switch-default="" class="meinberlin-idea-collection-detail-listing">
             <adh-listing
                 data-path="{{path}}"
                 data-ng-show="!isShowMap"
