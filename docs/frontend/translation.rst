@@ -119,12 +119,12 @@ Adhocracy is currently used mostly in Germany, i.e. in German language.
 Unfortunately, there are two variants of German, a formal (Sie) and an
 informal (Du) one.
 
-All translations should use the informal variant, except on the site
-mein.berlin.de. We use the script ``bin/change_german_salutation`` to 
-convert informal translations to formal ones.  Note that you will need 
-to extend that script whenever the translation changes. The common 
-workflow for this is: Iteratively run the script, check the output and 
-add new rules until everything is fine.
+All translations should use the informal variant. When necessary, we 
+use the script ``bin/change_german_salutation`` to convert informal 
+translations to formal ones.  Note that you will need to extend that 
+script whenever the translation changes. The common workflow for this 
+is: Iteratively run the script, check the output and add new rules 
+until everything is fine.
 
 
 .. _angular-translate: https://angular-translate.github.io
