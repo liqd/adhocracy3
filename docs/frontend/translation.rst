@@ -68,9 +68,10 @@ in the code are not automatically displayed in transifex, and
 updates in transifex are not instantly reflected in either the code
 or any running platform.
 
-Before you push local changes to transifex, please make sure that you will
-not overwrite any translations on transifex. This can be done in several
-ways, one of which is the following. Assuming you want to update the project called foo:
+Before you push local changes to transifex, please make sure that you
+will not overwrite any translations on transifex. This can be done in
+several ways, one of which is the following. Assuming you want to update
+the project called foo::
 
    $ cd src/foo/
    $ tx pull -a --force
@@ -119,11 +120,11 @@ Adhocracy is currently used mostly in Germany, i.e. in German language.
 Unfortunately, there are two variants of German, a formal (Sie) and an
 informal (Du) one.
 
-All translations should use the informal variant. When necessary, we 
-use the script ``bin/change_german_salutation`` to convert informal 
-translations to formal ones.  Note that you will need to extend that 
-script whenever the translation changes. The common workflow for this 
-is: Iteratively run the script, check the output and add new rules 
+All translations should use the informal variant. When necessary, we
+use the script ``bin/change_german_salutation`` to convert informal
+translations to formal ones.  Note that you will need to extend that
+script whenever the translation changes. The common workflow for this
+is: Iteratively run the script, check the output and add new rules
 until everything is fine.
 
 
