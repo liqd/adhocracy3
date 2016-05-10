@@ -16,9 +16,7 @@ import * as SIBadge from "../../Resources_/adhocracy_core/sheets/badge/IBadge";
 import * as SIBadgeable from "../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
 import * as SIBadgeAssignment from "../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment";
 import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
-import * as SIHasBadgesPool from "../../Resources_/adhocracy_core/sheets/badge/IHasBadgesPool";
 import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
-import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
 
 var pkgLocation = "/Badge";
@@ -131,14 +129,6 @@ export var bindPath = (
         });
     });
 
-    adhHttp.get(scope.badgesPath, {elements: "paths"}).then((badges) => {
-        var badgelist : string[] = badges.data[SIPool.nick].elements;
-        $q.all(_.map(badgelist, (b) => adhHttp.get(b))).then((result) => {
-            // FIXME: here a check is currently missing that checks if we have group at hand
-            // scope.badges = _.map(result, getBadge);
-        });
-    });
-
     if (typeof pathKey !== "undefined") {
         scope.$watch(pathKey, (path : string) => {
             if (path) {
@@ -179,7 +169,6 @@ export var badgeAssignmentCreateDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Assignment.html",
         scope: {
-            badgesPath: "@",
             badgeablePath: "@",
             poolPath: "@",
             showDescription: "=?",
@@ -226,7 +215,6 @@ export var badgeAssignmentEditDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Assignment.html",
         scope: {
             path: "@",
-            badgesPath: "@",
             poolPath: "@",
             showDescription: "=?",
             onSubmit: "=?",
@@ -290,21 +278,12 @@ export var badgeAssignmentDirective = (
             scope.badgeablePath = scope.path;
             scope.data = {};
 
-            var processUrl = adhTopLevelState.get("processUrl");
-            var promise1 = adhHttp.get(processUrl).then((resource) => {
-                scope.badgesPath = resource.data[SIHasBadgesPool.nick].badges_pool;
-            });
-
-            var promise2 = adhHttp.get(scope.path).then((proposal) => {
+            adhHttp.get(scope.path).then((proposal) => {
                 scope.poolPath = proposal.data[SIBadgeable.nick].post_pool;
 
                 return adhGetBadges(proposal).then((assignments : IBadge[]) => {
                     scope.assignments = assignments;
                 });
-            });
-
-            $q.all([promise1, promise2]).then(() => {
-                scope.ready = true;
             });
 
             scope.submit = () => {
