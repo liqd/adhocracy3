@@ -43,7 +43,6 @@ import * as AdhPcompassModule from "./Packages/Pcompass/Module";
 import * as AdhPermissionsModule from "./Packages/Permissions/Module";
 import * as AdhPreliminaryNamesModule from "./Packages/PreliminaryNames/Module";
 import * as AdhProcessModule from "./Packages/Process/Module";
-import * as AdhProposalModule from "./Packages/Proposal/Module";
 import * as AdhRateModule from "./Packages/Rate/Module";
 import * as AdhResourceAreaModule from "./Packages/ResourceArea/Module";
 import * as AdhResourceWidgetsModule from "./Packages/ResourceWidgets/Module";
@@ -184,7 +183,6 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhPreliminaryNamesModule.register(angular);
     AdhProcessModule.register(angular);
     AdhProcessModule.register(angular);
-    AdhProposalModule.register(angular);
     AdhRateModule.register(angular);
     AdhResourceAreaModule.register(angular);
     AdhResourceWidgetsModule.register(angular);

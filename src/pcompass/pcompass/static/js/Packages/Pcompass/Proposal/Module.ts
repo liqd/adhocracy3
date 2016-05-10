@@ -1,14 +1,14 @@
-import * as AdhBadgeModule from "../Badge/Module";
-import * as AdhHttpModule from "../Http/Module";
-import * as AdhPermissionsModule from "../Permissions/Module";
-import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
-import * as AdhRateModule from "../Rate/Module";
-import * as AdhTopLevelStateModule from "../TopLevelState/Module";
+import * as AdhBadgeModule from "../../Badge/Module";
+import * as AdhHttpModule from "../../Http/Module";
+import * as AdhPermissionsModule from "../../Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../../PreliminaryNames/Module";
+import * as AdhRateModule from "../../Rate/Module";
+import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
 
 import * as Proposal from "./Proposal";
 
 
-export var moduleName = "AdhProposal";
+export var moduleName = "AdhPcompassProposal";
 
 export var register = (angular) => {
     angular
@@ -20,11 +20,11 @@ export var register = (angular) => {
             AdhRateModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .directive("adhProposalDetail", [
+        .directive("adhPcompassProposalDetail", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.detailDirective])
-        .directive("adhProposalListItem", [
+        .directive("adhPcompassProposalListItem", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.listItemDirective])
-        .directive("adhProposalCreate", [
+        .directive("adhPcompassProposalCreate", [
             "adhConfig",
             "adhHttp",
             "adhPreliminaryNames",
@@ -35,7 +35,7 @@ export var register = (angular) => {
             "$location",
             Proposal.createDirective
         ])
-        .directive("adhProposalEdit", [
+        .directive("adhPcompassProposalEdit", [
             "adhConfig",
             "adhHttp",
             "adhPermissions",

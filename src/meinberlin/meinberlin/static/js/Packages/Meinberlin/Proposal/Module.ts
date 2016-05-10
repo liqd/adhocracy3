@@ -1,15 +1,15 @@
-import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
-import * as AdhBadgeModule from "../Badge/Module";
-import * as AdhEmbedModule from "../Embed/Module";
-import * as AdhHttpModule from "../Http/Module";
-import * as AdhMappingModule from "../Mapping/Module";
-import * as AdhPermissionsModule from "../Permissions/Module";
-import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
-import * as AdhRateModule from "../Rate/Module";
-import * as AdhResourceAreaModule from "../ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../TopLevelState/Module";
+import * as AdhAngularHelpersModule from "../../AngularHelpers/Module";
+import * as AdhBadgeModule from "../../Badge/Module";
+import * as AdhEmbedModule from "../../Embed/Module";
+import * as AdhHttpModule from "../../Http/Module";
+import * as AdhMappingModule from "../../Mapping/Module";
+import * as AdhPermissionsModule from "../../Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../../PreliminaryNames/Module";
+import * as AdhRateModule from "../../Rate/Module";
+import * as AdhResourceAreaModule from "../../ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
 
-import * as AdhEmbed from "../Embed/Embed";
+import * as AdhEmbed from "../../Embed/Embed";
 
 import * as Proposal from "./Proposal";
 

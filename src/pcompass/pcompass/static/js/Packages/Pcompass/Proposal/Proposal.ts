@@ -1,24 +1,24 @@
-/// <reference path="../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../../lib2/types/angular.d.ts"/>
 
-import * as AdhBadge from "../Badge/Badge";
-import * as AdhConfig from "../Config/Config";
-import * as AdhHttp from "../Http/Http";
-import * as AdhPermissions from "../Permissions/Permissions";
-import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
-import * as AdhRate from "../Rate/Rate";
-import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
-import * as AdhUtil from "../Util/Util";
+import * as AdhBadge from "../../Badge/Badge";
+import * as AdhConfig from "../../Config/Config";
+import * as AdhHttp from "../../Http/Http";
+import * as AdhPermissions from "../../Permissions/Permissions";
+import * as AdhPreliminaryNames from "../../PreliminaryNames/PreliminaryNames";
+import * as AdhRate from "../../Rate/Rate";
+import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
+import * as AdhUtil from "../../Util/Util";
 
-import * as SICommentable from "../../Resources_/adhocracy_core/sheets/comment/ICommentable";
-import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
-import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
-import * as SIRateable from "../../Resources_/adhocracy_core/sheets/rate/IRateable";
-import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
-import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
-import RIProposal from "../../Resources_/adhocracy_core/resources/proposal/IProposal";
-import RIProposalVersion from "../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
+import * as SICommentable from "../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
+import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SIRateable from "../../../Resources_/adhocracy_core/sheets/rate/IRateable";
+import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
+import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import RIProposal from "../../../Resources_/adhocracy_core/resources/proposal/IProposal";
+import RIProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
 
-var pkgLocation = "/Proposal";
+var pkgLocation = "/Pcompass/Proposal";
 
 
 export interface IScope extends angular.IScope {
