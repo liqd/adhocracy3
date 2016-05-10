@@ -48,7 +48,7 @@ class FormView(SDFormView):
                   }
         form = self.form_class(self.schema, **config)
         self.before(form)
-        self._setup_readonly_form_widgets(form)
+        self._setup_readonly_widgets(form)
         resources = form.get_widget_resources()
         return (form, resources)
 
@@ -61,16 +61,13 @@ class FormView(SDFormView):
         bindings['_csrf_token_'] = self.request.session.get_csrf_token()
         self.schema = csrf_schema.bind(**bindings)
 
-    def _setup_readonly_form_widgets(self, form: Form) -> Form:
-        """Setup widgets for readonly fields.
-
-        * Set readonly template for widgets if schema field is readonly.
-          (See for example the IMetadata sheet schema)
-        """
-        for field in form.children:
-            is_readonly = getattr(field.schema, 'readonly', False)
-            if is_readonly:
-                field.widget.readonly = True  # set readonly template
+    def _setup_readonly_widgets(self, form: Form):
+        """Set readonly template for widgets if schema field is readonly."""
+        is_readonly = getattr(form.schema, 'readonly', False)
+        if is_readonly:
+            form.widget.readonly = True  # set readonly template
+        for subfield in getattr(form, 'children', []):
+            self._setup_readonly_widgets(subfield)
 
 
 @mgmt_view(
