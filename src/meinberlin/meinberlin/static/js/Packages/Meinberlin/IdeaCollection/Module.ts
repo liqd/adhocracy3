@@ -8,7 +8,8 @@ import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
 import * as AdhPermissionsModule from "../../Permissions/Module";
 
 import * as AdhMeinberlinBuergerhaushaltProcessModule from "../Buergerhaushalt/Process/Module";
-import * as AdhMeinberlinProposalModule from "../../Proposal/Module";
+import * as AdhMeinberlinIdeaCollectionProcessModule from "./Process/Module";
+import * as AdhMeinberlinProposalModule from "../Proposal/Module";
 
 import * as AdhProcess from "../../Process/Process";
 
@@ -20,12 +21,15 @@ import * as IdeaCollection from "./IdeaCollection";
 export var moduleName = "adhMeinberlinIdeaCollection";
 
 export var register = (angular) => {
+    AdhMeinberlinIdeaCollectionProcessModule.register(angular);
+
     angular
         .module(moduleName, [
             AdhAbuseModule.moduleName,
             AdhCommentModule.moduleName,
             AdhHttpModule.moduleName,
             AdhMeinberlinBuergerhaushaltProcessModule.moduleName,
+            AdhMeinberlinIdeaCollectionProcessModule.moduleName,
             AdhMeinberlinProposalModule.moduleName,
             AdhMovingColumnsModule.moduleName,
             AdhPermissionsModule.moduleName,
