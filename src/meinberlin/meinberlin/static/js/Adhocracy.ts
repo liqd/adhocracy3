@@ -42,7 +42,6 @@ import * as AdhLocaleModule from "./Packages/Locale/Module";
 import * as AdhMappingModule from "./Packages/Mapping/Module";
 import * as AdhMarkdownModule from "./Packages/Markdown/Module";
 import * as AdhMeinberlinModule from "./Packages/Meinberlin/Module";
-import * as AdhMeinberlinProposalModule from "./Packages/Proposal/Module";
 import * as AdhMetaApiModule from "./Packages/MetaApi/Module";
 import * as AdhMovingColumnsModule from "./Packages/MovingColumns/Module";
 import * as AdhPermissionsModule from "./Packages/Permissions/Module";
@@ -196,7 +195,6 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhListingModule.register(angular);
     AdhLocaleModule.register(angular);
     AdhMeinberlinModule.register(angular);
-    AdhMeinberlinProposalModule.register(angular);
     AdhMappingModule.register(angular);
     AdhMarkdownModule.register(angular);
     AdhMetaApiModule.register(angular, metaApi);
