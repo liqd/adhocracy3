@@ -7,7 +7,6 @@ import * as AdhResourceAreaModule from "../../ResourceArea/Module";
 import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
 import * as AdhPermissionsModule from "../../Permissions/Module";
 
-import * as AdhMeinberlinBuergerhaushaltProcessModule from "../Buergerhaushalt/Process/Module";
 import * as AdhMeinberlinIdeaCollectionProcessModule from "./Process/Module";
 import * as AdhMeinberlinProposalModule from "../Proposal/Module";
 
@@ -28,7 +27,6 @@ export var register = (angular) => {
             AdhAbuseModule.moduleName,
             AdhCommentModule.moduleName,
             AdhHttpModule.moduleName,
-            AdhMeinberlinBuergerhaushaltProcessModule.moduleName,
             AdhMeinberlinIdeaCollectionProcessModule.moduleName,
             AdhMeinberlinProposalModule.moduleName,
             AdhMovingColumnsModule.moduleName,
