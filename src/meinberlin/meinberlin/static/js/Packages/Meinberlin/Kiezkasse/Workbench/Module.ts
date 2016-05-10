@@ -8,7 +8,7 @@ import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
 import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 
 import * as AdhMeinberlinKiezkasseProcessModule from "../Process/Module";
-import * as AdhMeinberlinProposalModule from "../../../Proposal/Module";
+import * as AdhMeinberlinProposalModule from "../../Proposal/Module";
 
 import * as AdhProcess from "../../../Process/Process";
 

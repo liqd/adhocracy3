@@ -1,34 +1,34 @@
-/// <reference path="../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../../lib2/types/angular.d.ts"/>
 
-import * as AdhBadge from "../Badge/Badge";
-import * as AdhConfig from "../Config/Config";
-import * as AdhHttp from "../Http/Http";
-import * as AdhMapping from "../Mapping/Mapping";
-import * as AdhPermissions from "../Permissions/Permissions";
-import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
-import * as AdhRate from "../Rate/Rate";
-import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
-import * as AdhUtil from "../Util/Util";
+import * as AdhBadge from "../../Badge/Badge";
+import * as AdhConfig from "../../Config/Config";
+import * as AdhHttp from "../../Http/Http";
+import * as AdhMapping from "../../Mapping/Mapping";
+import * as AdhPermissions from "../../Permissions/Permissions";
+import * as AdhPreliminaryNames from "../../PreliminaryNames/PreliminaryNames";
+import * as AdhRate from "../../Rate/Rate";
+import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
+import * as AdhUtil from "../../Util/Util";
 
-import RIBuergerhaushaltProposal from "../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal";
-import RIBuergerhaushaltProposalVersion from "../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
-import RIGeoProposal from "../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
-import RIGeoProposalVersion from "../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
-import RIKiezkasseProposal from "../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
-import RIKiezkasseProposalVersion from "../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
-import * as SIBuergerhaushaltProposal from "../../Resources_/adhocracy_meinberlin/sheets/burgerhaushalt/IProposal";
-import * as SICommentable from "../../Resources_/adhocracy_core/sheets/comment/ICommentable";
-import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
-import * as SIKiezkasseProposal from "../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal";
-import * as SILocationReference from "../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
-import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
-import * as SIMultiPolygon from "../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
-import * as SIPoint from "../../Resources_/adhocracy_core/sheets/geo/IPoint";
-import * as SIRateable from "../../Resources_/adhocracy_core/sheets/rate/IRateable";
-import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
-import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import RIBuergerhaushaltProposal from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal";
+import RIBuergerhaushaltProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
+import RIGeoProposal from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
+import RIGeoProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
+import RIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
+import RIKiezkasseProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
+import * as SIBuergerhaushaltProposal from "../../../Resources_/adhocracy_meinberlin/sheets/burgerhaushalt/IProposal";
+import * as SICommentable from "../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
+import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal";
+import * as SILocationReference from "../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
+import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SIMultiPolygon from "../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
+import * as SIPoint from "../../../Resources_/adhocracy_core/sheets/geo/IPoint";
+import * as SIRateable from "../../../Resources_/adhocracy_core/sheets/rate/IRateable";
+import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
+import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
-var pkgLocation = "/Proposal";
+var pkgLocation = "/Meinberlin/Proposal";
 
 
 export interface IScope extends angular.IScope {
