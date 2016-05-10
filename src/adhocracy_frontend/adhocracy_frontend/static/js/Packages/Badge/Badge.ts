@@ -86,7 +86,7 @@ export var bindPath = (
         description: ""
     };
 
-    var getBadge = (badge) => {
+    var extractBadge = (badge) => {
         return {
             title: badge.data[SITitle.nick].title,
             path: badge.path,
@@ -94,7 +94,7 @@ export var bindPath = (
         };
     };
 
-    var getGroup = (group) => {
+    var extractGroup = (group) => {
         return {
             title: group.data[SITitle.nick].title,
             path: group.path
@@ -103,28 +103,26 @@ export var bindPath = (
 
     adhPermissions.bindScope(scope, scope.poolPath, "rawOptions", {importOptions: false});
     scope.$watch("rawOptions", (rawOptions) => {
-        var requestBodyOptions = AdhUtil.deepPluck(rawOptions, [
+        var requestBodyOptions : {content_type : string}[] = AdhUtil.deepPluck(rawOptions, [
             "data", "POST", "request_body"
         ]);
 
         var badgeBodyOptions = _.find(
             requestBodyOptions,
-            (body : any) => body.content_type === RIBadgeAssignment.content_type);
+            (body) => body.content_type === RIBadgeAssignment.content_type);
 
-        var assignableBatchPaths : string = AdhUtil.deepPluck(badgeBodyOptions, [
+        var assignableBatchPaths : string[] = AdhUtil.deepPluck(badgeBodyOptions, [
             "data", SIBadgeAssignment.nick, "badge"
         ]);
 
-        var promise = $q.all(_.map(assignableBatchPaths, (b) => adhHttp.get(b))).then((result) => {
-            scope.badges = _.map(result, getBadge);
+        $q.all(_.map(assignableBatchPaths, (b) => adhHttp.get(b))).then((result) => {
+            scope.badges = _.map(result, extractBadge);
             return scope.badges;
-        });
+        }).then((badges) => {
+            var groupPaths : string  = _.union.apply(_, _.map(badges, "groups"));
 
-        promise.then((badges) => {
-            var groupPaths = _.union.apply(_, _.map(badges, (badge : any) => badge.groups));
-
-            $q.all(_.map(groupPaths, (g :  any) => adhHttp.get(g))).then((result) => {
-                 scope.badgeGroups = _.map(result, getGroup);
+            $q.all(_.map(groupPaths, (g) => adhHttp.get(g))).then((result) => {
+                 scope.badgeGroups = _.map(result, extractGroup);
             });
         });
     });
