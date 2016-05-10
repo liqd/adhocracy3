@@ -1,7 +1,6 @@
 """Sheets tab and add view for resources."""
 from collections import OrderedDict
 
-from colander import null
 from deform import Form
 from pyramid.interfaces import IRequest
 from pyramid.httpexceptions import HTTPNotFound
@@ -67,17 +66,11 @@ class FormView(SDFormView):
 
         * Set readonly template for widgets if schema field is readonly.
           (See for example the IMetadata sheet schema)
-
-        * Fix readonly template for list widget is not working
-          (See for example the IPermission sheet schema)
         """
         for field in form.children:
             is_readonly = getattr(field.schema, 'readonly', False)
             if is_readonly:
                 field.widget.readonly = True  # set readonly template
-                if field.name in form.cstruct:  # workaround list widget bug
-                    del form.cstruct[field.name]
-                    field.widget.deserialize = lambda x, y: null
 
 
 @mgmt_view(
