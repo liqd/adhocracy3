@@ -72,7 +72,6 @@ export var getBadgesFactory = (
     }
 };
 
-
 export var bindPath = (
     adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service,
@@ -101,31 +100,34 @@ export var bindPath = (
         };
     };
 
-    adhPermissions.bindScope(scope, scope.poolPath, "rawOptions", {importOptions: false});
-    scope.$watch("rawOptions", (rawOptions) => {
+    var getAssignableBadges = (rawOptions) => {
+        if (!rawOptions) {
+            return;
+        }
+
         var requestBodyOptions : {content_type : string}[] = AdhUtil.deepPluck(rawOptions, [
             "data", "POST", "request_body"
         ]);
 
-        var badgeBodyOptions = _.find(
+        var assignableBadgeOptions = _.find(
             requestBodyOptions,
             (body) => body.content_type === RIBadgeAssignment.content_type);
 
-        var assignableBatchPaths : string[] = AdhUtil.deepPluck(badgeBodyOptions, [
+        var assignableBadgePaths : string[] = AdhUtil.deepPluck(assignableBadgeOptions, [
             "data", SIBadgeAssignment.nick, "badge"
         ]);
 
-        $q.all(_.map(assignableBatchPaths, (b) => adhHttp.get(b))).then((result) => {
-            scope.badges = _.map(result, extractBadge);
-            return scope.badges;
-        }).then((badges) => {
+        $q.all(_.map(assignableBadgePaths, (b) => adhHttp.get(b).then(extractBadge))).then((badges) => {
+            scope.badges = badges;
             var groupPaths : string  = _.union.apply(_, _.map(badges, "groups"));
-
             $q.all(_.map(groupPaths, (g) => adhHttp.get(g))).then((result) => {
-                 scope.badgeGroups = _.map(result, extractGroup);
+                scope.badgeGroups = _.map(result, extractGroup);
             });
         });
-    });
+    };
+
+    adhPermissions.bindScope(scope, scope.poolPath, "rawOptions", {importOptions: false});
+    scope.$watch("rawOptions", getAssignableBadges);
 
     if (typeof pathKey !== "undefined") {
         scope.$watch(pathKey, (path : string) => {
@@ -281,6 +283,7 @@ export var badgeAssignmentDirective = (
 
                 return adhGetBadges(proposal).then((assignments : IBadge[]) => {
                     scope.assignments = assignments;
+                    scope.ready = true;
                 });
             });
 
