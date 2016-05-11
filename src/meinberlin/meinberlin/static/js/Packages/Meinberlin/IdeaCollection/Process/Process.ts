@@ -10,6 +10,9 @@ import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhProcess from "../../../Process/Process";
 import * as AdhUtil from "../../../Util/Util";
 
+import RIBuergerhaushaltProposalVersion from "../../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
+import RIKiezkasseProposalVersion from "../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
+
 import * as SIImageReference from "../../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SILocationReference from "../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
 import * as SIMultiPolygon from "../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
@@ -29,7 +32,9 @@ export var detailDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
         scope: {
-            path: "@"
+            path: "@",
+            isBuergerhaushalt: "=?",
+            isKiezkasse: "=?"
         },
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
@@ -45,6 +50,12 @@ export var detailDirective = (
                             var polygon = location.data[SIMultiPolygon.nick].coordinates[0][0];
                             scope.polygon =  polygon;
                         });
+
+                        if (scope.isBuergerhaushalt) {
+                            scope.contentType = RIBuergerhaushaltProposalVersion.content_type;
+                        } else {
+                            scope.contentType = RIKiezkasseProposalVersion.content_type;
+                        }
                     });
                 }
             });

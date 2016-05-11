@@ -1,12 +1,12 @@
 import * as AdhEmbedModule from "../../../Embed/Module";
 import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
 
-import * as AdhMeinberlinKiezkasseWorkbenchModule from "../Workbench/Module";
+import * as AdhMeinberlinIdeaCollectionModule from "../../IdeaCollection/Module";
 
 import * as AdhEmbed from "../../../Embed/Embed";
 import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
 
-import * as AdhMeinberlinKiezkasseWorkbench from "../Workbench/Workbench";
+import * as AdhMeinberlinIdeaCollection from "../../IdeaCollection/IdeaCollection";
 
 import RIKiezkasseProcess from "../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
 
@@ -17,14 +17,14 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhEmbedModule.moduleName,
-            AdhMeinberlinKiezkasseWorkbenchModule.moduleName,
+            AdhMeinberlinIdeaCollectionModule.moduleName,
             AdhResourceAreaModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerContext("kiezkasse", ["kiezkassen"]);
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            AdhMeinberlinKiezkasseWorkbench.registerRoutes(
+            AdhMeinberlinIdeaCollection.registerRoutesFactory(RIKiezkasseProcess.content_type)(
                 RIKiezkasseProcess.content_type,
                 "kiezkasse"
             )(adhResourceAreaProvider);

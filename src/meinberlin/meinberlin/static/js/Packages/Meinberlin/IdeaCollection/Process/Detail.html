@@ -10,8 +10,15 @@
                 data-ng-show="!isShowMap"
                 data-no-create-form="true"
                 data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
-                data-content-type="adhocracy_meinberlin.resources.burgerhaushalt.IProposalVersion">
-                <adh-meinberlin-proposal-list-item data-path="{{element}}" data-is-buergerhaushalt="true">
+                data-content-type="{{contentType}}"
+                data-custom="{
+                    isBuergerhaushalt: isBuergerhaushalt,
+                    isKiezkasse: isKiezkasse,
+                }">
+                <adh-meinberlin-proposal-list-item
+                    data-path="{{element}}"
+                    data-is-buergerhaushalt="custom.isBuergerhaushalt"
+                    data-is-kiezkasse="custom.isKiezkasse">
                 </adh-meinberlin-proposal-list-item>
             </adh-listing>
 
@@ -29,10 +36,15 @@
                     data-polygon="polygon"
                     data-no-create-form="true"
                     data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
-                    data-content-type="adhocracy_meinberlin.resources.burgerhaushalt.IProposalVersion">
+                    data-content-type="{{contentType}}"
+                    data-custom="{
+                        isBuergerhaushalt: isBuergerhaushalt,
+                        isKiezkasse: isKiezkasse,
+                    }">
                     <adh-meinberlin-proposal-map-list-item
                         data-path="{{item}}"
-                        data-is-buergerhaushalt="true">
+                        data-is-buergerhaushalt="custom.isBuergerhaushalt"
+                        data-is-kiezkasse="custom.isKiezkasse">
                     </adh-meinberlin-proposal-map-list-item>
                 </adh-map-listing>
             </adh-wait>

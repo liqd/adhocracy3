@@ -24,7 +24,7 @@ export var register = (angular) => {
             adhEmbedProvider.registerContext("buergerhaushalt", ["burgerhaushalt"]);
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            AdhMeinberlinIdeaCollection.registerRoutes(
+            AdhMeinberlinIdeaCollection.registerRoutesFactory(RIBuergerhaushaltProcess.content_type)(
                 RIBuergerhaushaltProcess.content_type,
                 "buergerhaushalt"
             )(adhResourceAreaProvider);
