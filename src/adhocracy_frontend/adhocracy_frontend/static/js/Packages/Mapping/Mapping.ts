@@ -505,6 +505,7 @@ export var mapListingInternal = (
             rawPolygon: "=polygon",
             items: "=",
             emptyText: "@",
+            custom: "=?",
             pin: "@?",
             pinSelected: "@?"
         },
