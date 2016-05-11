@@ -51,6 +51,7 @@ from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import has_annotation_sheet_data
+from adhocracy_core.workflows import update_workflow_state_acls
 
 logger = logging.getLogger(__name__)
 
@@ -681,6 +682,13 @@ def allow_create_asset_for_users(root, registry):  # pragma: no cover
     allow_create_asset_authenticated(users, registry, {})
 
 
+@log_migration
+def update_workflow_state_acl_for_all_resources(root,
+                                                registry):  # pragma: no cover
+    """Update the local :term:`acl` with the current workflow state acl."""
+    update_workflow_state_acls(root, registry)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -716,3 +724,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(remove_is_service_attribute)
     config.add_evolution_step(add_canbadge_sheet_to_users)
     config.add_evolution_step(allow_create_asset_for_users)
+    config.add_evolution_step(update_workflow_state_acl_for_all_resources)
