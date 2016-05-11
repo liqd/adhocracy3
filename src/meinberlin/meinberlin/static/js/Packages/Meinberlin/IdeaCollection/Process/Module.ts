@@ -13,7 +13,6 @@ export var register = (angular) => {
             AdhPermissionsModule.moduleName
         ])
         .directive("adhMeinberlinIdeaCollectionDetail", ["adhConfig", "adhHttp", "adhPermissions", Process.detailDirective])
-        // not used yet:
         .directive("adhMeinberlinIdeaCollectionEdit", [
             "adhConfig", "adhHttp", "adhShowError", "adhSubmitIfValid", "moment", Process.editDirective]);
 };
