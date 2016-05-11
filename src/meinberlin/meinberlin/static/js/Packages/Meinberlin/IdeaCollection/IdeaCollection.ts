@@ -168,7 +168,7 @@ export var registerRoutesFactory = (
     var proposalType;
     var proposalVersionType;
 
-    if (ideaCollection === "adhocracy_meinberlin.resources.kiezkassen.IProcess") {
+    if (ideaCollection === RIKiezkasseProcess.content_type) {
         ideaCollectionType = RIKiezkasseProcess;
         proposalType = RIKiezkasseProposal;
         proposalVersionType = RIKiezkasseProposalVersion;
@@ -254,10 +254,10 @@ export var registerRoutesFactory = (
             movingColumns: "is-collapse-show-show"
         })
         .specificVersionable(RIComment, RICommentVersion, "", processType, context, ["adhHttp", "$q", (
-            adhHttp: AdhHttp.Service<any>,
-            $q: angular.IQService
+            adhHttp : AdhHttp.Service<any>,
+            $q : angular.IQService
         ) => {
-            var getCommentableUrl = (resource): angular.IPromise<any> => {
+            var getCommentableUrl = (resource) : angular.IPromise<any> => {
                 if (resource.content_type !== RICommentVersion.content_type) {
                     return $q.when(resource);
                 } else {
@@ -266,7 +266,7 @@ export var registerRoutesFactory = (
                 }
             };
 
-            return (item: RIComment, version: RICommentVersion) => {
+            return (item : RIComment, version : RICommentVersion) => {
                 return getCommentableUrl(version).then((commentable) => {
                     return {
                         commentableUrl: commentable.path,
