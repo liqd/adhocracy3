@@ -11,8 +11,11 @@ import * as AdhUtil from "../../Util/Util";
 import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RIBuergerhaushaltProcess from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
-import RIProposal from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal";
-import RIProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
+import RIKiezkasseProcess from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
+import RIBuergerhaushaltProposal from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal";
+import RIBuergerhaushaltProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
+import RIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
+import RIKiezkasseProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
 import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
@@ -154,21 +157,52 @@ export var addProposalButtonDirective = (
     };
 };
 
-export var registerRoutes = (
-    processType : string = "",
-    context : string = ""
-) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-    adhResourceAreaProvider
-        .default(RIBuergerhaushaltProcess, "", processType, context, {
+
+export var registerRoutesFactory = (
+    ideaCollection : string
+) => (
+        processType : string = "",
+        context : string = ""
+    ) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
+
+        var ideaCollectionType;
+        var proposalType;
+        var proposalVersionType;
+        if (ideaCollection === "adhocracy_meinberlin.resources.kiezkassen.IProcess") {
+            ideaCollectionType = RIKiezkasseProcess;
+            proposalType = RIKiezkasseProposal;
+            proposalVersionType = RIKiezkasseProposalVersion;
+        } else {
+            ideaCollectionType = RIBuergerhaushaltProcess;
+            proposalType = RIBuergerhaushaltProposal;
+            proposalVersionType = RIBuergerhaushaltProposalVersion;
+        }
+
+        adhResourceAreaProvider
+        .default(ideaCollectionType, "", processType, context, {
             space: "content",
             movingColumns: "is-show-hide-hide"
         })
-        .default(RIBuergerhaushaltProcess, "create_proposal", processType, context, {
+        .default(ideaCollectionType, "edit", processType, context, {
             space: "content",
             movingColumns: "is-show-show-hide"
         })
-        .specific(RIBuergerhaushaltProcess, "create_proposal", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIBuergerhaushaltProcess) => {
+        .specific(ideaCollectionType, "edit", processType, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource) => {
+                return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                    if (!options.PUT) {
+                        throw 401;
+                    } else {
+                        return {};
+                    }
+                });
+            }])
+        .default(ideaCollectionType, "create_proposal", processType, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide"
+        })
+        .specific(ideaCollectionType, "create_proposal", processType, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -177,12 +211,12 @@ export var registerRoutes = (
                     }
                 });
             }])
-        .defaultVersionable(RIProposal, RIProposalVersion, "edit", processType, context, {
+        .defaultVersionable(proposalType, proposalVersionType, "edit", processType, context, {
             space: "content",
             movingColumns: "is-show-show-hide"
         })
-        .specificVersionable(RIProposal, RIProposalVersion, "edit", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIProposal, version : RIProposalVersion) => {
+        .specificVersionable(proposalType, proposalVersionType, "edit", processType, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item, version) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -193,22 +227,22 @@ export var registerRoutes = (
                     }
                 });
             }])
-        .defaultVersionable(RIProposal, RIProposalVersion, "", processType, context, {
+        .defaultVersionable(proposalType, proposalVersionType, "", processType, context, {
             space: "content",
             movingColumns: "is-show-show-hide"
         })
-        .specificVersionable(RIProposal, RIProposalVersion, "", processType, context, [
-            () => (item : RIProposal, version : RIProposalVersion) => {
+        .specificVersionable(proposalType, proposalVersionType, "", processType, context, [
+            () => (item, version) => {
                 return {
                     proposalUrl: version.path
                 };
             }])
-        .defaultVersionable(RIProposal, RIProposalVersion, "comments", processType, context, {
+        .defaultVersionable(proposalType, proposalVersionType, "comments", processType, context, {
             space: "content",
             movingColumns: "is-collapse-show-show"
         })
-        .specificVersionable(RIProposal, RIProposalVersion, "comments", processType, context, [
-            () => (item : RIProposal, version : RIProposalVersion) => {
+        .specificVersionable(proposalType, proposalVersionType, "comments", processType, context, [
+            () => (item, version) => {
                 return {
                     commentableUrl: version.path,
                     commentCloseUrl: version.path,
@@ -216,30 +250,30 @@ export var registerRoutes = (
                 };
             }])
         .defaultVersionable(RIComment, RICommentVersion, "", processType, context, {
-            space: "content",
-            movingColumns: "is-collapse-show-show"
-        })
+                space: "content",
+                movingColumns: "is-collapse-show-show"
+            })
         .specificVersionable(RIComment, RICommentVersion, "", processType, context, ["adhHttp", "$q", (
-            adhHttp : AdhHttp.Service<any>,
-            $q : angular.IQService
-        ) => {
-            var getCommentableUrl = (resource) : angular.IPromise<any> => {
-                if (resource.content_type !== RICommentVersion.content_type) {
-                    return $q.when(resource);
-                } else {
-                    var url = resource.data[SIComment.nick].refers_to;
-                    return adhHttp.get(url).then(getCommentableUrl);
-                }
-            };
+                adhHttp: AdhHttp.Service<any>,
+                $q: angular.IQService
+            ) => {
+                var getCommentableUrl = (resource): angular.IPromise<any> => {
+                    if (resource.content_type !== RICommentVersion.content_type) {
+                        return $q.when(resource);
+                    } else {
+                        var url = resource.data[SIComment.nick].refers_to;
+                        return adhHttp.get(url).then(getCommentableUrl);
+                    }
+                };
 
-            return (item : RIComment, version : RICommentVersion) => {
-                return getCommentableUrl(version).then((commentable) => {
-                    return {
-                        commentableUrl: commentable.path,
-                        commentCloseUrl: commentable.path,
-                        proposalUrl: commentable.path
-                    };
-                });
-            };
-        }]);
+                return (item: RIComment, version: RICommentVersion) => {
+                    return getCommentableUrl(version).then((commentable) => {
+                        return {
+                            commentableUrl: commentable.path,
+                            commentCloseUrl: commentable.path,
+                            proposalUrl: commentable.path
+                        };
+                    });
+                };
+            }]);
 };

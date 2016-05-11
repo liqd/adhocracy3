@@ -42,9 +42,9 @@ export var register = (angular) => {
                 RICollaborativeTextProcess, "mein.berlin.de")(adhResourceAreaProvider);
             AdhMeinberlinAlexanderplatzWorkbench.registerRoutes(
                 RIAlexanderplatzProcess.content_type, "mein.berlin.de")(adhResourceAreaProvider);
-            AdhMeinberlinIdeaCollection.registerRoutes(
+            AdhMeinberlinIdeaCollection.registerRoutesFactory(RIBuergerhaushaltProcess.content_type)(
                 RIBuergerhaushaltProcess.content_type, "mein.berlin.de")(adhResourceAreaProvider);
-            AdhMeinberlinIdeaCollection.registerRoutes(
+            AdhMeinberlinIdeaCollection.registerRoutesFactory(RIKiezkasseProcess.content_type)(
                 RIKiezkasseProcess.content_type, "mein.berlin.de")(adhResourceAreaProvider);
         }])
         .directive("adhMeinberlinDeHeader", ["adhConfig", "adhTopLevelState", AdhMeinberlinDe.headerDirective]);
