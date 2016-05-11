@@ -14,6 +14,8 @@ import RIBuergerhaushaltProposal from "../../../Resources_/adhocracy_meinberlin/
 import RIBuergerhaushaltProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
 import RIGeoProposal from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
 import RIGeoProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
+import RIIdeaCollectionProposal from "../../../Resources_/adhocracy_meinberlin/resources/idea_collection/IProposal";
+import RIIdeaCollectionProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/idea_collection/IProposalVersion";
 import RIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
 import RIKiezkasseProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
 import * as SIBuergerhaushaltProposal from "../../../Resources_/adhocracy_meinberlin/sheets/burgerhaushalt/IProposal";
@@ -192,6 +194,9 @@ var postCreate = (
     } else if (isBuergerhaushalt) {
         proposalClass = RIBuergerhaushaltProposal;
         proposalVersionClass = RIBuergerhaushaltProposalVersion;
+    } else {
+        proposalClass = RIIdeaCollectionProposal;
+        proposalVersionClass = RIIdeaCollectionProposalVersion;
     }
 
     var proposal = new proposalClass({preliminaryNames: adhPreliminaryNames});
@@ -222,6 +227,8 @@ var postEdit = (
         proposalVersionClass = RIKiezkasseProposalVersion;
     } else if (isBuergerhaushalt) {
         proposalVersionClass = RIBuergerhaushaltProposalVersion;
+    } else {
+        proposalVersionClass = RIIdeaCollectionProposalVersion;
     }
 
     var proposalVersion = new proposalVersionClass({preliminaryNames: adhPreliminaryNames});
