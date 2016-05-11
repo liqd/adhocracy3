@@ -72,6 +72,7 @@ export var getBadgesFactory = (
     }
 };
 
+
 export var bindPath = (
     adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service,
