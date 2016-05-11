@@ -38,15 +38,15 @@ export var workbenchDirective = (
             isKiezkasse: "=?"
         },
         link: (scope) => {
-            var processType;
-            var proposalType;
-            var proposalVersionType;
+            var processType = RIIdeaCollectionProcess;
+            var proposalType = RIGeoProposal;
+            var proposalVersionType = RIGeoProposalVersion;
 
             if (scope.isKiezkasse) {
                 processType = RIKiezkasseProcess;
                 proposalType = RIKiezkasseProposal;
                 proposalVersionType = RIKiezkasseProposalVersion;
-            } else {
+            } else if (scope.isBuergerhaushalt) {
                 processType = RIBuergerhaushaltProcess;
                 proposalType = RIBuergerhaushaltProposal;
                 proposalVersionType = RIBuergerhaushaltProposalVersion;
