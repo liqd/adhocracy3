@@ -35,6 +35,20 @@ export var workbenchDirective = (
             isKiezkasse: "=?"
         },
         link: (scope) => {
+            var processType;
+            var proposalType;
+            var proposalVersionType;
+
+            if (scope.isKiezkasse) {
+                processType = RIKiezkasseProcess;
+                proposalType = RIKiezkasseProposal;
+                proposalVersionType = RIKiezkasseProposalVersion;
+            } else {
+                processType = RIBuergerhaushaltProcess;
+                proposalType = RIBuergerhaushaltProposal;
+                proposalVersionType = RIBuergerhaushaltProposalVersion;
+            }
+
             scope.$on("$destroy", adhTopLevelState.bind("view", scope));
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("contentType", scope));
@@ -49,13 +63,13 @@ export var workbenchDirective = (
                 var contentType = values[0];
                 var view = values[1];
 
-                if (contentType === RIBuergerhaushaltProcess.content_type) {
+                if (contentType === processType.content_type) {
                     scope.views.process = view;
                 } else {
                     scope.views.process = "default";
                 }
 
-                if (contentType === RIProposal.content_type || contentType === RIProposalVersion.content_type) {
+                if (contentType === proposalType.content_type || contentType === proposalVersionType.content_type) {
                     scope.views.proposal = view;
                 } else {
                     scope.views.proposal = "default";
