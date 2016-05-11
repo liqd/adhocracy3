@@ -203,7 +203,7 @@ export var registerRoutesFactory = (
         })
         .default(ideaCollectionType, "edit", processType, context, {
             space: "content",
-            movingColumns: "is-show-show-hide"
+            movingColumns: "is-show-hide-hide"
         })
         .specific(ideaCollectionType, "edit", processType, context, [
             "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource) => {
