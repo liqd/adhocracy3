@@ -70,8 +70,8 @@ var bindPath = (
 ) => (
     scope : IScope,
     pathKey : string = "path",
-    isKiezkasse : boolean,
-    isBuergerhaushalt : boolean
+    isKiezkasse : boolean = false,
+    isBuergerhaushalt : boolean = false
 ) : void => {
     var getPolygon = () => {
         var processUrl = adhTopLevelState.get("processUrl");
@@ -145,8 +145,8 @@ var bindPath = (
 var fill = (
     scope : IScope,
     proposalVersion,
-    isKiezkasse : boolean,
-    isBuergerhaushalt : boolean
+    isKiezkasse : boolean = false,
+    isBuergerhaushalt : boolean = false
 ) : void => {
 
     if (isKiezkasse) {
@@ -180,8 +180,8 @@ var postCreate = (
 ) => (
     scope : IScope,
     poolPath : string,
-    isKiezkasse : boolean,
-    isBuergerhaushalt : boolean
+    isKiezkasse : boolean = false,
+    isBuergerhaushalt : boolean = false
 ) => {
     var proposalClass = RIGeoProposal;
     var proposalVersionClass = RIGeoProposalVersion;
@@ -213,8 +213,8 @@ var postEdit = (
 ) => (
     scope : IScope,
     oldVersion,
-    isKiezkasse : boolean,
-    isBuergerhaushalt : boolean
+    isKiezkasse : boolean = false,
+    isBuergerhaushalt : boolean = false
 ) => {
     var proposalVersionClass = RIGeoProposalVersion;
 
