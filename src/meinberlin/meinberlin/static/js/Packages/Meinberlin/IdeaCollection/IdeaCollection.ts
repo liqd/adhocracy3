@@ -30,6 +30,10 @@ export var workbenchDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/IdeaCollection.html",
+        scope: {
+            isBuergerhaushalt: "=?",
+            isKiezkasse: "=?"
+        },
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("view", scope));
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));

@@ -49,7 +49,8 @@ export var register = (angular) => {
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templateFactories[RIBuergerhaushaltProcess.content_type] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-meinberlin-idea-collection-workbench></adh-meinberlin-idea-collection-workbench>");
+                return $q.when("<adh-meinberlin-idea-collection-workbench data-is-buergerhaushalt=\"true\">" +
+                    "</adh-meinberlin-idea-collection-workbench>");
             }];
         }])
         .directive("adhMeinberlinIdeaCollectionWorkbench", [
