@@ -11,9 +11,9 @@ import * as AdhUtil from "../../Util/Util";
 import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RIBuergerhaushaltProcess from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
-import RIKiezkasseProcess from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
 import RIBuergerhaushaltProposal from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal";
 import RIBuergerhaushaltProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
+import RIKiezkasseProcess from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
 import RIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
 import RIKiezkasseProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
 import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
@@ -30,6 +30,10 @@ export var workbenchDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/IdeaCollection.html",
+        scope: {
+            isKiezkasse: "=?",
+            isBuergerhaushalt: "=?"
+        },
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("view", scope));
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
@@ -45,13 +49,17 @@ export var workbenchDirective = (
                 var contentType = values[0];
                 var view = values[1];
 
-                if (contentType === RIBuergerhaushaltProcess.content_type) {
+                if (contentType === RIBuergerhaushaltProcess.content_type
+                    || contentType === RIKiezkasseProcess.content_type) {
                     scope.views.process = view;
                 } else {
                     scope.views.process = "default";
                 }
 
-                if (contentType === RIProposal.content_type || contentType === RIProposalVersion.content_type) {
+                if (contentType === RIBuergerhaushaltProposal.content_type
+                    || contentType === RIBuergerhaushaltProposalVersion.content_type
+                    || contentType === RIKiezkasseProposal.content_type
+                    || contentType === RIKiezkasseProposalVersion.content_type) {
                     scope.views.proposal = view;
                 } else {
                     scope.views.proposal = "default";
