@@ -34,8 +34,7 @@ export var detailDirective = (
         scope: {
             path: "@",
             isBuergerhaushalt: "=?",
-            isKiezkasse: "=?",
-            contentType: "=?"
+            isKiezkasse: "=?"
         },
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {

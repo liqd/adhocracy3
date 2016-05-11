@@ -23,7 +23,7 @@ export var register = (angular) => {
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerContext("kiezkasse", ["kiezkassen"]);
         }])
-        .config(["adhResourceAreaProvider", (adhResourceAreaProvider: AdhResourceArea.Provider) => {
+        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             AdhMeinberlinIdeaCollection.registerRoutesFactory(RIKiezkasseProcess.content_type)(
                 RIKiezkasseProcess.content_type,
                 "kiezkasse"
