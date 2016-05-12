@@ -13,6 +13,9 @@ import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comme
 import RIBuergerhaushaltProcess from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
 import RIBuergerhaushaltProposal from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal";
 import RIBuergerhaushaltProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
+import RIGeoProposal from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
+import RIGeoProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
+import RIIdeaCollectionProcess from "../../../Resources_/adhocracy_meinberlin/resources/idea_collection/IProcess";
 import RIKiezkasseProcess from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
 import RIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
 import RIKiezkasseProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
@@ -182,15 +185,15 @@ export var registerRoutesFactory = (
     processType : string = "",
     context : string = ""
 ) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-    var ideaCollectionType;
-    var proposalType;
-    var proposalVersionType;
+    var ideaCollectionType = RIIdeaCollectionProcess;
+    var proposalType = RIGeoProposal;
+    var proposalVersionType = RIGeoProposalVersion;
 
     if (ideaCollection === RIKiezkasseProcess.content_type) {
         ideaCollectionType = RIKiezkasseProcess;
         proposalType = RIKiezkasseProposal;
         proposalVersionType = RIKiezkasseProposalVersion;
-    } else {
+    } else if (ideaCollection === RIBuergerhaushaltProcess.content_type) {
         ideaCollectionType = RIBuergerhaushaltProcess;
         proposalType = RIBuergerhaushaltProposal;
         proposalVersionType = RIBuergerhaushaltProposalVersion;
