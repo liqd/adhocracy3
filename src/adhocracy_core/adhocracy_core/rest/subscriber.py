@@ -9,7 +9,7 @@ def add_cors_headers(event):
     if _is_api_request(event.request):
         _set_cors_header(event.request, event.response)
     else:
-        return
+        _set_frame_options_header(event.response)
 
 
 def _set_cors_header(request: IRequest, response: IResponse):
@@ -21,6 +21,10 @@ def _set_cors_header(request: IRequest, response: IResponse):
         'Access-Control-Allow-Credentials': 'true',
         'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS',
     })
+
+
+def _set_frame_options_header(response: IResponse):
+    response.headers.update({'X-Frame-Options': 'DENY'})
 
 
 def _is_api_request(request: IRequest) -> bool:

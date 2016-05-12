@@ -9,7 +9,8 @@ def mock_route(mocker):
     return mocker.Mock(spec=IRoute)
 
 
-def test_add_cors_headers_ignore_if_no_api_request(request_, mock_route):
+def test_add_cors_headers_set_x_frame_options_if_no_api_request(request_,
+                                                                mock_route):
     from .subscriber import add_cors_headers
     mock_route.name = 'route_name'
     request_.matched_route = mock_route
@@ -17,7 +18,7 @@ def test_add_cors_headers_ignore_if_no_api_request(request_, mock_route):
     event = testing.DummyResource(response=response,
                                   request=request_)
     add_cors_headers(event)
-    assert response.headers == {}
+    assert response.headers == {'X-Frame-Options': 'DENY'}
 
 
 def test_add_cors_headers(request_):
