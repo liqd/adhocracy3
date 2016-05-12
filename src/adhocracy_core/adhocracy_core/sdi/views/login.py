@@ -12,6 +12,7 @@ from substanced.event import LoggedIn
 from substanced.sdi import mgmt_view
 
 from adhocracy_core.interfaces import IRolesUserLocator
+from adhocracy_core.rest.views import get_set_cookie_headers
 
 
 @mgmt_view(name='login',
@@ -55,10 +56,11 @@ def login(context, request):
             if user is not None:
                 request.session.pop('sdi.came_from', None)
                 headers = remember(request, resource_path(user))
+                cookie_headers = get_set_cookie_headers(headers, request)
                 msg = LoggedIn(login, user, context, request)
                 request.registry.notify(msg)
                 return HTTPFound(location=came_from,
-                                 headers=headers)
+                                 headers=cookie_headers)
             request.sdiapi.flash('Failed login', 'danger')
 
     # Pass this through FBO views (e.g., forbidden) which use its macros.

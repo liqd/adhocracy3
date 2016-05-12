@@ -729,23 +729,22 @@ def _login_user(request: IRequest) -> dict:
     user = request.validated['user']
     userid = resource_path(user)
     headers = remember(request, userid)
-    _set_sdi_auth_cookies(headers, request)
     cstruct = _get_api_auth_data(headers, request, user)
     return cstruct
 
 
-def _set_sdi_auth_cookies(headers: [tuple], request: IRequest):
+def get_set_cookie_headers(headers: [tuple], request: IRequest):
+    """Filter `Set-Cookie` headers, add `Secure` flag if `https` is used."""
     cookie_headers = []
     force_secure = request.scheme.startswith('https')
     for name, value in headers:
-        if name != 'Set-Cookie':
-            continue
-        header = (name, value)
-        has_secure_flag = 'Secure;' in value
-        if force_secure and not has_secure_flag:  # pragma: no branch
+        if force_secure:
             header = (name, value + 'Secure;')
-        cookie_headers.append(header)
-    request.response.headers.extend(cookie_headers)
+        else:
+            header = (name, value)
+        if name == 'Set-Cookie':
+            cookie_headers.append(header)
+    return cookie_headers
 
 
 def _get_api_auth_data(headers: [tuple], request: IRequest, user: IResource)\
