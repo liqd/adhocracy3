@@ -43,13 +43,16 @@ export var register = (angular) => {
                 RICollaborativeTextProcess, "mein.berlin.de")(adhResourceAreaProvider);
             AdhMeinberlinAlexanderplatzWorkbench.registerRoutes(
                 RIAlexanderplatzProcess.content_type, "mein.berlin.de")(adhResourceAreaProvider);
-            AdhMeinberlinIdeaCollection.registerRoutesFactory(RIBuergerhaushaltProcess.content_type)(
-                RIBuergerhaushaltProcess.content_type, "mein.berlin.de")(adhResourceAreaProvider);
-            AdhMeinberlinIdeaCollection.registerRoutesFactory(RIKiezkasseProcess.content_type)(
-                RIKiezkasseProcess.content_type, "mein.berlin.de")(adhResourceAreaProvider);
+
+            var processType1 = RIBuergerhaushaltProcess.content_type;
+            var registerRoutes1 = AdhMeinberlinIdeaCollection.registerRoutesFactory(processType1);
+            registerRoutes1(processType1, "mein.berlin.de")(adhResourceAreaProvider);
             var processType2 = RIIdeaCollectionProcess.content_type;
             var registerRoutes2 = AdhMeinberlinIdeaCollection.registerRoutesFactory(processType2);
             registerRoutes2(processType2, "mein.berlin.de")(adhResourceAreaProvider);
+            var processType3 = RIKiezkasseProcess.content_type;
+            var registerRoutes3 = AdhMeinberlinIdeaCollection.registerRoutesFactory(processType3);
+            registerRoutes3(processType3, "mein.berlin.de")(adhResourceAreaProvider);
         }])
         .directive("adhMeinberlinDeHeader", ["adhConfig", "adhTopLevelState", AdhMeinberlinDe.headerDirective]);
 };
