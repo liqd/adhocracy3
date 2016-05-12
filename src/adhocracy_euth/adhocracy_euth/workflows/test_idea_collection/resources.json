@@ -20,7 +20,9 @@
   "content_type": "adhocracy_core.resources.badge.IParticipantsAssignableBadgeGroup",
   "data": {"adhocracy_core.sheets.name.IName":
             {"name": "categories"}
-           }
+           },
+           "adhocracy_core.sheets.title.ITitle":
+           {"title": "Categories"}
  },
  {"path": "/opin/idea_collection/badges/categories",
   "creator": "/principals/users/0000000",
