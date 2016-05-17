@@ -346,7 +346,7 @@ export var createDirective = (
     return {
         restrict: "E",
         scope: {
-            path: "@",
+            poolPath: "@",
             isKiezkasse: "=?",
             isBuergerhaushalt: "=?"
         },
@@ -360,9 +360,8 @@ export var createDirective = (
             scope.data.lat = undefined;
             scope.data.lng = undefined;
 
-            var processUrl = scope.path;
-            adhHttp.get(processUrl).then((process) => {
-                var locationUrl = process.data[SILocationReference.nick]["location"];
+            adhHttp.get(scope.poolPath).then((pool) => {
+                var locationUrl = pool.data[SILocationReference.nick]["location"];
                 adhHttp.get(locationUrl).then((location) => {
                     var polygon = location.data[SIMultiPolygon.nick]["coordinates"][0][0];
                     scope.data.polygon = polygon;
@@ -371,7 +370,7 @@ export var createDirective = (
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.meinberlinProposalForm, () => {
-                    return postCreate(adhHttp, adhPreliminaryNames)(scope, processUrl, scope.isKiezkasse, scope.isBuergerhaushalt)
+                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.poolPath, scope.isKiezkasse, scope.isBuergerhaushalt)
                         .then((result) => {
                             $location.url(adhResourceUrlFilter(AdhUtil.parentPath(result[1].path)));
                         });
@@ -379,7 +378,7 @@ export var createDirective = (
             };
 
             scope.cancel = () => {
-                var fallback = adhResourceUrlFilter(scope.processUrl);
+                var fallback = adhResourceUrlFilter(scope.poolPath);
                 adhTopLevelState.goToCameFrom(fallback);
             };
         }
