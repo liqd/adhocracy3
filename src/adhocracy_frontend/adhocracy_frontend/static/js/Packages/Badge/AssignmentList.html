@@ -6,14 +6,15 @@
   <ul>
     <li data-ng-repeat="(groupPath, badgePaths) in badgesByGroup">
       {{badgeGroups[groupPath].title}}:
-    <ul>
-      <li data-ng-repeat="badgePath in badgePaths">
-        <input
-           type="checkbox"
-           name="badgePath"
-           data-ng-model="checkboxes[badgePath]"> {{badges[badgePath].title}} </input>
-      </li>
-    </ul>
+      <ul>
+        <li data-ng-repeat="badgePath in badgePaths">
+          <input
+             type="checkbox"
+             name="badgePath"
+             data-ng-model="checkboxes[badgePath]"> {{badges[badgePath].title}}
+        </li>
+      </ul>
+    </li>
     <span class="input-error" data-ng-show="serverError">{{serverError}}</span>
   </ul>
 
