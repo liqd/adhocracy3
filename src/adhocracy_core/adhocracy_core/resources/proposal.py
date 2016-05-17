@@ -72,6 +72,7 @@ class IGeoProposal(IProposal):
 geo_proposal_meta = proposal_meta._replace(
     iresource=IGeoProposal,
     element_types=(IGeoProposalVersion,),
+    item_type=IGeoProposalVersion
 )
 
 

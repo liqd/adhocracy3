@@ -3,7 +3,6 @@
         <div class="moving-column-tab">
             <i class="icon-document moving-column-icon"></i>
         </div>
-        <a class="moving-column-menu-button" data-ng-if="proposalItemOptions.POST" data-ng-href="{{ proposalUrl | adhParentPath | adhResourceUrl:'edit' }}">{{ "TR__EDIT" | translate }}</a>
 
         <div class="moving-column-menu-nav">
             <a class="moving-column-menu-nav-button" data-ng-href="{{ processUrl | adhResourceUrl }}" title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
@@ -16,14 +15,22 @@
         </div>
     </a>
 
-    <adh-recompile-on-change
-        data-ng-switch-when="body"
-        data-value="{{proposalUrl}}">
-        <adh-meinberlin-proposal-detail
-            data-ng-if="proposalUrl"
-            data-is-buergerhaushalt="isBuergerhaushalt"
-            data-is-kiezkasse="isKiezkasse"
-            data-path="{{proposalUrl}}">
-        </adh-meinberlin-proposal-detail>
-    </adh-recompile-on-change>
+    <div data-ng-switch-when="body">
+        <adh-resource-actions
+            data-resource-path="{{proposalUrl}}"
+            data-parent-path="true"
+            data-edit="true"
+            data-print="true">
+        </adh-resource-actions>
+
+        <adh-recompile-on-change
+            data-value="{{proposalUrl}}">
+            <adh-meinberlin-proposal-detail
+                data-ng-if="proposalUrl"
+                data-is-buergerhaushalt="isBuergerhaushalt"
+                data-is-kiezkasse="isKiezkasse"
+                data-path="{{proposalUrl}}">
+            </adh-meinberlin-proposal-detail>
+        </adh-recompile-on-change>
+    </div>
 </div>

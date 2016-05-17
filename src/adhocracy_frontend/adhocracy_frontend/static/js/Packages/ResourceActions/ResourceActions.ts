@@ -87,13 +87,14 @@ export var printActionDirective = (
     return {
         restrict: "E",
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"print();\">{{ 'TR__PRINT' | translate }}</a>",
+        require: "^adhMovingColumn",
         scope: {
             class: "@"
         },
-        link: (scope) => {
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             scope.print = () => {
                 // only the focused column is printed
-                adhTopLevelState.set("focus", 1);
+                column.focus();
                 $window.print();
             };
         }
