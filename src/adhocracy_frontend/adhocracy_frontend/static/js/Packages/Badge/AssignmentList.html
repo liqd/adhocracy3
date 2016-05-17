@@ -1,34 +1,35 @@
 <form
-   name="form"
-   data-ng-if="badgesByGroup && checkboxes"
-   data-ng-submit="submit()">
+    name="form"
+    data-ng-if="badgesByGroup && checkboxes"
+    data-ng-submit="submit()">
 
-  <ul>
-    <li data-ng-repeat="(groupPath, badgePaths) in badgesByGroup">
-      {{badgeGroups[groupPath].title}}:
-      <ul>
-        <li data-ng-repeat="badgePath in badgePaths">
-          <input
-             type="checkbox"
-             name="badgePath"
-             data-ng-model="checkboxes[badgePath]"> {{badges[badgePath].title}}
-        </li>
-      </ul>
-    </li>
-    <span class="input-error" data-ng-show="serverError">{{serverError}}</span>
-  </ul>
+    <div class="badges-groups row">
+        <div class="badges-group cols-2" data-ng-repeat="(groupPath, badgePaths) in badgesByGroup">
+            <!-- FIXME:this isn't working {{badgeGroups[groupPath].title}}: -->
+            <h2 class="badges-group-header">Dummy Group header</h2>
+            <label class="badge-toggle" data-ng-repeat="badgePath in badgePaths">
+                <input
+                    type="checkbox"
+                    name="badgePath"
+                    class="badge-checkbox"
+                    data-ng-model="checkboxes[badgePath]">
+                    {{badges[badgePath].title}}
+            </label>
+        </div>
+        <span class="input-error" data-ng-show="serverError">{{serverError}}</span>
+    </div>
 
-  <footer class="form-footer">
-    <a href="" class="button form-footer-button" data-ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
-    <input
-       type="submit"
-       name="submit"
-       value="{{ 'TR__PUBLISH' | translate }}"
-       class="button-cta form-footer-button-cta" />
-    <a
-       href=""
-       data-ng-if="delete"
-       data-ng-click="delete()"
-       class="button-cta-secondary form-footer-button-cta">{{ "TR__DELETE" | translate }}</a>
-  </footer>
+    <footer class="form-footer">
+        <a href="" class="button form-footer-button" data-ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
+        <input
+            type="submit"
+            name="submit"
+            value="{{ 'TR__PUBLISH' | translate }}"
+            class="button-cta form-footer-button-cta" />
+        <a
+            href=""
+            data-ng-if="delete"
+            data-ng-click="delete()"
+            class="button form-footer-button">{{ "TR__DELETE" | translate }}</a>
+    </footer>
 </form>
