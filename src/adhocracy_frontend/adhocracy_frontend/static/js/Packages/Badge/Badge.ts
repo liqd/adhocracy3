@@ -7,6 +7,7 @@ import * as AdhConfig from "../Config/Config";
 import * as AdhCredentials from "../User/Credentials";
 import * as AdhHttp from "../Http/Http";
 import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
@@ -26,6 +27,7 @@ export interface IBadge {
     description : string;
     name : string;
     path : string;
+    badgePath : string;
 }
 
 export interface IGetBadges {
@@ -53,7 +55,8 @@ export var getBadgesFactory = (
                     title: badge.data[SITitle.nick].title,
                     name: badge.data[SIName.nick].name,
                     description: assignment.data[SIDescription.nick].description,
-                    path: assignmentPath
+                    path: assignmentPath,
+                    badgePath: badgePath
                 };
             });
         });
@@ -118,11 +121,23 @@ export var bindPath = (
             "data", SIBadgeAssignment.nick, "badge"
         ]);
 
-        $q.all(_.map(assignableBadgePaths, (b) => adhHttp.get(b).then(extractBadge))).then((badges) => {
-            scope.badges = badges;
-            var groupPaths : string  = _.union.apply(_, _.map(badges, "groups"));
+        $q.all(_.map(assignableBadgePaths, (b) => adhHttp.get(b).then(extractBadge))).then((badges : any) => {
+            scope.badges = _.keyBy(badges, "path");
+            var groupPaths : string[]  = _.union.apply(_, _.map(badges, "groups"));
             $q.all(_.map(groupPaths, (g) => adhHttp.get(g))).then((result) => {
-                scope.badgeGroups = _.map(result, extractGroup);
+                scope.badgeGroups = _.keyBy(_.map(result, extractGroup), "path");
+
+                // TODO: factor out or make clearer
+                var badgesByGroup = {};
+                for (var groupPath of groupPaths) {
+                    badgesByGroup[groupPath] = [];
+                    for (var badge of badges) {
+                        if (_.includes(badge.groups, groupPath)) {
+                            badgesByGroup[groupPath].push(badge.path);
+                        }
+                    }
+                }
+                scope.badgesByGroup = badgesByGroup;
             });
         });
     };
@@ -159,16 +174,18 @@ export var fill = (resource, scope, userPath : string) => {
     return clone;
 };
 
-export var badgeAssignmentCreateDirective = (
+export var badgeAssignmentList = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhPermissions: AdhPermissions.Service,
+    adhPreliminaryNames: AdhPreliminaryNames.Service,
     $q : angular.IQService,
-    adhCredentials : AdhCredentials.Service
+    adhCredentials : AdhCredentials.Service,
+    adhGetBadges
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Assignment.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/AssignmentList.html",
         scope: {
             badgeablePath: "@",
             poolPath: "@",
@@ -179,74 +196,44 @@ export var badgeAssignmentCreateDirective = (
         link: (scope, element) => {
             bindPath(adhHttp, adhPermissions, $q)(scope);
 
-            scope.submit = () => {
-                var postdata = {
-                    content_type: RIBadgeAssignment.content_type,
-                    data: {}
-                };
-                return adhHttp.post(scope.poolPath, fill(postdata, scope, adhCredentials.userPath))
-                    .then((response) => {
-                        scope.serverError = null;
-                        if (scope.onSubmit) {
-                            scope.onSubmit();
-                        }
-                    }, (response) => {
-                        scope.serverError = response[0].description;
-                    });
-            };
+            adhHttp.get(scope.badgeablePath).then((proposal) => {
+                scope.poolPath = proposal.data[SIBadgeable.nick].post_pool;
 
-            scope.cancel = () => {
-                if (scope.onCancel) {
-                    scope.onCancel();
-                }
-            };
-        }
-    };
-};
-
-export var badgeAssignmentEditDirective = (
-    adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhPermissions: AdhPermissions.Service,
-    $q : angular.IQService,
-    adhCredentials : AdhCredentials.Service
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Assignment.html",
-        scope: {
-            path: "@",
-            poolPath: "@",
-            showDescription: "=?",
-            onSubmit: "=?",
-            onCancel: "=?"
-        },
-        link: (scope, element) => {
-            bindPath(adhHttp, adhPermissions, $q)(scope, "path");
-
-            scope.delete = () => {
-                return adhHttp.delete(scope.path, RIBadgeAssignment.content_type)
-                    .then(() => {
-                        scope.serverError = null;
-                        if (scope.onSubmit) {
-                            scope.onSubmit();
-                        }
-                    }, (response) => {
-                        scope.serverError = response[0].description;
-                    });
-            };
+                return adhGetBadges(proposal).then((assignments : IBadge[]) => {
+                    scope.assignments = _.keyBy(assignments, "badgePath");
+                    scope.checkboxes = _.mapValues(scope.assignments, (v) => true);
+                });
+            });
 
             scope.submit = () => {
-                var resource = scope.resource;
-                return adhHttp.put(resource.path, fill(resource, scope, adhCredentials.userPath))
-                    .then((response) => {
-                        scope.serverError = null;
-                        if (scope.onSubmit) {
-                            scope.onSubmit();
+                adhHttp.withTransaction((transaction) => {
+                    for (var badgePath in scope.checkboxes) {
+                        if (scope.checkboxes.hasOwnProperty(badgePath)) {
+                            var assignmentExisted = scope.assignments.hasOwnProperty(badgePath);
+                            if (scope.checkboxes[badgePath] && !assignmentExisted) {
+                                var assignment = new RIBadgeAssignment({preliminaryNames: adhPreliminaryNames});
+                                // TODO: handle description
+                                assignment.data[SIBadgeAssignment.nick] = {
+                                    badge: badgePath,
+                                    object: scope.badgeablePath,
+                                    subject: adhCredentials.userPath
+                                };
+                                transaction.post(scope.poolPath, assignment);
+                            } else if (!scope.checkboxes[badgePath] && assignmentExisted) {
+                                transaction.delete(scope.assignments[badgePath].path, RIBadgeAssignment.content_type);
+                            }
                         }
-                    }, (response) => {
-                        scope.serverError = response[0].description;
-                    });
+                    }
+
+                    return transaction.commit()
+                        .then((responses) => {
+                            if (scope.onSubmit) {
+                                scope.onSubmit();
+                            }
+                        }, (response) => {
+                            scope.serverError = response[0].description;
+                        });
+                });
             };
 
             scope.cancel = () => {
