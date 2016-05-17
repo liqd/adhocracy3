@@ -7,8 +7,11 @@ var EmbeddedCommentsPage = require("./EmbeddedCommentsPage.js");
 describe("ratings", function() {
     var page;
 
-    beforeEach(function() {
+    beforeAll(function() {
         shared.loginParticipant();
+    });
+
+    beforeEach(function() {
         page = new EmbeddedCommentsPage("c1").get();
     });
 
@@ -36,7 +39,6 @@ describe("ratings", function() {
     });
 
     it("is not affected by the edition of the comment", function() {
-        shared.loginParticipant();
         var page = new EmbeddedCommentsPage("c2");
         page.getUrl().then(function() {
             // at this point annotator may not be logged

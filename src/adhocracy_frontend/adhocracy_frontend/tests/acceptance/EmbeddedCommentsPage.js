@@ -43,6 +43,10 @@ var EmbeddedCommentsPage = function(referer) {
         //                   })
         //        });
     };
+    
+    this.getFirstComment = function() {
+        return this.listing.element(by.xpath("(//adh-comment)[1]"));
+    } 
 
     this.getReplyLink = function(comment) {
         return comment.element(by.css(".icon-reply"));

@@ -2,10 +2,11 @@
 
 var shared = require("./shared.js");
 var EmbeddedCommentsPage = require("./EmbeddedCommentsPage.js");
-
+var UserPages = require("./UserPages.js");
 
 describe("comments", function() {
-    beforeEach(function() {
+
+    beforeAll(function() {
         shared.loginParticipant();
     });
 
@@ -46,40 +47,6 @@ describe("comments", function() {
         expect(page.getCommentText(comment)).toEqual("comment 0a");
     });
 
-    it("can not be edited by anonymous", function() {
-        var page = new EmbeddedCommentsPage("c5").get();
-        var comment = page.createComment("comment 1");
-        shared.logout();
-        expect(page.getEditLink(comment).isPresent()).toBe(false);
-    });
-
-    it("can not be edited by other user", function() {
-        var page = new EmbeddedCommentsPage("c6").get();
-        var comment = page.createComment("comment 1");
-        shared.logout();
-        shared.loginOtherParticipant();
-        page.get();
-        expect(page.getEditLink(comment).isPresent()).toBe(false);
-    });
-
-    it("can not be replied to by anonymous", function() {
-        var page = new EmbeddedCommentsPage("c7").get();
-        var comment = page.createComment("comment 1");
-        shared.logout();
-        expect(page.getReplyLink(comment).isPresent()).toBe(false);
-    });
-
-    it("can be replied to by other user", function() {
-        var page = new EmbeddedCommentsPage("c8").get();
-        var comment = page.createComment("comment 1");
-        shared.logout();
-        shared.loginOtherParticipant();
-        page.get();
-        expect(page.getReplyLink(comment).isPresent()).toBe(true);
-        var reply = page.createReply(comment, "reply 1");
-        expect(page.getCommentText(reply)).toEqual("reply 1");
-    });
-
     it("can be edited twice", function() {
         var page = new EmbeddedCommentsPage("c9").get();
         var comment = page.createComment("comment 1");
@@ -105,6 +72,49 @@ describe("comments", function() {
         var changedComment = page.editComment(parent, ["comment 1 - edited"]);
         var reply = page.createReply(changedComment, "reply 1");
 
+        expect(page.getCommentText(reply)).toEqual("reply 1");
+    });
+
+    it("can not be edited by anonymous", function() {
+        shared.loginParticipant();
+        var page = new EmbeddedCommentsPage("c5").get();
+        var comment = page.createComment("comment 1");
+        shared.logout();
+        expect(page.getEditLink(comment).isPresent()).toBe(false);
+    });
+
+    it("can not be replied to by anonymous", function() {
+        shared.loginParticipant();
+        var page = new EmbeddedCommentsPage("c7").get();
+        var comment = page.createComment("comment 1");
+        shared.logout();
+        expect(page.getReplyLink(comment).isPresent()).toBe(false);
+    });
+});
+
+describe("comments of other user", function() {
+    
+    var page;
+    
+    beforeAll( function () {
+        shared.loginParticipant();
+        page = new EmbeddedCommentsPage("c6").get();
+        page.createComment("comment 1");
+        shared.logout();
+        shared.loginOtherParticipant();
+    });
+    
+    it("can not be edited", function() {
+        page.get();
+        var comment = page.getFirstComment();
+        expect(page.getEditLink(comment).isPresent()).toBe(false);
+    });
+
+    it("can be replied", function() {
+        page.get();
+        var comment = page.getFirstComment();
+        expect(page.getReplyLink(comment).isPresent()).toBe(true);
+        var reply = page.createReply(comment, "reply 1");
         expect(page.getCommentText(reply)).toEqual("reply 1");
     });
 });
