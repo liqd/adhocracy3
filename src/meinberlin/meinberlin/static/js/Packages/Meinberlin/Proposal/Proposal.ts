@@ -365,7 +365,7 @@ export var createDirective = (
                 var locationUrl = process.data[SILocationReference.nick]["location"];
                 adhHttp.get(locationUrl).then((location) => {
                     var polygon = location.data[SIMultiPolygon.nick]["coordinates"][0][0];
-                    scope.data.polygon =  polygon;
+                    scope.data.polygon = polygon;
                 });
             });
 

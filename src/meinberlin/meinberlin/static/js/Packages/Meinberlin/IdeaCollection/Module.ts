@@ -50,8 +50,8 @@ export var register = (angular) => {
             var customHeader = adhConfig.pkg_path + IdeaCollection.pkgLocation + "/CustomHeader.html";
             adhResourceAreaProvider.customHeader(processType, customHeader);
         }])
-        .config(["adhProcessProvider", (adhProcessProvider: AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[processType] = ["$q", ($q: angular.IQService) => {
+        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
+            adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {
                 return $q.when("<adh-meinberlin-idea-collection-workbench>" +
                     "</adh-meinberlin-idea-collection-workbench>");
             }];
