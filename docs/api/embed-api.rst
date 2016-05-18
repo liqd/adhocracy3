@@ -115,6 +115,9 @@ following parameters are always available:
 -   ``nocenter``: By default, the widget will be centered in the iframe.
     If this option is set to ``true``, it will fill the iframe instead.
 
+-   ``noheader``: By default, a header will be shown above the widget.
+    If this option is set to ``true``, it will be omitted.
+
 -   ``initial-url`` will set the initial URL (i.e. path, query and
     anchor) for the embedded platform if widget is ``"plain"``.
 
