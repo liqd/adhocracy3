@@ -34,11 +34,25 @@ export var detailDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
         scope: {
             path: "@",
+            sorts: "=?",
             isBuergerhaushalt: "=?",
             isKiezkasse: "=?"
         },
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            scope.sorts = [{
+                key: "rates",
+                name: "TR__RATES",
+                index: "rates",
+                reverse: true
+            }, {
+                key: "item_creation_date",
+                name: "TR__CREATION_DATE",
+                index: "item_creation_date",
+                reverse: true
+            }];
+            scope.sort = "item_creation_date";
+
             scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
