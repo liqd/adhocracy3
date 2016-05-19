@@ -15,8 +15,6 @@ script:
   - "PATH=${TRAVIS_BUILD_DIR}/bin:${PATH} ./bin/protractor etc/protractorConfSauce.js"
 notifications:
   email: false
-after_success:
-  - "bin/coveralls"
 cache:
   directories:
     - eggs
