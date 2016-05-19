@@ -169,7 +169,7 @@ export var register = () => {
 
             it("identifies if a super_type is requested instance", () => {
                 var resource = {
-                    content_type: RIPool.content_type,
+                    content_type: RIProcess.content_type,
                     path: "",
                     data: {}
                 };
