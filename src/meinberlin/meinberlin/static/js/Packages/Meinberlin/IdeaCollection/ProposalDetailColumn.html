@@ -16,21 +16,23 @@
     </a>
 
     <div data-ng-switch-when="body">
-        <adh-resource-actions
-            data-resource-path="{{proposalUrl}}"
-            data-parent-path="true"
-            data-edit="true"
-            data-print="true">
-        </adh-resource-actions>
-        <a href=""
-            data-ng-click="delete()"
-            data-ng-if="versionOptions.hide"
-            class="comment-header-link"
-            title="{{ 'TR__DELETE' | translate }}">
-            <i class="comment-header-icon icon-x"></i>
-        </a>
         <adh-recompile-on-change
             data-value="{{proposalUrl}}">
+            <div class="action-bar">
+                <adh-edit-action
+                    data-ng-if="proposalUrl && proposalItemOptions.PUT"
+                    data-class="action-bar-item"
+                    data-parent-path="true"
+                    data-resource-path="{{proposalUrl}}"></adh-edit-action>
+                <a href=""
+                    data-ng-click="delete()"
+                    data-ng-if="versionOptions.hide"
+                    class="action-bar-item"
+                    title="{{ 'TR__DELETE' | translate }}">
+                    {{ 'TR__DELETE' | translate }}</a>
+                <adh-print-action
+                    data-class="action-bar-item"></adh-print-action>
+            </div>
             <adh-meinberlin-proposal-detail
                 data-ng-if="proposalUrl"
                 data-is-buergerhaushalt="isBuergerhaushalt"
