@@ -16,6 +16,7 @@ export var register = () => {
             var $injectorMock;
             var $locationMock;
             var $templateRequestMock;
+            var adhMetaApiMock;
             var adhResourceUrlFilterMock;
             var service;
 
@@ -51,6 +52,8 @@ export var register = () => {
 
                 adhResourceUrlFilterMock = (path) => path;
 
+                adhMetaApiMock = jasmine.createSpyObj("adhMetaApi", ["resource"]);
+
                 service = new AdhResourceArea.Service(
                     providerMock,
                     <any>q,
@@ -61,7 +64,7 @@ export var register = () => {
                     adhConfigMock,
                     adhCredentialsMock,
                     adhEmbedMock,
-                    null,
+                    adhMetaApiMock,
                     adhResourceUrlFilterMock);
             });
 
@@ -124,22 +127,37 @@ export var register = () => {
                 // We here create a mock adhHttp Service object. We say an input string contains a process
                 // if it has 4 slashes. We wanted to verify that getProcess() worked both with URLs and paths.
                 beforeEach(() => {
-                    adhHttpMock.get.and.callFake((arg) => q.when({
-                        isInstanceOf: () => arg.match(/\//g).length === 4,
-                        arg: arg
-                    }));
+                    adhHttpMock.get.and.callFake((arg) => {
+                        if (arg.match(/\//g).length === 4) {
+                            return q.when({
+                                content_type: "adhocracy_core.resources.process.IProcess",
+                                path: arg,
+                                data: {}
+                            });
+                        } else {
+                            return q.when({
+                                content_type: "adhocracy_core.resources.organisation.IOrganisation",
+                                path: arg,
+                                data: {}
+                            });
+                        }
+                    });
+
+                    adhMetaApiMock.resource.and.returnValue({
+                        super_types: []
+                    });
                 });
 
                 it("works with URLs", (done) => {
                     service.getProcess("http://rest_url/bla/fu/bar/bass").then((result) => {
-                        expect(result.arg).toBe("http://rest_url/bla/fu");
+                        expect(result.path).toBe("http://rest_url/bla/fu");
                         done();
                     });
                 });
 
                 it("works with paths", (done) => {
                     service.getProcess("/bla/fu/bar/bass").then((result) => {
-                        expect(result.arg).toBe("http://rest_url/bla/fu");
+                        expect(result.path).toBe("http://rest_url/bla/fu");
                         done();
                     });
                 });
