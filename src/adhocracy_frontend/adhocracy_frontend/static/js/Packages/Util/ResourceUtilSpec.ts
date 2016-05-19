@@ -2,6 +2,8 @@
 
 import * as AdhResourceUtil from "./ResourceUtil";
 
+import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
+import RIPool from "../../Resources_/adhocracy_core/interfaces/IPool";
 
 export var register = () => {
     describe("ResourceUtil", () => {
@@ -143,6 +145,48 @@ export var register = () => {
 
             it("creates a follos entry referencing the old version", () => {
                 expect(resource.data["adhocracy_core.sheets.versions.IVersionable"].follows).toEqual(["/old/path"]);
+            });
+        });
+
+        describe("isInstanceOf", () => {
+            var mockMetaApiData = {};
+            mockMetaApiData[RIProcess.content_type] = RIProcess;
+            mockMetaApiData[RIPool.content_type] = RIPool;
+
+            var adhMetaApiMock = jasmine.createSpyObj("adhMetaApi", ["resource"]);
+            adhMetaApiMock.resource.and.callFake((name) => mockMetaApiData[name]);
+
+            it("identigies if a resoruce is requested istance", () => {
+                var resource = {
+                    content_type: RIProcess.content_type,
+                    path: "",
+                    data: {}
+                };
+                expect(
+                    AdhResourceUtil.isInstanceOf(resource, RIProcess.content_type, adhMetaApiMock)
+                ).toBe(true);
+            });
+
+            it("identifies if a super_type is requested instance", () => {
+                var resource = {
+                    content_type: RIPool.content_type,
+                    path: "",
+                    data: {}
+                };
+                expect(
+                    AdhResourceUtil.isInstanceOf(resource, RIPool.content_type, adhMetaApiMock)
+                ).toBe(true);
+            });
+
+            it("identifies if an resource is not of requested instance", () => {
+                var resource = {
+                    content_type: RIPool.content_type,
+                    path: "",
+                    data: {}
+                };
+                expect(
+                    AdhResourceUtil.isInstanceOf(resource, RIProcess.content_type, adhMetaApiMock)
+                ).toBe(false);
             });
         });
     });
