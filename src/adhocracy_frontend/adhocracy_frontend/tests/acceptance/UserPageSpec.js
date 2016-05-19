@@ -55,7 +55,6 @@ describe("user page", function() {
             var mailpath = browser.params.mail.queue_path + "/new/" + newMails[0];
 
             shared.parseEmail(mailpath, function(mail) {
-                // console.log('mail', mail);
                 expect(mail.text).toContain(content);
                 expect(mail.subject).toContain(subject);
                 expect(mail.from[0].address).toContain("noreply");
