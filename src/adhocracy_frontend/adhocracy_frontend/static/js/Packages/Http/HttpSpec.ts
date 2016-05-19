@@ -463,8 +463,7 @@ export var register = () => {
                             done();
                         },
                         (error) => {
-                            console.log("this should not happen.");
-                            done();
+                            throw "This should not happen";
                         }
                     );
                 });
