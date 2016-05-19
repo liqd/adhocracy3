@@ -199,6 +199,7 @@ group_meta = pool_meta._replace(
                      ),
     element_types=(),  # we don't want the frontend to post resources here
     permission_create='create_group',
+    is_sdi_addable=True,
 )
 
 
