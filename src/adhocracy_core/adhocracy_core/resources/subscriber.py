@@ -322,17 +322,24 @@ def decrease_comments_count(event):
         update_comments_count(comment_version, -1, event.registry)
 
 
+def _get_comments_count(resource, registry):
+    commentable_sheet = registry.content.get_sheet(resource, ICommentable)
+    appstruct = commentable_sheet.get()
+    return appstruct.get('comments_count', 1)
+
+
 def update_comments_count_after_visibility_change(event):
     """Update comments_count in lineage after visibility change."""
     visibility = get_visibility_change(event)
+    first_version = _get_first_version(event.object, event.registry)
+    comments_count = _get_comments_count(first_version, event.registry)
     if visibility == VisibilityChange.concealed:
-        delta = -1
+        delta = -(comments_count + 1)
     elif visibility == VisibilityChange.revealed:
-        delta = 1
+        delta = comments_count + 1
     else:
         delta = 0
     if delta != 0:
-        first_version = _get_first_version(event.object, event.registry)
         update_comments_count(first_version, delta, event.registry)
 
 
@@ -341,7 +348,7 @@ def update_comments_count(resource: ICommentVersion,
                           registry: Registry):
     """Update all commentable resources related to `resource`.
 
-    Traverse all commentable resources that have a IComment or ISubresource
+     Traverse all commentable resources that have a IComment or ISubresource
     reference to `resource` and update the comment_count value with `delta`.
 
     Example reference structure that is traversed:

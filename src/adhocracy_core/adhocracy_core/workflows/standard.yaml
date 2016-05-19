@@ -1,4 +1,5 @@
 initial_state: draft
+auto_transition: False
 states:
   draft:
     title: Draft

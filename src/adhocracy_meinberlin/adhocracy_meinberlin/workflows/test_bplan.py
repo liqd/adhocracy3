@@ -99,8 +99,10 @@ class TestBPlanWorkflow:
         assigment = registry.content.get_sheet(context, IWorkflowAssignment)
         assigment.set({'state_data': [
             {'name': 'participate','description': '',
-             'start_date': datetime.date(2015, 5, 5),
-             'end_date': datetime.date(2015, 6, 11)}]})
+             'start_date': datetime.date(2015, 5, 5)},
+            {'name': 'evaluate', 'description': '',
+             'start_date': datetime.date(2015, 6, 11)}
+        ]})
 
     def test_create_resources(self,
                               datadir,

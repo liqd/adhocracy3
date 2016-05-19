@@ -144,7 +144,6 @@ def _create_authentication_policy(settings, config: Configurator)\
                                                  http_only=True,
                                                  callback=groupfinder,
                                                  timeout=timeout)
-    # TODO add secure cookie flag if https
     multi_policy.add_policy(SDI_ROUTE_NAME, session_policy)
     return multi_policy
 

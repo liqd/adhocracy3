@@ -36,17 +36,17 @@ class Client:
         self._ws_connection = None
         self._is_running = False
         self._is_stopped = False
-        if ws_url is not None:
+        if ws_url is not None:  # pragma: no cover
             self._init_listener_thread()
 
-    def _init_listener_thread(self):
+    def _init_listener_thread(self):  # pragma: no cover
         """Init thread that keeps the connection alive."""
         runner = Thread(target=self._run)
         runner.daemon = True
         runner.start()
         self._wait_a_bit_until_connected()
 
-    def _run(self):
+    def _run(self):  # pragma: no cover
         """Start and keep alive connection to the websocket server."""
         assert self._ws_url
         while not self._is_stopped:
@@ -64,7 +64,7 @@ class Client:
                     exception_to_str(err))
                 time.sleep(1)
 
-    def _wait_a_bit_until_connected(self):
+    def _wait_a_bit_until_connected(self):  # pragma: no cover
         """Wait until the connection has been set up, but at most 2.5 secs."""
         for i in range(25):  # pragma: no branch
             if self._is_running:
@@ -76,7 +76,7 @@ class Client:
         frame = self._ws_connection.recv_frame()
         self._process_frame(frame)
 
-    def _connect_to_server(self):
+    def _connect_to_server(self):  # pragma: no cover
         if not self._is_connected():
             logger.debug('Try connecting to the Websocket server at '
                          + self._ws_url)
@@ -144,7 +144,7 @@ class Client:
         logger.debug('Sending message to Websocket server: %s', message_text)
         self._ws_connection.send(message_text)
 
-    def stop(self):
+    def stop(self):  # pragma: no cover
         """Stop the client."""
         self._is_stopped = True
         try:
@@ -180,7 +180,7 @@ def includeme(config):
     """
     settings = config.registry.settings
     ws_url = settings.get('adhocracy.ws_url', '')
-    if ws_url:
+    if ws_url:  # pragma: no cover
         ws_client = Client(ws_url=ws_url)
         config.registry.ws_client = ws_client
     else:

@@ -81,14 +81,14 @@ class AdhocracySchemaNodeUnitTest(unittest.TestCase):
             inst.deserialize('1')
 
 
-class TestAdhocracySchemaNode:
+class TestSequenceSchema:
 
     def make_one(self, **kwargs):
-        from adhocracy_core.schema import SequenceSchema
+        from . import SequenceSchema
 
         class AdhocracySequenceExample(SequenceSchema):
             child1 = colander.Schema(typ=colander.Int())
-        return AdhocracySequenceExample().bind()
+        return AdhocracySequenceExample(**kwargs).bind()
 
     def test_create(self):
         from . import SchemaNode
@@ -102,6 +102,16 @@ class TestAdhocracySchemaNode:
         inst = self.make_one()
         inst2 = self.make_one()
         assert not (inst.default is inst2.default)
+
+    def test_sequence_wiget_is_set(self):
+        from deform.widget import SequenceWidget
+        inst = self.make_one()
+        assert isinstance(inst.widget,  SequenceWidget)
+
+    def test_sequent_widget_is_fixe_if_readonly(self):
+        inst = self.make_one(readonly=True)
+        assert inst.widget.readonly
+        assert inst.widget.deserialize(inst, ['default']) == colander.null
 
 
 class TestInterface():

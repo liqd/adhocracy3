@@ -676,7 +676,7 @@ class TestUpdateCommentsCount:
 class TestUpdateCommentsCountAfterVisibilityChange:
 
     @fixture
-    def mock_versions_sheet(self, mock_sheet, registry):
+    def mock_sheet(self, mock_sheet, registry):
         registry.content.get_sheet.return_value = mock_sheet
         return mock_sheet
 
@@ -689,38 +689,40 @@ class TestUpdateCommentsCountAfterVisibilityChange:
         from .subscriber import update_comments_count_after_visibility_change
         return update_comments_count_after_visibility_change(*args)
 
-    def test_ignore_if_visible(self, mocker, registry, event, mock_update):
+    def test_ignore_if_visible(self, mocker, registry, event, mock_update, mock_sheet):
         from adhocracy_core.interfaces import VisibilityChange
         from . import subscriber
         event.registry = registry
+        comment_v0 = testing.DummyResource()
+        mock_sheet.get.side_effect = [{'FIRST': [comment_v0]}, {'comments_count': 1}]
         mock_visibility = mocker.patch.object(subscriber, 'get_visibility_change')
         mock_visibility.return_value = VisibilityChange.visible
         self.call_fut(event)
         assert not mock_update.called
 
     def test_decrease_count_if_consealed(self, mocker, registry, event,
-                                         mock_update, mock_versions_sheet):
+                                         mock_update, mock_sheet):
         from adhocracy_core.interfaces import VisibilityChange
         from . import subscriber
         event.registry = registry
         comment_v0 = testing.DummyResource()
-        mock_versions_sheet.get.return_value = {'FIRST': [comment_v0]}
+        mock_sheet.get.side_effect = [{'FIRST': [comment_v0]}, {'comments_count': 2}]
         mock_visibility = mocker.patch.object(subscriber, 'get_visibility_change')
         mock_visibility.return_value = VisibilityChange.concealed
         self.call_fut(event)
-        assert mock_update.called_with(comment_v0, -1, event.registry)
+        assert mock_update.called_with(comment_v0, -3, event.registry)
 
     def test_increase_count_if_revealed(self, mocker, registry, event,
-                                        mock_update, mock_versions_sheet):
+                                        mock_update, mock_sheet):
         from adhocracy_core.interfaces import VisibilityChange
         from . import subscriber
         event.registry = registry
         comment_v0 = testing.DummyResource()
-        mock_versions_sheet.get.return_value = {'FIRST': [comment_v0]}
+        mock_sheet.get.side_effect = [{'FIRST': [comment_v0]}, {'comments_count': 2}]
         mock_visibility = mocker.patch.object(subscriber, 'get_visibility_change')
         mock_visibility.return_value = VisibilityChange.revealed
         self.call_fut(event)
-        assert mock_update.called_with(comment_v0, 1, event.registry)
+        assert mock_update.called_with(comment_v0, 3, event.registry)
 
 
 class TestDownloadPictureForVersion:

@@ -1,7 +1,6 @@
 """Sheets tab and add view for resources."""
 from collections import OrderedDict
 
-from colander import null
 from deform import Form
 from pyramid.interfaces import IRequest
 from pyramid.httpexceptions import HTTPNotFound
@@ -23,8 +22,8 @@ from adhocracy_core.utils import create_schema
 class FormView(SDFormView):
     """View class that autogenerates forms based on :term:`schema` .
 
-    I uses :mod:`colander` schema to define the data structure and
-    validator and :mod:`deform` to render html forms.
+    Uses :mod:`colander` schema to define the data structure and
+    validators and :mod:`deform` to render html forms.
     """
 
     def _build_form(self) -> tuple:
@@ -49,7 +48,7 @@ class FormView(SDFormView):
                   }
         form = self.form_class(self.schema, **config)
         self.before(form)
-        self._setup_readonly_form_widgets(form)
+        self._setup_readonly_widgets(form)
         resources = form.get_widget_resources()
         return (form, resources)
 
@@ -62,22 +61,13 @@ class FormView(SDFormView):
         bindings['_csrf_token_'] = self.request.session.get_csrf_token()
         self.schema = csrf_schema.bind(**bindings)
 
-    def _setup_readonly_form_widgets(self, form: Form) -> Form:
-        """Setup widgets for readonly fields.
-
-        * Set readonly template for widgets if schema field is readonly.
-          (See for example the IMetadata sheet schema)
-
-        * Fix readonly template for list widget is not working
-          (See for example the IPermission sheet schema)
-        """
-        for field in form.children:
-            is_readonly = getattr(field.schema, 'readonly', False)
-            if is_readonly:
-                field.widget.readonly = True  # set readonly template
-                if field.name in form.cstruct:  # workaround list widget bug
-                    del form.cstruct[field.name]
-                    field.widget.deserialize = lambda x, y: null
+    def _setup_readonly_widgets(self, form: Form):
+        """Set readonly template for widgets if schema field is readonly."""
+        is_readonly = getattr(form.schema, 'readonly', False)
+        if is_readonly:
+            form.widget.readonly = True  # set readonly template
+        for subfield in getattr(form, 'children', []):
+            self._setup_readonly_widgets(subfield)
 
 
 @mgmt_view(

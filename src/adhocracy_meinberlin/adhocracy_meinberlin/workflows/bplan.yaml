@@ -1,4 +1,5 @@
 defaults: standard
+auto_transition: True
 states:
   participate:
     acm:

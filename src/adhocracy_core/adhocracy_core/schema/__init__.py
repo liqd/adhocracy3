@@ -24,6 +24,7 @@ from colander import deferred
 from colander import drop
 from colander import null
 from deform.widget import DateTimeInputWidget
+from deform.widget import SequenceWidget
 from pyramid.path import DottedNameResolver
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
@@ -83,6 +84,15 @@ class SequenceSchema(colander.SequenceSchema, SchemaNode):
     @deferred
     def default(node: SchemaNode, kw: dict) -> list:
         return []
+
+    @deferred
+    def widget(self, kw: dict):
+        """Customize SequenceWidget to work with readonly fields."""
+        widget = SequenceWidget()
+        if self.readonly:
+            widget.readonly = True
+            widget.deserialize = lambda x, y: null
+        return widget
 
 
 class MappingSchema(colander.MappingSchema, SchemaNode):
