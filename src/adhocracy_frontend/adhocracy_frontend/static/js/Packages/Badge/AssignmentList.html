@@ -6,7 +6,7 @@
     <div class="badges-groups row">
         <div class="badges-group cols-2" data-ng-repeat="(groupPath, badgePaths) in badgesByGroup">
             <!-- FIXME:this isn't working {{badgeGroups[groupPath].title}}: -->
-            <h2 class="badges-group-header">Dummy Group header</h2>
+            <h2 class="badges-group-header">{{badgeGroups[groupPath].title}}</h2>
             <label class="badge-toggle" data-ng-repeat="badgePath in badgePaths">
                 <input
                     type="checkbox"
