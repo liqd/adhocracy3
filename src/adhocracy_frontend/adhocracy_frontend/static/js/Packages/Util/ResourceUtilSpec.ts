@@ -156,7 +156,7 @@ export var register = () => {
             var adhMetaApiMock = jasmine.createSpyObj("adhMetaApi", ["resource"]);
             adhMetaApiMock.resource.and.callFake((name) => mockMetaApiData[name]);
 
-            it("identigies if a resoruce is requested istance", () => {
+            it("identifies a resource as a requested instance", () => {
                 var resource = {
                     content_type: RIProcess.content_type,
                     path: "",
@@ -167,7 +167,7 @@ export var register = () => {
                 ).toBe(true);
             });
 
-            it("identifies if a super_type is requested instance", () => {
+            it("identifies a super_type as super_type of a requested instance", () => {
                 var resource = {
                     content_type: RIProcess.content_type,
                     path: "",
@@ -178,7 +178,7 @@ export var register = () => {
                 ).toBe(true);
             });
 
-            it("identifies if an resource is not of requested instance", () => {
+            it("verifies that a resource is not the requested instance", () => {
                 var resource = {
                     content_type: RIPool.content_type,
                     path: "",
