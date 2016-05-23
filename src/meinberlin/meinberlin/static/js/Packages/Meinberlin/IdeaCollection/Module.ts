@@ -42,7 +42,12 @@ export var register = (angular) => {
         .directive("adhMeinberlinIdeaCollectionWorkbench", [
             "adhTopLevelState", "adhConfig", "adhHttp", IdeaCollection.workbenchDirective])
         .directive("adhMeinberlinIdeaCollectionProposalDetailColumn", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", "$location", "$window",
+            "adhConfig",
+            "adhHttp",
+            "adhPermissions",
+            "adhTopLevelState",
+            "$location",
+            "$window",
             IdeaCollection.proposalDetailColumnDirective])
         .directive("adhMeinberlinIdeaCollectionProposalCreateColumn", [
             "adhConfig", IdeaCollection.proposalCreateColumnDirective])
