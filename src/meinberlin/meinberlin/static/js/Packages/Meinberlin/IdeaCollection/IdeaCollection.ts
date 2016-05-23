@@ -107,7 +107,7 @@ export var proposalDetailColumnDirective = (
             column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "versionOptions");
-            scope.delete = () => {
+            scope.hide = () => {
                 var proposalClass = RIGeoProposal;
                 if (scope.isKiezkasse) {
                     proposalClass = RIKiezkasseProposal;
