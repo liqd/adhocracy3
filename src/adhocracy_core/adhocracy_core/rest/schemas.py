@@ -58,6 +58,8 @@ from adhocracy_core.schema import ContentType
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import DateTimes
 from adhocracy_core.schema import Email
+from adhocracy_core.schema import Float
+from adhocracy_core.schema import Floats
 from adhocracy_core.schema import Integer
 from adhocracy_core.schema import Integers
 from adhocracy_core.schema import Interface
@@ -95,6 +97,7 @@ INDEX_EXAMPLE_VALUES = {
     'rate': 1,
     'rates': 1,
     'interfaces': interface.Interface,
+    'controversiality': 0.0,
 }
 
 
@@ -928,6 +931,11 @@ def create_arbitrary_filter_node(index, example_value, query):
     return Integer()
 
 
+@dispatch((FieldIndex, KeywordIndex), float, (float, str))  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
+    return Float()
+
+
 @dispatch((FieldIndex, KeywordIndex), bool, (bool, str))  # flake8: noqa
 def create_arbitrary_filter_node(index, example_value, query):
     return Boolean()
@@ -978,6 +986,14 @@ def create_arbitrary_filter_node(index, example_value, query):
         return FieldComparableIntegers()
     else:
         return FieldComparableInteger()
+
+
+@dispatch(FieldIndex, float, list)  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
+    if query[0] in FieldSequenceComparator.__members__:
+        return FieldComparableFloats()
+    else:
+        return FieldComparableFloat()
 
 
 @dispatch(KeywordIndex, str, list)  # flake8: noqa
@@ -1144,6 +1160,12 @@ class FieldComparableIntegers(FieldComparableSequenceBase):
     value = Integers()
 
 
+class FieldComparableFloats(FieldComparableSequenceBase):
+    """Tuple with values FieldSequenceComparable and Floats."""
+
+    value = Floats()
+
+
 class FieldComparableInterfaces(FieldComparableSequenceBase):
     """Tuple with values FieldSequenceComparable and Interfaces."""
 
@@ -1178,6 +1200,12 @@ class FieldComparableInteger(FieldComparableBase):
     """Tuple with values FieldComparable and Integer."""
 
     value = Integer()
+
+
+class FieldComparableFloat(FieldComparableBase):
+    """Tuple with values FieldComparable and Float."""
+
+    value = Float()
 
 
 class FieldComparableInterface(FieldComparableBase):

@@ -15,6 +15,7 @@ from adhocracy_core.interfaces import IItem
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.rate import IRateable
+from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.principal import IUserBasic
@@ -33,6 +34,12 @@ def reindex_rates(event):
     """Reindex the rates index if a rate backreference is modified."""
     catalogs = find_service(event.object, 'catalogs')
     catalogs.reindex_index(event.object, 'rates')
+
+
+def reindex_controversiality(event):
+    """Reindex the controversiality index if backreference is modified."""
+    catalogs = find_service(event.object, 'catalogs')
+    catalogs.reindex_index(event.object, 'controversiality')
 
 
 def reindex_user_name(event):
@@ -111,6 +118,12 @@ def includeme(config):
     config.add_subscriber(reindex_rates,
                           ISheetBackReferenceModified,
                           event_isheet=IRateable)
+    config.add_subscriber(reindex_controversiality,
+                          ISheetBackReferenceModified,
+                          event_isheet=IRateable)
+    config.add_subscriber(reindex_controversiality,
+                          ISheetBackReferenceModified,
+                          event_isheet=ICommentable)
     config.add_subscriber(reindex_badge,
                           IResourceSheetModified,
                           event_isheet=IBadgeAssignment)
