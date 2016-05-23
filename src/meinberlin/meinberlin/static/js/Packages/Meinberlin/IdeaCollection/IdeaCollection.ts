@@ -106,7 +106,6 @@ export var proposalDetailColumnDirective = (
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
-            adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "versionOptions");
             scope.hide = () => {
                 var proposalClass = RIGeoProposal;
                 if (scope.isKiezkasse) {
