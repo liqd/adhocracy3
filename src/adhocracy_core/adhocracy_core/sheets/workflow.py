@@ -114,8 +114,7 @@ class WorkflowAssignmentSchema(MappingSchema):
 
     example:
 
-        {'name': 'state1', 'description': 'text', 'start_date': <DateTime>,
-         'end_date: <DateTime>}
+        {'name': 'state1', 'description': 'text', 'start_date': <DateTime>}
     """
 
 
