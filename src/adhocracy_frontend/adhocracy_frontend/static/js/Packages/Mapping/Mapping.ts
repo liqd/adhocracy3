@@ -293,6 +293,7 @@ export interface IMapListScope extends angular.IScope {
 
 export class MapListingController {
     private map : L.Map;
+    private clusterGroup;
     private scrollContainer;
     private selectedItemLeafletIcon;
     private itemLeafletIcon;
@@ -396,6 +397,12 @@ export class MapListingController {
             this.$scope.showZoomButton = true;
         });
 
+        this.clusterGroup = (<any>this.leaflet).markerClusterGroup({
+            chunkedLoading: true,
+            showCoverageOnHover: false
+        });
+        this.clusterGroup.addTo(map);
+
         return map;
     }
 
@@ -464,7 +471,7 @@ export class MapListingController {
             var marker = this.leaflet.marker(this.leaflet.latLng(lat, lng), {
                 icon: this.itemLeafletIcon
             });
-            marker.addTo(this.map);
+            marker.addTo(this.clusterGroup);
             marker.on("click", () => {
                 this.$timeout(() => {
                     this.$scope.selectItem(path);
@@ -488,7 +495,7 @@ export class MapListingController {
                     this.$scope.getNextItem();
                 }
                 delete this.markers[path];
-                this.map.removeLayer(marker);
+                this.clusterGroup.removeLayer(marker);
                 this.scrollToItem(this.$scope.selectedPath, false);
             };
         }

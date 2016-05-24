@@ -83,9 +83,20 @@ rather than in response to user action.
     @include border-radius(50%);
     @include box-shadow(0 0 1px 1px $color-text-inverted);
     background: $color-brand-two-normal;
+    color: $color-text-inverted;
+    text-align: center;
 
     &.is-active, &:hover, &:focus {
         background: $color-brand-one-introvert;
+    }
+
+    &.marker-cluster {
+        display: table;
+
+        div {
+            display: table-cell;
+            vertical-align: middle;
+        }
     }
 }
 
