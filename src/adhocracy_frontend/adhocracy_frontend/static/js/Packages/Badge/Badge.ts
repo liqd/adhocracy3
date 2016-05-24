@@ -104,6 +104,19 @@ export var bindPath = (
         };
     };
 
+    var collectBadgesByGroup = (groupPaths, badges) => {
+        var badgesByGroup = {};
+        for (var groupPath of groupPaths) {
+            badgesByGroup[groupPath] = [];
+            for (var badge of badges) {
+                if (_.includes(badge.groups, groupPath)) {
+                    badgesByGroup[groupPath].push(badge.path);
+                }
+            }
+        }
+        return badgesByGroup;
+    };
+
     var getAssignableBadges = (rawOptions) => {
         if (!rawOptions) {
             return;
@@ -126,18 +139,7 @@ export var bindPath = (
             var groupPaths : string[]  = _.union.apply(_, _.map(badges, "groups"));
             $q.all(_.map(groupPaths, (g) => adhHttp.get(g))).then((result) => {
                 scope.badgeGroups = _.keyBy(_.map(result, extractGroup), "path");
-
-                // TODO: factor out or make clearer
-                var badgesByGroup = {};
-                for (var groupPath of groupPaths) {
-                    badgesByGroup[groupPath] = [];
-                    for (var badge of badges) {
-                        if (_.includes(badge.groups, groupPath)) {
-                            badgesByGroup[groupPath].push(badge.path);
-                        }
-                    }
-                }
-                scope.badgesByGroup = badgesByGroup;
+                scope.badgesByGroup = collectBadgesByGroup(groupPaths, badges);
             });
         });
     };
@@ -212,7 +214,6 @@ export var badgeAssignmentList = (
                             var assignmentExisted = scope.assignments.hasOwnProperty(badgePath);
                             if (scope.checkboxes[badgePath] && !assignmentExisted) {
                                 var assignment = new RIBadgeAssignment({preliminaryNames: adhPreliminaryNames});
-                                // TODO: handle description
                                 assignment.data[SIBadgeAssignment.nick] = {
                                     badge: badgePath,
                                     object: scope.badgeablePath,
