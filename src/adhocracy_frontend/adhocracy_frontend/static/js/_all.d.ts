@@ -10,6 +10,7 @@ declare module "angularTranslateLoader" {}
 declare module "angularElastic" {}
 declare module "angularScroll" {}
 declare module "angularFlow" {}
+declare module "leafletMarkerCluster" {}
 
 declare module "sticky" {
     export var Sticky : any;

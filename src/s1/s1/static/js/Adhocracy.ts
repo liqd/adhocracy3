@@ -19,6 +19,7 @@ import * as modernizr from "modernizr";
 import * as moment from "moment";
 import * as webshim from "polyfiller";
 import * as leaflet from "leaflet";
+import * as leafletMarkerCluster from "leafletMarkerCluster";  if (leafletMarkerCluster) { ; };
 import * as markdownit from "markdownit";
 
 import * as AdhAbuseModule from "./Packages/Abuse/Module";

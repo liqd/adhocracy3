@@ -111,9 +111,9 @@ def root_view(request):
     result = render(
         'adhocracy_frontend:build/root.html.mako',
         {'css': [request.cachebusted_url('adhocracy_frontend:build/'
-                                         + css_path),
-                 request.cachebusted_url('adhocracy_frontend:build/'
                                          'lib/leaflet/dist/leaflet.css'),
+                 request.cachebusted_url('adhocracy_frontend:build/'
+                                         + css_path),
                  ],
          'js': [request.cachebusted_url('adhocracy_frontend:build/'
                                         'lib/requirejs/require.js'),
