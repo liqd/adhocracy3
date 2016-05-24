@@ -84,11 +84,22 @@ class TestUsers:
         assert sheets.asset.IHasAssetPool in meta.extended_sheets
         assert badge.add_badge_assignments_service in meta.after_creation
         assert asset.add_assets_service in meta.after_creation
+        assert principal.allow_create_asset_authenticated in meta.after_creation
 
     @mark.usefixtures('integration')
     def test_create(self, meta, registry):
         resource = registry.content.create(meta.iresource.__identifier__)
         assert meta.iresource.providedBy(resource)
+
+
+def test_create_asset_permission(context, registry, mocker):
+    from . import principal
+    from .principal import allow_create_asset_authenticated
+    set_acl = mocker.spy(principal, 'set_acl')
+    allow_create_asset_authenticated(context, registry, {})
+    set_acl.assert_called_with(context,
+                               [('Allow', 'system.Authenticated', 'create_asset')],
+                               registry=registry)
 
 
 class TestUser:
@@ -230,10 +241,12 @@ class TestPasswordResets:
 
     @mark.usefixtures('integration')
     def test_remove_view_permission(self, meta, registry):
+        from pyramid.authorization import Deny
+        from pyramid.authentication import Everyone
         from adhocracy_core.authorization import get_acl
         resource = registry.content.create(meta.iresource.__identifier__)
         acl = get_acl(resource)
-        assert acl == [('deny', 'system.Everyone', 'view')]
+        assert acl == [(Deny, Everyone, 'view')]
 
     @mark.usefixtures('integration')
     def test_hide(self, meta, registry):

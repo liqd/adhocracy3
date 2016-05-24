@@ -1,6 +1,10 @@
 """Principal types (user/group) and helpers to search/get user information."""
 from logging import getLogger
 
+from pyramid.authentication import Authenticated
+from pyramid.authentication import Everyone
+from pyramid.authorization import Allow
+from pyramid.authorization import Deny
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 from pyramid.traversal import get_current_registry
@@ -156,6 +160,17 @@ user_meta = pool_meta._replace(
 )
 
 
+def allow_create_asset_authenticated(context: IPool,
+                                     registry: Registry,
+                                     options: dict):
+    """Set local permission to create assets for authenticated.
+
+    This is needed to assure user can create their user image.
+    """
+    acl = [(Allow, Authenticated, 'create_asset')]
+    set_acl(context, acl, registry=registry)
+
+
 class IUsersService(IServicePool):
     """Service Pool for Users."""
 
@@ -168,6 +183,7 @@ users_meta = service_meta._replace(
     extended_sheets=(adhocracy_core.sheets.asset.IHasAssetPool,),
     after_creation=(add_badge_assignments_service,
                     add_assets_service,
+                    allow_create_asset_authenticated,
                     ),
 )
 
@@ -211,7 +227,7 @@ groups_meta = service_meta._replace(
 def deny_view_permission(context: IResource, registry: Registry,
                          options: dict):
     """Remove view permission for everyone for `context`."""
-    acl = [('deny', 'system.Everyone', 'view')]
+    acl = [(Deny, Everyone, 'view')]
     set_acl(context, acl, registry=registry)
 
 

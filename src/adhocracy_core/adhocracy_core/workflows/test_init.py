@@ -46,6 +46,51 @@ class TestAdhocracyACLWorkflow:
         assert mock_workflow.get_transitions.called_with(context, request,
                                                          from_state='draft')
 
+    def test_update_state_acl(self, inst, context, mock_workflow):
+        from substanced.workflow import ACLState
+        mock_workflow.state_of.return_value = 'state_name'
+        state = ACLState(acl=['Deny', 'view', 'role:admin'])
+        mock_workflow._states = {'state_name': state}
+        fut = inst.__class__.update_acl
+        fut(mock_workflow, context)
+        assert context.__acl__ == ['Deny', 'view', 'role:admin']
+
+
+class TestUpdateWorkflowStateACLs:
+
+    def call_fut(self, *args):
+        from . import update_workflow_state_acls
+        return update_workflow_state_acls(*args)
+
+    @fixture
+    def mock_catalogs(self, mocker, mock_catalogs):
+        mocker.patch('adhocracy_core.workflows.find_service',
+                     return_value=mock_catalogs)
+        return mock_catalogs
+
+    def test_ignore_if_no_resources_with_workflow_assignment(
+        self, context, registry, mock_catalogs, query):
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        self.call_fut(context, registry)
+        mock_catalogs.search.call_args[0][0] ==\
+            query._replace(interfaces=IWorkflowAssignment)
+
+    def test_ignore_if_only_resources_with_empty_workflow_assignment(
+        self, context, registry, mock_catalogs, search_result, mock_workflow, pool):
+        mock_catalogs.search.return_value =\
+            search_result._replace(elements=(x for x in [pool]))
+        registry.content.get_workflow.return_value = None
+        self.call_fut(context, registry)
+        assert not mock_workflow.update_acl.called
+
+    def test_reset_local_permissions_of_current_workflow_state(
+        self, context, registry, mock_catalogs, search_result, mock_workflow, pool):
+        mock_catalogs.search.return_value =\
+            search_result._replace(elements=(x for x in [pool]))
+        registry.content.get_workflow.return_value = mock_workflow
+        self.call_fut(context, registry)
+        assert mock_workflow.update_acl.called
+
 
 class TestAddWorkflow:
 

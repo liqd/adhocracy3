@@ -14,6 +14,7 @@ from zope.interface import directlyProvides
 from zope.interface import noLongerProvides
 from zope.interface.interfaces import IInterface
 
+from adhocracy_core.resources.principal import allow_create_asset_authenticated
 from adhocracy_core.catalog import ICatalogsService
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -50,6 +51,7 @@ from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import has_annotation_sheet_data
+from adhocracy_core.workflows import update_workflow_state_acls
 
 logger = logging.getLogger(__name__)
 
@@ -673,6 +675,20 @@ def add_canbadge_sheet_to_users(root, registry):  # pragma: no cover
     migrate_new_sheet(root, IUser, ICanBadge)
 
 
+@log_migration
+def allow_create_asset_for_users(root, registry):  # pragma: no cover
+    """Allow all users to create_assets inside the users service."""
+    users = find_service(root, 'principals', 'users')
+    allow_create_asset_authenticated(users, registry, {})
+
+
+@log_migration
+def update_workflow_state_acl_for_all_resources(root,
+                                                registry):  # pragma: no cover
+    """Update the local :term:`acl` with the current workflow state acl."""
+    update_workflow_state_acls(root, registry)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -707,3 +723,5 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(reset_comment_count)
     config.add_evolution_step(remove_is_service_attribute)
     config.add_evolution_step(add_canbadge_sheet_to_users)
+    config.add_evolution_step(allow_create_asset_for_users)
+    config.add_evolution_step(update_workflow_state_acl_for_all_resources)
