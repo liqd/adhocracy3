@@ -80,21 +80,12 @@ rather than in response to user action.
 }
 
 .leaflet-marker-icon {
-    @include rem(font-size, 42px);
-    @include text-shadow(
-        -1px -1px 0 $color-text-inverted,
-        1px -1px 0 $color-text-inverted,
-        -1px 1px 0 $color-text-inverted,
-        1px 1px 0 $color-text-inverted
-    );
-    color: $color-brand-two-normal;
+    @include border-radius(50%);
+    @include box-shadow(0 0 1px 1px $color-text-inverted);
+    background: $color-brand-two-normal;
 
     &.is-active, &:hover, &:focus {
-        color: $color-brand-one-introvert;
-    }
-
-    &:before {
-        display: block;
+        background: $color-brand-one-introvert;
     }
 }
 
