@@ -95,8 +95,8 @@ describe("comments", function() {
         var reply = page.createReply(parent, "comment 1.1");
         var changedReply = page.editComment(reply, ["b"]);
         var changedParent = page.editComment(parent, ["b"]);
-        expect(page.getCommentText(parent)).toEqual("comment 1b");
-        expect(page.getCommentText(reply)).toEqual("comment 1.1b");
+        expect(page.getCommentText(changedParent)).toEqual("comment 1b");
+        expect(page.getCommentText(changedReply)).toEqual("comment 1.1b");
     });
 
     it("can be edited and replied", function() {

@@ -56,6 +56,8 @@ var EmbeddedCommentsPage = function(referer) {
         this.getReplyLink(parent).click();
         parent.element(by.model("data.content")).sendKeys(content);
         parent.element(by.css("input[type=\"submit\"]")).click();
+        var new_comment = element(by.cssContainingText('.comment-content', content));
+        browser.wait(new_comment.isDisplayed);
         return parent.all(by.css('.comment-children .comment')).first();
     };
 
@@ -63,7 +65,10 @@ var EmbeddedCommentsPage = function(referer) {
         this.getEditLink(comment).click();
         var textarea = comment.element(by.model("data.content"));
         textarea.sendKeys.apply(textarea, keys);
+        var content = textarea.getAttribute('value');
         comment.element(by.css("input[type=\"submit\"]")).click();
+        var edited_comment = element(by.cssContainingText('.comment-content', content));
+        browser.wait(edited_comment.isDisplayed);
         return comment;
     };
 
