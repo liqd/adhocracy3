@@ -93,7 +93,11 @@ export var workbenchDirective = (
 
 export var proposalDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhPermissions : AdhPermissions.Service
+    adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
+    $location : angular.ILocationService,
+    $window : Window
 ) => {
     return {
         restrict: "E",
@@ -102,6 +106,21 @@ export var proposalDetailColumnDirective = (
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
+            scope.hide = () => {
+                var proposalClass = RIGeoProposal;
+                if (scope.isKiezkasse) {
+                    proposalClass = RIKiezkasseProposal;
+                } else if (scope.isBuergerhaushalt) {
+                    proposalClass = RIBuergerhaushaltProposal;
+                }
+                // FIXME: translate
+                if ($window.confirm("Do you really want to delete this?")) {
+                    adhHttp.hide(AdhUtil.parentPath(scope.proposalUrl), proposalClass.content_type)
+                        .then(() => {
+                            adhTopLevelState.goToCameFrom("/");
+                        });
+                }
+            };
         }
     };
 };
