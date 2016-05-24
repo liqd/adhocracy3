@@ -24,7 +24,6 @@ omit =
     src/adhocracy_meinberlin/adhocracy_meinberlin/scripts/*
     src/adhocracy_meinberlin/adhocracy_meinberlin/evolution/__init__.py
     src/adhocracy_euth/adhocracy_euth/__init__.py
-    src/adhocracy_aula/adhocracy_aula/__init__.py
 
 source =
     src/adhocracy_core
@@ -34,7 +33,6 @@ source =
     src/adhocracy_meinberlin
     src/adhocracy_frontend
     src/adhocracy_pcompass
-    src/adhocracy_aula
 
 [report]
 # Regexes for lines to exclude from consideration
