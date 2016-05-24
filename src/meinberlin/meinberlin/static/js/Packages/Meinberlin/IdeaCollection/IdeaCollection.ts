@@ -34,6 +34,7 @@ export var workbenchDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/IdeaCollection.html",
         scope: {
+            hasSwotLabels: "=?",
             isBuergerhaushalt: "=?",
             isKiezkasse: "=?"
         },
