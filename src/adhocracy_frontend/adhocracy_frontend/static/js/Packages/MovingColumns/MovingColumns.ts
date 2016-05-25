@@ -197,13 +197,19 @@ export class MovingColumnController {
     constructor(
         protected adhTopLevelState : AdhTopLevelState.Service,
         protected $timeout : angular.ITimeoutService,
-        public $scope : IMovingColumnScope
+        public $scope : IMovingColumnScope,
+        protected $element : angular.IAugmentedJQuery
     ) {
         $scope.ctrl = this;
         $scope._alerts = {};
         $scope.shared = {};
 
         this.lastId = 0;
+    }
+
+    public focus() : void {
+        var index = this.$element.index();
+        this.adhTopLevelState.set("focus", index);
     }
 
     public clear() : void {
@@ -280,6 +286,6 @@ export var movingColumnDirective = (adhConfig : AdhConfig.IService) => {
         replace: true,
         transclude: true,
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MovingColumn.html",
-        controller: ["adhTopLevelState", "$timeout", "$scope", MovingColumnController]
+        controller: ["adhTopLevelState", "$timeout", "$scope", "$element", MovingColumnController]
     };
 };

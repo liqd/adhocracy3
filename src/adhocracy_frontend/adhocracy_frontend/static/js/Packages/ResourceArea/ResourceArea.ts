@@ -3,12 +3,14 @@ import * as _ from "lodash";
 import * as ResourcesBase from "../../ResourcesBase";
 
 import * as AdhConfig from "../Config/Config";
+import * as AdhCredentials from "../User/Credentials";
 import * as AdhEmbed from "../Embed/Embed";
-import * as AdhHttp from "../Http/Http";
 import * as AdhHttpError from "../Http/Error";
+import * as AdhHttp from "../Http/Http";
+import * as AdhMetaApi from "../MetaApi/MetaApi";
+import * as AdhResourceUtil from "../Util/ResourceUtil";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
-import * as AdhCredentials from "../User/Credentials";
 
 import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
 import * as SITags from "../../Resources_/adhocracy_core/sheets/tags/ITags";
@@ -30,18 +32,26 @@ export class Provider implements angular.IServiceProvider {
         factory : (resource) => any;  // values return either Dict or angular.IPromise<Dict>
         type? : string;
     }};
-    public templates : {[embedContext : string]: any};
     public customHeaders : {[processType : string]: string};
 
     constructor() {
         var self = this;
         this.defaults = {};
         this.specifics = {};
-        this.templates = {};
         this.customHeaders = {};
-        this.$get = ["$q", "$injector", "$location", "adhHttp", "adhConfig", "adhCredentials", "adhEmbed", "adhResourceUrlFilter",
-            ($q, $injector, $location, adhHttp, adhConfig, adhCredentials, adhEmbed, adhResourceUrlFilter) => new Service(
-                self, $q, $injector, $location, adhHttp, adhConfig, adhCredentials, adhEmbed, adhResourceUrlFilter)];
+        this.$get = [
+            "$q",
+            "$injector",
+            "$location",
+            "$templateRequest",
+            "adhHttp",
+            "adhConfig",
+            "adhCredentials",
+            "adhEmbed",
+            "adhMetaApi",
+            "adhResourceUrlFilter",
+            (...args) => AdhUtil.construct(Service, [self].concat(args))
+        ];
     }
 
     public default(
@@ -109,11 +119,6 @@ export class Provider implements angular.IServiceProvider {
             .specific(versionType, view, processType, embedContext, factory, "version");
     }
 
-    public template(embedContext : string, templateFn : any) : Provider {
-        this.templates[embedContext] = templateFn;
-        return this;
-    }
-
     public customHeader(processType : string, templateUrl : string) : Provider {
         this.customHeaders[processType] = templateUrl;
         return this;
@@ -177,23 +182,21 @@ export class Provider implements angular.IServiceProvider {
  */
 export class Service implements AdhTopLevelState.IAreaInput {
     public template : string;
-    private hasRun : boolean;
-    private templateDeferred;
 
     constructor(
         private provider : Provider,
         private $q : angular.IQService,
         private $injector : angular.auto.IInjectorService,
         private $location : angular.ILocationService,
+        private $templateRequest : angular.ITemplateRequestService,
         private adhHttp : AdhHttp.Service<any>,
         private adhConfig : AdhConfig.IService,
-        private adhcredentials : AdhCredentials.Service,
+        private adhCredentials : AdhCredentials.Service,
         private adhEmbed : AdhEmbed.Service,
+        private adhMetaApi : AdhMetaApi.Service,
         private adhResourceUrlFilter
     ) {
         this.template = "<adh-resource-area></adh-resource-area>";
-        this.hasRun = false;
-        this.templateDeferred = this.$q.defer();
     }
 
     private getDefaults(resourceType : string, view : string, processType : string, embedContext : string) : Dict {
@@ -239,7 +242,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
      *
      * If `fail` is false, it promises undefined instead of failing.
      */
-    public getProcess(resourceUrl : string, fail = true) : angular.IPromise<ResourcesBase.Resource> {
+    public getProcess(resourceUrl : string, fail = true) : angular.IPromise<ResourcesBase.IResource> {
         var paths = [];
         var path = resourceUrl;
 
@@ -256,9 +259,9 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
         return this.$q.all(_.map(paths, (path) => {
             return this.adhHttp.get(this.adhConfig.rest_url + path);
-        })).then((resources : ResourcesBase.Resource[]) => {
+        })).then((resources : ResourcesBase.IResource[]) => {
             for (var i = 0; i < resources.length; i++) {
-                if (resources[i].isInstanceOf(RIProcess.content_type)) {
+                if (AdhResourceUtil.isInstanceOf(resources[i], RIProcess.content_type, this.adhMetaApi)) {
                     return resources[i];
                 }
             }
@@ -274,7 +277,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         return self.$q.all([
             self.adhHttp.get(resourceUrl),
             self.adhHttp.get(AdhUtil.parentPath(resourceUrl))
-        ]).then((args : ResourcesBase.Resource[]) => {
+        ]).then((args : ResourcesBase.IResource[]) => {
             var version = args[0];
             var item = args[1];
             if (version.data.hasOwnProperty(SIVersionable.nick) && item.data.hasOwnProperty(SITags.nick)) {
@@ -291,29 +294,9 @@ export class Service implements AdhTopLevelState.IAreaInput {
         });
     }
 
-    private resolveTemplate(embedContext) : void {
-        var templateFn;
-        if (this.provider.templates.hasOwnProperty(embedContext)) {
-            templateFn = this.provider.templates[embedContext];
-        } else {
-            var templateUrl = this.adhConfig.pkg_path + pkgLocation + "/ResourceArea.html";
-            templateFn = ["$templateRequest", ($templateRequest) => $templateRequest(templateUrl)];
-        }
-
-        if (typeof templateFn === "string") {
-            var templateString = templateFn;
-            templateFn = () => templateString;
-        }
-
-        this.$q.when(this.$injector.invoke(templateFn)).then((template) => {
-            this.templateDeferred.resolve(template);
-        }, (reason) => {
-            this.templateDeferred.reject(reason);
-        });
-    }
-
     public getTemplate() : angular.IPromise<string> {
-        return this.templateDeferred.promise;
+        var templateUrl = this.adhConfig.pkg_path + pkgLocation + "/ResourceArea.html";
+        return this.$templateRequest(templateUrl);
     }
 
     public has(resourceType : string, view : string = "", processType : string = "") : boolean {
@@ -337,11 +320,6 @@ export class Service implements AdhTopLevelState.IAreaInput {
         var view : string = "";
         var embedContext = this.adhEmbed.getContext();
 
-        if (!this.hasRun) {
-            this.hasRun = true;
-            this.resolveTemplate(embedContext);
-        }
-
         // if path has a view segment
         if (_.last(segs).match(/^@/)) {
             view = segs.pop().replace(/^@/, "");
@@ -354,8 +332,8 @@ export class Service implements AdhTopLevelState.IAreaInput {
             self.getProcess(resourceUrl, false),
             self.conditionallyRedirectVersionToLast(resourceUrl, view)
         ]).then((values : any[]) => {
-            var resource : ResourcesBase.Resource = values[0];
-            var process : ResourcesBase.Resource = values[1];
+            var resource : ResourcesBase.IResource = values[0];
+            var process : ResourcesBase.IResource = values[1];
             var hasRedirected : boolean = values[2];
 
             var processType = process ? process.content_type : "";
@@ -387,7 +365,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
             _.forEach(errors, (error) => {
                 if (error.code === 403) {
-                    if (self.adhcredentials.loggedIn) {
+                    if (self.adhCredentials.loggedIn) {
                         throw 403;
                     } else {
                         throw 401;

@@ -61,6 +61,7 @@ class TestGeoProposal:
     def test_meta(self, meta):
         from .proposal import IGeoProposalVersion
         assert meta.element_types == (IGeoProposalVersion,)
+        assert meta.item_type == IGeoProposalVersion
         assert meta.permission_create == 'create_proposal'
 
     @mark.usefixtures('integration')

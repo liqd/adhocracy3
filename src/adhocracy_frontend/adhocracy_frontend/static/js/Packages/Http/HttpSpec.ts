@@ -57,7 +57,7 @@ var mkAdhMetaApiMock = () => {
         sheetExists: () => true,
         fieldExists: () => true,
 
-        // used by exportContent.
+        // used by exportResource.
         field: (sheet, field) => {
             switch (sheet + "/" + field) {
             case "readWriteSheet/readOnlyField":
@@ -390,27 +390,27 @@ export var register = () => {
             describe("resolve", () => {
                 it("gets the resource if called with a path", (done) => {
                     var path = "/some/path";
-                    var content = {
+                    var resource = {
                         content_type: "mock2",
                         data: {}
                     };
                     adhHttp.get = <any>(jasmine.createSpy("adhHttp.get")
-                        .and.returnValue(q.when(content)));
+                        .and.returnValue(q.when(resource)));
 
                     adhHttp.resolve(path).then((ret) => {
-                        expect(ret).toEqual(content);
+                        expect(ret).toEqual(resource);
                         expect(adhHttp.get).toHaveBeenCalledWith(path);
                         done();
                     });
                 });
                 it("promises the resource if called with a resource", (done) => {
-                    var content = {
+                    var resource = {
                         content_type: "mock2",
                         data: {}
                     };
 
-                    adhHttp.resolve(content).then((ret) => {
-                        expect(ret).toEqual(content);
+                    adhHttp.resolve(resource).then((ret) => {
+                        expect(ret).toEqual(resource);
                         done();
                     });
                 });
@@ -463,8 +463,7 @@ export var register = () => {
                             done();
                         },
                         (error) => {
-                            console.log("this should not happen.");
-                            done();
+                            throw "This should not happen";
                         }
                     );
                 });
@@ -516,7 +515,7 @@ export var register = () => {
             });
         });
 
-        describe("importContent", () => {
+        describe("importResource", () => {
             var adhCacheMock;
 
             beforeEach(() => {
@@ -529,7 +528,7 @@ export var register = () => {
             });
 
             it("returns response.data if it is an object", () => {
-                var obj : ResourcesBase.Resource = <any>{
+                var obj : ResourcesBase.IResource = <any>{
                     content_type: "adhocracy_core.resources.pool.IBasicPool",
                     path: "p",
                     data: {}
@@ -539,7 +538,7 @@ export var register = () => {
                 };
                 var adhMetaApiMock = mkAdhMetaApiMock();
                 var adhPreliminaryNames = new AdhPreliminaryNames.Service();
-                var imported = () => Convert.importContent(response, <any>adhMetaApiMock, adhPreliminaryNames, adhCacheMock);
+                var imported = () => Convert.importResource(response, <any>adhMetaApiMock, adhPreliminaryNames, adhCacheMock);
                 expect(imported().path).toBe(obj.path);
             });
             it("throws if response.data is not an object", () => {
@@ -549,12 +548,12 @@ export var register = () => {
                 };
                 var adhMetaApiMock = mkAdhMetaApiMock();
                 var adhPreliminaryNames = new AdhPreliminaryNames.Service();
-                var imported = () => Convert.importContent(response, <any>adhMetaApiMock, adhPreliminaryNames, adhCacheMock);
+                var imported = () => Convert.importResource(response, <any>adhMetaApiMock, adhPreliminaryNames, adhCacheMock);
                 expect(imported).toThrow();
             });
         });
 
-        describe("exportContent", () => {
+        describe("exportResource", () => {
             var adhMetaApiMock;
 
             beforeEach(() => {
@@ -562,11 +561,11 @@ export var register = () => {
             });
 
             it("deletes the path", () => {
-                expect(Convert.exportContent(adhMetaApiMock, <any>{content_type: RIParagraph.content_type, data: {}, path: "test"}))
+                expect(Convert.exportResource(adhMetaApiMock, <any>{content_type: RIParagraph.content_type, data: {}, path: "test"}))
                     .toEqual({content_type: RIParagraph.content_type, data: {}});
             });
             it("deletes read-only properties", () => {
-                var x = Convert.exportContent(adhMetaApiMock, adhMetaApiMock.objBefore);
+                var x = Convert.exportResource(adhMetaApiMock, adhMetaApiMock.objBefore);
                 var y = adhMetaApiMock.objAfter;
                 expect(x).toEqual(y);  // (yes, this appears to do deep comparison of the entire structure.)
                 expect(adhMetaApiMock.field).toHaveBeenCalled();

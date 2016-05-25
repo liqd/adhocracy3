@@ -112,8 +112,8 @@ Embed Context
 For a general discussion of embedding, see :ref:`Embedding`.
 
 When entering adhocracy through the embed area, an embed context is
-defined. This changes how the resource area behaves. For example there
-might be a different template or different routes.
+defined. This changes the frontend's behaviour: for example there
+might be a different header or different routes.
 
 Conclusion
 ----------

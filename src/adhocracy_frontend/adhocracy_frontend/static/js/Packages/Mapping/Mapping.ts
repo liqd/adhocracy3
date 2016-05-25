@@ -505,6 +505,7 @@ export var mapListingInternal = (
             rawPolygon: "=polygon",
             items: "=",
             emptyText: "@",
+            custom: "=?",
             pin: "@?",
             pinSelected: "@?"
         },
@@ -538,7 +539,7 @@ export var mapSwitch = (
     };
 };
 
-export class Listing<Container extends ResourcesBase.Resource> extends AdhListing.Listing<Container> {
+export class Listing<Container extends ResourcesBase.IResource> extends AdhListing.Listing<Container> {
     public static templateUrl : string = pkgLocation + "/Listing.html";
 
     public createDirective(adhConfig : AdhConfig.IService, adhWebSocket: AdhWebSocket.Service) {

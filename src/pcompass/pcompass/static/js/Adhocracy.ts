@@ -37,12 +37,12 @@ import * as AdhListingModule from "./Packages/Listing/Module";
 import * as AdhLocaleModule from "./Packages/Locale/Module";
 import * as AdhMappingModule from "./Packages/Mapping/Module";
 import * as AdhMarkdownModule from "./Packages/Markdown/Module";
+import * as AdhMetaApiModule from "./Packages/MetaApi/Module";
 import * as AdhMovingColumnsModule from "./Packages/MovingColumns/Module";
 import * as AdhPcompassModule from "./Packages/Pcompass/Module";
 import * as AdhPermissionsModule from "./Packages/Permissions/Module";
 import * as AdhPreliminaryNamesModule from "./Packages/PreliminaryNames/Module";
 import * as AdhProcessModule from "./Packages/Process/Module";
-import * as AdhProposalModule from "./Packages/Proposal/Module";
 import * as AdhRateModule from "./Packages/Rate/Module";
 import * as AdhResourceAreaModule from "./Packages/ResourceArea/Module";
 import * as AdhResourceWidgetsModule from "./Packages/ResourceWidgets/Module";
@@ -115,7 +115,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
             }])
             .otherwise(() : AdhTopLevelState.IAreaInput => {
                 return {
-                    template: "<adh-page-wrapper><h1>404 - Not Found</h1></adh-page-wrapper>"
+                    template: "<adh-header></adh-header><div class=\"l-content\"><h1>404 - Not Found</h1></div>"
                 };
             });
     }]);
@@ -164,25 +164,25 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhBadgeModule.register(angular);
     AdhCommentModule.register(angular);
     AdhConfigModule.register(angular, config);
-    AdhCrossWindowMessagingModule.register(angular, config.trusted_domains !== []);
+    AdhCrossWindowMessagingModule.register(angular);
     AdhDateTimeModule.register(angular);
     AdhDoneModule.register(angular);
     AdhEmbedModule.register(angular);
     AdhEventManagerModule.register(angular);
-    AdhHttpModule.register(angular, config, metaApi);
+    AdhHttpModule.register(angular, config);
     AdhImageModule.register(angular);
     AdhInjectModule.register(angular);
     AdhListingModule.register(angular);
     AdhLocaleModule.register(angular);
     AdhMappingModule.register(angular);
     AdhMarkdownModule.register(angular);
+    AdhMetaApiModule.register(angular, metaApi);
     AdhMovingColumnsModule.register(angular);
     AdhPcompassModule.register(angular);
     AdhPermissionsModule.register(angular);
     AdhPreliminaryNamesModule.register(angular);
     AdhProcessModule.register(angular);
     AdhProcessModule.register(angular);
-    AdhProposalModule.register(angular);
     AdhRateModule.register(angular);
     AdhResourceAreaModule.register(angular);
     AdhResourceWidgetsModule.register(angular);

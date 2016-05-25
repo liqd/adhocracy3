@@ -987,24 +987,30 @@ class TestActivateAccountView:
 class TestReportAbuseView:
 
     @fixture
-    def request(self, request_):
+    def request_(self, request_):
         from adhocracy_core.messaging import Messenger
         request_.registry.messenger = Mock(spec=Messenger)
         request_.validated['url'] = 'http://localhost/blablah'
         request_.validated['remark'] = 'Too much blah!'
         return request_
 
-    def make_one(self, context, request):
+    @fixture
+    def inst(self, context, request_):
         from adhocracy_core.rest.views import ReportAbuseView
-        return ReportAbuseView(context, request)
+        return ReportAbuseView(context, request_)
 
-    def test_post(self, request, context):
-        inst = self.make_one(context, request)
+    def test_post(self, request_, inst):
         assert inst.post() == ''
-        assert request.registry.messenger.send_abuse_complaint.called
+        assert request_.registry.messenger.send_abuse_complaint.called
 
-    def test_options(self, request, context):
-        inst = self.make_one(context, request)
+    def test_options_with_permission(self, inst):
+        assert inst.options() == {'POST': {'request_body': {'remark': '',
+                                                            'url': ''},
+                                           'response_body': ''}}
+
+
+    def test_options_without_permission(self, config, inst):
+        config.testing_securitypolicy(userid='userid', permissive=False)
         assert inst.options() == {}
 
 

@@ -163,7 +163,9 @@ export var register = () => {
             });
         });
 
-        describe("factory", () => {
+        describe("provider", () => {
+            var provider;
+            var factory;
             var service;
             var config : AdhConfig.IService;
 
@@ -177,23 +179,46 @@ export var register = () => {
                     trusted_domains: []
                 };
                 windowMock.parent = jasmine.createSpyObj("parentMock", ["postMessage"]);
+                provider = new AdhCrossWindowMessaging.Provider;
+                factory = provider.$get[6];
             });
 
             it("returns a service instance", () => {
-                service = AdhCrossWindowMessaging.factory(config, locationMock, windowMock, rootScopeMock);
+                service = factory(config, locationMock, windowMock, rootScopeMock);
                 expect(service).toBeDefined();
             });
             it("returns a dummy service when not embedded", () => {
                 config.embedded = false;
-                service = AdhCrossWindowMessaging.factory(config, locationMock, windowMock, rootScopeMock);
+                service = factory(config, locationMock, windowMock, rootScopeMock);
                 expect(service.dummy).toBeDefined();
             });
             it("returns a service instance that uses $window.parent.postMessage", () => {
                 var name = "test";
                 var data = {x: "y"};
-                service = AdhCrossWindowMessaging.factory(config, locationMock, windowMock, rootScopeMock);
+                service = factory(config, locationMock, windowMock, rootScopeMock);
                 service.postMessage(name, data);
                 expect(windowMock.parent.postMessage).toHaveBeenCalled();
+            });
+            it("allows to register message handlers in configuration phase", () => {
+
+                var callbackMock = jasmine.createSpy("callbackMock");
+                provider.registerMessageHandler("test", callbackMock);
+
+                var data = {x: "y"};
+                var message = {
+                    name: "test",
+                    data: data
+                };
+                var event = {
+                    origin: "*",
+                    data: JSON.stringify(message)
+                };
+
+                service = factory(config, locationMock, windowMock, rootScopeMock);
+
+                var args = windowMock.addEventListener.calls.mostRecent().args;
+                args[1](event);
+                expect(callbackMock).toHaveBeenCalledWith(data);
             });
         });
     });

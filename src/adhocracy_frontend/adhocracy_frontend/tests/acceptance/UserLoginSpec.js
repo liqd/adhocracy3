@@ -100,7 +100,6 @@ describe("user password reset", function() {
             var mailpath = browser.params.mail.queue_path + "/new/" + newMails[0];
 
             shared.parseEmail(mailpath, function(mail) {
-                // console.log('email=', mail);
                 expect(mail.subject).toContain("Passwor");
                 expect(mail.to[0].address).toContain("participant");
                 resetUrl = _.find(mail.text.split("\n"), function(line) {return _.startsWith(line, "http");});

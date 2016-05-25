@@ -185,7 +185,7 @@ def remove_workflow_state_data_end_date(root, registry):
             workflow_assignment.set(
                 {'state_data': [{'name': 'participate', 'description': '',
                                  'start_date': start_date},
-                                {'name': 'evaluate', 'description': '',
+                                {'name': 'closed', 'description': '',
                                  'start_date': end_date}]})
 
 

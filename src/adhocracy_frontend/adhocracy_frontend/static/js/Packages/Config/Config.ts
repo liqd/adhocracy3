@@ -1,3 +1,5 @@
+/// <reference path="../../../lib2/types/angular.d.ts"/>
+
 /* tslint:disable:variable-name */
 
 /**
@@ -39,13 +41,4 @@ export interface IService {
     piwik_site_id : string;
     piwik_use_cookies : boolean;
     piwik_track_user_id : boolean;
-}
-
-
-export class Provider {
-    public config : IService;
-
-    public $get() : IService {
-        return this.config;
-    }
 }

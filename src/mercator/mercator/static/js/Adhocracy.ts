@@ -38,6 +38,7 @@ import * as AdhListingModule from "./Packages/Listing/Module";
 import * as AdhLocaleModule from "./Packages/Locale/Module";
 import * as AdhMarkdownModule from "./Packages/Markdown/Module";
 import * as AdhMercatorModule from "./Packages/Mercator/Module";
+import * as AdhMetaApiModule from "./Packages/MetaApi/Module";
 import * as AdhMovingColumnsModule from "./Packages/MovingColumns/Module";
 import * as AdhPermissionsModule from "./Packages/Permissions/Module";
 import * as AdhPreliminaryNamesModule from "./Packages/PreliminaryNames/Module";
@@ -117,7 +118,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
             }])
             .otherwise(() : AdhTopLevelState.IAreaInput => {
                 return {
-                    template: "<adh-page-wrapper><h1>404 - Not Found</h1></adh-page-wrapper>"
+                    template: "<adh-header></adh-header><div class=\"l-content\"><h1>404 - Not Found</h1></div>"
                 };
             });
     }]);
@@ -165,18 +166,19 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhBlogModule.register(angular);
     AdhCommentModule.register(angular);
     AdhConfigModule.register(angular, config);
-    AdhCrossWindowMessagingModule.register(angular, config.trusted_domains !== []);
+    AdhCrossWindowMessagingModule.register(angular);
     AdhDateTimeModule.register(angular);
     AdhDoneModule.register(angular);
     AdhEmbedModule.register(angular);
     AdhEventManagerModule.register(angular);
-    AdhHttpModule.register(angular, config, metaApi);
+    AdhHttpModule.register(angular, config);
     AdhImageModule.register(angular);
     AdhInjectModule.register(angular);
     AdhListingModule.register(angular);
     AdhLocaleModule.register(angular);
     AdhMarkdownModule.register(angular);
     AdhMercatorModule.register(angular);
+    AdhMetaApiModule.register(angular, metaApi);
     AdhMovingColumnsModule.register(angular);
     AdhPermissionsModule.register(angular);
     AdhPreliminaryNamesModule.register(angular);

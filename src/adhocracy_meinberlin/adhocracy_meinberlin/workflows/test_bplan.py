@@ -100,7 +100,7 @@ class TestBPlanWorkflow:
         assigment.set({'state_data': [
             {'name': 'participate','description': '',
              'start_date': datetime.date(2015, 5, 5)},
-            {'name': 'evaluate', 'description': '',
+            {'name': 'closed', 'description': '',
              'start_date': datetime.date(2015, 6, 11)}
         ]})
 
@@ -186,20 +186,20 @@ class TestBPlanWorkflow:
         assert resp.status_code == 200
 
     def test_change_state_to_frozen(self, app_initiator):
-        resp = do_transition_to(app_initiator, '/bplan', 'evaluate')
+        resp = do_transition_to(app_initiator, '/bplan', 'closed')
         assert resp.status_code == 200
 
-    def test_evaluate_anonymous_cannot_create_proposal(self,
+    def test_closed_anonymous_cannot_create_proposal(self,
                                                        app_anonymous):
         from adhocracy_meinberlin.resources.bplan import IProposal
         assert IProposal not in app_anonymous.get_postable_types('/bplan')
 
-    def test_evaluate_initiator_can_view_proposal(self,
+    def test_closed_initiator_can_view_proposal(self,
                                                   app_initiator):
         resp = app_initiator.get(path='/bplan/proposal_0000000')
         assert resp.status_code == 200
 
-    def test_evaluate_anonymous_cannot_view_proposal(self,
+    def test_closed_anonymous_cannot_view_proposal(self,
                                                      app_anonymous):
         resp = app_anonymous.get('/bplan/proposal_0000000')
         assert resp.status_code == 403
