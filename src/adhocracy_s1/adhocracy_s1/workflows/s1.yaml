@@ -9,6 +9,7 @@ states:
         - [create_comment,       ~,         A,           A,         ~,       A,         ~]
         - [create_rate,          ~,         A,           ~,         ~,       ~,         ~]
         - [edit_rate,            ~,         ~,           ~,         A,       ~,         ~]
+        - [hide,                 ~,         ~,           ~,         A,       ~,         ~]
   select:
     title: Evaluate
     acm:
@@ -18,6 +19,7 @@ states:
         - [create_rate,          ~,         A,           ~,         ~,       ~,         ~]
         - [edit_rate,            ~,         ~,           ~,         A,       ~,         ~]
         - [create_comment,       ~,         A,           A,         ~,       A,         ~]
+        - [hide,                 ~,         ~,           ~,         A,       ~,         ~]
   result:
     title: Result
     acm:
@@ -27,6 +29,7 @@ states:
         - [create_comment,       ~,         A,           A,         ~,       A,         ~]
         - [create_rate,          ~,         A,           ~,         ~,       ~,         ~]
         - [edit_rate,            ~,         ~,           ~,         A,       ~,         ~]
+        - [hide,                 ~,         ~,           ~,         A,       ~,         ~]
 transitions:
   to_select:
     from_state: propose

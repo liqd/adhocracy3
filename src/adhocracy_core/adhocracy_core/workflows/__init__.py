@@ -8,6 +8,7 @@ from pyrsistent import freeze
 from pyrsistent import PMap
 from substanced.workflow import ACLWorkflow
 from substanced.workflow import WorkflowError
+from substanced.util import find_service
 from zope.deprecation import deprecated
 from zope.interface import implementer
 from zope.interface import Interface
@@ -16,6 +17,9 @@ from adhocracy_core.authorization import acm_to_acl
 from adhocracy_core.authorization import create_fake_god_request
 from adhocracy_core.exceptions import ConfigurationError
 from adhocracy_core.interfaces import IAdhocracyWorkflow
+from adhocracy_core.interfaces import IPool
+from adhocracy_core.interfaces import search_query
+from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.workflows.schemas import create_workflow_meta_schema
 
 
@@ -36,6 +40,23 @@ class AdhocracyACLWorkflow(ACLWorkflow):
         transitions = self.get_transitions(context, request, from_state=state)
         states = [t['to_state'] for t in transitions]
         return list(set(states))
+
+    def update_acl(self, context) -> list:
+        """Reset the local permission :term:`acl` for `context`."""
+        state = self.state_of(context)
+        self._states[state](context, None, None, self)
+
+
+def update_workflow_state_acls(context: IPool, registry: Registry):
+    """Update :term:`acl` of current workflow state for all resources."""
+    catalog = find_service(context, 'catalogs')
+    query = search_query._replace(interfaces=IWorkflowAssignment)
+    resources = catalog.search(query).elements
+    for resource in resources:
+        workflow = registry.content.get_workflow(resource)
+        if workflow is None:
+            continue
+        workflow.update_acl(resource)
 
 
 def add_workflow(registry: Registry, workflow_asset: str, name: str):

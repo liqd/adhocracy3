@@ -16,15 +16,27 @@
     </a>
 
     <div data-ng-switch-when="body">
-        <adh-resource-actions
-            data-resource-path="{{proposalUrl}}"
-            data-parent-path="true"
-            data-edit="true"
-            data-print="true">
-        </adh-resource-actions>
-
         <adh-recompile-on-change
             data-value="{{proposalUrl}}">
+            <div class="action-bar">
+                <adh-edit-action
+                    data-ng-if="proposalUrl && proposalItemOptions.PUT"
+                    data-class="action-bar-item"
+                    data-parent-path="true"
+                    data-resource-path="{{proposalUrl}}"></adh-edit-action>
+                <adh-report-action
+                    data-class="action-bar-item"
+                    data-parent-path="true"
+                    data-resource-path="{{proposalUrl}}"></adh-report-action>
+                <a href=""
+                    data-ng-click="hide()"
+                    data-ng-if="proposalItemOptions.hide"
+                    class="action-bar-item"
+                    title="{{ 'TR__DELETE' | translate }}">
+                    {{ 'TR__DELETE' | translate }}</a>
+                <adh-print-action
+                    data-class="action-bar-item"></adh-print-action>
+            </div>
             <adh-meinberlin-proposal-detail
                 data-ng-if="proposalUrl"
                 data-is-buergerhaushalt="isBuergerhaushalt"
@@ -33,4 +45,10 @@
             </adh-meinberlin-proposal-detail>
         </adh-recompile-on-change>
     </div>
+
+    <adh-report-abuse
+        data-ng-switch-when="overlays"
+        data-ng-if="overlay === 'abuse'"
+        data-url="{{ proposalUrl | adhParentPath | adhResourceUrl | adhCanonicalUrl }}">
+    </adh-report-abuse>
 </div>

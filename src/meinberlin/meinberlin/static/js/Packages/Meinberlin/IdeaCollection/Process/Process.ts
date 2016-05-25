@@ -34,11 +34,38 @@ export var detailDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
         scope: {
             path: "@",
+            hasSwotLabels: "=?",
             isBuergerhaushalt: "=?",
             isKiezkasse: "=?"
         },
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            if (scope.hasSwotLabels) {
+                scope.facets = [{
+                    key: "badge",
+                    name: "TR__MEINBERLIN_IDEA_COLLECTION_CATEGORIES_LABEL",
+                    items: [
+                        { key: "strengths", name: "TR__MEINBERLIN_IDEA_COLLECTION_CATEGORIES_STRENGTHS" },
+                        { key: "weaknesses", name: "TR__MEINBERLIN_IDEA_COLLECTION_CATEGORIES_WEAKNESSES" },
+                        { key: "proposals", name: "TR__MEINBERLIN_IDEA_COLLECTION_CATEGORIES_PROPOSALS" },
+                        { key: "visions", name: "TR__MEINBERLIN_IDEA_COLLECTION_CATEGORIES_VISIONS" }
+                    ]
+                }];
+            }
+
+            scope.sorts = [{
+                key: "rates",
+                name: "TR__RATES",
+                index: "rates",
+                reverse: true
+            }, {
+                key: "item_creation_date",
+                name: "TR__CREATION_DATE",
+                index: "item_creation_date",
+                reverse: true
+            }];
+            scope.sort = "item_creation_date";
+
             scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {

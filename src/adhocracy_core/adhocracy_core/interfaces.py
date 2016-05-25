@@ -894,5 +894,8 @@ class IAdhocracyWorkflow(IWorkflow):  # pragma: no cover
     def get_next_states(context, request: IRequest) -> [str]:
         """Get states you can trigger a transition to."""
 
+    def update_acl(context) -> list:
+        """Reset the local permission :term:`acl` for `context`."""
+
 
 error_entry = namedtuple('ErrorEntry', ['location', 'name', 'description'])

@@ -279,7 +279,7 @@ class TestSetACMSForAppRoot:
 def test_get_root_base_acl():
     from . import _get_root_base_acl
     acl = _get_root_base_acl()
-    assert acl[0] == ('Allow', 'role:admin', 'view')
+    assert acl[0] == ('Allow', 'role:admin', 'edit')
 
 
 def test_set_acl_set_resource_dirty():

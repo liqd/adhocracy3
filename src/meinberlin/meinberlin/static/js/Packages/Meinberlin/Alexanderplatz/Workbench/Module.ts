@@ -9,7 +9,6 @@ import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 
 import RIAlexanderplatzProcess from "../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess";
 
-import * as AdhMapping from "../../../Mapping/Mapping";
 import * as AdhProcess from "../../../Process/Process";
 
 import * as Workbench from "./Workbench";
@@ -41,18 +40,6 @@ export var register = (angular) => {
             var customHeader = adhConfig.pkg_path + Workbench.pkgLocation + "/CustomHeader.html";
             adhResourceAreaProvider.customHeader(processType, customHeader);
             Workbench.registerRoutes(processType)(adhResourceAreaProvider);
-        }])
-        .config(["adhMapDataProvider", (adhMapDataProvider : AdhMapping.MapDataProvider) => {
-            adhMapDataProvider.icons["document"] = {
-                className: "icon-board-pin",
-                iconAnchor: [20, 39],
-                iconSize: [40, 40]
-            };
-            adhMapDataProvider.icons["document-selected"] = {
-                className: "icon-board-pin is-active",
-                iconAnchor: [20, 39],
-                iconSize: [40, 40]
-            };
         }])
         .directive("adhMeinberlinAlexanderplatzWorkbench", [
             "adhConfig", "adhTopLevelState", Workbench.workbenchDirective])

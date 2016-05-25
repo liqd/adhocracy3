@@ -1,20 +1,4 @@
 <div data-ng-switch="transclusionId">
-    <div data-ng-switch-when="menu">
-        <div class="moving-column-menu-sorts">
-            <span class="button m-menu-action">{{ "TR__SORT_BY" | translate }}</span>
-            <a href=""
-                data-ng-repeat="sortItem in shared.sorts"
-                class="button m-menu-action"
-                data-ng-click="shared.setSort(sortItem.key)"
-                data-ng-class="{'is-active': shared.sort===sortItem.key}">{{ sortItem.name | translate }}</a>
-        </div>
-    </div>
-
-    <adh-facets
-        data-ng-switch-when="sidebar"
-        data-facets="shared.facets">
-    </adh-facets>
-
     <div data-ng-switch-when="body">
         <adh-s1-proposal-listing
             data-ng-if="proposalState"

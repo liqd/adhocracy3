@@ -133,6 +133,8 @@ class TestAutoTransitionWorkflow:
             'workflow': mock_workflow,
             'workflow_state': 'participate',
             'state_data': [
+                {'name': 'participate', 'description': '',
+                 'start_date': datetime(2016, 1, 1)},
                 {'name': 'evaluate', 'description': '',
                  'start_date': datetime(2016, 1, 3)}
             ]}
