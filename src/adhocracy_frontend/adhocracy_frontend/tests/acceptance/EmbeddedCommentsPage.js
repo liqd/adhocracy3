@@ -10,6 +10,8 @@ var EmbeddedCommentsPage = function(referer) {
         + "?key=" + referer + "&pool-path=" + this.poolPath;
 
     this.listing = element(by.tagName("adh-comment-listing"));
+    this.firstComment = this.listing.all(by.tagName("adh-comment")).first();
+    this.allComments = this.listing.all(by.tagName("adh-comment"));
     this.listingCreateForm = this.listing.element(by.css(".listing-create-form"));
     this.commentInput = this.listingCreateForm.element(by.model("data.content"));
     this.submitButton = this.listingCreateForm.element(by.css("input[type=\"submit\"]"));
@@ -25,15 +27,17 @@ var EmbeddedCommentsPage = function(referer) {
     };
 
     this.fillComment = function(content) {
+        browser.wait(this.commentInput.isDisplayed);
         this.commentInput.sendKeys(content);
     };
 
     this.createComment = function(content) {
         this.fillComment(content);
         this.submitButton.click();
+        var new_comment = element(by.cssContainingText('.comment-content', content));
+        browser.wait(new_comment.isDisplayed);
         // FIXME: Return created comment
-        return this.listing.element(by.xpath("(//adh-comment)[1]"));
-
+        return this.firstComment;
         // return all.reduce(function(acc, elem) {
         //            return protractor.promise.all(
         //                acc.getAttribute("data-path"),
@@ -43,11 +47,11 @@ var EmbeddedCommentsPage = function(referer) {
         //                   })
         //        });
     };
-    
-    this.getFirstComment = function() {
-        return this.listing.element(by.xpath("(//adh-comment)[1]"));
-    } 
 
+     this.createEmptyComment = function() {
+         this.submitButton.click();
+     }
+    
     this.getReplyLink = function(comment) {
         return comment.element(by.css(".icon-reply"));
     };

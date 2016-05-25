@@ -13,22 +13,22 @@ describe("comments", function() {
     it("can be created", function() {
         var page = new EmbeddedCommentsPage("c1").get();
         var comment = page.createComment("comment 1");
-        expect(comment.isPresent()).toBe(true);
+        expect(comment.isDisplayed()).toBe(true);
         expect(page.getCommentText(comment)).toEqual("comment 1");
         expect(page.getCommentAuthor(comment)).toEqual(shared.participantName);
     });
 
     it("cannot be created empty", function() {
         var page = new EmbeddedCommentsPage("c2").get();
-        var comment = page.createComment("");
-        expect(comment.isPresent()).toBe(false);
+        page.createEmptyComment();
+        expect(page.allComments.count()).toBe(0);
     });
 
     it("can be created nested", function() {
         var createNestedReplies = function(parent, parentName, remaining) {
             var name = parentName + ".1";
             var reply = page.createReply(parent, name);
-            expect(reply.isPresent()).toBe(true);
+            expect(reply.isDisplayed()).toBe(true);
             expect(page.getCommentText(reply)).toEqual(name);
             if (remaining > 0) {
                 createNestedReplies(reply, name, remaining - 1);
@@ -106,13 +106,13 @@ describe("comments of other user", function() {
     
     it("can not be edited", function() {
         page.get();
-        var comment = page.getFirstComment();
+        var comment = page.firstComment;
         expect(page.getEditLink(comment).isPresent()).toBe(false);
     });
 
     it("can be replied", function() {
         page.get();
-        var comment = page.getFirstComment();
+        var comment = page.firstComment;
         expect(page.getReplyLink(comment).isPresent()).toBe(true);
         var reply = page.createReply(comment, "reply 1");
         expect(page.getCommentText(reply)).toEqual("reply 1");
