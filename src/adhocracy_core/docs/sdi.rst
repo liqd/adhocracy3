@@ -1,8 +1,8 @@
 # doctest: +ELLIPSIS
 # doctest: +NORMALIZE_WHITESPACE
 
-Admin interface (sdi)
-=====================
+Substanced Admin interface (sdi)
+================================
 
 A generic admin interface is provided based on :mod:`substanced.sdi`.
 
