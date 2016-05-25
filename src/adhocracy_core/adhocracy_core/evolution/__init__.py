@@ -675,6 +675,17 @@ def add_canbadge_sheet_to_users(root, registry):  # pragma: no cover
     migrate_new_sheet(root, IUser, ICanBadge)
 
 
+def enable_order_for_organisation(root, registry):  # pragma: no cover
+    """Enable children order for organisations."""
+    from adhocracy_core.resources.organisation import IOrganisation
+    from adhocracy_core.resources.organisation import enabled_ordering
+    catalogs = find_service(root, 'catalogs')
+    resources = _search_for_interfaces(catalogs, IOrganisation)
+    for resource in resources:
+        logger.info('Enable ordering for {0}'.format(resource))
+        enabled_ordering(resource, registry)
+
+
 @log_migration
 def allow_create_asset_for_users(root, registry):  # pragma: no cover
     """Allow all users to create_assets inside the users service."""
@@ -723,5 +734,6 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(reset_comment_count)
     config.add_evolution_step(remove_is_service_attribute)
     config.add_evolution_step(add_canbadge_sheet_to_users)
+    config.add_evolution_step(enable_order_for_organisation)
     config.add_evolution_step(allow_create_asset_for_users)
     config.add_evolution_step(update_workflow_state_acl_for_all_resources)

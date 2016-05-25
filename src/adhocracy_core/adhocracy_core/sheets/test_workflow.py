@@ -62,6 +62,7 @@ def test_state_data_create():
     assert isinstance(inst['name'], workflow.StateName)
     assert isinstance(inst['start_date'], schema.DateTime)
     assert isinstance(inst['description'], schema.Text)
+    assert inst.bind(workflow=None).default == {}
 
 
 def test_state_data_list():
@@ -101,9 +102,10 @@ class TestDeferredStateValidator:
         assert validator.choices == []
 
     def test_return_next_states_list_if_workflow(self, node, kw):
-        kw['workflow'].get_next_states.return_value = ['state1']
+        kw['workflow'].get_next_states.return_value = ['state2']
+        kw['workflow'].state_of.return_value = 'state1'
         validator = self.call_fut(node, kw)
-        assert validator.choices == ['state1']
+        assert validator.choices == ['state1', 'state2']
         kw['workflow'].get_next_states.assert_called_with(kw['context'],
                                                           kw['request'])
 
@@ -183,6 +185,22 @@ class TestWorkflowAssignmentSheet:
                                 creating=resource_meta)
         schema = inst.get_schema_with_bindings()
         assert schema.bindings['workflow'] is mock_workflow
+
+    def test_get_schema_with_bindings_add_name(
+        self, meta, context, registry, mock_workflow):
+        registry.content.get_workflow.return_value = mock_workflow
+        inst = meta.sheet_class(meta, context, registry)
+        schema = inst.get_schema_with_bindings()
+        assert schema.name == inst.meta.isheet.__identifier__
+
+    def test_get_schema_with_bindings_add_required_if_create_mandatory(
+        self, meta, context, registry, mock_workflow, resource_meta):
+        import colander
+        registry.content.get_workflow.return_value = mock_workflow
+        meta = meta._replace(create_mandatory=True)
+        inst = meta.sheet_class(meta, context, registry, creating=resource_meta)
+        schema = inst.get_schema_with_bindings()
+        assert schema.missing is colander.required
 
     def test_set_workflow_state(self, meta, context, registry, mock_workflow):
         registry.content.get_workflow.return_value = mock_workflow

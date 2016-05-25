@@ -244,8 +244,8 @@ class PermissionsSchema(MappingSchema):
 
     roles = Roles()
     groups = UniqueReferences(reftype=PermissionsGroupsReference)
-    roles_and_group_roles = Roles(readonly=True,
-                                  default=deferred_roles_and_group_roles)
+    # roles_and_group_roles = Roles(readonly=True,
+    #                               default=deferred_roles_and_group_roles)
 
 
 class PermissionsAttributeResourceSheet(AttributeResourceSheet):

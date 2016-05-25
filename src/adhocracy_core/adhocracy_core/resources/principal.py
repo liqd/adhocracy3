@@ -162,6 +162,7 @@ user_meta = pool_meta._replace(
     element_types=(),  # we don't want the frontend to post resources here
     use_autonaming=True,
     permission_create='create_user',
+    is_sdi_addable=True
 )
 
 
@@ -214,6 +215,7 @@ group_meta = pool_meta._replace(
                      ),
     element_types=(),  # we don't want the frontend to post resources here
     permission_create='create_group',
+    is_sdi_addable=True,
 )
 
 

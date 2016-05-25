@@ -114,12 +114,12 @@ def includeme(config):
     config.include('.caching')
     config.include('.messaging')
     config.include('.sheets')
+    config.include('.sdi')
     config.include('.resources')
     config.include('.workflows')
     config.include('.websockets')
     config.include('.rest')
     config.include('.stats')
-    config.include('.sdi')
     if settings.get('adhocracy.add_test_users', False):
         from adhocracy_core.testing import add_create_test_users_subscriber
         add_create_test_users_subscriber(config)
@@ -135,19 +135,15 @@ def _create_authentication_policy(settings, config: Configurator)\
                                                    groupfinder=groupfinder,
                                                    timeout=timeout)
     multi_policy.add_policy(None, token_policy)
-    manage_prefix = settings.get('substanced.manage_prefix', '/manage')
     session_factory = SignedCookieSessionFactory(secret,
                                                  httponly=True,
-                                                 path=manage_prefix,
                                                  timeout=timeout)
     config.set_session_factory(session_factory)
     session_policy = AuthTktAuthenticationPolicy(secret,
                                                  hashalg='sha512',
                                                  http_only=True,
                                                  callback=groupfinder,
-                                                 path=manage_prefix,
                                                  timeout=timeout)
-    # TODO add secure cookie flag if https
     multi_policy.add_policy(SDI_ROUTE_NAME, session_policy)
     return multi_policy
 
