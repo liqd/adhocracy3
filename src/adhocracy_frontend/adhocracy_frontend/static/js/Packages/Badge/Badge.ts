@@ -175,6 +175,9 @@ export var badgeAssignmentList = (
 
                 return adhGetBadges(proposal).then((assignments : IBadge[]) => {
                     scope.assignments = _.keyBy(assignments, "badgePath");
+                    // The following object only contains the current assignments. In order to render the badge 
+                    // assignment UI, AssignmentList.html iterates over the available badges, though,
+                    // and gives them the value checkboxes[badgePath], which is is parsed to false when undefined.
                     scope.checkboxes = _.mapValues(scope.assignments, (v) => true);
                 });
             });
