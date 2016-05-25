@@ -1,11 +1,13 @@
 var pr = process.env.TRAVIS_PULL_REQUEST;
+var souceUser = process.env.SAUCE_USERNAME || "liqd";
+var sauceKey = process.env.SAUCE_ACCESS_KEY;
 var name = ((pr === "false") ? "" : "#" + pr + " ") + process.env.TRAVIS_COMMIT;
 
 var common = require("./protractorCommon.js");
 
 var local = {
-    sauceUser: "liqd",
-    sauceKey: "77600374-1617-4d7b-b1b6-9fd82ddfe89c",
+    sauceUser: souceUser,
+    sauceKey: sauceKey,
 
     capabilities: {
         "browserName": "chrome",
