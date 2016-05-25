@@ -1,5 +1,6 @@
 """Principal types (user/group) and helpers to search/get user information."""
 from logging import getLogger
+from pytz import timezone
 
 from pyramid.authentication import Authenticated
 from pyramid.authentication import Everyone
@@ -122,6 +123,10 @@ class User(Pool):
         self.group_ids = []
         """Readonly :term:`group_id`s for this user."""
         self.hidden = True
+
+    @property
+    def timezone(self):  # be compatible to substanced
+        return timezone(self.tzname)
 
     def activate(self, active: bool=True):
         """
@@ -384,6 +389,20 @@ class UserLocatorAdapter(object):
             group_roleids = ['role:' + r for r in group.roles]
             roleids.update(group_roleids)
         return sorted(list(roleids))
+
+
+def get_user(request: Request) -> IUser:
+    """Get authenticated user, meant to use as request method 'user'."""
+    userid = request.authenticated_userid
+    if userid is None:
+        return None
+    adapter = request.registry.queryMultiAdapter((request.context, request),
+                                                 IRolesUserLocator)
+    if adapter is None:
+        return None
+    else:
+        user = adapter.get_user_by_userid(userid)
+        return user
 
 
 def groups_and_roles_finder(userid: str, request: Request) -> list:
