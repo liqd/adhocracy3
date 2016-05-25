@@ -76,13 +76,12 @@ export var getBadgesFactory = (
 };
 
 
-export var bindPath = (
+var bindPath = (
     adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service,
     $q : angular.IQService
 ) => (
-    scope,
-    pathKey? : string
+    scope
 ) : void => {
     scope.data = {
         badge: "",
@@ -146,21 +145,6 @@ export var bindPath = (
 
     adhPermissions.bindScope(scope, scope.poolPath, "rawOptions", {importOptions: false});
     scope.$watch("rawOptions", getAssignableBadges);
-
-    if (typeof pathKey !== "undefined") {
-        scope.$watch(pathKey, (path : string) => {
-            if (path) {
-                adhHttp.get(path).then((resource) => {
-                    scope.resource = resource;
-                    scope.badgeablePath = resource.data[SIBadgeAssignment.nick].object;
-                    scope.data = {
-                        description: resource.data[SIDescription.nick].description,
-                        badge: resource.data[SIBadgeAssignment.nick].badge
-                    };
-                });
-            }
-        });
-    }
 };
 
 
