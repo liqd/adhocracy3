@@ -8,6 +8,7 @@ var common = require("./protractorCommon.js");
 var local = {
     sauceUser: souceUser,
     sauceKey: sauceKey,
+        directConnect: false,
 
     capabilities: {
         "browserName": "chrome",
