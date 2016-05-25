@@ -257,6 +257,7 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
                                    'use_autonaming',
                                    'autonaming_prefix',
                                    'use_autonaming_random',
+                                   'is_sdi_addable',
                                    'element_types',
                                    'workflow_name',
                                    'item_type',
@@ -294,6 +295,10 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
     use_autonaming_random:
         Use random the name if the new content object is added to the parent.
         You can enable only one, autonaming or random autonaming.
+    is_sdi_addable:
+        Make this resource type automatically addable with the substanced
+        admin interface (sdi).
+
 
     IPool fields:
     -------------

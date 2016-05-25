@@ -388,6 +388,8 @@ def mock_workflow() -> Mock:
     from adhocracy_core.workflows import AdhocracyACLWorkflow
     mock = Mock(spec=AdhocracyACLWorkflow)
     mock._states = {}
+    mock.get_next_states.return_value = []
+    mock.state_of.return_value = None
     return mock
 
 
