@@ -23,7 +23,10 @@ class ManagementViews(object):
     def manage_main(self):
         view_data = sdi_mgmt_views(self.context, self.request)
         if not view_data:
-            raise HTTPForbidden()
+            self.request.session['came_from'] = self.request.url
+            location = self.request.sdiapi.mgmt_path(self.request.virtual_root,
+                                                     '@@login')
+            raise HTTPForbidden(location=location)
         else:
             view_name = '@@%s' % (view_data[0]['view_name'],)
             location = self.request.sdiapi.mgmt_path(self.request.context,

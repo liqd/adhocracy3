@@ -9,37 +9,27 @@ A generic admin interface is provided based on :mod:`substanced.sdi`.
 First you have to start adhocracy
 
     >>> from webtest import TestApp
-    >>> log = getfixture('log')
     >>> app_router = getfixture('app_router')
     >>> testapp = TestApp(app_router)
     >>> rest_url = 'http://localhost'
-    >>> xhr_headers = {'X-REQUESTED-WITH': 'XMLHttpRequest'}
 
-If you got the sdi without login you get an error::
+You have to login first::
 
-    >>> resp = testapp.get(rest_url + '/manage', headers=xhr_headers, expect_errors=True)
-    >>> resp.status_code
-    403
+    >>> resp = testapp.get(rest_url + '/manage/')
+    >>> csrf = resp.html.input['value']
+    >>> data = {'login': 'god',
+    ...         'password': 'password',
+    ...         'csrf_token': csrf,
+    ...         'form.submitted': 'Log In'}
+    >>> resp = testapp.post('/manage/@@login', data)
 
-If you login as god user with the frontend application::
+then you are redirected to the sdi contents listing::
 
-    >>> data = {'name': 'god',
-    ...         'password': 'password'}
-    >>> resp = testapp.post_json('/login_username', data, headers=xhr_headers)
-
-you are redirected to the sdi contents listing::
-
-    >>> resp = testapp.get(rest_url + '/manage')
-    >>> resp.status_code
-    302
+    >>> resp.location
+    '.../manage/'
+    >>> resp = testapp.get(resp.location)
     >>> resp.location
     '.../manage/@@contents'
-
-    >>> html = testapp.get(resp.location).text
-    >>> '/adhocracy' in html
-    True
-
-All following post requests are guarded with csrf tokens::
-
-    >>> 'csrfToken' in html
+    >>> resp = testapp.get(resp.location)
+    >>> '/adhocracy/@@manage_main' in resp.text
     True

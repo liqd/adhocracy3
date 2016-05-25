@@ -908,29 +908,28 @@ class TestLoginUserName:
                                'user_path': 'http://example.com/',
                                'user_token': 'token'}
 
-    def test_post_with_cookie_authentication_policy(
-        self, request, context, mock_authpolicy):
-        mock_authpolicy.remember.return_value = [('Set-Cookie', 'value;'),
-                                                 ('X-User-Token', 'token')]
-        inst = self.make_one(context, request)
-        inst.post()
-        assert ('X-User-Token', 'token') not in request.response.headers.items()
-        assert ('Set-Cookie', 'value;') in request.response.headers.items()
-
-    def test_post_with_cookie_authentication_policy_and_https(
-        self, request, context, mock_authpolicy):
-        request.scheme = 'https'
-        mock_authpolicy.remember.return_value = [('Set-Cookie', 'value;'),
-                                                 ('X-User-Token', 'token')]
-        inst = self.make_one(context, request)
-        inst = self.make_one(context, request)
-        inst.post()
-        assert ('Set-Cookie', 'value;Secure;') in request.response.headers.items()
-
-
     def test_options(self, request, context):
         inst = self.make_one(context, request)
         assert inst.options() == {}
+
+
+class TestSetSecureCookieFlag:
+
+    def call_fut(self, *args):
+        from .views import get_set_cookie_headers
+        return get_set_cookie_headers(*args)
+
+    def test_ignore_without_https(self, request_):
+        headers = [('Set-Cookie', 'value;'), ('X-User-Token', 'token')]
+        assert self.call_fut(headers, request_) == [('Set-Cookie',
+                                                     'value;')]
+
+    def test_set_secure_flag_with_https(self, request_):
+        request_.scheme = 'https'
+        headers = [('Set-Cookie', 'value;'), ('X-User-Token', 'token')]
+        self.call_fut(headers, request_)
+        assert self.call_fut(headers, request_) == [('Set-Cookie',
+                                                     'value;Secure;')]
 
 
 class TestLoginEmailView:

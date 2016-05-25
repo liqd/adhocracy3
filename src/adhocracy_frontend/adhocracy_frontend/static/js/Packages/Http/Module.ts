@@ -21,7 +21,6 @@ export var register = (angular, config) => {
         ])
         .config(["$httpProvider", ($httpProvider) => {
             $httpProvider.interceptors.push(["adhHttpBusy", (adhHttpBusy : AdhHttp.Busy) => adhHttpBusy.createInterceptor()]);
-            $httpProvider.defaults.withCredentials = true;  // allow cookie authentication for SingleSignOn with admin interface
         }])
         .service("adhHttpBusy", ["$q", AdhHttp.Busy])
         .directive("adhHttpBusy", ["adhConfig", "adhHttpBusy", AdhHttp.busyDirective])
