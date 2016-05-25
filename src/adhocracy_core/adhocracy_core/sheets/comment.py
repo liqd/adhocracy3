@@ -77,7 +77,7 @@ class CommentableSheet(AnnotationRessourceSheet):
         `comments_count` value is converted from int to :class:`Btrees.Length`,
         to support ZODB conflict resultion.
         """
-        if self._count_field_name in appstruct:
+        if self._count_field_name in appstruct:  # pragma: no branch
             data = getattr(self.context, self._annotation_key, {})
             if self._count_field_name not in data:
                 counter = Length(0)
