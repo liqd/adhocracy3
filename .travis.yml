@@ -28,6 +28,6 @@ env:
     - BUILDOUT_TARGET=spd
   global: # SAUCE_USERNAME and SAUCE_ACCESS_KEY
     - secure: ovz89AOVSOa0HefNp4Wbl1t5jV6nTJqQhf99klH/FAEtQRsZe5oklzi0zpDUXa1zIF18pGFLt0Bv8Nct7njp0N2fH8oItP7jmHpGwhHE8EQTWdvMq7KK3UX30JdXrFsyHTxnW8nGlNdTRcww/zn7KjwUTbja+4Y0RsCBB5HdA+w=
-    - secure: Nt4lAAiTCqTGBj7nPu+Kov1MeFUaapI4swkyoDHsXGE2x6/aeDmOErOHrur5QrOQEOkqwsLPeeshuu4J+3+f3LdhnV0kRVkNMRryFqOM4I953jhgsw8B+p4KWT7/sqCT2ubCmyVcaLjNlDX+pdZIu2pT9LcEkF8tfg5zkDcf5Fw=
+    - secure: jBR7/2APY1qskecsyPsTcxogGeS3xuPXwFM2SnS70hKfsdWOt0SCrJC5MpjAqmUHWnPh4g8rTT6uX/JyfBOgEh7ny1matjHsm+dwlDW/Y3QA73RuxU+KXVgXVg3YUlYFCQT7Ttx9Xj3qp5j0BrvZelGYLI3rSjvNRFW2bKsBQYg=
 after_success:
   - ./bin/coveralls
