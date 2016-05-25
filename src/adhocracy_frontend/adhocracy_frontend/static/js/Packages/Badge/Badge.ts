@@ -163,18 +163,6 @@ export var bindPath = (
     }
 };
 
-export var fill = (resource, scope, userPath : string) => {
-    var clone = _.cloneDeep(resource);
-    clone.data[SIDescription.nick] = {
-        description: scope.data.description
-    };
-    clone.data[SIBadgeAssignment.nick] = {
-        badge: scope.data.badge,
-        object: scope.badgeablePath,
-        subject: userPath
-    };
-    return clone;
-};
 
 export var badgeAssignmentList = (
     adhConfig : AdhConfig.IService,
