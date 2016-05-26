@@ -700,6 +700,19 @@ def update_workflow_state_acl_for_all_resources(root,
     update_workflow_state_acls(root, registry)
 
 
+@log_migration
+def add_controversiality_index(root, registry):  # pragma: no cover
+    """Add controversity index."""
+    from adhocracy_core.sheets.rate import IRateable
+    catalogs = find_service(root, 'catalogs')
+    catalog = catalogs['adhocracy']
+    catalog.update_indexes(registry=registry)
+    resources = _search_for_interfaces(catalogs, IRateable)
+    index = catalog['controversiality']
+    for resource in resources:
+        index.reindex_resource(resource)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -737,3 +750,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(enable_order_for_organisation)
     config.add_evolution_step(allow_create_asset_for_users)
     config.add_evolution_step(update_workflow_state_acl_for_all_resources)
+    config.add_evolution_step(add_controversiality_index)
