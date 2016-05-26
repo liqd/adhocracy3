@@ -6,7 +6,6 @@ from colander import All
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from pyramid.settings import asbool
 from pyramid.traversal import resource_path
-from pyramid.traversal import find_resource
 from urllib.parse import urljoin
 import requests
 
@@ -217,23 +216,6 @@ captcha_meta = sheet_meta._replace(
     create_mandatory=False,  # enabled if captchas enabled in configuration
     permission_create='create_user',
 )
-
-
-@deferred
-def deferred_roles_and_group_roles(node: SchemaNode, kw: dict) -> list:
-    """Return roles and groups roles for `context`.
-
-    :param kw: dictionary with 'context' key and
-              :class:`adhocracy_core.sheets.principal.IPermissions` object.
-    :return: list of :term:`roles` or [].
-    """
-    context = kw['context']
-    roles_and_group_roles = set(getattr(context, 'roles', []))
-    group_ids = getattr(context, 'group_ids', [])
-    groups = [find_resource(context, gid) for gid in group_ids]
-    for group in groups:
-        roles_and_group_roles.update(group.roles)
-    return sorted(list(roles_and_group_roles))
 
 
 class PermissionsSchema(MappingSchema):
