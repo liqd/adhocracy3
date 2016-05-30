@@ -9,7 +9,6 @@ import * as AdhHttp from "../Http/Http";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
-import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 
 import RIBadgeAssignment from "../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment";
@@ -224,54 +223,6 @@ export var badgeAssignmentList = (
                 });
             });
 
-        }
-    };
-};
-
-export var badgeAssignmentDirective = (
-    adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    $q : angular.IQService,
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Wrapper.html",
-        require: "^adhMovingColumn",
-        scope: {
-            path: "@",
-            showDescription: "=?",
-            onSubmit: "=?",
-            onCancel: "=?"
-        },
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            scope.badgeablePath = scope.path;
-            scope.data = {};
-
-            adhHttp.get(scope.path).then((proposal) => {
-                scope.poolPath = proposal.data[SIBadgeable.nick].post_pool;
-
-                return adhGetBadges(proposal).then((assignments : IBadge[]) => {
-                    scope.assignments = assignments;
-                    scope.ready = true;
-                });
-            });
-
-            scope.submit = () => {
-                column.hideOverlay("badges");
-                column.alert("TR__BADGE_ASSIGNMENT_UPDATED", "success");
-                if (scope.onSubmit) {
-                    scope.onSubmit();
-                }
-            };
-
-            scope.cancel = () => {
-                column.hideOverlay("badges");
-                if (scope.onCancel) {
-                    scope.onCancel();
-                }
-            };
         }
     };
 };

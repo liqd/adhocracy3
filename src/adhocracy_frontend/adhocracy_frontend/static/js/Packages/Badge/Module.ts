@@ -34,7 +34,5 @@ export var register = (angular) => {
             "$q",
             "adhCredentials",
             "adhGetBadges",
-            AdhBadge.badgeAssignmentList])
-        .directive("adhBadgeAssignment", ["adhConfig", "adhHttp", "$q", "adhTopLevelState", "adhGetBadges",
-            AdhBadge.badgeAssignmentDirective]);
+            AdhBadge.badgeAssignmentList]);
 };
