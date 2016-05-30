@@ -9,6 +9,7 @@ import * as ResourcesBase from "../../ResourcesBase";
 
 import RIParagraph from "../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
 import * as SITags from "../../Resources_/adhocracy_core/sheets/tags/ITags";
+import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 
 import * as Convert from "./Convert";
 import * as Error from "./Error";
@@ -420,6 +421,7 @@ export var register = () => {
                 var put;
                 var post1;
                 var post2;
+                var delete1;
                 var get2;
                 var request;
                 var response;
@@ -432,6 +434,7 @@ export var register = () => {
                             {body: {content_type: RIParagraph.content_type, path: "put response"}},
                             {body: {content_type: RIParagraph.content_type, path: "post1 response"}},
                             {body: {content_type: RIParagraph.content_type, path: "post2 response"}},
+                            {body: {content_type: RIParagraph.content_type, path: "delete response"}},
                             {body: {content_type: RIParagraph.content_type, path: "get2 response"}}
                         ],
                         updated_resources: {
@@ -455,6 +458,7 @@ export var register = () => {
                         post2 = httpTrans.post("/post/path/2", <any>{
                             content_type: RIParagraph.content_type
                         });
+                        delete1 = httpTrans.delete("/delete/path", RIParagraph.content_type);
                         get2 = httpTrans.get(post1.path);
                         return httpTrans.commit();
                     }).then(
@@ -501,11 +505,18 @@ export var register = () => {
                     expect(request[post2.index].result_path).toBe(post2.path);
                 });
 
+                it("sets the delete flag", () => {
+                    expect(request[delete1.index].body.data[SIMetadata.nick]).toBeDefined();
+                    expect(request[delete1.index].body.data[SIMetadata.nick].deleted).toBeDefined();
+                    expect(request[delete1.index].body.data[SIMetadata.nick].deleted).toBe(true);
+                });
+
                 it("maps preliminary data to responses via `index`", () => {
                     expect(response[get.index].path).toBe("get response");
                     expect(response[put.index].path).toBe("put response");
                     expect(response[post1.index].path).toBe("post1 response");
                     expect(response[post2.index].path).toBe("post2 response");
+                    expect(response[delete1.index].path).toBe("delete response");
                     expect(response[get2.index].path).toBe("get2 response");
                 });
 

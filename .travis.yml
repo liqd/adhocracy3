@@ -15,7 +15,7 @@ before_script:
   - "sh -e /etc/init.d/xvfb start"
 script:
   - "./bin/ad_check_code -a"
-  - "./bin/polytester -v pyunit,pyfunc,jsunit,jsint"
+  - "./bin/polytester -v pyunit,pyfunc,jsunit"
   - "PATH=${TRAVIS_BUILD_DIR}/bin:${PATH} ./bin/protractor etc/protractorConfFirefox.js"
 notifications:
   email: false
