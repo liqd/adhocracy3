@@ -479,38 +479,6 @@ export var register = () => {
                     request = args[1];
                 });
 
-                it("assigns different preliminary paths to different post requests", () => {
-                    expect(post1.path).not.toEqual(post2.path);
-                });
-
-                it("assigns preliminary first_version_paths on post requests", () => {
-                    expect(post1.first_version_path).toBeDefined();
-                });
-
-                it("prefixes preliminary paths with a single '@'", () => {
-                    expect(post1.path[0]).toBe("@");
-                    expect(post1.path[1]).not.toBe("@");
-                });
-
-                it("prefixes preliminary first_version_paths with a single '@'", () => {
-                    expect(post1.first_version_path[0]).toBe("@");
-                    expect(post1.first_version_path[1]).not.toBe("@");
-                });
-
-                it("adds a result_path to post requests", () => {
-                    expect(request[post1.index].result_path).toBeDefined();
-                    expect(request[post1.index].result_path).toBe(post1.path);
-
-                    expect(request[post2.index].result_path).toBeDefined();
-                    expect(request[post2.index].result_path).toBe(post2.path);
-                });
-
-                it("sets the delete flag", () => {
-                    expect(request[delete1.index].body.data[SIMetadata.nick]).toBeDefined();
-                    expect(request[delete1.index].body.data[SIMetadata.nick].deleted).toBeDefined();
-                    expect(request[delete1.index].body.data[SIMetadata.nick].deleted).toBe(true);
-                });
-
                 it("maps preliminary data to responses via `index`", () => {
                     expect(response[get.index].path).toBe("get response");
                     expect(response[put.index].path).toBe("put response");
@@ -522,6 +490,42 @@ export var register = () => {
 
                 it("throws if you try to use the transaction after commit", () => {
                     expect(() => _httpTrans.get("/some/path")).toThrow();
+                });
+
+                describe("post", () => {
+                    it("assigns different preliminary paths to different post requests", () => {
+                        expect(post1.path).not.toEqual(post2.path);
+                    });
+
+                    it("assigns preliminary first_version_paths on post requests", () => {
+                        expect(post1.first_version_path).toBeDefined();
+                    });
+
+                    it("prefixes preliminary paths with a single '@'", () => {
+                        expect(post1.path[0]).toBe("@");
+                        expect(post1.path[1]).not.toBe("@");
+                    });
+
+                    it("prefixes preliminary first_version_paths with a single '@'", () => {
+                        expect(post1.first_version_path[0]).toBe("@");
+                        expect(post1.first_version_path[1]).not.toBe("@");
+                    });
+
+                    it("adds a result_path to post requests", () => {
+                        expect(request[post1.index].result_path).toBeDefined();
+                        expect(request[post1.index].result_path).toBe(post1.path);
+
+                        expect(request[post2.index].result_path).toBeDefined();
+                        expect(request[post2.index].result_path).toBe(post2.path);
+                    });
+                });
+
+                describe("delete", () => {
+                    it("sets the delete flag", () => {
+                        expect(request[delete1.index].body.data[SIMetadata.nick]).toBeDefined();
+                        expect(request[delete1.index].body.data[SIMetadata.nick].deleted).toBeDefined();
+                        expect(request[delete1.index].body.data[SIMetadata.nick].deleted).toBe(true);
+                    });
                 });
             });
         });
