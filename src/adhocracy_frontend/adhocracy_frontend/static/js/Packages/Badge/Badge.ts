@@ -190,22 +190,20 @@ export var badgeAssignment = (
 
                     scope.submit = () => {
                         adhHttp.withTransaction((transaction) => {
-                            for (var badgePath in scope.checkboxes) {
-                                if (scope.checkboxes.hasOwnProperty(badgePath)) {
-                                    var assignmentExisted = scope.assignments.hasOwnProperty(badgePath);
-                                    if (scope.checkboxes[badgePath] && !assignmentExisted) {
-                                        var assignment = new RIBadgeAssignment({ preliminaryNames: adhPreliminaryNames });
-                                        assignment.data[SIBadgeAssignment.nick] = {
-                                            badge: badgePath,
-                                            object: scope.badgeablePath,
-                                            subject: adhCredentials.userPath
-                                        };
-                                        transaction.post(scope.poolPath, assignment);
-                                    } else if (!scope.checkboxes[badgePath] && assignmentExisted) {
-                                        transaction.delete(scope.assignments[badgePath].path, RIBadgeAssignment.content_type);
-                                    }
+                            _.forOwn(scope.checkboxes, (checked, badgePath) => {
+                                var assignmentExisted = scope.assignments.hasOwnProperty(badgePath);
+                                if (checked && !assignmentExisted) {
+                                    var assignment = new RIBadgeAssignment({ preliminaryNames: adhPreliminaryNames });
+                                    assignment.data[SIBadgeAssignment.nick] = {
+                                        badge: badgePath,
+                                        object: scope.badgeablePath,
+                                        subject: adhCredentials.userPath
+                                    };
+                                    transaction.post(scope.poolPath, assignment);
+                                } else if (!checked && assignmentExisted) {
+                                    transaction.delete(scope.assignments[badgePath].path, RIBadgeAssignment.content_type);
                                 }
-                            }
+                            });
 
                             return transaction.commit()
                                 .then((responses) => {
