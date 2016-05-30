@@ -38,16 +38,15 @@ describe("user page", function() {
     });
 
     it("backend sends message as email", function(done) {
-
-            var newMails = fs.readdirSync(browser.params.mail.queue_path + "/new");
-            var lastMail = newMails.length - 1
-            var mailpath = browser.params.mail.queue_path + "/new/" + newMails[lastMail];
-            shared.parseEmail(mailpath, function(mail) {
-                expect(mail.text).toContain(content);
-                expect(mail.subject).toContain(subject);
-                expect(mail.from[0].address).toContain("noreply");
-                expect(mail.to[0].address).toContain("participant");
-                done();
-            });
+        var newMails = fs.readdirSync(browser.params.mail.queue_path + "/new");
+        var lastMail = newMails.length - 1
+        var mailpath = browser.params.mail.queue_path + "/new/" + newMails[lastMail];
+        shared.parseEmail(mailpath, function(mail) {
+            expect(mail.text).toContain(content);
+            expect(mail.subject).toContain(subject);
+            expect(mail.from[0].address).toContain("noreply");
+            expect(mail.to[0].address).toContain("participant");
+            done();
+        });
     });
 });

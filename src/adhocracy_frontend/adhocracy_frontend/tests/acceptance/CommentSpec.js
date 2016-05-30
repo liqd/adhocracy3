@@ -2,10 +2,9 @@
 
 var shared = require("./shared.js");
 var EmbeddedCommentsPage = require("./EmbeddedCommentsPage.js");
-var UserPages = require("./UserPages.js");
+
 
 describe("comments", function() {
-
     beforeAll(function() {
         shared.loginParticipant();
     });
@@ -93,9 +92,8 @@ describe("comments", function() {
 });
 
 describe("comments of other user", function() {
-    
     var page;
-    
+
     beforeAll( function () {
         shared.loginParticipant();
         page = new EmbeddedCommentsPage("c6").get();
@@ -103,7 +101,7 @@ describe("comments of other user", function() {
         shared.logout();
         shared.loginOtherParticipant();
     });
-    
+
     it("can not be edited", function() {
         page.get();
         var comment = page.firstComment;

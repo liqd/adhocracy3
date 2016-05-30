@@ -40,10 +40,6 @@ describe("ratings", function() {
 
     it("is not affected by the edition of the comment", function() {
         var page = new EmbeddedCommentsPage("c2").get();
-        // at this point annotator may not be logged
-        // if we don't add the first shared.loginParticipant();
-        // even if the same call is performed by the beforeEach
-        // function?!
         var comment = page.createComment("c4");
         var rate = page.getRateWidget(comment);
 

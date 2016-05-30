@@ -38,20 +38,12 @@ var EmbeddedCommentsPage = function(referer) {
         browser.wait(new_comment.isDisplayed);
         // FIXME: Return created comment
         return this.firstComment;
-        // return all.reduce(function(acc, elem) {
-        //            return protractor.promise.all(
-        //                acc.getAttribute("data-path"),
-        //                elem.getAttribute("data-path")
-        //            ).then(function(paths) {
-        //                       return (path[0] > path[1] ? acc : elem);
-        //                   })
-        //        });
     };
 
      this.createEmptyComment = function() {
          this.submitButton.click();
      }
-    
+
     this.getReplyLink = function(comment) {
         return comment.element(by.css(".icon-reply"));
     };
