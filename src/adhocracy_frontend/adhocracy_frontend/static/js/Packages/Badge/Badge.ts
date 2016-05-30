@@ -171,7 +171,7 @@ export var badgeAssignment = (
             adhHttp.get(scope.path).then((proposal) => {
                 scope.poolPath = proposal.data[SIBadgeable.nick].post_pool;
 
-                return adhGetBadges(proposal).then((assignments: IBadge[]) => {
+                return adhGetBadges(proposal).then((assignments : IBadge[]) => {
                     scope.assignments = assignments;
 
                     bindPath(adhHttp, adhPermissions, $q)(scope);
@@ -179,9 +179,9 @@ export var badgeAssignment = (
                     adhHttp.get(scope.badgeablePath).then((proposal) => {
                         scope.poolPath = proposal.data[SIBadgeable.nick].post_pool;
 
-                        return adhGetBadges(proposal).then((assignments: IBadge[]) => {
+                        return adhGetBadges(proposal).then((assignments : IBadge[]) => {
                             scope.assignments = _.keyBy(assignments, "badgePath");
-                            // The following object only contains the current assignments. In order to render the badge 
+                            // The following object only contains the current assignments. In order to render the badge
                             // assignment UI, Assignment.html iterates over the available badges, though,
                             // and gives them the value checkboxes[badgePath], which is parsed to false when undefined.
                             scope.checkboxes = _.mapValues(scope.assignments, (v) => true);
