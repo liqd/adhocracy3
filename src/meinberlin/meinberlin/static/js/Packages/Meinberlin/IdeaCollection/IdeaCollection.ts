@@ -19,6 +19,7 @@ import RIIdeaCollectionProcess from "../../../Resources_/adhocracy_meinberlin/re
 import RIKiezkasseProcess from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
 import RIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
 import RIKiezkasseProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
+import * as SIBadgeable from "../../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
 import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
@@ -107,6 +108,17 @@ export var proposalDetailColumnDirective = (
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
+
+            var badgeAssignmentPoolPath;
+            scope.$watch("proposalUrl", (proposalUrl) => {
+                if (proposalUrl) {
+                    adhHttp.get(proposalUrl).then((proposal) => {
+                        badgeAssignmentPoolPath = proposal.data[SIBadgeable.nick].post_pool;
+                    });
+                }
+            });
+            adhPermissions.bindScope(scope, () => badgeAssignmentPoolPath, "badgeAssignmentPoolOptions");
+
             scope.hide = () => {
                 var proposalClass = RIGeoProposal;
                 if (scope.isKiezkasse) {

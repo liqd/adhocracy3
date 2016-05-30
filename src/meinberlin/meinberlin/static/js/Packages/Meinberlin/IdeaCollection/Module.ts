@@ -1,4 +1,5 @@
 import * as AdhAbuseModule from "../../Abuse/Module";
+import * as AdhBadgeModule from "../../Badge/Module";
 import * as AdhCommentModule from "../../Comment/Module";
 import * as AdhHttpModule from "../../Http/Module";
 import * as AdhMovingColumnsModule from "../../MovingColumns/Module";
@@ -28,6 +29,7 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhAbuseModule.moduleName,
+            AdhBadgeModule.moduleName,
             AdhCommentModule.moduleName,
             AdhHttpModule.moduleName,
             AdhMeinberlinIdeaCollectionProcessModule.moduleName,
