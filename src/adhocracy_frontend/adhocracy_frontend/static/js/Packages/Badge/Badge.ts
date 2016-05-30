@@ -183,7 +183,7 @@ export var badgeAssignment = (
                             scope.assignments = _.keyBy(assignments, "badgePath");
                             // The following object only contains the current assignments. In order to render the badge 
                             // assignment UI, Assignment.html iterates over the available badges, though,
-                            // and gives them the value checkboxes[badgePath], which is is parsed to false when undefined.
+                            // and gives them the value checkboxes[badgePath], which is parsed to false when undefined.
                             scope.checkboxes = _.mapValues(scope.assignments, (v) => true);
                         });
                     });
