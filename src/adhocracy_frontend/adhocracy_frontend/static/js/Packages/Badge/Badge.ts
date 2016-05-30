@@ -160,63 +160,70 @@ export var badgeAssignmentList = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/AssignmentList.html",
+        require: "^adhMovingColumn",
         scope: {
-            badgeablePath: "@",
-            poolPath: "@",
-            showDescription: "=?",
-            onSubmit: "=?",
-            onCancel: "=?"
+            path: "@",
+            showDescription: "=?"
         },
-        link: (scope, element) => {
-            bindPath(adhHttp, adhPermissions, $q)(scope);
+        link: (scope, element, attrs, column: AdhMovingColumns.MovingColumnController) => {
+            scope.badgeablePath = scope.path;
+            scope.data = {};
 
-            adhHttp.get(scope.badgeablePath).then((proposal) => {
+            adhHttp.get(scope.path).then((proposal) => {
                 scope.poolPath = proposal.data[SIBadgeable.nick].post_pool;
 
-                return adhGetBadges(proposal).then((assignments : IBadge[]) => {
-                    scope.assignments = _.keyBy(assignments, "badgePath");
-                    // The following object only contains the current assignments. In order to render the badge 
-                    // assignment UI, AssignmentList.html iterates over the available badges, though,
-                    // and gives them the value checkboxes[badgePath], which is is parsed to false when undefined.
-                    scope.checkboxes = _.mapValues(scope.assignments, (v) => true);
+                return adhGetBadges(proposal).then((assignments: IBadge[]) => {
+                    scope.assignments = assignments;
+
+                    bindPath(adhHttp, adhPermissions, $q)(scope);
+
+                    adhHttp.get(scope.badgeablePath).then((proposal) => {
+                        scope.poolPath = proposal.data[SIBadgeable.nick].post_pool;
+
+                        return adhGetBadges(proposal).then((assignments: IBadge[]) => {
+                            scope.assignments = _.keyBy(assignments, "badgePath");
+                            // The following object only contains the current assignments. In order to render the badge 
+                            // assignment UI, AssignmentList.html iterates over the available badges, though,
+                            // and gives them the value checkboxes[badgePath], which is is parsed to false when undefined.
+                            scope.checkboxes = _.mapValues(scope.assignments, (v) => true);
+                        });
+                    });
+
+                    scope.submit = () => {
+                        adhHttp.withTransaction((transaction) => {
+                            for (var badgePath in scope.checkboxes) {
+                                if (scope.checkboxes.hasOwnProperty(badgePath)) {
+                                    var assignmentExisted = scope.assignments.hasOwnProperty(badgePath);
+                                    if (scope.checkboxes[badgePath] && !assignmentExisted) {
+                                        var assignment = new RIBadgeAssignment({ preliminaryNames: adhPreliminaryNames });
+                                        assignment.data[SIBadgeAssignment.nick] = {
+                                            badge: badgePath,
+                                            object: scope.badgeablePath,
+                                            subject: adhCredentials.userPath
+                                        };
+                                        transaction.post(scope.poolPath, assignment);
+                                    } else if (!scope.checkboxes[badgePath] && assignmentExisted) {
+                                        transaction.delete(scope.assignments[badgePath].path, RIBadgeAssignment.content_type);
+                                    }
+                                }
+                            }
+
+                            return transaction.commit()
+                                .then((responses) => {
+                                    column.hideOverlay("badges");
+                                    column.alert("TR__BADGE_ASSIGNMENT_UPDATED", "success");
+                                }, (response) => {
+                                    scope.serverError = response[0].description;
+                                });
+                        });
+                    };
+
+                    scope.cancel = () => {
+                        column.hideOverlay("badges");
+                    };
                 });
             });
 
-            scope.submit = () => {
-                adhHttp.withTransaction((transaction) => {
-                    for (var badgePath in scope.checkboxes) {
-                        if (scope.checkboxes.hasOwnProperty(badgePath)) {
-                            var assignmentExisted = scope.assignments.hasOwnProperty(badgePath);
-                            if (scope.checkboxes[badgePath] && !assignmentExisted) {
-                                var assignment = new RIBadgeAssignment({preliminaryNames: adhPreliminaryNames});
-                                assignment.data[SIBadgeAssignment.nick] = {
-                                    badge: badgePath,
-                                    object: scope.badgeablePath,
-                                    subject: adhCredentials.userPath
-                                };
-                                transaction.post(scope.poolPath, assignment);
-                            } else if (!scope.checkboxes[badgePath] && assignmentExisted) {
-                                transaction.delete(scope.assignments[badgePath].path, RIBadgeAssignment.content_type);
-                            }
-                        }
-                    }
-
-                    return transaction.commit()
-                        .then((responses) => {
-                            if (scope.onSubmit) {
-                                scope.onSubmit();
-                            }
-                        }, (response) => {
-                            scope.serverError = response[0].description;
-                        });
-                });
-            };
-
-            scope.cancel = () => {
-                if (scope.onCancel) {
-                    scope.onCancel();
-                }
-            };
         }
     };
 };
