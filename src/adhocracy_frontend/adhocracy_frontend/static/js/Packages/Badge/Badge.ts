@@ -104,14 +104,14 @@ var bindPath = (
 
     var collectBadgesByGroup = (groupPaths, badges) => {
         var badgesByGroup = {};
-        for (var groupPath of groupPaths) {
+        _.forOwn(groupPaths, (groupPath) => {
             badgesByGroup[groupPath] = [];
-            for (var badge of badges) {
+            _.forOwn(badges, (badge) => {
                 if (_.includes(badge.groups, groupPath)) {
                     badgesByGroup[groupPath].push(badge.path);
                 }
-            }
-        }
+            });
+        });
         return badgesByGroup;
     };
 
