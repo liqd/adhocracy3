@@ -11,7 +11,7 @@ install:
   - "PATH=${TRAVIS_BUILD_DIR}/bin:${PATH} ./bin/buildout -c buildout-${BUILDOUT_TARGET}.cfg 2>/dev/null"
 script:
   - "./bin/ad_check_code -a"
-  - "./bin/polytester -v pyunit,pyfunc,jsunit,jsint"
+  - "./bin/polytester -v pyunit,pyfunc,jsunit"
   - "PATH=${TRAVIS_BUILD_DIR}/bin:${PATH} ./bin/protractor etc/protractorConfSauce.js"
 notifications:
   email: false
