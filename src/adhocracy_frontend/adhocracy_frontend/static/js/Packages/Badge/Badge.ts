@@ -115,9 +115,9 @@ var bindPath = (
         return badgesByGroup;
     };
 
-    var getAssignableBadges = (rawOptions) => {
+    var getAssignableBadges = (rawOptions) : angular.IPromise<any> => {
         if (!rawOptions) {
-            return;
+            return $q.when();
         }
 
         var requestBodyOptions : {content_type : string}[] = AdhUtil.deepPluck(rawOptions, [
@@ -132,10 +132,10 @@ var bindPath = (
             "data", SIBadgeAssignment.nick, "badge"
         ]);
 
-        $q.all(_.map(assignableBadgePaths, (b) => adhHttp.get(b).then(extractBadge))).then((badges : any) => {
+        return $q.all(_.map(assignableBadgePaths, (b) => adhHttp.get(b).then(extractBadge))).then((badges : any) => {
             scope.badges = _.keyBy(badges, "path");
             var groupPaths : string[]  = _.union.apply(_, _.map(badges, "groups"));
-            $q.all(_.map(groupPaths, (g) => adhHttp.get(g))).then((result) => {
+            return $q.all(_.map(groupPaths, (g) => adhHttp.get(g))).then((result) => {
                 scope.badgeGroups = _.keyBy(_.map(result, extractGroup), "path");
                 scope.badgesByGroup = collectBadgesByGroup(groupPaths, badges);
             });
