@@ -9,16 +9,28 @@ def mock_route(mocker):
     return mocker.Mock(spec=IRoute)
 
 
-def test_add_cors_headers_set_x_frame_options_if_no_api_request(request_,
-                                                                mock_route):
-    from .subscriber import add_cors_headers
+def test_set_response_header_set_x_frame_options_if_no_api_request(request_,
+                                                                   mock_route):
+    from .subscriber import set_response_headers
     mock_route.name = 'route_name'
     request_.matched_route = mock_route
     response = testing.DummyResource(headers={})
     event = testing.DummyResource(response=response,
                                   request=request_)
-    add_cors_headers(event)
+    set_response_headers(event)
     assert response.headers == {'X-Frame-Options': 'DENY'}
+
+
+def test_set_response_header_set_cors_header_if_api_request(request_,
+                                                             mocker):
+    from .subscriber import set_response_headers
+    request_.matched_route = None
+    mock = mocker.patch('adhocracy_core.rest.subscriber.add_cors_headers')
+    response = testing.DummyResource(headers={})
+    event = testing.DummyResource(response=response,
+                                  request=request_)
+    set_response_headers(event)
+    mock.assert_called_with(event)
 
 
 def test_add_cors_headers(request_):
@@ -45,7 +57,7 @@ def test_add_cors_headers_use_request_origin_as_allow_origin(request_):
     assert response.headers['Access-Control-Allow-Origin'] == 'http://x.org'
 
 
-@fixture()
+@fixture
 def integration(config):
     config.include('adhocracy_core.rest.subscriber')
 
@@ -54,7 +66,7 @@ def integration(config):
 class TestIntegrationIncludeme:
 
     def test_register_subscriber(self, registry):
-        from .subscriber import add_cors_headers
+        from .subscriber import set_response_headers
         handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
-        assert add_cors_headers.__name__ in handlers
+        assert set_response_headers.__name__ in handlers
 
