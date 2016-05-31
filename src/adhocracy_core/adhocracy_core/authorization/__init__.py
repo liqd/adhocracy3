@@ -67,10 +67,10 @@ class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
 
 
 def set_local_roles(resource, new_local_roles: dict, registry: Registry=None):
-    """Set the :term:`local role`s mapping to ``new_local_roles``.
+    """Set the :term:`local role's <local role>` mapping to ``new_local_roles``.
 
     :param new_local_roles: Mapping from :term:`groupid`/:term:`userid` to
-                            a set of :term:`role`s for the `resource`:
+                            a set of :term:`roles <role>` for the `resource`:
 
                             {'system.Everyone': {'role:reader'}}
 
@@ -97,12 +97,12 @@ def _assert_values_have_set_type(mapping: dict):
 
 
 def get_local_roles(resource) -> dict:
-    """Return the :term:`local role`s of the resource."""
+    """Return the :term:`local roles <local role>` of the resource."""
     return getattr(resource, '__local_roles__', {})
 
 
 def get_local_roles_all(resource) -> dict:
-    """Return the :term:`local role`s of the resource and its parents.
+    """Return the :term:`local roles <local role>` of the resource and its parents.
 
     The `creator`role is not inherited by children.
     """

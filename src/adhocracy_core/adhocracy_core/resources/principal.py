@@ -95,8 +95,8 @@ class IUser(IPool):
     active = Attribute('Whether the user account has been activated (bool)')
     activation_path = Attribute(
         'Activation path for not-yet-activated accounts (str)')
-    roles = Attribute('List of :term:`role`s')
-    group_ids = Attribute('List of :term:`group_id`s')
+    roles = Attribute('List of :term:`roles <role>`')
+    group_ids = Attribute('List of :term:`groupids <groupid>`')
     # TODO: add `password` attribute, this may be set by the
     # password authentication sheet
 
@@ -121,7 +121,7 @@ class User(Pool):
         super().__init__(data, family)
         self.roles = []
         self.group_ids = []
-        """Readonly :term:`group_id`s for this user."""
+        """Readonly :term:`groupids <groupid>` for this user."""
         self.hidden = True
 
     @property
@@ -345,14 +345,14 @@ class UserLocatorAdapter(object):
                              .format(users_count, index_name, value))
 
     def get_groupids(self, userid: str) -> [str]:
-        """Get :term:`groupid`s for term:`userid` or return None."""
+        """Get :term:`groupids <groupid>` for term:`userid` or return None."""
         groups = self.get_groups(userid)
         if groups is None:
             return None
         return ['group:' + g.__name__ for g in groups]
 
     def get_groups(self, userid: str) -> [IGroup]:
-        """Get :term:`group`s for term:`userid` or return None."""
+        """Get :term:`groups <group>` for term:`userid` or return None."""
         user = self.get_user_by_userid(userid)
         if user is None:
             return

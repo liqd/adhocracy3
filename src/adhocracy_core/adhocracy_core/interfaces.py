@@ -619,7 +619,7 @@ class AuditlogEntry(namedtuple('AuditlogEntry', ['name',
     user_name: (str):
         name of responsible user
     user_path:
-        :term:`user_id` of responsible user
+        :term:`userid` of responsible user
     """
 
 
@@ -744,8 +744,8 @@ class SearchQuery(namedtuple('Query', ['interfaces',
     only_visible (bool):
         filter hidden and deleted resources
     allows ([str], str):
-        filter resources that don't allow the :term:`principal`s  the given
-        permission ([principal], permission).
+        filter resources that don't allow the :term:`principals <principal>`
+        the given permission ([principal], permission).
 
     Present search result
     ----------------------
@@ -801,10 +801,10 @@ class IRolesUserLocator(IUserLocator):  # pragma: no cover
         """Return the group roleids for :term:`userid` or None."""
 
     def get_groupids(userid: str) -> list:
-        """Get :term:`groupid`s for term:`userid` or return None."""
+        """Get :term:`groupids <groupid>` for term:`userid` or return None."""
 
     def get_groups(userid: str) -> list:
-        """Get :term:`group`s for term:`userid` or return None."""
+        """Get :term:`groups <group>` for term:`userid` or return None."""
 
     def get_user_by_activation_path(activation_path: str) -> IResource:
         """Find user per activation path or return None."""
