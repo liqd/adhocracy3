@@ -61,7 +61,7 @@ export class Transaction {
         };
     }
 
-    public delete(path : string, contentType : string) : ITransactionResult {
+    public delete(path : string) : ITransactionResult {
         this.checkNotCommitted();
         this.requests.push({
             method: "DELETE",

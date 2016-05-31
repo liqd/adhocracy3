@@ -458,7 +458,7 @@ export var register = () => {
                         post2 = httpTrans.post("/post/path/2", <any>{
                             content_type: RIParagraph.content_type
                         });
-                        delete1 = httpTrans.delete("/delete/path", RIParagraph.content_type);
+                        delete1 = httpTrans.delete("/delete/path");
                         get2 = httpTrans.get(post1.path);
                         return httpTrans.commit();
                     }).then(

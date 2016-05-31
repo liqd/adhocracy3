@@ -266,7 +266,7 @@ export class Service<R extends ResourcesBase.IResource> {
         return this.put(path, <any>obj, _.extend({}, config, {keepMetadata: true}));
     }
 
-    public delete(path : string, contentType : string, config : IHttpConfig = {}) : angular.IPromise<any> {
+    public delete(path : string, config : IHttpConfig = {}) : angular.IPromise<any> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-put preliminary path: " + path;
         }
