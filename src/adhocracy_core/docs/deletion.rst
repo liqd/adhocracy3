@@ -7,8 +7,8 @@ Anyone with the *delete_resource* permission can *delete* it by using
 the HTTP DELETE verb.  Deleted resources can not be recovered.
 
 Deleting an existing resource is only possible for updatable
-resources, i.e. *not* for Versions, as this would mess up the version
-DAG.
+resources like Simple, Pools, Items, i.e. *not* for Versions as this would mess up the version
+:term:`DAG` and *not* for AssetDownloads.
 
 The effect of deleting is as follows:
 
@@ -19,11 +19,12 @@ The effect of deleting is as follows:
 * If the frontend attempts to retrieve a *deleted* resource via
   GET, the backend responds with HTTP status code *404 Not Found*, just
   as if the resource had never existed.
-* *Deleted* resources may still be referenced from other
-  resources. If the frontend follows such references it must therefore
+* *Deleted* resources may not be referenced from other
+  resources. If the frontend follows an outdated references it must therefore
   be prepared to encounter *404 Not Found* responses and deal with them
   appropriately (e.g. by silently skipping them or by showing an
   explanation such as "Comment deleted").
+* *DELETE* http method is idempotent
 
 Hiding Resources
 ================
@@ -63,7 +64,7 @@ The effect of these flags is as follows:
   resources will be found regardless of the value of their *hidden*
   flag.  However, only those with *hide_resource* permission are ever
   able to view the contents of hidden resources.  It's also possible to
-  set *include=visible* to get only non-deleted and non-hidden
+  set *include=visible* to get only non-hidden
   resources, but it's not necessary since that is the default.
 * If the frontend attempts to retrieve a *hidden* resource via GET, the
   backend normally responds with HTTP status code *410 Gone*.
@@ -175,21 +176,25 @@ Both pools show up in the pool sheet::
     ...                        ['elements']))
     ['.../pool1/',.../pool2/'...
 
-Lets check whether we have the permission to delete or hide resources.
+Lets check whether we have the permission to delete resources.
 The person who has created a resource (creator role) has the right to delete
 it::
 
-    >>> resp = anonymous.get(document_item).json
-
     >>> resp = participant.options(document_item).json
-    >>> resp['PUT']['request_body']['data']['adhocracy_core.sheets.metadata.IMetadata']
-    {'deleted': [True, False]}
+    >>> 'DELETE' in resp
 
-But they cannot hide it -- that special right is reserved to managers::
+But they cannot hide it::
+
+    >>> 'adhocracy_core.sheets.metadata.IMetadata' not in pprint(resp['PUT']['request_body']['data'])
+    True
+
+-- that special right is reserved to managers::
 
     >>> resp = moderator.options(document_item).json
     >>> pprint(resp['PUT']['request_body']['data']['adhocracy_core.sheets.metadata.IMetadata'])
     {'deleted': [True, False], 'hidden': [True, False]}
+
+FIXME: remove deleted flag, not used anymore
 
 Note: normally the sheets listed in the OPTIONS response are just mapped to
 empty dictionaries, the contained fields are not listed. But IMetadata is a
@@ -198,6 +203,9 @@ Therefore, the presence of the 'deleted' and/or 'hidden' fields indicates
 that PUTting a new value for this field is allowed. Once more, the
 corresponding value is just a stub (the empty string) and doesn't have any
 meaning.
+
+FIXME: remove the special 'hidden' field for option requests, not need if
+deleted flag is removed
 
 Lets hide pool2::
 
@@ -224,7 +232,7 @@ Now we get an error message when trying to retrieve the pool2::
     >>> 'modification_date' in resp.json
     True
 
-Nested resources inherit the deleted/hidden flag from their ancestors. Hence
+Nested resources inherit the hidden flag from their ancestors. Hence
 the child of the pool2 is now hidden too::
 
     >>> resp = anonymous.get("/pool2/child")
@@ -273,3 +281,14 @@ resources::
 
     >>> 'http://localhost/principals/users/0000001/' in resp.json['updated_resources']['modified']
     True
+
+In the end we can cleanup with some real deletion::
+
+    >>> resp = participant.delete("/pool1")
+    >>> resp.status_code
+    201
+
+    >>> resp = anonymous.get("/pool1")
+    >>> resp.status_code
+    410
+
