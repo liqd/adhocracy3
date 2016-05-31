@@ -40,9 +40,7 @@ local_roles
 states
 ~~~~~~
 
-Example::
-
-The test file contains the name resource path and the want
+The text file contains the resource path and the want
 workflow state transitions.
 
 
