@@ -43,8 +43,10 @@ protractor acceptance tests::
 
     bin/polytester acceptance
 
-.. NOTE:: You need to have chrome/chromium installed in order to run the
-acceptance tests.
+.. NOTE::
+
+    You need to have chrome/chromium installed in order to run the
+    acceptance tests.
 
 run backend functional tests::
 

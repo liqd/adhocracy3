@@ -97,7 +97,7 @@ def handle_error_x0x_exception(error, request):
 def handle_error_40x_exception(error, request):
     """Return JSON error for generic HTTPClientErrors.
 
-     If `error` is :class:`JSONHTTPClientError` it is
+    If `error` is :class:`JSONHTTPClientError` it is
     return without modifications.
     """
     if isinstance(error, JSONHTTPClientError):

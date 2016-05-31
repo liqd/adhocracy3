@@ -348,7 +348,7 @@ def update_comments_count(resource: ICommentVersion,
                           registry: Registry):
     """Update all commentable resources related to `resource`.
 
-     Traverse all commentable resources that have a IComment or ISubresource
+    Traverse all commentable resources that have a IComment or ISubresource
     reference to `resource` and update the comment_count value with `delta`.
 
     Example reference structure that is traversed:

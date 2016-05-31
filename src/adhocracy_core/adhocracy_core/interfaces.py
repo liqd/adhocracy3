@@ -349,9 +349,9 @@ class IPool(IResource):  # pragma: no cover
     def add(name: str, other) -> str:
         """Add subobject other.
 
-        :returns: The name used to place the subobject in the
-        folder (a derivation of ``name``, usually the result of
-        ``self.check_name(name)``).
+        :returns: The name used to place the subobject in the folder
+            (a derivation of ``name``, usually the result of
+            ``self.check_name(name)``).
         """
 
     def check_name(name: str) -> str:
