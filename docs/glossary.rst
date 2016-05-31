@@ -7,58 +7,73 @@ Glossary
    :sorted:
 
    ACM
-      An Access Control Matrix defines the rights of a list of
-      principals. An ACM crosses principals with permissions. At the
-      intersection of a principal and a permission there is an action.
-      The action can be either :data:`pyramid.security.Allow`,
-      :data:`pyramid.security.Deny` or :const:`None`. None is a default value and
-      does not grant any right.
+      An :abbr:`ACM (access control matrix)` maps :term:`permissions
+      <permission>` to :term:`roles <role>`.
 
-   post_pool
-      A normal or :term:`service` :class:`adhocracy_core.interfaces.IPool` that
-      serves as the common place to post resources of a special type for a
-      given context.
-      If `resource sheet` field with backreferences sets a
-      :class:`adhocracy_core.schema.PostPool` field, the
-      referencing resources can only be postet at the :term:`post_pool`.
-      This assumes that a post_pool exists in the :term:`lineage` of the referenced
-      resources.
-      If a `resource sheet` field with references sets this, the
-      referenced resource type can only be posted to :term:`post_pool`.
+   resource
+      Anything that exists in adhocracy is a resource: A proposal, a
+      comment, but also users or individual rates.
 
-   service
-      A resource marked as `service`. Services
-      may provide special rest api end points
-      and helper methods. You can find them by their name with
-      :func:`adhocracy_core.interfaces.IPool.find_service`.
-      The `service` has to be in :term:`lineage` or a child of a
-      :term:`lineage` pool for a given :term:`context`.
+   resource type
+      Think of a resource type as a blueprint, and a :term:`resource` as
+      the actual building you build by following the blueprint. Example:
+      The proposal "Better food in the cafeteria" would have the type
+      ``adhocracy_core.resources.proposal.IProposal``.  Note that all
+      resources of the same type have the same :term:`sheets <sheet>`,
+      so there might be a lot of similar types with slightly different
+      sheets (e.g. a simple proposal, a proposal with a budget, a
+      proposal with a geographical location, ...).
 
-   principal
-       A principal is a string representing a :term:`userid`, :term:`groupid`,
-       or :term:`roleid`. It is provided by an :term:`authentication policy`.
-       For more information about the permission system read
-       :doc:`api/authentication_api`.
+   sheet
+      Sheets are the features of :term:`resources <resource>`. A
+      proposal may for example have the sheet
+      ``adhocracy_core.sheets.title.ITitle`` that allows it to have a
+      title and the sheet ``adhocracy_core.sheets.comment.ICommentable``
+      that allows it to be commented on. A resource is really not much
+      more than the sum of its sheets.
 
-   userid
-      The unique id for one userique id of one :term:`group`: "group:<name>".
+   backend
+   frontend
+      The backend is the part of the software that stores the data.  The
+      frontend on the other hand is in charge of showing the data to
+      users.  Having a clear separation between these makes development
+      simpler and theoretically allows to have more than one frontend,
+      e.g. a website and a mobile app.
 
-   group
-       A set of users. Can be mapped to permission :term:`role`.
+   core
+   customization
+      Not all projects implemented with adhocracy are the same. That
+      is why it is very easy to customize it for each individual
+      project. The shared functionality is called "core" while the
+      special code is called "customization".
 
-   groupid
-       Unique id of one :term:`group`: "group:<name>".
+   process
+      A process :term:`resource` represents a participation process.
+      There are very different kinds of thos: Idea collections, where
+      users can enter proposals and get feedback, and giving feedback on
+      prepared documents are probaly the most common ones.
 
+   user
    role
-      A set of permissions that can be mapped to :term:`principal`
-
-   roleid
-       Unique id of one permission :term:`role`: "role:<name>".
-
    local role
-       A :term:`role` mapped to a :term:`principal` within a local
-       context and all his children.
+   permission
+      What a user is permitted to do depends on their role.  The roles a
+      user has often depend on the context. Example: Amelia (user) may
+      be the creator (role) of one proposal (context) and therefore
+      permitted to edit it (permission).
+
+   workflow
+      Participation :term:`processes <process>` typically have multiple
+      phases: For example, you may want to first publish an
+      announcement, then have the actual participation for some time,
+      and display the results once that is over. This is possible by
+      using workflows.  Workflows can be used with processes, but also
+      with any other kind of :term:`resource`. An important feature of
+      workflows is that you can change the :term:`permissions
+      <permission>` for each role based on the phase.
 
    DAG
-       Versions of one resource that build a directed acyclic graph.
-
+      A :abbr:`DAG (directed acyclic graph)` is a mathematical
+      structure that is wellsuited to describe the structure of
+      resources in the backend. It is also the model used for other
+      software such as git.
