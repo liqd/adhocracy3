@@ -595,9 +595,10 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
     last_version_in_transaction (None or IResource):
         The last Version created in this transaction (assuming linear history)
         (only for :class:`adhocracy_core.interfaces.IItem`)
-    changed_descendants (bool): child or grandchild is modified or has
-                                changed_backrefs
-    changed_backrefs (bool): References targeting this resource are changed
+    changed_descendants (bool):
+        child or grandchild is modified or has changed_backrefs
+    changed_backrefs (bool):
+        References targeting this resource are changed
     visibility (VisibilityChange):
         Tracks the visibility of the resource and whether it has changed
     """
