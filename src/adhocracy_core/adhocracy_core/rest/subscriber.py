@@ -1,20 +1,20 @@
 """Subscriber to modify the http response object."""
 from pyramid.interfaces import IRequest
-from pyramid.interfaces import IResponse
 from pyramid.events import NewResponse
 
 
-def add_cors_headers(event):
+def set_response_headers(event: NewResponse):
     """Add CORS headers to response for api requests."""
     if _is_api_request(event.request):
-        _set_cors_header(event.request, event.response)
+        add_cors_headers(event)
     else:
-        _set_frame_options_header(event.response)
+        _set_frame_options_header(event)
 
 
-def _set_cors_header(request: IRequest, response: IResponse):
-    origin = request.headers.get('Origin', '*')
-    response.headers.update({
+def add_cors_headers(event: NewResponse):
+    """Add CORS headers to response."""
+    origin = event.request.headers.get('Origin', '*')
+    event.response.headers.update({
         'Access-Control-Allow-Origin': origin,
         'Access-Control-Allow-Headers': 'Origin, Content-Type, Accept, '
                                         'X-User-Path, X-User-Token',
@@ -23,8 +23,8 @@ def _set_cors_header(request: IRequest, response: IResponse):
     })
 
 
-def _set_frame_options_header(response: IResponse):
-    response.headers.update({'X-Frame-Options': 'DENY'})
+def _set_frame_options_header(event: NewResponse):
+    event.response.headers.update({'X-Frame-Options': 'DENY'})
 
 
 def _is_api_request(request: IRequest) -> bool:
@@ -35,4 +35,4 @@ def _is_api_request(request: IRequest) -> bool:
 
 def includeme(config):
     """Register response subscriber."""
-    config.add_subscriber(add_cors_headers, NewResponse)
+    config.add_subscriber(set_response_headers, NewResponse)
