@@ -480,7 +480,7 @@ def mock_messenger():
 def _get_settings(request, part):
     """Return settings of a config part."""
     config_parser = ConfigParser()
-    config_file = 'etc/test_with_ws.ini'
+    config_file = 'etc/test.ini'
     config_parser.read(config_file)
     settings = {}
     for option, value in config_parser.items(part):
