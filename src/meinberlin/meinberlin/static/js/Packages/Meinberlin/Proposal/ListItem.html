@@ -14,7 +14,7 @@
                 'm-is-not-realized': assignment.name === 'not_realizeable',
                 'm-on-test': assignment.name === 'on_test',
                 'm-color': isBuergerhaushalt && (assignment.name === 'going_to_be_realized' || assignment.name === 'not_realizeable' || assignment.name === 'on_test')
-            }">{{ assignment.title }}</span>
+            }">{{ assignment.title | translate }}</span>
     </div>
     <div class="proposal-list-item-col-right">
         <ul class="meta-list m-vertical">

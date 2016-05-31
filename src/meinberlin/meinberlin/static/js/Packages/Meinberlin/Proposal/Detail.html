@@ -9,7 +9,7 @@
                 'm-is-not-realized': assignment.name === 'not_realizeable',
                 'm-on-test': assignment.name === 'on_test',
                 'm-color': isBuergerhaushalt && (assignment.name === 'going_to_be_realized' || assignment.name === 'not_realizeable' || assignment.name === 'on_test')
-            }">{{ assignment.title }}</span>
+            }">{{ assignment.title | translate }}</span>
 
         <ul class="meinberlin-proposal-detail-meta">
             <li data-ng-if="isKiezkasse || isBuergerhaushalt" class="meinberlin-proposal-detail-meta-item meinberlin-proposal-detail-meta-item-location">

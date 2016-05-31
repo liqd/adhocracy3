@@ -7,14 +7,14 @@
 
         <div class="badges-groups row">
             <div class="badges-group cols-2" data-ng-repeat="(groupPath, badgePaths) in badgesByGroup">
-                <h2 class="badges-group-header">{{badgeGroups[groupPath].title}}</h2>
+                <h2 class="badges-group-header">{{badgeGroups[groupPath].title | translate}}</h2>
                 <label class="badge-toggle" data-ng-repeat="badgePath in badgePaths">
                     <input
                         type="checkbox"
                         name="badgePath"
                         class="badge-checkbox"
                         data-ng-model="checkboxes[badgePath]"/>
-                        {{badges[badgePath].title}}
+                        {{badges[badgePath].title | translate}}
                 </label>
             </div>
             <span class="input-error" data-ng-show="serverError">{{serverError}}</span>
