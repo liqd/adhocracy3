@@ -3,7 +3,7 @@
 Deleting Resources
 ==================
 
-Anyone who can edit a resource (editor role) can *delete* it by using
+Anyone with the *delete_resource* permission can *delete* it by using
 the HTTP DELETE verb.  Deleted resources can not be recovered.
 
 Deleting an existing resource is only possible for updatable
