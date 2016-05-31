@@ -267,15 +267,16 @@ export class Service<R extends ResourcesBase.IResource> {
     }
 
     public delete(path : string, contentType : string, config : IHttpConfig = {}) : angular.IPromise<any> {
-        var obj = {
-            content_type: contentType,
-            data: {}
-        };
-        obj.data[SIMetadata.nick] = {
-            deleted: true
-        };
+        if (this.adhPreliminaryNames.isPreliminary(path)) {
+            throw "attempt to http-put preliminary path: " + path;
+        }
+        path = this.formatUrl(path);
+        var headers = this.parseConfig(config);
+        this.adhCache.invalidate(path);
 
-        return this.put(path, <any>obj, _.extend({}, config, {keepMetadata: true}));
+        return this.adhCredentials.ready.then(() => this.$http.delete(path, {
+            headers: <any>headers
+        }));
     }
 
     public postRaw(path : string, obj : R, config : IHttpConfig = {}) : angular.IPromise<any> {

@@ -8,8 +8,6 @@ import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 
 import * as ResourcesBase from "../../ResourcesBase";
 
-import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
-
 import * as AdhCache from "./Cache";
 import * as AdhConvert from "./Convert";
 import * as AdhError from "./Error";
@@ -65,18 +63,10 @@ export class Transaction {
 
     public delete(path : string, contentType : string) : ITransactionResult {
         this.checkNotCommitted();
-        var request = {
-            method: "PUT",
-            path: path,
-            body: {
-                content_type: contentType,
-                data : {}
-            }
-        };
-        request.body.data[SIMetadata.nick] = {
-            deleted: true
-        };
-        this.requests.push(request);
+        this.requests.push({
+            method: "DELETE",
+            path: path
+        });
         return {
             index: this.requests.length - 1,
             path: path
