@@ -1547,6 +1547,10 @@ custom filters:
   Only the LAST version of each rate is counted. Supports sorting.
   Valid query comparable: 'eq', 'noteq', 'lt', 'le', 'gt', 'ge', 'any', 'notany'
 
+* *controversiality* controversy metrics based on rates and number of comments
+  for all commentable and rateable resources. Supports sorting.
+  Valid query comparable: 'eq', 'noteq', 'lt', 'le', 'gt', 'ge', 'any', 'notany'
+
 * *name* the identifier value of all resources (last part in the resource url).
   This is the same value like the name in the :class:`adhocracy_core.sheets.name.IName`
   sheet.

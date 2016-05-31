@@ -969,6 +969,19 @@ class TestInteger:
         assert inst.missing == colander.drop
 
 
+class TestFloat:
+
+    def make_one(self):
+        from adhocracy_core.schema import Float
+        return Float()
+
+    def test_create(self):
+        inst = self.make_one()
+        assert inst.schema_type == colander.Float
+        assert inst.default == 0.0
+        assert inst.missing == colander.drop
+
+
 class TestRole:
 
     @fixture

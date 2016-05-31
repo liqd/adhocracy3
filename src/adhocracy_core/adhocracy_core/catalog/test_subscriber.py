@@ -39,6 +39,12 @@ def test_reindex_rate_index(event, catalog):
     catalog.reindex_index.assert_called_with(event.object, 'rates')
 
 
+def test_reindex_controversiality_index(event, catalog):
+    from .subscriber import reindex_controversiality
+    reindex_controversiality(event)
+    catalog.reindex_index.assert_called_with(event.object, 'controversiality')
+
+
 def test_reindex_user_name(event, catalog):
     from .subscriber import reindex_user_name
     reindex_user_name(event)
@@ -194,5 +200,6 @@ def test_register_subscriber(registry):
     assert subscriber.reindex_workflow_state.__name__ in handlers
     assert subscriber.reindex_user_name.__name__ in handlers
     assert subscriber.reindex_user_email.__name__ in handlers
+    assert subscriber.reindex_controversiality.__name__ in handlers
 
 

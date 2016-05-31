@@ -12,6 +12,7 @@ from colander import Boolean as BooleanType
 from colander import DateTime as DateTimeType
 from colander import Decimal as DecimalType
 from colander import Function
+from colander import Float as FloatType
 from colander import Integer as IntegerType
 from colander import Invalid
 from colander import Length
@@ -803,6 +804,26 @@ class Integers(SequenceSchema):
     """
 
     integer = Integer()
+
+
+class Float(SchemaNode):
+    """SchemaNode for Float values.
+
+    Example value: 1.234
+    """
+
+    schema_type = FloatType
+    default = 0.0
+    missing = drop
+
+
+class Floats(SequenceSchema):
+    """SchemaNode for a list of Float values.
+
+    Example value: [1.003, 2.0]
+    """
+
+    floats = Float()
 
 
 class FileStoreType(SchemaType):
