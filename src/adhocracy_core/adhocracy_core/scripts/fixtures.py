@@ -2,15 +2,57 @@
 import argparse
 import logging
 import sys
-import transaction
+from argparse import RawDescriptionHelpFormatter
 
 from pyramid.paster import bootstrap
 
 from adhocracy_core.interfaces import IFixtureAsset
+from .import_users import users_epilog
+from .import_groups import groups_epilog
+from .import_resources import resources_epilog
+from .import_local_roles import roles_epilog
 from . import import_fixture
 
 
 logger = logging.getLogger(__name__)
+
+
+fixtures_epilog = """A `fixture` is a :term:`asset`
+(`pkg_resource` or absolute file system path) referencing a directory with
+subdirectories for different types of resource import files:
+
+resources
+~~~~~~~~~
+{resources}
+
+users
+~~~~~
+{users}
+
+groups
+~~~~~~
+{users}
+
+local_roles
+~~~~~~~~~~~
+{roles}
+
+states
+~~~~~~
+
+Example::
+
+The test file contains the name resource path and the want
+workflow state transitions.
+
+
+.. WARN:: the workflow state is reset, this might cause unwanted side effects
+(like events/scripts that are triggered by transitions).
+
+Example::
+
+process/proposal:announce->participate
+"""
 
 
 def import_fixtures():  # pragma: no cover
@@ -26,7 +68,14 @@ def import_fixtures():  # pragma: no cover
 
 
 def _argparse():
-    parser = argparse.ArgumentParser(description='Import adhocracy fixtures.')
+    epilog = fixtures_epilog.format(resources=resources_epilog,
+                                    groups=groups_epilog,
+                                    users=users_epilog,
+                                    roles=roles_epilog,
+                                    )
+    parser = argparse.ArgumentParser(description='Import resource fixtures.',
+                                     epilog=epilog,
+                                     formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument('ini_file',
                         help='path to the adhocracy backend ini file',
                         default='etc/development.ini',

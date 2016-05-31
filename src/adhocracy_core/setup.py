@@ -51,6 +51,7 @@ test_requires = [
     'sphinx-autodoc-annotation',
     'sphinxcontrib-blockdiag',
     'sphinxcontrib-actdiag',
+    'sphinxcontrib-programoutput',
     'sphinx-rtd-theme',
 ]
 
