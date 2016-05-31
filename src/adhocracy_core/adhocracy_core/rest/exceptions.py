@@ -30,10 +30,10 @@ logger = logging.getLogger(__name__)
 class JSONHTTPClientError(HTTPClientError):
     """HTTPException with json body to describe the exception.
 
-    :param:`errors`: error entries to generate the error description.
-    :param:`request`: Request causing the error to log debug information.
-    :param:`code`: http status code
-    :param:`title`: http status title
+    :param errors: error entries to generate the error description.
+    :param request: Request causing the error to log debug information.
+    :param code: http status code
+    :param title: http status title
 
     The body contains a dictionary with the following data structure:
 
