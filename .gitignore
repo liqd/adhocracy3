@@ -76,3 +76,4 @@ RELEASE-VERSION
 *-requirements.txt
 /src/Mako/
 /styleguides
+src/deform
