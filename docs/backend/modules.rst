@@ -7,7 +7,7 @@ API and separation of responsibility
 *responsibility*
     (means reason to change code if functionality changes)
     should lay at one single point of code (packages/modules in this case),
-    see also :doc:`../coding_guides/refactore_guidelines`.
+    see also :doc:`../development/refactor_guidelines`.
 
 *layer*
     loosly group of modules that follow these rules:

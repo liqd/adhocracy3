@@ -17,7 +17,7 @@ Host
 Widget
     A piece of adhocracy that can be embedded on its own.  Some
     functionality (e.g. registration) will require the user to switch
-    to the *platform*.  See also :doc:`../development/coding_guide/css_guidelines`.
+    to the *platform*.  See also :doc:`../development/coding_guides/css_guidelines`.
 
 Frontend URL
     This is where the actual adhocracy frontend is available.  Users are

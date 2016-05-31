@@ -84,7 +84,7 @@ a list of options:
 
 Note that there's already standard messages for commits created by git
 (Revert "...") and conventions for review commits (``[R] prefix``) as
-described in the :doc:`code_review_process`.
+described in the :doc:`../attic/code_review_process`.
 
 
 Add feature branch

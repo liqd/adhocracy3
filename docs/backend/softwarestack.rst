@@ -25,7 +25,7 @@ History
 
 We started 2012 with the plan to port adhocracy2 to pyramid.
 This become a long discussion how to build a framework for particpation
-processes based on fancy graph data structures :doc:`../attic/index.rst`.
+processes based on fancy graph data structures :doc:`../attic/index`.
 Mid 2013 we started serious efforts to start developing.
 We compared multiple framework - database combinations to find the right
 technical base that allows to start quickly but does not stand in they way if
