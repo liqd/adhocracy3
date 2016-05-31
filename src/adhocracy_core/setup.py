@@ -37,7 +37,6 @@ test_requires = [
     'polytester',
     'selenium',
     'webtest',
-    'pytest-pyramid',
     'pytest-timeout',
     'pytest-mock',
     'pytest-localserver',

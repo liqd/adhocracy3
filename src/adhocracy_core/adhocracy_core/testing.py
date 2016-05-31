@@ -477,11 +477,10 @@ def mock_messenger():
     return messenger
 
 
-def _get_settings(request, part, config_path_key='pyramid_config'):
+def _get_settings(request, part):
     """Return settings of a config part."""
     config_parser = ConfigParser()
-    config_file = request.config.getoption(config_path_key) \
-        or 'etc/test.ini'
+    config_file = 'etc/test.ini'
     config_parser.read(config_file)
     settings = {}
     for option, value in config_parser.items(part):
