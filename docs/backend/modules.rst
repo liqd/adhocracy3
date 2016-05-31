@@ -106,7 +106,7 @@ Extend/Customize
 
 * must follow `Rules for extensible pyramid apps <http://docs.pylonsproject.org/projects/pyramid/en/master/narr/extending.html>`_:
   configuration, configuration extentensions, view/asset overriding, event subscribers.
-  Use :term:`imperative-configuration` , except for views :term:`configuration-declaration` .
+  Use imperative-configuration, except for views configuration-declaration.
 
 * may use the underlaying `zope component <http://docs.zope.org/zope.component/narr.html>`_ architecture
   provided by the :term:`application registry` directly.

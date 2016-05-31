@@ -86,8 +86,8 @@ def audit_resources_changes_callback(request: Request,
                                      response: Response) -> None:
     """Add auditlog entries to the auditlog when the resources are changed.
 
-    This is a :term:`response- callback` that run after a request has
-    finished. To store the audit entry it adds an additional transaction.
+    This is a response-callback that runs after a request has finished. To
+    store the audit entry it adds an additional transaction.
     """
     registry = request.registry
     changelog_metadata = registry.changelog.values()
