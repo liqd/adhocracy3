@@ -34,6 +34,7 @@ adhocracy.frontend_url = http://localhost:9090
 use = egg:gunicorn#main
 host = localhost
 port = 9080
+workers = 2
 
 [websockets]
 port = 8081

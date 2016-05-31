@@ -19,16 +19,14 @@ describe("user page", function() {
         expect(reviewerPage.getUserName()).toBe("admin");
     });
 
+    var currentDate = Date.now().toString();
+    var subject = "title" + currentDate;
+    var content = "content" + currentDate;
+
     it("is possible to send a message", function(done) {
         shared.loginOtherParticipant();
 
-        var mailsBeforeMessaging =
-            fs.readdirSync(browser.params.mail.queue_path + "/new");
-
         var annotatorPage = new UserPages.UserPage().get("0000001");
-        var currentDate = Date.now().toString();
-        var subject = "title" + currentDate;
-        var content = "content" + currentDate;
 
         annotatorPage.sendMessage(subject, content);
 
@@ -36,31 +34,19 @@ describe("user page", function() {
         var button = element(by.css(".user-profile-info-button"));
         browser.wait(EC.elementToBeClickable(button), 5000);
         expect(EC.elementToBeClickable(button)).toBeTruthy();
+        done();
+    });
 
-        var flow = browser.controlFlow();
-        // ensures the tests are executed after the click() from sendMessage()
-        // and after the previous expectation.
-        // see http://spin.atomicobject.com/2014/12/17/asynchronous-testing-protractor-angular/
-        // and https://code.google.com/p/selenium/wiki/WebDriverJs#Control_Flows
-        // for an explanation
-        flow.execute(function() {
-            var mailsAfterMessaging =
-                fs.readdirSync(browser.params.mail.queue_path + "/new");
-
-            expect(mailsAfterMessaging.length).toEqual(mailsBeforeMessaging.length + 1);
-
-            var newMails = _.difference(mailsAfterMessaging, mailsBeforeMessaging);
-            expect(newMails.length).toEqual(1);
-
-            var mailpath = browser.params.mail.queue_path + "/new/" + newMails[0];
-
-            shared.parseEmail(mailpath, function(mail) {
-                expect(mail.text).toContain(content);
-                expect(mail.subject).toContain(subject);
-                expect(mail.from[0].address).toContain("noreply");
-                expect(mail.to[0].address).toContain("participant");
-                done();
-            });
+    it("backend sends message as email", function(done) {
+        var newMails = fs.readdirSync(browser.params.mail.queue_path + "/new");
+        var lastMail = newMails.length - 1
+        var mailpath = browser.params.mail.queue_path + "/new/" + newMails[lastMail];
+        shared.parseEmail(mailpath, function(mail) {
+            expect(mail.text).toContain(content);
+            expect(mail.subject).toContain(subject);
+            expect(mail.from[0].address).toContain("noreply");
+            expect(mail.to[0].address).toContain("participant");
+            done();
         });
     });
 });
