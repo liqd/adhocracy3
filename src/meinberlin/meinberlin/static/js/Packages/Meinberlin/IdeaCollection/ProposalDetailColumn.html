@@ -28,12 +28,17 @@
                     data-class="action-bar-item"
                     data-parent-path="true"
                     data-resource-path="{{proposalUrl}}"></adh-report-action>
-                <a href=""
+                <a
+                    href=""
+                    class="action-bar-item"
+                    data-ng-click="ctrl.toggleOverlay('badges')"
+                    data-ng-if="badgeAssignmentPoolOptions.POST">{{ "TR__MANAGE_BADGE_ASSIGNMENTS" | translate }}</a>
+                <a
+                    href=""
                     data-ng-click="hide()"
                     data-ng-if="proposalItemOptions.hide"
                     class="action-bar-item"
-                    title="{{ 'TR__DELETE' | translate }}">
-                    {{ 'TR__DELETE' | translate }}</a>
+                    title="{{ 'TR__DELETE' | translate }}">{{ 'TR__DELETE' | translate }}</a>
                 <adh-print-action
                     data-class="action-bar-item"></adh-print-action>
             </div>
@@ -51,4 +56,10 @@
         data-ng-if="overlay === 'abuse'"
         data-url="{{ proposalUrl | adhParentPath | adhResourceUrl | adhCanonicalUrl }}">
     </adh-report-abuse>
+
+    <adh-badge-assignment
+        data-ng-switch-when="overlays"
+        data-ng-if="overlay === 'badges'"
+        data-path="{{proposalUrl}}">
+    </adh-badge-assignment>
 </div>
