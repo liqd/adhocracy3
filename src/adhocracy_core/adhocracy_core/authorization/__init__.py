@@ -125,7 +125,7 @@ def acm_to_acl(acm: dict) -> [str]:
 
     Permissions for principals with high priority are listed first and override
     succeding permissions. The order is determined by
-    :var:`adhocracy_core.schema.ROLE_PRINCIPALS`. Pricipals with higher
+    :py:data:`adhocracy_core.schema.ROLE_PRINCIPALS`. Pricipals with higher
     index in this list have higer priority.
     """
     acl = _migrate_acm_to_acl(acm)
