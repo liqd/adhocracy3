@@ -54,7 +54,8 @@ class SchemaNode(colander.SchemaNode):
 
     The constructor accepts these additional keyword arguments:
 
-        - ``readonly``: Disable deserialization. Default: False
+    readonly:
+        Disable deserialization. Default: False
     """
 
     readonly = False

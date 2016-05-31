@@ -731,13 +731,14 @@ class SearchQuery(namedtuple('Query', ['interfaces',
         Available :class:`SearchComparator`s depend on the index type.
     references (Reference or (ReferenceComparator.traverse, Reference)):
         References with (source, isheet, isheet_field, target).
-        If `source` is None search for resources referencing target
-        (back references).
-        If `target` is None search for resources referenced by source
-        (Reference).
-        If the tuple (ReferenceComparator.traverse, Reference) is given,
-        the resource graph is traversed following all references with the same
-        type as the given reference.
+
+        -   If `source` is None search for resources referencing target
+            (back references).
+        -   If `target` is None search for resources referenced by source
+            (Reference).
+        -   If the tuple (ReferenceComparator.traverse, Reference) is given,
+            the resource graph is traversed following all references with the
+            same type as the given reference.
     root (IResource):
        root resource to start searching  in descendants
     depth (int):
