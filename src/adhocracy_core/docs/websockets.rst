@@ -145,7 +145,7 @@ that has been subscribed.
           "resource": "RESOURCE_PATH",
           "child": "CHILD_RESOURCE_PATH" }
 
-    In practice this usually means that the resource has been deletd or
+    In practice this usually means that the resource has been deleted or
     marked as hidden (see :doc:`deletion`).
 
   * If a child (sub-Pool or Item) in the Pool is modified::

@@ -95,7 +95,7 @@ class Pool(Base, Folder):
     def delete(self, name: str, registry: Registry):
         """Delete subresource `name` from database.
 
-        :raises KeyError: if `name`is not a valid subresource name
+        :raises KeyError: if `name` is not a valid subresource name
         """
         subresource = self[name]
         event = ResourceWillBeDeleted(object=subresource,
