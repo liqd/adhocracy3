@@ -7,8 +7,8 @@ from pytest import fixture
 class TestAutoTransitionWorkflow:
 
     def call_fut(self, *args):
-        from .auto_transition_process_workflow import _auto_transition_process_workflow
-        return _auto_transition_process_workflow(*args)
+        from .ad_auto_transition_process_workflow import auto_transition_process_workflow
+        return auto_transition_process_workflow(*args)
 
     @fixture
     def registry(self, registry_with_content):
@@ -17,7 +17,7 @@ class TestAutoTransitionWorkflow:
     @fixture
     def mock_catalogs(self, mocker, mock_catalogs):
         mocker.patch(
-            'adhocracy_core.scripts.auto_transition_process_workflow.'
+            'adhocracy_core.scripts.ad_auto_transition_process_workflow.'
             'find_service',
             return_value = mock_catalogs)
         return mock_catalogs
@@ -36,7 +36,7 @@ class TestAutoTransitionWorkflow:
     @fixture
     def mock_transition_to_states(self, registry, mocker):
         mock = mocker.patch(
-            'adhocracy_core.scripts.auto_transition_process_workflow.'
+            'adhocracy_core.scripts.ad_auto_transition_process_workflow.'
             'transition_to_states')
         return mock
 
@@ -50,7 +50,7 @@ class TestAutoTransitionWorkflow:
     @fixture
     def mock_now(self, mocker):
         mock = mocker.patch(
-            'adhocracy_core.scripts.auto_transition_process_workflow.now',
+            'adhocracy_core.scripts.ad_auto_transition_process_workflow.now',
             return_value = datetime(2016, 1, 5))
         return mock
 

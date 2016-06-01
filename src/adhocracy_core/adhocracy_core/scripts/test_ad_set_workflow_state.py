@@ -6,7 +6,7 @@ import pytest
 @fixture
 def transaction_mock(monkeypatch):
     mock = Mock()
-    monkeypatch.setattr('adhocracy_core.scripts.set_workflow_state.transaction',
+    monkeypatch.setattr('adhocracy_core.scripts.ad_set_workflow_state.transaction',
                         mock)
     return mock
 
@@ -15,7 +15,7 @@ def transaction_mock(monkeypatch):
 def transition_to_mock(monkeypatch):
     import adhocracy_core.workflows
     mock = Mock(spec=adhocracy_core.workflows.transition_to_states)
-    monkeypatch.setattr('adhocracy_core.scripts.set_workflow_state.transition_to_states',
+    monkeypatch.setattr('adhocracy_core.scripts.ad_set_workflow_state.transition_to_states',
                         mock)
     return mock
 
@@ -29,8 +29,8 @@ def print_mock(monkeypatch):
 
 def test_set_workflow_state(registry, context, transaction_mock,
                             transition_to_mock):
-    from .set_workflow_state import _set_workflow_state
-    _set_workflow_state(context, registry, '/', ['announced', 'participate'])
+    from .ad_set_workflow_state import set_workflow_state
+    set_workflow_state(context, registry, '/', ['announced', 'participate'])
 
     transition_to_mock.assert_called_with(context, ['announced', 'participate'],
                                           registry, reset=False)
@@ -39,15 +39,15 @@ def test_set_workflow_state(registry, context, transaction_mock,
 
 def test_set_workflow_state_duplicate_state(registry, context, transaction_mock,
                                             transition_to_mock):
-    from .set_workflow_state import _set_workflow_state
+    from .ad_set_workflow_state import set_workflow_state
 
     with pytest.raises(ValueError):
-        _set_workflow_state(context, registry, '/', ['announced', 'participate', 'announced'])
+        set_workflow_state(context, registry, '/', ['announced', 'participate', 'announced'])
 
 
 def test_set_workflow_state_with_reset(registry, context, transition_to_mock):
-    from .set_workflow_state import _set_workflow_state
-    _set_workflow_state(context, registry, '/', [], reset=True)
+    from .ad_set_workflow_state import set_workflow_state
+    set_workflow_state(context, registry, '/', [], reset=True)
     transition_to_mock.assert_called_with(context, [], registry, reset=True)
 
 def test_set_workflow_state_with_absolute(registry_with_content, context, transition_to_mock):
@@ -56,11 +56,11 @@ def test_set_workflow_state_with_absolute(registry_with_content, context, transi
     state_of_mock = Mock(side_effect=['draft', 'participate'])
     workflow_mock.state_of = state_of_mock
     registry.content.get_workflow.return_value = workflow_mock
-    from .set_workflow_state import _set_workflow_state
-    _set_workflow_state(context, registry, '/', ['announced', 'participate'], absolute=True)
+    from .ad_set_workflow_state import set_workflow_state
+    set_workflow_state(context, registry, '/', ['announced', 'participate'], absolute=True)
     transition_to_mock.assert_called_with(context, ['announced', 'participate'], registry, reset=False)
 
-    _set_workflow_state(context, registry, '/', ['announced', 'participate', 'result'], absolute=True)
+    set_workflow_state(context, registry, '/', ['announced', 'participate', 'result'], absolute=True)
     transition_to_mock.assert_called_with(context, ['result'], registry, reset=False)
 
 def test_print_workflow_info(registry_with_content, context, print_mock):
@@ -68,6 +68,6 @@ def test_print_workflow_info(registry_with_content, context, print_mock):
     workflow_mock = Mock(type='standard')
     registry.content.get_workflow.return_value = workflow_mock
     registry.content.workflows_meta = {'standard': {'states': {'draft': None, 'announced': None}}}
-    from .set_workflow_state import _print_workflow_info
+    from .ad_set_workflow_state import _print_workflow_info
     _print_workflow_info(context, registry, '/')
     assert print_mock.called

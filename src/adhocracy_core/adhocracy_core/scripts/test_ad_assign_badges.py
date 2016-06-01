@@ -45,7 +45,7 @@ class TestAssignBadges:
         return filename
 
     def test_create_badge_assignment(self, context, registry_with_content, mock_sheet):
-        from .assign_badges import _import_assignments
+        from .ad_assign_badges import import_assignments
         import adhocracy_core.resources.badge
 
         filename = self.write_json()
@@ -54,7 +54,7 @@ class TestAssignBadges:
         badge = context['organisation']['badges']['winning']
         badgeable = context['organisation']['Winning_123']['VERSION_0000001']
         badge_assignments_service = context['organisation']['Winning_123']['badge_assignments']
-        _import_assignments(context, registry, filename)
+        import_assignments(context, registry, filename)
 
         registry.content.create.assert_called_with(
             adhocracy_core.resources.badge.IBadgeAssignment.__identifier__,
@@ -67,7 +67,7 @@ class TestAssignBadges:
                         {'description': '## Lorem ipsum'}})
 
     def test_create_badge_assignment_twice(self, context, registry_with_content, mock_sheet, log):
-        from .assign_badges import _import_assignments
+        from .ad_assign_badges import import_assignments
 
         registry = registry_with_content
         user = context['principals']['users']['0000000']
@@ -83,9 +83,9 @@ class TestAssignBadges:
         registry.content.get_sheet.return_value = mock_sheet
 
         filename = self.write_json()
-        _import_assignments(context, registry, filename)
+        import_assignments(context, registry, filename)
         registry.content.create = Mock()
-        _import_assignments(context, registry, filename)
+        import_assignments(context, registry, filename)
         assert not registry.content.create.called
 
     def teardown_method(self, method):

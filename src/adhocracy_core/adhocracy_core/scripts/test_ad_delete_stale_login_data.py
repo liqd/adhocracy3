@@ -6,33 +6,33 @@ from pytest import fixture
 class TestDeleteStaleLoginData:
 
     def call_fut(self, *args):
-        from .delete_stale_login_data import _delete_stale_login_data
-        return _delete_stale_login_data(*args)
+        from .ad_delete_stale_login_data import delete_stale_login_data
+        return delete_stale_login_data(*args)
 
     @fixture
     def mock_delete_resets(self, monkeypatch):
         from adhocracy_core.resources.principal import delete_password_resets
-        from . import delete_stale_login_data
+        from . import ad_delete_stale_login_data
         mock = Mock(spec=delete_password_resets)
-        monkeypatch.setattr(delete_stale_login_data, 'delete_password_resets',
+        monkeypatch.setattr(ad_delete_stale_login_data, 'delete_password_resets',
                             mock)
         return mock
 
     @fixture
     def mock_delete_users(self, monkeypatch):
         from adhocracy_core.resources.principal import delete_not_activated_users
-        from . import delete_stale_login_data
+        from . import ad_delete_stale_login_data
         mock = Mock(spec=delete_not_activated_users)
-        monkeypatch.setattr(delete_stale_login_data, 'delete_not_activated_users',
+        monkeypatch.setattr(ad_delete_stale_login_data, 'delete_not_activated_users',
                             mock)
         return mock
 
     @fixture
     def mock_token_manger(self, monkeypatch):
         from adhocracy_core.authentication import TokenMangerAnnotationStorage
-        from . import delete_stale_login_data
+        from . import ad_delete_stale_login_data
         mock = Mock(spec=TokenMangerAnnotationStorage)
-        monkeypatch.setattr(delete_stale_login_data, 'get_tokenmanager',
+        monkeypatch.setattr(ad_delete_stale_login_data, 'get_tokenmanager',
                             lambda x: mock)
         return mock
 

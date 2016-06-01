@@ -6,8 +6,8 @@ from pytest import fixture
 class TestDeleteNotReferencedImages:
 
     def call_fut(self, *args):
-        from .delete_images import _delete_not_referenced_images
-        return _delete_not_referenced_images(*args)
+        from .ad_delete_images import delete_not_referenced_images
+        return delete_not_referenced_images(*args)
 
     @fixture
     def context(self, context):
@@ -16,17 +16,17 @@ class TestDeleteNotReferencedImages:
 
     @fixture
     def mock_catalogs(self, monkeypatch, mock_catalogs):
-        from . import delete_images
-        monkeypatch.setattr(delete_images, 'find_service',
+        from . import ad_delete_images
+        monkeypatch.setattr(ad_delete_images, 'find_service',
                             lambda x, y: mock_catalogs)
         return mock_catalogs
 
     @fixture
     def mock_now(self, monkeypatch):
-        from . import delete_images
+        from . import ad_delete_images
         from datetime import datetime
         mock = Mock(return_value=datetime(2016, 1, 11))
-        monkeypatch.setattr(delete_images, 'now', mock)
+        monkeypatch.setattr(ad_delete_images, 'now', mock)
         return mock
 
     def test_ignore_no_images(self, context, mock_catalogs):

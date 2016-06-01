@@ -1,16 +1,20 @@
-"""Import fixtures."""
-import argparse
+"""Import fixtures to initialize the database.
+
+This is registered as console script in setup.py.
+
+"""
+from argparse import ArgumentParser
+from argparse import RawDescriptionHelpFormatter
 import logging
 import sys
-from argparse import RawDescriptionHelpFormatter
 
 from pyramid.paster import bootstrap
 
 from adhocracy_core.interfaces import IFixtureAsset
-from .import_users import users_epilog
-from .import_groups import groups_epilog
-from .import_resources import resources_epilog
-from .import_local_roles import roles_epilog
+from .ad_import_users import users_epilog
+from .ad_import_groups import groups_epilog
+from .ad_import_resources import resources_epilog
+from .ad_import_local_roles import roles_epilog
 from . import import_fixture
 
 
@@ -53,15 +57,16 @@ process/proposal:announce->participate
 """
 
 
-def import_fixtures():  # pragma: no cover
+def main():  # pragma: no cover
+    """Import fixtures script."""
     args = _argparse()
     env = bootstrap(args.ini_file)
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    _import_fixtures(env['root'],
-                     env['registry'],
-                     all=args.import_all,
-                     custom=args.import_custom,
-                     )
+    import_fixtures(env['root'],
+                    env['registry'],
+                    all=args.import_all,
+                    custom=args.import_custom,
+                    )
     env['closer']()
 
 
@@ -71,9 +76,9 @@ def _argparse():
                                     users=users_epilog,
                                     roles=roles_epilog,
                                     )
-    parser = argparse.ArgumentParser(description='Import resource fixtures.',
-                                     epilog=epilog,
-                                     formatter_class=RawDescriptionHelpFormatter)
+    parser = ArgumentParser(description='Import resource fixtures.',
+                            epilog=epilog,
+                            formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument('ini_file',
                         help='path to the adhocracy backend ini file',
                         default='etc/development.ini',
@@ -88,11 +93,12 @@ def _argparse():
     return parser.parse_args()
 
 
-def _import_fixtures(root,
-                     registry,
-                     all=False,
-                     custom='',
-                     ):
+def import_fixtures(root,
+                    registry,
+                    all=False,
+                    custom='',
+                    ):
+    """Import fixtures."""
     assets = [x[0] for x in registry.getUtilitiesFor(IFixtureAsset)]
     log_only = False
     if custom:
@@ -106,4 +112,3 @@ def _import_fixtures(root,
     for asset in assets:
         print('\nFixture {}'.format(asset))
         import_fixture(asset, root, registry, log_only=log_only)
-

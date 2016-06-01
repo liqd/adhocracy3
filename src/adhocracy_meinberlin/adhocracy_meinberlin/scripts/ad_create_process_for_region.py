@@ -22,9 +22,9 @@ from adhocracy_meinberlin.resources.kiezkassen import IProcess
 from adhocracy_core.sheets.geo import ILocationReference
 
 
-def create_process_for_region():
+def main():
     """Create sample Kiezkassen process for a given region and organisation."""
-    doc = textwrap.dedent(inspect.getdoc(create_process_for_region))
+    doc = textwrap.dedent(inspect.getdoc(main))
     parser = argparse.ArgumentParser(description=doc)
     parser.add_argument('config')
     parser.add_argument('region_name')

@@ -15,7 +15,7 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.workflows import transition_to_states
 
 
-def set_workflow_state():  # pragma: no cover
+def main():  # pragma: no cover
     """Set a workflow state for a given resource."""
     epilog = """
 Below are some usages examples. We assume there is a process
@@ -44,7 +44,7 @@ The `reset` option is used to reset the workflow before setting the state::
     ./bin/set_workflow_state --reset etc/development.ini /organisation/workshop draft announce
 
     """  # noqa
-    docstring = inspect.getdoc(set_workflow_state)
+    docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring,
                                      epilog=epilog,
                                      formatter_class=argparse
@@ -78,12 +78,12 @@ The `reset` option is used to reset the workflow before setting the state::
                              env['registry'],
                              args.resource_path)
     else:
-        _set_workflow_state(env['root'],
-                            env['registry'],
-                            args.resource_path,
-                            args.states,
-                            args.absolute,
-                            args.reset,)
+        set_workflow_state(env['root'],
+                           env['registry'],
+                           args.resource_path,
+                           args.states,
+                           args.absolute,
+                           args.reset, )
     env['closer']()
 
 
@@ -124,13 +124,14 @@ def _check_states(states):
             raise ValueError('Duplicate state: {}'.format(state))
 
 
-def _set_workflow_state(root: IResource,
-                        registry: Registry,
-                        resource_path: str,
-                        states: [str],
-                        absolute=False,
-                        reset=False,
-                        ):
+def set_workflow_state(root: IResource,
+                       registry: Registry,
+                       resource_path: str,
+                       states: [str],
+                       absolute=False,
+                       reset=False,
+                       ):
+    """Set a workflow state for a given resource."""
     resource = find_resource(root, resource_path)
     states_to_transition = _get_states_to_transition(resource,
                                                      registry,

@@ -22,14 +22,14 @@ from adhocracy_core.utils import now
 logger = logging.getLogger(__name__)
 
 
-def delete_not_referenced_images():  # pragma: no cover
+def main():  # pragma: no cover
     """Delete images older than `max_age` that are not referenced.
 
     usage::
 
         bin/delete_not_referenced_images etc/development.ini  --max_age 10
     """
-    docstring = inspect.getdoc(delete_not_referenced_images)
+    docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)
     parser.add_argument('ini_file',
                         help='path to the adhocracy backend ini file')
@@ -40,16 +40,17 @@ def delete_not_referenced_images():  # pragma: no cover
                         type=int)
     args = parser.parse_args()
     env = bootstrap(args.ini_file)
-    _delete_not_referenced_images(env['root'],
-                                  args.max_age,
-                                  )
+    delete_not_referenced_images(env['root'],
+                                 args.max_age,
+                                 )
     transaction.commit()
     env['closer']()
 
 
-def _delete_not_referenced_images(root,
-                                  max_age: int,
-                                  ):
+def delete_not_referenced_images(root,
+                                 max_age: int,
+                                 ):
+    """Delete images older than `max_age` that are not referenced."""
     catalogs = find_service(root, 'catalogs')
     max_date = now() - timedelta(days=max_age)
     query = search_query._replace(interfaces=IImage,

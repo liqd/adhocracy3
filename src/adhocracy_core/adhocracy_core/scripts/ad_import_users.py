@@ -23,7 +23,7 @@ from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.resources.badge import IBadge
 from adhocracy_core.resources.subscriber import _get_default_group
 from adhocracy_core import sheets
-from adhocracy_core.scripts.assign_badges import create_badge_assignment
+from adhocracy_core.scripts.ad_assign_badges import create_badge_assignment
 from adhocracy_core.sheets.name import IName
 
 
@@ -54,14 +54,14 @@ Example::
 """  # flake8: noqa
 
 
-def import_users():  # pragma: no cover
+def main():  # pragma: no cover
     """Import users from a JSON file.
 
     usage::
 
         bin/import_users etc/development.ini  <filename>
     """
-    docstring = inspect.getdoc(import_users)
+    docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring,
                                      epilog=users_epilog)
     parser.add_argument('ini_file',
@@ -71,11 +71,12 @@ def import_users():  # pragma: no cover
                         help='file containing the users')
     args = parser.parse_args()
     env = bootstrap(args.ini_file)
-    _import_users(env['root'], env['registry'], args.filename)
+    import_users(env['root'], env['registry'], args.filename)
     env['closer']()
 
 
-def _import_users(context: IResource, registry: Registry, filename: str):
+def import_users(context: IResource, registry: Registry, filename: str):
+    """Import users from a JSON file."""
     users_info = _load_users_info(filename)
     users_info = [_normalize_user_info(u) for u in users_info]
     users = find_service(context, 'principals', 'users')

@@ -1,12 +1,12 @@
 
-class TestImportFixture:
+class TestImportFixtures:
 
     def call_fut(self, *args, **kwargs):
-        from .fixtures import _import_fixtures
-        return _import_fixtures(*args, **kwargs)
+        from .ad_fixtures import import_fixtures
+        return import_fixtures(*args, **kwargs)
 
     def test_ignore_if_no_fixtures_registered(self, mocker, context, registry):
-        mock = mocker.patch('adhocracy_core.scripts.fixtures.import_fixture')
+        mock = mocker.patch('adhocracy_core.scripts.ad_fixtures.import_fixture')
         registry.getUtilitiesFor = mocker.Mock(return_value=[])
         self.call_fut(context, registry)
         assert not mock.called
@@ -15,7 +15,7 @@ class TestImportFixture:
                                       log):
         from mock import call
         from adhocracy_core.interfaces import IFixtureAsset
-        mock = mocker.patch('adhocracy_core.scripts.fixtures.import_fixture')
+        mock = mocker.patch('adhocracy_core.scripts.ad_fixtures.import_fixture')
         registry.registerUtility('', IFixtureAsset, name='adhocracy_core:fixt')
         self.call_fut(context, registry)
         out, err = capfd.readouterr()
@@ -26,7 +26,7 @@ class TestImportFixture:
     def test_import_registered_fixtures(self, mocker, context, registry, log):
         from mock import call
         from adhocracy_core.interfaces import IFixtureAsset
-        mock = mocker.patch('adhocracy_core.scripts.fixtures.import_fixture')
+        mock = mocker.patch('adhocracy_core.scripts.ad_fixtures.import_fixture')
         registry.registerUtility('', IFixtureAsset, name='adhocracy_core:fixt')
         registry.registerUtility('', IFixtureAsset, name='adhocracy_core:test')
         self.call_fut(context, registry, all=True)
@@ -38,7 +38,7 @@ class TestImportFixture:
     def test_import_custom_fixture(self, mocker, context, registry, log):
         from mock import call
         from adhocracy_core.interfaces import IFixtureAsset
-        mock = mocker.patch('adhocracy_core.scripts.fixtures.import_fixture')
+        mock = mocker.patch('adhocracy_core.scripts.ad_fixtures.import_fixture')
         registry.registerUtility('', IFixtureAsset, name='adhocracy_core:fixt')
         self.call_fut(context, registry, custom='/absolute/path/fixture')
         assert call('adhocracy_core:fixt', context, registry, log_only=False)\

@@ -1,7 +1,4 @@
-"""Export users and their proposal rates.
-
-This is a generic script used for diffrerent proposal implementations.
-"""
+"""Helpers to export users and their proposal rates."""
 
 import csv
 from pyramid.registry import Registry

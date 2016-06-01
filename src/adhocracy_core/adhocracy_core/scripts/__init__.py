@@ -1,4 +1,4 @@
-"""adhocracy_core scripts."""
+"""scripts."""
 
 import logging
 import json
@@ -26,9 +26,10 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.schema import ContentType
 from adhocracy_core.sheets.name import IName
-from adhocracy_core.scripts.import_groups import _import_groups
-from adhocracy_core.scripts.import_users import _import_users
-from adhocracy_core.scripts.set_workflow_state import _set_workflow_state
+from adhocracy_core.scripts.ad_import_groups import import_groups
+from adhocracy_core.scripts.ad_import_users import import_users
+from adhocracy_core.scripts.ad_set_workflow_state import set_workflow_state
+
 
 logger = logging.getLogger(__name__)
 
@@ -191,10 +192,10 @@ def import_fixture(asset: str, root: IPool, registry: Registry,
         if log_only:
             continue
         if import_type == 'groups':
-            _import_groups(root, registry, import_file)
+            import_groups(root, registry, import_file)
             # TODO don't use private functions
         elif import_type == 'users':
-            _import_users(root, registry, import_file)
+            import_users(root, registry, import_file)
         elif import_type == 'resources':
             import_resources(root, registry, import_file)
         elif import_type == 'local_roles':
@@ -238,9 +239,9 @@ def _import_workflow_states(root: IResource, registry: Registry,
               for line in lines}
     for path, states in states.items():
         logger.info('Set workflow state for {} to {}'.format(path, states))
-        _set_workflow_state(root,
-                            registry,
-                            path,
-                            states,
-                            absolute=True,
-                            reset=True)
+        set_workflow_state(root,
+                           registry,
+                           path,
+                           states,
+                           absolute=True,
+                           reset=True)

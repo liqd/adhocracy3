@@ -43,20 +43,20 @@ setup(name='adhocracy_mercator',
       main = adhocracy_mercator:main
       [console_scripts]
       ad_mercator_2015_export_proposals =\
-          adhocracy_mercator.scripts.mercator_2015_export_proposals:export_proposals
+          adhocracy_mercator.scripts.ad_mercator_2015_export_proposals:main
       ad_mercator_2016_export_proposals =\
-          adhocracy_mercator.scripts.mercator_2016_export_proposals:export_proposals
+          adhocracy_mercator.scripts.ad_mercator_2016_export_proposals:main
       ad_mercator_2015_export_lost_rates =\
-          adhocracy_mercator.scripts.mercator_2015_export_lost_rates:export_lost_rates
+          adhocracy_mercator.scripts.ad_mercator_2015_export_lost_rates:main
       ad_mercator_2015_export_users_and_proposals =\
-          adhocracy_mercator.scripts.mercator_2015_export_users:export_users
+          adhocracy_mercator.scripts.ad_mercator_2015_export_users:main
       ad_mercator_2016_export_users_and_proposals =\
-          adhocracy_mercator.scripts.mercator_2016_export_users:export_users
+          adhocracy_mercator.scripts.ad_mercator_2016_export_users:main
       ad_mercator_delete_users =\
-          adhocracy_mercator.scripts.mercator_delete_users:delete_users
+          adhocracy_mercator.scripts.ad_mercator_delete_users:main
       ad_mercator_2016_export_comments =\
-          adhocracy_mercator.scripts.mercator_2016_export_comments:export_comments
+          adhocracy_mercator.scripts.ad_mercator_2016_export_comments:main
       ad_delete_users =\
-          adhocracy_mercator.scripts.delete_users:delete_users
+          adhocracy_mercator.scripts.ad_delete_users:main
       """,
       )

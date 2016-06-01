@@ -43,12 +43,12 @@ setup(name='adhocracy_meinberlin',
       main = adhocracy_meinberlin:main
       [console_scripts]
       ad_meinberlin_import_bezirksregions=\
-          adhocracy_meinberlin.scripts.import_geodata:import_bezirksregions
+          adhocracy_meinberlin.scripts.ad_import_geodata:main
       ad_meinberlin_import_bezirke =\
-          adhocracy_meinberlin.scripts.import_geodata:import_bezirke
+          adhocracy_meinberlin.scripts.ad_import_geodata:main
       ad_meinberlin_create_process_for_region =\
-          adhocracy_meinberlin.scripts.create_process_for_region:create_process_for_region
+          adhocracy_meinberlin.scripts.ad_create_process_for_region:main
       ad_meinberlin_change_german_salutation =\
-          adhocracy_meinberlin.scripts.translations:change_german_salutation
+          adhocracy_meinberlin.scripts.ad_translations:main
       """,
       )

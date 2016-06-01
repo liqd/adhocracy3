@@ -167,7 +167,7 @@ class TestImportResources:
 
     def test_username_is_resolved_to_his_path(self, registry):
         from adhocracy_core.scripts import import_resources
-        from .import_users import _get_user_locator
+        from .ad_import_users import _get_user_locator
 
         (self._tempfd, filename) = mkstemp()
         with open(filename, 'w') as f:
@@ -322,19 +322,19 @@ class TestImportFixture:
 
     def test_ignore_if_log_only(self, asset, mocker, context, registry, log):
         import_file = self.create_import_file(asset, 'groups')
-        mock = mocker.patch('adhocracy_core.scripts._import_groups')
+        mock = mocker.patch('adhocracy_core.scripts.import_groups')
         self.call_fut(asset, context, registry, log_only=True)
         assert not mock.called
 
     def test_import_groups(self, asset, mocker, context, registry, log):
         import_file = self.create_import_file(asset, 'groups')
-        mock = mocker.patch('adhocracy_core.scripts._import_groups')
+        mock = mocker.patch('adhocracy_core.scripts.import_groups')
         self.call_fut(asset, context, registry)
         mock.assert_called_with(context, registry, import_file)
 
     def test_import_users(self, asset, mocker, context, registry, log):
         import_file = self.create_import_file(asset, 'users')
-        mock = mocker.patch('adhocracy_core.scripts._import_users')
+        mock = mocker.patch('adhocracy_core.scripts.import_users')
         self.call_fut(asset, context, registry)
         mock.assert_called_with(context, registry, import_file)
 
@@ -353,7 +353,7 @@ class TestImportFixture:
     def test_import_workflow_state(self, asset, mocker, context, registry):
         import_data = 'process/proposal:announce->participate'
         self.create_import_file(asset, 'states', import_data)
-        mock = mocker.patch('adhocracy_core.scripts._set_workflow_state')
+        mock = mocker.patch('adhocracy_core.scripts.set_workflow_state')
         self.call_fut(asset, context, registry)
         mock.assert_called_with(context, registry, 'process/proposal',
                                 ['announce', 'participate'],
@@ -363,7 +363,7 @@ class TestImportFixture:
     def test_ignore_if_empty_workflow_state(
         self, asset, mocker, context, registry):
         os.mkdir(asset + '/' + 'states')
-        mock = mocker.patch('adhocracy_core.scripts._set_workflow_state')
+        mock = mocker.patch('adhocracy_core.scripts.set_workflow_state')
         self.call_fut(asset, context, registry)
         assert not mock.called
 

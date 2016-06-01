@@ -93,27 +93,21 @@ setup(name='adhocracy_core',
       adhocracy_core = adhocracy_core.testing
       [console_scripts]
       ad_start_ws_server = adhocracy_core.websockets.start_ws_server:main
-      ad_import_users = adhocracy_core.scripts.import_users:import_users
-      ad_import_groups = adhocracy_core.scripts.import_groups:import_groups
-      ad_import_resources =\
-          adhocracy_core.scripts.import_resources:import_resources
-      ad_import_local_roles = \
-          adhocracy_core.scripts.import_local_roles:import_local_roles
-      ad_assign_badges =\
-          adhocracy_core.scripts.assign_badges:assign_badges
-      ad_set_workflow_state =\
-          adhocracy_core.scripts.set_workflow_state:set_workflow_state
+      ad_import_users = adhocracy_core.scripts.ad_import_users:main
+      ad_import_groups = adhocracy_core.scripts.ad_import_groups:main
+      ad_import_resources = adhocracy_core.scripts.ad_import_resources:main
+      ad_import_local_roles = adhocracy_core.scripts.ad_import_local_roles:main
+      ad_assign_badges = adhocracy_core.scripts.ad_assign_badges:main
+      ad_set_workflow_state = adhocracy_core.scripts.ad_set_workflow_state:main
       ad_delete_stale_login_data =\
-          adhocracy_core.scripts.delete_stale_login_data:delete_stale_login_data
+          adhocracy_core.scripts.ad_delete_stale_login_data:main
       ad_delete_not_referenced_images =\
-          adhocracy_core.scripts.delete_images:delete_not_referenced_images
-      ad_export_users =\
-          adhocracy_core.scripts.export_users:export_users
+          adhocracy_core.scripts.ad_delete_images:main
+      ad_export_users = adhocracy_core.scripts.ad_export_users:main
       ad_auto_transition_process_workflow=\
-          adhocracy_core.scripts.auto_transition_process_workflow:auto_transition_process_workflow
-      ad_fixtures =\
-        adhocracy_core.scripts.fixtures:import_fixtures
+       adhocracy_core.scripts.ad_auto_transition_process_workflow:main
+      ad_fixtures = adhocracy_core.scripts.ad_fixtures:main
       [pyramid.scaffold]
-      adhocracy=adhocracy_core.scaffolds:AdhocracyExtensionTemplate
+      adhocracy=adhocracy_core.scaffolds:main
       """,
       )

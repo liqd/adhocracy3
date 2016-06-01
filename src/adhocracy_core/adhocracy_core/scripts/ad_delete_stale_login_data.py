@@ -19,7 +19,7 @@ from adhocracy_core.resources.principal import delete_not_activated_users
 logger = logging.getLogger(__name__)
 
 
-def delete_stale_login_data():  # pragma: no cover
+def main():  # pragma: no cover
     """Remove expired login tokens, not active users, and old password resets.
 
     usage::
@@ -27,7 +27,7 @@ def delete_stale_login_data():  # pragma: no cover
         bin/remove_stale_login_data etc/development.ini  --resets_max_age 10
         --not_active_users_max_age 10
     """
-    docstring = inspect.getdoc(delete_stale_login_data)
+    docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)
     parser.add_argument('ini_file',
                         help='path to the adhocracy backend ini file')
@@ -43,20 +43,21 @@ def delete_stale_login_data():  # pragma: no cover
                         type=int)
     args = parser.parse_args()
     env = bootstrap(args.ini_file)
-    _delete_stale_login_data(env['root'],
-                             env['request'],
-                             args.resets_max_age,
-                             args.not_active_users_max_age,
-                             )
+    delete_stale_login_data(env['root'],
+                            env['request'],
+                            args.resets_max_age,
+                            args.not_active_users_max_age,
+                            )
     transaction.commit()
     env['closer']()
 
 
-def _delete_stale_login_data(root,
-                             request: Request,
-                             not_active_users_max_age: int,
-                             resets_max_age: int,
-                             ):
+def delete_stale_login_data(root,
+                            request: Request,
+                            not_active_users_max_age: int,
+                            resets_max_age: int,
+                            ):
+    """Remove expired login tokens, not active users, old password resets."""
     request.root = root
     delete_not_activated_users(request, not_active_users_max_age)
     delete_password_resets(request, resets_max_age)

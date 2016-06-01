@@ -26,7 +26,7 @@ from adhocracy_core.utils import load_json
 logger = logging.getLogger(__name__)
 
 
-def assign_badges():  # pragma: no cover
+def main():  # pragma: no cover
     """Assign badges to proposals.
 
     usage::
@@ -36,13 +36,13 @@ def assign_badges():  # pragma: no cover
     env = bootstrap(args.ini_file)
     root = env['root']
     registry = env['registry']
-    _import_assignments(root, registry, args.jsonfile)
+    import_assignments(root, registry, args.jsonfile)
     transaction.commit()
     env['closer']()
 
 
 def _parse_args():  # pragma: no cover
-    docstring = inspect.getdoc(assign_badges)
+    docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)
     parser.add_argument('ini_file',
                         help='path to the adhocracy backend ini file')
@@ -53,7 +53,8 @@ def _parse_args():  # pragma: no cover
     return parser.parse_args()
 
 
-def _import_assignments(root: IResource, registry: Registry, filename: str):
+def import_assignments(root: IResource, registry: Registry, filename: str):
+    """Import badge assignments."""
     entries = load_json(filename)
     for entry in entries:
         user, badge, badgeable = _find_resources(root, entry)

@@ -21,14 +21,14 @@ from adhocracy_mercator.scripts.export_users import get_most_rated_proposals
 from adhocracy_mercator.scripts.export_users import get_titles
 
 
-def export_lost_rates():
+def main():
     """Export all proposals and count 'lost' rates of older versions.
 
     usage::
 
         bin/export_mercator_lost_rates etc/development.ini  10
     """
-    docstring = inspect.getdoc(export_lost_rates)
+    docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)
     parser.add_argument('ini_file',
                         help='path to the adhocracy backend ini file')

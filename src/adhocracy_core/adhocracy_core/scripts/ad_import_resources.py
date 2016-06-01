@@ -11,7 +11,7 @@ import transaction
 
 from pyramid.paster import bootstrap
 
-from . import import_resources as main_import_resources
+from . import import_resources
 
 
 resources_epilog = """The JSON file contains the interface name of the resource
@@ -32,14 +32,14 @@ Example::
 """
 
 
-def import_resources():  # pragma: no cover
+def main():  # pragma: no cover
     """Import resources from a JSON file.
 
     usage::
 
         bin/import_resources etc/development.ini  <filename>
     """
-    docstring = inspect.getdoc(import_resources)
+    docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring,
                                      epilog=resources_epilog)
     parser.add_argument('ini_file',
@@ -50,6 +50,6 @@ def import_resources():  # pragma: no cover
     args = parser.parse_args()
     env = bootstrap(args.ini_file)
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    main_import_resources(env['root'], env['registry'], args.filename)
+    import_resources(env['root'], env['registry'], args.filename)
     transaction.commit()
     env['closer']()

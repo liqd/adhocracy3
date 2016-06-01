@@ -11,7 +11,7 @@ import json
 class TestImportGroups:
 
     def test_import_groups_create(self, registry, log):
-        from adhocracy_core.scripts.import_groups import _import_groups
+        from adhocracy_core.scripts.ad_import_groups import import_groups
 
         (self._tempfd, filename) = mkstemp()
         with open(filename, 'w') as f:
@@ -22,7 +22,7 @@ class TestImportGroups:
 
         root = registry.content.create(IRootPool.__identifier__)
         groups = find_service(root, 'principals', 'groups')
-        _import_groups(root, registry, filename)
+        import_groups(root, registry, filename)
 
         moderators = groups.get('moderators-xyz', None)
         assert moderators is not None
@@ -32,7 +32,7 @@ class TestImportGroups:
         assert reviewers.roles == ['annotator']
 
     def test_import_groups_update(self, registry, log):
-        from adhocracy_core.scripts.import_groups import _import_groups
+        from adhocracy_core.scripts.ad_import_groups import import_groups
         (self._tempfd, filename) = mkstemp()
         with open(filename, 'w') as f:
             f.write(json.dumps([
@@ -41,13 +41,13 @@ class TestImportGroups:
             ]))
         root = registry.content.create(IRootPool.__identifier__)
         groups = find_service(root, 'principals', 'groups')
-        _import_groups(root, registry, filename)
+        import_groups(root, registry, filename)
 
         with open(filename, 'w') as f:
             f.write(json.dumps([
                 {"name": "moderators-xyz", "roles": ["annotator"]}
             ]))
-        _import_groups(root, registry, filename)
+        import_groups(root, registry, filename)
 
         moderators = groups.get('moderators-xyz', None)
         assert moderators is not None

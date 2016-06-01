@@ -30,13 +30,13 @@ from adhocracy_core.scripts import get_sheet_field_for_partial
 from adhocracy_mercator.resources.mercator2 import IMercatorProposal
 
 
-def export_comments():
+def main():
     """
     Export all comments from database and write them to csv file.
 
     --limited restricts the export to a few fields.
     """
-    doc = textwrap.dedent(inspect.getdoc(export_comments))
+    doc = textwrap.dedent(inspect.getdoc(main))
     parser = argparse.ArgumentParser(description=doc)
     parser.add_argument('config')
     parser.add_argument('-l',

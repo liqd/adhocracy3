@@ -49,13 +49,13 @@ from adhocracy_mercator.sheets.mercator2 import IExtraFunding
 from adhocracy_mercator.sheets.mercator2 import ICommunity
 
 
-def export_proposals():
+def main():
     """
     Export all proposals from database and write them to csv file.
 
     --limited restricts the export to a few fields.
     """
-    doc = textwrap.dedent(inspect.getdoc(export_proposals))
+    doc = textwrap.dedent(inspect.getdoc(main))
     parser = argparse.ArgumentParser(description=doc)
     parser.add_argument('config')
     parser.add_argument('-l',

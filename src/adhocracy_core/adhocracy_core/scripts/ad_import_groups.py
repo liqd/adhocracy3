@@ -32,7 +32,7 @@ Example::
 """
 
 
-def import_groups():  # pragma: no cover
+def main():  # pragma: no cover
     """Import groups from a JSON file.
 
     Already existing groups will have their roles updated.
@@ -41,7 +41,7 @@ def import_groups():  # pragma: no cover
 
         bin/import_groups etc/development.ini  <filename>
     """
-    docstring = inspect.getdoc(import_groups)
+    docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring,
                                      epilog=groups_epilog)
     parser.add_argument('ini_file',
@@ -52,11 +52,12 @@ def import_groups():  # pragma: no cover
     args = parser.parse_args()
     env = bootstrap(args.ini_file)
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    _import_groups(env['root'], env['registry'], args.filename)
+    import_groups(env['root'], env['registry'], args.filename)
     env['closer']()
 
 
-def _import_groups(context: IResource, registry: Registry, filename: str):
+def import_groups(context: IResource, registry: Registry, filename: str):
+    """Import groups from a JSON file."""
     groups_info = _load_groups_info(filename)
     groups = find_service(context, 'principals', 'groups')
     for group_info in groups_info:

@@ -7,20 +7,19 @@ import argparse
 import inspect
 from pyramid.paster import bootstrap
 
-from .mercator_export_users import export_users_and_proposals_rates
-
+from .common import export_users_and_proposals_rates
 from adhocracy_core.utils import create_filename
-from adhocracy_mercator.resources.mercator2 import IMercatorProposal
+from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 
 
-def export_users():
+def main():
     """Export all users and their proposal rates to csv file.
 
     usage::
 
         bin/export_mercator_users etc/development.ini  10
     """
-    docstring = inspect.getdoc(export_users)
+    docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)
     parser.add_argument('ini_file',
                         help='path to the adhocracy backend ini file')
@@ -36,6 +35,7 @@ def export_users():
     filename = create_filename(directory='./var/export/',
                                prefix='adhocracy-users',
                                suffix='.csv')
-    export_users_and_proposals_rates(env['root'], filename, IMercatorProposal,
+    export_users_and_proposals_rates(env['root'], filename,
+                                     IMercatorProposalVersion,
                                      env['registry'], args)
     env['closer']()

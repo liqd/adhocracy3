@@ -17,14 +17,14 @@ from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import create_filename
 
 
-def export_users():  # pragma: no cover
+def main():  # pragma: no cover
     """Export all users.
 
     usage::
 
         bin/export_users <ini file>
     """
-    docstring = inspect.getdoc(export_users)
+    docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)
     parser.add_argument('ini_file',
                         help='path to the adhocracy backend ini file')
@@ -33,11 +33,12 @@ def export_users():  # pragma: no cover
     filename = create_filename(directory='./var/export/',
                                prefix='adhocracy-users',
                                suffix='.csv')
-    _export_users(env['root'], env['registry'], filename)
+    export_users(env['root'], env['registry'], filename)
     env['closer']()
 
 
-def _export_users(root, registry, filename):  # pragma: no cover
+def export_users(root, registry, filename):  # pragma: no cover
+    """Export all users."""
     users = _get_users(root, registry)
     with open(filename, 'w', newline='') as result_file:
         wr = csv.writer(result_file, delimiter=';', quotechar='"',

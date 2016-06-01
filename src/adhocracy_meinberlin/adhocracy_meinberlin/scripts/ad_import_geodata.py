@@ -1,7 +1,6 @@
 """Import GEO-Data to adhocracy meinBerlin.
 
 The functions are registered in setup.py
-in setup.py.
 """
 
 
@@ -34,9 +33,9 @@ from adhocracy_core.sheets.geo import IMultiPolygon
 GDAL_LEGACY = True
 
 
-def import_bezirke():
+def main():
     """Import Berlin districts to adhocracy meinBerlin."""
-    doc = textwrap.dedent(inspect.getdoc(import_bezirke))
+    doc = textwrap.dedent(inspect.getdoc(main))
     parser = argparse.ArgumentParser(description=doc)
     parser.add_argument('config')
     args = parser.parse_args()

@@ -23,18 +23,18 @@ from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from adhocracy_mercator.resources.mercator2 import IMercatorProposal
-from adhocracy_mercator.scripts.mercator_export_users import \
+from adhocracy_mercator.scripts.common import \
     get_most_rated_proposals
 
 
-def delete_users():
+def main():
     """Delete users whose emails are listed in a file.
 
     usage::
 
          bin/delete_users etc/development.ini <filename>
     """
-    docstring = inspect.getdoc(delete_users)
+    docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)
     parser.add_argument('ini_file',
                         help='path to the adhocracy backend ini file')

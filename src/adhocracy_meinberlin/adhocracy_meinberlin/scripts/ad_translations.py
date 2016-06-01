@@ -11,7 +11,7 @@ import re
 import textwrap
 
 
-def change_german_salutation():
+def main():
     """Import german translation json file and change from Du to Sie.
 
     The result will be saved to a separate file. If the input file is
@@ -19,7 +19,7 @@ def change_german_salutation():
     ``some/path/file_new.json``.
 
     """
-    doc = textwrap.dedent(inspect.getdoc(change_german_salutation))
+    doc = textwrap.dedent(inspect.getdoc(main))
     parser = argparse.ArgumentParser(description=doc)
     parser.add_argument('jsonfile')
     args = parser.parse_args()

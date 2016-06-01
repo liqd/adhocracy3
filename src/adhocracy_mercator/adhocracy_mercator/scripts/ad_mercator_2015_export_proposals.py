@@ -69,9 +69,9 @@ def get_heard_from_text(heardfrom: dict) -> str:
     return ','.join([kv_to_text(k, v) for (k, v) in heardfrom.items() if v])
 
 
-def export_proposals():
+def main():
     """Export all proposals from database and write them to csv file."""
-    doc = textwrap.dedent(inspect.getdoc(export_proposals))
+    doc = textwrap.dedent(inspect.getdoc(main))
     parser = argparse.ArgumentParser(description=doc)
     parser.add_argument('config')
     args = parser.parse_args()

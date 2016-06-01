@@ -25,7 +25,7 @@ class TestGetUsers:
         return pool
 
     def call_fut(self, root, registry):
-        from .export_users import _get_users
+        from .ad_export_users import _get_users
         return _get_users(root, registry)
 
     def test_get_users(self, context, registry, user1):
@@ -51,7 +51,7 @@ class TestWriteUsersToCSV:
         return user
 
     def call_fut(self, *args):
-        from .export_users import _write_users_to_csv
+        from .ad_export_users import _write_users_to_csv
         return _write_users_to_csv(*args)
 
     def test_write_users_to_csv(self, registry, mock_sheet, user1):

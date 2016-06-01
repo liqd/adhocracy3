@@ -26,8 +26,8 @@ class TestImportUsers:
         return registry.content.create(IRootPool.__identifier__)
 
     def call_fut(self, root, registry, filename):
-        from adhocracy_core.scripts.import_users import _import_users
-        return _import_users(root, registry, filename)
+        from adhocracy_core.scripts.ad_import_users import import_users
+        return import_users(root, registry, filename)
 
 
     def test_create(self, context, registry, log):

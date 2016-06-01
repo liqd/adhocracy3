@@ -25,7 +25,7 @@ from adhocracy_core.utils import now
 logger = logging.getLogger(__name__)
 
 
-def auto_transition_process_workflow():  # pragma: no cover
+def main():  # pragma: no cover
     """Automatically transition workflow states of processes.
 
      The transition is decided based on the start_date value im the state_data
@@ -36,18 +36,19 @@ def auto_transition_process_workflow():  # pragma: no cover
 
         bin/ad_auto_auto_transition_process_workflow etc/development.ini
     """
-    docstring = inspect.getdoc(auto_transition_process_workflow)
+    docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)
     parser.add_argument('ini_file',
                         help='path to the adhocracy backend ini file')
     args = parser.parse_args()
     env = bootstrap(args.ini_file)
-    _auto_transition_process_workflow(env['root'], env['registry'])
+    auto_transition_process_workflow(env['root'], env['registry'])
     transaction.commit()
     env['closer']()
 
 
-def _auto_transition_process_workflow(root: IRoot, registry: Registry):
+def auto_transition_process_workflow(root: IRoot, registry: Registry):
+    """Automatically transition workflow states of processes."""
     date_now = now()
     processes = _get_processes_with_auto_transition(root, registry)
     for process in processes:
