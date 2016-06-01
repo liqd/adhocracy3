@@ -40,7 +40,7 @@ require.config({
         leafletMarkerCluster: "../lib/leaflet.markercluster/dist/leaflet.markercluster",
         lodash: "../lib/lodash/dist/lodash.min",
         q: "../lib/q/q",
-        modernizr: "../lib2/modernizr/modernizr-2.8.3.min",
+        modernizr: "../lib2/modernizr/modernizr.min",
         moment: "../lib/moment/min/moment-with-locales.min",
         sticky: "../lib/relatively-sticky/jquery.relatively-sticky.min",
         socialSharePrivacy: "../lib/jquery.socialshareprivacy/jquery.socialshareprivacy.min",
