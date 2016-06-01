@@ -1,7 +1,5 @@
-"""Automatically transition workflow states.
+"""Script to automatically transition workflow states."""
 
-This is registered as console script.
-"""
 import transaction
 import argparse
 import inspect
@@ -28,13 +26,9 @@ logger = logging.getLogger(__name__)
 def main():  # pragma: no cover
     """Automatically transition workflow states of processes.
 
-     The transition is decided based on the start_date value im the state_data
-     of the workflow-assignment and the auto_transition setting of the
-     workflow,
-
-    usage::
-
-        bin/ad_auto_auto_transition_process_workflow etc/development.ini
+    The transition is decided based on the start_date value im the state_data
+    of the workflow-assignment and the auto_transition setting of the
+    workflow.
     """
     docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)

@@ -1,8 +1,4 @@
-"""Import local roles resources into the system.
-
-This is registered as console script in setup.py.
-
-"""
+"""Script to import local roles resources into the system."""
 import argparse
 import inspect
 import transaction
@@ -28,12 +24,7 @@ Example::
 
 
 def main():  # pragma: no cover
-    """Import/set local roles from a JSON file.
-
-    usage::
-
-        bin/import_local_roles etc/development.ini  <filename>
-    """
+    """Import/set local roles from a JSON file."""
     docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring,
                                      epilog=roles_epilog)

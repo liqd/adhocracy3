@@ -1,8 +1,4 @@
-"""Import/create groups into the system.
-
-This is registered as console script in setup.py.
-
-"""
+"""Script to import/create groups."""
 import argparse
 import inspect
 import logging
@@ -36,10 +32,6 @@ def main():  # pragma: no cover
     """Import groups from a JSON file.
 
     Already existing groups will have their roles updated.
-
-    usage::
-
-        bin/import_groups etc/development.ini  <filename>
     """
     docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring,

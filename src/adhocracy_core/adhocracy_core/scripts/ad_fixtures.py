@@ -1,8 +1,4 @@
-"""Import fixtures to initialize the database.
-
-This is registered as console script in setup.py.
-
-"""
+"""Script to import fixtures to initialize the database."""
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 import logging
@@ -58,7 +54,7 @@ process/proposal:announce->participate
 
 
 def main():  # pragma: no cover
-    """Import fixtures script."""
+    """Import fixtures to initialize the database."""
     args = _argparse()
     env = bootstrap(args.ini_file)
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)

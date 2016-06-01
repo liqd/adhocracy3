@@ -1,7 +1,4 @@
-"""Delete not referenced images.
-
-This is registered as console script.
-"""
+"""Script to delete not referenced images."""
 from datetime import timedelta
 import transaction
 import argparse
@@ -23,16 +20,12 @@ logger = logging.getLogger(__name__)
 
 
 def main():  # pragma: no cover
-    """Delete images older than `max_age` that are not referenced.
-
-    usage::
-
-        bin/delete_not_referenced_images etc/development.ini  --max_age 10
-    """
+    """Delete images older than `max_age` that are not referenced."""
     docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)
     parser.add_argument('ini_file',
-                        help='path to the adhocracy backend ini file')
+                        help='path to the adhocracy backend ini file',
+                        )
     parser.add_argument('-m',
                         '--max_age',
                         help='Max age in days of images',

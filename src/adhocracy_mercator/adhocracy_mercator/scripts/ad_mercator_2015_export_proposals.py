@@ -1,7 +1,4 @@
-"""Export proposal.
-
-This is registered as console script in setup.py.
-"""
+"""Script to export proposal."""
 
 import argparse
 import csv

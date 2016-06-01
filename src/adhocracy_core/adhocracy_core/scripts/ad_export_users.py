@@ -1,8 +1,4 @@
-"""Export adhocracy3 users to CSV.
-
-This is registered as console script in setup.py.
-
-"""
+"""Script to export adhocracy3 users to CSV."""
 import argparse
 import csv
 import inspect
@@ -18,12 +14,7 @@ from adhocracy_core.utils import create_filename
 
 
 def main():  # pragma: no cover
-    """Export all users.
-
-    usage::
-
-        bin/export_users <ini file>
-    """
+    """Export all users to csv."""
     docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)
     parser.add_argument('ini_file',
@@ -38,7 +29,7 @@ def main():  # pragma: no cover
 
 
 def export_users(root, registry, filename):  # pragma: no cover
-    """Export all users."""
+    """Export all users to csv."""
     users = _get_users(root, registry)
     with open(filename, 'w', newline='') as result_file:
         wr = csv.writer(result_file, delimiter=';', quotechar='"',

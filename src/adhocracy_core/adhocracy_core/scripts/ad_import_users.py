@@ -1,8 +1,4 @@
-"""Import/create users into the system.
-
-This is registered as console script in setup.py.
-
-"""
+"""Script to import/create users into the system."""
 import argparse
 import inspect
 import logging
@@ -55,12 +51,7 @@ Example::
 
 
 def main():  # pragma: no cover
-    """Import users from a JSON file.
-
-    usage::
-
-        bin/import_users etc/development.ini  <filename>
-    """
+    """Import users from a JSON file."""
     docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring,
                                      epilog=users_epilog)

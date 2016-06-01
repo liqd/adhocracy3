@@ -1,8 +1,4 @@
-"""Export advocate europe proposal comments.
-
-This is registered as console script 'export_comments'
-in setup.py.
-"""
+"""Script to export advocate europe proposal comments."""
 
 import argparse
 import csv
@@ -31,11 +27,7 @@ from adhocracy_mercator.resources.mercator2 import IMercatorProposal
 
 
 def main():
-    """
-    Export all comments from database and write them to csv file.
-
-    --limited restricts the export to a few fields.
-    """
+    """Export all comments from database and write them to csv file."""
     doc = textwrap.dedent(inspect.getdoc(main))
     parser = argparse.ArgumentParser(description=doc)
     parser.add_argument('config')

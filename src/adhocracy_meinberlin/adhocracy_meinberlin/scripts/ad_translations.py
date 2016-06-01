@@ -1,7 +1,4 @@
-"""Change the salutation in german texts.
-
-This console script is registered in setup.py
-"""
+"""Script to change the salutation in german texts."""
 
 import argparse
 import inspect

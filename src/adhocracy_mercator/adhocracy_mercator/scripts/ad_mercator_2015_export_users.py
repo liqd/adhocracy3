@@ -1,7 +1,4 @@
-"""Export users and their proposal rates.
-
-This is registered as console script in setup.py.
-"""
+"""Script to export users and their proposal rates."""
 
 import argparse
 import inspect
@@ -13,12 +10,7 @@ from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 
 
 def main():
-    """Export all users and their proposal rates to csv file.
-
-    usage::
-
-        bin/export_mercator_users etc/development.ini  10
-    """
+    """Export all users and their proposal rates to csv file."""
     docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)
     parser.add_argument('ini_file',

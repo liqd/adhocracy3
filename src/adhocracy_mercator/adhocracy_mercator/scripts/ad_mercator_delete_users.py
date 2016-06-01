@@ -1,9 +1,4 @@
-"""Delete users whose emails are listed in a file.
-
-Votes from the users are also deleted.
-
-This script is registered as console script in setup.py.
-"""
+"""Script to delete users whose emails are listed in a file."""
 
 import argparse
 import inspect
@@ -30,9 +25,7 @@ from adhocracy_mercator.scripts.common import \
 def main():
     """Delete users whose emails are listed in a file.
 
-    usage::
-
-         bin/delete_users etc/development.ini <filename>
+    Mind: Votes from the users are also deleted.
     """
     docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)

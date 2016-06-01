@@ -1,8 +1,4 @@
-"""Import/create resources into the system.
-
-This is registered as console script in setup.py.
-
-"""
+"""Script to import/create resources into the system."""
 import argparse
 import inspect
 import logging
@@ -33,12 +29,7 @@ Example::
 
 
 def main():  # pragma: no cover
-    """Import resources from a JSON file.
-
-    usage::
-
-        bin/import_resources etc/development.ini  <filename>
-    """
+    """Import resources from a JSON file."""
     docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring,
                                      epilog=resources_epilog)

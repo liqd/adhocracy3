@@ -1,9 +1,4 @@
-"""Assign badges to proposals.
-
-The functions of that script are registered as console script in
-setup.py.
-
-"""
+"""Script to assign badges to proposals."""
 
 import inspect
 import logging
@@ -27,11 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 def main():  # pragma: no cover
-    """Assign badges to proposals.
-
-    usage::
-      bin/assign_badges <config> <jsonfile>
-    """
+    """Assign badges to proposals."""
     args = _parse_args()
     env = bootstrap(args.ini_file)
     root = env['root']
@@ -45,7 +36,9 @@ def _parse_args():  # pragma: no cover
     docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)
     parser.add_argument('ini_file',
-                        help='path to the adhocracy backend ini file')
+                        help='path to the adhocracy backend ini file',
+                        default='etc/development.ini',
+                        nargs='?')
     parser.add_argument('jsonfile',
                         type=str,
                         help='path to jsonfile')
@@ -54,7 +47,7 @@ def _parse_args():  # pragma: no cover
 
 
 def import_assignments(root: IResource, registry: Registry, filename: str):
-    """Import badge assignments."""
+    """Assign badges to proposals."""
     entries = load_json(filename)
     for entry in entries:
         user, badge, badgeable = _find_resources(root, entry)

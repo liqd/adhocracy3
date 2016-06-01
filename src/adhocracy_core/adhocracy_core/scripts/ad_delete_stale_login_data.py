@@ -1,7 +1,4 @@
-"""Delete stale login data.
-
-This is registered as console script in setup.py.
-"""
+"""Script to delete stale login data."""
 import transaction
 import argparse
 import inspect
@@ -20,13 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 def main():  # pragma: no cover
-    """Remove expired login tokens, not active users, and old password resets.
-
-    usage::
-
-        bin/remove_stale_login_data etc/development.ini  --resets_max_age 10
-        --not_active_users_max_age 10
-    """
+    """Remove expired login tokens, not active users, old password resets."""
     docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)
     parser.add_argument('ini_file',

@@ -1,7 +1,4 @@
-"""Import GEO-Data to adhocracy meinBerlin.
-
-The functions are registered in setup.py
-"""
+"""Script to import GEO-Data to adhocracy meinBerlin."""
 
 
 import argparse

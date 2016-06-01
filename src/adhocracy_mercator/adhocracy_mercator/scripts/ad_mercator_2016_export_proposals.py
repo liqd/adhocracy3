@@ -1,7 +1,4 @@
-"""Export advocate europe 2016 proposal.
-
-This is registered as console script in setup.py.
-"""
+"""Script to export advocate europe 2016 proposal."""
 
 import argparse
 import csv
@@ -50,11 +47,7 @@ from adhocracy_mercator.sheets.mercator2 import ICommunity
 
 
 def main():
-    """
-    Export all proposals from database and write them to csv file.
-
-    --limited restricts the export to a few fields.
-    """
+    """Export all proposals from database and write them to csv file."""
     doc = textwrap.dedent(inspect.getdoc(main))
     parser = argparse.ArgumentParser(description=doc)
     parser.add_argument('config')

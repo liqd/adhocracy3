@@ -1,8 +1,4 @@
-"""Export proposals and count 'lost' rates of older versions.
-
-This is registered as console script in setup.py.
-
-"""
+"""Script to export proposals and count 'lost' rates of older versions."""
 
 import argparse
 import csv
@@ -22,12 +18,7 @@ from adhocracy_mercator.scripts.export_users import get_titles
 
 
 def main():
-    """Export all proposals and count 'lost' rates of older versions.
-
-    usage::
-
-        bin/export_mercator_lost_rates etc/development.ini  10
-    """
+    """Export all proposals and count 'lost' rates of older versions."""
     docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)
     parser.add_argument('ini_file',

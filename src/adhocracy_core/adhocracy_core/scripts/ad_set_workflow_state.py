@@ -1,7 +1,4 @@
-"""Set a workflow state for a given resource.
-
-This is registered as console script in setup.py.
-"""
+"""Script to set a workflow state for a given resource."""
 import argparse
 import inspect
 import transaction
