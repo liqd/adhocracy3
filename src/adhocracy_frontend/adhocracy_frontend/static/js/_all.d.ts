@@ -17,7 +17,6 @@ declare module "sticky" {
 }
 
 declare interface ModernizrStatic {
-    fullscreen : boolean;
     input : {
         autocomplete : boolean;
         autofocus : boolean;
@@ -47,7 +46,6 @@ declare interface ModernizrStatic {
     };
     postmessage : boolean;
     websockets : boolean;
-    flexbox : boolean;
     csspositionsticky : boolean;
     localstorage : boolean;
 }

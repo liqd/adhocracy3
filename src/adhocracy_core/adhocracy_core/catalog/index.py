@@ -78,9 +78,11 @@ class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
 
         :param query:
 
-            reference (Reference): reference with target or source
-            traverse (bool): traverse all references with same type, starting
-                             with the given target or source.
+            reference (Reference):
+                reference with target or source
+            traverse (bool):
+                traverse all references with same type, starting with the
+                given target or source.
         """
         return hypatia.query.Eq(self, query)
 
@@ -89,9 +91,11 @@ class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
 
         :param query:
 
-            reference (Reference): reference with target or source
-            traverse (bool): traverse all references with same type, starting
-                             with the given target or source.
+            reference (Reference):
+                reference with target or source
+            traverse (bool):
+                traverse all references with same type, starting with the given
+                target or source.
         """
         if 'traverse' not in query:
             query['traverse'] = False

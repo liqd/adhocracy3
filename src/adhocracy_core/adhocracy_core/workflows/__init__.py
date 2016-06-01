@@ -163,7 +163,7 @@ def transition_to_states(context, states: [str], registry: Registry,
     """Initialize workflow if needed and do transitions to the given states.
 
     :raises substanced.workflow.WorkflowError: if transition is missing to
-    do transitions to `states`.
+        do transitions to `states`.
     """
     request = create_fake_god_request(registry)
     workflow = registry.content.get_workflow(context)

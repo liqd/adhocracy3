@@ -12,29 +12,29 @@ What is adhocracy?
 
 Adhocracy 3 aims to be a:
 
-    - python framework to build a REST-API *backend* for cms-like applications
-      with a focus on `participation processes` and `collaborative text work`.
+*   python framework to build a REST-API *backend* for cms-like applications
+    with a focus on `participation processes` and `collaborative text work`.
 
-    - javascript framework to build SinglePageApplication *frontends*.
+*   javascript framework to build SinglePageApplication *frontends*.
 
 It comes with these features out of the box:
 
-* Generic :doc:`../api/rest_api` based on the following concepts:
+*   Generic :doc:`../api/rest_api` based on the following concepts:
 
-    * `Hypermedia REST API`: loose coupling frontend/backend, no fixed endpoints,
-      (only half implemented, possible future:`A3 Hypermedia REST-API <http://www.jokasis.de/docs/api_talk/html/>`_)
+    *   `Hypermedia REST API`: loose coupling frontend/backend, no fixed endpoints,
+        (only half implemented, possible future:`A3 Hypermedia REST-API <http://www.jokasis.de/docs/api_talk/html/>`_)
 
-    * `Supergraph`: Resources are versioned and build non hierachical data structures with other Resources,
-      Versions never change, see :doc:`../attic/supergraph` and :doc:`../attic/no_patches`.
-      (only half implemented, Problem: build a usable REST-API on top of this concept).
+    *   `Supergraph`: Resources are versioned and build non hierachical data structures with other Resources,
+        Versions never change, see :doc:`../attic/supergraph` and :doc:`../attic/no_patches`.
+        (only half implemented, Problem: build a usable REST-API on top of this concept).
 
-* Generic `API Specifiaction to build generic frontend` (see :doc:`../api/rest_api`)
+*   Generic `API Specifiaction to build generic frontend` (see :doc:`../api/rest_api`)
 
-* Generic `Admin interface` (not implemented yet)
+*   Generic `Admin interface` (not implemented yet)
 
-* `Resource and workflow modellings` for participation processes.
+*   `Resource and workflow modellings` for participation processes.
 
-* `SinglePageApplication` frontends and backend customizations for `specific participation projects`
+*   `SinglePageApplication` frontends and backend customizations for `specific participation projects`
 
 
 

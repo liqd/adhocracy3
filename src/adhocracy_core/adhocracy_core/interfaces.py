@@ -349,9 +349,9 @@ class IPool(IResource):  # pragma: no cover
     def add(name: str, other) -> str:
         """Add subobject other.
 
-        :returns: The name used to place the subobject in the
-        folder (a derivation of ``name``, usually the result of
-        ``self.check_name(name)``).
+        :returns: The name used to place the subobject in the folder
+            (a derivation of ``name``, usually the result of
+            ``self.check_name(name)``).
         """
 
     def check_name(name: str) -> str:
@@ -595,9 +595,10 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
     last_version_in_transaction (None or IResource):
         The last Version created in this transaction (assuming linear history)
         (only for :class:`adhocracy_core.interfaces.IItem`)
-    changed_descendants (bool): child or grandchild is modified or has
-                                changed_backrefs
-    changed_backrefs (bool): References targeting this resource are changed
+    changed_descendants (bool):
+        child or grandchild is modified or has changed_backrefs
+    changed_backrefs (bool):
+        References targeting this resource are changed
     visibility (VisibilityChange):
         Tracks the visibility of the resource and whether it has changed
     """
@@ -619,7 +620,7 @@ class AuditlogEntry(namedtuple('AuditlogEntry', ['name',
     user_name: (str):
         name of responsible user
     user_path:
-        :term:`user_id` of responsible user
+        :term:`userid` of responsible user
     """
 
 
@@ -730,13 +731,14 @@ class SearchQuery(namedtuple('Query', ['interfaces',
         Available :class:`SearchComparator`s depend on the index type.
     references (Reference or (ReferenceComparator.traverse, Reference)):
         References with (source, isheet, isheet_field, target).
-        If `source` is None search for resources referencing target
-        (back references).
-        If `target` is None search for resources referenced by source
-        (Reference).
-        If the tuple (ReferenceComparator.traverse, Reference) is given,
-        the resource graph is traversed following all references with the same
-        type as the given reference.
+
+        -   If `source` is None search for resources referencing target
+            (back references).
+        -   If `target` is None search for resources referenced by source
+            (Reference).
+        -   If the tuple (ReferenceComparator.traverse, Reference) is given,
+            the resource graph is traversed following all references with the
+            same type as the given reference.
     root (IResource):
        root resource to start searching  in descendants
     depth (int):
@@ -744,8 +746,8 @@ class SearchQuery(namedtuple('Query', ['interfaces',
     only_visible (bool):
         filter hidden and deleted resources
     allows ([str], str):
-        filter resources that don't allow the :term:`principal`s  the given
-        permission ([principal], permission).
+        filter resources that don't allow the :term:`principals <principal>`
+        the given permission ([principal], permission).
 
     Present search result
     ----------------------
@@ -801,10 +803,10 @@ class IRolesUserLocator(IUserLocator):  # pragma: no cover
         """Return the group roleids for :term:`userid` or None."""
 
     def get_groupids(userid: str) -> list:
-        """Get :term:`groupid`s for term:`userid` or return None."""
+        """Get :term:`groupids <groupid>` for term:`userid` or return None."""
 
     def get_groups(userid: str) -> list:
-        """Get :term:`group`s for term:`userid` or return None."""
+        """Get :term:`groups <group>` for term:`userid` or return None."""
 
     def get_user_by_activation_path(activation_path: str) -> IResource:
         """Find user per activation path or return None."""
@@ -857,7 +859,7 @@ class Reference(namedtuple('Reference', 'source isheet field target')):
 
 
 class HTTPCacheMode(Enum):
-    """Caching Mode for :class:`IHTTPCacheStrategy`s.
+    """Caching Mode for :class:`IHTTPCacheStrategy`.
 
     You can change the mode in you pyramid ini file with the
     `adhocracy_core.caching.http.mode` setting.

@@ -30,10 +30,10 @@ logger = logging.getLogger(__name__)
 class JSONHTTPClientError(HTTPClientError):
     """HTTPException with json body to describe the exception.
 
-    :param:`errors`: error entries to generate the error description.
-    :param:`request`: Request causing the error to log debug information.
-    :param:`code`: http status code
-    :param:`title`: http status title
+    :param errors: error entries to generate the error description.
+    :param request: Request causing the error to log debug information.
+    :param code: http status code
+    :param title: http status title
 
     The body contains a dictionary with the following data structure:
 
@@ -97,7 +97,7 @@ def handle_error_x0x_exception(error, request):
 def handle_error_40x_exception(error, request):
     """Return JSON error for generic HTTPClientErrors.
 
-     If `error` is :class:`JSONHTTPClientError` it is
+    If `error` is :class:`JSONHTTPClientError` it is
     return without modifications.
     """
     if isinstance(error, JSONHTTPClientError):
