@@ -68,49 +68,46 @@ export var detailDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
         scope: {
             path: "@",
-            hasSwotLabels: "=?",
             isBuergerhaushalt: "=?",
             isKiezkasse: "=?"
         },
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            if (scope.hasSwotLabels) {
-                scope.facets = [];
-                var params = {
-                    elements: "content",
-                    depth: 4,
-                    content_type: "adhocracy_core.resources.badge.IBadge"
-                };
-                adhHttp.get(scope.path, params).then((response) => {
-                    var badgePaths = _.map(response.data[SIPool.nick].elements, "path");
-                    $q.all(_.map(badgePaths, (b : string) => adhHttp.get(b).then(extractBadge))).then((badges : any) => {
-                        scope.badges = _.keyBy(badges, "path");
-                        var groupPaths: string[] = _.union.apply(_, _.map(badges, "groups"));
-                        return $q.all(_.map(groupPaths, (g) => adhHttp.get(g))).then((result) => {
-                            scope.badgeGroups = _.keyBy(_.map(result, extractGroup), "path");
-                            scope.badgesByGroup = collectBadgesByGroup(groupPaths, badges);
-                            _.forOwn(scope.badgeGroups, (v, group) => {
-                                adhHttp.get(group).then((g) => {
-                                    var items = [];
-                                    _.forOwn(scope.badgesByGroup[group], (badge) => {
-                                        adhHttp.get(badge).then((b) => {
-                                            items.push({
-                                                key: extractBadge(b).name,
-                                                name: extractBadge(b).title
-                                            });
+            scope.facets = [];
+            var params = {
+                elements: "content",
+                depth: 4,
+                content_type: "adhocracy_core.resources.badge.IBadge"
+            };
+            adhHttp.get(scope.path, params).then((response) => {
+                var badgePaths = _.map(response.data[SIPool.nick].elements, "path");
+                $q.all(_.map(badgePaths, (b : string) => adhHttp.get(b).then(extractBadge))).then((badges : any) => {
+                    scope.badges = _.keyBy(badges, "path");
+                    var groupPaths: string[] = _.union.apply(_, _.map(badges, "groups"));
+                    return $q.all(_.map(groupPaths, (g) => adhHttp.get(g))).then((result) => {
+                        scope.badgeGroups = _.keyBy(_.map(result, extractGroup), "path");
+                        scope.badgesByGroup = collectBadgesByGroup(groupPaths, badges);
+                        _.forOwn(scope.badgeGroups, (v, group) => {
+                            adhHttp.get(group).then((g) => {
+                                var items = [];
+                                _.forOwn(scope.badgesByGroup[group], (badge) => {
+                                    adhHttp.get(badge).then((b) => {
+                                        items.push({
+                                            key: extractBadge(b).name,
+                                            name: extractBadge(b).title
                                         });
                                     });
-                                    scope.facets.push({
-                                        key: "badge",
-                                        name: extractGroup(g).title,
-                                        items: items
-                                    });
+                                });
+                                scope.facets.push({
+                                    key: "badge",
+                                    name: extractGroup(g).title,
+                                    items: items
                                 });
                             });
                         });
                     });
                 });
-            }
+            });
 
             scope.sorts = [{
                 key: "rates",
