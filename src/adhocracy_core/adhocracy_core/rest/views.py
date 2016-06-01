@@ -395,6 +395,14 @@ class ItemRESTView(PoolRESTView):
         return cstruct
 
     @api_view(
+        request_method='DELETE',
+        permission='delete',
+    )
+    def delete(self) -> dict:  # pragma: no cover
+        """Delete resource."""
+        return super().delete()
+
+    @api_view(
         request_method='POST',
         permission='create',
         schema=POSTItemRequestSchema,

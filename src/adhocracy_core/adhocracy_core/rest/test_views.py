@@ -484,6 +484,7 @@ class TestItemRESTView:
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
+        assert 'delete' in dir(inst)
 
     def test_get_item_with_first_version(self, request_, item,
                                          mock_tags_sheet):
