@@ -116,7 +116,7 @@ that has been subscribed.
 
         { "event": "removed", "resource": "RESOURCE_PATH" }
 
-    In practice this usually means that the resource has been delted or marked
+    In practice this usually means that the resource has been deleted or marked
     hidden (see :doc:`deletion`).
 
 * If resource is a Pool:
