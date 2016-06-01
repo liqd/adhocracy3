@@ -15,6 +15,7 @@ import RIBuergerhaushaltProposalVersion from "../../../../Resources_/adhocracy_m
 import RIGeoProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
 import RIKiezkasseProposalVersion from "../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
 
+import * as SIBadge from "../../../../Resources_/adhocracy_core/sheets/badge/IBadge";
 import * as SIImageReference from "../../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SILocationReference from "../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
 import * as SIMultiPolygon from "../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
@@ -34,13 +35,17 @@ var bindFacets = (
     var params = {
         elements: "content",
         depth: 4,
-        content_type: "adhocracy_core.resources.badge.IBadge"
+        content_type: SIBadge.nick
     };
     adhHttp.get(scope.path, params).then((response) => {
         var badgePaths = _.map(response.data[SIPool.nick].elements, "path");
-        return $q.all(_.map(badgePaths, (b: string) => adhHttp.get(b).then(AdhBadge.extractBadge))).then((badges: any) => {
+        return $q.all(
+            _.map(badgePaths, (b : string) => adhHttp.get(b).then(AdhBadge.extractBadge)))
+        .then((badges: any) => {
             var groupPaths: string[] = _.union.apply(_, _.map(badges, "groups"));
-            return $q.all(_.map(groupPaths, (g) => adhHttp.get(g))).then((result) => {
+            return $q.all(
+                _.map(groupPaths, (g) => adhHttp.get(g)))
+            .then((result) => {
                 scope.badgeGroups = _.keyBy(_.map(result, AdhBadge.extractGroup), "path");
                 scope.badgesByGroup = AdhBadge.collectBadgesByGroup(groupPaths, badges);
                 _.forOwn(scope.badgeGroups, (group, groupPath) => {
