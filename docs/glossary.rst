@@ -49,9 +49,9 @@ Glossary
 
    process
       A process :term:`resource` represents a participation process.
-      There are very different kinds of thos: Idea collections, where
+      There are very different kinds of these. Idea Collections, where
       users can enter proposals and get feedback, and giving feedback on
-      prepared documents are probaly the most common ones.
+      prepared documents, are probaly the most common ones.
 
    user
    role
@@ -74,6 +74,6 @@ Glossary
 
    DAG
       A :abbr:`DAG (directed acyclic graph)` is a mathematical
-      structure that is wellsuited to describe the structure of
+      structure that is well-suited to describe the structure of
       resources in the backend. It is also the model used for other
       software such as git.
