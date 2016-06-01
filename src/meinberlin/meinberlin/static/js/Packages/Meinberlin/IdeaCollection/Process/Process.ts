@@ -26,7 +26,32 @@ import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workfl
 
 var pkgLocation = "/Meinberlin/IdeaCollection/Process";
 
-var bindFacets = (
+var createBadgeGroup = (scope, group, groupPath) => {
+    var items = [];
+    _.forOwn(scope.badgesByGroup[groupPath], (badge) => {
+        items.push({
+            key: badge.name,
+            name: badge.title
+        });
+    });
+    return {
+        key: "badge",
+        name: group.title,
+        items: items
+    };
+};
+
+var createBadgeGroups = (scope, groupPaths, badges) => {
+    scope.badgesByGroup = AdhBadge.collectBadgesByGroup(groupPaths, badges);
+    var facets = [];
+    _.forOwn(scope.badgeGroups, (group, groupPath) => {
+        var badgeGroup = createBadgeGroup(scope, group, groupPath);
+        facets.push(badgeGroup);
+    });
+    return facets;
+};
+
+var getFacets = (
     adhHttp: AdhHttp.Service<any>,
     $q: angular.IQService
 ) => (
@@ -47,21 +72,7 @@ var bindFacets = (
                 _.map(groupPaths, (g) => adhHttp.get(g)))
             .then((result) => {
                 scope.badgeGroups = _.keyBy(_.map(result, AdhBadge.extractGroup), "path");
-                scope.badgesByGroup = AdhBadge.collectBadgesByGroup(groupPaths, badges);
-                _.forOwn(scope.badgeGroups, (group, groupPath) => {
-                    var items = [];
-                    _.forOwn(scope.badgesByGroup[groupPath], (badge) => {
-                        items.push({
-                            key: badge.name,
-                            name: badge.title
-                        });
-                    });
-                    scope.facets.push({
-                        key: "badge",
-                        name: group.title,
-                        items: items
-                    });
-                });
+                scope.facets = createBadgeGroups(scope, groupPaths, badges);
             });
         });
     });
@@ -84,8 +95,7 @@ export var detailDirective = (
         },
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            scope.facets = [];
-            bindFacets(adhHttp, $q)(scope);
+            getFacets(adhHttp, $q)(scope);
 
             scope.sorts = [{
                 key: "rates",
