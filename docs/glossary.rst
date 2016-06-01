@@ -60,9 +60,11 @@ Glossary
       What a user is permitted to do depends on their role.  The roles a
       user has often depend on the context. Example: Amelia (user) may
       be the creator (role) of one proposal (context) and therefore
-      permitted to edit it (permission).
+      permitted to edit it (permission). Proposals that she hasn't
+      created, she may not edit, but she may comment on them.
 
    workflow
+   phase
       Participation :term:`processes <process>` typically have multiple
       phases: For example, you may want to first publish an
       announcement, then have the actual participation for some time,
