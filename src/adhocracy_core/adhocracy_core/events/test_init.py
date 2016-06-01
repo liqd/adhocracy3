@@ -23,6 +23,24 @@ class ResourceCreatedAndAddedUnitTest(unittest.TestCase):
         assert verifyObject(IResourceCreatedAndAdded, inst)
 
 
+class ResourceDeletedTest:
+
+    def make_one(self, *args):
+        from adhocracy_core.events import ResourceWillBeDeleted
+        return ResourceWillBeDeleted(*args)
+
+    def test_create(self):
+        from adhocracy_core.interfaces import IResourceWillBeDeleted
+        context = testing.DummyResource()
+        parent = testing.DummyResource()
+        registry = testing.DummyResource()
+
+        inst = self.make_one(context, parent, registry)
+
+        assert IResourceWillBeDeleted.providedBy(inst)
+        assert verifyObject(IResourceWillBeDeleted, inst)
+
+
 class ResourceSheetModifiedUnitTest(unittest.TestCase):
 
     def make_one(self, *arg):

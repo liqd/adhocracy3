@@ -47,6 +47,7 @@ from adhocracy_core.rest.schemas import PUTAssetRequestSchema
 from adhocracy_core.rest.schemas import GETPoolRequestSchema
 from adhocracy_core.rest.schemas import GETItemResponseSchema
 from adhocracy_core.rest.schemas import GETResourceResponseSchema
+from adhocracy_core.rest.schemas import DELETEResourceResponseSchema
 from adhocracy_core.rest.schemas import options_resource_response_data_dict
 from adhocracy_core.schema import SchemaNode
 from adhocracy_core.schema import AbsolutePath
@@ -121,6 +122,9 @@ class ResourceRESTView:
         else:
             del cstruct['GET']
 
+        if not request.has_permission('delete', context):
+            del cstruct['DELETE']
+
         is_users = IUsersService.providedBy(context) \
             and request.has_permission('create_user', context)
         # TODO move the is_user specific part the UsersRestView
@@ -147,7 +151,7 @@ class ResourceRESTView:
         return cstruct
 
     def _add_metadata_edit_permission_info(self, cstruct: dict):
-        """Add info if a user may set the deleted/hidden metadata fields."""
+        """Add info if a user may set the hidden metadata fields."""
         if IMetadata.__identifier__ not in cstruct:
             return
         # everybody who can PUT metadata can delete the resource
@@ -245,6 +249,33 @@ class SimpleRESTView(ResourceRESTView):
             cstruct = schema.serialize(appstruct)
         return cstruct
 
+    @api_view(
+        request_method='DELETE',
+        permission='delete',
+    )
+    def delete(self) -> dict:
+        """Delete resource."""
+        parent = self.context.__parent__
+        name = self.context.__name__
+        parent.delete(name, self.registry)
+        if is_batchmode(self.request):
+            appstruct = {}
+        else:
+            updated = _build_updated_resources_dict(self.registry)
+            appstruct = {'updated_resources': updated}
+        schema = create_schema(DELETEResourceResponseSchema,
+                               self.context,
+                               self.request)
+        # temporary undelete to make serialization work
+        self.context.__parent__ = parent
+        self.context.__name__ = name
+        # serialize appstruct
+        cstruct = schema.serialize(appstruct)
+        del self.context.__parent__
+        del self.context.__name__
+        return cstruct
+        # TODO refactor (method is to long and not DRY)
+
 
 @view_defaults(
     context=IPool,
@@ -262,6 +293,14 @@ class PoolRESTView(SimpleRESTView):
         # This delegation method is necessary since otherwise validation_GET
         # won't be found.
         return super().get()
+
+    @api_view(
+        request_method='DELETE',
+        permission='delete',
+    )
+    def delete(self) -> dict:  # pragma: no cover
+        """Delete resource."""
+        return super().delete()
 
     def build_post_response(self, resource) -> dict:
         """Build response data structure for a POST request."""

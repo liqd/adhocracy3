@@ -141,6 +141,7 @@ class TestResourceRESTView:
          'POST': {'request_body': [{'content_type': IResource.__identifier__,
                                     'data': {ISheet.__identifier__: {}}}],
                   'response_body': {'content_type': '', 'path': ''}},
+         'DELETE': {},
          'PUT': {'request_body': {'content_type': '',
                                   'data': {ISheet.__identifier__: {}}},
                  'response_body': {'content_type': '', 'path': ''}}}
@@ -149,6 +150,7 @@ class TestResourceRESTView:
         assert wanted['PUT'] == response['PUT']
         assert wanted['HEAD'] == response['HEAD']
         assert wanted['OPTIONS'] == response['OPTIONS']
+        assert wanted['DELETE'] == response['DELETE']
 
     def test_options_with_sheets_and_addables_but_no_permissons(
             self, config, request_, context, resource_meta, mock_sheet):
@@ -166,8 +168,18 @@ class TestResourceRESTView:
                   'OPTIONS': {}}
         assert wanted == response
 
-    def test_options_without_sheets_and_addables(self, request_, context):
+    def test_options_with_delete_permisssion_without_sheets_and_addables(
+        self, request_, context):
         inst = self.make_one(context, request_)
+        response = inst.options()
+        wanted = {'HEAD': {},
+                  'OPTIONS': {},
+                  'DELETE': {}}
+        assert wanted == response
+
+    def test_options_without_delete_permission(self, request_, context):
+        inst = self.make_one(context, request_)
+        request_.has_permission = Mock(return_value=False)
         response = inst.options()
         wanted = {'HEAD': {},
                   'OPTIONS': {}}
@@ -256,6 +268,7 @@ class TestSimpleRESTView:
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
+        assert 'delete' in dir(inst)
 
     def test_put_no_sheets(self, request_, context, mock_sheet):
         request_.registry.content.get_sheets_edit.return_value = [mock_sheet]
@@ -282,6 +295,45 @@ class TestSimpleRESTView:
         response = inst.put()
         assert mock_sheet.set.call_args[0][0] == {'x': 'y'}
 
+    def test_delete_remove_context(self, request_, pool, context):
+        pool['child'] = context
+        inst = self.make_one(context, request_)
+        inst.delete()
+        assert 'child' not in pool
+
+    def test_delete_reaise_if_context_has_no_parent(self, request_, context):
+        inst = self.make_one(context, request_)
+        with raises(Exception):
+            inst.delete()
+
+    def test_delete_return_updated_resources(self, request_, pool, context,
+                                             changelog_meta):
+        from adhocracy_core.interfaces import VisibilityChange
+        pool['child'] = context
+        request_.registry.changelog['/child'] = \
+            changelog_meta._replace(resource=context,
+                                    visibility=VisibilityChange.concealed)
+        inst = self.make_one(context, request_)
+        response = inst.delete()
+        wanted = {'updated_resources': {'changed_descendants': [],
+                          'created': [],
+                          'modified': [],
+                          'removed': ['http://example.com/child/']}}
+        assert wanted == response
+
+    def test_delete_empty_updated_if_batchmode(self, request_, pool, context,
+                                               changelog_meta, mocker):
+        from adhocracy_core.interfaces import VisibilityChange
+        pool['child'] = context
+        request_.registry.changelog['/child'] = \
+            changelog_meta._replace(resource=context,
+                                    visibility=VisibilityChange.concealed)
+        mocker.patch('adhocracy_core.rest.views.is_batchmode',
+                     return_value=True)
+        inst = self.make_one(context, request_)
+        response = inst.delete()
+        assert response['updated_resources']['removed'] == []
+
 
 class TestPoolRESTView:
 
@@ -296,6 +348,7 @@ class TestPoolRESTView:
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
+        assert 'delete' in dir(inst)
 
     def test_get_no_sheets(self, request_, context):
         from adhocracy_core.rest.schemas import GETResourceResponseSchema
@@ -641,7 +694,7 @@ class TestBadgeAssignmentsRESTView:
     def test_options_ignore_if_no_postable_resources(self, context, request_):
         inst = self.make_one(context, request_)
         response = inst.options()
-        assert response == {'HEAD': {}, 'OPTIONS': {}}
+        assert response == {'HEAD': {}, 'OPTIONS': {}, 'DELETE': {}}
 
     def test_options_ignore_if_no_postable_assignments_sheets(
             self, request_, context, resource_meta,  mock_sheet):

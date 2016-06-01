@@ -1,5 +1,6 @@
 """Basic type with children typically to create process structures."""
 from BTrees.Length import Length
+from pyramid.registry import Registry
 from substanced.folder import Folder
 from substanced.util import find_service
 from substanced.interfaces import IFolder
@@ -11,6 +12,7 @@ import adhocracy_core.sheets.pool
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.title
 import adhocracy_core.sheets.workflow
+from adhocracy_core.events import ResourceWillBeDeleted
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import resource_meta
@@ -89,6 +91,18 @@ class Pool(Base, Folder):
     def find_service(self, service_name, *sub_service_names):
         """Return  the :term:`service` for the given context."""
         return find_service(self, service_name, *sub_service_names)
+
+    def delete(self, name: str, registry: Registry):
+        """Delete subresource `name` from database.
+
+        :raises KeyError: if `name`is not a valid subresource name
+        """
+        subresource = self[name]
+        event = ResourceWillBeDeleted(object=subresource,
+                                      parent=self,
+                                      registry=registry)
+        registry.notify(event)
+        self.remove(name, registry=registry)
 
 
 pool_meta = resource_meta._replace(

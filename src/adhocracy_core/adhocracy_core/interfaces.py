@@ -8,6 +8,7 @@ from pyramid.interfaces import ILocation
 from pyramid.interfaces import IAuthorizationPolicy
 from pyramid.interfaces import IRequest
 from pyramid.security import ACLPermitsResult
+from pyramid.registry import Registry
 from zope.deprecation import deprecated
 from zope.interface import Attribute
 from zope.interface import Interface
@@ -389,6 +390,13 @@ class IPool(IResource):  # pragma: no cover
         """
     # TODO remove find_service, substanced.util.find_service does the same
 
+    def delete(name: str, registry: Registry):
+        """Remove subobject `name` from database.
+
+        :raises KeyError: if `name`is not a valid subresource name
+        """
+        # TODO add delete/undelete feature
+
 
 class IServicePool(IPool, IService):
     """Pool serving as a :term:`service`."""
@@ -474,6 +482,14 @@ class IResourceCreatedAndAdded(IObjectEvent):
     parent = Attribute('The parent of the new resource')
     registry = Attribute('The pyramid registry')
     creator = Attribute('User resource object of the authenticated User')
+
+
+class IResourceWillBeDeleted(IObjectEvent):
+    """An event type sent when a IResource will be deleted."""
+
+    object = Attribute('The going to be deleted resource')
+    parent = Attribute('The parent of the deleted resource')
+    registry = Attribute('The pyramid registry')
 
 
 class IItemVersionNewVersionAdded(IObjectEvent):
