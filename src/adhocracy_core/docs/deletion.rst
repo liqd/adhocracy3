@@ -182,11 +182,12 @@ it::
 
     >>> resp = participant.options(document_item).json
     >>> 'DELETE' in resp
+    True
 
 But they cannot hide it::
 
-    >>> 'adhocracy_core.sheets.metadata.IMetadata' not in pprint(resp['PUT']['request_body']['data'])
-    True
+    >>> pprint(resp['PUT']['request_body']['data']['adhocracy_core.sheets.metadata.IMetadata'])
+    {'deleted': [True, False]}
 
 -- that special right is reserved to managers::
 
@@ -284,11 +285,13 @@ resources::
 
 In the end we can cleanup with some real deletion::
 
-    >>> resp = participant.delete("/pool1")
+    >>> resp = admin.delete("/pool1")
     >>> resp.status_code
-    201
+    200
 
-    >>> resp = anonymous.get("/pool1")
+    >>> resp.json['updated_resources']['removed']
+    ['.../pool1...
+
+    >>> resp = admin.get("/pool1")
     >>> resp.status_code
-    410
-
+    404
