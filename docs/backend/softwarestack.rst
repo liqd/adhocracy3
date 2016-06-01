@@ -1,23 +1,23 @@
 Softwarestack
 =============
 
-- `Python 3 <https://www.python.org>`_ (programming language)
+-   `Python 3 <https://www.python.org>`_ (programming language)
 
-- `Pyramid <http://pylonsproject.org>`_  (web framework)
+-   `Pyramid <http://pylonsproject.org>`_  (web framework)
 
-- `substance D <http://docs.pylonsproject.org/projects/substanced/en/latest>`_ (application server)
+-   `substance D <http://docs.pylonsproject.org/projects/substanced/en/latest>`_ (application server)
 
-- `hypatia <https://github.com/Pylons/hypatia>`_ (search)
+-   `hypatia <https://github.com/Pylons/hypatia>`_ (search)
 
-- `ZODB <http://zodb.org>`_ (object database)
+-   `ZODB <http://zodb.org>`_ (object database)
 
-- `colander schema <http://docs.pylonsproject.org/projects/colander/en/latest/>`_ (data structures and validation)
+-   `colander schema <http://docs.pylonsproject.org/projects/colander/en/latest/>`_ (data structures and validation)
 
-- `Autobahn|Python <http://autobahn.ws/python/>`_ (websocket server)
+-   `Autobahn|Python <http://autobahn.ws/python/>`_ (websocket server)
 
-- `Varnish <https://www.varnish-cache.org/>`_ (http proxy cache server)
+-   `Varnish <https://www.varnish-cache.org/>`_ (http proxy cache server)
 
-- `buildout <http://www.buildout.org/en/latest/>`_ (build system)
+-   `buildout <http://www.buildout.org/en/latest/>`_ (build system)
 
 
 History
@@ -25,20 +25,20 @@ History
 
 We started 2012 with the plan to port adhocracy2 to pyramid.
 This become a long discussion how to build a framework for particpation
-processes based on fancy graph data structures :doc:`../attic/index.rst`.
+processes based on fancy graph data structures :doc:`../attic/index`.
 Mid 2013 we started serious efforts to start developing.
 We compared multiple framework - database combinations to find the right
 technical base that allows to start quickly but does not stand in they way if
 the project grows. Doing this we had the following in mind:
 
-      * python 3 support
-      * active community and good documentation
-      * good extensibility -> `zope component` style like architecture
-      * fast references to resources and complex reference queries
-      * one system to search & store python objects and references
-      * ACID transactions
-      * resource tree, url traversal
-      * workflows, local permissions
+*    python 3 support
+*    active community and good documentation
+*    good extensibility -> `zope component` style like architecture
+*    fast references to resources and complex reference queries
+*    one system to search & store python objects and references
+*    ACID transactions
+*    resource tree, url traversal
+*    workflows, local permissions
 
 We did two prototypes to play with the neo4j graph database and dropped it
 mainly due to cutting edge python support and transaction features.
@@ -147,25 +147,25 @@ If we start a rewrite we would focus on full-stack frameworks for REST-APIs,
 standards, and simplified requirements. The following more recent projects
 are look promising.
 
-- http://ramses.tech/
+-   http://ramses.tech/
 
-    (full stack solution for REST-APIs,
-    easy prototyping/api specification,
-    good ElasticSearch "frontend" to handle all kind of requests)
+    -   full stack solution for REST-APIs
+    -   easy prototyping/api specification
+    -   good ElasticSearch "frontend" to handle all kind of requests
 
-- http://morepath.readthedocs.org/
+-   http://morepath.readthedocs.org/
 
-    (flexible micro framework for REST-API/HTML rendering,
-     combine/extend small application (like processXY, document management, user management, ...)
+    -   flexible micro framework for REST-API/HTML rendering
+    -   combine/extend small application (like processXY, document management, user management, ...)
 
-- django rest framework v3 / (or json-api extension) http://www.django-rest-framework.org/
+-   django rest framework v3 / (or json-api extension) http://www.django-rest-framework.org/
 
-  (full stack solution for REST-APIs)
+    -   full stack solution for REST-APIs
 
-- json-api https://py-jsonapi.readthedocs.org/en/latest/
+-   json-api https://py-jsonapi.readthedocs.org/en/latest/
 
-  (full stack solution for REST-APIs)
+    -   full stack solution for REST-APIs
 
-- http://pythonhosted.org/jsondata/
+-   http://pythonhosted.org/jsondata/
 
-  (data structure and patches based on JSON-Schema)
+    -   data structure and patches based on JSON-Schema

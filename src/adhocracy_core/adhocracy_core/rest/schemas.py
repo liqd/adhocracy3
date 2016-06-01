@@ -58,6 +58,8 @@ from adhocracy_core.schema import ContentType
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import DateTimes
 from adhocracy_core.schema import Email
+from adhocracy_core.schema import Float
+from adhocracy_core.schema import Floats
 from adhocracy_core.schema import Integer
 from adhocracy_core.schema import Integers
 from adhocracy_core.schema import Interface
@@ -95,6 +97,7 @@ INDEX_EXAMPLE_VALUES = {
     'rate': 1,
     'rates': 1,
     'interfaces': interface.Interface,
+    'controversiality': 0.0,
 }
 
 
@@ -297,7 +300,6 @@ def add_put_data_subschemas(node: MappingSchema, kw: dict):
         if name not in data:
             continue
         schema = sheet.get_schema_with_bindings()
-        schema.name = name
         node.add(schema)
 
 
@@ -363,15 +365,11 @@ def add_post_data_subschemas(node: SchemaNode, kw: dict):
         iresource = ContentType().deserialize(content_type)
     except Invalid:
         return  # the content type is validated later, so we just ignore errors
-    registry = request.registry.content
-    creates = registry.get_sheets_create(context, request, iresource)
+    creates = request.registry.content.get_sheets_create(context,
+                                                         request,
+                                                         iresource)
     for sheet in creates:
-        name = sheet.meta.isheet.__identifier__
-        is_mandatory = sheet.meta.create_mandatory
-        missing = required if is_mandatory else drop
         schema = sheet.get_schema_with_bindings()
-        schema.name = name
-        schema.missing = missing
         node.add(schema)
 
 
@@ -781,12 +779,13 @@ class GETPoolRequestSchema(MappingSchema):
                              validator=deferred_validate_aggregateby)
 
     def deserialize(self, cstruct=null):  # noqa
-        """ Deserialize the :term:`cstruct` into an :term:`appstruct`.
+        """Deserialize the :term:`cstruct` into an :term:`appstruct`.
 
         Adapt key/values to :class:`adhocracy_core.interfaces.SearchQuery`. for
         BBB.
-        TODO: CHANGE API according to internal SearchQuery api.
-             refactor to follow coding guideline better.
+
+        TODO: Change API according to internal SearchQuery api.
+        refactor to follow coding guideline better.
         """
         depth_cstruct = cstruct.get('depth', None)
         if depth_cstruct == 'all':
@@ -933,6 +932,11 @@ def create_arbitrary_filter_node(index, example_value, query):
     return Integer()
 
 
+@dispatch((FieldIndex, KeywordIndex), float, (float, str))  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
+    return Float()
+
+
 @dispatch((FieldIndex, KeywordIndex), bool, (bool, str))  # flake8: noqa
 def create_arbitrary_filter_node(index, example_value, query):
     return Boolean()
@@ -983,6 +987,14 @@ def create_arbitrary_filter_node(index, example_value, query):
         return FieldComparableIntegers()
     else:
         return FieldComparableInteger()
+
+
+@dispatch(FieldIndex, float, list)  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
+    if query[0] in FieldSequenceComparator.__members__:
+        return FieldComparableFloats()
+    else:
+        return FieldComparableFloat()
 
 
 @dispatch(KeywordIndex, str, list)  # flake8: noqa
@@ -1149,6 +1161,12 @@ class FieldComparableIntegers(FieldComparableSequenceBase):
     value = Integers()
 
 
+class FieldComparableFloats(FieldComparableSequenceBase):
+    """Tuple with values FieldSequenceComparable and Floats."""
+
+    value = Floats()
+
+
 class FieldComparableInterfaces(FieldComparableSequenceBase):
     """Tuple with values FieldSequenceComparable and Interfaces."""
 
@@ -1183,6 +1201,12 @@ class FieldComparableInteger(FieldComparableBase):
     """Tuple with values FieldComparable and Integer."""
 
     value = Integer()
+
+
+class FieldComparableFloat(FieldComparableBase):
+    """Tuple with values FieldComparable and Float."""
+
+    value = Float()
 
 
 class FieldComparableInterface(FieldComparableBase):

@@ -49,7 +49,6 @@ from adhocracy_core.utils import find_graph
 from adhocracy_core.utils import get_changelog_metadata
 from adhocracy_core.utils import get_iresource
 from adhocracy_core.utils import get_modification_date
-from adhocracy_core.utils import get_user
 from adhocracy_core.utils import get_visibility_change
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.metadata import IMetadata
@@ -70,7 +69,7 @@ def update_modification_date_modified_by(event):
     appstruct = {}
     appstruct['modification_date'] = get_modification_date(event.registry)
     if event.request is not None:
-        appstruct['modified_by'] = get_user(event.request)
+        appstruct['modified_by'] = event.request.user
     sheet.set(appstruct,
               send_event=False,
               omit_readonly=False,
@@ -349,7 +348,7 @@ def update_comments_count(resource: ICommentVersion,
                           registry: Registry):
     """Update all commentable resources related to `resource`.
 
-     Traverse all commentable resources that have a IComment or ISubresource
+    Traverse all commentable resources that have a IComment or ISubresource
     reference to `resource` and update the comment_count value with `delta`.
 
     Example reference structure that is traversed:

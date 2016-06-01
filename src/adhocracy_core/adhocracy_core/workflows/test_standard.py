@@ -131,6 +131,21 @@ class TestStandardPublicWithPrivateProcessesConfig:
         resp = app_admin.get(process_url_public)
         assert resp.status_code == 200
 
+    def test_participate_authenticated_can_post_proposal(
+            self, process_url_public, app_authenticated):
+        from adhocracy_core.resources.proposal import IProposal
+        resp = app_authenticated.post_resource(process_url_public, IProposal,
+                                               {})
+        assert resp.status_code == 200
+
+    def test_participate_authenticated_can_post_badge_assignments(
+            self, process_url_public, app_authenticated):
+        from adhocracy_core.resources.badge import IBadgeAssignment
+        resp = app_authenticated.options(process_url_public +
+                                         '/proposal_0000000/badge_assignments')
+        assert resp.json['POST']['request_body'][0]['content_type'] == \
+            IBadgeAssignment.__identifier__
+
     def test_evaluate_authenticated_can_read_public_process(
             self, process_url_public, app_authenticated, app_admin):
         self.set_process_state(process_url_public, app_admin, 'evaluate')

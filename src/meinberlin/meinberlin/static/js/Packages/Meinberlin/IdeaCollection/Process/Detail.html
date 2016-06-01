@@ -6,15 +6,18 @@
         </div>
         <div data-ng-switch-default="" class="meinberlin-idea-collection-detail-listing">
             <adh-listing
-                data-path="{{path}}"
-                data-ng-show="!isShowMap"
-                data-no-create-form="true"
-                data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
                 data-content-type="{{contentType}}"
                 data-custom="{
                     isBuergerhaushalt: isBuergerhaushalt,
                     isKiezkasse: isKiezkasse,
-                }">
+                }"
+                data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
+                data-facets="facets"
+                data-ng-show="!isShowMap"
+                data-no-create-form="true"
+                data-path="{{path}}"
+                data-sort="sort"
+                data-sorts="sorts">
                 <adh-meinberlin-proposal-list-item
                     data-path="{{element}}"
                     data-is-buergerhaushalt="custom.isBuergerhaushalt"
@@ -31,16 +34,19 @@
             }"></div>
             <adh-wait condition="isShowMap">
                 <adh-map-listing
-                    data-path="{{path}}"
-                    data-ng-show="isShowMap"
-                    data-polygon="polygon"
-                    data-no-create-form="true"
-                    data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
                     data-content-type="{{contentType}}"
                     data-custom="{
                         isBuergerhaushalt: isBuergerhaushalt,
                         isKiezkasse: isKiezkasse,
-                    }">
+                    }"
+                    data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
+                    data-facets="facets"
+                    data-ng-show="isShowMap"
+                    data-no-create-form="true"
+                    data-path="{{path}}"
+                    data-polygon="polygon"
+                    data-sort="sort"
+                    data-sorts="sorts">
                     <adh-meinberlin-proposal-map-list-item
                         data-path="{{item}}"
                         data-is-buergerhaushalt="custom.isBuergerhaushalt"

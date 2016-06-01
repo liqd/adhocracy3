@@ -244,6 +244,9 @@ def request_():
     """
     request = DummyRequest()
     request.registry.settings = {}
+    request.user = None
+    request.scheme = 'http'
+    request.matched_route = None
     return request
 
 
@@ -385,6 +388,8 @@ def mock_workflow() -> Mock:
     from adhocracy_core.workflows import AdhocracyACLWorkflow
     mock = Mock(spec=AdhocracyACLWorkflow)
     mock._states = {}
+    mock.get_next_states.return_value = []
+    mock.state_of.return_value = None
     return mock
 
 
@@ -472,11 +477,10 @@ def mock_messenger():
     return messenger
 
 
-def _get_settings(request, part, config_path_key='pyramid_config'):
+def _get_settings(request, part):
     """Return settings of a config part."""
     config_parser = ConfigParser()
-    config_file = request.config.getoption(config_path_key) \
-        or 'etc/test_with_ws.ini'
+    config_file = 'etc/test.ini'
     config_parser.read(config_file)
     settings = {}
     for option, value in config_parser.items(part):

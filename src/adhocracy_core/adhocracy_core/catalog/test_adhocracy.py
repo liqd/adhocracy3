@@ -27,6 +27,7 @@ def test_create_adhocracy_catalog(pool_graph, registry):
     assert 'rate' in catalogs['adhocracy']
     assert 'rates' in catalogs['adhocracy']
     assert 'comments' in catalogs['adhocracy']
+    assert 'controversiality' in catalogs['adhocracy']
     assert 'creator' in catalogs['adhocracy']
     assert 'item_creation_date' in catalogs['adhocracy']
     assert 'item_badge' in catalogs['adhocracy']
@@ -189,6 +190,55 @@ def test_includeme_register_index_rates(registry):
     from substanced.interfaces import IIndexView
     assert registry.adapters.lookup((IRateable,), IIndexView,
                                     name='adhocracy|rates')
+
+
+class TestIndexControversiality:
+
+    @fixture
+    def mock_catalogs(self, monkeypatch, mock_catalogs) -> Mock:
+        from . import adhocracy
+        monkeypatch.setattr(adhocracy, 'find_service',
+                            lambda x, y: mock_catalogs)
+        return mock_catalogs
+
+    def call_fut(self, *args):
+        from .adhocracy import index_controversiality
+        return index_controversiality(*args)
+
+    def test_no_rates(self, context, mock_catalogs,
+                                    search_result, query):
+        from adhocracy_core.sheets.rate import IRate
+        search_result = search_result._replace(frequency_of={})
+        mock_catalogs.search.return_value = search_result
+        assert self.call_fut(context, 'default') == 0.0
+        mock_catalogs.search.call_args_list[0][0] == \
+            query._replace(interfaces=IRate,
+                           frequency_of='rate',
+                           indexes={'tag': 'LAST'},
+                           references=[(None, IRate, 'object', context) ],
+                           )
+
+    def test_only_up_rates(self, context, mock_catalogs, search_result):
+        search_result = search_result._replace(frequency_of={1: 5})
+        mock_catalogs.search.return_value = search_result
+        assert self.call_fut(context, 'default') == 0.0
+
+    def test_only_down_rates(self, context, mock_catalogs, search_result):
+        search_result = search_result._replace(frequency_of={-1: 2})
+        mock_catalogs.search.return_value = search_result
+        assert self.call_fut(context, 'default') == 0.0
+
+    def test_both_up_and_down_rates(self, context, mock_catalogs, search_result):
+        search_result = search_result._replace(frequency_of={1: 5, -1: 2})
+        mock_catalogs.search.return_value = search_result
+        assert self.call_fut(context, 'default') == 3.1622776601683795
+
+    @mark.usefixtures('integration')
+    def test_includeme_register_index_creator(self, registry):
+        from adhocracy_core.sheets.rate import IRateable
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IRateable,), IIndexView,
+                                        name='adhocracy|controversiality')
 
 
 class TestIndexComments:

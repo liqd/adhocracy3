@@ -12,10 +12,13 @@ states:
        - [create_proposal,   A,           ~,         ~,       ~]
        - [create_document,   A,           ~,         ~,       ~]
        - [create_comment,    A,           A,         ~,       ~]
-       - [create_rate,      A,           ~,         ~,       ~]
+       - [create_rate,      A,           ~,         ~,        ~]
+       - [create_asset,      A,           ~,         ~,       ~]
+       - [create_badge_assignment,  ~,    A,         A,       ~]
        - [edit_rate,         ~,           ~,         A,       ~]
        - [create_relation,   A,           ~,         ~,       ~]
        - [edit_relation,     ~,           ~,         A,       ~]
+       - [hide,              ~,           A,         ~,       ~]
   frozen:
     title: Frozen
 transitions:

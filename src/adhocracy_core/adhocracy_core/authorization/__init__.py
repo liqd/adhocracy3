@@ -67,10 +67,10 @@ class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
 
 
 def set_local_roles(resource, new_local_roles: dict, registry: Registry=None):
-    """Set the :term:`local role`s mapping to ``new_local_roles``.
+    """Set the :term:`local role's <local role>` mapping to ``new_local_roles``.
 
     :param new_local_roles: Mapping from :term:`groupid`/:term:`userid` to
-                            a set of :term:`role`s for the `resource`:
+                            a set of :term:`roles <role>` for the `resource`:
 
                             {'system.Everyone': {'role:reader'}}
 
@@ -97,14 +97,14 @@ def _assert_values_have_set_type(mapping: dict):
 
 
 def get_local_roles(resource) -> dict:
-    """Return the :term:`local role`s of the resource."""
+    """Return the :term:`local roles <local role>` of the resource."""
     return getattr(resource, '__local_roles__', {})
 
 
 def get_local_roles_all(resource) -> dict:
-    """Return the :term:`local role`s of the resource and its parents.
+    """Return the :term:`local roles <local role>` of the resource and its parents.
 
-    The `creator`role is not inherited by children.
+    The `creator` role is not inherited by children.
     """
     local_roles_all = defaultdict(set)
     local_roles_all.update(get_local_roles(resource))
@@ -125,7 +125,7 @@ def acm_to_acl(acm: dict) -> [str]:
 
     Permissions for principals with high priority are listed first and override
     succeding permissions. The order is determined by
-    :var:`adhocracy_core.schema.ROLE_PRINCIPALS`. Pricipals with higher
+    :py:data:`adhocracy_core.schema.ROLE_PRINCIPALS`. Pricipals with higher
     index in this list have higer priority.
     """
     acl = _migrate_acm_to_acl(acm)
@@ -165,7 +165,7 @@ def set_acms_for_app_root(event):
                   That way everytime the application starts the root `acm`
                   is updated.
 
-    The `root_acm`(:func:`root_acm_asset`) is extended by the :term:`acm`
+    The `root_acm` (:func:`root_acm_asset`) is extended by the :term:`acm`
     returned by the :class:`adhocracy_core.authorization.IRootACMExtension`
     adapter.
 
@@ -209,7 +209,9 @@ def create_fake_god_request(registry):
 
 
 def includeme(config):
-    """Register adapter to extend the root acm."""
+    """Register adapter to extend the root acm and add authorization policy."""
     config.registry.registerAdapter(acm_extension_adapter,
                                     (Interface,),
                                     IRootACMExtension)
+    authz_policy = RoleACLAuthorizationPolicy()
+    config.set_authorization_policy(authz_policy)

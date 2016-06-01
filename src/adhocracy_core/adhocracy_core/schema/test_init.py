@@ -81,14 +81,14 @@ class AdhocracySchemaNodeUnitTest(unittest.TestCase):
             inst.deserialize('1')
 
 
-class TestAdhocracySchemaNode:
+class TestSequenceSchema:
 
     def make_one(self, **kwargs):
-        from adhocracy_core.schema import SequenceSchema
+        from . import SequenceSchema
 
         class AdhocracySequenceExample(SequenceSchema):
             child1 = colander.Schema(typ=colander.Int())
-        return AdhocracySequenceExample().bind()
+        return AdhocracySequenceExample(**kwargs).bind()
 
     def test_create(self):
         from . import SchemaNode
@@ -102,6 +102,16 @@ class TestAdhocracySchemaNode:
         inst = self.make_one()
         inst2 = self.make_one()
         assert not (inst.default is inst2.default)
+
+    def test_sequence_wiget_is_set(self):
+        from deform.widget import SequenceWidget
+        inst = self.make_one()
+        assert isinstance(inst.widget,  SequenceWidget)
+
+    def test_sequent_widget_is_fixe_if_readonly(self):
+        inst = self.make_one(readonly=True)
+        assert inst.widget.readonly
+        assert inst.widget.deserialize(inst, ['default']) == colander.null
 
 
 class TestInterface():
@@ -705,6 +715,15 @@ class DateTimeUnitTest(unittest.TestCase):
         today = datetime.utcnow().strftime('%Y-%m-%d')
         assert today in result
 
+    def test_bind_and_setup_datetime_widget(self):
+        from deform.widget import DateTimeInputWidget
+        inst = self.make_one().bind()
+        widget = inst.widget
+        assert isinstance(widget, DateTimeInputWidget)
+        schema = widget._pstruct_schema
+        assert schema['date_submit'].missing is colander.null
+        assert schema['time_submit'].missing is colander.null
+
 
 class TestBoolean:
 
@@ -947,6 +966,19 @@ class TestInteger:
         inst = self.make_one()
         assert inst.schema_type == colander.Integer
         assert inst.default == 0
+        assert inst.missing == colander.drop
+
+
+class TestFloat:
+
+    def make_one(self):
+        from adhocracy_core.schema import Float
+        return Float()
+
+    def test_create(self):
+        inst = self.make_one()
+        assert inst.schema_type == colander.Float
+        assert inst.default == 0.0
         assert inst.missing == colander.drop
 
 

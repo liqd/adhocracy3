@@ -84,11 +84,22 @@ class TestUsers:
         assert sheets.asset.IHasAssetPool in meta.extended_sheets
         assert badge.add_badge_assignments_service in meta.after_creation
         assert asset.add_assets_service in meta.after_creation
+        assert principal.allow_create_asset_authenticated in meta.after_creation
 
     @mark.usefixtures('integration')
     def test_create(self, meta, registry):
         resource = registry.content.create(meta.iresource.__identifier__)
         assert meta.iresource.providedBy(resource)
+
+
+def test_create_asset_permission(context, registry, mocker):
+    from . import principal
+    from .principal import allow_create_asset_authenticated
+    set_acl = mocker.spy(principal, 'set_acl')
+    allow_create_asset_authenticated(context, registry, {})
+    set_acl.assert_called_with(context,
+                               [('Allow', 'system.Authenticated', 'create_asset')],
+                               registry=registry)
 
 
 class TestUser:
@@ -124,6 +135,7 @@ class TestUser:
 
     @mark.usefixtures('integration')
     def test_create(self, meta, registry, principals):
+        from pytz import timezone
         from zope.interface.verify import verifyObject
         from adhocracy_core import sheets
         appstructs = {
@@ -144,6 +156,7 @@ class TestUser:
         assert user.password.startswith('$2')
         assert user.tzname == 'UTC'
         assert user.roles == []
+        assert user.timezone == timezone(user.tzname)
 
 
 class TestGroups:
@@ -230,10 +243,12 @@ class TestPasswordResets:
 
     @mark.usefixtures('integration')
     def test_remove_view_permission(self, meta, registry):
+        from pyramid.authorization import Deny
+        from pyramid.authentication import Everyone
         from adhocracy_core.authorization import get_acl
         resource = registry.content.create(meta.iresource.__identifier__)
         acl = get_acl(resource)
-        assert acl == [('deny', 'system.Everyone', 'view')]
+        assert acl == [(Deny, Everyone, 'view')]
 
     @mark.usefixtures('integration')
     def test_hide(self, meta, registry):
@@ -590,3 +605,24 @@ class TestDeletePasswordResets:
         mock_is_older.return_value = False
         self.call_fut(request_, 7)
         assert 'reset' in resets
+
+
+class TestGetUser:
+
+    def call_fut(self, *args):
+        from .principal import get_user
+        return get_user(*args)
+
+    def test_return_none_if_no_authenticated_user(self, request_):
+        request_.authenticated_userid = None
+        assert self.call_fut(request_) is None
+
+    def test_return_none_if_user_no_locator(self, request_):
+        request_.authenticated_userid = 'userid'
+        assert self.call_fut(request_) is None
+
+    def test_return_user_resource(self, request_, mock_user_locator):
+        user = testing.DummyResource()
+        request_.authenticated_userid = 'userid'
+        mock_user_locator.get_user_by_userid.return_value = user
+        assert self.call_fut(request_) == user

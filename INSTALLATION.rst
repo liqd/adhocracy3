@@ -1,1 +1,1 @@
-docs/installation.rst
+docs/development/installation.rst

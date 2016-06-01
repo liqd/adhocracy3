@@ -17,7 +17,7 @@ Host
 Widget
     A piece of adhocracy that can be embedded on its own.  Some
     functionality (e.g. registration) will require the user to switch
-    to the *platform*.  See also :doc:`../development/coding_guide/css_guidelines`.
+    to the *platform*.  See also :doc:`../development/coding_guides/css_guidelines`.
 
 Frontend URL
     This is where the actual adhocracy frontend is available.  Users are
@@ -114,6 +114,9 @@ following parameters are always available:
 
 -   ``nocenter``: By default, the widget will be centered in the iframe.
     If this option is set to ``true``, it will fill the iframe instead.
+
+-   ``noheader``: By default, a header will be shown above the widget.
+    If this option is set to ``true``, it will be omitted.
 
 -   ``initial-url`` will set the initial URL (i.e. path, query and
     anchor) for the embedded platform if widget is ``"plain"``.

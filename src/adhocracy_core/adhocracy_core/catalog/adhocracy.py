@@ -1,4 +1,6 @@
 """Adhocracy catalog and index views."""
+import math
+
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_interface
 from pyramid.traversal import get_current_registry
@@ -47,6 +49,7 @@ class AdhocracyCatalogIndexes:
     rate = catalog.Field()
     rates = catalog.Field()
     comments = catalog.Field()
+    controversiality = catalog.Field()
     creator = catalog.Field()
     item_creation_date = catalog.Field()
     workflow_state = catalog.Field()
@@ -124,6 +127,25 @@ def index_rates(resource, default) -> int:
     for value, count in result.frequency_of.items():
         rate_sum += value * count
     return rate_sum
+
+
+def index_controversiality(resource, default) -> int:
+    """Return metric based on number up/down rates and comments.
+
+    Only the LAST version of each rate is counted.
+    """
+    catalogs = find_service(resource, 'catalogs')
+    query = search_query._replace(interfaces=IRate,
+                                  frequency_of='rate',
+                                  indexes={'tag': 'LAST'},
+                                  references=[(None, IRate, 'object', resource)
+                                              ],
+                                  )
+    result = catalogs.search(query)
+    up_rates = result.frequency_of.get(1, 0)
+    down_rates = result.frequency_of.get(-1, 0)
+    controversiality = math.sqrt(up_rates * down_rates)
+    return controversiality
 
 
 def index_comments(resource, default) -> int:
@@ -260,6 +282,10 @@ def includeme(config):
     config.add_indexview(index_rates,
                          catalog_name='adhocracy',
                          index_name='rates',
+                         context=IRateable)
+    config.add_indexview(index_controversiality,
+                         catalog_name='adhocracy',
+                         index_name='controversiality',
                          context=IRateable)
     config.add_indexview(index_comments,
                          catalog_name='adhocracy',

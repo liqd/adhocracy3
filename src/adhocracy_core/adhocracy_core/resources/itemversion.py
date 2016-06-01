@@ -36,17 +36,18 @@ def update_last_tag(version, registry, options):
 def notify_new_itemversion_created(context, registry, options):
     """Notify referencing Resources after creating a new ItemVersion.
 
-    Args:
-        context (IItemversion): the newly created resource
-        registry (pyramid registry):
-        option (dict):
-            `root_versions`: List with root resources. Will be passed along to
-                            resources that reference old versions so they can
-                            decide whether they should update themselfes.
-            `creator`: User resource that passed to the creation events.
+    :param context: the newly created resource
+    :param registry: pyramid registry
+    :param option:
 
-    Returns:
-        None
+        root_versions:
+            List with root resources. Will be passed along to
+            resources that reference old versions so they can
+            decide whether they should update themselfes.
+        creator:
+            User resource that passed to the creation events.
+
+    :return: None
 
     """
     new_version = context

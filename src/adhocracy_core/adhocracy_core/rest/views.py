@@ -14,6 +14,7 @@ from zope.interface.interfaces import IInterface
 from zope.interface import Interface
 import colander
 
+from adhocracy_core.authentication import UserTokenHeader
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -58,7 +59,6 @@ from adhocracy_core.sheets.pool import IPool as IPoolSheet
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.tags import ITags
 from adhocracy_core.utils import extract_events_from_changelog_metadata
-from adhocracy_core.utils import get_user
 from adhocracy_core.utils import is_batchmode
 from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import is_created_in_current_transaction
@@ -309,7 +309,7 @@ class PoolRESTView(SimpleRESTView):
         validated = self.request.validated
         kwargs = dict(parent=self.context,
                       appstructs=validated.get('data', {}),
-                      creator=get_user(self.request),
+                      creator=self.request.user,
                       root_versions=validated.get('root_versions', []),
                       request=self.request,
                       is_batchmode=is_batchmode(self.request),
@@ -725,15 +725,38 @@ class LoginUsernameView:
 
 
 def _login_user(request: IRequest) -> dict:
-    """Log-in a user and return a response indicating success."""
+    """Set cookies and return a data for token header authentication."""
     user = request.validated['user']
     userid = resource_path(user)
-    authentication_headers = dict(remember(request, userid))
-    url = request.resource_url(user)
-    token = authentication_headers['X-User-Token']
+    headers = remember(request, userid)
+    cstruct = _get_api_auth_data(headers, request, user)
+    return cstruct
+
+
+def get_set_cookie_headers(headers: [tuple], request: IRequest):
+    """Filter `Set-Cookie` headers, add `Secure` flag if `https` is used."""
+    cookie_headers = []
+    force_secure = request.scheme.startswith('https')
+    for name, value in headers:
+        if force_secure:
+            header = (name, value + 'Secure;')
+        else:
+            header = (name, value)
+        if name == 'Set-Cookie':
+            cookie_headers.append(header)
+    return cookie_headers
+
+
+def _get_api_auth_data(headers: [tuple], request: IRequest, user: IResource)\
+        -> dict:
+    token_headers = dict([(x, y) for x, y in headers if x == UserTokenHeader])
+    token = token_headers[UserTokenHeader]
+    user_url = request.resource_url(user)
+    # TODO: use colander schema to create cstruct
     return {'status': 'success',
-            'user_path': url,
-            'user_token': token}
+            'user_path': user_url,
+            'user_token': token,
+            }
 
 
 @view_defaults(
@@ -820,7 +843,7 @@ class ReportAbuseView:
         messenger = self.request.registry.messenger
         messenger.send_abuse_complaint(url=self.request.validated['url'],
                                        remark=self.request.validated['remark'],
-                                       user=get_user(self.request))
+                                       user=self.request.user)
         return ''
 
 
@@ -857,10 +880,11 @@ class MessageUserView:
         """Send a message to another user."""
         messenger = self.request.registry.messenger
         data = self.request.validated
+        user = self.request.user
         messenger.send_message_to_user(recipient=data['recipient'],
                                        title=data['title'],
                                        text=data['text'],
-                                       from_user=get_user(self.request))
+                                       from_user=user)
         return ''
 
 

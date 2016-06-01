@@ -43,19 +43,16 @@ export var register = (angular) => {
             };
 
             adhMapDataProvider.icons["item"] = {
-                className: "icon-map-pin",
-                iconAnchor: [17.5, 41],
-                iconSize: [35, 42]
+                className: "",
+                iconSize: [20, 20]
             };
             adhMapDataProvider.icons["add"] = {
-                className: "icon-map-pin-add",
-                iconAnchor: [16.5, 41],
-                iconSize: [35, 42]
+                className: "",
+                iconSize: [20, 20]
             };
             adhMapDataProvider.icons["item-selected"] = {
-                className: "icon-map-pin is-active",
-                iconAnchor: [17.5, 41],
-                iconSize: [33, 42]
+                className: "is-active",
+                iconSize: [20, 20]
             };
         }])
         .directive("adhMapInput", ["adhConfig", "adhSingleClickWrapper", "adhMapData", "$timeout", "leaflet", AdhMapping.mapInput])

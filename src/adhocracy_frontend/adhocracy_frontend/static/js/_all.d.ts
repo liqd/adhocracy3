@@ -10,13 +10,13 @@ declare module "angularTranslateLoader" {}
 declare module "angularElastic" {}
 declare module "angularScroll" {}
 declare module "angularFlow" {}
+declare module "leafletMarkerCluster" {}
 
 declare module "sticky" {
     export var Sticky : any;
 }
 
 declare interface ModernizrStatic {
-    fullscreen : boolean;
     input : {
         autocomplete : boolean;
         autofocus : boolean;
@@ -46,7 +46,6 @@ declare interface ModernizrStatic {
     };
     postmessage : boolean;
     websockets : boolean;
-    flexbox : boolean;
     csspositionsticky : boolean;
     localstorage : boolean;
 }

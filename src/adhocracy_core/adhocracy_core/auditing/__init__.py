@@ -8,7 +8,6 @@ from pyramid.response import Response
 from BTrees.OOBTree import OOBTree
 from datetime import datetime
 from logging import getLogger
-from adhocracy_core.utils import get_user
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ChangelogMetadata
@@ -87,8 +86,8 @@ def audit_resources_changes_callback(request: Request,
                                      response: Response) -> None:
     """Add auditlog entries to the auditlog when the resources are changed.
 
-    This is a :term:`response- callback` that run after a request has
-    finished. To store the audit entry it adds an additional transaction.
+    This is a response-callback that runs after a request has finished. To
+    store the audit entry it adds an additional transaction.
     """
     registry = request.registry
     changelog_metadata = registry.changelog.values()
@@ -98,10 +97,8 @@ def audit_resources_changes_callback(request: Request,
 
 
 def _get_user_info(request: Request) -> (str, str):
-    if not hasattr(request, 'authenticated_userid'):
-        return ('', '')  # ease scripting without user and testing
-    user = get_user(request)
-    if user is None:
+    user = request.user
+    if user is None:  # ease scripting without user and testing
         return ('', '')
     else:
         user_name = request.registry.content.get_sheet_field(user,

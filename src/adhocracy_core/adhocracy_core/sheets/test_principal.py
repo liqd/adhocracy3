@@ -362,7 +362,7 @@ class TestPermissionsSchema:
         inst = self.make_one().bind(context=context)
         assert inst.serialize({}) == {'groups': [],
                                       'roles': [],
-                                      'roles_and_group_roles': []}
+                                      }
 
     def test_serialize_with_groups_and_roles(self, context, group, request_):
         context.roles = ['view']
@@ -373,7 +373,7 @@ class TestPermissionsSchema:
         assert inst.serialize(appstruct) == \
             {'groups': [request_.application_url + '/group/'],
              'roles': ['view'],
-             'roles_and_group_roles': ['admin', 'view']}
+             }
 
 
 class TestPermissionsSheet:
@@ -409,7 +409,6 @@ class TestPermissionsSheet:
     def test_get_empty(self, inst):
         assert inst.get() == {'groups': [],
                               'roles': [],
-                              'roles_and_group_roles': [],
                               }
 
     def test_set_groups(self, inst, context):

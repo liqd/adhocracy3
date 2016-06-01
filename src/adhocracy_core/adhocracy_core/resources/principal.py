@@ -1,6 +1,11 @@
 """Principal types (user/group) and helpers to search/get user information."""
 from logging import getLogger
+from pytz import timezone
 
+from pyramid.authentication import Authenticated
+from pyramid.authentication import Everyone
+from pyramid.authorization import Allow
+from pyramid.authorization import Deny
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 from pyramid.traversal import get_current_registry
@@ -90,8 +95,8 @@ class IUser(IPool):
     active = Attribute('Whether the user account has been activated (bool)')
     activation_path = Attribute(
         'Activation path for not-yet-activated accounts (str)')
-    roles = Attribute('List of :term:`role`s')
-    group_ids = Attribute('List of :term:`group_id`s')
+    roles = Attribute('List of :term:`roles <role>`')
+    group_ids = Attribute('List of :term:`groupids <groupid>`')
     # TODO: add `password` attribute, this may be set by the
     # password authentication sheet
 
@@ -116,8 +121,12 @@ class User(Pool):
         super().__init__(data, family)
         self.roles = []
         self.group_ids = []
-        """Readonly :term:`group_id`s for this user."""
+        """Readonly :term:`groupids <groupid>` for this user."""
         self.hidden = True
+
+    @property
+    def timezone(self):  # be compatible to substanced
+        return timezone(self.tzname)
 
     def activate(self, active: bool=True):
         """
@@ -153,7 +162,19 @@ user_meta = pool_meta._replace(
     element_types=(),  # we don't want the frontend to post resources here
     use_autonaming=True,
     permission_create='create_user',
+    is_sdi_addable=True
 )
+
+
+def allow_create_asset_authenticated(context: IPool,
+                                     registry: Registry,
+                                     options: dict):
+    """Set local permission to create assets for authenticated.
+
+    This is needed to assure user can create their user image.
+    """
+    acl = [(Allow, Authenticated, 'create_asset')]
+    set_acl(context, acl, registry=registry)
 
 
 class IUsersService(IServicePool):
@@ -168,6 +189,7 @@ users_meta = service_meta._replace(
     extended_sheets=(adhocracy_core.sheets.asset.IHasAssetPool,),
     after_creation=(add_badge_assignments_service,
                     add_assets_service,
+                    allow_create_asset_authenticated,
                     ),
 )
 
@@ -193,6 +215,7 @@ group_meta = pool_meta._replace(
                      ),
     element_types=(),  # we don't want the frontend to post resources here
     permission_create='create_group',
+    is_sdi_addable=True,
 )
 
 
@@ -211,7 +234,7 @@ groups_meta = service_meta._replace(
 def deny_view_permission(context: IResource, registry: Registry,
                          options: dict):
     """Remove view permission for everyone for `context`."""
-    acl = [('deny', 'system.Everyone', 'view')]
+    acl = [(Deny, Everyone, 'view')]
     set_acl(context, acl, registry=registry)
 
 
@@ -322,14 +345,14 @@ class UserLocatorAdapter(object):
                              .format(users_count, index_name, value))
 
     def get_groupids(self, userid: str) -> [str]:
-        """Get :term:`groupid`s for term:`userid` or return None."""
+        """Get :term:`groupids <groupid>` for term:`userid` or return None."""
         groups = self.get_groups(userid)
         if groups is None:
             return None
         return ['group:' + g.__name__ for g in groups]
 
     def get_groups(self, userid: str) -> [IGroup]:
-        """Get :term:`group`s for term:`userid` or return None."""
+        """Get :term:`groups <group>` for term:`userid` or return None."""
         user = self.get_user_by_userid(userid)
         if user is None:
             return
@@ -368,6 +391,20 @@ class UserLocatorAdapter(object):
             group_roleids = ['role:' + r for r in group.roles]
             roleids.update(group_roleids)
         return sorted(list(roleids))
+
+
+def get_user(request: Request) -> IUser:
+    """Get authenticated user, meant to use as request method 'user'."""
+    userid = request.authenticated_userid
+    if userid is None:
+        return None
+    adapter = request.registry.queryMultiAdapter((request.context, request),
+                                                 IRolesUserLocator)
+    if adapter is None:
+        return None
+    else:
+        user = adapter.get_user_by_userid(userid)
+        return user
 
 
 def groups_and_roles_finder(userid: str, request: Request) -> list:

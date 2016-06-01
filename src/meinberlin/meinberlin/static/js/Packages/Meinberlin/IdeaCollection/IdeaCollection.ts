@@ -13,9 +13,13 @@ import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comme
 import RIBuergerhaushaltProcess from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
 import RIBuergerhaushaltProposal from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal";
 import RIBuergerhaushaltProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
+import RIGeoProposal from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
+import RIGeoProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
+import RIIdeaCollectionProcess from "../../../Resources_/adhocracy_meinberlin/resources/idea_collection/IProcess";
 import RIKiezkasseProcess from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
 import RIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
 import RIKiezkasseProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
+import * as SIBadgeable from "../../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
 import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
@@ -31,19 +35,20 @@ export var workbenchDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/IdeaCollection.html",
         scope: {
+            hasSwotLabels: "=?",
             isBuergerhaushalt: "=?",
             isKiezkasse: "=?"
         },
         link: (scope) => {
-            var processType;
-            var proposalType;
-            var proposalVersionType;
+            var processType = RIIdeaCollectionProcess;
+            var proposalType = RIGeoProposal;
+            var proposalVersionType = RIGeoProposalVersion;
 
             if (scope.isKiezkasse) {
                 processType = RIKiezkasseProcess;
                 proposalType = RIKiezkasseProposal;
                 proposalVersionType = RIKiezkasseProposalVersion;
-            } else {
+            } else if (scope.isBuergerhaushalt) {
                 processType = RIBuergerhaushaltProcess;
                 proposalType = RIBuergerhaushaltProposal;
                 proposalVersionType = RIBuergerhaushaltProposalVersion;
@@ -90,7 +95,11 @@ export var workbenchDirective = (
 
 export var proposalDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhPermissions : AdhPermissions.Service
+    adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
+    $location : angular.ILocationService,
+    $window : Window
 ) => {
     return {
         restrict: "E",
@@ -99,6 +108,32 @@ export var proposalDetailColumnDirective = (
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
+
+            var badgeAssignmentPoolPath;
+            scope.$watch("proposalUrl", (proposalUrl) => {
+                if (proposalUrl) {
+                    adhHttp.get(proposalUrl).then((proposal) => {
+                        badgeAssignmentPoolPath = proposal.data[SIBadgeable.nick].post_pool;
+                    });
+                }
+            });
+            adhPermissions.bindScope(scope, () => badgeAssignmentPoolPath, "badgeAssignmentPoolOptions");
+
+            scope.hide = () => {
+                var proposalClass = RIGeoProposal;
+                if (scope.isKiezkasse) {
+                    proposalClass = RIKiezkasseProposal;
+                } else if (scope.isBuergerhaushalt) {
+                    proposalClass = RIBuergerhaushaltProposal;
+                }
+                // FIXME: translate
+                if ($window.confirm("Do you really want to delete this?")) {
+                    adhHttp.hide(AdhUtil.parentPath(scope.proposalUrl), proposalClass.content_type)
+                        .then(() => {
+                            adhTopLevelState.goToCameFrom("/");
+                        });
+                }
+            };
         }
     };
 };
@@ -182,15 +217,15 @@ export var registerRoutesFactory = (
     processType : string = "",
     context : string = ""
 ) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-    var ideaCollectionType;
-    var proposalType;
-    var proposalVersionType;
+    var ideaCollectionType = RIIdeaCollectionProcess;
+    var proposalType = RIGeoProposal;
+    var proposalVersionType = RIGeoProposalVersion;
 
     if (ideaCollection === RIKiezkasseProcess.content_type) {
         ideaCollectionType = RIKiezkasseProcess;
         proposalType = RIKiezkasseProposal;
         proposalVersionType = RIKiezkasseProposalVersion;
-    } else {
+    } else if (ideaCollection === RIBuergerhaushaltProcess.content_type) {
         ideaCollectionType = RIBuergerhaushaltProcess;
         proposalType = RIBuergerhaushaltProposal;
         proposalVersionType = RIBuergerhaushaltProposalVersion;

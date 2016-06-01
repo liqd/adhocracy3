@@ -12,6 +12,7 @@ from colander import Boolean as BooleanType
 from colander import DateTime as DateTimeType
 from colander import Decimal as DecimalType
 from colander import Function
+from colander import Float as FloatType
 from colander import Integer as IntegerType
 from colander import Invalid
 from colander import Length
@@ -23,6 +24,8 @@ from colander import String as StringType
 from colander import deferred
 from colander import drop
 from colander import null
+from deform.widget import DateTimeInputWidget
+from deform.widget import SequenceWidget
 from pyramid.path import DottedNameResolver
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
@@ -51,7 +54,8 @@ class SchemaNode(colander.SchemaNode):
 
     The constructor accepts these additional keyword arguments:
 
-        - ``readonly``: Disable deserialization. Default: False
+    readonly:
+        Disable deserialization. Default: False
     """
 
     readonly = False
@@ -82,6 +86,15 @@ class SequenceSchema(colander.SequenceSchema, SchemaNode):
     @deferred
     def default(node: SchemaNode, kw: dict) -> list:
         return []
+
+    @deferred
+    def widget(self, kw: dict):
+        """Customize SequenceWidget to work with readonly fields."""
+        widget = SequenceWidget()
+        if self.readonly:
+            widget.readonly = True
+            widget.deserialize = lambda x, y: null
+        return widget
 
 
 class MappingSchema(colander.MappingSchema, SchemaNode):
@@ -431,13 +444,15 @@ class ResourceObjectType(SchemaType):
         """Initialize self."""
         self.serialization_form = serialization_form
         """
-        :param:`serialization_form`:
-            If 'url` the :term:`request` binding is used to serialize
-            to the resource url.
-            If `path` the :term:`context` binding is used to  serialize to
-            the :term:`Resource Location` path.
-            If `content` the :term:`request` and  'context' binding is used to
-            serialize the complete resource content and metadata.
+        :param serialization_form:
+
+            -   If 'url` the :term:`request` binding is used to serialize
+                to the resource url.
+            -   If `path` the :term:`context` binding is used to  serialize to
+                the :term:`Resource Location` path.
+            -   If `content` the :term:`request` and 'context' binding is used
+                to serialize the complete resource content and metadata.
+
             Default `url`.
         """
 
@@ -666,13 +681,21 @@ class DateTime(SchemaNode):
 
     Constructor arguments:
 
-    :param 'tzinfo': This timezone is used if the :term:`cstruct` is missing
-                     the tzinfo. Defaults to UTC
+    :param tzinfo: This timezone is used if the :term:`cstruct` is missing
+                   the tzinfo. Defaults to UTC
     """
 
     schema_type = DateTimeType
     default = deferred_date_default
     missing = deferred_date_default
+
+    @deferred
+    def widget(self, kw: dict):
+        widget = DateTimeInputWidget()
+        schema = widget._pstruct_schema
+        schema['date_submit'].missing = null  # Fix readonly template bug
+        schema['time_submit'].missing = null
+        return widget
 
 
 class DateTimes(SequenceSchema):
@@ -712,7 +735,7 @@ class PostPool(Reference):
 
     Constructor arguments:
 
-    :param 'iresource_or_service_name`:
+    :param iresource_or_service_name:
         The resource interface/:term:`service` name of this
         :term:`post_pool`. If it is a :term:`interface` the
         :term:`lineage` of the `context` is searched for the first matching
@@ -731,8 +754,8 @@ class PostPool(Reference):
 def create_post_pool_validator(child_node: Reference, kw: dict) -> callable:
     """Create validator to check `kw['context']` is inside :term:`post_pool`.
 
-    :param:`child_node` Reference to a sheet with :term:`post_pool` field.
-    :param:`kw`: dictionary with keys `context` and `registry`.
+    :param child_node: Reference to a sheet with :term:`post_pool` field.
+    :param kw: dictionary with keys `context` and `registry`.
     """
     isheet = child_node.reftype.getTaggedValue('target_isheet')
     context = kw['context']
@@ -784,6 +807,26 @@ class Integers(SequenceSchema):
     """
 
     integer = Integer()
+
+
+class Float(SchemaNode):
+    """SchemaNode for Float values.
+
+    Example value: 1.234
+    """
+
+    schema_type = FloatType
+    default = 0.0
+    missing = drop
+
+
+class Floats(SequenceSchema):
+    """SchemaNode for a list of Float values.
+
+    Example value: [1.003, 2.0]
+    """
+
+    floats = Float()
 
 
 class FileStoreType(SchemaType):

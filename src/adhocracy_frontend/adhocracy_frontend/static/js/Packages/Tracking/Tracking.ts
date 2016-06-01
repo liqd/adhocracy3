@@ -46,7 +46,8 @@ export class Service {
 
     public trackPageView(url : string, title? : string) {
         if (this.trackingEnabled) {
-            this.$window._paq.push(["trackLink", url, "link"]);
+            this.$window._paq.push(["setDocumentTitle", url]);
+            this.$window._paq.push(["trackPageView"]);
         }
     }
 

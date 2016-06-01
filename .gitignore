@@ -68,7 +68,6 @@ src/pcompass/pcompass/build/
 src/s1/s1/build/
 src/spd/spd/build/
 src/euth/euth/build/
-src/aula/aula/build/
 /tmp
 /wheelhouse
 /share
@@ -77,3 +76,4 @@ RELEASE-VERSION
 *-requirements.txt
 /src/Mako/
 /styleguides
+src/deform

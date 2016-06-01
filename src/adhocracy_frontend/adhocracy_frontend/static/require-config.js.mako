@@ -37,9 +37,10 @@ require.config({
         markdownit: "../lib/markdown-it/dist/markdown-it.min",
         flow: "../lib/flow.js/dist/flow.min",
         leaflet: "../lib/leaflet/dist/leaflet",
+        leafletMarkerCluster: "../lib/leaflet.markercluster/dist/leaflet.markercluster",
         lodash: "../lib/lodash/dist/lodash.min",
         q: "../lib/q/q",
-        modernizr: "../lib2/modernizr/modernizr-2.8.3.min",
+        modernizr: "../lib2/modernizr/modernizr.min",
         moment: "../lib/moment/min/moment-with-locales.min",
         sticky: "../lib/relatively-sticky/jquery.relatively-sticky.min",
         socialSharePrivacy: "../lib/jquery.socialshareprivacy/jquery.socialshareprivacy.min",
@@ -84,6 +85,9 @@ require.config({
         },
         sticky: {
             deps: ["jquery"]
+        },
+        leafletMarkerCluster: {
+            deps: ["leaflet"]
         }
     }
 });

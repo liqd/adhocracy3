@@ -913,6 +913,25 @@ class TestLoginUserName:
         assert inst.options() == {}
 
 
+class TestSetSecureCookieFlag:
+
+    def call_fut(self, *args):
+        from .views import get_set_cookie_headers
+        return get_set_cookie_headers(*args)
+
+    def test_ignore_without_https(self, request_):
+        headers = [('Set-Cookie', 'value;'), ('X-User-Token', 'token')]
+        assert self.call_fut(headers, request_) == [('Set-Cookie',
+                                                     'value;')]
+
+    def test_set_secure_flag_with_https(self, request_):
+        request_.scheme = 'https'
+        headers = [('Set-Cookie', 'value;'), ('X-User-Token', 'token')]
+        self.call_fut(headers, request_)
+        assert self.call_fut(headers, request_) == [('Set-Cookie',
+                                                     'value;Secure;')]
+
+
 class TestLoginEmailView:
 
     @fixture

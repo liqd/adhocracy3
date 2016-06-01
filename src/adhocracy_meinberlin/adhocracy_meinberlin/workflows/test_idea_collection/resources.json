@@ -3,6 +3,50 @@
   "data": {"adhocracy_core.sheets.name.IName":
            {"name": "idea_collection"},
            "adhocracy_core.sheets.title.ITitle":
-           {"title": "Idea collection participation process"}
-          }}
+           {"title": "Idea collection participation process"},
+           "adhocracy_core.sheets.geo.ILocationReference":
+           {"location": "/locations/alt-treptow"}
+          }},
+ {"path": "/organisation/idea_collection/badges",
+  "content_type": "adhocracy_core.resources.badge.IParticipantsAssignableBadgeGroup",
+  "data": {"adhocracy_core.sheets.name.IName":
+            {"name": "categories"}
+           }
+ },
+ {"path": "/organisation/idea_collection/badges/categories",
+  "creator": "/principals/users/0000000",
+  "content_type": "adhocracy_core.resources.badge.IBadge",
+  "data": {"adhocracy_core.sheets.name.IName":
+           {"name": "strengths"},
+           "adhocracy_core.sheets.title.ITitle":
+           {"title": "Stärken"}
+          }
+ },
+ {"path": "/organisation/idea_collection/badges/categories",
+  "creator": "/principals/users/0000000",
+  "content_type": "adhocracy_core.resources.badge.IBadge",
+  "data": {"adhocracy_core.sheets.name.IName":
+           {"name": "weaknesses"},
+           "adhocracy_core.sheets.title.ITitle":
+           {"title": "Schwächen"}
+          }
+ },
+ {"path": "/organisation/idea_collection/badges/categories",
+  "creator": "/principals/users/0000000",
+  "content_type": "adhocracy_core.resources.badge.IBadge",
+  "data": {"adhocracy_core.sheets.name.IName":
+           {"name": "proposals"},
+           "adhocracy_core.sheets.title.ITitle":
+           {"title": "Vorschläge"}
+          }
+ },
+ {"path": "/organisation/idea_collection/badges/categories",
+  "creator": "/principals/users/0000000",
+  "content_type": "adhocracy_core.resources.badge.IBadge",
+  "data": {"adhocracy_core.sheets.name.IName":
+           {"name": "visions"},
+           "adhocracy_core.sheets.title.ITitle":
+           {"title": "Visionen"}
+          }
+ }
 ]

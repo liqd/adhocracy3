@@ -14,6 +14,7 @@ from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
 
+from adhocracy_core.authentication import UserTokenHeader
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
 from adhocracy_core.interfaces import error_entry
 from adhocracy_core.schema import References
@@ -29,10 +30,10 @@ logger = logging.getLogger(__name__)
 class JSONHTTPClientError(HTTPClientError):
     """HTTPException with json body to describe the exception.
 
-    :param:`errors`: error entries to generate the error description.
-    :param:`request`: Request causing the error to log debug information.
-    :param:`code`: http status code
-    :param:`title`: http status title
+    :param errors: error entries to generate the error description.
+    :param request: Request causing the error to log debug information.
+    :param code: http status code
+    :param title: http status title
 
     The body contains a dictionary with the following data structure:
 
@@ -96,7 +97,7 @@ def handle_error_x0x_exception(error, request):
 def handle_error_40x_exception(error, request):
     """Return JSON error for generic HTTPClientErrors.
 
-     If `error` is :class:`JSONHTTPClientError` it is
+    If `error` is :class:`JSONHTTPClientError` it is
     return without modifications.
     """
     if isinstance(error, JSONHTTPClientError):
@@ -179,8 +180,8 @@ def _get_filtered_request_headers(request) -> []:
     """Filter secret parts of the request headers."""
     headers = {}
     for key, value in request.headers.items():
-        if 'X-User-Token' in key:
-            headers['X-User-Token'] = '<hidden>'
+        if key in [UserTokenHeader, 'Cookie']:
+            headers[key] = '<hidden>'
         else:
             headers[key] = value
     return headers

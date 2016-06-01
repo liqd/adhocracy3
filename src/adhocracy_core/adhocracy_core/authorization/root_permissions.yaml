@@ -1,21 +1,20 @@
 principals:                         [everyone, authenticated, participant, moderator, creator, initiator, admin]
 permissions:
   # general
-  - [view,                           A,         A,             A,            A,         A,       A,         A] # default permission view resource sheets/field;  view a resource or show it in listings
-  - [create,                         ~,         ~,             A,            A,         ~,       A,         A] # default permission to create resource sheets/fields; general guard to create resources (POST requests)
+  - [view,                           A,         ~,             ~,            ~,         ~,       ~,         ~] # default permission view resource sheets/field;  view a resource or show it in listings
+  - [create,                         ~,         A,             ~,            ~,         ~,       ~,         ~] # default permission to create resource sheets/fields; general guard to create resources (POST requests)
   - [edit,                           ~,         ~,             ~,            ~,         A,       ~,         A] # default permission to edit resourche sheets/fields
-  - [edit_some,                      ~,         ~,             A,            A,         A,       A,         A] # General guard permission to edit non versionable resources (do put requests)
+  - [edit_some,                      ~,         A,             ~,            ~,         ~,       ~,         ~] # General guard permission to edit non versionable resources (do put requests)
   - [delete,                         ~,         ~,             ~,            A,         A,       ~,         A] # mark resources as "deleted"
-  - [hide,                           ~,         ~,             ~,            A,         ~,       A,         A] # mark resources as "hidden" because there are legal problems.
+  - [hide,                           ~,         ~,             ~,            ~,         ~,       ~,         A] # mark resources as "hidden" because there are legal problems.
   - [do_transition,                  ~,         ~,             ~,            ~,         ~,       A,         A] # default permission to do transition to next workflow state (phase)
-  - [message_to_user,                ~,         ~,             A,            A,         ~,       A,         A] # send message to user
+  - [message_to_user,                ~,         A,             ~,            ~,         ~,       ~,         ~] # send message to user
   - [report_abuse,                   A,         ~,             ~,            ~,         ~,       ~,         ~] # report abuse, resources that should be hidden
   # create structure
-  - [create_pool,                    ~,         ~,             ~,            ~,         ~,       ~,         A] # create pool
   - [create_organisation,            ~,         ~,             ~,            ~,         ~,       ~,         A] # create organisation
   - [create_process,                 ~,         ~,             ~,            ~,         ~,       A,         A] # create process
   # create process content
-  - [create_asset,                   ~,         ~,             A,            ~,         ~,       ~,         A] # create asset (image/file upload)
+  - [create_asset,                   ~,         ~,             ~,            ~,         ~,       ~,         A] # create asset (image/file upload)
   - [create_external,                ~,         ~,             A,            ~,         ~,       ~,         A] # create external (store external URL)
   - [create_proposal,                ~,         ~,             ~,            ~,         ~,       ~,         A] # create proposal
   - [create_document,                ~,         ~,             ~,            ~,         ~,       ~,         A] # create document
@@ -24,7 +23,7 @@ permissions:
   - [edit_rate,                      ~,         ~,             ~,            ~,         ~,       ~,         ~] # create rate version (edit for rates)
   # badges
   - [create_badge,                   ~,         ~,             ~,            A,         ~,       A,         A] # create badge
-  - [create_badge_assignment,        ~,         ~,             ~,            A,         ~,       A,         A] # create badge assingment
+  - [create_badge_assignment,        ~,         ~,             ~,            ~,         ~,       ~,         A] # create badge assingment
   - [create_badge_group,             ~,         ~,             ~,            A,         ~,       A,         A] # create badge group
   - [assign_badge,                   ~,         ~,             ~,            A,         ~,       A,         A] # assign a specific badge with a badge assignment resource
   # user, groups, permissions

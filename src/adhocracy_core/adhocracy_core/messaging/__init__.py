@@ -220,12 +220,12 @@ class Messenger:
                              ):
         """Send invitation email with link to reset the user password.
 
-        :param:`subject_tmpl`: pyramid asset pointing to a mako
-                               template file. If not set the translation
-                               message is used for the mail subject.
-        :param:`body_tmpl`: pyramid asset pointing to a mako
-                           template file. If not set the translation message
-                           is used for the mail body.
+        :param subject_tmpl: pyramid asset pointing to a mako
+                             template file. If not set the translation
+                             message is used for the mail subject.
+        :param body_tmpl: pyramid asset pointing to a mako
+                          template file. If not set the translation message
+                          is used for the mail body.
         """
         mapping = {'reset_url': self._build_reset_url(password_reset),
                    'user_name': user.name,
