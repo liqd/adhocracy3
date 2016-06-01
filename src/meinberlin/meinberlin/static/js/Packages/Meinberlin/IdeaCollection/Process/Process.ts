@@ -25,6 +25,43 @@ import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workfl
 
 var pkgLocation = "/Meinberlin/IdeaCollection/Process";
 
+var bindFacets = (
+    adhHttp: AdhHttp.Service<any>,
+    $q: angular.IQService
+) => (
+    scope
+): void => {
+    var params = {
+        elements: "content",
+        depth: 4,
+        content_type: "adhocracy_core.resources.badge.IBadge"
+    };
+    adhHttp.get(scope.path, params).then((response) => {
+        var badgePaths = _.map(response.data[SIPool.nick].elements, "path");
+        return $q.all(_.map(badgePaths, (b: string) => adhHttp.get(b).then(AdhBadge.extractBadge))).then((badges: any) => {
+            var groupPaths: string[] = _.union.apply(_, _.map(badges, "groups"));
+            return $q.all(_.map(groupPaths, (g) => adhHttp.get(g))).then((result) => {
+                scope.badgeGroups = _.keyBy(_.map(result, AdhBadge.extractGroup), "path");
+                scope.badgesByGroup = AdhBadge.collectBadgesByGroup(groupPaths, badges);
+                _.forOwn(scope.badgeGroups, (group, groupPath) => {
+                    var items = [];
+                    _.forOwn(scope.badgesByGroup[groupPath], (badge) => {
+                        items.push({
+                            key: badge.name,
+                            name: badge.title
+                        });
+                    });
+                    scope.facets.push({
+                        key: "badge",
+                        name: group.title,
+                        items: items
+                    });
+                });
+            });
+        });
+    });
+};
+
 
 export var detailDirective = (
     adhConfig : AdhConfig.IService,
@@ -43,40 +80,7 @@ export var detailDirective = (
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             scope.facets = [];
-            var params = {
-                elements: "content",
-                depth: 4,
-                content_type: "adhocracy_core.resources.badge.IBadge"
-            };
-            adhHttp.get(scope.path, params).then((response) => {
-                var badgePaths = _.map(response.data[SIPool.nick].elements, "path");
-                $q.all(_.map(badgePaths, (b : string) => adhHttp.get(b).then(extractBadge))).then((badges : any) => {
-                    scope.badges = _.keyBy(badges, "path");
-                    var groupPaths: string[] = _.union.apply(_, _.map(badges, "groups"));
-                    return $q.all(_.map(groupPaths, (g) => adhHttp.get(g))).then((result) => {
-                        scope.badgeGroups = _.keyBy(_.map(result, extractGroup), "path");
-                        scope.badgesByGroup = collectBadgesByGroup(groupPaths, badges);
-                        _.forOwn(scope.badgeGroups, (v, group) => {
-                            adhHttp.get(group).then((g) => {
-                                var items = [];
-                                _.forOwn(scope.badgesByGroup[group], (badge) => {
-                                    adhHttp.get(badge).then((b) => {
-                                        items.push({
-                                            key: extractBadge(b).name,
-                                            name: extractBadge(b).title
-                                        });
-                                    });
-                                });
-                                scope.facets.push({
-                                    key: "badge",
-                                    name: extractGroup(g).title,
-                                    items: items
-                                });
-                            });
-                        });
-                    });
-                });
-            });
+            bindFacets(adhHttp, $q)(scope);
 
             scope.sorts = [{
                 key: "rates",
