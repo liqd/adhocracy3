@@ -74,6 +74,35 @@ export var getBadgesFactory = (
     }
 };
 
+export var extractBadge = (badge) => {
+    return {
+        name: badge.data[SIName.nick].name,
+        title: badge.data[SITitle.nick].title,
+        path: badge.path,
+        groups: badge.data[SIBadge.nick].groups
+    };
+};
+
+export var extractGroup = (group) => {
+    return {
+        name: group.data[SIName.nick].name,
+        title: group.data[SITitle.nick].title,
+        path: group.path
+    };
+};
+
+export var collectBadgesByGroup = (groupPaths, badges) => {
+    var badgesByGroup = {};
+    _.forEach(groupPaths, (groupPath) => {
+        badgesByGroup[groupPath] = [];
+        _.forOwn(badges, (badge) => {
+            if (_.includes(badge.groups, groupPath)) {
+                badgesByGroup[groupPath].push(badge);
+            }
+        });
+    });
+    return badgesByGroup;
+};
 
 var bindPath = (
     adhHttp : AdhHttp.Service<any>,
@@ -85,34 +114,6 @@ var bindPath = (
     scope.data = {
         badge: "",
         description: ""
-    };
-
-    var extractBadge = (badge) => {
-        return {
-            title: badge.data[SITitle.nick].title,
-            path: badge.path,
-            groups: badge.data[SIBadge.nick].groups
-        };
-    };
-
-    var extractGroup = (group) => {
-        return {
-            title: group.data[SITitle.nick].title,
-            path: group.path
-        };
-    };
-
-    var collectBadgesByGroup = (groupPaths, badges) => {
-        var badgesByGroup = {};
-        _.forEach(groupPaths, (groupPath) => {
-            badgesByGroup[groupPath] = [];
-            _.forOwn(badges, (badge) => {
-                if (_.includes(badge.groups, groupPath)) {
-                    badgesByGroup[groupPath].push(badge.path);
-                }
-            });
-        });
-        return badgesByGroup;
     };
 
     var getAssignableBadges = (rawOptions) : angular.IPromise<any> => {
