@@ -43,7 +43,7 @@ Frontend Technical Admin Interface (substanced)
       group resource_handling {
         label = "Resource Handling"
         registry;resource;
-      }rchitecture/index.html
+      }
 
     }
 

@@ -54,7 +54,8 @@ class SchemaNode(colander.SchemaNode):
 
     The constructor accepts these additional keyword arguments:
 
-        - ``readonly``: Disable deserialization. Default: False
+    readonly:
+        Disable deserialization. Default: False
     """
 
     readonly = False
@@ -443,13 +444,15 @@ class ResourceObjectType(SchemaType):
         """Initialize self."""
         self.serialization_form = serialization_form
         """
-        :param:`serialization_form`:
-            If 'url` the :term:`request` binding is used to serialize
-            to the resource url.
-            If `path` the :term:`context` binding is used to  serialize to
-            the :term:`Resource Location` path.
-            If `content` the :term:`request` and  'context' binding is used to
-            serialize the complete resource content and metadata.
+        :param serialization_form:
+
+            -   If 'url` the :term:`request` binding is used to serialize
+                to the resource url.
+            -   If `path` the :term:`context` binding is used to  serialize to
+                the :term:`Resource Location` path.
+            -   If `content` the :term:`request` and 'context' binding is used
+                to serialize the complete resource content and metadata.
+
             Default `url`.
         """
 
@@ -678,8 +681,8 @@ class DateTime(SchemaNode):
 
     Constructor arguments:
 
-    :param 'tzinfo': This timezone is used if the :term:`cstruct` is missing
-                     the tzinfo. Defaults to UTC
+    :param tzinfo: This timezone is used if the :term:`cstruct` is missing
+                   the tzinfo. Defaults to UTC
     """
 
     schema_type = DateTimeType
@@ -732,7 +735,7 @@ class PostPool(Reference):
 
     Constructor arguments:
 
-    :param 'iresource_or_service_name`:
+    :param iresource_or_service_name:
         The resource interface/:term:`service` name of this
         :term:`post_pool`. If it is a :term:`interface` the
         :term:`lineage` of the `context` is searched for the first matching
@@ -751,8 +754,8 @@ class PostPool(Reference):
 def create_post_pool_validator(child_node: Reference, kw: dict) -> callable:
     """Create validator to check `kw['context']` is inside :term:`post_pool`.
 
-    :param:`child_node` Reference to a sheet with :term:`post_pool` field.
-    :param:`kw`: dictionary with keys `context` and `registry`.
+    :param child_node: Reference to a sheet with :term:`post_pool` field.
+    :param kw: dictionary with keys `context` and `registry`.
     """
     isheet = child_node.reftype.getTaggedValue('target_isheet')
     context = kw['context']

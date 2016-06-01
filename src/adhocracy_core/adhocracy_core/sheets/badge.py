@@ -160,8 +160,8 @@ def create_unique_badge_assignment_validator(badge_ref: Reference,
     Badge assignments is considered unique if there is at most one for each
     badge in :term:`post_pool`.
 
-    :param:`badge` Reference to a sheet with :term:`post_pool` field.
-    :param:`kw`: dictionary with keys `context` and `registry`.
+    :param badge: Reference to a sheet with :term:`post_pool` field.
+    :param kw: dictionary with keys `context` and `registry`.
     """
     context = kw['context']
     registry = kw['registry']

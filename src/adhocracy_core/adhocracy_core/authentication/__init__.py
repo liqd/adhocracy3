@@ -234,7 +234,7 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
 def validate_user_headers(view: callable):
     """Decorator vor :term:`view` to check if the user token.
 
-    :raise `pyramid.httpexceptions.HTTPBadRequest: if user token is invalid
+    :raise pyramid.httpexceptions.HTTPBadRequest: if user token is invalid
     """
     def wrapped_view(context, request):
         token_is_set = UserTokenHeader in request.headers

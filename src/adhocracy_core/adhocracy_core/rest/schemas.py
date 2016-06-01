@@ -779,12 +779,13 @@ class GETPoolRequestSchema(MappingSchema):
                              validator=deferred_validate_aggregateby)
 
     def deserialize(self, cstruct=null):  # noqa
-        """ Deserialize the :term:`cstruct` into an :term:`appstruct`.
+        """Deserialize the :term:`cstruct` into an :term:`appstruct`.
 
         Adapt key/values to :class:`adhocracy_core.interfaces.SearchQuery`. for
         BBB.
-        TODO: CHANGE API according to internal SearchQuery api.
-             refactor to follow coding guideline better.
+
+        TODO: Change API according to internal SearchQuery api.
+        refactor to follow coding guideline better.
         """
         depth_cstruct = cstruct.get('depth', None)
         if depth_cstruct == 'all':
