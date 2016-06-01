@@ -3,6 +3,7 @@
 
 import * as _ from "lodash";
 
+import * as AdhBadge from "../../../Badge/Badge";
 import * as AdhConfig from "../../../Config/Config";
 import * as AdhHttp from "../../../Http/Http";
 import * as AdhMovingColumns from "../../../MovingColumns/MovingColumns";
@@ -14,8 +15,6 @@ import RIBuergerhaushaltProposalVersion from "../../../../Resources_/adhocracy_m
 import RIGeoProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
 import RIKiezkasseProposalVersion from "../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
 
-
-import * as SIBadge from "../../../../Resources_/adhocracy_core/sheets/badge/IBadge";
 import * as SIImageReference from "../../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SILocationReference from "../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
 import * as SIMultiPolygon from "../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
@@ -33,36 +32,6 @@ export var detailDirective = (
     adhPermissions : AdhPermissions.Service,
     $q : angular.IQService
 ) => {
-    var extractBadge = (badge) => {
-        return {
-            name: badge.data[SIName.nick].name,
-            title: badge.data[SITitle.nick].title,
-            path: badge.path,
-            groups: badge.data[SIBadge.nick].groups
-        };
-    };
-
-    var extractGroup = (group) => {
-        return {
-            name: group.data[SIName.nick].name,
-            title: group.data[SITitle.nick].title,
-            path: group.path
-        };
-    };
-
-    var collectBadgesByGroup = (groupPaths, badges) => {
-        var badgesByGroup = {};
-        _.forEach(groupPaths, (groupPath) => {
-            badgesByGroup[groupPath] = [];
-            _.forOwn(badges, (badge) => {
-                if (_.includes(badge.groups, groupPath)) {
-                    badgesByGroup[groupPath].push(badge.path);
-                }
-            });
-        });
-        return badgesByGroup;
-    };
-
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
