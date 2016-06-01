@@ -104,7 +104,7 @@ def get_local_roles(resource) -> dict:
 def get_local_roles_all(resource) -> dict:
     """Return the :term:`local roles <local role>` of the resource and its parents.
 
-    The `creator`role is not inherited by children.
+    The `creator` role is not inherited by children.
     """
     local_roles_all = defaultdict(set)
     local_roles_all.update(get_local_roles(resource))
@@ -165,7 +165,7 @@ def set_acms_for_app_root(event):
                   That way everytime the application starts the root `acm`
                   is updated.
 
-    The `root_acm`(:func:`root_acm_asset`) is extended by the :term:`acm`
+    The `root_acm` (:func:`root_acm_asset`) is extended by the :term:`acm`
     returned by the :class:`adhocracy_core.authorization.IRootACMExtension`
     adapter.
 

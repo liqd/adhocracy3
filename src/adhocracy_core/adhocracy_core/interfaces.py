@@ -859,7 +859,7 @@ class Reference(namedtuple('Reference', 'source isheet field target')):
 
 
 class HTTPCacheMode(Enum):
-    """Caching Mode for :class:`IHTTPCacheStrategy`s.
+    """Caching Mode for :class:`IHTTPCacheStrategy`.
 
     You can change the mode in you pyramid ini file with the
     `adhocracy_core.caching.http.mode` setting.
