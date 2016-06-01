@@ -12,7 +12,7 @@
   "data": {"adhocracy_core.sheets.name.IName":
             {"name": "categories"},
            "adhocracy_core.sheets.title.ITitle":
-           {"title": "TR__MEINBERLIN_IDEA_COLLECTION_CATEGORIES"}
+           {"title": "Kategorien"}
            }
  },
  {"path": "/organisation/idea_collection/badges/categories",
@@ -21,7 +21,7 @@
   "data": {"adhocracy_core.sheets.name.IName":
            {"name": "strengths"},
            "adhocracy_core.sheets.title.ITitle":
-           {"title": "TR__MEINBERLIN_IDEA_COLLECTION_CATEGORIES_STRENGTHS"}
+           {"title": "Stärken"}
           }
  },
  {"path": "/organisation/idea_collection/badges/categories",
@@ -30,7 +30,7 @@
   "data": {"adhocracy_core.sheets.name.IName":
            {"name": "weaknesses"},
            "adhocracy_core.sheets.title.ITitle":
-           {"title": "TR__MEINBERLIN_IDEA_COLLECTION_CATEGORIES_WEAKNESSES"}
+           {"title": "Schwächen"}
           }
  },
  {"path": "/organisation/idea_collection/badges/categories",
@@ -39,7 +39,7 @@
   "data": {"adhocracy_core.sheets.name.IName":
            {"name": "proposals"},
            "adhocracy_core.sheets.title.ITitle":
-           {"title": "TR__MEINBERLIN_IDEA_COLLECTION_CATEGORIES_PROPOSALS"}
+           {"title": "Vorschläge"}
           }
  },
  {"path": "/organisation/idea_collection/badges/categories",
@@ -48,7 +48,7 @@
   "data": {"adhocracy_core.sheets.name.IName":
            {"name": "visions"},
            "adhocracy_core.sheets.title.ITitle":
-           {"title": "TR__MEINBERLIN_IDEA_COLLECTION_CATEGORIES_VISIONS"}
+           {"title": "Visionen"}
           }
  }
 ]
