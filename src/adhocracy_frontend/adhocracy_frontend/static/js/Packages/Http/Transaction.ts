@@ -114,7 +114,7 @@ export class Transaction {
         };
     }
 
-    public commit(config = {}) : angular.IPromise<ResourcesBase.IResource[]> {
+    public commit(config = {}) : angular.IPromise<any[]> {
         var _self = this;
 
         this.checkNotCommitted();
@@ -129,7 +129,7 @@ export class Transaction {
         return this.adhHttp.postRaw("/batch", this.requests.map(conv), config).then(
             (response) => {
                 var imported = AdhConvert.importBatchResources(
-                    response.data.responses, this.adhMetaApi, this.adhPreliminaryNames, this.adhCache);
+                    this.requests, response.data.responses, this.adhMetaApi, this.adhPreliminaryNames, this.adhCache);
                 _self.adhCache.invalidateUpdated(response.data.updated_resources, <string[]>_.map(imported, "path"));
                 return imported;
             },
