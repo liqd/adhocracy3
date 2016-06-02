@@ -13,6 +13,7 @@ from zope.interface.interfaces import IInterface
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import ISheetReferenceNewVersion
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
+from adhocracy_core.interfaces import IResourceWillBeDeleted
 from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.interfaces import ILocalRolesModfied
 from adhocracy_core.interfaces import ISheet
@@ -36,6 +37,22 @@ class ResourceCreatedAndAdded:
         self.parent = parent
         self.registry = registry
         self.creator = creator
+
+
+@implementer(IResourceWillBeDeleted)
+class ResourceWillBeDeleted:
+    """An event type sent when a IResource will be deleted.
+
+    :param object(adhocracy_core.interfaces.IResource):
+    :param parent(adhocracy_core.interfaces.IResource):
+    :param registry(pyramid.registry.Registry):
+    """
+
+    def __init__(self, object, parent, registry):
+        """Initialize self."""
+        self.object = object
+        self.parent = parent
+        self.registry = registry
 
 
 @implementer(IResourceSheetModified)

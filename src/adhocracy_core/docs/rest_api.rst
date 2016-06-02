@@ -254,7 +254,7 @@ JSON object that has the allowed request methods as keys::
 
     >>> resp_data = testapp.options(rest_url + "/", headers=god_header).json
     >>> sorted(resp_data.keys())
-    ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
+    ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
 
 If a GET, POST, or PUT request is allowed, the corresponding key will point
 to an object that contains at least "request_body" and "response_body" as
@@ -390,7 +390,7 @@ The response object has 3 top-level entries:
   contains a reference to its creator.
 
   The subkey 'removed' lists any resources that have been removed
-  by marking them as deleted or hidden (see :doc:`deletion`)::
+  by marking them as hidden (see :doc:`deletion`)::
 
       >>> resp_data['updated_resources']['removed']
       []

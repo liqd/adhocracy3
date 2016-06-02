@@ -9,7 +9,6 @@ import * as ResourcesBase from "../../ResourcesBase";
 
 import RIParagraph from "../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
 import * as SITags from "../../Resources_/adhocracy_core/sheets/tags/ITags";
-import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 
 import * as Convert from "./Convert";
 import * as Error from "./Error";
@@ -458,7 +457,7 @@ export var register = () => {
                         post2 = httpTrans.post("/post/path/2", <any>{
                             content_type: RIParagraph.content_type
                         });
-                        delete1 = httpTrans.delete("/delete/path", RIParagraph.content_type);
+                        delete1 = httpTrans.delete("/delete/path");
                         get2 = httpTrans.get(post1.path);
                         return httpTrans.commit();
                     }).then(
@@ -521,10 +520,9 @@ export var register = () => {
                 });
 
                 describe("delete", () => {
-                    it("sets the delete flag", () => {
-                        expect(request[delete1.index].body.data[SIMetadata.nick]).toBeDefined();
-                        expect(request[delete1.index].body.data[SIMetadata.nick].deleted).toBeDefined();
-                        expect(request[delete1.index].body.data[SIMetadata.nick].deleted).toBe(true);
+                    it("uses the DELETE method", () => {
+                        expect(request[delete1.index].body).not.toBeDefined();
+                        expect(request[delete1.index].method).toBe("DELETE");
                     });
                 });
             });

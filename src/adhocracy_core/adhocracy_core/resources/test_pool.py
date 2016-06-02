@@ -102,3 +102,20 @@ class TestPoolClass:
         inst['service'] = service
         service = inst.find_service('service')
         assert service is inst['service']
+
+    def test_delete_removes_subresource(self, registry, context):
+        inst = self._makeOne()
+        inst['child'] = context
+        inst.delete('child', registry)
+        assert 'child' not in inst
+
+    def test_delete_sends_deleted_event(self, config, registry, context):
+        from adhocracy_core.testing import create_event_listener
+        from adhocracy_core.events import IResourceWillBeDeleted
+        deleted_listener = create_event_listener(config, IResourceWillBeDeleted)
+        inst = self._makeOne()
+        inst['child'] = context
+        inst.delete('child', registry)
+        event = deleted_listener[0]
+        assert event.parent == inst
+        assert event.object == context

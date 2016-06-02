@@ -201,7 +201,7 @@ export var badgeAssignment = (
                                     };
                                     transaction.post(scope.poolPath, assignment);
                                 } else if (!checked && assignmentExisted) {
-                                    transaction.delete(scope.assignments[badgePath].path, RIBadgeAssignment.content_type);
+                                    transaction.delete(scope.assignments[badgePath].path);
                                 }
                             });
 
