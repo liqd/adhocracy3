@@ -53,6 +53,7 @@ export interface IOptions {
     GET : boolean;
     POST : boolean;
     HEAD : boolean;
+    DELETE : boolean;
     delete : boolean;
     hide : boolean;
     canPost(contentType : string) : boolean;
@@ -66,6 +67,7 @@ export var emptyOptions : IOptions = {
     GET: false,
     POST: false,
     HEAD: false,
+    DELETE: false,
     delete: false,
     hide: false,
     canPost: (contentType) => false,
@@ -143,6 +145,7 @@ export class Service<R extends ResourcesBase.IResource> {
             GET: !!raw.data.GET,
             POST: !!raw.data.POST,
             HEAD: !!raw.data.HEAD,
+            DELETE: !!raw.data.DELETE,
             delete: Boolean(metadata && _.has(metadata, "deleted")),
             hide: Boolean(metadata && _.has(metadata, "hidden")),
             canPost: (contentType : string) => {
