@@ -268,7 +268,7 @@ export class Service<R extends ResourcesBase.IResource> {
 
     public delete(path : string, config : IHttpConfig = {}) : angular.IPromise<any> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
-            throw "attempt to http-put preliminary path: " + path;
+            throw "attempt to http-delete preliminary path: " + path;
         }
         path = this.formatUrl(path);
         var headers = this.parseConfig(config);
