@@ -19,8 +19,10 @@ import RIIdeaCollectionProcess from "../../../Resources_/adhocracy_meinberlin/re
 import RIKiezkasseProcess from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
 import RIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
 import RIKiezkasseProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
+import * as SIBadge from "../../../Resources_/adhocracy_core/sheets/badge/IBadge";
 import * as SIBadgeable from "../../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
 import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
+import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 export var pkgLocation = "/Meinberlin/IdeaCollection";
@@ -117,6 +119,14 @@ export var proposalDetailColumnDirective = (
                 }
             });
             adhPermissions.bindScope(scope, () => badgeAssignmentPoolPath, "badgeAssignmentPoolOptions");
+            var params = {
+                elements: "content",
+                depth: 4,
+                content_type: SIBadge.nick
+            };
+            adhHttp.get(scope.processUrl, params).then((response) => {
+                scope.badgesExist = response.data[SIPool.nick].elements.length > 0;
+            });
 
             scope.hide = () => {
                 var proposalClass = RIGeoProposal;
