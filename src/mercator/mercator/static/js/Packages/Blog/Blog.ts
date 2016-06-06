@@ -5,7 +5,6 @@ import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as AdhUtil from "../Util/Util";
 
-import RIDocument from "../../Resources_/adhocracy_core/resources/document/IDocument";
 import RIDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
 
 var pkgLocation = "/Blog";
@@ -102,7 +101,7 @@ export var detailDirective = (
             scope.delete = () => {
                 if ($window.confirm("Do you really want to delete this?")) {
                     var itemPath = AdhUtil.parentPath(scope.path);
-                    adhHttp.delete(itemPath, RIDocument.content_type)
+                    adhHttp.delete(itemPath)
                         .then(() => {
                             if (typeof scope.onChange !== "undefined") {
                                 scope.onChange();

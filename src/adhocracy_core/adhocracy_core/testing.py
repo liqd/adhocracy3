@@ -115,6 +115,12 @@ class DummyPool(testing.DummyResource):
         from substanced.util import find_service
         return find_service(self, service_name, *sub_service_names)
 
+    def delete(self, name, registry):
+        subresource = self[name]
+        del self[name]
+        subresource.__name__ = None
+        subresource.__parent__ = None
+
 
 def register_sheet(context, mock_sheet, registry, isheet=None) -> Mock:
     """Register `mock_sheet` for `context`. You can ony use this only once.
@@ -846,6 +852,14 @@ class AppUser:
                             headers=self.header,
                             params=params,
                             expect_errors=True)
+        return resp
+
+    def delete(self, path: str) -> TestResponse:
+        """Send delete request to the backend rest server."""
+        url = self._build_url(path)
+        resp = self.app.delete(url,
+                               headers=self.header,
+                               expect_errors=True)
         return resp
 
     def options(self, path: str) -> TestResponse:

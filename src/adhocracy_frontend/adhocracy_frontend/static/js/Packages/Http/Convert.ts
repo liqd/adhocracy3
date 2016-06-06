@@ -167,13 +167,17 @@ export var importResource = <R extends ResourcesBase.IResource>(
  * far.
  */
 export var importBatchResources = (
+    requests : any[],
     responses,
     metaApi : AdhMetaApi.Service,
     preliminaryNames : AdhPreliminaryNames.Service,
     adhCache : AdhCache.Service
-) : ResourcesBase.IResource[] => {
+) : any[] => {
 
-    return responses.map((response) => {
+    return responses.map((response, index) => {
+        if (requests[index].method === "DELETE") {
+            return { path: requests[index].path };
+        }
         response.data = response.body;
         delete response.body;
         return importResource(response, metaApi, preliminaryNames, adhCache);

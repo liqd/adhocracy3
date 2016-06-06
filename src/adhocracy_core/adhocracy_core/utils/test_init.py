@@ -227,6 +227,14 @@ class TestGetVisibilityChange:
         event.new_appstruct = {'deleted': False, 'hidden': False}
         assert self.call_fut(event) == VisibilityChange.visible
 
+    def test_return_invisible_if_deleted_event(self, context, pool):
+        from adhocracy_core.events import ResourceWillBeDeleted
+        from adhocracy_core.interfaces import VisibilityChange
+        event = ResourceWillBeDeleted(object=context,
+                                      parent=pool,
+                                      registry=None)
+        assert self.call_fut(event) == VisibilityChange.concealed
+
 
 def test_get_modification_date_not_cached():
     """The shared modification date is cached."""

@@ -8,8 +8,6 @@ import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 
 import * as ResourcesBase from "../../ResourcesBase";
 
-import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
-
 import * as AdhCache from "./Cache";
 import * as AdhConvert from "./Convert";
 import * as AdhError from "./Error";
@@ -63,20 +61,12 @@ export class Transaction {
         };
     }
 
-    public delete(path : string, contentType : string) : ITransactionResult {
+    public delete(path : string) : ITransactionResult {
         this.checkNotCommitted();
-        var request = {
-            method: "PUT",
-            path: path,
-            body: {
-                content_type: contentType,
-                data : {}
-            }
-        };
-        request.body.data[SIMetadata.nick] = {
-            deleted: true
-        };
-        this.requests.push(request);
+        this.requests.push({
+            method: "DELETE",
+            path: path
+        });
         return {
             index: this.requests.length - 1,
             path: path
@@ -124,7 +114,7 @@ export class Transaction {
         };
     }
 
-    public commit(config = {}) : angular.IPromise<ResourcesBase.IResource[]> {
+    public commit(config = {}) : angular.IPromise<any[]> {
         var _self = this;
 
         this.checkNotCommitted();
@@ -139,7 +129,7 @@ export class Transaction {
         return this.adhHttp.postRaw("/batch", this.requests.map(conv), config).then(
             (response) => {
                 var imported = AdhConvert.importBatchResources(
-                    response.data.responses, this.adhMetaApi, this.adhPreliminaryNames, this.adhCache);
+                    this.requests, response.data.responses, this.adhMetaApi, this.adhPreliminaryNames, this.adhCache);
                 _self.adhCache.invalidateUpdated(response.data.updated_resources, <string[]>_.map(imported, "path"));
                 return imported;
             },

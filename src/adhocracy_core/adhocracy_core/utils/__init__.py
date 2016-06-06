@@ -8,6 +8,7 @@ import time
 import json
 
 from colander import Schema
+from multipledispatch import dispatch
 
 from pyramid.compat import is_nonstr_iter
 from pyramid.location import lineage
@@ -24,7 +25,8 @@ from zope.interface.interfaces import IInterface
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import VisibilityChange
-from adhocracy_core.interfaces import IResourceSheetModified
+from adhocracy_core.events import ResourceWillBeDeleted
+from adhocracy_core.events import ResourceSheetModified
 
 
 def find_graph(context) -> object:
@@ -251,8 +253,10 @@ def extract_events_from_changelog_metadata(meta: ChangelogMetadata) -> list:
     return events
 
 
-def get_visibility_change(event: IResourceSheetModified) -> VisibilityChange:
+@dispatch(ResourceSheetModified)
+def get_visibility_change(event):
     """Return changed visbility for `event.object`."""
+
     is_deleted = event.new_appstruct.get('deleted', False)
     is_hidden = event.new_appstruct.get('hidden', False)
     was_deleted = event.old_appstruct['deleted']
@@ -269,6 +273,12 @@ def get_visibility_change(event: IResourceSheetModified) -> VisibilityChange:
             return VisibilityChange.revealed
         else:
             return VisibilityChange.invisible
+
+
+@dispatch(ResourceWillBeDeleted)  # flake8: noqa
+def get_visibility_change(event):
+    """Return changed visbility for `event.object`."""
+    return VisibilityChange.concealed
 
 
 def now() -> datetime:

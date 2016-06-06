@@ -7,6 +7,7 @@ from substanced.event import ACLModified
 
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import IResourceWillBeDeleted
 from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import ISheetBackReferenceModified
@@ -139,3 +140,5 @@ def includeme(config):
     config.add_subscriber(add_changelog_visibility,
                           IResourceSheetModified,
                           event_isheet=IMetadata)
+    config.add_subscriber(add_changelog_visibility,
+                          IResourceWillBeDeleted)

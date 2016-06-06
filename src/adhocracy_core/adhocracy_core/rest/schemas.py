@@ -269,6 +269,12 @@ class ResourceResponseSchema(ResourcePathSchema):
     updated_resources = UpdatedResourcesSchema()
 
 
+class DELETEResourceResponseSchema(MappingSchema):
+    """Data structure for Resource Delete requests."""
+
+    updated_resources = UpdatedResourcesSchema()
+
+
 class ItemResponseSchema(ResourceResponseSchema):
     """Data structure for responses of IItem requests."""
 
@@ -647,7 +653,7 @@ class POSTMessageUserViewRequestSchema(MappingSchema):
 class BatchHTTPMethod(SingleLine):
     """An HTTP method in a batch request."""
 
-    validator = OneOf(['GET', 'POST', 'PUT', 'OPTIONS'])
+    validator = OneOf(['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE'])
     missing = required
 
 
@@ -1247,7 +1253,9 @@ options_resource_response_data_dict =\
      'PUT': {'request_body': {'content_type': '',
                               'data': {}},
              'response_body': {'content_type': '',
-                               'path': ''}}}
+                               'path': ''}},
+     'DELETE': {},
+     }
 
 
 @deferred

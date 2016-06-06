@@ -116,8 +116,8 @@ that has been subscribed.
 
         { "event": "removed", "resource": "RESOURCE_PATH" }
 
-    In practice this usually means that the resource has been marked as deleted
-    or hidden (see :doc:`deletion`).
+    In practice this usually means that the resource has been deleted or marked
+    hidden (see :doc:`deletion`).
 
 * If resource is a Pool:
 
@@ -145,8 +145,8 @@ that has been subscribed.
           "resource": "RESOURCE_PATH",
           "child": "CHILD_RESOURCE_PATH" }
 
-    In practice this usually means that the resource has been marked as deleted
-    or hidden (see :doc:`deletion`).
+    In practice this usually means that the resource has been deleted or
+    marked as hidden (see :doc:`deletion`).
 
   * If a child (sub-Pool or Item) in the Pool is modified::
 
@@ -207,7 +207,7 @@ that has been subscribed.
 A note about resource removal: if a resource is removed (deleted or hidden),
 any subscribers to it will automatically be unsubscribed, so they won't
 receive further updates about this resource, even if it later "revealed"
-(unhidden or undeleted) again. Subscribers to the parent pool will receive a
+(unhidden) again. Subscribers to the parent pool will receive a
 "new_child" or "new_version" message notifying them about the revealed
 resource just as if it had been newly created.
 
