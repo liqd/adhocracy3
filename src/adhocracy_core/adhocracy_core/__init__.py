@@ -96,6 +96,7 @@ def add_request_callbacks(request):
 def includeme(config):
     """Setup basic adhocracy."""
     settings = config.registry.settings
+    config.include('deform_markdown')
     config.include('pyramid_zodbconn')
     config.include('pyramid_mako')
     config.include('pyramid_chameleon')
