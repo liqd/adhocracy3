@@ -120,12 +120,12 @@ export var proposalDetailColumnDirective = (
             });
             adhPermissions.bindScope(scope, () => badgeAssignmentPoolPath, "badgeAssignmentPoolOptions");
             var params = {
-                elements: "content",
+                elements: "omit",
                 depth: 4,
                 content_type: SIBadge.nick
             };
             adhHttp.get(scope.processUrl, params).then((response) => {
-                scope.badgesExist = response.data[SIPool.nick].elements.length > 0;
+                scope.badgesExist = response.data[SIPool.nick].count > 0;
             });
 
             scope.hide = () => {
