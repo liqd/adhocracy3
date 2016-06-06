@@ -54,7 +54,6 @@ export interface IOptions {
     POST : boolean;
     HEAD : boolean;
     DELETE : boolean;
-    delete : boolean;
     hide : boolean;
     canPost(contentType : string) : boolean;
     canPut(sheetNick : string) : boolean;
@@ -68,7 +67,6 @@ export var emptyOptions : IOptions = {
     POST: false,
     HEAD: false,
     DELETE: false,
-    delete: false,
     hide: false,
     canPost: (contentType) => false,
     canPut: (sheetNick) => false
@@ -146,7 +144,6 @@ export class Service<R extends ResourcesBase.IResource> {
             POST: !!raw.data.POST,
             HEAD: !!raw.data.HEAD,
             DELETE: !!raw.data.DELETE,
-            delete: Boolean(metadata && _.has(metadata, "deleted")),
             hide: Boolean(metadata && _.has(metadata, "hidden")),
             canPost: (contentType : string) => {
                 if (raw.data.POST) {

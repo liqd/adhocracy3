@@ -141,7 +141,6 @@ export var register = () => {
                                 POST: false,
                                 HEAD: false,
                                 DELETE: false,
-                                delete: false,
                                 hide: false,
                                 canPost: jasmine.any(Function),
                                 canPut: jasmine.any(Function)
