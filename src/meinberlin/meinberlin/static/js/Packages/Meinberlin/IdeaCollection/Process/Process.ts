@@ -28,7 +28,7 @@ var pkgLocation = "/Meinberlin/IdeaCollection/Process";
 
 var createBadgeFacets = (badgeGroups, groupPaths, badges) => {
     var badgesByGroup = AdhBadge.collectBadgesByGroup(groupPaths, badges);
-    return _.map(badgeGroups, (group) => {
+    return _.map(badgeGroups, (group : any) => {
         return {
             key: "badge",
             name: group.title,
