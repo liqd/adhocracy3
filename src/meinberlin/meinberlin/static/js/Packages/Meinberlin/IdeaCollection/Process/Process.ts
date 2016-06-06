@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import * as AdhBadge from "../../../Badge/Badge";
 import * as AdhConfig from "../../../Config/Config";
 import * as AdhHttp from "../../../Http/Http";
+import * as AdhListing from "../../../Listing/Listing";
 import * as AdhMovingColumns from "../../../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhProcess from "../../../Process/Process";
@@ -26,7 +27,7 @@ import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workfl
 
 var pkgLocation = "/Meinberlin/IdeaCollection/Process";
 
-var createBadgeFacets = (badgeGroups, groupPaths, badges) => {
+var createBadgeFacets = (badgeGroups, groupPaths, badges) : AdhListing.IFacetItem[] => {
     var badgesByGroup = AdhBadge.collectBadgesByGroup(groupPaths, badges);
     return _.map(badgeGroups, (group : any) => {
         return {
@@ -47,7 +48,7 @@ var getFacets = (
     $q : angular.IQService
 ) => (
     path : string
-) : angular.IPromise<any[]> => {
+) : angular.IPromise<AdhListing.IFacetItem[]> => {
     var params = {
         elements: "content",
         depth: 4,
