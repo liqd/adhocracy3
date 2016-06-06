@@ -49,21 +49,24 @@ var getFacets = (
 ) => (
     path : string
 ) : angular.IPromise<AdhListing.IFacetItem[]> => {
+    var httpMap = (paths : string[], fn) : angular.IPromise<any[]> => {
+        return $q.all(_.map(paths, (path) => {
+            return adhHttp.get(path).then(fn);
+        }));
+    };
+
     var params = {
         elements: "content",
         depth: 4,
         content_type: SIBadge.nick
     };
+
     return adhHttp.get(path, params).then((response) => {
-        var badgePaths = _.map(response.data[SIPool.nick].elements, "path");
-        return $q.all(
-            _.map(badgePaths, (b : string) => adhHttp.get(b).then(AdhBadge.extractBadge)))
-        .then((badges : any) => {
-            var groupPaths : string[] = _.union.apply(_, _.map(badges, "groups"));
-            return $q.all(
-                _.map(groupPaths, (g) => adhHttp.get(g)))
-            .then((result) => {
-                var badgeGroups = _.keyBy(_.map(result, AdhBadge.extractGroup), "path");
+        var badgePaths = <string[]>_.map(response.data[SIPool.nick].elements, "path");
+        return httpMap(badgePaths, AdhBadge.extractBadge).then((badges) => {
+            var groupPaths = _.union.apply(_, _.map(badges, "groups"));
+            return httpMap(groupPaths, AdhBadge.extractGroup).then((groups) => {
+                var badgeGroups = _.keyBy(groups, "path");
                 return createBadgeFacets(badgeGroups, groupPaths, badges);
             });
         });
