@@ -299,6 +299,10 @@ export class Listing<Container extends ResourcesBase.IResource> {
                     $scope.update();
                 });
 
+                $scope.$watch("params", () => {
+                    $scope.update();
+                }, true);
+
                 $scope.$watch("path", (newPath : string) => {
                     unregisterWebsocket($scope);
 
