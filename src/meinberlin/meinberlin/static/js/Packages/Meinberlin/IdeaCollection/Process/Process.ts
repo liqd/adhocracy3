@@ -52,11 +52,11 @@ var createBadgeGroups = (scope, groupPaths, badges) => {
 };
 
 var getFacets = (
-    adhHttp: AdhHttp.Service<any>,
-    $q: angular.IQService
+    adhHttp : AdhHttp.Service<any>,
+    $q : angular.IQService
 ) => (
     scope
-): void => {
+) : void => {
     var params = {
         elements: "content",
         depth: 4,
@@ -66,8 +66,8 @@ var getFacets = (
         var badgePaths = _.map(response.data[SIPool.nick].elements, "path");
         return $q.all(
             _.map(badgePaths, (b : string) => adhHttp.get(b).then(AdhBadge.extractBadge)))
-        .then((badges: any) => {
-            var groupPaths: string[] = _.union.apply(_, _.map(badges, "groups"));
+        .then((badges : any) => {
+            var groupPaths : string[] = _.union.apply(_, _.map(badges, "groups"));
             return $q.all(
                 _.map(groupPaths, (g) => adhHttp.get(g)))
             .then((result) => {
