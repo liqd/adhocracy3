@@ -26,11 +26,11 @@ import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workfl
 
 var pkgLocation = "/Meinberlin/IdeaCollection/Process";
 
-var createBadgeGroup = (scope, group, groupPath) => {
+var createBadgeGroup = (badgesByGroup, group, groupPath) => {
     return {
         key: "badge",
         name: group.title,
-        items: _.map(scope.badgesByGroup[groupPath], (badge) => {
+        items: _.map(badgesByGroup[groupPath], (badge : any) => {
             return {
                 key: badge.name,
                 name: badge.title
@@ -39,10 +39,10 @@ var createBadgeGroup = (scope, group, groupPath) => {
     };
 };
 
-var createBadgeGroups = (scope, groupPaths, badges) => {
-    scope.badgesByGroup = AdhBadge.collectBadgesByGroup(groupPaths, badges);
-    return _.map(scope.badgeGroups, (group, groupPath) => {
-        return createBadgeGroup(scope, group, groupPath);
+var createBadgeGroups = (badgeGroups, groupPaths, badges) => {
+    var badgesByGroup = AdhBadge.collectBadgesByGroup(groupPaths, badges);
+    return _.map(badgeGroups, (group, groupPath) => {
+        return createBadgeGroup(badgesByGroup, group, groupPath);
     });
 };
 
@@ -50,14 +50,14 @@ var getFacets = (
     adhHttp : AdhHttp.Service<any>,
     $q : angular.IQService
 ) => (
-    scope
-) : void => {
+    path : string
+) : angular.IPromise<any[]> => {
     var params = {
         elements: "content",
         depth: 4,
         content_type: SIBadge.nick
     };
-    adhHttp.get(scope.path, params).then((response) => {
+    return adhHttp.get(path, params).then((response) => {
         var badgePaths = _.map(response.data[SIPool.nick].elements, "path");
         return $q.all(
             _.map(badgePaths, (b : string) => adhHttp.get(b).then(AdhBadge.extractBadge)))
@@ -66,8 +66,8 @@ var getFacets = (
             return $q.all(
                 _.map(groupPaths, (g) => adhHttp.get(g)))
             .then((result) => {
-                scope.badgeGroups = _.keyBy(_.map(result, AdhBadge.extractGroup), "path");
-                scope.facets = createBadgeGroups(scope, groupPaths, badges);
+                var badgeGroups = _.keyBy(_.map(result, AdhBadge.extractGroup), "path");
+                return createBadgeGroups(badgeGroups, groupPaths, badges);
             });
         });
     });
@@ -90,7 +90,9 @@ export var detailDirective = (
         },
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            getFacets(adhHttp, $q)(scope);
+            getFacets(adhHttp, $q)(scope.path).then((facets) => {
+                scope.facets = facets;
+            });
 
             scope.sorts = [{
                 key: "rates",
