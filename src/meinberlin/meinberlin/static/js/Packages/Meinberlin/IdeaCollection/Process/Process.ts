@@ -26,11 +26,11 @@ import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workfl
 
 var pkgLocation = "/Meinberlin/IdeaCollection/Process";
 
-var createBadgeGroup = (badgesByGroup, group, groupPath) => {
+var createBadgeGroup = (badgesByGroup, group) => {
     return {
         key: "badge",
         name: group.title,
-        items: _.map(badgesByGroup[groupPath], (badge : any) => {
+        items: _.map(badgesByGroup[group.path], (badge : any) => {
             return {
                 key: badge.name,
                 name: badge.title
@@ -41,8 +41,8 @@ var createBadgeGroup = (badgesByGroup, group, groupPath) => {
 
 var createBadgeGroups = (badgeGroups, groupPaths, badges) => {
     var badgesByGroup = AdhBadge.collectBadgesByGroup(groupPaths, badges);
-    return _.map(badgeGroups, (group, groupPath) => {
-        return createBadgeGroup(badgesByGroup, group, groupPath);
+    return _.map(badgeGroups, (group) => {
+        return createBadgeGroup(badgesByGroup, group);
     });
 };
 
