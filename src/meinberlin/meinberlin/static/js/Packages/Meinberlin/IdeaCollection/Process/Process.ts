@@ -27,28 +27,23 @@ import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workfl
 var pkgLocation = "/Meinberlin/IdeaCollection/Process";
 
 var createBadgeGroup = (scope, group, groupPath) => {
-    var items = [];
-    _.forOwn(scope.badgesByGroup[groupPath], (badge) => {
-        items.push({
-            key: badge.name,
-            name: badge.title
-        });
-    });
     return {
         key: "badge",
         name: group.title,
-        items: items
+        items: _.map(scope.badgesByGroup[groupPath], (badge) => {
+            return {
+                key: badge.name,
+                name: badge.title
+            };
+        })
     };
 };
 
 var createBadgeGroups = (scope, groupPaths, badges) => {
     scope.badgesByGroup = AdhBadge.collectBadgesByGroup(groupPaths, badges);
-    var facets = [];
-    _.forOwn(scope.badgeGroups, (group, groupPath) => {
-        var badgeGroup = createBadgeGroup(scope, group, groupPath);
-        facets.push(badgeGroup);
+    return _.map(scope.badgeGroups, (group, groupPath) => {
+        return createBadgeGroup(scope, group, groupPath);
     });
-    return facets;
 };
 
 var getFacets = (
