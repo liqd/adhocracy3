@@ -77,3 +77,4 @@ RELEASE-VERSION
 /src/Mako/
 /styleguides
 src/deform
+src/deform_markdown
