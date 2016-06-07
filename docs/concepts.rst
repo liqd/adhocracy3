@@ -23,16 +23,14 @@ sheet
     that allows it to be commented on. A resource is really not much
     more than the sum of its sheets.
 
-backend
-frontend
+backend / frontend
     The backend is the part of the software that stores the data.  The
     frontend on the other hand is in charge of showing the data to
     users.  Having a clear separation between these makes development
     simpler and theoretically allows to have more than one frontend,
     e.g. a website and a mobile app.
 
-core
-customization
+core / customization
     Not all projects implemented with adhocracy are the same. That
     is why it is very easy to customize it for each individual
     project. The shared functionality is called "core" while the
@@ -44,18 +42,14 @@ process
     users can enter proposals and get feedback, and giving feedback on
     prepared documents, are probaly the most common ones.
 
-user
-role
-local role
-permission
+permissions
     What a user is permitted to do depends on their role.  The roles a
     user has often depend on the context. Example: Amelia (user) may
     be the creator (role) of one proposal (context) and therefore
     permitted to edit it (permission). Proposals that she hasn't
     created, she may not edit, but she may comment on them.
 
-workflow
-phase
+workflow and phases
     Participation :term:`processes <process>` typically have multiple
     phases: For example, you may want to first publish an
     announcement, then have the actual participation for some time,
