@@ -1,10 +1,6 @@
 Concepts
 ========
 
-ACM
-    An :abbr:`ACM (access control matrix)` maps :term:`permissions
-    <permission>` to :term:`roles <role>`.
-
 resource
     Anything that exists in adhocracy is a resource: A proposal, a
     comment, but also users or individual rates.
@@ -68,9 +64,3 @@ phase
     with any other kind of :term:`resource`. An important feature of
     workflows is that you can change the :term:`permissions
     <permission>` for each role based on the phase.
-
-DAG
-    A :abbr:`DAG (directed acyclic graph)` is a mathematical
-    structure that is well-suited to describe the structure of
-    resources in the backend. It is also the model used for other
-    software such as git.
