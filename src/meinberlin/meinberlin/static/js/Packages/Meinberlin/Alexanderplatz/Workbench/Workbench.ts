@@ -77,6 +77,11 @@ export var processDetailColumnDirective = (
                     });
                 }
             });
+
+            scope.data = {};
+            scope.showMap = (isShowMap) => {
+                scope.data.isShowMap = isShowMap;
+            };
         }
     };
 };
