@@ -1,9 +1,9 @@
 <div data-ng-switch="transclusionId" class="tabset m-full-width m-button-style">
     <div data-ng-switch-when="menu">
-        <div class="moving-column-tab" data-ng-if="!isShowMap">
+        <div class="moving-column-tab" data-ng-if="!data.isShowMap">
             <i class="icon-list-column moving-column-icon"></i>
         </div>
-        <div class="moving-column-tab" data-ng-if="isShowMap">
+        <div class="moving-column-tab" data-ng-if="data.isShowMap">
             <i class="icon-map-filled moving-column-icon"></i>
         </div>
 
@@ -15,17 +15,17 @@
     </div>
 
     <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ processUrl | adhResourceUrl }}">
-        <div class="moving-column-tab" data-ng-if="!isShowMap">
+        <div class="moving-column-tab" data-ng-if="!data.isShowMap">
             <i class="icon-list-column moving-column-icon"></i>
         </div>
-        <div class="moving-column-tab" data-ng-if="isShowMap">
+        <div class="moving-column-tab" data-ng-if="data.isShowMap">
             <i class="icon-map-filled moving-column-icon"></i>
         </div>
     </a>
 
     <div data-ng-switch-when="body">
         <div class="action-bar">
-            <adh-map-switch data-model="isShowMap"></adh-map-switch>
+            <adh-map-switch data-model="data.isShowMap"></adh-map-switch>
         </div>
         <ul class="tabset-tabs">
             <li class="tab"
@@ -45,17 +45,17 @@
         <div data-ng-if="tab === 'proposals'">
             <div
                 class="map-info-persistent"
-                data-ng-if="isShowMap"
+                data-ng-if="data.isShowMap"
                 data-adh-html-translate="TR__MAP_INCOMPLETE"
                 data-translate-templates="{
                     link: '&lt;a href=&quot;&quot; data-ng-click=&quot;showMap(false)&quot;&gt;{{ content }}&lt;/a&gt;'
             }"></div>
-            <adh-wait condition="isShowMap">
+            <adh-wait condition="data.isShowMap">
                 <adh-map-listing
                     data-ng-if="polygon"
                     data-path="{{processUrl}}"
                     data-polygon="polygon"
-                    data-ng-show="isShowMap"
+                    data-ng-show="data.isShowMap"
                     data-no-create-form="true"
                     data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
                     data-content-type="{{proposalType}}">
@@ -65,7 +65,7 @@
 
             <adh-listing
                 data-path="{{processUrl}}"
-                data-ng-show="!isShowMap"
+                data-ng-show="!data.isShowMap"
                 data-no-create-form="true"
                 data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
                 data-content-type="{{proposalType}}">
@@ -77,17 +77,17 @@
         <div data-ng-if="tab === 'documents'">
             <div
                 class="map-info-persistent"
-                data-ng-if="isShowMap"
+                data-ng-if="data.isShowMap"
                 data-adh-html-translate="TR__MAP_INCOMPLETE_DOCUMENTS"
                 data-translate-templates="{
                     link: '&lt;a href=&quot;&quot; data-ng-click=&quot;showMap(false)&quot;&gt;{{ content }}&lt;/a&gt;'
             }"></div>
-            <adh-wait condition="isShowMap">
+            <adh-wait condition="data.isShowMap">
                 <adh-map-listing
                     data-ng-if="polygon"
                     data-path="{{processUrl}}"
                     data-polygon="polygon"
-                    data-ng-show="isShowMap"
+                    data-ng-show="data.isShowMap"
                     data-no-create-form="true"
                     data-empty-text="{{ 'TR__DOCUMENT_EMPTY_TEXT' | translate }}"
                     data-content-type="{{documentType}}">
@@ -97,7 +97,7 @@
 
             <adh-listing
                 data-path="{{processUrl}}"
-                data-ng-show="!isShowMap"
+                data-ng-show="!data.isShowMap"
                 data-no-create-form="true"
                 data-sorts="[{key: 'title', index: 'title'}]"
                 data-empty-text="{{ 'TR__DOCUMENT_EMPTY_TEXT' | translate }}"

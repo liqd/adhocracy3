@@ -131,6 +131,10 @@ export var detailDirective = (
                 }
             });
             adhPermissions.bindScope(scope, () => scope.path);
+
+            scope.showMap = (isShowMap) => {
+                scope.isShowMap = isShowMap;
+            };
         }
     };
 };
