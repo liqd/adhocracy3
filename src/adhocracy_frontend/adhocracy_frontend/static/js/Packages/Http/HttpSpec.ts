@@ -433,7 +433,7 @@ export var register = () => {
                             {body: {content_type: RIParagraph.content_type, path: "put response"}},
                             {body: {content_type: RIParagraph.content_type, path: "post1 response"}},
                             {body: {content_type: RIParagraph.content_type, path: "post2 response"}},
-                            {body: {content_type: RIParagraph.content_type, path: "delete response"}},
+                            {body: {}},
                             {body: {content_type: RIParagraph.content_type, path: "get2 response"}}
                         ],
                         updated_resources: {
@@ -483,7 +483,6 @@ export var register = () => {
                     expect(response[put.index].path).toBe("put response");
                     expect(response[post1.index].path).toBe("post1 response");
                     expect(response[post2.index].path).toBe("post2 response");
-                    expect(response[delete1.index].path).toBe("delete response");
                     expect(response[get2.index].path).toBe("get2 response");
                 });
 
@@ -523,6 +522,10 @@ export var register = () => {
                     it("uses the DELETE method", () => {
                         expect(request[delete1.index].body).not.toBeDefined();
                         expect(request[delete1.index].method).toBe("DELETE");
+                    });
+
+                    it("the response path is based on the request, as the response body is empty", () => {
+                        expect(response[delete1.index].path).toBe("/delete/path");
                     });
                 });
             });
