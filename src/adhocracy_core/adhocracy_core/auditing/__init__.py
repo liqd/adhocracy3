@@ -93,7 +93,7 @@ def audit_resources_changes_callback(request: Request,
     changelog_metadata = registry.changelog.values()
     user_name, user_path = _get_user_info(request)
     for meta in changelog_metadata:
-        _log_change(request.context, user_name, user_path, meta)
+        _log_change(user_name, user_path, meta)
 
 
 def _get_user_info(request: Request) -> (str, str):
@@ -108,8 +108,7 @@ def _get_user_info(request: Request) -> (str, str):
         return (user_name, user_path)
 
 
-def _log_change(context: IResource,
-                user_name: str,
+def _log_change(user_name: str,
                 user_path: str,
                 change: ChangelogMetadata) -> None:
     data_changed = change.created or change.modified
@@ -117,7 +116,7 @@ def _log_change(context: IResource,
                                                VisibilityChange.revealed]
     if data_changed or visibility_changed:
         action_name = _get_entry_name(change),
-        log_auditevent(context,
+        log_auditevent(change.resource,
                        action_name,
                        user_name=user_name,
                        user_path=user_path)
