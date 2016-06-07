@@ -6,17 +6,17 @@ resource
     comment, but also users or individual rates.
 
 resource type
-    Think of a resource type as a blueprint, and a :term:`resource` as
+    Think of a resource type as a blueprint, and a resource as
     the actual building you build by following the blueprint. Example:
     The proposal "Better food in the cafeteria" would have the type
     ``adhocracy_core.resources.proposal.IProposal``.  Note that all
-    resources of the same type have the same :term:`sheets <sheet>`,
+    resources of the same type have the same sheets,
     so there might be a lot of similar types with slightly different
     sheets (e.g. a simple proposal, a proposal with a budget, a
     proposal with a geographical location, ...).
 
 sheet
-    Sheets are the features of :term:`resources <resource>`. A
+    Sheets are the features of resources. A
     proposal may for example have the sheet
     ``adhocracy_core.sheets.title.ITitle`` that allows it to have a
     title and the sheet ``adhocracy_core.sheets.comment.ICommentable``
@@ -37,7 +37,7 @@ core / customization
     special code is called "customization".
 
 process
-    A process :term:`resource` represents a participation process.
+    A process resource represents a participation process.
     There are very different kinds of these. Idea Collections, where
     users can enter proposals and get feedback, and giving feedback on
     prepared documents, are probaly the most common ones.
@@ -50,11 +50,11 @@ permissions
     created, she may not edit, but she may comment on them.
 
 workflow and phases
-    Participation :term:`processes <process>` typically have multiple
+    Participation processes typically have multiple
     phases: For example, you may want to first publish an
     announcement, then have the actual participation for some time,
     and display the results once that is over. This is possible by
     using workflows.  Workflows can be used with processes, but also
-    with any other kind of :term:`resource`. An important feature of
-    workflows is that you can change the :term:`permissions
-    <permission>` for each role based on the phase.
+    with any other kind of resource. An important feature of
+    workflows is that you can change the permissions
+    for each role based on the phase.
