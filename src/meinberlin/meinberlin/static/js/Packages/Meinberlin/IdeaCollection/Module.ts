@@ -67,7 +67,7 @@ export var register = (angular) => {
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-meinberlin-idea-collection-workbench data-has-swot-labels=\"true\">" +
+                return $q.when("<adh-meinberlin-idea-collection-workbench>" +
                     "</adh-meinberlin-idea-collection-workbench>");
             }];
         }]);

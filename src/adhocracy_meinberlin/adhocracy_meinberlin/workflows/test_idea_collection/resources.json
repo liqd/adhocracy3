@@ -10,7 +10,9 @@
  {"path": "/organisation/idea_collection/badges",
   "content_type": "adhocracy_core.resources.badge.IParticipantsAssignableBadgeGroup",
   "data": {"adhocracy_core.sheets.name.IName":
-            {"name": "categories"}
+            {"name": "categories"},
+           "adhocracy_core.sheets.title.ITitle":
+           {"title": "Kategorien"}
            }
  },
  {"path": "/organisation/idea_collection/badges/categories",

@@ -74,6 +74,35 @@ export var getBadgesFactory = (
     }
 };
 
+export var extractBadge = (badge) => {
+    return {
+        name: badge.data[SIName.nick].name,
+        title: badge.data[SITitle.nick].title,
+        path: badge.path,
+        groups: badge.data[SIBadge.nick].groups
+    };
+};
+
+export var extractGroup = (group) => {
+    return {
+        name: group.data[SIName.nick].name,
+        title: group.data[SITitle.nick].title,
+        path: group.path
+    };
+};
+
+export var collectBadgesByGroup = (groupPaths, badges) => {
+    var badgesByGroup = {};
+    _.forEach(groupPaths, (groupPath) => {
+        badgesByGroup[groupPath] = [];
+        _.forOwn(badges, (badge) => {
+            if (_.includes(badge.groups, groupPath)) {
+                badgesByGroup[groupPath].push(badge);
+            }
+        });
+    });
+    return badgesByGroup;
+};
 
 var bindPath = (
     adhHttp : AdhHttp.Service<any>,
@@ -85,34 +114,6 @@ var bindPath = (
     scope.data = {
         badge: "",
         description: ""
-    };
-
-    var extractBadge = (badge) => {
-        return {
-            title: badge.data[SITitle.nick].title,
-            path: badge.path,
-            groups: badge.data[SIBadge.nick].groups
-        };
-    };
-
-    var extractGroup = (group) => {
-        return {
-            title: group.data[SITitle.nick].title,
-            path: group.path
-        };
-    };
-
-    var collectBadgesByGroup = (groupPaths, badges) => {
-        var badgesByGroup = {};
-        _.forEach(groupPaths, (groupPath) => {
-            badgesByGroup[groupPath] = [];
-            _.forOwn(badges, (badge) => {
-                if (_.includes(badge.groups, groupPath)) {
-                    badgesByGroup[groupPath].push(badge.path);
-                }
-            });
-        });
-        return badgesByGroup;
     };
 
     var getAssignableBadges = (rawOptions) : angular.IPromise<any> => {
@@ -172,20 +173,17 @@ export var badgeAssignment = (
                 scope.poolPath = proposal.data[SIBadgeable.nick].post_pool;
 
                 return adhGetBadges(proposal).then((assignments : IBadge[]) => {
-                    scope.assignments = assignments;
 
                     bindPath(adhHttp, adhPermissions, $q)(scope);
 
                     adhHttp.get(scope.badgeablePath).then((proposal) => {
                         scope.poolPath = proposal.data[SIBadgeable.nick].post_pool;
 
-                        return adhGetBadges(proposal).then((assignments : IBadge[]) => {
-                            scope.assignments = _.keyBy(assignments, "badgePath");
-                            // The following object only contains the current assignments. In order to render the badge
-                            // assignment UI, Assignment.html iterates over the available badges, though,
-                            // and gives them the value checkboxes[badgePath], which is parsed to false when undefined.
-                            scope.checkboxes = _.mapValues(scope.assignments, (v) => true);
-                        });
+                        scope.assignments = _.keyBy(assignments, "badgePath");
+                        // The following object only contains the current assignments. In order to render the badge
+                        // assignment UI, Assignment.html iterates over the available badges, though,
+                        // and gives them the value checkboxes[badgePath], which is parsed to false when undefined.
+                        scope.checkboxes = _.mapValues(scope.assignments, (v) => true);
                     });
 
                     scope.submit = () => {

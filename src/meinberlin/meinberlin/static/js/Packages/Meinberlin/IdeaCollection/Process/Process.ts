@@ -3,8 +3,10 @@
 
 import * as _ from "lodash";
 
+import * as AdhBadge from "../../../Badge/Badge";
 import * as AdhConfig from "../../../Config/Config";
 import * as AdhHttp from "../../../Http/Http";
+import * as AdhListing from "../../../Listing/Listing";
 import * as AdhMovingColumns from "../../../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhProcess from "../../../Process/Process";
@@ -14,44 +16,83 @@ import RIBuergerhaushaltProposalVersion from "../../../../Resources_/adhocracy_m
 import RIGeoProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
 import RIKiezkasseProposalVersion from "../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
 
+import * as SIBadge from "../../../../Resources_/adhocracy_core/sheets/badge/IBadge";
 import * as SIImageReference from "../../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SILocationReference from "../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
 import * as SIMultiPolygon from "../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
 import * as SIName from "../../../../Resources_/adhocracy_core/sheets/name/IName";
+import * as SIPool from "../../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/Meinberlin/IdeaCollection/Process";
 
+var createBadgeFacets = (badgeGroups, badges) : AdhListing.IFacetItem[] => {
+    var groupPaths = _.map(badgeGroups, "path");
+    var badgesByGroup = AdhBadge.collectBadgesByGroup(groupPaths, badges);
+    return _.map(badgeGroups, (group : any) => {
+        return {
+            key: "badge",
+            name: group.title,
+            items: _.map(badgesByGroup[group.path], (badge : any) => {
+                return {
+                    key: badge.name,
+                    name: badge.title
+                };
+            })
+        };
+    });
+};
+
+var getFacets = (
+    adhHttp : AdhHttp.Service<any>,
+    $q : angular.IQService
+) => (
+    path : string
+) : angular.IPromise<AdhListing.IFacetItem[]> => {
+    var httpMap = (paths : string[], fn) : angular.IPromise<any[]> => {
+        return $q.all(_.map(paths, (path) => {
+            return adhHttp.get(path).then(fn);
+        }));
+    };
+
+    var params = {
+        elements: "content",
+        depth: 4,
+        content_type: SIBadge.nick
+    };
+
+    return adhHttp.get(path, params).then((response) => {
+        var badgePaths = <string[]>_.map(response.data[SIPool.nick].elements, "path");
+        return httpMap(badgePaths, AdhBadge.extractBadge).then((badges) => {
+            var groupPaths = _.union.apply(_, _.map(badges, "groups"));
+            return httpMap(groupPaths, AdhBadge.extractGroup).then((badgeGroups) => {
+                return createBadgeFacets(badgeGroups, badges);
+            });
+        });
+    });
+};
+
 
 export var detailDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    adhPermissions : AdhPermissions.Service
+    adhPermissions : AdhPermissions.Service,
+    $q : angular.IQService
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
         scope: {
             path: "@",
-            hasSwotLabels: "=?",
             isBuergerhaushalt: "=?",
             isKiezkasse: "=?"
         },
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            if (scope.hasSwotLabels) {
-                scope.facets = [{
-                    key: "badge",
-                    name: "TR__MEINBERLIN_IDEA_COLLECTION_CATEGORIES_LABEL",
-                    items: [
-                        { key: "strengths", name: "TR__MEINBERLIN_IDEA_COLLECTION_CATEGORIES_STRENGTHS" },
-                        { key: "weaknesses", name: "TR__MEINBERLIN_IDEA_COLLECTION_CATEGORIES_WEAKNESSES" },
-                        { key: "proposals", name: "TR__MEINBERLIN_IDEA_COLLECTION_CATEGORIES_PROPOSALS" },
-                        { key: "visions", name: "TR__MEINBERLIN_IDEA_COLLECTION_CATEGORIES_VISIONS" }
-                    ]
-                }];
-            }
+            getFacets(adhHttp, $q)(scope.path).then((facets) => {
+                scope.facets = facets;
+            });
 
             scope.sorts = [{
                 key: "rates",
