@@ -149,7 +149,7 @@ class WorkflowAssignmentSheet(AnnotationRessourceSheet):
     It allows to view and modify the workflow state of `context`.
     If the you set a new workflow state a transition to this state is executed.
 
-    The workflow of `context` is only found, if the :term:`resource type`
+    The workflow of `context` is only found, if the :term:`resource_type`
     metadata of `context` has a valid 'workflow` entry.
     """
 
