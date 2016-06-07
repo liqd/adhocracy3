@@ -1,10 +1,13 @@
 """Admin interface based on substanced (sdi), url prefix is '/manage'."""
+from pkg_resources import resource_filename
 from pyramid.config import Configurator
+from substanced.form import get_deform_renderer
 from substanced.content import _ContentTypePredicate
 from substanced.sdi import MANAGE_ROUTE_NAME
 from substanced.sdi import sdiapi
 from substanced.sdi import add_mgmt_view
 from zope.interface.interfaces import IInterface
+import deform
 
 from adhocracy_core.interfaces import IPool
 from .views.sheets import AddResourceSheetsBase
@@ -69,9 +72,15 @@ def includeme(config):
 def _add_sdi_assets(config: Configurator):
     year = 86400 * 365
     config.add_static_view('deformstatic', 'deform:static', cache_max_age=year)
+
     config.add_static_view('sdistatic',
                            'substanced.sdi:static',
                            cache_max_age=year)
+    deform_dirs = (resource_filename('deform', 'templates/'),
+                   resource_filename('deform_markdown', 'templates/')
+                   )
+    deform_renderer = get_deform_renderer(deform_dirs)
+    deform.Form.set_default_renderer(deform_renderer)
 
 
 def _add_manage_route(settings: dict, config: Configurator):

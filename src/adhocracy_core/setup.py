@@ -19,6 +19,7 @@ requires = [
     'substanced',
     'pyramid_tm',
     'colander',
+    'deform_markdown',
     'autobahn',
     'websocket-client',
     'Pillow',
