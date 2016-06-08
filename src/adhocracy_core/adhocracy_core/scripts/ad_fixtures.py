@@ -66,7 +66,7 @@ def main():  # pragma: no cover
     env['closer']()
 
 
-def _argparse():
+def _argparse():  # pragma: no cover
     epilog = fixtures_epilog.format(resources=resources_epilog,
                                     groups=groups_epilog,
                                     users=users_epilog,
