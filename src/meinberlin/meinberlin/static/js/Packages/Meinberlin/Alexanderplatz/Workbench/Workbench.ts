@@ -93,7 +93,8 @@ export var documentDetailColumnDirective = (
     adhHttp : AdhHttp.Service<any>,
     adhResourceUrl,
     $location : angular.ILocationService,
-    $window : angular.IWindowService
+    $window : angular.IWindowService,
+    $translate
 ) => {
     return {
         restrict: "E",
@@ -108,13 +109,15 @@ export var documentDetailColumnDirective = (
             };
 
             scope.hide = () => {
-                if ($window.confirm("Do you really want to delete this?")) {
-                    var itemPath = AdhUtil.parentPath(scope.documentUrl);
-                    adhHttp.hide(itemPath, RIGeoDocument.content_type)
-                        .then(() => {
-                            $location.url(adhResourceUrl(scope.processUrl));
-                        });
-                }
+                return $translate("TR__ASK_TO_CONFIRM_HIDE_ACTION").then((question) => {
+                    if ($window.confirm(question)) {
+                        var itemPath = AdhUtil.parentPath(scope.documentUrl);
+                        adhHttp.hide(itemPath, RIGeoDocument.content_type)
+                            .then(() => {
+                                $location.url(adhResourceUrl(scope.processUrl));
+                            });
+                    }
+                });
             };
         }
     };
