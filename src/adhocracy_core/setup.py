@@ -107,6 +107,7 @@ setup(name='adhocracy_core',
       ad_auto_transition_process_workflow=\
        adhocracy_core.scripts.ad_auto_transition_process_workflow:main
       ad_fixtures = adhocracy_core.scripts.ad_fixtures:main
+      ad_auditlog = adhocracy_core.scripts.ad_auditlog:main
       [pyramid.scaffold]
       adhocracy=adhocracy_core.scaffolds:main
       """,
