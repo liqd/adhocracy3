@@ -16,6 +16,7 @@ export var register = (angular) => {
         .directive("adhResourceActions", ["adhPermissions", "adhConfig", AdhResourceActions.resourceActionsDirective])
         .directive("adhReportAction", [AdhResourceActions.reportActionDirective])
         .directive("adhShareAction", [AdhResourceActions.shareActionDirective])
+        .directive("adhHideAction", ["adhHttp", "adhTopLevelState", "$translate", "$window", AdhResourceActions.hideActionDirective])
         .directive("adhResourceWidgetDeleteAction", [AdhResourceActions.resourceWidgetDeleteActionDirective])
         .directive("adhEditAction", ["adhTopLevelState", "adhResourceUrlFilter", "$location", AdhResourceActions.editActionDirective])
         .directive("adhModerateAction", [
