@@ -28,7 +28,7 @@ def main():  # pragma: no cover
     If no enddate is given the end of the auditlog is uded,
 
     Additionally filtering by resource path is possible:
-    ./bin/ad_auditlog -s 2016-01-01 -e 2016-02-1 etc/development.ini /foo/bar
+    ./bin/ad_auditlog -s 2016-01-01 -e 2016-02-1 -p /path etc/development.ini
     """
     docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)
