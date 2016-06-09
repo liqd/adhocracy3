@@ -713,6 +713,12 @@ def add_controversiality_index(root, registry):  # pragma: no cover
         index.reindex_resource(resource)
 
 
+@log_migration
+def add_description_sheet_to_user(root, registry):  # pragma: no cover
+    """Add description sheet to user."""
+    migrate_new_sheet(root, IUser, IDescription)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -751,3 +757,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(allow_create_asset_for_users)
     config.add_evolution_step(update_workflow_state_acl_for_all_resources)
     config.add_evolution_step(add_controversiality_index)
+    config.add_evolution_step(add_description_sheet_to_user)
