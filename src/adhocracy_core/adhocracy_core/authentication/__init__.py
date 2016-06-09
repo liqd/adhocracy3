@@ -10,7 +10,6 @@ from pyramid.interfaces import IRequest
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.traversal import resource_path
 from pyramid.security import Everyone
-from pyramid.settings import asbool
 from zope.interface import implementer
 from zope.interface import Interface
 from zope.component import ComponentLookupError
@@ -175,11 +174,6 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         cached_userid = getattr(request, '__cached_userid__', None)
         if cached_userid:
             return cached_userid
-        settings = request.registry.settings
-        if not asbool(settings.get('adhocracy.validate_user_token', True)):
-            # used for work in progress thentos integration
-            userid = self._get_user_path(request)
-            return userid
         tokenmanager = self.get_tokenmanager(request)
         if tokenmanager is None:
             return None

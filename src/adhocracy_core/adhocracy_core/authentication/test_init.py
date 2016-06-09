@@ -165,21 +165,6 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         self.request.headers = self.token_headers
         assert inst.authenticated_userid(self.request) is None
 
-    def test_authenticated_userid_with_token_validation_off_no_token(self):
-        tokenmanager = Mock()
-        inst = self.make_one('', get_tokenmanager=lambda x: tokenmanager)
-        self.request.registry.settings['adhocracy.validate_user_token'] = False
-        self.request.headers = {'X-User-Path': self.user_url}
-        assert inst.authenticated_userid(self.request) == self.userid
-
-    def test_authenticated_userid_with_token_validation_off_wrong_token(self):
-        tokenmanager = Mock()
-        inst = self.make_one('', get_tokenmanager=lambda x: tokenmanager)
-        self.request.registry.settings['adhocracy.validate_user_token'] = False
-        self.request.headers = {'X-User-Path': self.user_url,
-                                'X-User-Token': 'whatever'}
-        assert inst.authenticated_userid(self.request) == self.userid
-
     def test_authenticated_userid_set_cached_userid(self):
         tokenmanager = Mock()
         tokenmanager.get_user_id.return_value = self.userid
