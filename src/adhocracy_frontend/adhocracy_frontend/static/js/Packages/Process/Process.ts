@@ -35,7 +35,7 @@ export var getStateData = (sheet : SIWorkflow.Sheet, name : string) : IStateData
 
 
 export class Provider implements angular.IServiceProvider {
-    public templateFactories : {[processType : string]: any};
+    public templateFactories : {[processType : string]: string};
     public $get;
 
     constructor () {
@@ -53,13 +53,11 @@ export class Service {
         private $injector : angular.auto.IInjectorService
     ) {}
 
-    public getTemplate(processType : string) : angular.IPromise<string> {
+    public getTemplate(processType : string) : string {
         if (!this.provider.templateFactories.hasOwnProperty(processType)) {
-            throw "No template for process type \"" + processType + "\" has been configured.";
+            return "";
         }
-
-        var fn = this.provider.templateFactories[processType];
-        return this.$injector.invoke(fn);
+        return this.provider.templateFactories[processType];
     }
 }
 

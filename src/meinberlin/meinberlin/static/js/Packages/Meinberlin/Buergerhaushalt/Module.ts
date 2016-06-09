@@ -37,9 +37,7 @@ export var register = (angular) => {
             adhResourceAreaProvider.customHeader(processType, customHeader);
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-meinberlin-idea-collection-workbench data-is-buergerhaushalt=\"true\">" +
-                    "</adh-meinberlin-idea-collection-workbench>");
-            }];
+            adhProcessProvider.templateFactories[processType] =
+                "<adh-meinberlin-idea-collection-workbench data-is-buergerhaushalt=\"true\"></adh-meinberlin-idea-collection-workbench>";
         }]);
 };

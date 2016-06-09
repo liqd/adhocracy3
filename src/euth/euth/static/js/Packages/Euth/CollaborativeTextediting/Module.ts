@@ -15,12 +15,10 @@ export var register = (angular) => {
             AdhDebateWorkbenchModule.moduleName
         ])
         .config(["adhProcessProvider", (adhProcessProvider: AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[RIEuthCollaborativeTextProcess.content_type] = ["$q", ($q: angular.IQService) => {
-                return $q.when("<adh-debate-workbench></adh-debate-workbench>");
-            }];
-            adhProcessProvider.templateFactories[RIEuthCollaborativeTextPrivateProcess.content_type] = ["$q", ($q: angular.IQService) => {
-                return $q.when("<adh-debate-workbench></adh-debate-workbench>");
-            }];
+            adhProcessProvider.templateFactories[RIEuthCollaborativeTextProcess.content_type] =
+                "<adh-debate-workbench></adh-debate-workbench>";
+            adhProcessProvider.templateFactories[RIEuthCollaborativeTextPrivateProcess.content_type] =
+                "<adh-debate-workbench></adh-debate-workbench>";
         }])
         .config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RIEuthCollaborativeTextProcess)])
         .config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RIEuthCollaborativeTextPrivateProcess)]);

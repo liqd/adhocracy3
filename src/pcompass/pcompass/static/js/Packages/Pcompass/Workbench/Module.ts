@@ -33,9 +33,8 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIPcompassProcess.content_type)])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[RIPcompassProcess.content_type] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-pcompass-workbench></adh-pcompass-workbench>");
-            }];
+            adhProcessProvider.templateFactories[RIPcompassProcess.content_type] =
+                "<adh-pcompass-workbench></adh-pcompass-workbench>";
         }])
         .directive("adhPcompassWorkbench", ["adhTopLevelState", "adhConfig", "adhHttp", Workbench.workbenchDirective])
         .directive("adhPcompassProposalDetailColumn", ["adhConfig", "adhHttp", "adhPermissions", Workbench.proposalDetailColumnDirective])
