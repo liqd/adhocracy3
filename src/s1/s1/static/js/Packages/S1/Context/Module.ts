@@ -34,11 +34,8 @@ export var register = (angular) => {
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerContext("s1");
         }])
-        .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
+        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             AdhS1Workbench.registerRoutes(RIS1Process.content_type, "s1")(adhResourceAreaProvider);
             AdhUserViews.registerRoutes("s1")(adhResourceAreaProvider);
-
-            var customHeader = adhConfig.pkg_path + Context.pkgLocation + "/CustomHeader.html";
-            adhResourceAreaProvider.customHeader(RIS1Process.content_type, customHeader);
         }]);
 };
