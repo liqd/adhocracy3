@@ -200,7 +200,7 @@ def import_fixture(asset: str, root: IPool, registry: Registry,
             import_resources(root, registry, import_file)
         elif import_type == 'local_roles':
             import_local_roles(root, registry, import_file)
-        elif import_type == 'states':
+        elif import_type == 'states':  # pragma: no branch
             _import_workflow_states(root, registry, import_file)
 
 
