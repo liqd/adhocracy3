@@ -183,12 +183,15 @@ def get_sheet_field_for_partial(sheet: ISheet,
 
 
 def import_fixture(asset: str, root: IPool, registry: Registry,
-                   log_only=False):
+                   log_only=False,
+                   print_stdout=True):
     """Import files in fixture directory defined by :term:`asset` ."""
     fixture = _asset_to_fixture(asset)
     imports = _get_import_files(fixture)
     for import_type, import_file in imports:
-        print('Import type "{}" file "{}"'.format(import_type, import_file))
+        if print_stdout:  # pragma: no cover
+            msg = 'Import type "{}" file "{}"'.format(import_type, import_file)
+            print(msg)
         if log_only:
             continue
         if import_type == 'groups':

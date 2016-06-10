@@ -156,6 +156,7 @@ Lets create some content::
     >>> data = {'content_type': 'adhocracy_core.resources.document.IDocument',
     ...         'data': {}}
     >>> resp = participant.post("/pool1/child", data)
+    >>> document_creator = participant.user_path
     >>> document_item = resp.json['path']
     >>> document_first_version = resp.json['first_version_path']
 
@@ -264,8 +265,8 @@ Lets hide an item with referenced resources. Prior to doing so, lets check
 that there actually is a listed version::
 
     >>> resp = anonymous.get(document_item)
-    >>> resp.json['data']['adhocracy_core.sheets.metadata.IMetadata']['creator']
-    'http://localhost/principals/users/0000001/'
+    >>> document_creator == resp.json['data']['adhocracy_core.sheets.metadata.IMetadata']['creator']
+    True
 
 Now we hide the item::
 
@@ -280,7 +281,7 @@ The referenced user resource is affected by this change since its
 back references have changed. Therefore, it shows up in the list of modified
 resources::
 
-    >>> 'http://localhost/principals/users/0000001/' in resp.json['updated_resources']['modified']
+    >>> document_creator in resp.json['updated_resources']['modified']
     True
 
 In the end we can cleanup with some real deletion::

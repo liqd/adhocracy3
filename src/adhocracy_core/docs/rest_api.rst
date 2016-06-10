@@ -15,8 +15,6 @@ Some imports to work with rest api calls::
     >>> import os
     >>> import requests
     >>> from pprint import pprint
-    >>> from adhocracy_core.testing import god_header
-    >>> from adhocracy_core.testing import god_path
 
 Start Adhocracy testapp::
 
@@ -25,6 +23,14 @@ Start Adhocracy testapp::
     >>> app_router = getfixture('app_router')
     >>> testapp = TestApp(app_router)
     >>> rest_url = 'http://localhost'
+
+Login::
+
+   >>> data = {'name': 'admin',
+   ...         'password': 'password'}
+   >>> resp = testapp.post_json(rest_url + '/login_username', data).json
+   >>> admin_header = {'X-User-Token': resp['user_token']}
+   >>> admin_path = resp['user_path']
 
 .. _api-resource-structure:
 
@@ -252,7 +258,7 @@ Returns possible methods for this resource, example request/response data
 structures and available interfaces with resource data. The result is a
 JSON object that has the allowed request methods as keys::
 
-    >>> resp_data = testapp.options(rest_url + "/", headers=god_header).json
+    >>> resp_data = testapp.options(rest_url + "/", headers=admin_header).json
     >>> sorted(resp_data.keys())
     ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
 
@@ -354,7 +360,7 @@ Create a new resource ::
 
     >>> prop = {'content_type': 'adhocracy_core.resources.process.IProcess',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'Documents'}}}
-    >>> resp_data = testapp.post_json(rest_url + "/", prop, headers=god_header).json
+    >>> resp_data = testapp.post_json(rest_url + "/", prop, headers=admin_header).json
     >>> resp_data["content_type"]
     'adhocracy_core.resources.process.IProcess'
 
@@ -381,7 +387,7 @@ The response object has 3 top-level entries:
   The subkey 'modified' lists any resources that have been modified::
 
       >>> sorted(resp_data['updated_resources']['modified'])
-      ['http://localhost/', 'http://localhost/principals/users/0000000/']
+      ['http://localhost/', 'http://localhost/principals/users/...']
 
   Modifications also include that case that a reference from another
   resource has been added or removed, since references are often exposed in
@@ -417,7 +423,7 @@ Modify data of an existing resource ::
 
 ...    >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
 ...    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'youdidntexpectthis'}}}
-...    >>> resp_data = testapp.put_json(rest_url + "/Documents", data, headers=god_header).json
+...    >>> resp_data = testapp.put_json(rest_url + "/Documents", data, headers=admin_header).json
 ...    >>> pprint(resp_data)
 ...    {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
 ...     'path': rest_url + '/Documents'}
@@ -444,7 +450,7 @@ The normal return code is 200 ::
     >>> data = {'content_type': 'adhocracy_core.resources.process.IProcess',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'Documents'}}}
 
-.. >>> testapp.put_json(rest_url + "/Documents", data, headers=god_header)
+.. >>> testapp.put_json(rest_url + "/Documents", data, headers=admin_header)
 .. 200 OK application/json ...
 
 If you submit invalid data the return error code is 400 ::
@@ -452,7 +458,7 @@ If you submit invalid data the return error code is 400 ::
     >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
     ...         'data': {'adhocracy_core.sheets.example.WRONGINTERFACE': {'name': 'Documents'}}}
 
-.. >>> testapp.put_json(rest_url + "/Documents", data, headers=god_header)
+.. >>> testapp.put_json(rest_url + "/Documents", data, headers=admin_header)
 .. Traceback (most recent call last):
 .. ...
 .. {"errors": [{"description": ...
@@ -544,7 +550,7 @@ Create a Document (a subclass of Item which pools DocumentVersions) ::
     >>> pdag = {'content_type': 'adhocracy_core.resources.document.IDocument',
     ...         'data': {},
     ...         }
-    >>> resp = testapp.post_json(rest_url + "/Documents", pdag, headers=god_header)
+    >>> resp = testapp.post_json(rest_url + "/Documents", pdag, headers=admin_header)
     >>> pdag_path = resp.json["path"]
     >>> pdag_path
     '.../Documents/document_0000000/'
@@ -588,8 +594,6 @@ Fetch the first Document version, it is empty ::
     {'follows': []}
 
 but owned by the Document item creator::
-    >>> pprint(resp.json['data']['adhocracy_core.sheets.metadata.IMetadata']['creator'])
-    'http://localhost/principals/users/0000000/'
 
 
 Create a new version of the proposal that follows the first version ::
@@ -600,7 +604,7 @@ Create a new version of the proposal that follows the first version ::
     ...                  'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [pvrs0_path]}},
     ...          'root_versions': [pvrs0_path]}
-    >>> resp = testapp.post_json(pdag_path, pvrs, headers=god_header)
+    >>> resp = testapp.post_json(pdag_path, pvrs, headers=admin_header)
     >>> pvrs1_path = resp.json["path"]
     >>> pvrs1_path != pvrs0_path
     True
@@ -631,7 +635,7 @@ Create a Section item inside the Document item ::
     >>> sdag = {'content_type': 'adhocracy_core.resources.paragraph.IParagraph',
     ...         'data': {}
     ...         }
-    >>> resp = testapp.post_json(pdag_path, sdag, headers=god_header)
+    >>> resp = testapp.post_json(pdag_path, sdag, headers=admin_header)
     >>> sdag_path = resp.json["path"]
     >>> svrs0_path = resp.json["first_version_path"]
 
@@ -640,7 +644,7 @@ and a second Section ::
     >>> sdag = {'content_type': 'adhocracy_core.resources.paragraph.IParagraph',
     ...         'data': {}
     ...         }
-    >>> resp = testapp.post_json(pdag_path, sdag, headers=god_header)
+    >>> resp = testapp.post_json(pdag_path, sdag, headers=admin_header)
     >>> s2dag_path = resp.json["path"]
     >>> s2vrs0_path = resp.json["first_version_path"]
 
@@ -654,7 +658,7 @@ initial versions ::
     ...                     'follows': [pvrs1_path],}
     ...                 },
     ...          'root_versions': [pvrs1_path]}
-    >>> resp = testapp.post_json(pdag_path, pvrs, headers=god_header)
+    >>> resp = testapp.post_json(pdag_path, pvrs, headers=admin_header)
     >>> pvrs2_path = resp.json["path"]
 
 If we create a second version of kapitel1 ::
@@ -670,7 +674,7 @@ If we create a second version of kapitel1 ::
     ...          },
     ...          'root_versions': [pvrs2_path]
     ...         }
-    >>> resp = testapp.post_json(sdag_path, svrs, headers=god_header)
+    >>> resp = testapp.post_json(sdag_path, svrs, headers=admin_header)
     >>> svrs1_path = resp.json['path']
     >>> svrs1_path != svrs0_path
     True
@@ -715,7 +719,7 @@ and pvrs2 (both contain s2vrs0_path)::
     ...          },
     ...          'root_versions': []
     ...         }
-    >>> resp = testapp.post_json(s2dag_path, svrs, headers=god_header, status=400)
+    >>> resp = testapp.post_json(s2dag_path, svrs, headers=admin_header, status=400)
     >>> pprint(resp.json['errors'][0])
     {'description': 'No fork allowed - The auto update ...
 
@@ -731,7 +735,7 @@ But if we set the `root_version` to the last  Document version (pvrs3)::
     ...          },
     ...          'root_versions': [pvrs3_path]
     ...         }
-    >>> resp = testapp.post_json(s2dag_path, svrs, headers=god_header)
+    >>> resp = testapp.post_json(s2dag_path, svrs, headers=admin_header)
 
 a new version pvrs4 is automatically created following only pvrs3, not pvrs2::
 
@@ -851,7 +855,7 @@ for more on comments and *post pools*)::
     >>> post_pool_path = commentable['post_pool']
     >>> comment = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...            'data': {}}
-    >>> resp = testapp.post_json(post_pool_path, comment, headers=god_header)
+    >>> resp = testapp.post_json(post_pool_path, comment, headers=admin_header)
     >>> comment_path = resp.json["path"]
     >>> first_commvers_path = resp.json['first_version_path']
     >>> first_commvers_path
@@ -868,7 +872,7 @@ version as predecessor::
     ...                 'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [first_commvers_path]}},
     ...             'root_versions': [first_commvers_path]}
-    >>> resp = testapp.post_json(comment_path, commvers, headers=god_header)
+    >>> resp = testapp.post_json(comment_path, commvers, headers=admin_header)
     >>> snd_commvers_path = resp.json['path']
     >>> snd_commvers_path
     '.../Documents/document_0000000/comments/comment_000.../VERSION_0000001/'
@@ -876,7 +880,7 @@ version as predecessor::
 However, if we try to add another version that *also* gives the first
 version (no longer head) as predecessor, we get an error::
 
-    >>> resp_data = testapp.post_json(comment_path, commvers, status=400, headers=god_header).json
+    >>> resp_data = testapp.post_json(comment_path, commvers, status=400, headers=admin_header).json
     >>> pprint(resp_data)
     {'errors': [{'description': 'No fork allowed ...
                  'location': 'body',
@@ -910,7 +914,7 @@ We can post comments to this pool only::
 
     >>> comment = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...            'data': {}}
-    >>> resp = testapp.post_json(post_pool_path, comment, headers=god_header)
+    >>> resp = testapp.post_json(post_pool_path, comment, headers=admin_header)
     >>> comment_path = resp.json["path"]
     >>> comment_path
     '.../Documents/document_0000000/comments/comment_000...'
@@ -930,7 +934,7 @@ another version to say something meaningful. A comment contains *content*
     ...                 'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [first_commvers_path]}},
     ...             'root_versions': [first_commvers_path]}
-    >>> resp = testapp.post_json(comment_path, commvers, headers=god_header)
+    >>> resp = testapp.post_json(comment_path, commvers, headers=admin_header)
     >>> snd_commvers_path = resp.json['path']
     >>> snd_commvers_path
     '.../Documents/document_0000000/comments/comment_000.../VERSION_0000001/'
@@ -940,7 +944,7 @@ it's also possible to write a comment about another comment::
 
     >>> metacomment = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...                 'data': {}}
-    >>> resp = testapp.post_json(post_pool_path, metacomment, headers=god_header)
+    >>> resp = testapp.post_json(post_pool_path, metacomment, headers=admin_header)
     >>> metacomment_path = resp.json["path"]
     >>> metacomment_path
     '.../Documents/document_0000000/comments/comment_000...'
@@ -960,7 +964,7 @@ As usual, we have to add another version to actually say something::
     ...                     'adhocracy_core.sheets.versions.IVersionable': {
     ...                         'follows': [first_metacommvers_path]}},
     ...                 'root_versions': [first_metacommvers_path]}
-    >>> resp = testapp.post_json(metacomment_path, metacommvers, headers=god_header)
+    >>> resp = testapp.post_json(metacomment_path, metacommvers, headers=admin_header)
     >>> snd_metacommvers_path = resp.json['path']
     >>> snd_metacommvers_path
     '.../Documents/document_0000000/comments/comment_000.../VERSION_0000001/'
@@ -1003,19 +1007,19 @@ resource and then post a `IRateVersion` resource below it::
 
     >>> rate = {'content_type': 'adhocracy_core.resources.rate.IRate',
     ...         'data': {}}
-    >>> resp = testapp.post_json(rateable_post_pool, rate, headers=god_header)
+    >>> resp = testapp.post_json(rateable_post_pool, rate, headers=admin_header)
     >>> rate_path = resp.json["path"]
     >>> first_ratevers_path = resp.json['first_version_path']
     >>> ratevers = {'content_type': 'adhocracy_core.resources.rate.IRateVersion',
     ...             'data': {
     ...                 'adhocracy_core.sheets.rate.IRate': {
-    ...                     'subject': 'http://localhost/principals/users/0000000/',
+    ...                     'subject': admin_path,
     ...                     'object': snd_commvers_path,
     ...                     'rate': '1'},
     ...                 'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [first_ratevers_path]}},
     ...             'root_versions': [first_ratevers_path]}
-    >>> resp = testapp.post_json(rate_path, ratevers, headers=god_header)
+    >>> resp = testapp.post_json(rate_path, ratevers, headers=admin_header)
     >>> snd_ratevers_path = resp.json['path']
     >>> snd_ratevers_path
     '...Documents/document_0000000/rates/rate_0000000/VERSION_0000001/'
@@ -1025,7 +1029,7 @@ If we want to change our rate, we can post a new version::
     >>> ratevers['data']['adhocracy_core.sheets.rate.IRate']['rate'] = '0'
     >>> ratevers['data']['adhocracy_core.sheets.versions.IVersionable']['follows'] = [snd_ratevers_path]
     >>> ratevers['root_versions'] = [snd_ratevers_path]
-    >>> resp = testapp.post_json(rate_path, ratevers, headers=god_header)
+    >>> resp = testapp.post_json(rate_path, ratevers, headers=admin_header)
     >>> third_ratevers_path = resp.json['path']
     >>> third_ratevers_path != snd_ratevers_path
     True
@@ -1033,12 +1037,12 @@ If we want to change our rate, we can post a new version::
 But creating a second rate is not allowed to prevent people from voting
 multiple times::
 
-    >>> resp = testapp.post_json(rateable_post_pool, rate, headers=god_header)
+    >>> resp = testapp.post_json(rateable_post_pool, rate, headers=admin_header)
     >>> rate2_path = resp.json["path"]
     >>> first_rate2vers_path = resp.json['first_version_path']
     >>> ratevers['data']['adhocracy_core.sheets.versions.IVersionable']['follows'] = [first_rate2vers_path]
     >>> ratevers['root_versions'] = [first_rate2vers_path]
-    >>> resp_data = testapp.post_json(rate2_path, ratevers, headers=god_header,
+    >>> resp_data = testapp.post_json(rate2_path, ratevers, headers=admin_header,
     ...                               status=400).json
     >>> resp_data['errors'][0]['name']
     'data.adhocracy_core.sheets.rate.IRate.object'
@@ -1050,10 +1054,10 @@ multiple times::
 The *subject* of a rate must always be the user that is currently logged in --
 it's not possible to vote for other users::
 
-    >>> ratevers['data']['adhocracy_core.sheets.rate.IRate']['subject'] = 'http://localhost/principals/users/0000001/'
+    >>> ratevers['data']['adhocracy_core.sheets.rate.IRate']['subject'] = 'http://localhost/principals/users/0000005/'
     >>> ratevers['data']['adhocracy_core.sheets.versions.IVersionable']['follows'] = [third_ratevers_path]
     >>> ratevers['root_versions'] = [third_ratevers_path]
-    >>> resp_data = testapp.post_json(rate_path, ratevers, headers=god_header,
+    >>> resp_data = testapp.post_json(rate_path, ratevers, headers=admin_header,
     ...                               status=400).json
     >>> resp_data['errors'][0]['name']
     'data.adhocracy_core.sheets.rate.IRate.subject'
@@ -1183,7 +1187,7 @@ Let's add some more paragraphs to the second document above ::
 
 The batch response is a dictionary with two fields::
 
-    >>> batch_resp = testapp.post_json(batch_url, batch, headers=god_header).json
+    >>> batch_resp = testapp.post_json(batch_url, batch, headers=admin_header).json
     >>> sorted(batch_resp)
     ['responses', 'updated_resources']
 
@@ -1286,7 +1290,7 @@ the paragraph will not be present in the database ::
     ...           }
     ...         ]
     >>> invalid_batch_resp = testapp.post_json(batch_url, invalid_batch,
-    ...                                        status=400, headers=god_header).json
+    ...                                        status=400, headers=admin_header).json
     >>> pprint(sorted(invalid_batch_resp['updated_resources']))
     ['changed_descendants', 'created', 'modified', 'removed']
     >>> pprint(invalid_batch_resp['responses'])
@@ -1561,8 +1565,7 @@ custom filters:
   user resource url.
   Valid query comparable: 'eq'
   Supports sorting.
-
-    >>> resp_data = testapp.get('/Documents', params={'creator': god_path}).json
+    >>> resp_data = testapp.get('/Documents', params={'creator': '/principals/users/0000002'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/Documents/badges/',
      'http://localhost/Documents/document_0000000/']
@@ -1597,7 +1600,7 @@ First we create more paragraphs versions::
     ...                  'follows': [pvrs0_path]}},
     ...          'root_versions': [pvrs0_path]}
     >>> resp = testapp.post_json('http://localhost/Documents/document_0000000/PARAGRAPH_0000002',
-    ...                           pvrs, headers=god_header)
+    ...                           pvrs, headers=admin_header)
     >>> pvrs1_path = resp.json["path"]
 
 Now we can search references::
