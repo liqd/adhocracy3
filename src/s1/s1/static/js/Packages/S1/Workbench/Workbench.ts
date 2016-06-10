@@ -71,6 +71,11 @@ export var s1CurrentColumnDirective = (
                 index: "rates",
                 reverse: true
             }, {
+                key: "controversiality",
+                name: "TR__CONTROVERSIALITY",
+                index: "controversiality",
+                reverse: true
+            }, {
                 key: "comments",
                 name: "TR__COMMENTS_TOTAL",
                 index: "comments",
@@ -114,6 +119,16 @@ export var s1NextColumnDirective = (
                 key: "rates",
                 name: "TR__RATES",
                 index: "rates",
+                reverse: true
+            }, {
+                key: "controversiality",
+                name: "TR__CONTROVERSIALITY",
+                index: "controversiality",
+                reverse: true
+            }, {
+                key: "comments",
+                name: "TR__COMMENTS_TOTAL",
+                index: "comments",
                 reverse: true
             }, {
                 key: "item_creation_date",
@@ -164,6 +179,16 @@ export var s1ArchiveColumnDirective = (
                 key: "rates",
                 name: "TR__RATES",
                 index: "rates",
+                reverse: true
+            }, {
+                key: "controversiality",
+                name: "TR__CONTROVERSIALITY",
+                index: "controversiality",
+                reverse: true
+            }, {
+                key: "comments",
+                name: "TR__COMMENTS_TOTAL",
+                index: "comments",
                 reverse: true
             }, {
                 key: "item_creation_date",
