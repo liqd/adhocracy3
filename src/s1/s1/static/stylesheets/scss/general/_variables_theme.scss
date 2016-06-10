@@ -38,5 +38,7 @@ $color-button-cta-hover-background: $color-brand-one-normal;
 $color-button-cta-active-background: $color-brand-one-extrovert;
 $color-button-cta-active-text: $color-text-inverted;
 
-$s1-header-width: 80%;
 $moving-column-menu-height: 30px / $font-size-normal * 1em;
+$s1-header-width: 80%;
+// REFACT consider pushing this into the standard variables
+$s1-header-height: 100px;

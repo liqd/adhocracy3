@@ -6,6 +6,7 @@
     <div class="s1-header-menu">
         <a class="s1-header-link button-cta-secondary" data-ng-class="{'is-active': meeting == 'archive'}" data-ng-href="{{ processUrl | adhResourceUrl:'archive' }}">{{ "TR__ARCHIVE" | translate }}</a>
         <adh-s1-meeting-selector data-process-url="{{ processUrl }}"></adh-s1-meeting-selector>
+        <a data-ng-href="{{ '/principals/users' | adhResourceUrl }}" class="button-cta-secondary s1-header-userlist">{{ "TR__S1_USER_LIST" | translate }}</a>
         <adh-user-indicator data-separator="/"></adh-user-indicator>
     </div>
 </div>
