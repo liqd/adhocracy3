@@ -518,6 +518,7 @@ def app_settings(request) -> dict:
     settings['zodbconn.uri'] = 'memory://'
     # satisfy substanced
     settings['substanced.secret'] = 'secret'
+    settings['substanced.uploads_tempdir'] = 'var/tmp'
     # extra dependenies
     settings['pyramid.includes'] = [
         # database connection

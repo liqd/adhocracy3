@@ -26,15 +26,19 @@ from colander import drop
 from colander import null
 from deform.widget import DateTimeInputWidget
 from deform.widget import SequenceWidget
+from deform.widget import Select2Widget
 from deform_markdown import MarkdownTextAreaWidget
+from deform.widget import filedict
 from pyramid.path import DottedNameResolver
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
 from pyramid.traversal import lineage
 from pyramid import security
 from pyramid.traversal import find_interface
+from substanced.file import file_upload_widget
 from substanced.file import File
 from substanced.file import USE_MAGIC
+from substanced.form import FileUploadTempStore
 from substanced.util import get_dotted_name
 from substanced.util import find_service
 from zope.interface.interfaces import IInterface
@@ -585,6 +589,19 @@ class Reference(Resource):
     reftype = SheetReference
     backref = False
     validator = All(validate_reftype)
+    multiple = False
+
+    def _get_choices(self):
+        context = self.bindings['context']
+        request = self.bindings['request']
+        return self.choices_getter(context, request)
+
+    @property
+    def widget(self):
+        values = self._get_choices()
+        return Select2Widget(values=values,
+                             multiple=self.multiple
+                             )
 
 
 class Resources(SequenceSchema):
@@ -832,36 +849,58 @@ class Floats(SequenceSchema):
 
 
 class FileStoreType(SchemaType):
-    """Accepts raw file data as per as 'multipart/form-data' upload."""
+    """Accepts `raw file data` or `filedict`.
+
+    `raw file data`: used to make 'multipart/form-data' upload in
+        :class:`adhocracy_core.rest.views.AssetsServiceRESTView` work.
+
+    `filedict`: dictionary with html5 file data, as used for
+        :mod:`adhocracy_core.sdi`.
+    """
 
     SIZE_LIMIT = 16 * 1024 ** 2  # 16 MB
 
-    def serialize(self, node, value):
-        """Serialization is not supported."""
-        raise Invalid(node,
-                      msg='Cannot serialize FileStore',
-                      value=value)
+    def serialize(self, node: SchemaNode, value: File) -> filedict:
+        """Serialize File value to filedict."""
+        if not value:
+            return colander.null
+        cstruct = filedict([('mimetype', value.mimetype),
+                            ('size', value.size),
+                            ('uid', str(hash(value))),
+                            ('filename', value.title),
+                            # prevent file data is written to tmpstore
+                            ('fp', None),
+                            ])
+        return cstruct
 
-    def deserialize(self, node, value):
-        """Deserialize into a File."""
+    def deserialize(self, node: SchemaNode, value: object) -> File:
+        """Deserialize :class:`cgi.file` or class:`deform.widget.filedict` ."""
         if value == null:
             return None
         try:
-            result = File(stream=value.file,
+            filedata, filename = self._get_file_data_and_name(value)
+            filedata.seek(0)
+            result = File(stream=filedata,
                           mimetype=USE_MAGIC,
-                          title=value.filename)
+                          title=filename)
             # We add the size as an extra attribute since get_size() doesn't
             # work before the transaction has been committed
-            if isinstance(value.file, io.BytesIO):
-                result.size = len(value.file.getvalue())
+            if isinstance(filedata, io.BytesIO):
+                result.size = len(filedata.getvalue())
             else:
-                result.size = os.fstat(value.file.fileno()).st_size
+                result.size = os.fstat(filedata.fileno()).st_size
         except Exception as err:
             raise Invalid(node, msg=str(err), value=value)
         if result.size > self.SIZE_LIMIT:
             msg = 'Asset too large: {} bytes'.format(result.size)
             raise Invalid(node, msg=msg, value=value)
         return result
+
+    def _get_file_data_and_name(self, value: object) -> tuple:
+        if isinstance(value, filedict):
+            return value['fp'], value['filename']
+        else:
+            return value.file, value.filename
 
 
 class FileStore(SchemaNode):
@@ -870,6 +909,18 @@ class FileStore(SchemaNode):
     schema_type = FileStoreType
     default = None
     missing = drop
+
+    @deferred
+    def widget(self, kw: dict):
+        if 'request' in kw:
+            return file_upload_widget(self, kw)
+
+    def deserialize(self, cstruct=null):
+        appstruct = super().deserialize(cstruct=cstruct)
+        request = self.bindings.get('request', None)
+        if request:
+            FileUploadTempStore(request).clear()
+        return appstruct
 
 
 class SingleLines(SequenceSchema):
