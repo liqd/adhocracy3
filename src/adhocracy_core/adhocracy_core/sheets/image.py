@@ -68,7 +68,7 @@ def picture_url_validator(node, value):
         msg = 'Connection failed, status is {} instead of 200'
         raise Invalid(node, msg.format(resp.status_code))
 
-    mimetype = resp.headers.get('ContentType', '')
+    mimetype = resp.headers.get('Content-Type', '')
     image_mime_type_validator(node, mimetype)
 
     size = int(resp.headers.get('Content-Length', '0'))
