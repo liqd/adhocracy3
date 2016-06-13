@@ -82,3 +82,60 @@ class TestIAssetMetadata:
     def test_includeme_register(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
         assert registry.content.get_sheet(context, meta.isheet)
+
+
+class TestIAssetData:
+
+    @fixture
+    def meta(self):
+        from .asset import asset_data_meta
+        return asset_data_meta
+
+    def test_meta(self, meta):
+        from . import asset
+        assert meta.isheet == asset.IAssetData
+        assert meta.schema_class == asset.AssetDataSchema
+        assert meta.readable is False
+
+    def test_create(self, meta, context):
+        from .asset import deferred_validate_asset_mime_type
+        inst = meta.sheet_class(meta, context, None)
+        inst.schema['data'].widget == deferred_validate_asset_mime_type
+
+    def test_get(self, meta, context):
+        inst = meta.sheet_class(meta, context, None)
+        assert inst.get() == {'data': None}
+
+    @mark.usefixtures('integration')
+    def test_includeme_register(self, meta, registry):
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert registry.content.get_sheet(context, meta.isheet)
+
+
+class TestDeferredValidateAssetMimeType:
+
+    def call_fut(self, *args):
+        from .asset import deferred_validate_asset_mime_type
+        return deferred_validate_asset_mime_type(*args)
+
+    def test_ignore_if_no_image(self, node, context):
+        kw = {'context': context,
+              'creating': None }
+        assert self.call_fut(node, kw) is None
+
+    def test_validate_mimetype_if_editing_image(self, node):
+        from adhocracy_core.resources.image import IImage
+        from .image import validate_image_data_mimetype
+        context = testing.DummyResource(__provides__=IImage)
+        kw = {'context': context,
+              'creating': None}
+        assert self.call_fut(node, kw) == validate_image_data_mimetype
+
+    def test_validate_mimetype_if_creating_image(self, node, context,
+                                                 resource_meta):
+        from adhocracy_core.sheets.image import validate_image_data_mimetype
+        from adhocracy_core.resources.image import IImage
+        creating = resource_meta._replace(iresource=IImage)
+        kw = {'context': context,
+              'creating': creating}
+        assert self.call_fut(node, kw) == validate_image_data_mimetype

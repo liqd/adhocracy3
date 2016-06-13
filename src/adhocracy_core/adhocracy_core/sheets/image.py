@@ -1,6 +1,5 @@
 """image sheet."""
 from colander import OneOf
-from colander import required
 from colander import All
 from colander import Invalid
 from requests.exceptions import ConnectionError
@@ -17,6 +16,7 @@ from adhocracy_core.schema import Reference
 from adhocracy_core.schema import Resource
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import URL
+from adhocracy_core.schema import SchemaNode
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
@@ -29,13 +29,19 @@ class IImageMetadata(IAssetMetadata):
 image_mime_type_validator = OneOf(('image/gif', 'image/jpeg', 'image/png'))
 
 
+def validate_image_data_mimetype(node: SchemaNode, value):
+    """Validate image mime type of `value`."""
+    mimetype = value.mimetype
+    image_mime_type_validator(node, mimetype)
+
+
 class ImageMetadataSchema(AssetMetadataSchema):
     """Data structure storing image asset metadata."""
 
-    mime_type = SingleLine(missing=required,
-                           validator=image_mime_type_validator)
-    detail = Resource(dimensions=Dimensions(width=800, height=800))
-    thumbnail = Resource(dimensions=Dimensions(width=100, height=100))
+    detail = Resource(dimensions=Dimensions(width=800, height=800),
+                      readonly=True)
+    thumbnail = Resource(dimensions=Dimensions(width=100, height=100),
+                         readonly=True)
 
 
 image_metadata_meta = asset_metadata_meta._replace(
