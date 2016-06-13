@@ -15,9 +15,9 @@ export var register = (angular) => {
             AdhDebateWorkbenchModule.moduleName
         ])
         .config(["adhProcessProvider", (adhProcessProvider: AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[RIEuthCollaborativeTextProcess.content_type] =
+            adhProcessProvider.templates[RIEuthCollaborativeTextProcess.content_type] =
                 "<adh-debate-workbench></adh-debate-workbench>";
-            adhProcessProvider.templateFactories[RIEuthCollaborativeTextPrivateProcess.content_type] =
+            adhProcessProvider.templates[RIEuthCollaborativeTextPrivateProcess.content_type] =
                 "<adh-debate-workbench></adh-debate-workbench>";
         }])
         .config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RIEuthCollaborativeTextProcess)])

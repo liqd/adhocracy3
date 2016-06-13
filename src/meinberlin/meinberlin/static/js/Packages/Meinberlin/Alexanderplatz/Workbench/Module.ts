@@ -31,7 +31,7 @@ export var register = (angular) => {
             AdhTopLevelStateModule.moduleName
         ])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[processType] =
+            adhProcessProvider.templates[processType] =
                 "<adh-meinberlin-alexanderplatz-workbench></adh-meinberlin-alexanderplatz-workbench>";
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider, adhConfig) => {

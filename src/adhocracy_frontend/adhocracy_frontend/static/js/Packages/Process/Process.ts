@@ -35,11 +35,11 @@ export var getStateData = (sheet : SIWorkflow.Sheet, name : string) : IStateData
 
 
 export class Provider implements angular.IServiceProvider {
-    public templateFactories : {[processType : string]: string};
+    public templates : {[processType : string]: string};
     public $get;
 
     constructor () {
-        this.templateFactories = {};
+        this.templates = {};
 
         this.$get = ["$injector", ($injector) => {
             return new Service(this, $injector);
@@ -54,10 +54,10 @@ export class Service {
     ) {}
 
     public getTemplate(processType : string) : string {
-        if (!this.provider.templateFactories.hasOwnProperty(processType)) {
+        if (!this.provider.templates.hasOwnProperty(processType)) {
             return "";
         }
-        return this.provider.templateFactories[processType];
+        return this.provider.templates[processType];
     }
 }
 

@@ -33,7 +33,7 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIPcompassProcess.content_type)])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[RIPcompassProcess.content_type] =
+            adhProcessProvider.templates[RIPcompassProcess.content_type] =
                 "<adh-pcompass-workbench></adh-pcompass-workbench>";
         }])
         .directive("adhPcompassWorkbench", ["adhTopLevelState", "adhConfig", "adhHttp", Workbench.workbenchDirective])

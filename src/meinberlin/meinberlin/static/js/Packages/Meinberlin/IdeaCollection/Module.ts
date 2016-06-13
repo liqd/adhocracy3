@@ -66,7 +66,7 @@ export var register = (angular) => {
             adhResourceAreaProvider.customHeader(processType, customHeader);
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[processType] =
+            adhProcessProvider.templates[processType] =
                 "<adh-meinberlin-idea-collection-workbench></adh-meinberlin-idea-collection-workbench>";
         }]);
 };

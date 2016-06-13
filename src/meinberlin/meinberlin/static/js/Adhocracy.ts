@@ -166,7 +166,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
 
     // register debate workbench
     app.config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-        adhProcessProvider.templateFactories[RICollaborativeTextProcess.content_type] =
+        adhProcessProvider.templates[RICollaborativeTextProcess.content_type] =
             "<adh-debate-workbench></adh-debate-workbench>";
     }]);
     app.config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RICollaborativeTextProcess)]);

@@ -32,8 +32,8 @@ export var register = (angular) => {
             AdhTopLevelStateModule.moduleName
         ])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[RIEuthProcess.content_type] = "<adh-pcompass-workbench></adh-pcompass-workbench>";
-            adhProcessProvider.templateFactories[RIEuthPrivateProcess.content_type] =
+            adhProcessProvider.templates[RIEuthProcess.content_type] = "<adh-pcompass-workbench></adh-pcompass-workbench>";
+            adhProcessProvider.templates[RIEuthPrivateProcess.content_type] =
                 "<adh-pcompass-workbench></adh-pcompass-workbench>";
         }])
         .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIEuthProcess)])

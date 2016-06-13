@@ -37,7 +37,7 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIProcess.content_type)])
         .config(["adhProcessProvider", (adhProcessProvider) => {
-            adhProcessProvider.templateFactories[processType] =
+            adhProcessProvider.templates[processType] =
                 "<adh-mercator-2015-workbench></adh-mercator-2015-workbench>";
         }])
         .directive("adhMercator2015Workbench", ["adhConfig", "adhTopLevelState", Workbench.workbenchDirective])

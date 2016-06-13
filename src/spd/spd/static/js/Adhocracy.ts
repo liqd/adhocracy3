@@ -162,7 +162,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
 
     // register workbench
     app.config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-        adhProcessProvider.templateFactories[RIDigitalLebenProcess.content_type] =
+        adhProcessProvider.templates[RIDigitalLebenProcess.content_type] =
             "<adh-debate-workbench></adh-debate-workbench>";
     }]);
     app.config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RIDigitalLebenProcess)]);

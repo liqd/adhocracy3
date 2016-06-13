@@ -41,7 +41,7 @@ export var register = (angular) => {
             Workbench.registerRoutes(processType)(adhResourceAreaProvider, adhMetaApi);
         }])
         .config(["adhProcessProvider", (adhProcessProvider) => {
-            adhProcessProvider.templateFactories[processType] = "<adh-mercator-2016-workbench></adh-mercator-2016-workbench>";
+            adhProcessProvider.templates[processType] = "<adh-mercator-2016-workbench></adh-mercator-2016-workbench>";
         }])
         .directive("adhMercator2016Workbench", ["adhConfig", "adhTopLevelState", Workbench.workbenchDirective])
         .directive("adhMercator2016ProposalCreateColumn", [
