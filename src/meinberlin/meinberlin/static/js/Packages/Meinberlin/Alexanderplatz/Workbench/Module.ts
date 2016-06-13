@@ -39,8 +39,8 @@ export var register = (angular) => {
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider, adhConfig) => {
             var processType = RIAlexanderplatzProcess.content_type;
-            var customHeader = adhConfig.pkg_path + AdhMeinberlinIdeaCollection.pkgLocation + "/CustomHeader.html";
-            adhResourceAreaProvider.customHeader(processType, customHeader);
+            var processHeaderSlot = adhConfig.pkg_path + AdhMeinberlinIdeaCollection.pkgLocation + "/ProcessHeaderSlot.html";
+            adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
             Workbench.registerRoutes(processType)(adhResourceAreaProvider);
         }])
         .directive("adhMeinberlinAlexanderplatzWorkbench", [

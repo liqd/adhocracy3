@@ -33,8 +33,8 @@ export var register = (angular) => {
             registerRoutes(processType)(adhResourceAreaProvider);
             registerRoutes(processType, "kiezkasse")(adhResourceAreaProvider);
 
-            var customHeader = adhConfig.pkg_path + AdhMeinberlinIdeaCollection.pkgLocation + "/CustomHeader.html";
-            adhResourceAreaProvider.customHeader(processType, customHeader);
+            var processHeaderSlot = adhConfig.pkg_path + AdhMeinberlinIdeaCollection.pkgLocation + "/ProcessHeaderSlot.html";
+            adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[processType] =

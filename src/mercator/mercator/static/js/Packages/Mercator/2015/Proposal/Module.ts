@@ -48,8 +48,8 @@ export var register = (angular) => {
             adhMetaApi
         ) => {
             var processType = RIMercator2015Process.content_type;
-            var customHeader = adhConfig.pkg_path + Proposal.pkgLocation + "/CustomHeader.html";
-            adhResourceAreaProvider.customHeader(processType, customHeader);
+            var processHeaderSlot = adhConfig.pkg_path + Proposal.pkgLocation + "/ProcessHeaderSlot.html";
+            adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
             Proposal.registerRoutes(processType)(adhResourceAreaProvider, adhMetaApi);
         }])
         .config(["flowFactoryProvider", (flowFactoryProvider) => {
