@@ -348,7 +348,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
                 var defaults : Dict = self.getDefaults(resource.content_type, view, processType, embedContext);
 
                 var meta : Dict = {
-                    customHeader: self.provider.customHeaders[processType],
+                    areaHeader: self.provider.customHeaders[processType],
                     embedContext: embedContext,
                     processType: processType,
                     processUrl: processUrl,
