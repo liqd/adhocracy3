@@ -11,6 +11,7 @@ class IDocumentProcess(IProcess):
 
 
 document_process_meta = process_meta._replace(
+    content_name='DocumentProcess',
     iresource=IDocumentProcess,
     element_types=(IDocument,
                    ),

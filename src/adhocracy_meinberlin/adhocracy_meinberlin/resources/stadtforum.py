@@ -20,6 +20,7 @@ class IProcess(process.IProcess):
 
 
 process_meta = process.process_meta._replace(
+    content_name='StadtForumProcess',
     iresource=IProcess,
     element_types=(IPoll,
                    ),

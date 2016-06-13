@@ -11,6 +11,7 @@ class IProcess(process.IProcess):
 
 
 process_meta = process.process_meta._replace(
+    content_name='IdeaCollectionProcess',
     iresource=IProcess,
     element_types=(proposal.IGeoProposal,
                    ),
