@@ -18,6 +18,7 @@ def includeme(config):
     config.include('.resources')
     config.include('.workflows')
     config.include('.rest')
+    config.include('.evolution')
 
 
 def main(global_config, **settings):
