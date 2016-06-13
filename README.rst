@@ -16,6 +16,3 @@ licensed under the GNU Affero General Public License (AGPLv3), see
 LICENSE.txt.
 
 Further reading http://adhocracy3.readthedocs.org/
-
-
-
