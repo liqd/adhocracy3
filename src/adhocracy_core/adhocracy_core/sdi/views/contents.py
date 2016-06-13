@@ -1,6 +1,7 @@
 """Contents tab."""
 from substanced.folder.views import FolderContents
 from substanced.folder.views import folder_contents_views
+from adhocracy_core.interfaces import IResource
 
 
 @folder_contents_views()
@@ -20,3 +21,16 @@ class AdhocracyFolderContents(FolderContents):
             if intr['content_type'] in addables:
                 cts.append(data)
         return cts
+
+    def get_query(self):
+        """The default query function for a folder."""
+        system_catalog = self.system_catalog
+        folder = self.context
+        path = system_catalog['path']
+        interfaces = system_catalog['interfaces']
+        allowed = system_catalog['allowed']
+        q = (path.eq(folder, depth=1, include_origin=False) &
+             interfaces.any([IResource]) &
+             allowed.allows(self.request, 'sdi.view')
+             )
+        return q
