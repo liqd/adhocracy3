@@ -1,4 +1,6 @@
 {
+    "TR__CHOOSE_BADGE": "Wählen Sie ein Etikett",
+    "TR__CHOOSE_BADGES": "Wählen Sie ein oder mehrere Etiketten",
     "TR__CREATE_PROPOSAL": "Vorschlag anlegen",
     "TR__CURRENT_STATE": "Aktueller Status",
     "TR__ERROR_MUST_BE_A_VALID_EMAIL_STRING": "Bitte eine gültige E-Mail-Adresse angeben",
