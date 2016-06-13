@@ -43,8 +43,10 @@ designers sometimes have very different angles on the same things.
 With the following terms I try to find (and name) common grounds. This
 terminology is largely based on existing systems like
 `OOCSS <https://github.com/stubbornella/oocss/wiki>`_,
-`SMACSS <http://smacss.com>`_ and
-`BEM <http://bem.info/method/definitions/>`_. The basic idea is to apply
+`SMACSS <http://smacss.com>`_,
+`BEM <http://bem.info/method/definitions/>`_,
+`SUIT <https://github.com/suitcss/suit/>`_, and
+`Pattern Lab <http://patternlab.io/about.html>`_. The basic idea is to apply
 concepts known from object oriented programming (OOP) to CSS code. The
 descriptions are written so that non-programmers should be able to grasp
 them easily.
