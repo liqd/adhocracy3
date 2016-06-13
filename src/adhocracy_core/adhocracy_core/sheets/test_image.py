@@ -58,7 +58,10 @@ class TestImageReference:
         assert meta.editable is True
 
     def test_create(self, meta, context):
-        assert meta.sheet_class(meta, context, None)
+        from .image import get_asset_choices
+        inst = meta.sheet_class(meta, context, None)
+        assert inst
+        assert inst.schema['picture'].choices_getter == get_asset_choices
 
     def test_schema(self, inst):
         from .image import picture_url_validator
@@ -77,6 +80,30 @@ class TestImageReference:
         assert registry.content.get_sheet(context, meta.isheet)
 
 import colander
+
+class TestGetAssetChoices:
+
+    def call_fut(self, *args):
+        from .image import get_asset_choices
+        return get_asset_choices(*args)
+
+    def test_return_empty_list_if_no_assets_service(self, pool):
+        assert self.call_fut(pool, None) == []
+
+    def test_return_empty_list_if_empty_assets_service(self, pool, service):
+        pool['assets'] = service
+        assert self.call_fut(pool, None) == []
+
+    def test_get_asset_choices_from_assets_service(self, pool, request_,
+                                                   service):
+        from .image import IImageMetadata
+        service['image'] = testing.DummyResource(__provides__=IImageMetadata)
+        service['no_image'] = testing.DummyResource()
+        pool['assets'] = service
+        choices = self.call_fut(pool, request_)
+        assert choices == [('http://example.com/assets/image/',
+                            '/assets/image')]
+
 
 class TestPictureUrlValidator:
 

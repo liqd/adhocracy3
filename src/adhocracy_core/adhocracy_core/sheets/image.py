@@ -3,7 +3,9 @@ from colander import OneOf
 from colander import required
 from colander import All
 from colander import Invalid
+from pyramid.traversal import resource_path
 from requests.exceptions import ConnectionError
+from substanced.util import find_service
 import requests
 
 from adhocracy_core.interfaces import Dimensions
@@ -77,10 +79,23 @@ def picture_url_validator(node, value):
         raise Invalid(node, msg)
 
 
+def get_asset_choices(context, request) -> []:
+    """Return asset choices based on the available `assets` service."""
+    assets = find_service(context, 'assets')
+    if assets is None:
+        return []
+    target_isheet = ImageReference.getTaggedValue('target_isheet')
+    choices = [(request.resource_url(asset), resource_path(asset))
+               for asset in assets.values()
+               if target_isheet.providedBy(asset)]
+    return choices
+
+
 class ImageReferenceSchema(MappingSchema):
     """Data structure for the image reference sheet."""
 
-    picture = Reference(reftype=ImageReference)
+    picture = Reference(reftype=ImageReference,
+                        choices_getter=get_asset_choices)
     picture_description = SingleLine()
     external_picture_url = URL(validator=All(URL.validator,
                                              picture_url_validator,
