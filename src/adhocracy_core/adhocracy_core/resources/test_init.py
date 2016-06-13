@@ -51,7 +51,7 @@ class TestAddResourceTypeToRegistry:
         iresource = IResource
         resource_type = iresource.__identifier__
         self.make_one(resource_meta, config)
-        assert registry.content.meta[resource_type]['content_name'] ==\
+        assert registry.content.meta[resource_type]['name'] ==\
                resource_type  # substance uses strings for content type ids
         assert registry.content.resources_meta[iresource] == \
                resource_meta  # adhocracy uses interfaces for content types ids
@@ -61,7 +61,7 @@ class TestAddResourceTypeToRegistry:
         type_id = IResource.__identifier__
         metadata_a = resource_meta._replace(content_name='Name')
         self.make_one(metadata_a, config)
-        assert config.registry.content.meta[type_id]['content_name'] == 'Name'
+        assert config.registry.content.meta[type_id]['name'] == 'Name'
 
     def test_add_sdi_view_name_if_is_sdi_addable(self, config, resource_meta):
         from adhocracy_core.sdi import add_sdi_add_view
