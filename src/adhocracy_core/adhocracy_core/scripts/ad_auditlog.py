@@ -1,6 +1,5 @@
 """Script to view auditlog entries."""
 
-import transaction
 import argparse
 import inspect
 import logging
@@ -18,18 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 def main():  # pragma: no cover
-    """View auditlog entries.
-
-    Show the auditlog entries for a time period:
-
-    ./bin/ad_auditlog -s 2016-01-01 -e 2016-02-1 etc/development.ini
-
-    If no startdate is given the start of the auditlog is used.
-    If no enddate is given the end of the auditlog is uded,
-
-    Additionally filtering by resource path is possible:
-    ./bin/ad_auditlog -s 2016-01-01 -e 2016-02-1 -p /path etc/development.ini
-    """
+    """Print auditlog entries."""
     docstring = inspect.getdoc(main)
     parser = argparse.ArgumentParser(description=docstring)
     parser.add_argument('ini_file',
@@ -53,7 +41,6 @@ def main():  # pragma: no cover
     env = bootstrap(args.ini_file)
     auditlog_show(env['root'], startdate=args.startdate,
                   endtdate=args.enddate, path=args.path)
-    transaction.commit()
     env['closer']()
 
 
