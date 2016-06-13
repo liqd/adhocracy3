@@ -55,7 +55,7 @@ export class Service {
 
     public getTemplate(processType : string) : string {
         if (!this.provider.templates.hasOwnProperty(processType)) {
-            return "";
+            throw "No template for process type \"" + processType + "\" has been configured.";
         }
         return this.provider.templates[processType];
     }
