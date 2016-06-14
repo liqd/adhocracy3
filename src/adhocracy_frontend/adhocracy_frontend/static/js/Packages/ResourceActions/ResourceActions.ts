@@ -16,7 +16,7 @@ export var resourceActionsDirective = (
             resourcePath: "@",
             parentPath: "=?",
             share: "=?",
-            delete: "=?",
+            resourceWidgetDelete: "=?",
             print: "=?",
             report: "=?",
             cancel: "=?",
@@ -63,7 +63,7 @@ export var shareActionDirective = () => {
     };
 };
 
-export var deleteActionDirective = () => {
+export var resourceWidgetDeleteActionDirective = () => {
     return {
         restrict: "E",
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"delete();\">{{ 'TR__DELETE' | translate }}</a>",
