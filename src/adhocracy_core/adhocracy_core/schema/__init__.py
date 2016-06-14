@@ -49,6 +49,7 @@ from zope.interface.interfaces import IInterface
 import colander
 import pytz
 
+from adhocracy_core.interfaces import API_ROUTE_NAME
 from adhocracy_core.utils import normalize_to_tuple
 from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.utils import get_iresource
@@ -497,7 +498,8 @@ class ResourceObjectType(SchemaType):
             cstruct['data'] = sheet_cstructs
             return cstruct
         else:
-            return bindings['request'].resource_url(value)
+            return bindings['request'].resource_url(value,
+                                                    route_name=API_ROUTE_NAME)
 
     def deserialize(self, node, value):
         """Deserialize url or path to object.

@@ -23,7 +23,7 @@ Start adhocracy app and log in some users::
 
 Test that the relevant resources and sheets exist:
 
-    >>> resp = anonymous.get('http://localhost/meta_api/').json
+    >>> resp = anonymous.get('/meta_api').json
     >>> 'adhocracy_core.sheets.versions.IVersions' in resp['sheets']
     True
     >>> 'adhocracy_core.sheets.principal.IUserBasic' in resp['sheets']
@@ -48,7 +48,7 @@ path of the new user::
     ...                  'email': 'anna@example.org'},
     ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
     ...                  'password': 'EckVocUbs3'}}}
-    >>> resp = anonymous.post('http://localhost/principals/users', data).json
+    >>> resp = anonymous.post('/principals/users', data).json
     >>> resp['content_type']
     'adhocracy_core.resources.principal.IUser'
     >>> user_path = resp['path']
@@ -80,7 +80,7 @@ E.g. when we try to register a user with an empty password::
     ...                  'email': 'annina@example.org'},
     ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
     ...                  'password': ''}}}
-    >>> resp = anonymous.post('http://localhost/principals/users', data)
+    >>> resp = anonymous.post('/principals/users', data)
     >>> resp.status_code
     400
     >>> pprint(resp.json)
@@ -113,7 +113,7 @@ registered::
     ...                  'email': 'anna@example.org'},
     ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
     ...                  'password': 'EckVocUbs3'}}}
-    >>> resp = anonymous.post('http://localhost/principals/users', data)
+    >>> resp = anonymous.post('/principals/users', data)
     >>> resp.status_code
     400
     >>> pprint(resp.json)
@@ -169,7 +169,7 @@ must post a JSON request containing the path to the
 
     >>> newest_activation_path = getfixture('newest_activation_path')
     >>> data = {'path': newest_activation_path}
-    >>> resp = anonymous.post('http://localhost/activate_account', data).json
+    >>> resp = anonymous.post('/activate_account', data).json
     >>> pprint(resp)
     {'status': 'success',
      'user_path': '.../principals/users/...',
@@ -181,7 +181,7 @@ successful login request (see next section).  This means that the user
 account has been activated and the user is now logged in. ::
 
     >>> data = {'path': '/activate/blahblah'}
-    >>> resp = anonymous.post('http://localhost/activate_account', data)
+    >>> resp = anonymous.post('/activate_account', data)
     >>> resp.status_code
     400
     >>> pprint(resp.json)
@@ -234,7 +234,7 @@ JSON request to the URL ``login_username`` with a user name and password::
 
     >>> data = {'name': 'Anna Müller',
     ...         'password': 'EckVocUbs3'}
-    >>> resp = anonymous.post('http://localhost/login_username', data).json
+    >>> resp = anonymous.post('/login_username', data).json
     >>> pprint(resp)
     {'status': 'success',
      'user_path': '.../principals/users/...',
@@ -249,7 +249,7 @@ Or to ``login_email``, specifying the user's email address instead of name::
 
     >>> data = {'email': 'anna@example.org',
     ...        'password': 'EckVocUbs3'}
-    >>> resp = anonymous.post('http://localhost/login_email', data).json
+    >>> resp = anonymous.post('/login_email', data).json
     >>> pprint(resp)
     {'status': 'success',
      'user_path': '.../principals/users/...',
@@ -266,7 +266,7 @@ the wrong password is specified. For security reasons, the same error message
 
     >>> data = {'name': 'No such user',
     ...         'password': 'EckVocUbs3'}
-    >>> resp = anonymous.post('http://localhost/login_username', data)
+    >>> resp = anonymous.post('/login_username', data)
     >>> resp.status_code
     400
     >>> pprint(resp.json)
@@ -300,7 +300,6 @@ Without authentication we may not post anything::
     True
 
 With authentication instead we may::
-
     >>> resp = admin.options('/').json
     >>> pprint(resp['POST']['request_body'])
     [...'adhocracy_core.resources.organisation.IOrganisation',...]
@@ -310,7 +309,7 @@ that identifies the "X-User-Token" header as source of the problem::
 
     >>> broken = copy(anonymous)
     >>> broken.header = broken_header
-    >>> resp = broken.get('http://localhost/meta_api/')
+    >>> resp = broken.get('/meta_api')
     >>> resp.status_code
     400
     >>> sorted(resp.json.keys())

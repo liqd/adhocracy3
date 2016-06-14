@@ -371,11 +371,15 @@ class TestResourceObjectUnitTests:
             inst.serialize(node, child)
 
     def test_serialize_value_url_location_aware_without_parent_and_name(
-            self, request_, node):
+            self, request_, node, mocker):
+        from adhocracy_core.interfaces import API_ROUTE_NAME
         inst = self.make_one()
         child = testing.DummyResource()
         node = node.bind(request=request_)
+        mocker.spy(request_, 'resource_url')
         result = inst.serialize(node, child)
+        request_.resource_url.assert_called_with(child,
+                                                 route_name=API_ROUTE_NAME)
         assert result == request_.application_url + '/'
 
     def test_serialize_value_url_location_aware_with_serialize_to_content(

@@ -689,7 +689,7 @@ class AppUser:
 
     def __init__(self,
                  app_router: Router,
-                 rest_url: str='http://localhost',
+                 rest_url: str='http://localhost/api',
                  base_path: str='/',
                  header: dict=None,
                  user_path: str='',
@@ -786,7 +786,10 @@ class AppUser:
     def _build_url(self, path: str) -> str:
         if path.startswith('http'):
             return path
-        return self.rest_url + self.base_path + path
+        elif path.startswith('/'):
+            return self.rest_url + path
+        else:
+            return self.rest_url + self.base_path + path
 
     def batch(self, subrequests: list):
         """Build and post batch request to the backend rest server."""

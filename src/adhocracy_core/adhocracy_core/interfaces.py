@@ -24,6 +24,7 @@ from substanced.sdi import MANAGE_ROUTE_NAME
 
 
 SDI_ROUTE_NAME = MANAGE_ROUTE_NAME
+API_ROUTE_NAME = 'adhocracy_api'
 
 
 DEFAULT_USER_GROUP_NAME = 'default_group'
