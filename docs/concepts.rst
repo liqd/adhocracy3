@@ -63,14 +63,14 @@ be the creator (role) of one proposal (context) and therefore
 permitted to edit it (permission). Proposals that she hasn't
 created, she may not edit, but she may comment on them.
 
-workflow and phases
--------------------
+workflow states
+---------------
 
-Participation processes typically have multiple
-phases: For example, you may want to first publish an
-announcement, then have the actual participation for some time,
-and display the results once that is over. This is possible by
-using workflows.  Workflows can be used with processes, but also
-with any other kind of resource. An important feature of
-workflows is that you can change the permissions
-for each role based on the phase.
+Participation processes typically have multiple phases: For example, you
+may want to first publish an announcement, then have the actual
+participation for some time, and display the results once that is over.
+This is possible by using workflows that can have different states.
+
+Workflows can be used with processes, but also with any other kind of
+resource. An important feature of workflows is that you can change the
+permissions for each role based on the state.
