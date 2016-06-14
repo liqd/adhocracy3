@@ -130,15 +130,9 @@ export var proposalDetailColumnDirective = (
             });
 
             scope.hide = () => {
-                var proposalClass = RIGeoProposal;
-                if (scope.isKiezkasse) {
-                    proposalClass = RIKiezkasseProposal;
-                } else if (scope.isBuergerhaushalt) {
-                    proposalClass = RIBuergerhaushaltProposal;
-                }
                 return $translate("TR__ASK_TO_CONFIRM_HIDE_ACTION").then((question) => {
                     if ($window.confirm(question)) {
-                        adhHttp.hide(AdhUtil.parentPath(scope.proposalUrl), proposalClass.content_type)
+                        adhHttp.hide(AdhUtil.parentPath(scope.proposalUrl))
                             .then(() => {
                                 adhTopLevelState.goToCameFrom("/");
                             });

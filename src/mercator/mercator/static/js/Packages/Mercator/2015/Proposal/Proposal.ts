@@ -269,7 +269,7 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
         var itemPath = AdhUtil.parentPath(path);
         // FIXME: translate
         if (this.$window.confirm("Do you really want to delete this?")) {
-            return this.adhHttp.hide(itemPath, RIMercatorProposal.content_type)
+            return this.adhHttp.hide(itemPath)
                 .then(() => {
                     this.$location.url("/r/mercator");
                 });

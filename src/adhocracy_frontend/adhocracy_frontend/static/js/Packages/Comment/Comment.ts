@@ -242,7 +242,7 @@ export var commentDetailDirective = (
         scope.hide = () : angular.IPromise<void> => {
             return $translate("TR__ASK_TO_CONFIRM_HIDE_ACTION").then((question) => {
                 if ($window.confirm(question)) {
-                    return adhHttp.hide(scope.data.itemPath, RIComment.content_type).then(() => {
+                    return adhHttp.hide(scope.data.itemPath).then(() => {
                         if (scope.onSubmit) {
                             scope.onSubmit();
                         }
