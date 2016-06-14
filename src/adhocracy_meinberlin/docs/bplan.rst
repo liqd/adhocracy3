@@ -89,7 +89,7 @@ A working image url is needed to test referencing external images.
     >>> base_path = adhocracy_core.__path__[0]
     >>> test_image_path = os.path.join(base_path, '../', 'docs', 'test_image.png')
     >>> httpserver.serve_content(open(test_image_path, 'rb').read())
-    >>> httpserver.headers['ContentType'] = 'image/png'
+    >>> httpserver.headers['Content-Type'] = 'image/png'
     >>> test_image_url = httpserver.url
 
 
