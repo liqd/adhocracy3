@@ -20,6 +20,10 @@ from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.utils import get_iresource
 
 
+# check python-magic is installed properly to make mime type validation work
+import magic  # noqa
+
+
 class IHasAssetPool(ISheet, ISheetReferenceAutoUpdateMarker):
     """Marker interface for resources that have an asset pool."""
 
