@@ -23,6 +23,7 @@ def enabled_ordering(pool: IPool, registry: Registry, **kwargs):
 
 
 organisation_meta = pool_meta._replace(
+    content_name='Organisation',
     iresource=IOrganisation,
     permission_create='create_organisation',
     is_implicit_addable=True,

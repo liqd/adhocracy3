@@ -8,6 +8,7 @@ class IProcess(document_process.IDocumentProcess):
 
 
 process_meta = document_process.document_process_meta._replace(
+    content_name='CollaborativeTextProcess',
     iresource=IProcess,
     workflow_name='debate'
 )

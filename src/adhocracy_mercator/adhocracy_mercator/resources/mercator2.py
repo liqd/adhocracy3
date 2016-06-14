@@ -253,6 +253,7 @@ class IProcess(process.IProcess):
 
 
 process_meta = process.process_meta._replace(
+    content_name='Mercator2016Process',
     iresource=IProcess,
     element_types=(IMercatorProposal,
                    ),

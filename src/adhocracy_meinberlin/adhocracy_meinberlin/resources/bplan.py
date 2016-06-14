@@ -36,6 +36,7 @@ class IProcess(process.IProcess):
 
 
 process_meta = process.process_meta._replace(
+    content_name='BplanProcess',
     iresource=IProcess,
     element_types=(IProposal,
                    ),

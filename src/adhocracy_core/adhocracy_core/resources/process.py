@@ -14,6 +14,7 @@ class IProcess(IPool):
 
 
 process_meta = pool_meta._replace(
+    content_name='Process',
     iresource=IProcess,
     permission_create='create_process',
     is_sdi_addable=True,
