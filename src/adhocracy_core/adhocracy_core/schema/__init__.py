@@ -26,6 +26,7 @@ from colander import drop
 from colander import null
 from deform.widget import DateTimeInputWidget
 from deform.widget import SequenceWidget
+from deform.widget import Select2Widget
 from deform_markdown import MarkdownTextAreaWidget
 from pyramid.path import DottedNameResolver
 from pyramid.traversal import find_resource
@@ -566,6 +567,26 @@ def validate_reftype(node: SchemaNode, value: IResource):
         raise Invalid(node, msg=error, value=value)
 
 
+@deferred
+def deferred_select_widget(node, kw) -> Select2Widget:
+    """Return Select2Widget expects `node` to have `choices_getter` `multiple`.
+
+    `choices_getter` is a function attribute accepting `node` and
+    `request` and returning a list with selectable option tuples.
+
+    `multiple` is a boolean attribute enabling multiselect.
+    """
+    choices = []
+    if hasattr(node, 'choices_getter'):
+        context = kw['context']
+        request = kw['request']
+        choices = node.choices_getter(context, request)
+    multiple = getattr(node, 'multiple', False)
+    return Select2Widget(values=choices,
+                         multiple=multiple
+                         )
+
+
 class Reference(Resource):
     """Schema Node to reference a resource that implements a specific sheet.
 
@@ -585,6 +606,8 @@ class Reference(Resource):
     reftype = SheetReference
     backref = False
     validator = All(validate_reftype)
+    multiple = False
+    widget = deferred_select_widget
 
 
 class Resources(SequenceSchema):
@@ -619,6 +642,8 @@ class References(Resources):
     reftype = SheetReference
     backref = False
     validator = All(_validate_reftypes)
+    multiple = True
+    widget = deferred_select_widget
 
 
 class UniqueReferences(References):
