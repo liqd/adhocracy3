@@ -69,17 +69,20 @@ The organization for the B-Plan needs to exist beforehand in the a3
 platform.
 
     >>> from webtest import TestApp
-    >>> from adhocracy_core.testing import god_header
     >>> app_router = getfixture('app_router')
     >>> testapp = TestApp(app_router)
+    >>> resp = testapp.post_json('/login_username',
+    ...                          {'name': 'admin', 'password': 'password'})
+    >>> admin_header = {'X-User-Token': resp.json['user_token']}
     >>> rest_url = 'http://localhost'
+
     >>> data = {'content_type':
     ...                'adhocracy_core.resources.organisation.IOrganisation',
     ...         'data': {
     ...             'adhocracy_core.sheets.name.IName':
     ...                 {'name': 'orga'}
     ...         }}
-    >>> resp = testapp.post_json(rest_url + '/', data, headers=god_header)
+    >>> resp = testapp.post_json(rest_url + '/', data, headers=admin_header)
 
 A working image url is needed to test referencing external images.
 
