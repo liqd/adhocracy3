@@ -1,6 +1,7 @@
 """Sheets for managing assets."""
 
 from colander import required
+from colander import deferred
 from persistent import Persistent
 from zope.deprecation import deprecated
 
@@ -12,9 +13,15 @@ from adhocracy_core.schema import FileStore
 from adhocracy_core.schema import Integer
 from adhocracy_core.schema import PostPool
 from adhocracy_core.schema import SingleLine
+from adhocracy_core.schema import SchemaNode
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
+from adhocracy_core.utils import get_iresource
+
+
+# check python-magic is installed properly to make mime type validation work
+import magic  # noqa
 
 
 class IHasAssetPool(ISheet, ISheetReferenceAutoUpdateMarker):
@@ -48,7 +55,7 @@ class AssetReference(SheetToSheet):
 class AssetMetadataSchema(MappingSchema):
     """Data structure storing asset metadata."""
 
-    mime_type = SingleLine(missing=required)
+    mime_type = SingleLine(readonly=True)
     size = Integer(readonly=True)
     filename = SingleLine(readonly=True)
     attached_to = UniqueReferences(readonly=True,
@@ -66,10 +73,24 @@ class IAssetData(ISheet, ISheetReferenceAutoUpdateMarker):
     """Marker interface for the actual asset data."""
 
 
+@deferred
+def deferred_validate_asset_mime_type(node: SchemaNode, kw: dict):
+    """Validate mime type for the uploaded asset file data."""
+    from .image import validate_image_data_mimetype
+    from adhocracy_core.resources.image import IImage
+    context = kw['context']
+    creating = kw['creating']
+    iresource = creating and creating.iresource or get_iresource(context)
+    is_image = iresource.isOrExtends(IImage)
+    if is_image:
+        return validate_image_data_mimetype
+
+
 class AssetDataSchema(MappingSchema):
     """Data structure storing for the actual asset data."""
 
-    data = FileStore(missing=required)
+    data = FileStore(missing=required,
+                     validator=deferred_validate_asset_mime_type)
 
 
 asset_data_meta = sheet_meta._replace(

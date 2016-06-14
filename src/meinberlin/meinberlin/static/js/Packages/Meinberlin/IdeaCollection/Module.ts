@@ -62,13 +62,11 @@ export var register = (angular) => {
             var registerRoutes = IdeaCollection.registerRoutesFactory(processType);
             registerRoutes(processType)(adhResourceAreaProvider);
 
-            var customHeader = adhConfig.pkg_path + IdeaCollection.pkgLocation + "/CustomHeader.html";
-            adhResourceAreaProvider.customHeader(processType, customHeader);
+            var processHeaderSlot = adhConfig.pkg_path + IdeaCollection.pkgLocation + "/ProcessHeaderSlot.html";
+            adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-meinberlin-idea-collection-workbench>" +
-                    "</adh-meinberlin-idea-collection-workbench>");
-            }];
+            adhProcessProvider.templates[processType] =
+                "<adh-meinberlin-idea-collection-workbench></adh-meinberlin-idea-collection-workbench>";
         }]);
 };

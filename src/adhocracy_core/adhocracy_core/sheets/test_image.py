@@ -2,6 +2,7 @@ from pyramid import testing
 from pytest import fixture
 from pytest import mark
 from pytest import raises
+import colander
 
 
 class TestImageMetadataSheet:
@@ -27,10 +28,6 @@ class TestImageMetadataSheet:
                               'size': 0,
                               'detail': None,
                               'thumbnail': None}
-
-    def test_validate_mime_type(self, inst):
-        validator = inst.schema['mime_type'].validator
-        assert validator.choices == ('image/gif', 'image/jpeg', 'image/png')
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta, registry):
@@ -58,7 +55,10 @@ class TestImageReference:
         assert meta.editable is True
 
     def test_create(self, meta, context):
-        assert meta.sheet_class(meta, context, None)
+        from .image import get_asset_choices
+        inst = meta.sheet_class(meta, context, None)
+        assert inst
+        assert inst.schema['picture'].choices_getter == get_asset_choices
 
     def test_schema(self, inst):
         from .image import picture_url_validator
@@ -76,7 +76,30 @@ class TestImageReference:
         context = testing.DummyResource(__provides__=meta.isheet)
         assert registry.content.get_sheet(context, meta.isheet)
 
-import colander
+
+class TestGetAssetChoices:
+
+    def call_fut(self, *args):
+        from .image import get_asset_choices
+        return get_asset_choices(*args)
+
+    def test_return_empty_list_if_no_assets_service(self, pool):
+        assert self.call_fut(pool, None) == []
+
+    def test_return_empty_list_if_empty_assets_service(self, pool, service):
+        pool['assets'] = service
+        assert self.call_fut(pool, None) == []
+
+    def test_get_asset_choices_from_assets_service(self, pool, request_,
+                                                   service):
+        from .image import IImageMetadata
+        service['image'] = testing.DummyResource(__provides__=IImageMetadata)
+        service['no_image'] = testing.DummyResource()
+        pool['assets'] = service
+        choices = self.call_fut(pool, request_)
+        assert choices == [('http://example.com/assets/image/',
+                            '/assets/image')]
+
 
 class TestPictureUrlValidator:
 
@@ -107,12 +130,12 @@ class TestPictureUrlValidator:
 
     @mark.parametrize('mimetype', ['image/jpeg', 'image/png', 'image/gif'])
     def test_ignore_if_image_mimetype(self, node, test_image, mimetype):
-        test_image.headers['ContentType'] = mimetype
+        test_image.headers['Content-Type'] = mimetype
         self.call_fut(node, test_image.url)
 
     def test_raise_if_non_image_mimetype(self, node, test_image):
         mimetype = 'no image'
-        test_image.headers['ContentType'] = mimetype
+        test_image.headers['Content-Type'] = mimetype
         with raises(colander.Invalid) as err:
             self.call_fut(node, test_image.url)
         assert 'not one of' in err.value.msg
@@ -120,7 +143,7 @@ class TestPictureUrlValidator:
     def test_raise_if_image_mimetype_but_size_to_big(self, node, mocker):
         from adhocracy_core.schema import FileStoreType
         over_max_size = FileStoreType.SIZE_LIMIT + 1
-        resp = mocker.Mock(headers={'ContentType': 'image/png',
+        resp = mocker.Mock(headers={'Content-Type': 'image/png',
                                     'Content-Length':  over_max_size},
                            status_code=200)
         mocker.patch('requests.head', return_value=resp)
@@ -128,3 +151,17 @@ class TestPictureUrlValidator:
             self.call_fut(node, 'image url')
         assert 'too large' in err.value.msg
 
+
+def test_image_mimetype_validator():
+    from .image import image_mime_type_validator
+    assert image_mime_type_validator.choices == \
+           ('image/gif', 'image/jpeg', 'image/png')
+
+
+def test_validate_image_data_mimetype(node, mocker):
+    from . import image
+    fut = image.validate_image_data_mimetype
+    mocker.spy(image, 'image_mime_type_validator')
+    file = mocker.Mock(mimetype='image/png')
+    fut(node, file)
+    image.image_mime_type_validator.assert_called_with(node, 'image/png')

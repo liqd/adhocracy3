@@ -570,6 +570,26 @@ def validate_reftype(node: SchemaNode, value: IResource):
         raise Invalid(node, msg=error, value=value)
 
 
+@deferred
+def deferred_select_widget(node, kw) -> Select2Widget:
+    """Return Select2Widget expects `node` to have `choices_getter` `multiple`.
+
+    `choices_getter` is a function attribute accepting `node` and
+    `request` and returning a list with selectable option tuples.
+
+    `multiple` is a boolean attribute enabling multiselect.
+    """
+    choices = []
+    if hasattr(node, 'choices_getter'):
+        context = kw['context']
+        request = kw['request']
+        choices = node.choices_getter(context, request)
+    multiple = getattr(node, 'multiple', False)
+    return Select2Widget(values=choices,
+                         multiple=multiple
+                         )
+
+
 class Reference(Resource):
     """Schema Node to reference a resource that implements a specific sheet.
 
@@ -590,18 +610,7 @@ class Reference(Resource):
     backref = False
     validator = All(validate_reftype)
     multiple = False
-
-    def _get_choices(self):
-        context = self.bindings['context']
-        request = self.bindings['request']
-        return self.choices_getter(context, request)
-
-    @property
-    def widget(self):
-        values = self._get_choices()
-        return Select2Widget(values=values,
-                             multiple=self.multiple
-                             )
+    widget = deferred_select_widget
 
 
 class Resources(SequenceSchema):
@@ -636,6 +645,8 @@ class References(Resources):
     reftype = SheetReference
     backref = False
     validator = All(_validate_reftypes)
+    multiple = True
+    widget = deferred_select_widget
 
 
 class UniqueReferences(References):

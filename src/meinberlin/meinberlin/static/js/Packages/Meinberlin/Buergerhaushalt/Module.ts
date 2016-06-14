@@ -33,13 +33,11 @@ export var register = (angular) => {
             registerRoutes(processType)(adhResourceAreaProvider);
             registerRoutes(processType, "buergerhaushalt")(adhResourceAreaProvider);
 
-            var customHeader = adhConfig.pkg_path + AdhMeinberlinIdeaCollection.pkgLocation + "/CustomHeader.html";
-            adhResourceAreaProvider.customHeader(processType, customHeader);
+            var processHeaderSlot = adhConfig.pkg_path + AdhMeinberlinIdeaCollection.pkgLocation + "/ProcessHeaderSlot.html";
+            adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-meinberlin-idea-collection-workbench data-is-buergerhaushalt=\"true\">" +
-                    "</adh-meinberlin-idea-collection-workbench>");
-            }];
+            adhProcessProvider.templates[processType] =
+                "<adh-meinberlin-idea-collection-workbench data-is-buergerhaushalt=\"true\"></adh-meinberlin-idea-collection-workbench>";
         }]);
 };

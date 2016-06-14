@@ -1,9 +1,10 @@
 """image sheet."""
 from colander import OneOf
-from colander import required
 from colander import All
 from colander import Invalid
+from pyramid.traversal import resource_path
 from requests.exceptions import ConnectionError
+from substanced.util import find_service
 import requests
 
 from adhocracy_core.interfaces import Dimensions
@@ -17,6 +18,7 @@ from adhocracy_core.schema import Reference
 from adhocracy_core.schema import Resource
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import URL
+from adhocracy_core.schema import SchemaNode
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
@@ -29,13 +31,19 @@ class IImageMetadata(IAssetMetadata):
 image_mime_type_validator = OneOf(('image/gif', 'image/jpeg', 'image/png'))
 
 
+def validate_image_data_mimetype(node: SchemaNode, value):
+    """Validate image mime type of `value`."""
+    mimetype = value.mimetype
+    image_mime_type_validator(node, mimetype)
+
+
 class ImageMetadataSchema(AssetMetadataSchema):
     """Data structure storing image asset metadata."""
 
-    mime_type = SingleLine(missing=required,
-                           validator=image_mime_type_validator)
-    detail = Resource(dimensions=Dimensions(width=800, height=800))
-    thumbnail = Resource(dimensions=Dimensions(width=100, height=100))
+    detail = Resource(dimensions=Dimensions(width=800, height=800),
+                      readonly=True)
+    thumbnail = Resource(dimensions=Dimensions(width=100, height=100),
+                         readonly=True)
 
 
 image_metadata_meta = asset_metadata_meta._replace(
@@ -68,7 +76,7 @@ def picture_url_validator(node, value):
         msg = 'Connection failed, status is {} instead of 200'
         raise Invalid(node, msg.format(resp.status_code))
 
-    mimetype = resp.headers.get('ContentType', '')
+    mimetype = resp.headers.get('Content-Type', '')
     image_mime_type_validator(node, mimetype)
 
     size = int(resp.headers.get('Content-Length', '0'))
@@ -77,10 +85,23 @@ def picture_url_validator(node, value):
         raise Invalid(node, msg)
 
 
+def get_asset_choices(context, request) -> []:
+    """Return asset choices based on the available `assets` service."""
+    assets = find_service(context, 'assets')
+    if assets is None:
+        return []
+    target_isheet = ImageReference.getTaggedValue('target_isheet')
+    choices = [(request.resource_url(asset), resource_path(asset))
+               for asset in assets.values()
+               if target_isheet.providedBy(asset)]
+    return choices
+
+
 class ImageReferenceSchema(MappingSchema):
     """Data structure for the image reference sheet."""
 
-    picture = Reference(reftype=ImageReference)
+    picture = Reference(reftype=ImageReference,
+                        choices_getter=get_asset_choices)
     picture_description = SingleLine()
     external_picture_url = URL(validator=All(URL.validator,
                                              picture_url_validator,

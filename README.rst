@@ -15,7 +15,4 @@ This project (i.e. all files in this repository if not declared otherwise) is
 licensed under the GNU Affero General Public License (AGPLv3), see
 LICENSE.txt.
 
-Further reading http://adhocracy3.readthedocs.org/
-
-
-
+Further reading https://adhocracy3.readthedocs.io/

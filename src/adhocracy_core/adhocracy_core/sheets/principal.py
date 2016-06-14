@@ -6,6 +6,7 @@ from colander import All
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from pyramid.settings import asbool
 from pyramid.traversal import resource_path
+from substanced.util import find_service
 from urllib.parse import urljoin
 import requests
 
@@ -218,6 +219,18 @@ captcha_meta = sheet_meta._replace(
 )
 
 
+def get_group_choices(context, request) -> []:
+    """Return group choices based on the `/principals/groups` service."""
+    groups = find_service(context, 'principals', 'groups')
+    if groups is None:
+        return []
+    target_isheet = PermissionsGroupsReference.getTaggedValue('target_isheet')
+    choices = [(request.resource_url(group), name)
+               for name, group in groups.items()
+               if target_isheet.providedBy(group)]
+    return choices
+
+
 class PermissionsSchema(MappingSchema):
     """Permissions sheet data structure.
 
@@ -225,9 +238,8 @@ class PermissionsSchema(MappingSchema):
     """
 
     roles = Roles()
-    groups = UniqueReferences(reftype=PermissionsGroupsReference)
-    # roles_and_group_roles = Roles(readonly=True,
-    #                               default=deferred_roles_and_group_roles)
+    groups = UniqueReferences(reftype=PermissionsGroupsReference,
+                              choices_getter=get_group_choices)
 
 
 class PermissionsAttributeResourceSheet(AttributeResourceSheet):

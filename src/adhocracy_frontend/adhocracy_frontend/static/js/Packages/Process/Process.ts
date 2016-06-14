@@ -35,11 +35,11 @@ export var getStateData = (sheet : SIWorkflow.Sheet, name : string) : IStateData
 
 
 export class Provider implements angular.IServiceProvider {
-    public templateFactories : {[processType : string]: any};
+    public templates : {[processType : string]: string};
     public $get;
 
     constructor () {
-        this.templateFactories = {};
+        this.templates = {};
 
         this.$get = ["$injector", ($injector) => {
             return new Service(this, $injector);
@@ -53,13 +53,11 @@ export class Service {
         private $injector : angular.auto.IInjectorService
     ) {}
 
-    public getTemplate(processType : string) : angular.IPromise<string> {
-        if (!this.provider.templateFactories.hasOwnProperty(processType)) {
+    public getTemplate(processType : string) : string {
+        if (!this.provider.templates.hasOwnProperty(processType)) {
             throw "No template for process type \"" + processType + "\" has been configured.";
         }
-
-        var fn = this.provider.templateFactories[processType];
-        return this.$injector.invoke(fn);
+        return this.provider.templates[processType];
     }
 }
 
@@ -113,18 +111,11 @@ export var processViewDirective = (
     return {
         restrict: "E",
         link: (scope, element) => {
-            var childScope : angular.IScope;
-
             adhTopLevelState.on("processType", (processType) => {
                 if (processType) {
-                    adhProcess.getTemplate(processType).then((template) => {
-                        if (childScope) {
-                            childScope.$destroy();
-                        }
-                        childScope = scope.$new();
-                        element.html(template);
-                        $compile(element.contents())(childScope);
-                    });
+                    var template = adhProcess.getTemplate(processType);
+                    element.html(template);
+                    $compile(element.contents())(scope);
                 }
             });
         }

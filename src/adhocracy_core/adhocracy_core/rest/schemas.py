@@ -43,8 +43,6 @@ from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.resources.base import Base
-from adhocracy_core.sheets.asset import IAssetData
-from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.sheets.metadata import is_older_than
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.schema import AbsolutePath
@@ -85,7 +83,6 @@ from adhocracy_core.utils import now
 from adhocracy_core.utils import unflatten_multipart_request
 from adhocracy_core.utils import create_schema
 from adhocracy_core.utils import get_reason_if_blocked
-
 
 resolver = DottedNameResolver()
 
@@ -328,40 +325,6 @@ class PUTResourceRequestSchema(MappingSchema):
                       default={})
 
 
-def validate_claimed_asset_mime_type(self, node: SchemaNode, appstruct: dict):
-    """Validate claimed mime type for the uploaded asset file data."""
-    if not appstruct:
-        return
-    file = _get_sheet_field(appstruct, 'data')
-    if not file:
-        msg = 'Sheet {} and field {} is missing.'\
-            .format(IAssetData.__identifier__, 'data')
-        raise Invalid(node['data'], msg=msg)
-    claimed_type = _get_sheet_field(appstruct, 'mime_type')
-    if not claimed_type:
-         msg = 'Sheet {} and field {} is missing.'\
-            .format(IAssetMetadata.__identifier__, 'mime_type')
-         raise Invalid(node['data'], msg=msg)
-    detected_type = file.mimetype
-    if claimed_type != detected_type:
-        msg = 'Claimed MIME type is {} but file content seems to be {}'
-        raise Invalid(node['data'], msg.format(claimed_type, detected_type))
-
-
-def _get_sheet_field(appstruct: dict, field: str) -> object:
-    for sheet_appstruct in appstruct['data'].values():
-        for key, value in sheet_appstruct.items():
-            if key == field:
-                return value
-
-
-class PUTAssetRequestSchema(PUTResourceRequestSchema):
-
-    """Data structure for Asset PUT requests."""
-
-    validator = validate_claimed_asset_mime_type
-
-
 def add_post_data_subschemas(node: SchemaNode, kw: dict):
     """Add the resource sheet schemas that are 'creatable'."""
     context = kw['context']
@@ -409,13 +372,6 @@ class POSTResourceRequestSchema(PUTResourceRequestSchema):
     data = SchemaNode(MappingType(unknown='raise'),
                       after_bind=add_post_data_subschemas,
                       default={})
-
-
-class POSTAssetRequestSchema(POSTResourceRequestSchema):
-
-    """Data structure for Asset POST requests."""
-
-    validator = validate_claimed_asset_mime_type
 
 
 class AbsolutePaths(SequenceSchema):

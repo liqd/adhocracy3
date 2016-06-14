@@ -36,14 +36,12 @@ export var register = (angular) => {
             adhConfig,
             adhMetaApi
         ) => {
-            var customHeader = adhConfig.pkg_path + Workbench.pkgLocation + "/CustomHeader.html";
-            adhResourceAreaProvider.customHeader(processType, customHeader);
+            var processHeaderSlot = adhConfig.pkg_path + Workbench.pkgLocation + "/ProcessHeaderSlot.html";
+            adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
             Workbench.registerRoutes(processType)(adhResourceAreaProvider, adhMetaApi);
         }])
         .config(["adhProcessProvider", (adhProcessProvider) => {
-            adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-mercator-2016-workbench></adh-mercator-2016-workbench>");
-            }];
+            adhProcessProvider.templates[processType] = "<adh-mercator-2016-workbench></adh-mercator-2016-workbench>";
         }])
         .directive("adhMercator2016Workbench", ["adhConfig", "adhTopLevelState", Workbench.workbenchDirective])
         .directive("adhMercator2016ProposalCreateColumn", [

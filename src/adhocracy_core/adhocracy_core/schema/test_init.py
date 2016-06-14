@@ -452,6 +452,34 @@ class TestResource:
         assert inst.schema_type == ResourceObjectType
 
 
+class TestDeferredSelectWidget:
+
+    def call_fut(self, *args):
+        from . import deferred_select_widget
+        return deferred_select_widget(*args)
+
+    def test_empty_widget_if_no_choices_getter(self, node):
+        from deform.widget import Select2Widget
+        kw = {'context': object(), 'request': object()}
+        widget = self.call_fut(node, kw)
+        assert isinstance(widget, Select2Widget)
+        assert widget.multiple == False
+        assert widget.values == []
+
+    def test_filled_widget_if_choices_getter(self, node, mocker):
+        kw = {'context': object(), 'request': object()}
+        node.choices_getter = mocker.Mock(return_value=[('key', 'value')])
+        widget = self.call_fut(node, kw)
+        assert widget.values == [('key', 'value')]
+        node.choices_getter.assert_called_with(kw['context'], kw['request'])
+
+    def test_multi_select_widget_if_multiple(self, node):
+        kw = {'context': object(), 'request': object()}
+        node.multiple = True
+        widget = self.call_fut(node, kw)
+        assert widget.multiple
+
+
 class ReferenceUnitTest(unittest.TestCase):
 
     def make_one(self, **kwargs):
@@ -467,11 +495,13 @@ class ReferenceUnitTest(unittest.TestCase):
 
     def test_create(self):
         from adhocracy_core.interfaces import SheetReference
-        from adhocracy_core.schema import validate_reftype
+        from . import validate_reftype
+        from . import deferred_select_widget
         inst = self.make_one()
         assert inst.backref is False
         assert inst.reftype == SheetReference
         assert inst.validator.validators == (validate_reftype,)
+        assert inst.widget == deferred_select_widget
 
     def test_with_backref(self):
         inst = self.make_one(backref=True)
@@ -578,9 +608,12 @@ class TestUniqueReferences:
         return UniqueReferences(**kwargs)
 
     def test_create(self):
-        from adhocracy_core.schema import References
+        from . import References
+        from . import deferred_select_widget
         inst = self.make_one()
         assert isinstance(inst, References)
+        assert inst.widget == deferred_select_widget
+        assert inst.multiple
 
     def test_valid_deserialize_with_colander_null(self, request_):
         inst = self.make_one().bind(request_=request_)

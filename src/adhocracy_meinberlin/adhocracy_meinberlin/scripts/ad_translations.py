@@ -32,7 +32,7 @@ def main():
             'Wenn Sie einem Kommentar inhaltlich widersprechen möchten'),
         ('utze dies', 'utzen Sie dies'),
         ('ähle bitte', 'ählen Sie bitte'),
-        ('ähle ein Badge', 'ählen Sie ein Badge'),
+        ('ähle ein oder mehrere', 'ählen Sie ein oder mehrere'),
         ('erstelle ein ', 'erstellen Sie ein '),
         ('Bitte entschuldige', 'Bitte entschuldigen Sie'),
         ('bekommst Du an Deine', 'bekommen Sie an Ihre'),

@@ -65,6 +65,7 @@ def add_metadata(context: IAsset, registry: Registry, **kwargs):
     meta_appstruct = {
         'size': file.size,
         'filename': file.title,
+        'mime_type': file.mimetype,
     }
     meta_sheet.set(meta_appstruct, omit_readonly=False)
 

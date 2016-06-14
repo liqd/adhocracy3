@@ -23,9 +23,9 @@ body {
 @media print {
     *:not([class^=leaflet]) {
         // scss-lint:disable ImportantRule, ColorVariable
-        background-color: #fff !important;
-        border-color: #000 !important;
-        color: #000 !important;
+        background-color: initial !important;
+        border-color: initial !important;
+        color: inherit !important;
         // scss-lint:enable ImportantRule, ColorVariable
     }
 }
