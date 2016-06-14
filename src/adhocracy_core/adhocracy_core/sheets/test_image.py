@@ -103,12 +103,12 @@ class TestPictureUrlValidator:
 
     @mark.parametrize('mimetype', ['image/jpeg', 'image/png', 'image/gif'])
     def test_ignore_if_image_mimetype(self, node, test_image, mimetype):
-        test_image.headers['ContentType'] = mimetype
+        test_image.headers['Content-Type'] = mimetype
         self.call_fut(node, test_image.url)
 
     def test_raise_if_non_image_mimetype(self, node, test_image):
         mimetype = 'no image'
-        test_image.headers['ContentType'] = mimetype
+        test_image.headers['Content-Type'] = mimetype
         with raises(colander.Invalid) as err:
             self.call_fut(node, test_image.url)
         assert 'not one of' in err.value.msg
@@ -116,7 +116,7 @@ class TestPictureUrlValidator:
     def test_raise_if_image_mimetype_but_size_to_big(self, node, mocker):
         from adhocracy_core.schema import FileStoreType
         over_max_size = FileStoreType.SIZE_LIMIT + 1
-        resp = mocker.Mock(headers={'ContentType': 'image/png',
+        resp = mocker.Mock(headers={'Content-Type': 'image/png',
                                     'Content-Length':  over_max_size},
                            status_code=200)
         mocker.patch('requests.head', return_value=resp)
