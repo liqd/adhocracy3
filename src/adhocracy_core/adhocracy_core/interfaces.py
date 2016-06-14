@@ -24,6 +24,7 @@ from substanced.sdi import MANAGE_ROUTE_NAME
 
 
 SDI_ROUTE_NAME = MANAGE_ROUTE_NAME
+API_ROUTE_NAME = 'adhocracy_api'
 
 
 def namedtuple(typename, field_names, verbose=False, rename=False):

@@ -15,6 +15,7 @@ from zope.interface import Interface
 import colander
 
 from adhocracy_core.authentication import UserTokenHeader
+from adhocracy_core.interfaces import API_ROUTE_NAME
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -487,7 +488,9 @@ class BadgeAssignmentsRESTView(PoolRESTView):
             if IBadgeAssignment.__identifier__ not in info['data']:
                 continue
             assignables = get_assignable_badges(self.context, self.request)
-            urls = [self.request.resource_url(x) for x in assignables]
+            urls = [self.request.resource_url(x, route_name=API_ROUTE_NAME)
+                    for x in assignables]
+            # TODO: use colander schema to create cstruct
             info['data'][IBadgeAssignment.__identifier__] =\
                 {'badge': urls}
         return cstruct

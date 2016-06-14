@@ -22,7 +22,7 @@ Start Adhocracy testapp::
     >>> log = getfixture('log')
     >>> app_router = getfixture('app_router')
     >>> testapp = TestApp(app_router)
-    >>> rest_url = 'http://localhost'
+    >>> rest_url = 'http://localhost/api'
 
 Login::
 
@@ -108,7 +108,7 @@ Global Info
 The dedicated prefix defaults to "/meta_api/", but can be customized. The
 result is a JSON object with two main keys, "resources" and "sheets"::
 
-    >>> resp_data = testapp.get('/meta_api/').json
+    >>> resp_data = testapp.get(rest_url + '/meta_api/').json
     >>> sorted(resp_data.keys())
     ['resources', 'sheets', 'workflows']
 
@@ -615,7 +615,7 @@ Add and update child resource
 We expect certain Versionable fields for the rest of this test suite
 to work ::
 
-    >>> resp = testapp.get('/meta_api')
+    >>> resp = testapp.get(rest_url + '/meta_api')
     >>> vers_fields = resp.json['sheets']['adhocracy_core.sheets.versions.IVersionable']['fields']
     >>> pprint(sorted(vers_fields, key=itemgetter('name')))
     [{'containertype': 'list',

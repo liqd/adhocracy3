@@ -10,8 +10,12 @@ class TestEmbedCodeConfigAdapter:
         from .embed import embed_code_config_adapter
         return embed_code_config_adapter(*args)
 
-    def test_default_mapping(self, context, request_):
+    def test_default_mapping(self, context, request_, mocker):
+        from adhocracy_core.interfaces import API_ROUTE_NAME
+        mocker.spy(request_, 'resource_url')
         result = self.call_fut(context, request_)
+        request_.resouce_url.assert_called_with(context,
+                                                route_name=API_ROUTE_NAME)
         assert result == {'sdk_url': 'http://localhost:6551/AdhocracySDK.js',
                           'frontend_url': 'http://localhost:6551',
                           'path': 'http://example.com/',
