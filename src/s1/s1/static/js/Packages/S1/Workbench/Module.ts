@@ -24,9 +24,7 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIS1Process.content_type)])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[RIS1Process.content_type] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-s1-workbench></adh-s1-workbench>");
-            }];
+            adhProcessProvider.templates[RIS1Process.content_type] = "<adh-s1-workbench></adh-s1-workbench>";
         }])
         .directive("adhS1Workbench", ["adhConfig", "adhTopLevelState", Workbench.s1WorkbenchDirective])
         .directive("adhS1Landing", ["$translate", "adhConfig", "adhTopLevelState", Workbench.s1LandingDirective])

@@ -25,17 +25,13 @@ sheets:
 
 * `adhocracy_core.sheets.metadata.IMetadata`: provided by all resources,
   automatically created and updated by the backend
-* `adhocracy_core.sheets.asset.IAssetMetadata` with only one read-write field:
+* `adhocracy_core.sheets.asset.IAssetMetadata` with only readonly fields:
 
-  :mime_type: the MIME type of the asset; must be specified by the frontend,
-      but the backend will sanity-check the posted data and reject the asset
+  :mime_type: the MIME type of the asset; The mime_type provided by the uploaded
+      asset file will be sanity-check. The backend rejects the asset
       in case of a detectable mismatch (e.g. if the frontend posts a Word file
-      but gives "image/jpeg" as MIME type). Not all mismatches will be
+      the image mimetype "image/jpeg" is given). Not all mismatches will be
       detectable, e.g. different "text/" subtypes can be hard to distinguish.
-
-  All other following fields are read-only, they are automatically created and
-  updated by the backend:
-
   :size: the size of the asset (in bytes)
   :filename: the name of the file uploaded by the frontend (in the backend,
       the asset will have a different, auto-generated path)
@@ -122,8 +118,6 @@ request will have keys similar to the following:
 
 :content_type: the type of the resource that shall be created, e.g.
         "adhocracy_core.resources.image.IImage"
-:data\:adhocracy_core.sheets.asset.IAssetMetadata\:mime_type: the MIME type of
-    the uploaded file, e.g. "image/jpeg"
 :data\:adhocracy_core.sheets.asset.IAssetData\:data: the binary data of the
     uploaded file, as per the HTML `<input type="file" name="asset">` tag.
 
@@ -143,10 +137,7 @@ Now we can upload a sample picture::
 
     >>> upload_files = [('data:adhocracy_core.sheets.asset.IAssetData:data',
     ...     'python.jpg', open('docs/_static/python.jpg', 'rb').read())]
-    >>> request_body = {
-    ...    'content_type': 'adhocracy_core.resources.image.IImage',
-    ...    'data:adhocracy_core.sheets.image.IImageMetadata:mime_type':
-    ...        'image/jpeg'}
+    >>> request_body = {'content_type': 'adhocracy_core.resources.image.IImage'}
     >>> resp_data = admin.post(asset_pool_path, request_body,
     ...                        upload_files=upload_files).json
 
@@ -255,8 +246,7 @@ To upload a new version of an asset, the frontend sends a PUT request with
 enctype="multipart/form-data" to the asset URL. The PUT request may contain
 the same keys as a POST request used to create a new asset.
 
-The `data:adhocracy_core.sheets.asset.IAssetData:data` and
-`data:adhocracy_core.sheets.asset.IAssetMetadata:mime_type` key is required,
+The `data:adhocracy_core.sheets.asset.IAssetData:data` key is required,
 since the only use case for a PUT request is uploading a new version of the
 binary data (everything else is just metadata).
 
@@ -275,10 +265,7 @@ Lets replace the uploaded python with another one::
 
     >>> upload_files = [('data:adhocracy_core.sheets.asset.IAssetData:data',
     ...     'python2.jpg', open('docs/_static/python2.jpg', 'rb').read())]
-    >>> request_body = {
-    ...    'content_type': 'adhocracy_core.resources.image.IImage',
-    ...    'data:adhocracy_core.sheets.image.IImageMetadata:mime_type':
-    ...        'image/jpeg'}
+    >>> request_body = {'content_type': 'adhocracy_core.resources.image.IImage'}
     >>> resp_data = admin.put(pic_path, request_body,
     ...                       upload_files=upload_files).json
 

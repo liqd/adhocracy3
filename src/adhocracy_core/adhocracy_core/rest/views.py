@@ -41,9 +41,7 @@ from adhocracy_core.rest.schemas import POSTCreatePasswordResetRequestSchema
 from adhocracy_core.rest.schemas import POSTPasswordResetRequestSchema
 from adhocracy_core.rest.schemas import POSTReportAbuseViewRequestSchema
 from adhocracy_core.rest.schemas import POSTResourceRequestSchema
-from adhocracy_core.rest.schemas import POSTAssetRequestSchema
 from adhocracy_core.rest.schemas import PUTResourceRequestSchema
-from adhocracy_core.rest.schemas import PUTAssetRequestSchema
 from adhocracy_core.rest.schemas import GETPoolRequestSchema
 from adhocracy_core.rest.schemas import GETItemResponseSchema
 from adhocracy_core.rest.schemas import GETResourceResponseSchema
@@ -521,7 +519,7 @@ class AssetsServiceRESTView(PoolRESTView):
     @api_view(
         request_method='POST',
         permission='create_asset',
-        schema=POSTAssetRequestSchema,
+        schema=POSTResourceRequestSchema,
         accept='multipart/form-data',
     )
     def post(self):
@@ -539,7 +537,7 @@ class AssetRESTView(SimpleRESTView):
     @api_view(
         request_method='PUT',
         permission='create_asset',
-        schema=PUTAssetRequestSchema,
+        schema=PUTResourceRequestSchema,
         accept='multipart/form-data',
     )
     def put(self) -> dict:

@@ -37,9 +37,8 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIProcess.content_type)])
         .config(["adhProcessProvider", (adhProcessProvider) => {
-            adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-mercator-2015-workbench></adh-mercator-2015-workbench>");
-            }];
+            adhProcessProvider.templates[processType] =
+                "<adh-mercator-2015-workbench></adh-mercator-2015-workbench>";
         }])
         .directive("adhMercator2015Workbench", ["adhConfig", "adhTopLevelState", Workbench.workbenchDirective])
         .directive("adhMercator2015ProposalCreateColumn", [

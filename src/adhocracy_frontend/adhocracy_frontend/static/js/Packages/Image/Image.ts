@@ -55,7 +55,6 @@ export var uploadImageFactory = (
 
     var formData = new FormData();
     formData.append("content_type", contentType);
-    formData.append("data:" + metadataSheet + ":mime_type", file.type);
     formData.append("data:adhocracy_core.sheets.asset.IAssetData:data", bytes());
 
     return adhHttp.get(poolPath)

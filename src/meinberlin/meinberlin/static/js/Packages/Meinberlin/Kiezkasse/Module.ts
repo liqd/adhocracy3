@@ -37,9 +37,7 @@ export var register = (angular) => {
             adhResourceAreaProvider.customHeader(processType, customHeader);
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-meinberlin-idea-collection-workbench data-is-kiezkasse=\"true\">" +
-                    "</adh-meinberlin-idea-collection-workbench>");
-            }];
+            adhProcessProvider.templates[processType] =
+                "<adh-meinberlin-idea-collection-workbench data-is-kiezkasse=\"true\"></adh-meinberlin-idea-collection-workbench>";
         }]);
 };

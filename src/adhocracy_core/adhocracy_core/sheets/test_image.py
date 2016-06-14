@@ -2,6 +2,7 @@ from pyramid import testing
 from pytest import fixture
 from pytest import mark
 from pytest import raises
+import colander
 
 
 class TestImageMetadataSheet:
@@ -27,10 +28,6 @@ class TestImageMetadataSheet:
                               'size': 0,
                               'detail': None,
                               'thumbnail': None}
-
-    def test_validate_mime_type(self, inst):
-        validator = inst.schema['mime_type'].validator
-        assert validator.choices == ('image/gif', 'image/jpeg', 'image/png')
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta, registry):
@@ -76,7 +73,6 @@ class TestImageReference:
         context = testing.DummyResource(__provides__=meta.isheet)
         assert registry.content.get_sheet(context, meta.isheet)
 
-import colander
 
 class TestPictureUrlValidator:
 
@@ -128,3 +124,17 @@ class TestPictureUrlValidator:
             self.call_fut(node, 'image url')
         assert 'too large' in err.value.msg
 
+
+def test_image_mimetype_validator():
+    from .image import image_mime_type_validator
+    assert image_mime_type_validator.choices == \
+           ('image/gif', 'image/jpeg', 'image/png')
+
+
+def test_validate_image_data_mimetype(node, mocker):
+    from . import image
+    fut = image.validate_image_data_mimetype
+    mocker.spy(image, 'image_mime_type_validator')
+    file = mocker.Mock(mimetype='image/png')
+    fut(node, file)
+    image.image_mime_type_validator.assert_called_with(node, 'image/png')

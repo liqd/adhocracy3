@@ -90,6 +90,7 @@ class TestAsset:
         meta = registry.content.get_sheet(res, IAssetMetadata).get()
         assert meta['filename'] == 'title'
         assert meta['size'] == 100
+        assert meta['mime_type'] == 'image/png'
 
 
 class TestAssetsService:

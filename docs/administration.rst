@@ -42,3 +42,13 @@ command. The `-h` flag can be used to see a full description of the
 options:
 
 .. program-output:: set_workflow_state -h
+
+
+Show Auditlog
+-------------
+
+The entries of the auditlog can be shown with the `ad_auditlog`
+command. The `-h` flag can be used to see a full description of the
+options:
+
+.. program-output:: set_workflow_state -h

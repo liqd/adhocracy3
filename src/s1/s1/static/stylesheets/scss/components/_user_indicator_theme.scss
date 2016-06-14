@@ -1,28 +1,3 @@
 .user-indicator {
-    @include inline-block;
-    vertical-align: top;
-
-    a {
-        @include inline-block;
-    }
-
-    .user-indicator-logout {
-        height: auto;
-        line-height: 1;
-    }
-
-    .user-profile-image {
-        @include rem(margin-right, 10px);
-        float: left;
-    }
-
-    .user-indicator-name,
-    .user-indicator-logout {
-        display: block;
-    }
-
-    .user-indicator-name-logout-separator {
-        display: none;
-    }
-
+    @include rem(padding, 10px);
 }

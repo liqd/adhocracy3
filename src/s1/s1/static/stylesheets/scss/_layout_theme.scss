@@ -12,3 +12,14 @@
     margin: 0 auto;
     overflow-y: auto;
 }
+
+// Need more space for the header so the second line (process progress indicator) fits
+
+.l-header.main-header {
+    @include rem(height, $s1-header-height);
+    max-width: initial;
+}
+
+.l-content {
+    @include rem(top, $s1-header-height);
+}

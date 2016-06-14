@@ -383,13 +383,6 @@ class TestPOSTResourceRequestSchema:
         assert inst['content_type'].validator is deferred_validate_post_content_type
 
 
-def test_post_asset_request_schema():
-    from . import schemas
-    schema_class = schemas.POSTAssetRequestSchema
-    assert issubclass(schema_class, schemas.POSTResourceRequestSchema)
-    assert schema_class.validator is schemas.validate_claimed_asset_mime_type
-
-
 class TestDeferredValidatePostContentType:
 
     def call_fut(self, node, kw):
@@ -525,73 +518,6 @@ class TestPUTResourceRequestSchema:
         from adhocracy_core.rest.schemas import add_put_data_subschemas
         inst = self.make_one()
         assert inst['data'].after_bind is add_put_data_subschemas
-
-
-def test_put_asset_request_schema():
-    from . import schemas
-    schema_class = schemas.PUTAssetRequestSchema
-    assert issubclass(schema_class, schemas.PUTResourceRequestSchema)
-    assert schema_class.validator is schemas.validate_claimed_asset_mime_type
-
-
-class TestValidateClaimedMimeType:
-
-    @fixture
-    def mock_data(self):
-        from substanced.file import File
-        data = Mock(spec=File)
-        data.mimetype = 'text/plain'
-        return data
-
-    @fixture
-    def appstruct(self, mock_data):
-        from adhocracy_core.sheets.asset import IAssetData
-        from adhocracy_core.sheets.asset import IAssetMetadata
-        class IMyAssetMetadata(IAssetMetadata):
-            pass
-        return \
-            {'data':
-                 {IAssetData.__identifier__: {'data': mock_data},
-                  IMyAssetMetadata.__identifier__: {'mime_type': 'text/right'}}}
-
-    @fixture
-    def node(self, node):
-        from copy import deepcopy
-        node['data'] = deepcopy(node)
-        return node
-
-    def call_fut(*args):
-        from .schemas import validate_claimed_asset_mime_type
-        return validate_claimed_asset_mime_type(*args)
-
-    def test_ignore_if_appstruct_empty(self, node):
-        appstruct = {}
-        assert self.call_fut(node, appstruct) is None
-
-    def test_ignore_if_mime_type_matches(self, mock_data, node, appstruct):
-        mock_data.mimetype = 'text/right'
-        assert self.call_fut(node, appstruct) is None
-
-    def test_raise_if_mime_type_dismatch(self, mock_data, node, appstruct):
-        mock_data.mimetype = 'text/wrong'
-        with raises(colander.Invalid) as err_info:
-            self.call_fut(node, appstruct)
-        assert 'Claimed MIME type' in err_info.value.msg
-
-    def test_raise_if_metadata_appstruct_missing(self, mock_data, node, appstruct):
-        del appstruct['data']['adhocracy_core.rest.test_schemas.IMyAssetMetadata']
-        mock_data.mimetype = 'text/right'
-        with raises(colander.Invalid) as err_info:
-            self.call_fut(node, appstruct)
-        assert 'is missing' in err_info.value.msg
-
-    def test_raise_if_asset_data_appstruct_missing(self, mock_data, node, appstruct):
-        from adhocracy_core.sheets.asset import IAssetData
-        del appstruct['data'][IAssetData.__identifier__]
-        mock_data.mimetype = 'text/right'
-        with raises(colander.Invalid) as err_info:
-            self.call_fut(node, appstruct)
-        assert 'is missing' in err_info.value.msg
 
 
 class TestAddPutRequestSubSchemasUnitTest:
@@ -1738,4 +1664,6 @@ class TestCreateValidateAccountActive:
             validator(node, {'password': 'secret'})
         assert error_info.value.asdict() == \
                {'child_node': 'User account not yet activated'}
+
+
 

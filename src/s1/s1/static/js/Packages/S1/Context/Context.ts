@@ -6,7 +6,7 @@ import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
 import RIS1Process from "../../../Resources_/adhocracy_s1/resources/s1/IProcess";
 import * as SIWorkflowAssignment from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/S1/Context";
+export var pkgLocation = "/S1/Context";
 
 
 export var headerDirective = (
