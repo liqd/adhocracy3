@@ -80,7 +80,7 @@ export var detailDirective = (
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhShowError,
     adhSubmitIfValid,
-    adhUploadImage
+    adhUploadImage,
     $translate
 ) => {
     return {
