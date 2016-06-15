@@ -38,3 +38,4 @@ permissions:
   - [sdi.manage-contents,             ~,         ~,             ~,            ~,         ~,       ~,         A] # delete/copy/rename resources in contents tab
   - [sdi.add-content,                 ~,         ~,             ~,            ~,         ~,       ~,         A] # add resources
   - [sdi.manage-sheets,               ~,         ~,             ~,            ~,         ~,       ~,         A] # view/edit sheets tab
+  - [sdi.manage-database,             ~,         ~,             ~,            ~,         ~,       ~,         A] # view/edit database tab
