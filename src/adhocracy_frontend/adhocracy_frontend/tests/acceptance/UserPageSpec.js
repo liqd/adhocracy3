@@ -8,17 +8,6 @@ var EC = protractor.ExpectedConditions;
 var _ = require("lodash");
 
 describe("user page", function() {
-    it("displays the correct name for each user", function() {
-        var annotatorPage = new UserPages.UserPage().get("0000005");
-        expect(annotatorPage.getUserName()).toBe("participant");
-
-        var contributorPage = new UserPages.UserPage().get("0000004");
-        expect(contributorPage.getUserName()).toBe("moderator");
-
-        var reviewerPage = new UserPages.UserPage().get("0000002");
-        expect(reviewerPage.getUserName()).toBe("admin");
-    });
-
     var currentDate = Date.now().toString();
     var subject = "title" + currentDate;
     var content = "content" + currentDate;
