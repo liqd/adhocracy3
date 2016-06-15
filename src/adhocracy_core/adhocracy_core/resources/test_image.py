@@ -220,6 +220,7 @@ class TestImage:
         import adhocracy_core.sheets.image
         assert meta.iresource is image.IImage
         assert meta.is_implicit_addable is True
+        assert meta.content_name == 'Image'
         assert meta.extended_sheets ==\
                (adhocracy_core.sheets.image.IImageMetadata,)
         assert meta.after_creation == (asset.add_metadata,

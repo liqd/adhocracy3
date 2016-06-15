@@ -1086,9 +1086,21 @@ class TestFileStoreType:
         from adhocracy_core.schema import FileStoreType
         return FileStoreType()
 
-    def test_serialize_raises_exception(self, inst):
-        with raises(colander.Invalid):
-            inst.serialize(None, colander.null)
+    def test_serialize_null(self, inst):
+        assert inst.serialize(None, None) is colander.null
+
+    def test_serialize_file_to_filedict(self, inst):
+        from deform.widget import filedict
+        from substanced.file import File
+        file = Mock(spec=File, mimetype='image/file', size=10)
+        result = inst.serialize(None, file)
+        assert isinstance(result, filedict)
+        assert result == {'fp': None,
+                          'filename': file.title,
+                          'size': file.size,
+                          'uid': str(hash(file)),
+                          'mimetype': file.mimetype,
+                          }
 
     def test_deserialize_null(self, inst):
         assert inst.deserialize(None, colander.null) is None
@@ -1143,6 +1155,41 @@ class TestFileStoreType:
         with raises(colander.Invalid) as err_info:
             inst.deserialize(None, value)
         assert 'too large' in err_info.value.msg
+
+
+class TestFileStore:
+
+    @fixture
+    def inst(self):
+        from . import FileStore
+        return FileStore()
+
+    @fixture
+    def request_(self, request_):
+        request_.registry.settings['substanced.uploads_tempdir'] = '.'
+        return request_
+
+    def test_create(self, inst):
+        from . import FileStoreType
+        inst = inst.bind()
+        assert isinstance(inst.typ, FileStoreType)
+        assert inst.widget is None
+
+    def test_create_add_upload_widget_if_request(self, inst, request_):
+        from deform.widget import FileUploadWidget
+        inst = inst.bind(request=request_)
+        assert isinstance(inst.widget, FileUploadWidget)
+
+    def test_deserialize_ignore_tmp_store_if_no_request(self, inst):
+        inst = inst.bind()
+        assert inst.deserialize(colander.null) is None
+
+    def test_deserialize_clear_tmp_store_if_request(self, inst, request_,
+                                               mocker):
+        inst = inst.bind(request=request_)
+        mock = mocker.patch('adhocracy_core.schema.FileUploadTempStore').return_value
+        inst.deserialize(colander.null) is None
+        assert mock.clear.called
 
 
 class TestACLPrincipalType:
