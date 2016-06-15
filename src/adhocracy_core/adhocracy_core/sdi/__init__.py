@@ -65,7 +65,9 @@ def includeme(config):
     config.scan('.views.login')
     config.scan('.views.contents')
     config.scan('.views.sheets')
+    config.scan('.views.catalogs')
     config.scan('substanced.db.views')
+    config.scan('substanced.catalog.views')
 
 
 def _add_sdi_assets(config: Configurator):
