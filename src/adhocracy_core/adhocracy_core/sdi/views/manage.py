@@ -21,14 +21,15 @@ class ManagementViews(object):
                permission=NO_PERMISSION_REQUIRED,
                )
     def manage_main(self):
-        view_data = sdi_mgmt_views(self.context, self.request)
-        if not view_data:
+        sdi_tabs = sdi_mgmt_views(self.context, self.request)
+        can_use_sdi = self.request.has_permission('sdi.view', self.context)
+        if sdi_tabs and can_use_sdi:
+            view_name = '@@%s' % (sdi_tabs[0]['view_name'],)
+            location = self.request.sdiapi.mgmt_path(self.request.context,
+                                                     view_name)
+            return HTTPFound(location=location)
+        else:
             self.request.session['came_from'] = self.request.url
             location = self.request.sdiapi.mgmt_path(self.request.virtual_root,
                                                      '@@login')
             raise HTTPForbidden(location=location)
-        else:
-            view_name = '@@%s' % (view_data[0]['view_name'],)
-            location = self.request.sdiapi.mgmt_path(self.request.context,
-                                                     view_name)
-            return HTTPFound(location=location)
