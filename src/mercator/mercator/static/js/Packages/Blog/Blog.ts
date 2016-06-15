@@ -80,7 +80,8 @@ export var detailDirective = (
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhShowError,
     adhSubmitIfValid,
-    adhUploadImage
+    adhUploadImage,
+    $translate
 ) => {
     return {
         restrict: "E",
@@ -99,15 +100,17 @@ export var detailDirective = (
             adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.path), "itemOptions");
 
             scope.delete = () => {
-                if ($window.confirm("Do you really want to delete this?")) {
-                    var itemPath = AdhUtil.parentPath(scope.path);
-                    adhHttp.delete(itemPath)
-                        .then(() => {
-                            if (typeof scope.onChange !== "undefined") {
-                                scope.onChange();
-                            }
-                        });
-                }
+                return $translate("TR__ASK_TO_CONFIRM_HIDE_ACTION").then((question) => {
+                    if ($window.confirm(question)) {
+                        var itemPath = AdhUtil.parentPath(scope.path);
+                        adhHttp.delete(itemPath)
+                            .then(() => {
+                                if (typeof scope.onChange !== "undefined") {
+                                    scope.onChange();
+                                }
+                            });
+                    }
+                });
             };
 
             scope.edit = () => {

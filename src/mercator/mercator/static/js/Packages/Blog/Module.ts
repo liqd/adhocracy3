@@ -40,6 +40,7 @@ export var register = (angular) => {
             "adhShowError",
             "adhSubmitIfValid",
             "adhUploadImage",
+            "$translate",
             Blog.detailDirective])
         .directive("adhBlog", ["adhConfig", Blog.listingDirective])
         .directive("adhBlogPostCreate", [

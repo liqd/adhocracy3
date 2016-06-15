@@ -100,7 +100,8 @@ export var proposalDetailColumnDirective = (
     adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     $location : angular.ILocationService,
-    $window : Window
+    $window : Window,
+    $translate
 ) => {
     return {
         restrict: "E",
@@ -135,13 +136,14 @@ export var proposalDetailColumnDirective = (
                 } else if (scope.isBuergerhaushalt) {
                     proposalClass = RIBuergerhaushaltProposal;
                 }
-                // FIXME: translate
-                if ($window.confirm("Do you really want to delete this?")) {
-                    adhHttp.hide(AdhUtil.parentPath(scope.proposalUrl), proposalClass.content_type)
-                        .then(() => {
-                            adhTopLevelState.goToCameFrom("/");
-                        });
-                }
+                return $translate("TR__ASK_TO_CONFIRM_HIDE_ACTION").then((question) => {
+                    if ($window.confirm(question)) {
+                        adhHttp.hide(AdhUtil.parentPath(scope.proposalUrl), proposalClass.content_type)
+                            .then(() => {
+                                adhTopLevelState.goToCameFrom("/");
+                            });
+                    }
+                });
             };
         }
     };
