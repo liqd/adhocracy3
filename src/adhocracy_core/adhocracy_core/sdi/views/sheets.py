@@ -2,10 +2,10 @@
 from collections import OrderedDict
 
 from pyramid.httpexceptions import HTTPFound
-from pyramid.httpexceptions import HTTPNotFound
 from pyramid.interfaces import IRequest
 from substanced.sdi import mgmt_view
 from substanced.util import _
+from substanced.sdi import LEFT
 
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IResourceSheet
@@ -17,11 +17,22 @@ from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import create_schema
 
 
+def has_editable_sheets(context: object, request: IResource) -> bool:
+    """Return True if `context` has editable sheets."""
+    try:
+        sheets = request.registry.content.get_sheets_edit(context, request)
+    except KeyError:
+        return False
+    return bool(sheets)
+
+
 @mgmt_view(
     name='properties',
     renderer='substanced.property:templates/propertysheets.pt',
     tab_title=_('Sheets'),
-    permission='sdi.view',
+    permission='sdi.manage-sheets',
+    tab_near=LEFT,
+    tab_condition=has_editable_sheets,
 )
 class EditResourceSheets(FormView):
     """Edit resource sheets form tab."""
@@ -34,8 +45,6 @@ class EditResourceSheets(FormView):
         self.registry = self.request.registry
         self.sheets = self._get_editable_sheets()
         self.sheet_names = list(self.sheets.keys())
-        if not self.sheets:
-            raise HTTPNotFound('No editable resource sheets')
         self.active_sheet_name = self._get_active_sheet_name()
         self.active_sheet = self._get_active_sheet()
         self.schema = self.active_sheet.get_schema_with_bindings()

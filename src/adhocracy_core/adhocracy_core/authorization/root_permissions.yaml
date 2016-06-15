@@ -32,3 +32,11 @@ permissions:
   - [view_userextended,              ~,         ~,             ~,            ~,         A,       ~,         A] # view user extended sheet/fields
   - [create_edit_sheet_permissions,  ~,         ~,             ~,            ~,         ~,       ~,         A] # default permission to do transition to next workflow state (phase)
   - [create_group,                   ~,         ~,             ~,            ~,         ~,       ~,         A] # create user group
+  # admin interface (sdi)
+  - [sdi.view,                        ~,         ~,             ~,            ~,         ~,       ~,         A] # view the admin interface
+  - [sdi.view-contents,               ~,         ~,             ~,            ~,         ~,       ~,         A] # view contents tab
+  - [sdi.manage-contents,             ~,         ~,             ~,            ~,         ~,       ~,         A] # delete/copy/rename resources in contents tab
+  - [sdi.add-content,                 ~,         ~,             ~,            ~,         ~,       ~,         A] # add resources
+  - [sdi.manage-sheets,               ~,         ~,             ~,            ~,         ~,       ~,         A] # view/edit sheets tab
+  - [sdi.manage-database,             ~,         ~,             ~,            ~,         ~,       ~,         A] # view/edit database tab
+  - [sdi.manage-catalog,              ~,         ~,             ~,            ~,         ~,       ~,         A] # view/edit catalogs/index tab
