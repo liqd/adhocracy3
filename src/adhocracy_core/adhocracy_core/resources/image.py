@@ -143,6 +143,7 @@ def add_image_size_downloads(context: IImage, registry: Registry, **kwargs):
 
 
 image_meta = asset_meta._replace(
+    content_name='Image',
     iresource=IImage,
     is_implicit_addable=True,
     extended_sheets=(adhocracy_core.sheets.image.IImageMetadata,),

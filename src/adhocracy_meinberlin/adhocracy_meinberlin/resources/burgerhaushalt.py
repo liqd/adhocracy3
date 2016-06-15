@@ -34,6 +34,7 @@ class IProcess(process.IProcess):
 
 
 process_meta = process.process_meta._replace(
+    content_name='BuergerhaushaltProcess',
     iresource=IProcess,
     element_types=(IProposal,
                    ),

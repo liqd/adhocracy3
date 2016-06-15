@@ -9,6 +9,7 @@ class IProcess(process.IProcess):
     """Policy Compass participation process."""
 
 process_meta = process.process_meta._replace(
+    content_name='PCompassProcess',
     iresource=IProcess,
     element_types=(IProposal,),
     workflow_name='standard',

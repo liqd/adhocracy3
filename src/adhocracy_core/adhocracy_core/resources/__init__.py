@@ -66,9 +66,9 @@ def add_resource_type_to_registry(metadata: ResourceMetadata,
     resources_meta[metadata.iresource] = metadata
     iresource = metadata.iresource
     name = metadata.content_name or iresource.__identifier__
-    meta = {'content_name': name}
+    meta = {'name': name}
     if metadata.is_sdi_addable:
-        add_view_name = 'add_' + name
+        add_view_name = 'add_' + iresource.__identifier__
         meta['add_view'] = add_view_name
         if hasattr(config, 'add_sdi_add_view'):  # ease tests
             config.add_sdi_add_view(metadata.iresource, add_view_name)

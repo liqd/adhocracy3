@@ -85,6 +85,7 @@ asset_meta = pool_meta._replace(
     use_autonaming=True,
     permission_create='create_asset',
     after_creation=(add_metadata,),
+    is_sdi_addable=True,
 )
 
 

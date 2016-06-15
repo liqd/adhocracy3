@@ -354,12 +354,18 @@ class TestPermissionsSchema:
         from adhocracy_core.sheets.principal import PermissionsSchema
         return PermissionsSchema()
 
+    def test_create(self):
+        from .principal import get_group_choices
+        inst = self.make_one()
+        assert inst
+        assert inst['groups'].choices_getter == get_group_choices
+
     def test_deserialize_empty(self):
         inst = self.make_one()
         assert inst.deserialize({}) == {'groups': []}
 
-    def test_serialize_empty(self, context):
-        inst = self.make_one().bind(context=context)
+    def test_serialize_empty(self, context, request_):
+        inst = self.make_one().bind(context=context, request=request_)
         assert inst.serialize({}) == {'groups': [],
                                       'roles': [],
                                       }
@@ -374,6 +380,33 @@ class TestPermissionsSchema:
             {'groups': [request_.application_url + '/group/'],
              'roles': ['view'],
              }
+
+
+class TestGetGroupChoices:
+
+    def call_fut(self, *args):
+        from .principal import get_group_choices
+        return get_group_choices(*args)
+
+    def test_return_empty_list_if_no_assets_service(self, pool):
+        assert self.call_fut(pool, None) == []
+
+    def test_return_empty_list_if_empty_assets_service(self, pool, service):
+        pool['principals'] = service
+        pool['principals']['groups'] = service.clone()
+        assert self.call_fut(pool, None) == []
+
+    def test_get_asset_choices_from_assets_service(self, pool, request_,
+                                                   service):
+        from .principal import IGroup
+        pool['principals'] = service
+        pool['principals']['groups'] = service.clone()
+        pool['principals']['groups']['group'] = \
+            testing.DummyResource(__provides__=IGroup)
+        pool['principals']['groups']['no_group'] = testing.DummyResource()
+        choices = self.call_fut(pool, request_)
+        assert choices == [('http://example.com/principals/groups/group/',
+                            'group')]
 
 
 class TestPermissionsSheet:

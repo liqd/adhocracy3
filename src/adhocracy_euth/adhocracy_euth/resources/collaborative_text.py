@@ -8,6 +8,7 @@ class IProcess(document_process.IDocumentProcess):
 
 
 process_meta = document_process.document_process_meta._replace(
+    content_name='CollaborativeTextProcess',
     iresource=IProcess,
     workflow_name='debate'
 )
@@ -18,6 +19,7 @@ class IPrivateProcess(IProcess):
 
 
 private_process_meta = document_process.document_process_meta._replace(
+    content_name='PrivateCollaborativeTextProcess',
     iresource=IPrivateProcess,
     workflow_name='debate_private'
 )

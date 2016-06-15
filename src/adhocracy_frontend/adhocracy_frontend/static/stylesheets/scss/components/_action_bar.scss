@@ -30,6 +30,7 @@
     @include rem(padding, 0 7px);
     background: $color-structure-normal;
     width: 100%;
+    margin-bottom: 1px;
 
     .map-switch {
         float: right;

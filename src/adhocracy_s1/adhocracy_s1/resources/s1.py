@@ -11,6 +11,7 @@ class IProcess(process.IProcess):
 
 
 process_meta = process.process_meta._replace(
+    content_name='S1Process',
     iresource=IProcess,
     workflow_name='s1',
 )
