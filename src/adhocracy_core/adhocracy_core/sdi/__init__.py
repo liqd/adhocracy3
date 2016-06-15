@@ -65,7 +65,6 @@ def includeme(config):
     config.scan('.views.manage')
     config.scan('.views.login')
     config.scan('.views.contents')
-    config.scan('.views.services')
     config.scan('.views.sheets')
 
 
