@@ -76,11 +76,8 @@ def _add_default_group(context, registry):
                                  True):  # pragma: no cover
         return
     group_name = 'authenticated'
-    group_roles = ['participant']
     groups = find_service(context, 'principals', 'groups')
-    appstructs = {adhocracy_core.sheets.principal.IGroup.__identifier__:
-                  {'roles': group_roles},
-                  adhocracy_core.sheets.name.IName.__identifier__:
+    appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
                   {'name': group_name},
                   }
     registry.content.create(IGroup.__identifier__, groups,
