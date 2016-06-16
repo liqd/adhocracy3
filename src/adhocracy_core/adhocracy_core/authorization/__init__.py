@@ -150,7 +150,8 @@ def _migrate_acm_to_acl(acm: dict) -> dict:
 def _sort_by_principal_priority(acl: list) -> list:
     roles = ROLE_PRINCIPALS.copy()
     roles.reverse()
-    systems = SYSTEM_PRINCIPALS
+    systems = SYSTEM_PRINCIPALS.copy()
+    systems.reverse()
     schema = ACEPrincipal()
     principals = [schema.deserialize(x) for x in roles + systems]
     acl.sort(key=lambda x: principals.index(x[1]))
