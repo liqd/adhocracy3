@@ -98,10 +98,7 @@ export var proposalDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service,
-    adhTopLevelState : AdhTopLevelState.Service,
-    $location : angular.ILocationService,
-    $window : Window,
-    $translate
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
@@ -128,23 +125,6 @@ export var proposalDetailColumnDirective = (
             adhHttp.get(scope.processUrl, params).then((response) => {
                 scope.badgesExist = response.data[SIPool.nick].count > 0;
             });
-
-            scope.hide = () => {
-                var proposalClass = RIGeoProposal;
-                if (scope.isKiezkasse) {
-                    proposalClass = RIKiezkasseProposal;
-                } else if (scope.isBuergerhaushalt) {
-                    proposalClass = RIBuergerhaushaltProposal;
-                }
-                return $translate("TR__ASK_TO_CONFIRM_HIDE_ACTION").then((question) => {
-                    if ($window.confirm(question)) {
-                        adhHttp.hide(AdhUtil.parentPath(scope.proposalUrl), proposalClass.content_type)
-                            .then(() => {
-                                adhTopLevelState.goToCameFrom("/");
-                            });
-                    }
-                });
-            };
         }
     };
 };

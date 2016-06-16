@@ -254,16 +254,18 @@ export class Service<R extends ResourcesBase.IResource> {
                 AdhError.logBackendError);
     }
 
-    public hide(path : string, contentType : string, config : IHttpConfig = {}) : angular.IPromise<any> {
-        var obj = {
-            content_type: contentType,
-            data: {}
-        };
-        obj.data[SIMetadata.nick] = {
-            hidden: true
-        };
+    public hide(path : string, config : IHttpConfig = {}) : angular.IPromise<any> {
+        return this.get(path).then((resource) => {
+            var obj = {
+                content_type: resource.content_type,
+                data: {}
+            };
+            obj.data[SIMetadata.nick] = {
+                hidden: true
+            };
 
-        return this.put(path, <any>obj, _.extend({}, config, {keepMetadata: true}));
+            return this.put(path, <any>obj, _.extend({}, config, {keepMetadata: true}));
+        });
     }
 
     public delete(path : string, config : IHttpConfig = {}) : angular.IPromise<any> {

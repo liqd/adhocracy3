@@ -1,6 +1,6 @@
 <div class="action-bar">
     <adh-edit-action
-        data-ng-if="edit && resourcePath && proposalItemOptions.PUT"
+        data-ng-if="edit && resourcePath && options.PUT"
         data-class="action-bar-item"
         data-parent-path="parentPath"
         data-resource-path="{{resourcePath}}"></adh-edit-action>
@@ -15,11 +15,17 @@
     <adh-share-action
         data-ng-if="share"
         data-class="action-bar-item"></adh-share-action>
-    <adh-delete-action
-        data-ng-if="delete && resourcePath && proposalItemOptions.hide"
+    <adh-hide-action
+        data-ng-if="hide && resourcePath && options.hide"
         data-class="action-bar-item"
         data-parent-path="parentPath"
-        data-resource-path="{{resourcePath}}"></adh-delete-action>
+        data-content-type="{{contentType}}"
+        data-resource-path="{{resourcePath}}"></adh-hide-action>
+    <adh-resource-widget-delete-action
+        data-ng-if="resourceWidgetDelete && resourcePath && options.hide"
+        data-class="action-bar-item"
+        data-parent-path="parentPath"
+        data-resource-path="{{resourcePath}}"></adh-resource-widget-delete-action>
     <adh-print-action
         data-ng-if="print"
         data-class="action-bar-item"></adh-print-action>

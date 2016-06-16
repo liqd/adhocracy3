@@ -1,4 +1,5 @@
 import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
 import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
@@ -16,7 +17,8 @@ export var resourceActionsDirective = (
             resourcePath: "@",
             parentPath: "=?",
             share: "=?",
-            delete: "=?",
+            hide: "=?",
+            resourceWidgetDelete: "=?",
             print: "=?",
             report: "=?",
             cancel: "=?",
@@ -25,7 +27,8 @@ export var resourceActionsDirective = (
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceActions.html",
         link: (scope, element) => {
-            adhPermissions.bindScope(scope, scope.resourcePath, "proposalItemOptions");
+            var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
+            adhPermissions.bindScope(scope, path, "options");
         }
     };
 };
@@ -62,7 +65,37 @@ export var shareActionDirective = () => {
     };
 };
 
-export var deleteActionDirective = () => {
+export var hideActionDirective = (
+    adhHttp: AdhHttp.Service<any>,
+    adhTopLevelState: AdhTopLevelState.Service,
+    $translate,
+    $window : Window
+) => {
+    return {
+        restrict: "E",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"hide();\">{{ 'TR__HIDE' | translate }}</a>",
+        require: "^adhMovingColumn",
+        scope: {
+            resourcePath: "@",
+            parentPath: "=?",
+            class: "@",
+        },
+        link: (scope, element) => {
+            scope.hide = () => {
+                return $translate("TR__ASK_TO_CONFIRM_HIDE_ACTION").then((question) => {
+                    var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
+                    if ($window.confirm(question)) {
+                        return adhHttp.hide(path).then(() => {
+                            adhTopLevelState.goToCameFrom("/");
+                        });
+                    }
+                });
+            };
+        }
+    };
+};
+
+export var resourceWidgetDeleteActionDirective = () => {
     return {
         restrict: "E",
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"delete();\">{{ 'TR__DELETE' | translate }}</a>",
