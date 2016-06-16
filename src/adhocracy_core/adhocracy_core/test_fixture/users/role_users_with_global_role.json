@@ -1,31 +1,31 @@
 [
   { "name": "admin",
-    "email": "admin@liqd.de",
+    "email": "admin@example.com",
     "initial-password": "password",
     "roles": ["admin"]
   },
    { "name": "initiator",
-    "email": "initiator@liqd.de",
+    "email": "initiator@example.com",
     "initial-password": "password",
     "roles": ["initiator"]
   },
   { "name": "moderator",
-    "email": "moderator@liqd.de",
+    "email": "moderator@example.com",
     "initial-password": "password",
     "roles": ["moderator"]
   },
   { "name": "participant",
-    "email": "participant@liqd.de",
+    "email": "participant@example.com",
     "initial-password": "password",
     "roles": ["participant"]
   },
   { "name": "participant2",
-    "email": "participant2@liqd.de",
+    "email": "participant2@example.com",
     "initial-password": "password",
     "roles": ["participant2"]
   },
   { "name": "authenticated",
-    "email": "authenticated@liqd.de",
+    "email": "authenticated@example.com",
     "initial-password": "password",
     "roles": ["authenticated"]
   }

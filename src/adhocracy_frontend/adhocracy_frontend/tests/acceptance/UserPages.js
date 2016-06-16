@@ -3,7 +3,7 @@
 var shared = require("./shared.js");
 
 var participantName = "participant";
-var participantEmail = "participant@example.org";
+var participantEmail = "participant@example.com";
 var participantPassword = "password";
 
 var otherParticipantName = "participant2";
