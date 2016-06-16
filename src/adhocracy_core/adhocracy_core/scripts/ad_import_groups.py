@@ -23,7 +23,7 @@ group to create and a simplified serialization of the sheets data.
 Example::
 
 [
-  {"name": "Alice", "roles": ["contributor"], "groups": ["gods"]},
+  {"name": "administrators", "roles": ["moderator", "admin"] },
 ]
 """
 

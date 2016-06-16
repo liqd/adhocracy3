@@ -108,6 +108,6 @@ class TestRoot:
         group_users = [x.__name__ for x in group_sheet.get()['users']]
         group_roles = group_sheet.get()['roles']
         assert group is not None
-        assert group_roles == ['participant']
+        assert group_roles == []
 
 
