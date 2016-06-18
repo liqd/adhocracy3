@@ -26,8 +26,6 @@ class TestPrivatePublicProcess:
         add_resources(app_admin.app_router, private)
         public = str(datadir.join('public.json'))
         add_resources(app_admin.app_router, public)
-        public_local_roles = str(datadir.join('public_local_roles.json'))
-        add_local_roles(app_admin.app_router, public_local_roles)
 
         resp = app_admin.get(process_url_private)
         assert resp.status_code == 200
@@ -66,7 +64,6 @@ class TestPrivatePublicProcess:
                                 'participate')
         assert resp.status_code == 200
 
-    @mark.xfail(reason='Default group may not have participator role, WIP')
     def test_participate_authenticated_cannot_read_private_process(
             self, process_url_private, app_authenticated):
         """The authenticated test user has no gobal role but is member ob the

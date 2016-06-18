@@ -2,6 +2,7 @@ title: Example
 description: Example workflow used in tests
 initial_state: participate
 auto_transition: False
+add_local_role_participant_to_default_group: True
 states:
   participate:
     title: Participate
