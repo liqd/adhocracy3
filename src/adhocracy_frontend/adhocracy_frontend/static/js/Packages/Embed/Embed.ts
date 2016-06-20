@@ -30,12 +30,6 @@ export class Provider implements angular.IServiceProvider {
      */
     constructor() {
         this.directives = [
-            "document-workbench",
-            "comment-listing",
-            "create-or-show-comment-listing",
-            "login",
-            "register",
-            "user-indicator",
             "empty"
         ];
         this.directiveAliases = {};

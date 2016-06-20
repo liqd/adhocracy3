@@ -16,6 +16,7 @@ import * as AdhCredentialsModule from "./CredentialsModule";
 import * as AdhUserModule from "./Module";
 import * as AdhImageModule from "../Image/Module";
 
+import * as AdhEmbed from "../Embed/Embed";
 import * as AdhHttp from "../Http/Http";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
@@ -84,6 +85,12 @@ export var register = (angular) => {
                 .when("activate", ["adhConfig", "adhUser", "adhDone", "$rootScope", "$location", AdhUserViews.activateArea]);
         }])
         .config(["adhResourceAreaProvider", AdhUserViews.registerRoutes()])
+        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
+            adhEmbedProvider
+                .registerDirective("login")
+                .registerDirective("register")
+                .registerDirective("user-indicator");
+        }])
         .directive("adhListUsers", ["adhCredentials", "adhConfig", AdhUserViews.userListDirective])
         .directive("adhUserListItem", ["adhConfig", AdhUserViews.userListItemDirective])
         .directive("adhUserProfile", [
