@@ -37,7 +37,7 @@ export interface IParagraph {
 export interface IScope extends angular.IScope {
     path? : string;
     hasMap? : boolean;
-    hasBadges?: boolean;
+    hasBadges? : boolean;
     options : AdhHttp.IOptions;
     errors? : AdhHttp.IBackendErrorItem[];
     data : {
@@ -51,10 +51,10 @@ export interface IScope extends angular.IScope {
 
         // optional features
         coordinates? : number[];
-        assignments?: AdhBadge.IBadgeAssignment[];
+        assignments? : AdhBadge.IBadgeAssignment[];
     };
     selectedState? : string;
-    resource: any;
+    resource : any;
 
     toggleCreateForm() : void;
     showCreateForm? : boolean;
