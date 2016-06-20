@@ -35,7 +35,7 @@ export var register = (angular) => {
             AdhTopLevelStateModule.moduleName,
             AdhAbuse.moduleName
         ])
-        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
+        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider
                 .registerDirective("comment-listing")
                 .registerDirective("create-or-show-comment-listing");

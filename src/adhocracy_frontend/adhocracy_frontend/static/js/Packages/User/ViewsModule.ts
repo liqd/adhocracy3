@@ -85,7 +85,7 @@ export var register = (angular) => {
                 .when("activate", ["adhConfig", "adhUser", "adhDone", "$rootScope", "$location", AdhUserViews.activateArea]);
         }])
         .config(["adhResourceAreaProvider", AdhUserViews.registerRoutes()])
-        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
+        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider
                 .registerDirective("login")
                 .registerDirective("register")
