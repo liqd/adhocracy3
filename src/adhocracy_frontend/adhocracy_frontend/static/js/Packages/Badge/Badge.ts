@@ -35,6 +35,49 @@ export interface IGetBadgeAssignments {
     (resource : SIBadgeable.HasSheet) : angular.IPromise<IBadgeAssignment[]>;
 }
 
+export interface IBadge {
+    name : string;
+    title? : string;
+    path : string;
+    groups? : string[];
+}
+
+export interface IBadgeGroup {
+    name : string;
+    title : string;
+    path : string;
+}
+
+var extractBadge = (badge): IBadge => {
+    return {
+        name: badge.data[SIName.nick].name,
+        title: badge.data[SITitle.nick].title,
+        path: badge.path,
+        groups: badge.data[SIBadge.nick].groups
+    };
+};
+
+var extractGroup = (group): IBadgeGroup => {
+    return {
+        name: group.data[SIName.nick].name,
+        title: group.data[SITitle.nick].title,
+        path: group.path
+    };
+};
+
+var collectBadgesByGroup = (groupPaths, badges) => {
+    var badgesByGroup = {};
+    _.forEach(groupPaths, (groupPath) => {
+        badgesByGroup[groupPath] = [];
+        _.forOwn(badges, (badge) => {
+            if (_.includes(badge.groups, groupPath)) {
+                badgesByGroup[groupPath].push(badge);
+            }
+        });
+    });
+    return badgesByGroup;
+};
+
 var createBadgeFacets = (badgeGroups, badges): AdhListing.IFacetItem[] => {
     var groupPaths = _.map(badgeGroups, "path");
     var badgesByGroup = collectBadgesByGroup(groupPaths, badges);
@@ -80,6 +123,7 @@ export var getBadgeFacets = (
             });
         });
     };
+
 export var getBadgesFactory = (
     adhHttp : AdhHttp.Service<any>,
     $q : angular.IQService
@@ -119,36 +163,6 @@ export var getBadgesFactory = (
     } else {
         return $q.all(_.map(assignmentPaths, getBadge));
     }
-};
-
-export var extractBadge = (badge) => {
-    return {
-        name: badge.data[SIName.nick].name,
-        title: badge.data[SITitle.nick].title,
-        path: badge.path,
-        groups: badge.data[SIBadge.nick].groups
-    };
-};
-
-export var extractGroup = (group) => {
-    return {
-        name: group.data[SIName.nick].name,
-        title: group.data[SITitle.nick].title,
-        path: group.path
-    };
-};
-
-export var collectBadgesByGroup = (groupPaths, badges) => {
-    var badgesByGroup = {};
-    _.forEach(groupPaths, (groupPath) => {
-        badgesByGroup[groupPath] = [];
-        _.forOwn(badges, (badge) => {
-            if (_.includes(badge.groups, groupPath)) {
-                badgesByGroup[groupPath].push(badge);
-            }
-        });
-    });
-    return badgesByGroup;
 };
 
 var bindPath = (
