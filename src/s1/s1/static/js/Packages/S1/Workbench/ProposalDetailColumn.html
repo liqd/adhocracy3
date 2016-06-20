@@ -10,10 +10,11 @@
                 data-ng-href="{{ processUrl | adhResourceUrl:meeting }}">{{ 'TR__CLOSE' | translate }} X</a>
         </div>
     </div>
-    <adh-s1-proposal-detail
+    <adh-recompile-on-change
         data-ng-switch-when="body"
-        data-path="{{proposalUrl}}">
-    </adh-s1-proposal-detail>
+        data-value="{{proposalUrl}}">
+        <adh-s1-proposal-detail data-path="{{proposalUrl}}"></adh-s1-proposal-detail>
+    </adh-recompile-on-change>
     <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ proposalUrl | adhParentPath | adhResourceUrl }}">
         <i class="icon-collapse moving-column-expand-icon"></i>
     </a>
