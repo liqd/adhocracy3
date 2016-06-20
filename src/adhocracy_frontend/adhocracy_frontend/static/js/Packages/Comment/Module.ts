@@ -13,6 +13,7 @@ import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 import * as AdhAbuse from "../Abuse/Module";
 
 import * as AdhComment from "./Comment";
+import * as AdhEmbed from "../Embed/Embed";
 
 
 export var moduleName = "adhComment";
@@ -34,6 +35,11 @@ export var register = (angular) => {
             AdhTopLevelStateModule.moduleName,
             AdhAbuse.moduleName
         ])
+        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
+            adhEmbedProvider
+                .registerDirective("comment-listing")
+                .registerDirective("create-or-show-comment-listing");
+        }])
         .directive("adhCommentListing", [
             "adhConfig",
             "adhHttp",
