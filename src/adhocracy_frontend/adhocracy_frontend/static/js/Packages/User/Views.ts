@@ -563,7 +563,7 @@ export var indicatorDirective = (
 export var metaDirective = (
     adhConfig : AdhConfig.IService,
     adhResourceArea : AdhResourceArea.Service,
-    adhGetBadges : AdhBadge.IGetBadges
+    adhGetBadges : AdhBadge.IGetBadgeAssignments
 ) => {
     return {
         restrict: "E",
@@ -619,7 +619,7 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
             adhHttp : AdhHttp.Service<any>,
             $scope,
             adhTopLevelState : AdhTopLevelState.Service,
-            adhGetBadges : AdhBadge.IGetBadges
+            adhGetBadges : AdhBadge.IGetBadgeAssignments
         ) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
@@ -651,7 +651,7 @@ export var userProfileDirective = (
     adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhUser : AdhUser.Service,
-    adhGetBadges : AdhBadge.IGetBadges
+    adhGetBadges : AdhBadge.IGetBadgeAssignments
 ) => {
     return {
         restrict: "E",

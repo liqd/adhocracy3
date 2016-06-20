@@ -45,7 +45,7 @@ export interface IScope extends angular.IScope {
         lng : number;
         lat : number;
         polygon: number[][];
-        assignments : AdhBadge.IBadge[];
+        assignments : AdhBadge.IBadgeAssignment[];
 
         budget? : number;
         creatorParticipate? : boolean;
@@ -65,7 +65,7 @@ var bindPath = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $q : angular.IQService
 ) => (
     scope : IScope,
@@ -240,7 +240,7 @@ export var detailDirective = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $q : angular.IQService
 ) => {
     return {
@@ -264,7 +264,7 @@ export var listItemDirective = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $q : angular.IQService
 ) => {
     return {
@@ -297,7 +297,7 @@ export var mapListItemDirective = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $q : angular.IQService
 ) => {
     return {
@@ -395,7 +395,7 @@ export var editDirective = (
     adhShowError,
     adhSubmitIfValid,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $location : angular.ILocationService,
     $q : angular.IQService
 ) => {

@@ -21,7 +21,7 @@ import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
 
 var pkgLocation = "/Badge";
 
-export interface IBadge {
+export interface IBadgeAssignment {
     title : string;
     description : string;
     name : string;
@@ -29,17 +29,17 @@ export interface IBadge {
     badgePath : string;
 }
 
-export interface IGetBadges {
-    (resource : SIBadgeable.HasSheet) : angular.IPromise<IBadge[]>;
+export interface IGetBadgeAssignments {
+    (resource : SIBadgeable.HasSheet) : angular.IPromise<IBadgeAssignment[]>;
 }
 
 export var getBadgesFactory = (
     adhHttp : AdhHttp.Service<any>,
     $q : angular.IQService
-) : IGetBadges => (
+) : IGetBadgeAssignments => (
     resource : SIBadgeable.HasSheet,
     includeParent? : boolean
-) : angular.IPromise<IBadge[]> => {
+) : angular.IPromise<IBadgeAssignment[]> => {
     if (typeof includeParent === "undefined") {
         includeParent = !!resource.content_type.match(/Version$/);
     }
@@ -172,7 +172,7 @@ export var badgeAssignment = (
             adhHttp.get(scope.path).then((proposal) => {
                 scope.poolPath = proposal.data[SIBadgeable.nick].post_pool;
 
-                return adhGetBadges(proposal).then((assignments : IBadge[]) => {
+                return adhGetBadges(proposal).then((assignments : IBadgeAssignment[]) => {
 
                     bindPath(adhHttp, adhPermissions, $q)(scope);
 

@@ -31,7 +31,7 @@ export interface IScope extends angular.IScope {
         rateCount : number;
         creationDate : string;
         commentCount : number;
-        assignments : AdhBadge.IBadge[];
+        assignments : AdhBadge.IBadgeAssignment[];
     };
     selectedState? : string;
     resource : any;
@@ -43,7 +43,7 @@ var bindPath = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $q : angular.IQService
 ) => (
     scope : IScope,
@@ -125,7 +125,7 @@ export var detailDirective = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $q : angular.IQService
 ) => {
     return {

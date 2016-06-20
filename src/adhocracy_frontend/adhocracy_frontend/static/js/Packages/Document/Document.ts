@@ -34,12 +34,6 @@ export interface IParagraph {
     selectedState? : string;
 }
 
-export interface IBadge {
-    title : string;
-    description : string;
-    name : string;
-}
-
 export interface IScope extends angular.IScope {
     path? : string;
     hasMap? : boolean;
@@ -57,7 +51,7 @@ export interface IScope extends angular.IScope {
 
         // optional features
         coordinates? : number[];
-        assignments?: IBadge[];
+        assignments?: AdhBadge.IBadgeAssignment[];
     };
     selectedState? : string;
     resource: any;
@@ -100,7 +94,7 @@ export var highlightSelectedParagraph = (
 export var bindPath = (
     $q : angular.IQService,
     adhHttp : AdhHttp.Service<any>,
-    adhGetBadges? : AdhBadge.IGetBadges,
+    adhGetBadges? : AdhBadge.IGetBadgeAssignments,
     adhTopLevelState? : AdhTopLevelState.Service
 ) => (
     scope : IScope,
@@ -349,7 +343,7 @@ export var detailDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -374,7 +368,7 @@ export var listItemDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -405,7 +399,7 @@ export var mapListItemDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     var directive : angular.IDirective = listItemDirective($q, adhConfig, adhHttp, adhGetBadges, adhTopLevelState);
