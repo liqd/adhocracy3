@@ -55,7 +55,7 @@ var bindPath = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $q : angular.IQService
 ) => (
     scope : IScope,
@@ -162,7 +162,7 @@ export var detailDirective = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $q : angular.IQService
 ) => {
     return {
@@ -183,7 +183,7 @@ export var listItemDirective = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $q : angular.IQService
 ) => {
     return {
@@ -257,7 +257,7 @@ export var editDirective = (
     adhShowError,
     adhSubmitIfValid,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $location : angular.ILocationService,
     $q : angular.IQService
 ) => {
