@@ -212,7 +212,7 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhTopLevelState : AdhTopLevelState.Service,
-        private adhGetBadges : AdhBadge.IGetBadges,
+        private adhGetBadges : AdhBadge.IGetBadgeAssignments,
         private adhUploadImage,
         private flowFactory,
         private moment : moment.MomentStatic,
@@ -730,7 +730,7 @@ export class CreateWidget<R extends ResourcesBase.IResource> extends Widget<R> {
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         adhTopLevelState : AdhTopLevelState.Service,
-        adhGetBadges : AdhBadge.IGetBadges,
+        adhGetBadges : AdhBadge.IGetBadgeAssignments,
         adhUploadImage,
         private $timeout : angular.ITimeoutService,
         flowFactory,
@@ -792,7 +792,7 @@ export class DetailWidget<R extends ResourcesBase.IResource> extends Widget<R> {
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         adhTopLevelState : AdhTopLevelState.Service,
-        adhGetBadges : AdhBadge.IGetBadges,
+        adhGetBadges : AdhBadge.IGetBadgeAssignments,
         adhUploadImage,
         flowFactory,
         moment : moment.MomentStatic,
@@ -856,7 +856,7 @@ export var listItem = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges
+    adhGetBadges : AdhBadge.IGetBadgeAssignments
 ) => {
     return {
         restrict: "E",

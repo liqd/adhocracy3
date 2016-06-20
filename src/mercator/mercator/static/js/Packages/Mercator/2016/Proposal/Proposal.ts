@@ -497,7 +497,7 @@ var get = (
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges
+    adhGetBadges : AdhBadge.IGetBadgeAssignments
 ) => (path : string) : ng.IPromise<IDetailData> => {
     return adhHttp.get(path).then((proposal) => {
         var subs : {
@@ -703,7 +703,7 @@ export var editDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhResourceUrl,
-    adhGetBadges : AdhBadge.IGetBadges
+    adhGetBadges : AdhBadge.IGetBadgeAssignments
 ) => {
     return {
         restrict: "E",
@@ -761,7 +761,7 @@ export var moderateDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhResourceUrl,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     adhCredentials : AdhCredentials.Service
 ) => {
     return {
@@ -829,7 +829,7 @@ export var listItem = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges
+    adhGetBadges : AdhBadge.IGetBadgeAssignments
 ) => {
     return {
         retrict: "E",
@@ -1008,7 +1008,7 @@ export var detailDirective = (
     adhHttp : AdhHttp.Service<any>,
     adhTopLevelState : AdhTopLevelState.Service,
     adhPermissions : AdhPermissions.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $translate
 ) => {
     return {
