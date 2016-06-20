@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import * as AdhConfig from "../Config/Config";
 import * as AdhCredentials from "../User/Credentials";
 import * as AdhHttp from "../Http/Http";
+import * as AdhListing from "../Listing/Listing";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
@@ -17,6 +18,7 @@ import * as SIBadgeable from "../../Resources_/adhocracy_core/sheets/badge/IBadg
 import * as SIBadgeAssignment from "../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment";
 import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
 import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
+import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
 
 var pkgLocation = "/Badge";
@@ -33,6 +35,51 @@ export interface IGetBadgeAssignments {
     (resource : SIBadgeable.HasSheet) : angular.IPromise<IBadgeAssignment[]>;
 }
 
+var createBadgeFacets = (badgeGroups, badges): AdhListing.IFacetItem[] => {
+    var groupPaths = _.map(badgeGroups, "path");
+    var badgesByGroup = collectBadgesByGroup(groupPaths, badges);
+    return _.map(badgeGroups, (group: any) => {
+        return {
+            key: "badge",
+            name: group.title,
+            items: _.map(badgesByGroup[group.path], (badge: any) => {
+                return {
+                    key: badge.name,
+                    name: badge.title
+                };
+            })
+        };
+    });
+};
+
+export var getBadgeFacets = (
+    adhHttp: AdhHttp.Service<any>,
+    $q: angular.IQService
+) => (
+    path: string
+): angular.IPromise<AdhListing.IFacetItem[]> => {
+        var httpMap = (paths: string[], fn): angular.IPromise<any[]> => {
+            return $q.all(_.map(paths, (path) => {
+                return adhHttp.get(path).then(fn);
+            }));
+        };
+
+        var params = {
+            elements: "content",
+            depth: 4,
+            content_type: SIBadge.nick
+        };
+
+        return adhHttp.get(path, params).then((response) => {
+            var badgePaths = <string[]>_.map(response.data[SIPool.nick].elements, "path");
+            return httpMap(badgePaths, extractBadge).then((badges) => {
+                var groupPaths = _.union.apply(_, _.map(badges, "groups"));
+                return httpMap(groupPaths, extractGroup).then((badgeGroups) => {
+                    return createBadgeFacets(badgeGroups, badges);
+                });
+            });
+        });
+    };
 export var getBadgesFactory = (
     adhHttp : AdhHttp.Service<any>,
     $q : angular.IQService
