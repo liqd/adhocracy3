@@ -10,9 +10,11 @@ $color-text-highlight-extrovert: lighten($color-text-highlight-normal, 10%);
 $color-text-inverted: white;
 
 // Function colors
-$color-function-valid: #2eac66;
-$color-function-invalid: #e6332a;
+$color-function-valid: #4a6d21;
+$color-function-invalid: #b30000;
 $color-function-neutral: #f6d02b;
+$color-function-informative: #706047;
+$color-function-warning: #c80013;
 
 // Background colors
 $color-background-base: white;
