@@ -114,7 +114,7 @@ export var mapInput = (
             mapElement.height(scope.height);
 
             var map = leaflet.map(mapElement[0]);
-            leaflet.tileLayer("https://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
+            leaflet.tileLayer(adhConfig.map_tile_url, adhConfig.map_tile_options).addTo(map);
 
             scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.rawPolygon), adhMapData.style);
             scope.polygon.addTo(map);
@@ -227,6 +227,7 @@ export var mapInput = (
 };
 
 export var mapDetail = (
+    adhConfig : AdhConfig.IService,
     adhMapData : IMapData,
     leaflet : typeof L,
     $timeout : angular.ITimeoutService
@@ -250,7 +251,7 @@ export var mapDetail = (
             scope.map = leaflet.map(mapElement[0], {
                 scrollWheelZoom: false
             });
-            leaflet.tileLayer("https://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(scope.map);
+            leaflet.tileLayer(adhConfig.map_tile_url, adhConfig.map_tile_options).addTo(scope.map);
             scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.polygon), adhMapData.style);
             scope.polygon.addTo(scope.map);
 
@@ -301,6 +302,7 @@ export class MapListingController {
     private scrollToItem;
 
     constructor(
+        private adhConfig : AdhConfig.IService,
         private adhMapData : IMapData,
         private $scope : IMapListScope,
         private $element,
@@ -369,7 +371,7 @@ export class MapListingController {
         mapElement.height(this.$scope.height);
 
         var map = this.leaflet.map(mapElement[0]);
-        this.leaflet.tileLayer("https://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
+        this.leaflet.tileLayer(this.adhConfig.map_tile_url, this.adhConfig.map_tile_options).addTo(map);
 
         this.$scope.polygon = this.leaflet.polygon(this.leaflet.GeoJSON.coordsToLatLngs(this.$scope.rawPolygon), this.adhMapData.style);
         this.$scope.polygon.addTo(map);
@@ -525,7 +527,7 @@ export var mapListingInternal = (
                 return adhConfig.pkg_path + pkgLocation + "/ListingInternalHorizontal.html";
             }
         },
-        controller: ["adhMapData", "$scope", "$element", "$attrs", "$timeout", "leaflet", MapListingController]
+        controller: ["adhConfig", "adhMapData", "$scope", "$element", "$attrs", "$timeout", "leaflet", MapListingController]
     };
 };
 

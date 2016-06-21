@@ -1,4 +1,5 @@
 """Frontend view and simple pyramid app configurations."""
+import json
 import pkg_resources
 
 from pyramid.renderers import render
@@ -61,6 +62,18 @@ def config_view(request):
         'adhocracy.frontend.piwik_track_user_id', 'false'))
     config['profile_images_enabled'] = asbool(settings.get(
         'adhocracy.frontend.profile_images_enabled', 'true'))
+    config['map_tile_url'] = settings.get(
+        'adhocracy.frontend.map_tile_url',
+        'http://{s}.tile.osm.org/{z}/{x}/{y}.png')
+    map_tile_options = settings.get('adhocracy.frontend.map_tile_options')
+    if map_tile_options is not None:
+        config['map_tile_options'] = json.loads(map_tile_options)
+    else:
+        url = 'https://www.openstreetmap.org/copyright'
+        config['map_tile_options'] = {
+            'maxZoom': 18,
+            'attribution': '© <a href="%s">OpenStreetMap</a>' % url,
+        }
     use_cachbust = asbool(settings.get('cachebust.enabled', 'false'))
     if not use_cachbust:  # ease testing
         return config
