@@ -16,6 +16,7 @@ export var resourceActionsDirective = (
         scope: {
             resourcePath: "@",
             parentPath: "=?",
+            deleteRedirectUrl: "@?",
             share: "=?",
             hide: "=?",
             resourceWidgetDelete: "=?",
@@ -66,8 +67,9 @@ export var shareActionDirective = () => {
 };
 
 export var hideActionDirective = (
-    adhHttp: AdhHttp.Service<any>,
-    adhTopLevelState: AdhTopLevelState.Service,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhResourceUrlFilter,
     $translate,
     $window : Window
 ) => {
@@ -79,6 +81,7 @@ export var hideActionDirective = (
             resourcePath: "@",
             parentPath: "=?",
             class: "@",
+            redirectUrl: "@?",
         },
         link: (scope, element) => {
             scope.hide = () => {
@@ -86,7 +89,12 @@ export var hideActionDirective = (
                     var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
                     if ($window.confirm(question)) {
                         return adhHttp.hide(path).then(() => {
-                            adhTopLevelState.goToCameFrom("/");
+                            var url = scope.redirectUrl;
+                            if (!url) {
+                                var processUrl = adhTopLevelState.get("processUrl");
+                                url = processUrl ? adhResourceUrlFilter(processUrl) : "/";
+                            }
+                            adhTopLevelState.goToCameFrom(url);
                         });
                     }
                 });
