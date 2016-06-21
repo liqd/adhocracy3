@@ -69,7 +69,7 @@ export var shareActionDirective = () => {
 export var hideActionDirective = (
     adhHttp : AdhHttp.Service<any>,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhResourceUrlFilter
+    adhResourceUrlFilter,
     $translate,
     $window : Window
 ) => {
