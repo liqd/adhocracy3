@@ -82,11 +82,6 @@ category: Variables
         <td colspan="3"><strong>Functional colors</strong></td>
     </tr>
     <tr>
-        <td><div class="example-color color-function-informative"></div></td>
-        <td><code>color-function-informative</code></td>
-        <td>For messages</td>
-    </tr>
-    <tr>
         <td><div class="example-color color-function-neutral"></div></td>
         <td><code>color-function-neutral</code></td>
         <td>For neutral (neither positive nor negative) content, e.g. badges saying 'on test'</td>
@@ -196,7 +191,6 @@ category: Variables
 .color-text-inverted {background-color: $color-text-inverted;}
 
 .color-function-neutral {background-color: $color-function-neutral;}
-.color-function-informative {background-color: $color-function-informative;}
 .color-function-negative {background-color: $color-function-negative;}
 .color-function-positive {background-color: $color-function-positive;}
 
@@ -227,4 +221,4 @@ category: Variables
 @include check-contrast($color-text-highlight-normal, $color-background-base-introvert);
 @include check-contrast($color-text-inverted, $color-function-negative);
 @include check-contrast($color-text-inverted, $color-function-positive);
-@include check-contrast($color-text-inverted, $color-function-informative);
+@include check-contrast($color-text-normal, $color-function-neutral);

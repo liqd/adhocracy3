@@ -349,8 +349,8 @@ A list of alert messages to notify users in the moving column
 
 .moving-column-alert {
     @include rem(padding, 1rem);
-    background: $color-function-informative;
-    color: $color-text-inverted;
+    background: $color-function-neutral;
+    color: $color-text-normal;
     text-align: center;
 
     &.m-error {
