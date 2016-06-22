@@ -359,7 +359,8 @@ A list of alert messages to notify users in the moving column
     }
 
     &.m-warning {
-        background: $color-function-warning;
+        background: $color-function-neutral;
+        color: $color-text-darkest;
     }
 
     &.m-success {
