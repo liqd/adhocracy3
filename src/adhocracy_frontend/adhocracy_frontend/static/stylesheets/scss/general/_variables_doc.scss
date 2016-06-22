@@ -31,6 +31,11 @@ category: Variables
             <code>color-text-highlight-normal</code></td>
     </tr>
     <tr>
+        <td><div class="example-color color-text-darkest"></div></td>
+        <td><code>color-text-darkest</code></td>
+        <td>For text on 'function-color-warning' background</td>
+    </tr>
+    <tr>
         <td><div class="example-color color-text-highlight-normal"></div></td>
         <td><code>color-text-highlight-normal</code></td>
         <td>For highlighted content such as links</td>
@@ -82,19 +87,24 @@ category: Variables
         <td colspan="3"><strong>Functional colors</strong></td>
     </tr>
     <tr>
-        <td><div class="example-color color-function-valid"></div></td>
-        <td><code>color-function-valid</code></td>
-        <td>For valid content</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-function-invalid"></div></td>
-        <td><code>color-function-invalid</code></td>
-        <td>For invalid content</td>
+        <td><div class="example-color color-function-informative"></div></td>
+        <td><code>color-function-informative</code></td>
+        <td>For messages</td>
     </tr>
     <tr>
         <td><div class="example-color color-function-neutral"></div></td>
         <td><code>color-function-neutral</code></td>
-        <td>For neutral (neither valid nor invalid) content</td>
+        <td>For neutral (neither valid nor invalid) content, e.g. badges saying 'on test'</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-function-negative"></div></td>
+        <td><code>color-function-negative</code></td>
+        <td>For negative content, e.g. proposals that aren't realized, wrong input</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-function-positive"></div></td>
+        <td><code>color-function-positive</code></td>
+        <td>For approved content, e.g. proposals that are realized, pro-rates</td>
     </tr>
     <tr>
         <td colspan="3"><strong>Structural colors</strong></td>
@@ -185,14 +195,16 @@ category: Variables
 .color-text-normal {background-color: $color-text-normal;}
 .color-text-introvert {background-color: $color-text-introvert;}
 .color-text-extrovert {background-color: $color-text-extrovert;}
+.color-text-darkest {background-color: $color-text-darkest;}
 .color-text-highlight-normal {background-color: $color-text-highlight-normal;}
 .color-text-highlight-introvert {background-color: $color-text-highlight-introvert;}
 .color-text-highlight-extrovert {background-color: $color-text-highlight-extrovert;}
 .color-text-inverted {background-color: $color-text-inverted;}
 
-.color-function-valid {background-color: $color-function-valid;}
-.color-function-invalid {background-color: $color-function-invalid;}
 .color-function-neutral {background-color: $color-function-neutral;}
+.color-function-informative {background-color: $color-function-informative;}
+.color-function-negative {background-color: $color-function-negative;}
+.color-function-positive {background-color: $color-function-positive;}
 
 .color-background-base {background-color: $color-background-base;}
 .color-background-base-introvert {background-color: $color-background-base-introvert;}
