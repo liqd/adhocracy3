@@ -76,7 +76,6 @@ export var hideActionDirective = (
     return {
         restrict: "E",
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"hide();\">{{ 'TR__HIDE' | translate }}</a>",
-        require: "^adhMovingColumn",
         scope: {
             resourcePath: "@",
             parentPath: "=?",
@@ -150,7 +149,6 @@ export var editActionDirective = (
     return {
         restrict: "E",
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"edit();\">{{ 'TR__EDIT' | translate }}</a>",
-        require: "^adhMovingColumn",
         scope: {
             resourcePath: "@",
             parentPath: "=?",
@@ -174,7 +172,6 @@ export var moderateActionDirective = (
     return {
         restrict: "E",
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"moderate();\">{{ 'TR__MODERATE' | translate }}</a>",
-        require: "^adhMovingColumn",
         scope: {
             resourcePath: "@",
             parentPath: "=?",
