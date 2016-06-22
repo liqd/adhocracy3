@@ -53,6 +53,7 @@ test_requires = [
     'sphinxcontrib-actdiag',
     'sphinxcontrib-programoutput',
     'sphinx-rtd-theme',
+    'requires.io',
 ]
 
 debug_requires = [

@@ -1,5 +1,0 @@
-pyramid
-pyramid_debugtoolbar
-waitress
-substanced
-pyramid_tm
