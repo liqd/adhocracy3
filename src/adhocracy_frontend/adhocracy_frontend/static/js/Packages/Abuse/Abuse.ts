@@ -10,7 +10,8 @@ export var reportAbuseDirective = (adhHttp : AdhHttp.Service<any>, adhConfig : A
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Abuse.html",
         scope: {
-            url: "@"  // frontend URL
+            url: "@",  // frontend URL
+            modals: "=",
         },
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
@@ -20,15 +21,15 @@ export var reportAbuseDirective = (adhHttp : AdhHttp.Service<any>, adhConfig : A
                     url: scope.url,
                     remark: scope.remark
                 }).then(() => {
-                    column.hideOverlay("abuse");
-                    column.alert("TR__REPORT_ABUSE_STATUS_OK", "success");
+                    scope.modals.hideOverlay("abuse");
+                    scope.modals.alert("TR__REPORT_ABUSE_STATUS_OK", "success");
                 }, () => {
                     // FIXME
                 });
             };
 
             scope.cancel = () => {
-                column.hideOverlay("abuse");
+                scope.modals.hideOverlay("abuse");
             };
         }
     };

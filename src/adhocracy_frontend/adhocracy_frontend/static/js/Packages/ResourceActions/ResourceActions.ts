@@ -7,7 +7,52 @@ import * as AdhUtil from "../Util/Util";
 
 var pkgLocation = "/ResourceActions";
 
+
+class Modals {
+    public overlay : string;
+    public alerts : {[id : number]: {message : string, mode : string}};
+    private lastId : number;
+
+    constructor(protected $timeout) {
+        this.lastId = 0;
+        this.alerts = {};
+    }
+
+    public alert(message : string, mode : string = "info", duration : number = 3000) : void {
+        var id = this.lastId++;
+        this.$timeout(() => this.removeAlert(id), duration);
+
+        this.alerts[id] = {
+            message: message,
+            mode: mode
+        };
+    }
+
+    public removeAlert(id : number) : void {
+        delete this.alerts[id];
+    }
+
+    public showOverlay(key : string) : void {
+        this.overlay = key;
+    }
+
+    public hideOverlay(key? : string) : void {
+        if (typeof key === "undefined" || this.overlay === key) {
+            this.overlay = undefined;
+        }
+    }
+
+    public toggleOverlay(key : string, condition? : boolean) : void {
+        if (condition || (typeof condition === "undefined" && this.overlay !== key)) {
+            this.overlay = key;
+        } else if (this.overlay === key) {
+            this.overlay = undefined;
+        }
+    }
+}
+
 export var resourceActionsDirective = (
+    $timeout : angular.ITimeoutService,
     adhPermissions : AdhPermissions.Service,
     adhConfig: AdhConfig.IService
 ) => {
@@ -29,6 +74,7 @@ export var resourceActionsDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceActions.html",
         link: (scope, element) => {
             var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
+            scope.modals = new Modals($timeout);
             adhPermissions.bindScope(scope, path, "options");
         }
     };
@@ -38,13 +84,13 @@ export var reportActionDirective = () => {
     return {
         restrict: "E",
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"report();\">{{ 'TR__REPORT' | translate }}</a>",
-        require: "^adhMovingColumn",
         scope: {
-            class: "@"
+            class: "@",
+            modals: "=",
         },
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.report = () => {
-                column.toggleOverlay("abuse");
+                scope.modals.toggleOverlay("abuse");
             };
         }
     };
@@ -54,13 +100,13 @@ export var shareActionDirective = () => {
     return {
         restrict: "E",
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"report();\">{{ 'TR__SHARE' | translate }}</a>",
-        require: "^adhMovingColumn",
         scope: {
-            class: "@"
+            class: "@",
+            modals: "=",
         },
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.report = () => {
-                column.toggleOverlay("share");
+                scope.modals.toggleOverlay("share");
             };
         }
     };
