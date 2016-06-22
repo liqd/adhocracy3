@@ -72,7 +72,7 @@ Badge modifiers for labeling if a proposal has been realized or not.
         }
 
         &.m-is-not-realized {
-            border-left-color: $color-function-invalid;
+            border-left-color: $color-function-negative;
         }
 
         &.m-on-test {

@@ -234,7 +234,7 @@ Click show results
         &:hover:not(.is-disabled),
         &:focus:not(.is-disabled),
         &:active:not(.is-disabled) {
-            color: $color-function-invalid;
+            color: $color-function-negative;
         }
     }
 
@@ -244,7 +244,7 @@ Click show results
         }
 
         &.is-negative {
-            color: $color-function-invalid;
+            color: $color-function-negative;
         }
     }
 }

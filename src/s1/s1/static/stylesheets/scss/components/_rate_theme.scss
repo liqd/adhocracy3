@@ -11,7 +11,7 @@
 
         &.is-rate-button-active {
             &:hover {
-                color: $color-function-invalid;
+                color: $color-function-negative;
             }
 
             &:active {

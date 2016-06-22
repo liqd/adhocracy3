@@ -92,9 +92,9 @@ Textinput that represents a title.
 */
 
 .error-state {
-    border-color: $color-function-invalid;
-    color: $color-function-invalid;
-    outline: 1px solid $color-function-invalid;
+    border-color: $color-function-negative;
+    color: $color-function-negative;
+    outline: 1px solid $color-function-negative;
 }
 
 input[type="text"],
