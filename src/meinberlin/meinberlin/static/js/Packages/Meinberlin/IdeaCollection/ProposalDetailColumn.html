@@ -25,6 +25,7 @@
                     data-parent-path="true"
                     data-resource-path="{{proposalUrl}}"></adh-edit-action>
                 <adh-report-action
+                    data-modals="column"
                     data-class="action-bar-item"
                     data-parent-path="true"
                     data-resource-path="{{proposalUrl}}"></adh-report-action>
@@ -53,6 +54,7 @@
     <adh-report-abuse
         data-ng-switch-when="overlays"
         data-ng-if="overlay === 'abuse'"
+        data-modals="column"
         data-url="{{ proposalUrl | adhParentPath | adhResourceUrl | adhCanonicalUrl }}">
     </adh-report-abuse>
 
