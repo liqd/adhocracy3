@@ -12,9 +12,11 @@ $color-text-inverted: white;
 // Function colors
 $color-function-valid: #4a6d21;
 $color-function-invalid: #b30000;
-$color-function-neutral: #f6d02b;
 $color-function-informative: #706047;
 $color-function-warning: #c80013;
+$color-function-negative: #c72e51;
+$color-function-positive: #00af5d;
+$color-function-neutral: #fdd216;
 
 // Background colors
 $color-background-base: white;
@@ -60,7 +62,7 @@ $padding-medium: 1rem;
 $section-jump-navigation-width: 2rem;
 $moving-column-single-width-max: 55rem;
 $moving-column-single-width-min: 35rem;
-$badge-line-height: 1 + 4px / $font-size-smaller;
+$badge-line-height: 2;
 $badge-height: $badge-line-height * $font-size-smaller;
 
 //Line-height (leading)

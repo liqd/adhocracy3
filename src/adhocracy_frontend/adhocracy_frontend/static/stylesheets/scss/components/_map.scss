@@ -54,6 +54,11 @@ time.
         background: $color-function-invalid;
         font-weight: $font-weight-extrovert;
     }
+
+    &.ng-invalid a {
+        color: $color-text-inverted;
+        text-decoration: underline;
+    }
 }
 
 /*doc

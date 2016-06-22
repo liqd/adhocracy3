@@ -125,6 +125,9 @@ textarea {
 
     &.ng-dirty.ng-invalid {
         @extend .error-state;
+        border-color: $color-function-negative;
+        color: $color-function-negative;
+        outline: 1px solid $color-function-negative;
     }
 
     &.ng-disabled,
@@ -202,7 +205,8 @@ Class to add styling to a label when the label itself is used as a container.
 .input-error {
     @include rem(font-size, $font-size-small);
     display: block;
-    color: $color-function-invalid;
+    color: $color-function-negative;
+    padding-top: 10px;
 }
 
 /*doc
