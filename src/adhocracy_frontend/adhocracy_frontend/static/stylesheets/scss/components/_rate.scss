@@ -80,10 +80,10 @@ $arrow-width: 1rem;
 
     &:active,
     &.is-rate-button-active {
-        background: $color-function-valid;
+        background: $color-function-positive;
 
         &:before {
-            border-right-color: $color-function-valid;
+            border-right-color: $color-function-positive;
         }
 
         // :focus is sometimes set on click and then stays.
@@ -225,7 +225,7 @@ Click show results
         &:hover:not(.is-disabled),
         &:focus:not(.is-disabled),
         &:active:not(.is-disabled) {
-            color: $color-function-valid;
+            color: $color-function-positive;
         }
     }
 
@@ -234,17 +234,17 @@ Click show results
         &:hover:not(.is-disabled),
         &:focus:not(.is-disabled),
         &:active:not(.is-disabled) {
-            color: $color-function-invalid;
+            color: $color-function-negative;
         }
     }
 
     .rate-difference {
         &.is-positive {
-            color: $color-function-valid;
+            color: $color-function-positive;
         }
 
         &.is-negative {
-            color: $color-function-invalid;
+            color: $color-function-negative;
         }
     }
 }

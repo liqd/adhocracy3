@@ -12,8 +12,7 @@
             data-ng-class="{
                 'm-is-realized': assignment.name === 'going_to_be_realized',
                 'm-is-not-realized': assignment.name === 'not_realizeable',
-                'm-on-test': assignment.name === 'on_test',
-                'm-color': isBuergerhaushalt && (assignment.name === 'going_to_be_realized' || assignment.name === 'not_realizeable' || assignment.name === 'on_test')
+                'm-on-test': assignment.name === 'on_test'
             }">{{ assignment.title | translate }}</span>
     </div>
     <div class="proposal-list-item-col-right">

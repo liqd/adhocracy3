@@ -331,7 +331,6 @@ A list of alert messages to notify users in the moving column
 ```html_example
 <ul class="moving-column-alerts static-example">
     <li class="moving-column-alert m-error">Error</li>
-    <li class="moving-column-alert m-warning">Warning</li>
     <li class="moving-column-alert m-info">Info</li>
     <li class="moving-column-alert m-success">Success</li>
 </ul>
@@ -350,19 +349,17 @@ A list of alert messages to notify users in the moving column
 
 .moving-column-alert {
     @include rem(padding, 1rem);
-    background: $color-structure-normal;
+    background: $color-function-neutral;
+    color: $color-text-normal;
     text-align: center;
 
     &.m-error {
-        background: $color-function-invalid;
-    }
-
-    &.m-warning {
-        background: mix($color-function-invalid, $color-structure-normal);
+        background: $color-function-negative;
+        color: $color-text-inverted;
     }
 
     &.m-success {
-        background: $color-function-valid;
+        background: $color-function-positive;
     }
 }
 

@@ -92,9 +92,9 @@ Textinput that represents a title.
 */
 
 .error-state {
-    border-color: $color-function-invalid;
-    color: $color-function-invalid;
-    outline: 1px solid $color-function-invalid;
+    border-color: $color-function-negative;
+    color: $color-function-negative;
+    outline: 1px solid $color-function-negative;
 }
 
 input[type="text"],
@@ -125,6 +125,9 @@ textarea {
 
     &.ng-dirty.ng-invalid {
         @extend .error-state;
+        border-color: $color-function-negative;
+        color: $color-function-negative;
+        outline: 1px solid $color-function-negative;
     }
 
     &.ng-disabled,
@@ -133,7 +136,6 @@ textarea {
         outline: 1px solid $color-structure-normal;
     }
 }
-
 
 
 .ng-submitted {
@@ -201,8 +203,9 @@ Class to add styling to a label when the label itself is used as a container.
 
 .input-error {
     @include rem(font-size, $font-size-small);
+    @include rem(padding-top, 10px);
     display: block;
-    color: $color-function-invalid;
+    color: $color-function-negative;
 }
 
 /*doc

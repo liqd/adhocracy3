@@ -10,11 +10,9 @@ Badge modifiers for labeling if a proposal has been realized or not.
 ```html_example
 <span class="badge m-is-realized">Is Realized</span>
 <span class="badge m-is-not-realized">Is Not Realized</span>
+<span class="badge m-on-test">On Test</span>
 <span class="badge m-info">Information</span>
-<span class="badge m-color m-is-realized">Is Realized</span>
-<span class="badge m-color m-is-not-realized">Is Not Relaized</span>
-<span class="badge m-color m-on-test">On Test</span>
-<div class="badge-description m-color m-is-realized">
+<div class="badge-description m-is-realized">
     <p>Modified badge description</p>
 </div>
 ```
@@ -23,23 +21,27 @@ Badge modifiers for labeling if a proposal has been realized or not.
 
 .badge {
     &.m-info,
-    &.m-color,
     &.m-is-realized,
     &.m-is-not-realized {
         color: $color-text-inverted;
     }
 
     &.m-is-realized {
-        background-color: $color-brand-two-normal;
+        background-color: $color-function-positive;
     }
 
     &.m-is-not-realized {
-        background-color: $color-text-introvert;
+        background-color: $color-function-negative;
+    }
+
+    &.m-on-test {
+        background-color: $color-function-neutral;
+        color: $color-text-normal;
     }
 
     &.m-info {
         padding-left: 0;
-        background-color: $color-brand-two-normal;
+        background-color: $color-brand-one-normal;
 
         &:before {
             @include inline-block;
@@ -50,42 +52,21 @@ Badge modifiers for labeling if a proposal has been realized or not.
             vertical-align: baseline;
         }
     }
-
-    &.m-color {
-        @include rem(border-width, 0 0 0 $badge-height);
-        background-color: $color-text-introvert;
-        border-style: solid;
-        position: relative;
-
-        &.m-is-realized {
-            border-color: $color-function-valid;
-        }
-
-        &.m-is-not-realized {
-            border-color: $color-function-invalid;
-        }
-
-        &.m-on-test {
-            border-color: $color-function-neutral;
-        }
-    }
 }
 
 .badge-description {
-    &.m-color {
-        @include rem(border-left, 0.4rem solid $color-text-highlight-normal);
-        @include rem(padding-left, 0.5rem);
+    @include rem(border-left, 0.4rem solid $color-text-highlight-normal);
+    @include rem(padding-left, 0.5rem);
 
-        &.m-is-realized {
-            border-left-color: $color-function-valid;
-        }
+    &.m-is-realized {
+        border-left-color: $color-function-positive;
+    }
 
-        &.m-is-not-realized {
-            border-left-color: $color-function-invalid;
-        }
+    &.m-is-not-realized {
+        border-left-color: $color-function-negative;
+    }
 
-        &.m-on-test {
-            border-left-color: $color-function-neutral;
-        }
+    &.m-on-test {
+        border-left-color: $color-function-neutral;
     }
 }
