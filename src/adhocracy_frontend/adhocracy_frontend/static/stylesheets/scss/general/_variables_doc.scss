@@ -220,5 +220,5 @@ category: Variables
 @include check-contrast($color-text-highlight-normal, $color-background-base);
 @include check-contrast($color-text-highlight-normal, $color-background-base-introvert);
 @include check-contrast($color-text-inverted, $color-function-negative);
-@include check-contrast($color-text-inverted, $color-function-positive);
+@include check-contrast($color-text-normal, $color-function-positive);
 @include check-contrast($color-text-normal, $color-function-neutral);
