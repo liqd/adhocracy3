@@ -7,8 +7,7 @@
             data-ng-class="{
                 'm-is-realized': assignment.name === 'going_to_be_realized',
                 'm-is-not-realized': assignment.name === 'not_realizeable',
-                'm-on-test': assignment.name === 'on_test',
-                'm-color': isBuergerhaushalt && (assignment.name === 'going_to_be_realized' || assignment.name === 'not_realizeable' || assignment.name === 'on_test')
+                'm-on-test': assignment.name === 'on_test'
             }">{{ assignment.title | translate }}</span>
 
         <ul class="meinberlin-proposal-detail-meta">
@@ -53,8 +52,7 @@
             data-ng-class="{
                 'm-is-realized': assignment.name === 'going_to_be_realized',
                 'm-is-not-realized': assignment.name === 'not_realizeable',
-                'm-on-test': assignment.name === 'on_test',
-                'm-color': isBuergerhaushalt && (assignment.name === 'going_to_be_realized' || assignment.name === 'not_realizeable' || assignment.name === 'on_test')
+                'm-on-test': assignment.name === 'on_test'
             }">
             <adh-parse-markdown data-parsetext="assignment.description"></adh-parse-markdown>
         </div>
