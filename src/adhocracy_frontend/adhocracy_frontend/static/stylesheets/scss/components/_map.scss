@@ -53,11 +53,11 @@ time.
     &.ng-invalid {
         background: $color-function-negative;
         font-weight: $font-weight-extrovert;
-    }
 
-    &.ng-invalid a {
-        color: $color-text-inverted;
-        text-decoration: underline;
+        a {
+            color: inherit;
+            text-decoration: underline;
+        }
     }
 }
 
