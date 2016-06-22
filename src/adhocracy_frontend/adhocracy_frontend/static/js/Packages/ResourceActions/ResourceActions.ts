@@ -127,14 +127,16 @@ export var printActionDirective = (
     return {
         restrict: "E",
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"print();\">{{ 'TR__PRINT' | translate }}</a>",
-        require: "^adhMovingColumn",
+        require: "?^adhMovingColumn",
         scope: {
             class: "@"
         },
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope, element, attrs, column? : AdhMovingColumns.MovingColumnController) => {
             scope.print = () => {
-                // only the focused column is printed
-                column.focus();
+                if (column) {
+                    // only the focused column is printed
+                    column.focus();
+                }
                 $window.print();
             };
         }
