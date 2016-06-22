@@ -27,16 +27,4 @@
             <adh-mercator-2015-proposal-detail-view data-ng-if="proposalUrl" data-path="{{proposalUrl}}"></adh-mercator-2015-proposal-detail-view>
         </adh-resource-wrapper>
     </adh-recompile-on-change>
-
-    <adh-report-abuse
-        class="report-abuse"
-        data-ng-switch-when="overlays"
-        data-ng-if="overlay === 'abuse'"
-        data-url="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}">
-    </adh-report-abuse>
-
-    <div data-ng-switch-when="overlays" data-ng-if="overlay === 'share'">
-        <adh-social-share data-uri="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}"></adh-social-share>
-        <a href="" class="button" data-ng-click="ctrl.hideOverlay('share')">{{ "TR__CANCEL" | translate }}</a>
-    </div>
 </div>
