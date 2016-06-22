@@ -31,11 +31,6 @@ category: Variables
             <code>color-text-highlight-normal</code></td>
     </tr>
     <tr>
-        <td><div class="example-color color-text-darkest"></div></td>
-        <td><code>color-text-darkest</code></td>
-        <td>For text on 'function-color-warning' background</td>
-    </tr>
-    <tr>
         <td><div class="example-color color-text-highlight-normal"></div></td>
         <td><code>color-text-highlight-normal</code></td>
         <td>For highlighted content such as links</td>
@@ -195,7 +190,6 @@ category: Variables
 .color-text-normal {background-color: $color-text-normal;}
 .color-text-introvert {background-color: $color-text-introvert;}
 .color-text-extrovert {background-color: $color-text-extrovert;}
-.color-text-darkest {background-color: $color-text-darkest;}
 .color-text-highlight-normal {background-color: $color-text-highlight-normal;}
 .color-text-highlight-introvert {background-color: $color-text-highlight-introvert;}
 .color-text-highlight-extrovert {background-color: $color-text-highlight-extrovert;}
@@ -234,5 +228,3 @@ category: Variables
 @include check-contrast($color-text-inverted, $color-function-negative);
 @include check-contrast($color-text-inverted, $color-function-positive);
 @include check-contrast($color-text-inverted, $color-function-informative);
-@include check-contrast($color-text-darkest, $color-function-neutral);
-
