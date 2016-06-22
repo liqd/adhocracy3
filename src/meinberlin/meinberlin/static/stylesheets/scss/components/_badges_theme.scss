@@ -68,7 +68,7 @@ Badge modifiers for labeling if a proposal has been realized or not.
         @include rem(padding-left, 0.5rem);
 
         &.m-is-realized {
-            border-left-color: $color-function-valid;
+            border-left-color: $color-function-positive;
         }
 
         &.m-is-not-realized {

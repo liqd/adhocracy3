@@ -1,6 +1,6 @@
 .rate {
     .rate-pro {
-        color: $color-function-valid;
+        color: $color-function-positive;
 
         &:hover, &:focus, &:active,
         &.is-rate-button-active {
@@ -15,7 +15,7 @@
             }
 
             &:active {
-                color: $color-function-valid;
+                color: $color-function-positive;
 
                 .s1-rate-icon:before {
                     @extend .icon-vote;

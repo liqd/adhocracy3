@@ -481,7 +481,7 @@ different types of values starting from preferred.
 
       @include rem(margin, 10px 5px);
       @include rem(margin-bottom, 2rem);
-      @include rem(border, 3px solid $color-function-valid);
+      @include rem(border, 3px solid $color-function-positive);
 
    This automatically calculates ``rem`` units with a ``px`` fallback
    for older browsers.
