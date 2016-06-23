@@ -167,40 +167,21 @@ class TestWorkflowAssignmentSheet:
                                     'workflow_state': 'draft',
                                     'state_data': []}
 
-    def test_get_schema_with_bindings(
+    def test_get_schema_with_bindings_add_context_workflow(
         self, meta, context, registry, mock_workflow, request_):
         registry.content.get_workflow.return_value = mock_workflow
         inst = meta.sheet_class(meta, context, registry, request=request_)
         schema = inst.get_schema_with_bindings()
         assert schema.bindings['workflow'] is mock_workflow
-        assert schema.bindings['context'] is context
-        assert schema.bindings['request'] is request_
-        assert schema.bindings['registry'] is registry
 
-    def test_get_schema_with_bindings_with_creating(
+    def test_get_schema_with_bindings_with_creating_add_default_workflow(
         self, meta, context, registry, mock_workflow, request_, resource_meta):
-        resource_meta = resource_meta._replace(workflow_name='w')
+        resource_meta = resource_meta._replace(default_workflow='w')
         registry.content.workflows['w'] = mock_workflow
         inst = meta.sheet_class(meta, context, registry, request=request_,
                                 creating=resource_meta)
         schema = inst.get_schema_with_bindings()
         assert schema.bindings['workflow'] is mock_workflow
-
-    def test_get_schema_with_bindings_add_name(
-        self, meta, context, registry, mock_workflow):
-        registry.content.get_workflow.return_value = mock_workflow
-        inst = meta.sheet_class(meta, context, registry)
-        schema = inst.get_schema_with_bindings()
-        assert schema.name == inst.meta.isheet.__identifier__
-
-    def test_get_schema_with_bindings_add_required_if_create_mandatory(
-        self, meta, context, registry, mock_workflow, resource_meta):
-        import colander
-        registry.content.get_workflow.return_value = mock_workflow
-        meta = meta._replace(create_mandatory=True)
-        inst = meta.sheet_class(meta, context, registry, creating=resource_meta)
-        schema = inst.get_schema_with_bindings()
-        assert schema.missing is colander.required
 
     def test_set_workflow_state(self, meta, context, registry, mock_workflow):
         registry.content.get_workflow.return_value = mock_workflow

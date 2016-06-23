@@ -173,7 +173,7 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
 
         Deferred default values can rely on the following bindings:
 
-            `context`, `registry`
+            `context`, `registry`, `creating`
 
         Deferred validators can rely on the following bindings:
 
