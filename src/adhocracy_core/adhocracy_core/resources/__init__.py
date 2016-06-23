@@ -136,7 +136,7 @@ class ResourceFactory:
 
     def __call__(self,
                  parent=None,
-                 appstructs={},
+                 appstructs=None,
                  run_after_creation=True,
                  creator=None,
                  registry=None,
@@ -184,6 +184,7 @@ class ResourceFactory:
             ComponentLookupError: if `appstructs` contains sheet data
                                   for non existing sheets.
         """
+        appstructs = appstructs or dict()
         resource = self.meta.content_class()
         directlyProvides(resource, self.meta.iresource)
         isheets = self.meta.basic_sheets + self.meta.extended_sheets
