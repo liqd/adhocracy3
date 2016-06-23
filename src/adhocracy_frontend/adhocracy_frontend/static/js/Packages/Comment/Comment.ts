@@ -437,6 +437,7 @@ export var commentColumnDirective = (
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["commentCloseUrl", "commentableUrl"]);
+            scope.column = column;
         }
     };
 };
