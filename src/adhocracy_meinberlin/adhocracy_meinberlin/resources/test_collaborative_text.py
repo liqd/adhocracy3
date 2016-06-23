@@ -19,7 +19,7 @@ class TestCollaborativeTextProcess:
         assert meta.iresource == IProcess
         assert meta.iresource.isOrExtends(
             adhocracy_core.resources.document_process.IDocumentProcess)
-        assert meta.workflow_name == 'debate'
+        assert meta.default_workflow == 'debate'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

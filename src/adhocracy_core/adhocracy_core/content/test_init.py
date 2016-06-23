@@ -372,20 +372,20 @@ class TestResourceContentRegistry:
     def test_get_workflow_workflow_set(self, inst, context, mock_workflow,
                                        resource_meta):
         inst.workflows['sample'] = mock_workflow
-        meta = resource_meta._replace(workflow_name='sample')
+        meta = resource_meta._replace(default_workflow='sample')
         inst.resources_meta[IResource] = meta
         assert inst.get_workflow(context) == mock_workflow
 
     def test_get_workflow_workflow_not_set(self, inst, context, mock_workflow,
                                        resource_meta):
         inst.workflows['sample'] = mock_workflow
-        meta = resource_meta._replace(workflow_name='')
+        meta = resource_meta._replace(default_workflow='')
         inst.resources_meta[IResource] = meta
         assert inst.get_workflow(context) is None
 
     def test_get_workflow_raise_if_wrong_workflow_name(self, inst, context,
                                                        resource_meta):
-        meta = resource_meta._replace(workflow_name='WRONG')
+        meta = resource_meta._replace(default_workflow='WRONG')
         inst.resources_meta[IResource] = meta
         from adhocracy_core.exceptions import RuntimeConfigurationError
         with raises(RuntimeConfigurationError):

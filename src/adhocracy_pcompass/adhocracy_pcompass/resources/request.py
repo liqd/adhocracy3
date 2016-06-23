@@ -12,7 +12,7 @@ process_meta = process.process_meta._replace(
     content_name='PCompassProcess',
     iresource=IProcess,
     element_types=(IProposal,),
-    workflow_name='standard',
+    default_workflow='standard',
 )
 
 

@@ -260,7 +260,7 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
                                    'use_autonaming_random',
                                    'is_sdi_addable',
                                    'element_types',
-                                   'workflow_name',
+                                   'default_workflow',
                                    'item_type',
                                    ])):
     """Metadata to register Resource Types.
@@ -307,7 +307,7 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
     element_types:
         Set addable content types, class heritage is honored.
 
-    workflow_name:
+    default_workflow:
         Name of workflow to be assigned to instances. Possible workflows can be
         found in :mod:`adhocracy_core.workflows`.
 

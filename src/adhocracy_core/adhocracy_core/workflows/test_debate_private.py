@@ -47,7 +47,7 @@ class TestDebatePrivateProcess:
         from adhocracy_core.resources.process import process_meta
         import adhocracy_core
         configurator = make_configurator(app_settings, adhocracy_core)
-        debate_process_meta = process_meta._replace(workflow_name='debate_private')
+        debate_process_meta = process_meta._replace(default_workflow='debate_private')
         add_resource_type_to_registry(debate_process_meta, configurator)
         configurator.registry.registerAdapter(self._get_root_acm_extension,
                                               (IRootPool,),IRootACMExtension),

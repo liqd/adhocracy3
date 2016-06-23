@@ -21,7 +21,7 @@ process_meta = pool_meta._replace(
     after_creation=(add_assets_service,
                     add_badges_service,
                     ),
-    workflow_name='sample',
+    default_workflow='sample',
 )._add(basic_sheets=(IHasAssetPool,
                      IHasBadgesPool,
                      IDescription,))

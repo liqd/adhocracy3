@@ -40,7 +40,7 @@ resource_meta = ResourceMetadata(content_name='',
                                  use_autonaming_random=False,
                                  is_sdi_addable=False,
                                  element_types=(),
-                                 workflow_name='',
+                                 default_workflow='',
                                  item_type=False,
                                  )
 
