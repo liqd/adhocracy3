@@ -14,6 +14,7 @@
         data-ng-switch-when="body"
         data-value="{{userUrl}}">
         <adh-user-profile
+            data-modals="ctrl"
             data-path="{{userUrl}}">
         </adh-user-profile>
     </adh-recompile-on-change>
@@ -21,6 +22,7 @@
     <adh-user-message
         data-ng-switch-when="overlays"
         data-ng-if="overlay === 'messaging'"
+        data-modals="ctrl"
         data-recipient-url="{{userUrl}}">
     </adh-user-message>
 </div>
