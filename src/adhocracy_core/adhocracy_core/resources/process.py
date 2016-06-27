@@ -22,6 +22,12 @@ process_meta = pool_meta._replace(
                     add_badges_service,
                     ),
     default_workflow='sample',
+    alternative_workflows=(
+        'standard',
+        'standard_private',
+        'debate',
+        'debate_private',
+    )
 )._add(basic_sheets=(IHasAssetPool,
                      IHasBadgesPool,
                      IDescription,))

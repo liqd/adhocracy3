@@ -42,6 +42,7 @@ resource_meta = ResourceMetadata(content_name='',
                                  is_sdi_addable=False,
                                  element_types=(),
                                  default_workflow='',
+                                 alternative_workflows=tuple(),
                                  item_type=False,
                                  )
 

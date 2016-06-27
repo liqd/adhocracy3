@@ -17,6 +17,7 @@ from adhocracy_core.schema import SequenceSchema
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import AnnotationRessourceSheet
+from adhocracy_core.utils import get_iresource
 from adhocracy_core.interfaces import IResourceSheet
 from adhocracy_core.interfaces import IWorkflow
 
@@ -119,9 +120,15 @@ class Workflow(SingleLine):
 
     @deferred
     def validator(node: MappingSchema, kw: dict):
+        context = kw['context']
         registry = kw['registry']
-        workflows = [x for x in registry.content.workflows.keys()]
-        workflows.append('')
+        creating = kw['creating']
+        if creating:
+            meta = creating
+        else:
+            iresource = get_iresource(context)
+            meta = registry.content.resources_meta[iresource]
+        workflows = ('', meta.default_workflow) + meta.alternative_workflows
         return OneOf(workflows)
 
     @deferred

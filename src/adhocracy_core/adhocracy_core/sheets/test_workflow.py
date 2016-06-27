@@ -19,9 +19,18 @@ def registry(registry_with_content):
 class TestWorkflow:
 
     @fixture
-    def kw(self, registry, mock_workflow):
+    def resource_meta(self, resource_meta):
+        return resource_meta._replace(default_workflow='default',
+                                      alternative_workflows=('alternative',))
+
+    @fixture
+    def kw(self, registry, mock_workflow, context, resource_meta):
+        registry.content.resources_meta[resource_meta.iresource] =\
+            resource_meta
         return {'registry': registry,
-                'workflow': mock_workflow}
+                'workflow': mock_workflow,
+                'creating': None,
+                'context': context}
 
     @fixture
     def inst(self):
@@ -30,12 +39,13 @@ class TestWorkflow:
 
     def test_create(self, inst, kw):
         from adhocracy_core.schema import SingleLine
-        kw['registry'].content.workflows = {'sample': object}
         inst = inst.bind(**kw)
         assert isinstance(inst, SingleLine)
-        assert inst.validator.choices == ['sample', '']
-        assert sorted(inst.widget.values) == [('', 'No workflow'),
-                                              ('sample', 'sample')]
+        assert inst.validator.choices == ('', 'default', 'alternative')
+        assert inst.widget.values == [('default', 'default'),
+                                      ('alternative', 'alternative'),
+                                      ('', 'No workflow'),
+                                      ]
 
     def test_serialize_empty_without_workflow(self, inst, kw):
         kw['workflow'] = None
@@ -43,10 +53,31 @@ class TestWorkflow:
         assert inst.serialize() == ''
 
     def test_serialize_empty_with_workflow(self, inst, kw):
-        kw['workflow'].type = 'sample'
+        kw['workflow'].type = 'default'
         inst = inst.bind(**kw)
-        assert inst.serialize() == 'sample'
+        assert inst.serialize() == 'default'
 
+    def test_deserialize_default_workflow(self, inst, kw):
+        inst = inst.bind(**kw)
+        assert inst.deserialize('default') == 'default'
+
+    def test_deserialize_additional_workflows(self, inst, kw):
+        inst = inst.bind(**kw)
+        assert inst.deserialize('alternative') == 'alternative'
+
+    def test_deserialize_creating_default_workflow(self, inst, kw,
+                                                   resource_meta):
+        kw['creating'] = resource_meta._replace(
+            default_workflow='creating_default')
+        inst = inst.bind(**kw)
+        assert inst.deserialize('creating_default') == 'creating_default'
+
+    def test_deserialize_raise_if_non_default_or_alternative_workflow(
+        self, inst, kw):
+        from colander import Invalid
+        inst = inst.bind(**kw)
+        with raises(Invalid):
+            inst.deserialize('other')
 
 
 class TestStateName:
@@ -197,7 +228,9 @@ class TestWorkflowAssignmentSheet:
                               'state_data': []}
 
     def test_get_schema_with_bindings_add_context_workflow(
-        self, meta, context, registry, mock_workflow):
+        self, meta, context, registry, mock_workflow, resource_meta):
+        registry.content.resources_meta[resource_meta.iresource] =\
+            resource_meta
         inst = meta.sheet_class(meta, context, registry)
         inst._get_data_appstruct = Mock(return_value={'workflow': 'sample'})
         registry.content.workflows['sample'] = mock_workflow
