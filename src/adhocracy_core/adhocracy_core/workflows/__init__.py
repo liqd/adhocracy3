@@ -189,7 +189,6 @@ def match_permission(acm, state, permission):
 
 def includeme(config):  # pragma: no cover
     """Include workflows and add 'add_workflow' config directive."""
-    config.include('.subscriber')
     config.add_directive('add_workflow', add_workflow_directive)
     config.add_workflow('adhocracy_core.workflows:sample.yaml',
                         'sample')

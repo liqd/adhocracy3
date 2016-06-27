@@ -24,6 +24,7 @@ from adhocracy_core.exceptions import ConfigurationError
 from adhocracy_core.events import ResourceCreatedAndAdded
 from adhocracy_core.sheets.name import IName
 from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import get_modification_date
 
 
@@ -196,6 +197,16 @@ class ResourceFactory:
         else:
             resource.__parent__ = None
             resource.__name__ = ''
+
+        default_workflow = self.meta.default_workflow
+        has_workflow = IWorkflowAssignment in isheets and default_workflow
+        workflow_assignment = IWorkflowAssignment.__identifier__
+        if has_workflow:
+            if workflow_assignment not in appstructs:
+                appstructs[workflow_assignment] = \
+                    {'workflow': default_workflow}
+            elif 'workflow' not in appstructs[workflow_assignment]:
+                appstructs[workflow_assignment]['workflow'] = default_workflow
 
         for key, struct in appstructs.items():
             isheet = DottedNameResolver().maybe_resolve(key)
