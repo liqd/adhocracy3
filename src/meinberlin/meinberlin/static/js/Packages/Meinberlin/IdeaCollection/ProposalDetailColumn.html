@@ -19,30 +19,17 @@
         <adh-recompile-on-change
             data-value="{{proposalUrl}}">
             <div class="action-bar">
-                <adh-edit-action
-                    data-ng-if="proposalUrl && proposalItemOptions.PUT"
-                    data-class="action-bar-item"
-                    data-parent-path="true"
-                    data-resource-path="{{proposalUrl}}"></adh-edit-action>
-                <adh-report-action
-                    data-modals="column"
-                    data-class="action-bar-item"
-                    data-parent-path="true"
-                    data-resource-path="{{proposalUrl}}"></adh-report-action>
                 <adh-resource-actions
-                    data-assign-badges="true"
-                    data-modals="column"
+                    data-resource-path="{{proposalUrl}}"
                     data-process-url="{{processUrl}}"
                     data-ng-if="proposalUrl"
                     data-parent-path="true"
-                    data-resource-path="{{proposalUrl}}"></adh-resource-actions>
-                <adh-hide-action
-                    data-ng-if="proposalUrl && proposalItemOptions.hide"
-                    data-class="action-bar-item"
-                    data-parent-path="true"
-                    data-resource-path="{{proposalUrl}}"></adh-hide-action>
-                <adh-print-action
-                    data-class="action-bar-item"></adh-print-action>
+                    data-edit="true"
+                    data-assign-badges="true"
+                    data-report="true"
+                    data-hide="true"
+                    data-print="true">
+                </adh-resource-actions>
             </div>
             <adh-meinberlin-proposal-detail
                 data-ng-if="proposalUrl"
