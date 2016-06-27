@@ -185,8 +185,9 @@ export var commentDetailDirective = (
     var _postEdit = postEdit(adhHttp, adhPreliminaryNames);
 
     var link = (scope : ICommentResourceScope, element) => {
+        scope.modals = new AdhResourceActions.Modals($timeout);
+
         scope.report = () => {
-            scope.modals = new AdhResourceActions.Modals($timeout);
             scope.modals.toggleOverlay("abuse");
         };
 
