@@ -112,6 +112,24 @@ export var shareActionDirective = () => {
     };
 };
 
+export var assignBadgesActionDirective = () => {
+    return {
+        restrict: "E",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"assignBadges();\">{{ 'TR__MANAGE_BADGE_ASSIGNMENTS' | translate }}</a>",
+        scope: {
+            resourcePath: "@",
+            parentPath: "=?",
+            class: "@",
+            modals: "=",
+        },
+        link: (scope) => {
+            scope.assignBadges = () => {
+                scope.modals.toggleOverlay("badges");
+            };
+        }
+    };
+};
+
 export var hideActionDirective = (
     adhHttp : AdhHttp.Service<any>,
     adhTopLevelState : AdhTopLevelState.Service,
