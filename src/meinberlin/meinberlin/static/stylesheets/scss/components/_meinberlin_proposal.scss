@@ -1,26 +1,3 @@
-.meinberlin-proposal-form {
-    background-color: $color-background-base-introvert;
-    bottom: 0;
-    padding: 0;
-    position: absolute;
-    top: 0;
-    width: 100%;
-
-    label,
-    .input-error {
-        display: block;
-    }
-
-    .map-buttons {
-        background: $color-background-base;
-    }
-}
-
-.meinberlin-proposal-form-upper {
-    @include rem(padding, 1rem);
-    background: $color-background-base;
-}
-
 .meinberlin-proposal-detail {
     .rate {
         float: right;
@@ -201,10 +178,4 @@ as metadata.  It serves as an entry to a detail view.
 .meinberlin-proposal-list-item-title {
     @include rem(font-size, $font-size-normal);
     @include rem(margin, 0 0 15px);
-}
-
-.meinberlin-proposal-form-footer {
-    .form-footer-button {
-        @include rem(padding-left, 10px);
-    }
 }
