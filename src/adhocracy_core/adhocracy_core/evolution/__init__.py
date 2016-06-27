@@ -271,6 +271,8 @@ def change_pools_autonaming_scheme(root, registry):  # pragma: no cover
     count = len(pools)
     for index, pool in enumerate(pools):
         logger.info('Migrating {0} of {1}: {2}'.format(index + 1, count, pool))
+        if not pool:
+            continue
         if hasattr(pool, '_autoname_last'):
             pool._autoname_lasts = PersistentMapping()
             for prefix in prefixes:
@@ -719,6 +721,28 @@ def add_description_sheet_to_user(root, registry):  # pragma: no cover
     migrate_new_sheet(root, IUser, IDescription)
 
 
+@log_migration
+def add_local_roles_for_workflow_state(root,
+                                       registry):  # pragma: no cover
+    """Add local role of the current workflow state for all processes."""
+    from adhocracy_core.authorization import add_local_roles
+    from adhocracy_core.resources.process import IProcess
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
+    catalogs = find_service(root, 'catalogs')
+    resources = _search_for_interfaces(catalogs, IProcess)
+    count = len(resources)
+    for index, resource in enumerate(resources):
+        workflow = registry.content.get_sheet_field(resource,
+                                                    IWorkflowAssignment,
+                                                    'workflow')
+        state_name = workflow.state_of(resource)
+        local_roles = workflow._states[state_name].local_roles
+        logger.info('Update workflow local roles for resource {0} - {1} of {2}'
+                    .format(resource, index + 1, count))
+        if local_roles:
+            add_local_roles(resource, local_roles, registry=registry)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -758,3 +782,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(update_workflow_state_acl_for_all_resources)
     config.add_evolution_step(add_controversiality_index)
     config.add_evolution_step(add_description_sheet_to_user)
+    config.add_evolution_step(add_local_roles_for_workflow_state)
