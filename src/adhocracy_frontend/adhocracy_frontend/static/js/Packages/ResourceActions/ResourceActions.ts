@@ -8,7 +8,7 @@ import * as AdhUtil from "../Util/Util";
 var pkgLocation = "/ResourceActions";
 
 
-class Modals {
+export class Modals {
     public overlay : string;
     public alerts : {[id : number]: {message : string, mode : string}};
     private lastId : number;

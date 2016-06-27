@@ -58,6 +58,7 @@ export var register = (angular) => {
             "adhRecursionHelper",
             "$window",
             "$q",
+            "$timeout",
             "$translate",
             AdhComment.commentDetailDirective])
         .directive("adhCommentCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", AdhComment.commentCreateDirective])

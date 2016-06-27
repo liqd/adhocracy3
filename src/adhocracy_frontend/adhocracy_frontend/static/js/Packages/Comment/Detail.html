@@ -51,6 +51,21 @@
             </div>
         </div>
 
+        <ul class="moving-column-alerts">
+            <li data-ng-repeat="(id, alert) in modals.alerts" class="moving-column-alert m-{{alert.mode}}" data-ng-click="modals.removeAlert(id)">
+                {{ alert.message | translate }}
+            </li>
+        </ul>
+
+        <div class="action-bar-modal" data-ng-if="modals.overlay">
+            <adh-report-abuse
+                data-ng-if="modals.overlay === 'abuse'"
+                data-modals="modals"
+                class="report-abuse"
+                data-url="{{data.path}}">
+            </adh-report-abuse>
+        </div>
+
         <form class="comment-children-edit-form" data-ng-switch-when="1" data-ng-submit="submit()">
             <div class="form-error" data-ng-repeat="error in errors">
                 <p>{{ error | translate }}</p>
