@@ -5,6 +5,7 @@ import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 
+import * as SIBadgeable from "../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
 var pkgLocation = "/ResourceActions";
 
 
@@ -53,6 +54,7 @@ class Modals {
 
 export var resourceActionsDirective = (
     $timeout : angular.ITimeoutService,
+    adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service,
     adhConfig: AdhConfig.IService
 ) => {
@@ -62,6 +64,7 @@ export var resourceActionsDirective = (
             resourcePath: "@",
             parentPath: "=?",
             deleteRedirectUrl: "@?",
+            assignBadges: "=?",
             share: "=?",
             hide: "=?",
             resourceWidgetDelete: "=?",
@@ -70,12 +73,23 @@ export var resourceActionsDirective = (
             cancel: "=?",
             edit: "=?",
             moderate: "=?",
+            modals: "=?"
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceActions.html",
         link: (scope, element) => {
             var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
             scope.modals = new Modals($timeout);
             adhPermissions.bindScope(scope, path, "options");
+
+            var badgeAssignmentPoolPath;
+            scope.$watch("resourcePath", (resourcePath) => {
+                if (resourcePath) {
+                    adhHttp.get(resourcePath).then((badgeable) => {
+                        badgeAssignmentPoolPath = badgeable.data[SIBadgeable.nick].post_pool;
+                    });
+                }
+            });
+            adhPermissions.bindScope(scope, () => badgeAssignmentPoolPath, "badgeAssignmentPoolOptions");
         }
     };
 };

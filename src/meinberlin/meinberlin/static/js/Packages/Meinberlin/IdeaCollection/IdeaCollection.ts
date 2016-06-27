@@ -20,7 +20,6 @@ import RIKiezkasseProcess from "../../../Resources_/adhocracy_meinberlin/resourc
 import RIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
 import RIKiezkasseProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
 import * as SIBadge from "../../../Resources_/adhocracy_core/sheets/badge/IBadge";
-import * as SIBadgeable from "../../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
 import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
@@ -109,16 +108,6 @@ export var proposalDetailColumnDirective = (
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
 
             scope.column = column;
-
-            var badgeAssignmentPoolPath;
-            scope.$watch("proposalUrl", (proposalUrl) => {
-                if (proposalUrl) {
-                    adhHttp.get(proposalUrl).then((proposal) => {
-                        badgeAssignmentPoolPath = proposal.data[SIBadgeable.nick].post_pool;
-                    });
-                }
-            });
-            adhPermissions.bindScope(scope, () => badgeAssignmentPoolPath, "badgeAssignmentPoolOptions");
 
             var params = {
                 depth: 4,

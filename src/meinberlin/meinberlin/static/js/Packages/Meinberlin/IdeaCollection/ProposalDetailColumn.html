@@ -29,12 +29,12 @@
                     data-class="action-bar-item"
                     data-parent-path="true"
                     data-resource-path="{{proposalUrl}}"></adh-report-action>
-                <adh-assign-badges-action
+                <adh-resource-actions
+                    data-assign-badges="true"
                     data-modals="column"
-                    data-ng-if="proposalUrl && badgesExist && badgeAssignmentPoolOptions.PUT"
-                    data-class="action-bar-item"
+                    data-ng-if="proposalUrl && badgesExist"
                     data-parent-path="true"
-                    data-resource-path="{{proposalUrl}}"></adh-assign-badges-action>
+                    data-resource-path="{{proposalUrl}}"></adh-resource-actions>
                 <adh-hide-action
                     data-ng-if="proposalUrl && proposalItemOptions.hide"
                     data-class="action-bar-item"
@@ -58,10 +58,4 @@
         data-modals="column"
         data-url="{{ proposalUrl | adhParentPath | adhResourceUrl | adhCanonicalUrl }}">
     </adh-report-abuse>
-
-    <adh-badge-assignment
-        data-ng-switch-when="overlays"
-        data-ng-if="overlay === 'badges'"
-        data-path="{{proposalUrl}}">
-    </adh-badge-assignment>
 </div>

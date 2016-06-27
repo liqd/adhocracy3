@@ -11,6 +11,7 @@
         data-resource-path="{{resourcePath}}"></adh-moderate-action>
     <adh-assign-badges-action
         data-ng-if="assignBadges && resourcePath && badgeAssignmentPoolOptions.PUT"
+        data-modals="modals"
         data-class="action-bar-item"
         data-parent-path="parentPath"
         data-resource-path="{{resourcePath}}"></adh-assign-badges-action>
@@ -56,7 +57,10 @@
         class="report-abuse"
         data-url="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}">
     </adh-report-abuse>
-
+    <adh-badge-assignment
+        data-ng-if="modals.overlay === 'badges'"
+        data-path="{{resourcePath}}">
+    </adh-badge-assignment>
     <div data-ng-if="modals.overlay === 'share'">
         <adh-social-share data-uri="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}"></adh-social-share>
         <a href="" class="button" data-ng-click="modals.hideOverlay('share')">{{ "TR__CANCEL" | translate }}</a>
