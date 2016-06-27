@@ -743,6 +743,34 @@ def add_local_roles_for_workflow_state(root,
             add_local_roles(resource, local_roles, registry=registry)
 
 
+@log_migration
+def rename_default_group(root, registry):  # pragma: no cover
+    """Rename default user group."""
+    from adhocracy_core.authorization import add_local_roles
+    from adhocracy_core.authorization import get_local_roles
+    from adhocracy_core.authorization import set_local_roles
+    from adhocracy_core.resources.process import IProcess
+    from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
+    catalogs = find_service(root, 'catalogs')
+    resources = _search_for_interfaces(catalogs, IProcess)
+    old_default_group = 'authenticated'
+    old_default_group_principal = 'group:' + old_default_group
+    new_default_group = DEFAULT_USER_GROUP_NAME
+    new_default_group_principal = 'group:' + DEFAULT_USER_GROUP_NAME
+    for resource in resources:
+        local_roles = get_local_roles(resource)
+        if old_default_group_principal in local_roles:
+            logger.info('Rename default group in local roles'
+                        ' of {0}'.format(resource))
+            old_roles = local_roles.pop(old_default_group_principal)
+            set_local_roles(resource, local_roles)
+            add_local_roles({new_default_group_principal: old_roles})
+    groups = root['principals']['groups']
+    if old_default_group in groups:
+        logger.info('Rename default group to {}'.format(new_default_group))
+        groups.rename(old_default_group, new_default_group, registry=registry)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -783,3 +811,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_controversiality_index)
     config.add_evolution_step(add_description_sheet_to_user)
     config.add_evolution_step(add_local_roles_for_workflow_state)
+    config.add_evolution_step(rename_default_group)
