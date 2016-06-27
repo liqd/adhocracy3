@@ -88,13 +88,7 @@ export var processDetailColumnDirective = (
 
 export var documentDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhPermissions : AdhPermissions.Service,
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhHttp : AdhHttp.Service<any>,
-    adhResourceUrl,
-    $location : angular.ILocationService,
-    $window : angular.IWindowService,
-    $translate
+    adhPermissions : AdhPermissions.Service
 ) => {
     return {
         restrict: "E",
@@ -103,18 +97,13 @@ export var documentDetailColumnDirective = (
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "documentUrl"]);
             adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.documentUrl), "documentItemOptions");
-
-            scope.setCameFrom = () => {
-                adhTopLevelState.setCameFrom();
-            };
         }
     };
 };
 
 export var proposalDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhPermissions : AdhPermissions.Service,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhPermissions : AdhPermissions.Service
 ) => {
     return {
         restrict: "E",
@@ -123,19 +112,13 @@ export var proposalDetailColumnDirective = (
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
             adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
-
-            scope.setCameFrom = () => {
-                adhTopLevelState.setCameFrom();
-            };
         }
     };
 };
 
 export var documentCreateColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhResourceUrl
+    adhHttp : AdhHttp.Service<any>
 ) => {
     return {
         restrict: "E",
@@ -150,20 +133,13 @@ export var documentCreateColumnDirective = (
                     });
                 }
             });
-
-            scope.cancel = () => {
-                var url = adhResourceUrl(scope.processUrl);
-                adhTopLevelState.goToCameFrom(url);
-            };
         }
     };
 };
 
 export var documentEditColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhResourceUrl
+    adhHttp : AdhHttp.Service<any>
 ) => {
     return {
         restrict: "E",
@@ -178,19 +154,12 @@ export var documentEditColumnDirective = (
                     });
                 }
             });
-
-            scope.cancel = () => {
-                var url = adhResourceUrl(AdhUtil.parentPath(scope.documentUrl));
-                adhTopLevelState.goToCameFrom(url);
-            };
         }
     };
 };
 
 export var proposalCreateColumnDirective = (
-    adhConfig : AdhConfig.IService,
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhResourceUrl
+    adhConfig : AdhConfig.IService
 ) => {
     return {
         restrict: "E",
@@ -198,19 +167,12 @@ export var proposalCreateColumnDirective = (
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl"]);
-
-            scope.cancel = () => {
-                var url = adhResourceUrl(scope.processUrl);
-                adhTopLevelState.goToCameFrom(url);
-            };
         }
     };
 };
 
 export var proposalEditColumnDirective = (
-    adhConfig : AdhConfig.IService,
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhResourceUrl
+    adhConfig : AdhConfig.IService
 ) => {
     return {
         restrict: "E",
@@ -218,11 +180,6 @@ export var proposalEditColumnDirective = (
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
-
-            scope.cancel = () => {
-                var url = adhResourceUrl(AdhUtil.parentPath(scope.proposalUrl));
-                adhTopLevelState.goToCameFrom(url);
-            };
         }
     };
 };
