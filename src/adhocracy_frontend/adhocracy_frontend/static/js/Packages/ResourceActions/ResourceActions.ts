@@ -49,6 +49,11 @@ class Modals {
             this.overlay = undefined;
         }
     }
+
+    public clear() : void {
+        this.alerts = {};
+        this.overlay = undefined;
+    }
 }
 
 export var resourceActionsDirective = (
