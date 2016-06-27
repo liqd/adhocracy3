@@ -10,10 +10,10 @@
             data-ng-click="setCameFrom()"
             data-ng-href="{{ documentUrl | adhParentPath | adhResourceUrl:'edit' }}">{{ "TR__EDIT" | translate }}</a>
         <adh-hide-action
-            data-ng-if="proposalUrl && proposalItemOptions.hide"
+            data-ng-if="documentUrl && documentItemOptions.hide"
             data-class="action-bar-item"
             data-parent-path="true"
-            data-resource-path="{{proposalUrl}}"></adh-hide-action>
+            data-resource-path="{{documentUrl}}"></adh-hide-action>
         <div class="moving-column-menu-nav">
             <a class="moving-column-menu-nav-button" data-ng-href="{{ processUrl | adhResourceUrl }}" title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
         </div>
