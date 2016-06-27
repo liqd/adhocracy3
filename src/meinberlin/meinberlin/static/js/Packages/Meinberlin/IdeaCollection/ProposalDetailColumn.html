@@ -32,7 +32,8 @@
                 <adh-resource-actions
                     data-assign-badges="true"
                     data-modals="column"
-                    data-ng-if="proposalUrl && badgesExist"
+                    data-process-url="{{processUrl}}"
+                    data-ng-if="proposalUrl"
                     data-parent-path="true"
                     data-resource-path="{{proposalUrl}}"></adh-resource-actions>
                 <adh-hide-action

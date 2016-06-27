@@ -10,7 +10,7 @@
         data-parent-path="parentPath"
         data-resource-path="{{resourcePath}}"></adh-moderate-action>
     <adh-assign-badges-action
-        data-ng-if="assignBadges && resourcePath && badgeAssignmentPoolOptions.PUT"
+        data-ng-if="assignBadges && resourcePath && badgesExist && badgeAssignmentPoolOptions.PUT"
         data-modals="modals"
         data-class="action-bar-item"
         data-parent-path="parentPath"

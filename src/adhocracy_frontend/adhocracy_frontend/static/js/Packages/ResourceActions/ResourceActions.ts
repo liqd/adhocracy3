@@ -5,7 +5,10 @@ import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 
+import * as SIBadge from "../../Resources_/adhocracy_core/sheets/badge/IBadge";
 import * as SIBadgeable from "../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
+import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
+
 var pkgLocation = "/ResourceActions";
 
 
@@ -63,6 +66,7 @@ export var resourceActionsDirective = (
         scope: {
             resourcePath: "@",
             parentPath: "=?",
+            processUrl: "@?",
             deleteRedirectUrl: "@?",
             assignBadges: "=?",
             share: "=?",
@@ -90,6 +94,13 @@ export var resourceActionsDirective = (
                 }
             });
             adhPermissions.bindScope(scope, () => badgeAssignmentPoolPath, "badgeAssignmentPoolOptions");
+            var params = {
+                depth: 4,
+                content_type: SIBadge.nick
+            };
+            adhHttp.get(scope.processUrl, params).then((response) => {
+                scope.badgesExist = response.data[SIPool.nick].count > 0;
+            });
         }
     };
 };
