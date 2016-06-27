@@ -445,6 +445,12 @@ class TestIndexWorkflowState:
         mock_sheet.get.return_value = {'workflow_state': 'STATE'}
         assert index_workflow_state(context, 'default') == 'STATE'
 
+    def test_return_default_if_without_workflow(self, context, mock_sheet, registry):
+        from adhocracy_core.exceptions import RuntimeConfigurationError
+        from .adhocracy import index_workflow_state
+        registry.content.get_sheet.side_effect = RuntimeConfigurationError
+        assert index_workflow_state(context, 'default') == 'default'
+
     @mark.usefixtures('integration')
     def test_register(self, registry):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment

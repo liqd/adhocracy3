@@ -1,9 +1,7 @@
 """Sheets to assign workflows to resources and change states."""
 from colander import deferred
-from colander import null
 from colander import OneOf
 from colander import drop
-from colander import required
 from deform.widget import SelectWidget
 from deform.widget import Widget
 from pyramid.testing import DummyRequest
@@ -12,7 +10,6 @@ from zope.interface import implementer
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.schema import MappingSchema
-from adhocracy_core.schema import SchemaNode
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import SingleLine
@@ -21,7 +18,7 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import AnnotationRessourceSheet
 from adhocracy_core.interfaces import IResourceSheet
-from adhocracy_core.utils import create_schema
+from adhocracy_core.interfaces import IWorkflow
 
 
 class ISample(ISheet):
@@ -31,32 +28,30 @@ class ISample(ISheet):
 deprecated('ISample', 'Backward compatible code, dont use')
 
 
-class Workflow(SchemaNode):
-    """Workflow :class:`adhocracy_core.interfaces.IWorkflow`."""
-
-    schema_type = SingleLine.schema_type
-    readonly = True
-    default = None
-
-    def serialize(self, workflow=null):
-        """Serialize the :term:`appstruct` to a :term:`cstruct`."""
-        if workflow:
-            return workflow.type
-
-
 @deferred
 def deferred_state_validator(node, kw: dict) -> OneOf:
     """Validate workflow state."""
     context = kw['context']
     workflow = kw['workflow']
     request = kw['request']
+    creating = kw['creating']
     if workflow is None:
         allowed = []
+    elif creating:
+        allowed = [workflow._initial_state]
     else:
         nexts = workflow.get_next_states(context, request)
         current = workflow.state_of(context)
         allowed = [current] + nexts
     return OneOf(allowed)
+
+
+@deferred
+def deferred_state_default(node, kw: dict) -> str:
+    """Return initial workflow state."""
+    workflow = kw['workflow']
+    initial_state = workflow and workflow._initial_state or ''
+    return initial_state
 
 
 @deferred
@@ -80,7 +75,7 @@ class StateName(SingleLine):
         if workflow is None:
             states = []
         else:
-            states = workflow._states.keys()  # TODO don't use private attr
+            states = workflow._states.keys()
         return OneOf(states)
 
     @deferred
@@ -111,6 +106,33 @@ class StateDataList(SequenceSchema):
     data = StateData()
 
 
+class Workflow(SingleLine):
+    """SchemaNode for workflow types.
+
+    Default value requires the schema binding `workflow`.
+    """
+
+    @deferred
+    def default(node: MappingSchema, kw: dict) -> IWorkflow:
+        workflow = kw['workflow']
+        return workflow and workflow.type or ''
+
+    @deferred
+    def validator(node: MappingSchema, kw: dict):
+        registry = kw['registry']
+        workflows = [x for x in registry.content.workflows.keys()]
+        workflows.append('')
+        return OneOf(workflows)
+
+    @deferred
+    def widget(node: MappingSchema, kw: dict) -> SelectWidget:
+        """Return widget to select the wanted workflow."""
+        choices = [(w, w) for w in node.validator.choices]
+        choices.remove(('', ''))
+        choices.append(('', 'No workflow'))
+        return SelectWidget(values=choices)
+
+
 class WorkflowAssignmentSchema(MappingSchema):
     """Workflow assignment sheet data structure."""
 
@@ -121,6 +143,7 @@ class WorkflowAssignmentSchema(MappingSchema):
     """
 
     workflow_state = SingleLine(missing=drop,
+                                default=deferred_state_default,
                                 validator=deferred_state_validator,
                                 widget=deferred_state_widget,
                                 )
@@ -153,46 +176,49 @@ class WorkflowAssignmentSheet(AnnotationRessourceSheet):
     metadata of `context` has a valid 'workflow` entry.
     """
 
-    def get_schema_with_bindings(self):
-        schema = create_schema(self.meta.schema_class,
-                               self.context,
-                               self.request,
-                               registry=self.registry,
-                               creating=self.creating,
-                               workflow=self._get_workflow()
-                               )
-        schema.name = self.meta.isheet.__identifier__
-        is_mandatory = self.creating and self.meta.create_mandatory
-        schema.missing = required if is_mandatory else drop
-        return schema
+    def _get_basic_bindings(self) -> dict:
+        bindings = super()._get_basic_bindings()
+        workflow = self._get_workflow()
+        bindings['workflow'] = workflow
+        return bindings
 
-    def _get_workflow(self):
+    def _get_workflow(self) -> IWorkflow:
         if self.creating:
-            name = self.creating.workflow_name
-            workflow = self.registry.content.workflows.get(name, None)
+            name = self.creating.default_workflow
         else:
-            workflow = self.registry.content.get_workflow(self.context)
+            name = self._get_data_appstruct().get('workflow')
+        workflow = self.registry.content.workflows.get(name, None)
         return workflow
 
-    def _store_data(self, appstruct: dict):
-        if 'workflow_state' in appstruct:
+    def _store_data(self, appstruct: dict, initialize_workflow=True):
+        if 'workflow' in appstruct and 'workflow_state' in appstruct:
+            del appstruct['workflow_state']  # we cannot change both
+        if 'workflow' in appstruct and initialize_workflow:
+            self._initialize(appstruct['workflow'])
+        elif 'workflow_state' in appstruct:
             self._do_transition_to(appstruct['workflow_state'])
             del appstruct['workflow_state']
         super()._store_data(appstruct)
 
+    def _initialize(self, name: str):
+        if name != '':
+            workflow = self.registry.content.workflows[name]
+            workflow.initialize(self.context, request=self.request)
+
     def _get_data_appstruct(self) -> dict:
         """Get data appstruct."""
         appstruct = super()._get_data_appstruct()
-        workflow = self.registry.content.get_workflow(self.context)
-        if workflow:
-            appstruct['workflow'] = workflow
-            appstruct['workflow_state'] = workflow.state_of(self.context)
+        if 'workflow' in appstruct:
+            name = appstruct['workflow']
+            if name:
+                workflow = self.registry.content.workflows[name]
+                appstruct['workflow_state'] = workflow.state_of(self.context)
         return appstruct
 
     def _do_transition_to(self, name: str):
         """Do transition to state `name`, don`t check user permissions."""
-        workflow = self.get()['workflow']
         request = self.request or DummyRequest()  # ease testing
+        workflow = self._get_workflow()
         workflow.transition_to_state(self.context, request, to_state=name)
 
 

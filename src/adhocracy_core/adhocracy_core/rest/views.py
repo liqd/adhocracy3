@@ -163,7 +163,8 @@ class ResourceRESTView:
         workflow_sheets = [s for s in edit_sheets
                            if s.meta.isheet.isOrExtends(IWorkflowAssignment)]
         for sheet in workflow_sheets:
-            workflow = sheet.get()['workflow']
+            workflow_name = sheet.get()['workflow']
+            workflow = self.registry.content.workflows.get(workflow_name, None)
             if workflow is None:
                 states = []
             else:

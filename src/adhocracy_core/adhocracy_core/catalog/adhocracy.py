@@ -206,24 +206,22 @@ def index_item_badge(resource, default) -> [str]:
 def index_workflow_state(resource, default) -> [str]:
     """Return value for the workflow_state index."""
     registry = get_current_registry(resource)
-    state = registry.content.get_sheet_field(resource,
-                                             IWorkflowAssignment,
-                                             'workflow_state')
+    try:
+        state = registry.content.get_sheet_field(resource,
+                                                 IWorkflowAssignment,
+                                                 'workflow_state')
+    except (RuntimeConfigurationError, KeyError):
+        return default
     return state
 
 
 def index_workflow_state_of_item(resource, default) -> [str]:
     """Find item and return it`s value for the workflow_state index."""
-    registry = get_current_registry(resource)
     item = find_interface(resource, IItem)
-    try:
-        state = registry.content.get_sheet_field(item,
-                                                 IWorkflowAssignment,
-                                                 'workflow_state')
-    except (RuntimeConfigurationError, AttributeError):
-        return default
+    if item:
+        return index_workflow_state(item, default)
     else:
-        return state
+        return default
 
 
 def index_user_name(resource, default) -> str:
