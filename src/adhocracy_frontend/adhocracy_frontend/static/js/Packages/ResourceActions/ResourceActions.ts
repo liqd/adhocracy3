@@ -8,7 +8,7 @@ import * as AdhUtil from "../Util/Util";
 var pkgLocation = "/ResourceActions";
 
 
-class Modals {
+export class Modals {
     public overlay : string;
     public alerts : {[id : number]: {message : string, mode : string}};
     private lastId : number;
@@ -99,13 +99,13 @@ export var reportActionDirective = () => {
 export var shareActionDirective = () => {
     return {
         restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"report();\">{{ 'TR__SHARE' | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"share();\">{{ 'TR__SHARE' | translate }}</a>",
         scope: {
             class: "@",
             modals: "=",
         },
         link: (scope) => {
-            scope.report = () => {
+            scope.share = () => {
                 scope.modals.toggleOverlay("share");
             };
         }
