@@ -8,6 +8,7 @@ import * as AdhConfig from "../Config/Config";
 import * as AdhHttp from "../Http/Http";
 import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhResourceActions from "../ResourceActions/ResourceActions";
 import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhEmbed from "../Embed/Embed";
@@ -657,16 +658,16 @@ export var userProfileDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfile.html",
         transclude: true,
-        require: "^adhMovingColumn",
         scope: {
-            path: "@"
+            path: "@",
+            modals: "="
         },
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
 
             scope.showMessaging = () => {
                 if (scope.messageOptions.POST) {
-                    column.showOverlay("messaging");
+                    scope.modals.showOverlay("messaging");
                 } else if (!adhCredentials.loggedIn) {
                     adhTopLevelState.setCameFromAndGo("/login");
                 } else {
@@ -693,10 +694,10 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserMessage.html",
         scope: {
-            recipientUrl: "@"
+            recipientUrl: "@",
+            modals: "="
         },
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column)  => {
+        link: (scope)  => {
             adhHttp.get(scope.recipientUrl).then((recipient : RIUser) => {
                 scope.recipientName = recipient.data[SIUserBasic.nick].name;
             });
@@ -707,15 +708,15 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
                     title: scope.message.title,
                     text: scope.message.text
                 }).then(() => {
-                    column.hideOverlay();
-                    column.alert("TR__MESSAGE_STATUS_OK", "success");
+                    scope.modals.hideOverlay();
+                    scope.modals.alert("TR__MESSAGE_STATUS_OK", "success");
                 }, () => {
                     // FIXME
                 });
             };
 
             scope.cancel = () => {
-                column.hideOverlay();
+                scope.modals.hideOverlay();
             };
         }
     };
@@ -724,7 +725,8 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
 
 export var userDetailColumnDirective = (
     adhPermissions : AdhPermissions.Service,
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    $timeout : angular.ITimeoutService
 ) => {
     return {
         restrict: "E",
@@ -733,6 +735,7 @@ export var userDetailColumnDirective = (
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["userUrl"]);
             adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
+            scope.modals = new AdhResourceActions.Modals($timeout);
         }
     };
 };

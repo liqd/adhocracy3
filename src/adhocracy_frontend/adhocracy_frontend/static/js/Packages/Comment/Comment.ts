@@ -184,7 +184,7 @@ export var commentDetailDirective = (
     var _update = update(adhHttp, $q);
     var _postEdit = postEdit(adhHttp, adhPreliminaryNames);
 
-    var link = (scope : ICommentResourceScope, element) => {
+    var link = (scope : ICommentResourceScope) => {
         scope.modals = new AdhResourceActions.Modals($timeout);
 
         scope.report = () => {
@@ -265,7 +265,6 @@ export var commentDetailDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
-        require: "?^adhMovingColumn",
         scope: {
             path: "@",
             onSubmit: "=?"
