@@ -23,5 +23,15 @@ export var register = (angular) => {
         .directive("adhModerateAction", [
             "adhTopLevelState", "adhResourceUrlFilter", "$location", AdhResourceActions.moderateActionDirective])
         .directive("adhPrintAction", ["adhTopLevelState", "$window", AdhResourceActions.printActionDirective])
-        .directive("adhCancelAction", ["adhTopLevelState", "adhResourceUrlFilter", AdhResourceActions.cancelActionDirective]);
+        .directive("adhCancelAction", ["adhTopLevelState", "adhResourceUrlFilter", AdhResourceActions.cancelActionDirective])
+        .animation(".action-bar-modal", () => {
+            return {
+                enter: (element, done) => {
+                    element.hide().slideDown(done);
+                },
+                leave: (element, done) => {
+                    element.slideUp(done);
+                }
+            };
+        });
 };
