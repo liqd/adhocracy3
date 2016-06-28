@@ -44,7 +44,7 @@ export var register = (angular) => {
         .directive("adhMercator2015ProposalCreateColumn", [
             "adhConfig", "adhResourceUrlFilter", "$location", Workbench.proposalCreateColumnDirective])
         .directive("adhMercator2015ProposalDetailColumn", [
-            "$window", "adhTopLevelState", "adhPermissions", "adhConfig", Workbench.proposalDetailColumnDirective])
+            "adhTopLevelState", "adhPermissions", "adhConfig", Workbench.proposalDetailColumnDirective])
         .directive("adhMercator2015ProposalEditColumn", [
             "adhConfig", "adhResourceUrlFilter", "$location", Workbench.proposalEditColumnDirective])
         .directive("adhMercator2015ProposalListingColumn",
