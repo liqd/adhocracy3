@@ -10,7 +10,7 @@ from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.interfaces import ISheetBackReferenceModified
-from adhocracy_core.interfaces import IResourceCreatedAndAdded
+from adhocracy_core.interfaces import ISheetBackReferenceRemoved
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.versions import IVersionable
@@ -62,14 +62,8 @@ def reindex_user_activation_path(event):
 
 def reindex_badge(event):
     """Reindex badge index if a backreference is modified/created."""
-    # TODO we cannot listen to the backreference modified event of the
-    # IBadgeable sheet here, because this event is send before the
-    # IBadgeAssignment fields 'subject' and 'badge' are properly stored.
     catalogs = find_service(event.object, 'catalogs')
-    badgeable = event.registry.content.get_sheet_field(event.object,
-                                                       IBadgeAssignment,
-                                                       'object')
-    catalogs.reindex_index(badgeable, 'badge')
+    catalogs.reindex_index(event.object, 'badge')
 
 
 def reindex_visibility(event):
@@ -125,11 +119,11 @@ def includeme(config):
                           ISheetBackReferenceModified,
                           event_isheet=ICommentable)
     config.add_subscriber(reindex_badge,
-                          IResourceSheetModified,
-                          event_isheet=IBadgeAssignment)
+                          ISheetBackReferenceModified,
+                          event_isheet=IBadgeable)
     config.add_subscriber(reindex_badge,
-                          IResourceCreatedAndAdded,
-                          object_iface=IBadgeAssignment)
+                          ISheetBackReferenceRemoved,
+                          event_isheet=IBadgeAssignment)
     config.add_subscriber(reindex_item_badge,
                           ISheetBackReferenceModified,
                           object_iface=IItem,

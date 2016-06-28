@@ -66,12 +66,8 @@ def test_reindex_user_activation_path(event, catalog):
 
 def test_reindex_badge_index(event, catalog, mock_sheet, registry_with_content):
     from .subscriber import reindex_badge
-    badgeable = testing.DummyResource()
-    mock_sheet.get.return_value = {'object': badgeable}
-    registry_with_content.content.get_sheet.return_value = mock_sheet
-    event.registry = registry_with_content
     reindex_badge(event)
-    catalog.reindex_index.assert_called_with(badgeable, 'badge')
+    catalog.reindex_index.assert_called_with(event.object, 'badge')
 
 
 def test_reindex_item_badge(event, catalog):
