@@ -90,22 +90,24 @@ export var resourceActionsDirective = (
             scope.modals = new Modals($timeout);
             adhPermissions.bindScope(scope, path, "options");
 
-            var badgeAssignmentPoolPath;
-            scope.$watch("resourcePath", (resourcePath) => {
-                if (resourcePath) {
-                    adhHttp.get(resourcePath).then((badgeable) => {
-                        badgeAssignmentPoolPath = badgeable.data[SIBadgeable.nick].post_pool;
-                    });
-                }
-            });
-            adhPermissions.bindScope(scope, () => badgeAssignmentPoolPath, "badgeAssignmentPoolOptions");
-            var params = {
-                depth: 4,
-                content_type: SIBadge.nick
-            };
-            adhHttp.get(scope.resourceWithBadgesUrl, params).then((response) => {
-                scope.badgesExist = response.data[SIPool.nick].count > 0;
-            });
+            if (scope.assignBadges) {
+                var badgeAssignmentPoolPath;
+                scope.$watch("resourcePath", (resourcePath) => {
+                    if (resourcePath) {
+                        adhHttp.get(resourcePath).then((badgeable) => {
+                            badgeAssignmentPoolPath = badgeable.data[SIBadgeable.nick].post_pool;
+                        });
+                    }
+                });
+                adhPermissions.bindScope(scope, () => badgeAssignmentPoolPath, "badgeAssignmentPoolOptions");
+                var params = {
+                    depth: 4,
+                    content_type: SIBadge.nick
+                };
+                adhHttp.get(scope.resourceWithBadgesUrl, params).then((response) => {
+                    scope.badgesExist = response.data[SIPool.nick].count > 0;
+                });
+            }
 
             scope.$watch("resourcePath", () => {
                 scope.modals.clear();
