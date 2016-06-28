@@ -39,7 +39,8 @@ export var register = (angular) => {
         .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIEuthProcess)])
         .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIEuthPrivateProcess)])
         .directive("adhPcompassWorkbench", ["adhTopLevelState", "adhConfig", "adhHttp", Workbench.workbenchDirective])
-        .directive("adhPcompassProposalDetailColumn", ["adhConfig", "adhHttp", "adhPermissions", Workbench.proposalDetailColumnDirective])
+        .directive("adhPcompassProposalDetailColumn", [
+            "$timeout", "adhConfig", "adhHttp", "adhPermissions", Workbench.proposalDetailColumnDirective])
         .directive("adhPcompassProposalCreateColumn", ["adhConfig", Workbench.proposalCreateColumnDirective])
         .directive("adhPcompassProposalEditColumn", ["adhConfig", Workbench.proposalEditColumnDirective])
         .directive("adhPcompassProposalImageColumn", [
