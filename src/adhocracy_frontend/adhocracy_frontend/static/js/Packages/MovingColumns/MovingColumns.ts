@@ -174,19 +174,6 @@ export class MovingColumnController {
     public $broadcast(name : string, ...args : any[]) {
         return this.$scope.$broadcast.apply(this.$scope, arguments);
     }
-
-    /**
-     * Bind variables from topLevelState and clear this column whenever one of them changes.
-     */
-    public bindVariablesAndClear(scope, keys : string[]) : void {
-        var self : MovingColumnController = this;
-
-        keys.forEach((key : string) => {
-            scope.$on("$destroy", self.adhTopLevelState.on(key, (value) => {
-                scope[key] = value;
-            }));
-        });
-    }
 }
 
 

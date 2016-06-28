@@ -724,8 +724,9 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
 
 
 export var userDetailColumnDirective = (
-    adhPermissions : AdhPermissions.Service,
     adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
     $timeout : angular.ITimeoutService
 ) => {
     return {
@@ -733,7 +734,7 @@ export var userDetailColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserDetailColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["userUrl"]);
+            scope.$on("$destroy", adhTopLevelState.bind("userUrl", scope));
             adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
             scope.modals = new AdhResourceActions.Modals($timeout);
         }
