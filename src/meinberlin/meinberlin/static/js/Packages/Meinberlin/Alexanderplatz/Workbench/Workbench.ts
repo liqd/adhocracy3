@@ -2,7 +2,6 @@
 
 import * as AdhConfig from "../../../Config/Config";
 import * as AdhHttp from "../../../Http/Http";
-import * as AdhMovingColumns from "../../../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
@@ -56,8 +55,7 @@ export var processDetailColumnDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProcessDetailColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("tab", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
@@ -94,8 +92,7 @@ export var documentDetailColumnDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentDetailColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("documentUrl", scope));
             adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.documentUrl), "documentItemOptions");
@@ -111,8 +108,7 @@ export var proposalDetailColumnDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalDetailColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
             adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
@@ -128,8 +124,7 @@ export var documentCreateColumnDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentCreateColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$watch("processUrl", (processUrl) => {
                 if (processUrl) {
@@ -150,8 +145,7 @@ export var documentEditColumnDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentEditColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("documentUrl", scope));
             scope.$watch("processUrl", (processUrl) => {
@@ -172,8 +166,7 @@ export var proposalCreateColumnDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalCreateColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
         }
     };
@@ -186,8 +179,7 @@ export var proposalEditColumnDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalEditColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
         }

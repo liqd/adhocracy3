@@ -56,8 +56,7 @@ export var proposalCreateColumnDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalCreateColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("platformUrl", scope));
             bindRedirectsToScope(scope, adhConfig, adhResourceUrlFilter, $location);
         }
@@ -96,8 +95,7 @@ export var proposalEditColumnDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalEditColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("platformUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
             bindRedirectsToScope(scope, adhConfig, adhResourceUrlFilter, $location);
@@ -114,8 +112,7 @@ export var proposalListingColumnDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalListingColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("platformUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
             scope.contentType = RIMercatorProposalVersion.content_type;

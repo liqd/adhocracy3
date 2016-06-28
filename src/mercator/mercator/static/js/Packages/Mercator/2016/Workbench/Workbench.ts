@@ -61,8 +61,7 @@ export var proposalCreateColumnDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalCreateColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             bindRedirectsToScope(scope, adhConfig, adhResourceUrlFilter, $location);
         }
@@ -111,8 +110,7 @@ export var proposalEditColumnDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalEditColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
             bindRedirectsToScope(scope, adhConfig, adhResourceUrlFilter, $location);
@@ -130,8 +128,7 @@ export var proposalModerateColumnDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalModerateColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
             bindRedirectsToScope(scope, adhConfig, adhResourceUrlFilter, $location);
@@ -148,8 +145,7 @@ export var proposalListingColumnDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalListingColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
             scope.contentType = RIProposal.content_type;

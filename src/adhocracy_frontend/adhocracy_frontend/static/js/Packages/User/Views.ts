@@ -6,7 +6,6 @@ import * as _ from "lodash";
 import * as AdhBadge from "../Badge/Badge";
 import * as AdhConfig from "../Config/Config";
 import * as AdhHttp from "../Http/Http";
-import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhResourceActions from "../ResourceActions/ResourceActions";
 import * as AdhResourceArea from "../ResourceArea/ResourceArea";
@@ -732,8 +731,7 @@ export var userDetailColumnDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserDetailColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("userUrl", scope));
             adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
             scope.modals = new AdhResourceActions.Modals($timeout);
