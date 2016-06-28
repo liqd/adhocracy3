@@ -49,6 +49,11 @@ export class Modals {
             this.overlay = undefined;
         }
     }
+
+    public clear() : void {
+        this.alerts = {};
+        this.overlay = undefined;
+    }
 }
 
 export var resourceActionsDirective = (
@@ -76,6 +81,10 @@ export var resourceActionsDirective = (
             var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
             scope.modals = new Modals($timeout);
             adhPermissions.bindScope(scope, path, "options");
+
+            scope.$watch("resourcePath", () => {
+                scope.modals.clear();
+            });
         }
     };
 };
