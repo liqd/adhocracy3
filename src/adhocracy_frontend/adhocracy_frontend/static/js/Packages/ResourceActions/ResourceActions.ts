@@ -5,6 +5,10 @@ import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 
+import * as SIBadge from "../../Resources_/adhocracy_core/sheets/badge/IBadge";
+import * as SIBadgeable from "../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
+import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
+
 var pkgLocation = "/ResourceActions";
 
 
@@ -58,6 +62,7 @@ export class Modals {
 
 export var resourceActionsDirective = (
     $timeout : angular.ITimeoutService,
+    adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service,
     adhConfig: AdhConfig.IService
 ) => {
@@ -66,7 +71,9 @@ export var resourceActionsDirective = (
         scope: {
             resourcePath: "@",
             parentPath: "=?",
+            resourceWithBadgesUrl: "@?",
             deleteRedirectUrl: "@?",
+            assignBadges: "=?",
             share: "=?",
             hide: "=?",
             resourceWidgetDelete: "=?",
@@ -75,12 +82,32 @@ export var resourceActionsDirective = (
             cancel: "=?",
             edit: "=?",
             moderate: "=?",
+            modals: "=?"
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceActions.html",
         link: (scope, element) => {
             var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
             scope.modals = new Modals($timeout);
             adhPermissions.bindScope(scope, path, "options");
+
+            if (scope.assignBadges) {
+                var badgeAssignmentPoolPath;
+                scope.$watch("resourcePath", (resourcePath) => {
+                    if (resourcePath) {
+                        adhHttp.get(resourcePath).then((badgeable) => {
+                            badgeAssignmentPoolPath = badgeable.data[SIBadgeable.nick].post_pool;
+                        });
+                    }
+                });
+                adhPermissions.bindScope(scope, () => badgeAssignmentPoolPath, "badgeAssignmentPoolOptions");
+                var params = {
+                    depth: 4,
+                    content_type: SIBadge.nick
+                };
+                adhHttp.get(scope.resourceWithBadgesUrl, params).then((response) => {
+                    scope.badgesExist = response.data[SIPool.nick].count > 0;
+                });
+            }
 
             scope.$watch("resourcePath", () => {
                 scope.modals.clear();
@@ -116,6 +143,24 @@ export var shareActionDirective = () => {
         link: (scope) => {
             scope.share = () => {
                 scope.modals.toggleOverlay("share");
+            };
+        }
+    };
+};
+
+export var assignBadgesActionDirective = () => {
+    return {
+        restrict: "E",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"assignBadges();\">{{ 'TR__MANAGE_BADGE_ASSIGNMENTS' | translate }}</a>",
+        scope: {
+            resourcePath: "@",
+            parentPath: "=?",
+            class: "@",
+            modals: "=",
+        },
+        link: (scope) => {
+            scope.assignBadges = () => {
+                scope.modals.toggleOverlay("badges");
             };
         }
     };

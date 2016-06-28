@@ -13,11 +13,13 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName,
             AdhMovingColumnsModule.moduleName
         ])
-        .directive("adhResourceActions", ["$timeout", "adhPermissions", "adhConfig", AdhResourceActions.resourceActionsDirective])
+        .directive("adhResourceActions", [
+            "$timeout", "adhHttp", "adhPermissions", "adhConfig", AdhResourceActions.resourceActionsDirective])
         .directive("adhReportAction", [AdhResourceActions.reportActionDirective])
         .directive("adhShareAction", [AdhResourceActions.shareActionDirective])
         .directive("adhHideAction", [
             "adhHttp", "adhTopLevelState", "adhResourceUrlFilter", "$translate", "$window", AdhResourceActions.hideActionDirective])
+        .directive("adhAssignBadgesAction", [AdhResourceActions.assignBadgesActionDirective])
         .directive("adhResourceWidgetDeleteAction", [AdhResourceActions.resourceWidgetDeleteActionDirective])
         .directive("adhEditAction", ["adhTopLevelState", "adhResourceUrlFilter", "$location", AdhResourceActions.editActionDirective])
         .directive("adhModerateAction", [

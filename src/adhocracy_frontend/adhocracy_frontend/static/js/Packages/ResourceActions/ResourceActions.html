@@ -9,6 +9,12 @@
         data-class="action-bar-item"
         data-parent-path="parentPath"
         data-resource-path="{{resourcePath}}"></adh-moderate-action>
+    <adh-assign-badges-action
+        data-ng-if="assignBadges && resourcePath && badgesExist && badgeAssignmentPoolOptions.PUT"
+        data-modals="modals"
+        data-class="action-bar-item"
+        data-parent-path="parentPath"
+        data-resource-path="{{resourcePath}}"></adh-assign-badges-action>
     <adh-report-action
         data-ng-if="report"
         data-modals="modals"
@@ -51,6 +57,12 @@
         class="report-abuse"
         data-url="{{ resourcePath | adhResourceUrl | adhCanonicalUrl }}">
     </adh-report-abuse>
+
+    <adh-badge-assignment
+        data-ng-if="modals.overlay === 'badges'"
+        data-modals="modals"
+        data-path="{{resourcePath}}">
+    </adh-badge-assignment>
 
     <div data-ng-if="modals.overlay === 'share'">
         <adh-social-share data-uri="{{ resourcePath | adhResourceUrl | adhCanonicalUrl }}"></adh-social-share>

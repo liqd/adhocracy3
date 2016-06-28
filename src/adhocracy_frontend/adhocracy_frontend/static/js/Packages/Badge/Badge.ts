@@ -9,7 +9,6 @@ import * as AdhHttp from "../Http/Http";
 import * as AdhListing from "../Listing/Listing";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
-import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhUtil from "../Util/Util";
 
 import RIBadgeAssignment from "../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment";
@@ -221,12 +220,12 @@ export var badgeAssignment = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Assignment.html",
-        require: "^adhMovingColumn",
         scope: {
+            modals: "=",
             path: "@",
             showDescription: "=?"
         },
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.badgeablePath = scope.path;
             scope.data = {};
 
@@ -266,8 +265,8 @@ export var badgeAssignment = (
 
                             return transaction.commit()
                                 .then((responses) => {
-                                    column.hideOverlay("badges");
-                                    column.alert("TR__BADGE_ASSIGNMENT_UPDATED", "success");
+                                    scope.modals.hideOverlay("badges");
+                                    scope.modals.alert("TR__BADGE_ASSIGNMENT_UPDATED", "success");
                                 }, (response) => {
                                     scope.serverError = response[0].description;
                                 });
@@ -275,7 +274,7 @@ export var badgeAssignment = (
                     };
 
                     scope.cancel = () => {
-                        column.hideOverlay("badges");
+                        scope.modals.hideOverlay("badges");
                     };
                 });
             });
