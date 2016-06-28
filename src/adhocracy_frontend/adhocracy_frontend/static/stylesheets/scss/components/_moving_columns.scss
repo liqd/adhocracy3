@@ -301,50 +301,6 @@ States:
     }
 }
 
-/*doc
----
-title: Moving Column Alerts
-name: moving-column-alerts
-parent: moving-columns
----
-
-A list of alert messages to notify users in the moving column
-
-```html_example
-<ul class="moving-column-alerts static-example">
-    <li class="moving-column-alert m-error">Error</li>
-    <li class="moving-column-alert m-info">Info</li>
-    <li class="moving-column-alert m-success">Success</li>
-</ul>
-```
-*/
-.moving-column-alerts {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    z-index: 3;
-
-    @media print {
-        display: none;
-    }
-}
-
-.moving-column-alert {
-    @include rem(padding, 1rem);
-    background: $color-function-neutral;
-    color: $color-text-normal;
-    text-align: center;
-
-    &.m-error {
-        background: $color-function-negative;
-        color: $color-text-inverted;
-    }
-
-    &.m-success {
-        background: $color-function-positive;
-    }
-}
-
 .moving-column-tab {
     float: left;
 }

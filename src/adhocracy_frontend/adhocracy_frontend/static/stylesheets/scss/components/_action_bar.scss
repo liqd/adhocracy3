@@ -6,7 +6,7 @@ category: Widgets
 ---
 
 A bar with items that trigger actions. Use this widget to provide a
-consistent interface for actions like edit, delete, report, print, and share. 
+consistent interface for actions like edit, delete, report, print, and share.
 It is typically located at the top of a larger widget, e.g. a proposal detail.
 
 Elements of the action bar are called action bar items (`action-bar-item`).
@@ -144,4 +144,51 @@ open/close with a sliding animation.
 .modal {
     border-bottom: 2px solid $color-structure-normal;
     padding: 1em;
+}
+
+/*doc
+---
+title: Alerts
+name: alerts
+parent: modal
+---
+
+A list of alert messages to notify users of the result of a modal action.
+
+The messages are informational by default, but can have the modifieres
+`m-error` and `m-success`.
+
+```html_example
+<ul class="alerts static-example">
+    <li class="alerts-message">Info</li>
+    <li class="alerts-message m-error">Error</li>
+    <li class="alerts-message m-success">Success</li>
+</ul>
+```
+*/
+.alerts {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    z-index: 3;
+
+    @media print {
+        display: none;
+    }
+}
+
+.alerts-message {
+    @include rem(padding, 1rem);
+    background: $color-function-neutral;
+    color: $color-text-normal;
+    text-align: center;
+
+    &.m-error {
+        background: $color-function-negative;
+        color: $color-text-inverted;
+    }
+
+    &.m-success {
+        background: $color-function-positive;
+    }
 }
