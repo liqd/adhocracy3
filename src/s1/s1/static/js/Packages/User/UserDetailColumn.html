@@ -20,7 +20,7 @@
                 {{ alert.message | translate }}
             </li>
         </ul>
-        <div class="action-bar-modal" data-ng-if="modals.modal">
+        <div class="modal" data-ng-if="modals.modal">
             <adh-user-message
                 data-ng-if="modals.modal === 'messaging'"
                 data-modals="modals"
