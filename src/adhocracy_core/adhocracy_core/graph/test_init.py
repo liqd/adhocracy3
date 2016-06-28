@@ -662,6 +662,28 @@ class TestGraphIsInSubtree:
         assert result is True
 
 
+class TestGraphSendBackReferenceRemovedNotifications:
+
+    def call_fut(self, objectmap, *args, **kwargs):
+        from adhocracy_core.graph import Graph
+        graph = Graph(objectmap.root)
+        return graph.send_back_reference_removal_notificatons(*args, **kwargs)
+
+    def test_send_events(self, context, mocker, config, registry, objectmap):
+        from adhocracy_core.testing import create_event_listener
+        from adhocracy_core.interfaces import ISheetBackReferenceRemoved
+        from adhocracy_core.interfaces import ISheet
+        added_listener = create_event_listener(config,
+                                               ISheetBackReferenceRemoved)
+        reference = mocker.Mock()
+        self.call_fut(objectmap, [reference], registry)
+
+        event = added_listener[0]
+        assert event.object == reference.target
+        assert event.isheet == reference.isheet
+        assert event.reference == reference
+
+
 def test_includeme_register_graph(config, context):
     from adhocracy_core.graph import Graph
     config.include('adhocracy_core.content')
