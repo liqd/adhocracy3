@@ -3,8 +3,6 @@
         <div class="moving-column-tab">
             <i class="icon-document moving-column-icon"></i>
         </div>
-
-        <a class="moving-column-menu-button" href="" data-ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
     </div>
 
     <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ processUrl | adhResourceUrl:'create_proposal' }}">
@@ -14,6 +12,10 @@
     </a>
 
     <div class="tabs" data-ng-switch-when="body">
-        <adh-meinberlin-proposal-create data-path="{{processUrl}}"></adh-meinberlin-proposal-create>
+        <adh-resource-actions
+            data-resource-path="{{processUrl}}"
+            data-cancel="true">
+        </adh-resource-actions>
+        <adh-meinberlin-proposal-create data-pool-path="{{processUrl}}"></adh-meinberlin-proposal-create>
     </div>
 </div>

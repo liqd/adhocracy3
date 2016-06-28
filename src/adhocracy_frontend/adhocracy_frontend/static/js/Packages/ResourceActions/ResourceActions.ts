@@ -213,6 +213,7 @@ export var editActionDirective = (
         },
         link: (scope) => {
             scope.edit = () => {
+                adhTopLevelState.setCameFrom();
                 var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
                 var url = adhResourceUrl(path, "edit");
                 $location.url(url);
