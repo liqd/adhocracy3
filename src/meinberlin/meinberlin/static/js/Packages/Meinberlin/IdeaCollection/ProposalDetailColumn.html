@@ -18,19 +18,17 @@
     <div data-ng-switch-when="body">
         <adh-recompile-on-change
             data-value="{{proposalUrl}}">
-            <div class="action-bar">
-                <adh-resource-actions
-                    data-resource-path="{{proposalUrl}}"
-                    data-process-url="{{processUrl}}"
-                    data-ng-if="proposalUrl"
-                    data-parent-path="true"
-                    data-edit="true"
-                    data-assign-badges="true"
-                    data-report="true"
-                    data-hide="true"
-                    data-print="true">
-                </adh-resource-actions>
-            </div>
+            <adh-resource-actions
+                data-resource-path="{{proposalUrl}}"
+                data-process-url="{{processUrl}}"
+                data-ng-if="proposalUrl"
+                data-parent-path="true"
+                data-edit="true"
+                data-assign-badges="true"
+                data-report="true"
+                data-hide="true"
+                data-print="true">
+            </adh-resource-actions>
             <adh-meinberlin-proposal-detail
                 data-ng-if="proposalUrl"
                 data-is-buergerhaushalt="isBuergerhaushalt"

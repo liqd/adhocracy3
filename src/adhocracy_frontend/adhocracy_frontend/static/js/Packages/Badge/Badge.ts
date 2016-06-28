@@ -225,7 +225,7 @@ export var badgeAssignment = (
             path: "@",
             showDescription: "=?"
         },
-        link: (scope, element) => {
+        link: (scope) => {
             scope.badgeablePath = scope.path;
             scope.data = {};
 
