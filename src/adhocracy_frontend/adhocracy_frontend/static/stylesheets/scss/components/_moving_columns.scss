@@ -148,24 +148,17 @@ The menu should always have the same state as its columns.
     }
 }
 
-.moving-column-body,
-.moving-column-modal,
-.moving-column-mask {
+.moving-column-body {
+    @include rem(border-width, 0 $moving-column-border-width $moving-column-border-width);
+    @include rem(font-size, $font-size-normal);
+
     position: absolute;
     top: $moving-column-menu-height;
     left: 0;
     right: 0;
-    overflow-y: auto;
-}
-
-.moving-column-body,
-.moving-column-mask {
     bottom: 0;
-}
+    overflow-y: auto;
 
-.moving-column-body {
-    @include rem(border-width, 0 $moving-column-border-width $moving-column-border-width);
-    @include rem(font-size, $font-size-normal);
     border-color: $color-structure-normal;
     border-style: solid;
 
@@ -308,16 +301,6 @@ States:
     }
 }
 
-.moving-column-mask {
-    @include opacity(0.5);
-    background-color: $color-background-mask;
-    z-index: 2;
-
-    @media print {
-        display: none;
-    }
-}
-
 /*doc
 ---
 title: Moving Column Alerts
@@ -359,40 +342,6 @@ A list of alert messages to notify users in the moving column
 
     &.m-success {
         background: $color-function-positive;
-    }
-}
-
-.moving-column-modal {
-    @include clearfix;
-    @include rem(padding, 1rem);
-    background: $color-structure-normal;
-    border-top: 1px solid $color-structure-introvert;
-    // .leaflet-top has 1000
-    z-index: 1000;
-    max-height: 80%;
-    overflow-y: auto;
-
-    textarea,
-    input[type="text"] {
-        background: $color-background-base;
-    }
-
-    &.ng-enter, &.ng-leave {
-        @include transition(opacity 0.5s);
-    }
-
-    &.ng-enter,
-    &.ng-leave.ng-leave-active {
-        @include opacity(0);
-    }
-
-    &.ng-leave,
-    &.ng-enter.ng-enter-active {
-        @include opacity(1);
-    }
-
-    @media print {
-        display: none;
     }
 }
 
