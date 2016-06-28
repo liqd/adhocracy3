@@ -68,7 +68,7 @@ export var proposalDetailColumnDirective = (
             });
             scope.modals = new AdhResourceActions.Modals($timeout);
             scope.assignBadges = () => {
-                scope.modals.toggleOverlay("badges");
+                scope.modals.toggleModal("badges");
             };
         }
     };

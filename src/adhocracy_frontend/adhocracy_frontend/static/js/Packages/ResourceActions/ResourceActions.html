@@ -50,22 +50,22 @@
     </li>
 </ul>
 
-<div class="action-bar-modal" data-ng-if="modals.overlay">
+<div class="action-bar-modal" data-ng-if="modals.modal">
     <adh-report-abuse
-        data-ng-if="modals.overlay === 'abuse'"
+        data-ng-if="modals.modal === 'abuse'"
         data-modals="modals"
         class="report-abuse"
         data-url="{{ resourcePath | adhResourceUrl | adhCanonicalUrl }}">
     </adh-report-abuse>
 
     <adh-badge-assignment
-        data-ng-if="modals.overlay === 'badges'"
+        data-ng-if="modals.modal === 'badges'"
         data-modals="modals"
         data-path="{{resourcePath}}">
     </adh-badge-assignment>
 
-    <div data-ng-if="modals.overlay === 'share'">
+    <div data-ng-if="modals.modal === 'share'">
         <adh-social-share data-uri="{{ resourcePath | adhResourceUrl | adhCanonicalUrl }}"></adh-social-share>
-        <a href="" class="button" data-ng-click="modals.hideOverlay('share')">{{ "TR__CANCEL" | translate }}</a>
+        <a href="" class="button" data-ng-click="modals.hideModal('share')">{{ "TR__CANCEL" | translate }}</a>
     </div>
 </div>

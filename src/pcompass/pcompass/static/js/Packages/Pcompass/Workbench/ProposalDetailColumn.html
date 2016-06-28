@@ -30,9 +30,9 @@
                 {{ alert.message | translate }}
             </li>
         </ul>
-        <div class="action-bar-modal" data-ng-if="modals.overlay">
+        <div class="action-bar-modal" data-ng-if="modals.modal">
             <adh-badge-assignment
-                data-ng-if="overlay === 'badges'"
+                data-ng-if="modals.modal === 'badges'"
                 data-modals="modals"
                 data-path="{{proposalUrl}}">
             </adh-badge-assignment>

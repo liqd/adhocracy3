@@ -19,7 +19,7 @@ export var reportAbuseDirective = (adhHttp : AdhHttp.Service<any>, adhConfig : A
                     url: scope.url,
                     remark: scope.remark
                 }).then(() => {
-                    scope.modals.hideOverlay("abuse");
+                    scope.modals.hideModal("abuse");
                     scope.modals.alert("TR__REPORT_ABUSE_STATUS_OK", "success");
                 }, () => {
                     // FIXME
@@ -27,7 +27,7 @@ export var reportAbuseDirective = (adhHttp : AdhHttp.Service<any>, adhConfig : A
             };
 
             scope.cancel = () => {
-                scope.modals.hideOverlay("abuse");
+                scope.modals.hideModal("abuse");
             };
         }
     };

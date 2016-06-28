@@ -12,7 +12,7 @@
             <a
                 class="action-bar-item"
                 href=""
-                data-ng-click="modals.toggleOverlay('messaging')"
+                data-ng-click="modals.toggleModal('messaging')"
                 data-ng-if="messageOptions.POST">{{ "TR__MESSAGING" | translate }}</a>
         </div>
         <ul class="moving-column-alerts">
@@ -20,9 +20,9 @@
                 {{ alert.message | translate }}
             </li>
         </ul>
-        <div class="action-bar-modal" data-ng-if="modals.overlay">
+        <div class="action-bar-modal" data-ng-if="modals.modal">
             <adh-user-message
-                data-ng-if="modals.overlay === 'messaging'"
+                data-ng-if="modals.modal === 'messaging'"
                 data-modals="modals"
                 data-recipient-url="{{userUrl}}">
             </adh-user-message>

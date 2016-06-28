@@ -188,7 +188,7 @@ export var commentDetailDirective = (
         scope.modals = new AdhResourceActions.Modals($timeout);
 
         scope.report = () => {
-            scope.modals.toggleOverlay("abuse");
+            scope.modals.toggleModal("abuse");
         };
 
         scope.$on("$destroy", adhTopLevelState.on("commentUrl", (commentVersionUrl) => {

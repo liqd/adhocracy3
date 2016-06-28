@@ -56,9 +56,9 @@
             </li>
         </ul>
 
-        <div class="action-bar-modal" data-ng-if="modals.overlay">
+        <div class="action-bar-modal" data-ng-if="modals.modal">
             <adh-report-abuse
-                data-ng-if="modals.overlay === 'abuse'"
+                data-ng-if="modals.modal === 'abuse'"
                 data-modals="modals"
                 class="report-abuse"
                 data-url="{{data.path}}">

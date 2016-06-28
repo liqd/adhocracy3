@@ -164,7 +164,7 @@ export var movingColumns = (
  *
  * Every moving column should be wrapped in an instance of this
  * directive.  It provides common functionality, e.g. alerts and
- * overlays via a controller that can be required by subelements.
+ * modals via a controller that can be required by subelements.
  *
  * Subelements can inject template code with the following transclusionIds
  * (see AdhInject):
@@ -172,17 +172,17 @@ export var movingColumns = (
  * -   body
  * -   menu
  * -   collapsed
- * -   overlays
+ * -   modals
  */
 export interface IMovingColumnScope extends angular.IScope {
-    // the controller with interfaces for alerts, overlays, ...
+    // the controller with interfaces for alerts, modals, ...
     ctrl : MovingColumnController;
 
     // an object that can be used to share data between different parts of the column.
     shared;
 
-    // key of the currently active overlay or undefined
-    overlay : string;
+    // key of the currently active modal or undefined
+    modal : string;
 
     // private
     _alerts : {[id : number]: {
@@ -214,7 +214,7 @@ export class MovingColumnController {
 
     public clear() : void {
         this.$scope._alerts = {};
-        this.$scope.overlay = undefined;
+        this.$scope.modal = undefined;
     }
 
     public alert(message : string, mode : string = "info", duration : number = 3000) : void {
@@ -231,21 +231,21 @@ export class MovingColumnController {
         delete this.$scope._alerts[id];
     }
 
-    public showOverlay(key : string) : void {
-        this.$scope.overlay = key;
+    public showModal(key : string) : void {
+        this.$scope.modal = key;
     }
 
-    public hideOverlay(key? : string) : void {
-        if (typeof key === "undefined" || this.$scope.overlay === key) {
-            this.$scope.overlay = undefined;
+    public hideModal(key? : string) : void {
+        if (typeof key === "undefined" || this.$scope.modal === key) {
+            this.$scope.modal = undefined;
         }
     }
 
-    public toggleOverlay(key : string, condition? : boolean) : void {
-        if (condition || (typeof condition === "undefined" && this.$scope.overlay !== key)) {
-            this.$scope.overlay = key;
-        } else if (this.$scope.overlay === key) {
-            this.$scope.overlay = undefined;
+    public toggleModal(key : string, condition? : boolean) : void {
+        if (condition || (typeof condition === "undefined" && this.$scope.modal !== key)) {
+            this.$scope.modal = key;
+        } else if (this.$scope.modal === key) {
+            this.$scope.modal = undefined;
         }
     }
 

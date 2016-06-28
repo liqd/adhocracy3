@@ -149,7 +149,7 @@ The menu should always have the same state as its columns.
 }
 
 .moving-column-body,
-.moving-column-overlay,
+.moving-column-modal,
 .moving-column-mask {
     position: absolute;
     top: $moving-column-menu-height;
@@ -362,7 +362,7 @@ A list of alert messages to notify users in the moving column
     }
 }
 
-.moving-column-overlay {
+.moving-column-modal {
     @include clearfix;
     @include rem(padding, 1rem);
     background: $color-structure-normal;

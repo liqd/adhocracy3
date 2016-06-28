@@ -667,7 +667,7 @@ export var userProfileDirective = (
 
             scope.showMessaging = () => {
                 if (scope.messageOptions.POST) {
-                    scope.modals.showOverlay("messaging");
+                    scope.modals.showModal("messaging");
                 } else if (!adhCredentials.loggedIn) {
                     adhTopLevelState.setCameFromAndGo("/login");
                 } else {
@@ -708,7 +708,7 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
                     title: scope.message.title,
                     text: scope.message.text
                 }).then(() => {
-                    scope.modals.hideOverlay();
+                    scope.modals.hideModal();
                     scope.modals.alert("TR__MESSAGE_STATUS_OK", "success");
                 }, () => {
                     // FIXME
@@ -716,7 +716,7 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
             };
 
             scope.cancel = () => {
-                scope.modals.hideOverlay();
+                scope.modals.hideModal();
             };
         }
     };
