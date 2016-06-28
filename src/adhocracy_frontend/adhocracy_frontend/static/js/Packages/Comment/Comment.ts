@@ -6,6 +6,7 @@ import * as AdhHttp from "../Http/Http";
 import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
+import * as AdhResourceActions from "../ResourceActions/ResourceActions";
 import * as AdhResourceUtil from "../Util/ResourceUtil";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
@@ -42,6 +43,7 @@ export interface ICommentResourceScope extends angular.IScope {
     afterCreateComment() : angular.IPromise<void>;
     item : any;
     report? : () => void;
+    modals : AdhResourceActions.Modals;
     // update resource
     update() : angular.IPromise<void>;
     // update outer listing
@@ -176,18 +178,18 @@ export var commentDetailDirective = (
     adhRecursionHelper,
     $window : Window,
     $q : angular.IQService,
+    $timeout,
     $translate
 ) => {
     var _update = update(adhHttp, $q);
     var _postEdit = postEdit(adhHttp, adhPreliminaryNames);
 
-    var link = (scope : ICommentResourceScope, element, attrs, column? : AdhMovingColumns.MovingColumnController) => {
-        if (column) {
-            scope.report = () => {
-                column.$scope.shared.abuseUrl = scope.data.path;
-                column.toggleOverlay("abuse");
-            };
-        }
+    var link = (scope : ICommentResourceScope, element) => {
+        scope.modals = new AdhResourceActions.Modals($timeout);
+
+        scope.report = () => {
+            scope.modals.toggleOverlay("abuse");
+        };
 
         scope.$on("$destroy", adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
             if (!commentVersionUrl) {

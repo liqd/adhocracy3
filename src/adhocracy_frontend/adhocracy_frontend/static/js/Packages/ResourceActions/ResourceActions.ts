@@ -12,7 +12,7 @@ import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 var pkgLocation = "/ResourceActions";
 
 
-class Modals {
+export class Modals {
     public overlay : string;
     public alerts : {[id : number]: {message : string, mode : string}};
     private lastId : number;
@@ -52,6 +52,11 @@ class Modals {
         } else if (this.overlay === key) {
             this.overlay = undefined;
         }
+    }
+
+    public clear() : void {
+        this.alerts = {};
+        this.overlay = undefined;
     }
 }
 
@@ -101,6 +106,10 @@ export var resourceActionsDirective = (
             adhHttp.get(scope.processUrl, params).then((response) => {
                 scope.badgesExist = response.data[SIPool.nick].count > 0;
             });
+
+            scope.$watch("resourcePath", () => {
+                scope.modals.clear();
+            });
         }
     };
 };
@@ -124,13 +133,13 @@ export var reportActionDirective = () => {
 export var shareActionDirective = () => {
     return {
         restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"report();\">{{ 'TR__SHARE' | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"share();\">{{ 'TR__SHARE' | translate }}</a>",
         scope: {
             class: "@",
             modals: "=",
         },
         link: (scope) => {
-            scope.report = () => {
+            scope.share = () => {
                 scope.modals.toggleOverlay("share");
             };
         }

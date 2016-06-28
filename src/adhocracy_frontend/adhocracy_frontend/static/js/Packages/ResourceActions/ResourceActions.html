@@ -55,7 +55,7 @@
         data-ng-if="modals.overlay === 'abuse'"
         data-modals="modals"
         class="report-abuse"
-        data-url="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}">
+        data-url="{{ resourcePath | adhResourceUrl | adhCanonicalUrl }}">
     </adh-report-abuse>
 
     <adh-badge-assignment
@@ -65,7 +65,7 @@
     </adh-badge-assignment>
 
     <div data-ng-if="modals.overlay === 'share'">
-        <adh-social-share data-uri="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}"></adh-social-share>
+        <adh-social-share data-uri="{{ resourcePath | adhResourceUrl | adhCanonicalUrl }}"></adh-social-share>
         <a href="" class="button" data-ng-click="modals.hideOverlay('share')">{{ "TR__CANCEL" | translate }}</a>
     </div>
 </div>
