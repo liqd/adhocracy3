@@ -5,9 +5,9 @@ name: action-bar
 category: Widgets
 ---
 
-A bar that can be used to trigger actions. Use this widget to provide a
-consistent interface for actions like edit, delete, report, print, and share.
-It is typically located at the top of a larger widget, e.g. proposal detail.
+A bar with items that trigger actions. Use this widget to provide a
+consistent interface for actions like edit, delete, report, print, and share. 
+It is typically located at the top of a larger widget, e.g. a proposal detail.
 
 Elements of the action bar are called action bar items (`action-bar-item`).
 They can have the `m-selected` modifier.
