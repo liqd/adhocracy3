@@ -159,19 +159,12 @@ export var movingColumns = (
 };
 
 
-export interface IMovingColumnScope extends angular.IScope {
-    // an object that can be used to share data between different parts of the column.
-    shared;
-}
-
 export class MovingColumnController {
     constructor(
         protected adhTopLevelState : AdhTopLevelState.Service,
-        public $scope : IMovingColumnScope,
+        public $scope : angular.IScope,
         protected $element : angular.IAugmentedJQuery
-    ) {
-        $scope.shared = {};
-    }
+    ) {}
 
     public focus() : void {
         var index = this.$element.index();
