@@ -71,7 +71,7 @@ export var resourceActionsDirective = (
         scope: {
             resourcePath: "@",
             parentPath: "=?",
-            processUrl: "@?",
+            resourceWithBadgesUrl: "@?",
             deleteRedirectUrl: "@?",
             assignBadges: "=?",
             share: "=?",
@@ -103,7 +103,7 @@ export var resourceActionsDirective = (
                 depth: 4,
                 content_type: SIBadge.nick
             };
-            adhHttp.get(scope.processUrl, params).then((response) => {
+            adhHttp.get(scope.resourceWithBadgesUrl, params).then((response) => {
                 scope.badgesExist = response.data[SIPool.nick].count > 0;
             });
 
