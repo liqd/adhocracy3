@@ -60,9 +60,9 @@ export var proposalDetailColumnDirective = (
             });
             adhPermissions.bindScope(scope, () => badgeAssignmentPoolPath, "badgeAssignmentPoolOptions");
             var params = {
-                    depth: 4,
-                    content_type: SIBadge.nick
-                };
+                depth: 4,
+                content_type: SIBadge.nick
+            };
             adhHttp.get(scope.processUrl, params).then((response) => {
                 scope.badgesExist = response.data[SIPool.nick].count > 0;
             });
