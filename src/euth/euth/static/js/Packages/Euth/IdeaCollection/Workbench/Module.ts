@@ -5,6 +5,7 @@ import * as AdhMovingColumnsModule from "../../../MovingColumns/Module";
 import * as AdhPermissionsModule from "../../../Permissions/Module";
 import * as AdhProcessModule from "../../../Process/Module";
 import * as AdhProposalModule from "../Proposal/Module";
+import * as AdhResourceActionsModule from "../../../ResourceActions/Module";
 import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
 import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 
@@ -28,6 +29,7 @@ export var register = (angular) => {
             AdhPermissionsModule.moduleName,
             AdhProcessModule.moduleName,
             AdhProposalModule.moduleName,
+            AdhResourceActionsModule.moduleName,
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
@@ -40,7 +42,7 @@ export var register = (angular) => {
         .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIEuthPrivateProcess)])
         .directive("adhPcompassWorkbench", ["adhTopLevelState", "adhConfig", "adhHttp", Workbench.workbenchDirective])
         .directive("adhPcompassProposalDetailColumn", [
-            "$timeout", "adhConfig", "adhHttp", "adhPermissions", Workbench.proposalDetailColumnDirective])
+            "$timeout", "adhConfig", "adhPermissions", Workbench.proposalDetailColumnDirective])
         .directive("adhPcompassProposalCreateColumn", ["adhConfig", Workbench.proposalCreateColumnDirective])
         .directive("adhPcompassProposalEditColumn", ["adhConfig", Workbench.proposalEditColumnDirective])
         .directive("adhPcompassProposalImageColumn", [
