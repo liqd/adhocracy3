@@ -66,7 +66,7 @@ export var s1CurrentColumnDirective = (
                 });
             });
 
-            scope.shared.sorts = [{
+            scope.sorts = [{
                 key: "rates",
                 name: "TR__RATES",
                 index: "rates",
@@ -82,11 +82,6 @@ export var s1CurrentColumnDirective = (
                 index: "item_creation_date",
                 reverse: true
             }];
-
-            scope.shared.sort = "rates";
-            scope.shared.setSort = (sort : string) => {
-                scope.shared.sort = sort;
-            };
         }
     };
 };
@@ -116,7 +111,7 @@ export var s1NextColumnDirective = (
                 });
             });
 
-            scope.shared.sorts = [{
+            scope.sorts = [{
                 key: "rates",
                 name: "TR__RATES",
                 index: "rates",
@@ -127,11 +122,6 @@ export var s1NextColumnDirective = (
                 index: "item_creation_date",
                 reverse: true
             }];
-
-            scope.shared.sort = "rates";
-            scope.shared.setSort = (sort : string) => {
-                scope.shared.sort = sort;
-            };
         }
     };
 };
@@ -162,7 +152,7 @@ export var s1ArchiveColumnDirective = (
                 });
             });
 
-            scope.shared.facets = [{
+            scope.facets = [{
                 key: "workflow_state",
                 name: "TR__S1_FACET_STATE_HEADER",
                 items: [
@@ -171,7 +161,7 @@ export var s1ArchiveColumnDirective = (
                 ]
             }];
 
-            scope.shared.sorts = [{
+            scope.sorts = [{
                 key: "rates",
                 name: "TR__RATES",
                 index: "rates",
@@ -182,11 +172,6 @@ export var s1ArchiveColumnDirective = (
                 index: "item_creation_date",
                 reverse: true
             }];
-
-            scope.shared.sort = "rates";
-            scope.shared.setSort = (sort : string) => {
-                scope.shared.sort = sort;
-            };
         }
     };
 };

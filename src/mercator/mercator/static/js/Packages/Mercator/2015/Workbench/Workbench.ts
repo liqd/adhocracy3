@@ -65,7 +65,6 @@ export var proposalCreateColumnDirective = (
 
 
 export var proposalDetailColumnDirective = (
-    $window : Window,
     adhTopLevelState : AdhTopLevelState.Service,
     adhPermissions : AdhPermissions.Service,
     adhConfig : AdhConfig.IService
@@ -80,12 +79,6 @@ export var proposalDetailColumnDirective = (
 
             scope.delete = () => {
                 column.$broadcast("triggerDelete", scope.proposalUrl);
-            };
-
-            scope.print = () => {
-                // only the focused column is printed
-                adhTopLevelState.set("focus", 1);
-                $window.print();
             };
         }
     };
