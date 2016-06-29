@@ -14,7 +14,9 @@
         </div>
     </a>
 
-    <div data-ng-switch-when="body">
+    <adh-recompile-on-change
+        data-ng-switch-when="body"
+        data-value="{{proposalUrl}}">
         <div class="action-bar">
             <a class="action-bar-item" data-ng-if="proposalItemOptions.POST" data-ng-href="{{ proposalUrl | adhParentPath | adhResourceUrl:'edit' }}">{{ "TR__EDIT" | translate }}</a>
             <a
@@ -23,18 +25,22 @@
                 data-ng-click="assignBadges()"
                 href="">{{ "TR__MANAGE_BADGE_ASSIGNMENTS" | translate }}</a>
         </div>
-        <adh-recompile-on-change
-            data-value="{{proposalUrl}}">
-            <adh-pcompass-proposal-detail
-                data-ng-if="proposalUrl"
+        <ul class="moving-column-alerts">
+            <li data-ng-repeat="(id, alert) in modals.alerts" class="moving-column-alert m-{{alert.mode}}" data-ng-click="modals.removeAlert(id)">
+                {{ alert.message | translate }}
+            </li>
+        </ul>
+        <div class="action-bar-modal" data-ng-if="modals.overlay">
+            <adh-badge-assignment
+                data-ng-if="overlay === 'badges'"
+                data-modals="modals"
                 data-path="{{proposalUrl}}">
-            </adh-pcompass-proposal-detail>
-        </adh-recompile-on-change>
+            </adh-badge-assignment>
+        </div>
 
-        <adh-badge-assignment
-            data-ng-if="overlay === 'badges'"
-            data-modals="modals"
+        <adh-pcompass-proposal-detail
+            data-ng-if="proposalUrl"
             data-path="{{proposalUrl}}">
-        </adh-badge-assignment>
-    </div>
+        </adh-pcompass-proposal-detail>
+    </adh-recompile-on-change>
 </div>
