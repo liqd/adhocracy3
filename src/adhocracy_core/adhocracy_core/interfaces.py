@@ -587,6 +587,7 @@ class VisibilityChange(Enum):
 class ChangelogMetadata(namedtuple('ChangelogMetadata',
                                    ['modified',
                                     'created',
+                                    'autoupdated',
                                     'followed_by',
                                     'resource',
                                     'last_version',
@@ -603,6 +604,9 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
         modified.
     created (bool):
         This resource is created and added to a pool.
+    autoupdated (bool):
+        The modification/creation was caused by a modified referenced
+        resource. This means there is no real content change.
     followed_by (None or IResource):
         A new Version (:class:`adhocracy_core.interfaces.IItemVersion`) follows
         this resource

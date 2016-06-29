@@ -125,17 +125,28 @@ def _mark_referenced_resources_as_changed(resource: IResource,
             _add_changelog_backrefs_for_resource(ref.target, registry)
 
 
+def add_changelog_autoupdated(event):
+    """Add autoupdated message to the transaction_changelog."""
+    _add_changelog(event.registry, event.object,
+                   key='autoupdated',
+                   value=event.autoupdated)
+
+
 def includeme(config):
     """Register subscriber to update transaction changelog."""
     config.add_subscriber(add_changelog_created,
                           IResourceCreatedAndAdded)
     config.add_subscriber(add_changelog_modified_and_descendants,
                           IResourceSheetModified)
+    config.add_subscriber(add_changelog_autoupdated,
+                          IResourceSheetModified)
     config.add_subscriber(add_changelog_modified_and_descendants,
                           ACLModified)
     config.add_subscriber(add_changelog_backrefs,
                           ISheetBackReferenceModified)
     config.add_subscriber(add_changelog_followed,
+                          IItemVersionNewVersionAdded)
+    config.add_subscriber(add_changelog_autoupdated,
                           IItemVersionNewVersionAdded)
     config.add_subscriber(add_changelog_visibility,
                           IResourceSheetModified,

@@ -5,6 +5,7 @@ from adhocracy_core.interfaces import VisibilityChange
 
 changelog_meta = ChangelogMetadata(modified=False,
                                    created=False,
+                                   autoupdated=False,
                                    followed_by=None,
                                    resource=None,
                                    last_version=None,

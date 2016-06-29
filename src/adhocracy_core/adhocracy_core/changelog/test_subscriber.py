@@ -172,6 +172,20 @@ def test_add_changelog_visibility(event, changelog, mock_visibility):
     assert changelog['/'].visibility == 'consealed'
 
 
+def test_add_changelog_autoupaded_true(event, changelog):
+    from .subscriber import add_changelog_autoupdated
+    event.autoupdated = True
+    add_changelog_autoupdated(event)
+    assert changelog['/'].autoupdated
+
+
+def test_add_changelog_autoupaded_false(event, changelog):
+    from .subscriber import add_changelog_autoupdated
+    event.autoupdated = False
+    add_changelog_autoupdated(event)
+    assert not changelog['/'].autoupdated
+
+
 @fixture()
 def integration(config):
     config.include('adhocracy_core.events')
@@ -187,3 +201,4 @@ def test_register_subscriber(registry):
     assert subscriber.add_changelog_modified_and_descendants.__name__ in handlers
     assert subscriber.add_changelog_backrefs.__name__ in handlers
     assert subscriber.add_changelog_visibility.__name__ in handlers
+    assert subscriber.add_changelog_autoupdated.__name__ in handlers
