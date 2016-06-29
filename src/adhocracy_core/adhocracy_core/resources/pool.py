@@ -19,6 +19,7 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import resource_meta
 from adhocracy_core.resources.base import Base
 from adhocracy_core.utils import now
+from adhocracy_core.utils import find_graph
 
 
 class IBasicPool(IPool):
@@ -106,10 +107,13 @@ class Pool(Base, Folder):
                                           parent=self,
                                           registry=registry)
             registry.notify(event)
+        graph = find_graph(subresource)
+        references = list(graph.get_references(subresource))
         super().remove(name,
                        registry=registry,
                        send_events=send_events,
                        **kwargs)
+        graph.send_back_reference_removal_notificatons(references, registry)
 
 
 pool_meta = resource_meta._replace(

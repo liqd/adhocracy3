@@ -46,6 +46,7 @@ export var proposalDetailColumnDirective = (
             column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
 
+            scope.column = column;
             var badgeAssignmentPoolPath;
             scope.$watch("proposalUrl", (proposalUrl) => {
                 if (proposalUrl) {

@@ -13,15 +13,27 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName,
             AdhMovingColumnsModule.moduleName
         ])
-        .directive("adhResourceActions", ["$timeout", "adhPermissions", "adhConfig", AdhResourceActions.resourceActionsDirective])
+        .directive("adhResourceActions", [
+            "$timeout", "adhHttp", "adhPermissions", "adhConfig", AdhResourceActions.resourceActionsDirective])
         .directive("adhReportAction", [AdhResourceActions.reportActionDirective])
         .directive("adhShareAction", [AdhResourceActions.shareActionDirective])
         .directive("adhHideAction", [
             "adhHttp", "adhTopLevelState", "adhResourceUrlFilter", "$translate", "$window", AdhResourceActions.hideActionDirective])
+        .directive("adhAssignBadgesAction", [AdhResourceActions.assignBadgesActionDirective])
         .directive("adhResourceWidgetDeleteAction", [AdhResourceActions.resourceWidgetDeleteActionDirective])
         .directive("adhEditAction", ["adhTopLevelState", "adhResourceUrlFilter", "$location", AdhResourceActions.editActionDirective])
         .directive("adhModerateAction", [
             "adhTopLevelState", "adhResourceUrlFilter", "$location", AdhResourceActions.moderateActionDirective])
         .directive("adhPrintAction", ["adhTopLevelState", "$window", AdhResourceActions.printActionDirective])
-        .directive("adhCancelAction", ["adhTopLevelState", "adhResourceUrlFilter", AdhResourceActions.cancelActionDirective]);
+        .directive("adhCancelAction", ["adhTopLevelState", "adhResourceUrlFilter", AdhResourceActions.cancelActionDirective])
+        .animation(".action-bar-modal", () => {
+            return {
+                enter: (element, done) => {
+                    element.hide().slideDown(done);
+                },
+                leave: (element, done) => {
+                    element.slideUp(done);
+                }
+            };
+        });
 };

@@ -264,6 +264,17 @@ class Graph(Persistent):
 
         return False
 
+    def send_back_reference_removal_notificatons(self,
+                                                 references: [Reference],
+                                                 registry: Registry):
+        """Send SheetBackReferenceRemoved to reference targets."""
+        for reference in references:
+            event = SheetBackReferenceRemoved(reference.target,
+                                              reference.isheet,
+                                              reference,
+                                              registry)
+            registry.notify(event)
+
 
 def includeme(config):  # pragma: no cover
     """Register Graph content type."""

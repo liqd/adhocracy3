@@ -1,3 +1,66 @@
+/*doc
+---
+title: Action Bar
+name: action-bar
+category: Widgets
+---
+
+A bar with items that trigger actions. Use this widget to provide a
+consistent interface for actions like edit, delete, report, print, and share. 
+It is typically located at the top of a larger widget, e.g. a proposal detail.
+
+Elements of the action bar are called action bar items (`action-bar-item`).
+They can have the `m-selected` modifier.
+
+An action can trigger showing a modal below the action bar
+(`action-bar-modal`).  Only one modal is visible at a time.
+
+```html_example
+<div class="action-bar">
+    <a class="action-bar-item">edit</a>
+    <a class="action-bar-item m-selected">delete</a>
+    <a class="action-bar-item">report</a>
+</div>
+<div class="action-bar-modal">
+    <form>
+        <input type="text" />
+        <input type="submit" class="button-cta" />
+    </form>
+</div>
+```
+
+```html_example
+<div class="action-bar">
+    <a class="action-bar-item">edit</a>
+    <a class="action-bar-item">delete</a>
+    <a class="action-bar-item">report</a>
+</div>
+<div class="action-bar">
+    <a class="action-bar-item">edit</a>
+    <a class="action-bar-item">delete</a>
+    <a class="action-bar-item">report</a>
+</div>
+<div class="action-bar">
+</div>
+<div class="action-bar">
+    <a class="action-bar-item">edit</a>
+    <a class="action-bar-item">delete</a>
+    <a class="action-bar-item">report</a>
+    <a class="action-bar-item">edit</a>
+    <a class="action-bar-item">delete</a>
+    <a class="action-bar-item">report</a>
+    <a class="action-bar-item">edit</a>
+    <a class="action-bar-item">delete</a>
+    <a class="action-bar-item">report</a>
+    <a class="action-bar-item">edit</a>
+    <a class="action-bar-item">delete</a>
+    <a class="action-bar-item">report</a>
+    <a class="action-bar-item">edit</a>
+    <a class="action-bar-item">delete</a>
+    <a class="action-bar-item">report</a>
+</div>
+```
+*/
 .action-bar,
 .action-bar-link {
     line-height: 2;
@@ -54,4 +117,5 @@
 
 .action-bar-modal {
     border-bottom: 2px solid $color-structure-normal;
+    padding: 1em;
 }
