@@ -130,5 +130,5 @@ class TestPoolClass:
         mock_graph = mocker.patch(
             'adhocracy_core.resources.pool.find_graph').return_value
         inst['child'] = context
-        inst.delete('child', registry)
+        inst.remove('child', registry)
         assert mock_graph.send_back_reference_removal_notificatons.called
