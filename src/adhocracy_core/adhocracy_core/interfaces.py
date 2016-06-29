@@ -594,6 +594,21 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
                                     'changed_descendants',
                                     'changed_backrefs',
                                     'visibility'])):
+    def __new__(cls,
+                modified: bool=False,
+                created: bool=False,
+                autoupdated: bool=False,
+                followed_by: IResource=None,
+                resource: IResource=None,
+                last_version: IResource=None,
+                changed_descendants: bool=False,
+                changed_backrefs: bool=False,
+                visibility: str=VisibilityChange.visible,
+                ):
+        return super().__new__(cls, modified, created, autoupdated,
+                               followed_by, resource, last_version,
+                               changed_descendants, changed_backrefs,
+                               visibility)
     """Metadata to track modified resources during one transaction.
 
     Fields:
@@ -622,6 +637,9 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
     visibility (VisibilityChange):
         Tracks the visibility of the resource and whether it has changed
     """
+
+
+changelog_meta = ChangelogMetadata()
 
 
 class AuditlogEntry(namedtuple('AuditlogEntry', ['name',
