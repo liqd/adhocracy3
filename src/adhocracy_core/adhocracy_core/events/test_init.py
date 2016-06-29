@@ -55,9 +55,10 @@ class ResourceSheetModifiedUnitTest(unittest.TestCase):
         request = testing.DummyResource()
         old_appstruct = {}
         new_appstruct = {}
+        autoupdated = True
 
         inst = self.make_one(context, parent, registry, old_appstruct,
-                              new_appstruct, request)
+                              new_appstruct, request, autoupdated)
 
         assert IResourceSheetModified.providedBy(inst)
         assert verifyObject(IResourceSheetModified, inst)
@@ -66,6 +67,7 @@ class ResourceSheetModifiedUnitTest(unittest.TestCase):
         assert inst.old_appstruct is old_appstruct
         assert inst.new_appstruct is new_appstruct
         assert inst.request is request
+        assert inst.autoupdated
 
 
 class ItemNewVersionAddedUnitTest(unittest.TestCase):
@@ -80,8 +82,10 @@ class ItemNewVersionAddedUnitTest(unittest.TestCase):
         new_version = testing.DummyResource()
         registry = testing.DummyResource()
         creator = testing.DummyResource()
+        autoupdated = True
 
-        inst = self.make_one(context, new_version, registry, creator)
+        inst = self.make_one(context, new_version, registry, creator,
+                             autoupdated)
 
         assert IItemVersionNewVersionAdded.providedBy(inst)
         assert verifyObject(IItemVersionNewVersionAdded, inst)

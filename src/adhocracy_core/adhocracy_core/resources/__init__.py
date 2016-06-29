@@ -142,6 +142,7 @@ class ResourceFactory:
                  registry=None,
                  request=None,
                  send_event=True,
+                 autoupdated=False,
                  **kwargs
                  ):
         """Triggered when a ResourceFactory instance is called.
@@ -168,9 +169,12 @@ class ResourceFactory:
             send_event (bool): send
                 :class:`adhocracy_core.interfaces.IResourceCreatedAndAdded`
                 event. Default is True.
+            autoupdated (bool): The creation is caused by a modified
+                referenced resource, no real content is modified.
+                Default is False.
             **kwargs: Arbitary keyword arguments. Will be passed along with
-                       'creator' to the `after_creation` hook as 3rd argument
-                      `options`.
+-               `creator` and  `autoupdated` to the `after_creation` hook as
+                3rd argument `options`.
 
         Returns:
             object (IResource): the newly created resource
@@ -228,6 +232,7 @@ class ResourceFactory:
         if run_after_creation:
             for call in self.meta.after_creation:
                 kwargs['creator'] = creator
+                kwargs['autoupdated'] = autoupdated
                 call(resource, registry, options=kwargs)
 
         if send_event:

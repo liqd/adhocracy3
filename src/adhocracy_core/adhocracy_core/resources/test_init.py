@@ -130,7 +130,9 @@ class TestResourceFactory:
 
         inst = self.make_one(meta)(creator=None, kwarg1=True)
 
-        assert inst._options == {'kwarg1': True, 'creator': None}
+        assert inst._options == {'kwarg1': True,
+                                 'creator': None,
+                                 'autoupdated': False}
         assert inst._registry is registry
 
     def test_call_without_run_after_create(self, resource_meta):

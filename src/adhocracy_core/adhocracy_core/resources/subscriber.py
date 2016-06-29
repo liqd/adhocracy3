@@ -225,6 +225,7 @@ def _create_new_version(event, appstruct) -> IResource:
                                           registry=event.registry,
                                           root_versions=event.root_versions,
                                           is_batchmode=event.is_batchmode,
+                                          autoupdated=True,
                                           )
     return new_version
 
@@ -248,7 +249,7 @@ def autoupdate_non_versionable_has_new_version(event):
     if not sheet.meta.editable:
         return
     appstruct = _get_updated_appstruct(event, sheet)
-    sheet.set(appstruct)
+    sheet.set(appstruct, autoupdated=True)
 
 
 def send_password_reset_mail(event):
