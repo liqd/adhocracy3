@@ -3,13 +3,6 @@
         <div class="moving-column-tab">
             <i class="icon-document moving-column-icon"></i>
         </div>
-        <a class="moving-column-menu-button" data-ng-if="proposalItemOptions.POST" data-ng-href="{{ proposalUrl | adhParentPath | adhResourceUrl:'edit' }}">{{ "TR__EDIT" | translate }}</a>
-        <a
-            class="moving-column-menu-button"
-            data-ng-if="badgeAssignmentPoolOptions.POST"
-            data-ng-click="ctrl.toggleOverlay('badges')"
-            href="">{{ "TR__MANAGE_BADGE_ASSIGNMENTS" | translate }}</a>
-
         <div class="moving-column-menu-nav">
             <a class="moving-column-menu-nav-button" data-ng-href="{{ processUrl | adhResourceUrl }}" title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
         </div>
@@ -21,19 +14,27 @@
         </div>
     </a>
 
-    <adh-recompile-on-change
-        data-ng-switch-when="body"
-        data-value="{{proposalUrl}}">
-        <adh-pcompass-proposal-detail
-            data-ng-if="proposalUrl"
-            data-path="{{proposalUrl}}">
-        </adh-pcompass-proposal-detail>
-    </adh-recompile-on-change>
+    <div data-ng-switch-when="body">
+        <div class="action-bar">
+            <a class="action-bar-item" data-ng-if="proposalItemOptions.POST" data-ng-href="{{ proposalUrl | adhParentPath | adhResourceUrl:'edit' }}">{{ "TR__EDIT" | translate }}</a>
+            <a
+                class="action-bar-item"
+                data-ng-if="badgeAssignmentPoolOptions.POST && badgesExist"
+                data-ng-click="assignBadges()"
+                href="">{{ "TR__MANAGE_BADGE_ASSIGNMENTS" | translate }}</a>
+        </div>
+        <adh-recompile-on-change
+            data-value="{{proposalUrl}}">
+            <adh-pcompass-proposal-detail
+                data-ng-if="proposalUrl"
+                data-path="{{proposalUrl}}">
+            </adh-pcompass-proposal-detail>
+        </adh-recompile-on-change>
 
-    <adh-badge-assignment
-        data-ng-switch-when="overlays"
-        data-ng-if="overlay === 'badges'"
-        data-modals="column"
-        data-path="{{proposalUrl}}">
-    </adh-badge-assignment>
+        <adh-badge-assignment
+            data-ng-if="overlay === 'badges'"
+            data-modals="modals"
+            data-path="{{proposalUrl}}">
+        </adh-badge-assignment>
+    </div>
 </div>
