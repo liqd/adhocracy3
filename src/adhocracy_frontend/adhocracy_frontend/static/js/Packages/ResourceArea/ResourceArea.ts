@@ -184,7 +184,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         private $injector : angular.auto.IInjectorService,
         private $location : angular.ILocationService,
         private $templateRequest : angular.ITemplateRequestService,
-        private adhHttp : AdhHttp.Service<any>,
+        private adhHttp : AdhHttp.Service,
         private adhConfig : AdhConfig.IService,
         private adhCredentials : AdhCredentials.Service,
         private adhEmbed : AdhEmbed.Service,

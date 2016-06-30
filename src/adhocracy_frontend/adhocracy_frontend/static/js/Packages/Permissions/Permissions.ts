@@ -5,7 +5,7 @@ import * as AdhHttp from "../Http/Http";
 
 
 export class Service {
-    constructor(private adhHttp : AdhHttp.Service<any>, private adhCredentials : AdhCredentials.Service) {}
+    constructor(private adhHttp : AdhHttp.Service, private adhCredentials : AdhCredentials.Service) {}
 
     /**
      * Set result of OPTIONS request to scope.key and keep it fresh.

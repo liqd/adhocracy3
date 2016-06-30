@@ -62,7 +62,7 @@ export class Modals {
 
 export var resourceActionsDirective = (
     $timeout : angular.ITimeoutService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhConfig: AdhConfig.IService
 ) => {
@@ -167,7 +167,7 @@ export var assignBadgesActionDirective = () => {
 };
 
 export var hideActionDirective = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhResourceUrlFilter,
     $translate,

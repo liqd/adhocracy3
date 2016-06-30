@@ -118,7 +118,7 @@ export var registerRoutes = (
             movingColumns: "is-show-hide-hide"
         })
         .specific(processType, "create_document", processType.content_type, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (resource) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -142,7 +142,7 @@ export var registerRoutes = (
             movingColumns: "is-show-show-hide"
         })
         .specificVersionable(RIDocument, RIDocumentVersion, "edit", processType.content_type, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIDocument, version : RIDocumentVersion) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (item : RIDocument, version : RIDocumentVersion) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -171,7 +171,7 @@ export var registerRoutes = (
             movingColumns: "is-collapse-show-show"
         })
         .specificVersionable(RIComment, RICommentVersion, "", processType.content_type, context, ["adhHttp", "$q", (
-            adhHttp : AdhHttp.Service<any>,
+            adhHttp : AdhHttp.Service,
             $q : angular.IQService
         ) => {
             var getCommentableUrl = (resource) : angular.IPromise<any> => {

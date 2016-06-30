@@ -1,4 +1,4 @@
-/// <reference path="../../../lib2/types/angular.d.ts"/>
+    /// <reference path="../../../lib2/types/angular.d.ts"/>
 
 import * as AdhConfig from "../Config/Config";
 import * as AdhHttp from "../Http/Http";
@@ -63,7 +63,7 @@ export class Service {
 
 export var workflowSwitchDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     $window : angular.IWindowService
 ) => {

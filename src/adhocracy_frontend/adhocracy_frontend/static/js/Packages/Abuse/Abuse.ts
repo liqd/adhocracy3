@@ -4,7 +4,7 @@ import * as AdhHttp from "../Http/Http";
 var pkgLocation = "/Abuse";
 
 
-export var reportAbuseDirective = (adhHttp : AdhHttp.Service<any>, adhConfig : AdhConfig.IService) => {
+export var reportAbuseDirective = (adhHttp : AdhHttp.Service, adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Abuse.html",

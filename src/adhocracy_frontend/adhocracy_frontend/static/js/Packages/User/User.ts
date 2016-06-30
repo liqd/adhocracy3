@@ -25,7 +25,7 @@ export class Service {
     public ready : angular.IPromise<RIUser>;
 
     constructor(
-        private adhHttp : AdhHttp.Service<any>,
+        private adhHttp : AdhHttp.Service,
         private adhCredentials : AdhCredentials.Service,
         private $q : angular.IQService,
         private $rootScope : angular.IScope
