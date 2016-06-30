@@ -2,6 +2,7 @@
 import transaction
 import substanced.util
 
+from pyramid.registry import Registry
 from pyramid.traversal import resource_path
 from pyramid.request import Request
 from pyramid.response import Response
@@ -9,7 +10,9 @@ from BTrees.OOBTree import OOBTree
 from datetime import datetime
 from logging import getLogger
 from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.interfaces import AuditlogAction
@@ -40,12 +43,15 @@ class AuditLog(OOBTree):
             name: AuditlogAction,
             resource_path: str,
             user_name: str,
-            user_path: str) -> None:
+            user_path: str,
+            sheet_data: [dict],
+            ) -> None:
         """Add an auditlog entry to the audit log."""
         self[datetime.utcnow()] = AuditlogEntry(name,
                                                 resource_path,
                                                 user_name,
-                                                user_path)
+                                                user_path,
+                                                sheet_data)
 
 
 def get_auditlog(context: IResource) -> AuditLog:
@@ -70,7 +76,8 @@ def set_auditlog(context: IResource) -> None:
 def log_auditevent(context: IResource,
                    name: AuditlogAction,
                    user_name: str,
-                   user_path: str) -> None:
+                   user_path: str,
+                   sheet_data: [dict]) -> None:
     """Add an auditlog entry for `context` to the audit database.
 
     The audit database is created if missing. If the `zodbconn.uri.audit`
@@ -79,7 +86,7 @@ def log_auditevent(context: IResource,
     auditlog = get_auditlog(context)
     path = resource_path(context)
     if auditlog is not None:
-        auditlog.add(name, path, user_name, user_path)
+        auditlog.add(name, path, user_name, user_path, sheet_data)
 
 
 def audit_resources_changes_callback(request: Request,
@@ -93,7 +100,7 @@ def audit_resources_changes_callback(request: Request,
     changelog_metadata = registry.changelog.values()
     user_name, user_path = _get_user_info(request)
     for meta in changelog_metadata:
-        _log_change(user_name, user_path, meta)
+        _log_change(user_name, user_path, meta, request.registry, request)
 
 
 def _get_user_info(request: Request) -> (str, str):
@@ -110,16 +117,21 @@ def _get_user_info(request: Request) -> (str, str):
 
 def _log_change(user_name: str,
                 user_path: str,
-                change: ChangelogMetadata) -> None:
+                change: ChangelogMetadata,
+                registry: Registry,
+                request: Request) -> None:
     data_changed = change.created or change.modified
     visibility_changed = change.visibility in [VisibilityChange.concealed,
                                                VisibilityChange.revealed]
     if data_changed or visibility_changed:
         action_name = _get_entry_name(change),
+        sheets = _get_content_sheets(change, registry)
+        sheet_data = _get_sheet_data(sheets, request)
         log_auditevent(change.resource,
                        action_name,
                        user_name=user_name,
-                       user_path=user_path)
+                       user_path=user_path,
+                       sheet_data=sheet_data)
         transaction.commit()
 
 
@@ -134,3 +146,22 @@ def _get_entry_name(change) -> str:
         return AuditlogAction.revealed
     else:
         raise ValueError('Invalid change state', change)
+
+
+def _get_content_sheets(change: ChangelogMetadata, registry: Registry):
+    if change.created:
+        sheets = registry.content.get_sheets_create(change.resource)
+    else:
+        sheets = registry.content.get_sheets_edit(change.resource)
+    return sheets
+
+
+def _get_sheet_data(sheets: [ISheet], request: Request):
+    sheet_data = []
+    _disabled = [IMetadata]
+    for sheet in sheets:
+        if sheet.meta.isheet not in _disabled:
+            sheet.request = request
+            sheet_data.append({sheet.meta.isheet:
+                               sheet.serialize(add_back_references=False)})
+    return sheet_data
