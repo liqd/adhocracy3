@@ -99,8 +99,17 @@ def audit_resources_changes_callback(request: Request,
     registry = request.registry
     changelog_metadata = registry.changelog.values()
     user_name, user_path = _get_user_info(request)
-    for meta in changelog_metadata:
-        _log_change(user_name, user_path, meta, request.registry, request)
+    for change in changelog_metadata:
+        if _is_audit_change(change):
+            action_name = _get_entry_name(change),
+            sheets = _get_content_sheets(change, registry)
+            sheet_data = _get_sheet_data(sheets, request)
+            log_auditevent(change.resource,
+                           action_name,
+                           user_name=user_name,
+                           user_path=user_path,
+                           sheet_data=sheet_data)
+            transaction.commit()
 
 
 def _get_user_info(request: Request) -> (str, str):
@@ -115,24 +124,11 @@ def _get_user_info(request: Request) -> (str, str):
         return (user_name, user_path)
 
 
-def _log_change(user_name: str,
-                user_path: str,
-                change: ChangelogMetadata,
-                registry: Registry,
-                request: Request) -> None:
+def _is_audit_change(change: ChangelogMetadata):
     data_changed = change.created or change.modified
     visibility_changed = change.visibility in [VisibilityChange.concealed,
                                                VisibilityChange.revealed]
-    if data_changed or visibility_changed:
-        action_name = _get_entry_name(change),
-        sheets = _get_content_sheets(change, registry)
-        sheet_data = _get_sheet_data(sheets, request)
-        log_auditevent(change.resource,
-                       action_name,
-                       user_name=user_name,
-                       user_path=user_path,
-                       sheet_data=sheet_data)
-        transaction.commit()
+    return data_changed or visibility_changed
 
 
 def _get_entry_name(change) -> str:
