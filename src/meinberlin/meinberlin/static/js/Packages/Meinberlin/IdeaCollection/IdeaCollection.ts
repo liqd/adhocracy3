@@ -2,6 +2,7 @@
 
 import * as AdhConfig from "../../Config/Config";
 import * as AdhHttp from "../../Http/Http";
+import * as AdhMovingColumns from "../../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../../Permissions/Permissions";
 import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
@@ -26,7 +27,7 @@ export var pkgLocation = "/Meinberlin/IdeaCollection";
 export var workbenchDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service
 ) => {
     return {
         restrict: "E",
@@ -207,7 +208,7 @@ export var registerRoutesFactory = (
             movingColumns: "is-show-hide-hide"
         })
         .specific(ideaCollectionType, "edit", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (resource) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.PUT) {
                         throw 401;
@@ -221,7 +222,7 @@ export var registerRoutesFactory = (
             movingColumns: "is-show-show-hide"
         })
         .specific(ideaCollectionType, "create_proposal", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (resource) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -235,7 +236,7 @@ export var registerRoutesFactory = (
             movingColumns: "is-show-show-hide"
         })
         .specificVersionable(proposalType, proposalVersionType, "edit", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item, version) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (item, version) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -273,7 +274,7 @@ export var registerRoutesFactory = (
             movingColumns: "is-collapse-show-show"
         })
         .specificVersionable(RIComment, RICommentVersion, "", processType, context, ["adhHttp", "$q", (
-            adhHttp : AdhHttp.Service<any>,
+            adhHttp : AdhHttp.Service,
             $q : angular.IQService
         ) => {
             var getCommentableUrl = (resource) : angular.IPromise<any> => {

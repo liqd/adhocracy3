@@ -1,4 +1,4 @@
-/// <reference path="../../../../../lib2/types/lodash.d.ts"/>
+    /// <reference path="../../../../../lib2/types/lodash.d.ts"/>
 /// <reference path="../../../../../lib2/types/moment.d.ts"/>
 
 import * as _ from "lodash";
@@ -26,7 +26,7 @@ var pkgLocation = "/Meinberlin/IdeaCollection/Process";
 
 export var detailDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     $q : angular.IQService
 ) => {
@@ -91,7 +91,7 @@ export var detailDirective = (
 
 export var editDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhShowError,
     adhSubmitIfValid,
     moment
