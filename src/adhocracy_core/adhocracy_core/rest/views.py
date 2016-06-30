@@ -255,7 +255,7 @@ class SimpleRESTView(ResourceRESTView):
         """Delete resource."""
         parent = self.context.__parent__
         name = self.context.__name__
-        parent.delete(name, self.registry)
+        parent.remove(name, registry=self.registry)
         if is_batchmode(self.request):
             appstruct = {}
         else:

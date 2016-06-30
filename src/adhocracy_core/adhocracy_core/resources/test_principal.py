@@ -544,9 +544,9 @@ class TestDeleteNotActiveUsers:
         return user
 
     @fixture
-    def users(self, context, user):
-        context['user'] = user
-        return context
+    def users(self, service, user):
+        service['user'] = user
+        return service
 
     def call_fut(self, *args):
         from .principal import delete_not_activated_users
@@ -583,12 +583,11 @@ class TestDeletePasswordResets:
         return reset
 
     @fixture
-    def resets(self, reset, monkeypatch):
+    def resets(self, reset, service, monkeypatch):
         from . import principal
-        mock = testing.DummyResource()
-        mock['reset'] = reset
-        monkeypatch.setattr(principal, 'find_service', lambda x, y, z: mock)
-        return mock
+        service['reset'] = reset
+        monkeypatch.setattr(principal, 'find_service', lambda x, y, z: service)
+        return service
 
     def call_fut(self, *args):
         from .principal import delete_password_resets

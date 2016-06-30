@@ -390,12 +390,14 @@ class IPool(IResource):  # pragma: no cover
         """
     # TODO remove find_service, substanced.util.find_service does the same
 
-    def delete(name: str, registry: Registry):
+    def remove(name: str,
+               send_events: bool=True,
+               registry: Registry=None,
+               **kwargs):
         """Remove subobject `name` from database.
 
         :raises KeyError: if `name`is not a valid subresource name
         """
-        # TODO add delete/undelete feature
 
 
 class IServicePool(IPool, IService):

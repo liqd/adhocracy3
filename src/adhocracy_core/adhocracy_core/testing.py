@@ -74,7 +74,7 @@ class DummyPool(testing.DummyResource):
         from substanced.util import find_service
         return find_service(self, service_name, *sub_service_names)
 
-    def delete(self, name, registry):
+    def remove(self, name, registry=None, send_events=False, **kwargs):
         subresource = self[name]
         del self[name]
         subresource.__name__ = None
