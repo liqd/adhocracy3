@@ -22,7 +22,7 @@ var pkgLocation = "/Pcompass/Workbench";
 export var workbenchDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service
 ) => {
     return {
         restrict: "E",
@@ -38,7 +38,7 @@ export var workbenchDirective = (
 export var proposalDetailColumnDirective = (
     $timeout,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
@@ -131,7 +131,7 @@ export var registerRoutes = (
             movingColumns: "is-show-show-hide"
         })
         .specific(RIPcompassProcess, "create_proposal", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIPcompassProcess) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (resource : RIPcompassProcess) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -145,7 +145,7 @@ export var registerRoutes = (
             movingColumns: "is-show-show-hide"
         })
         .specificVersionable(RIProposal, RIProposalVersion, "edit", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIProposal, version : RIProposalVersion) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (item : RIProposal, version : RIProposalVersion) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -183,7 +183,7 @@ export var registerRoutes = (
             movingColumns: "is-collapse-show-show"
         })
         .specificVersionable(RIComment, RICommentVersion, "", processType, context, ["adhHttp", "$q", (
-            adhHttp : AdhHttp.Service<any>,
+            adhHttp : AdhHttp.Service,
             $q : angular.IQService
         ) => {
             var getCommentableUrl = (resource) : angular.IPromise<any> => {

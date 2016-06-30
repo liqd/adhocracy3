@@ -38,7 +38,7 @@ export var s1WorkbenchDirective = (
 
 export var s1CurrentColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -93,7 +93,7 @@ export var s1CurrentColumnDirective = (
 
 export var s1NextColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -143,7 +143,7 @@ export var s1NextColumnDirective = (
 
 export var s1ArchiveColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -383,7 +383,7 @@ export var registerRoutes = (
             movingColumns: "is-collapse-show-show"
         })
         .specificVersionable(RIComment, RICommentVersion, "", processType, context, ["adhHttp", "$q", (
-            adhHttp : AdhHttp.Service<any>,
+            adhHttp : AdhHttp.Service,
             $q : angular.IQService
         ) => {
             var getCommentableUrl = (resource) : angular.IPromise<any> => {
