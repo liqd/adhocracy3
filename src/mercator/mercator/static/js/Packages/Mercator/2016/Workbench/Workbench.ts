@@ -139,7 +139,7 @@ export var proposalModerateColumnDirective = (
 
 export var proposalListingColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -251,7 +251,7 @@ export var registerRoutes = (
             movingColumns: "is-collapse-show-show"
         })
         .specific(RICommentVersion, "", processType, context, ["adhHttp", "$q", (
-            adhHttp : AdhHttp.Service<any>,
+            adhHttp : AdhHttp.Service,
             $q : angular.IQService
         ) => (resource : RICommentVersion) => {
             var specifics = {};
@@ -294,7 +294,7 @@ export var registerRoutes = (
             movingColumns: "is-show-hide-hide"
         })
         .specific(RIProcess, "create_proposal", processType, context, ["adhHttp",
-            (adhHttp : AdhHttp.Service<any>) => {
+            (adhHttp : AdhHttp.Service) => {
                 return (resource : RIProcess) => {
                     return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                         if (!options.POST) {
@@ -319,7 +319,7 @@ export var registerRoutes = (
             space: "content",
             movingColumns: "is-collapse-show-hide"
         })
-        .specific(RIProposal, "moderate", processType, context, ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+        .specific(RIProposal, "moderate", processType, context, ["adhHttp", (adhHttp : AdhHttp.Service) => {
             return (resource : RIProposal) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.canPut(SIWinnerInfo.nick)) {
@@ -336,7 +336,7 @@ export var registerRoutes = (
             space: "content",
             movingColumns: "is-collapse-show-hide"
         })
-        .specific(RIProposal, "edit", processType, context, ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+        .specific(RIProposal, "edit", processType, context, ["adhHttp", (adhHttp : AdhHttp.Service) => {
             return (resource : RIProposal) => {
                 var poolPath = AdhUtil.parentPath(resource.path);
 
