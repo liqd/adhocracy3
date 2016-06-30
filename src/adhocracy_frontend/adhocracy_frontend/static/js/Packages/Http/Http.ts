@@ -97,7 +97,7 @@ export var nonResourcePaths : string[] = [
 // FIXME: This service should be able to handle any type, not just instances of
 // ``Resources.IResource``.  Methods like ``postNewVersion`` may need additional
 // constraints (e.g. by moving them to subclasses).
-export class Service<R extends ResourcesBase.IResource> {
+export class Service {
 
     constructor(
         private $http : angular.IHttpService,
