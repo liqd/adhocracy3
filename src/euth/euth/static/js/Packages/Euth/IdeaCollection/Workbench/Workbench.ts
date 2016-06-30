@@ -8,10 +8,7 @@ import * as AdhUtil from "../../../Util/Util";
 
 import * as ResourcesBase from "../../ResourcesBase";
 
-import * as SIBadge from "../../../../Resources_/adhocracy_core/sheets/badge/IBadge";
-import * as SIBadgeable from "../../../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
 import * as SIComment from "../../../../Resources_/adhocracy_core/sheets/comment/IComment";
-import * as SIPool from "../../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import RIComment from "../../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RIProposal from "../../../../Resources_/adhocracy_core/resources/proposal/IProposal";
@@ -38,7 +35,6 @@ export var workbenchDirective = (
 export var proposalDetailColumnDirective = (
     $timeout,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
@@ -50,22 +46,6 @@ export var proposalDetailColumnDirective = (
             scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
 
-            var badgeAssignmentPoolPath;
-            scope.$watch("proposalUrl", (proposalUrl) => {
-                if (proposalUrl) {
-                    adhHttp.get(proposalUrl).then((proposal) => {
-                        badgeAssignmentPoolPath = proposal.data[SIBadgeable.nick].post_pool;
-                    });
-                }
-            });
-            adhPermissions.bindScope(scope, () => badgeAssignmentPoolPath, "badgeAssignmentPoolOptions");
-            var params = {
-                depth: 4,
-                content_type: SIBadge.nick
-            };
-            adhHttp.get(scope.processUrl, params).then((response) => {
-                scope.badgesExist = response.data[SIPool.nick].count > 0;
-            });
             scope.modals = new AdhResourceActions.Modals($timeout);
             scope.assignBadges = () => {
                 scope.modals.toggleModal("badges");
