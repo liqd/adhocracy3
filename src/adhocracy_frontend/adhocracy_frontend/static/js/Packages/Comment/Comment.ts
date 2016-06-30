@@ -3,7 +3,6 @@ import * as _ from "lodash";
 import * as AdhConfig from "../Config/Config";
 import * as AdhCredentials from "../User/Credentials";
 import * as AdhHttp from "../Http/Http";
-import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as AdhResourceActions from "../ResourceActions/ResourceActions";
@@ -188,7 +187,7 @@ export var commentDetailDirective = (
         scope.modals = new AdhResourceActions.Modals($timeout);
 
         scope.report = () => {
-            scope.modals.toggleOverlay("abuse");
+            scope.modals.toggleModal("abuse");
         };
 
         scope.$on("$destroy", adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
@@ -339,6 +338,11 @@ export var adhCommentListing = (
                 name: "TR__RATES",
                 index: "rates",
                 reverse: true
+            }, {
+                key: "controversiality",
+                name: "TR__CONTROVERSIALITY",
+                index: "controversiality",
+                reverse: true
             }];
             scope.params = {};
 
@@ -430,14 +434,15 @@ export var adhCreateOrShowCommentListing = (
 };
 
 export var commentColumnDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Column.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["commentCloseUrl", "commentableUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("commentCloseUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("commentableUrl", scope));
         }
     };
 };

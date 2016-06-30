@@ -31,14 +31,14 @@
                 data-resource-path="{{proposalUrl}}">
             </adh-assign-badges-action>
         </div>
-        <ul class="moving-column-alerts">
-            <li data-ng-repeat="(id, alert) in modals.alerts" class="moving-column-alert m-{{alert.mode}}" data-ng-click="modals.removeAlert(id)">
+        <ul class="alerts">
+            <li data-ng-repeat="(id, alert) in modals.alerts" class="alerts-message m-{{alert.mode}}" data-ng-click="modals.removeAlert(id)">
                 {{ alert.message | translate }}
             </li>
         </ul>
-        <div class="action-bar-modal" data-ng-if="modals.overlay">
+        <div class="modal" data-ng-if="modals.modal">
             <adh-badge-assignment
-                data-ng-if="modals.overlay === 'badges'"
+                data-ng-if="modals.modal === 'badges'"
                 data-modals="modals"
                 data-path="{{proposalUrl}}">
             </adh-badge-assignment>
