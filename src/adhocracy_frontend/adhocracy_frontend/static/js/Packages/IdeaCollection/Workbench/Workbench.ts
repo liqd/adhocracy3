@@ -92,6 +92,26 @@ export var proposalEditColumnDirective = (
     };
 };
 
+export var proposalImageColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhResourceUrl,
+    adhParentPath
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalImageColumn.html",
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
+            scope.goBack = () => {
+                var url = adhResourceUrl(adhParentPath(scope.proposalUrl));
+                adhTopLevelState.goToCameFrom(url);
+            };
+        }
+    };
+};
+
 export var detailColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhTopLevelState : AdhTopLevelState.Service
