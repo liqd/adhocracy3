@@ -17,7 +17,10 @@ import * as AdhIdeaCollectionProposalModule from "../Proposal/Module";
 
 import * as Workbench from "./Workbench";
 
+import RIGeoProposal from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
+import RIGeoProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
 import RIIdeaCollectionProcess from "../../../Resources_/adhocracy_meinberlin/resources/idea_collection/IProcess";
+
 
 export var moduleName = "adhIdeaCollectionWorkbench";
 
@@ -56,7 +59,7 @@ export var register = (angular) => {
         .directive("adhIdeaCollectionAddProposalButton", [
             "adhConfig", "adhPermissions", "adhTopLevelState", Workbench.addProposalButtonDirective])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider: AdhResourceArea.Provider, adhConfig) => {
-            var registerRoutes = Workbench.registerRoutesFactory(processType);
+            var registerRoutes = Workbench.registerRoutesFactory(RIIdeaCollectionProcess, RIGeoProposal, RIGeoProposalVersion);
             registerRoutes()(adhResourceAreaProvider);
 
             var processHeaderSlot = adhConfig.pkg_path + Workbench.pkgLocation + "/ProcessHeaderSlot.html";

@@ -15,9 +15,15 @@ import * as AdhIdeaCollectionWorkbench from "../../IdeaCollection/Workbench/Work
 
 import RIAlexanderplatzProcess from "../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess";
 import RIBuergerhaushaltProcess from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
+import RIBuergerhaushaltProposal from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal";
+import RIBuergerhaushaltProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
 import RICollaborativeTextProcess from "../../../Resources_/adhocracy_meinberlin/resources/collaborative_text/IProcess";
+import RIGeoProposal from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
+import RIGeoProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
 import RIIdeaCollectionProcess from "../../../Resources_/adhocracy_meinberlin/resources/idea_collection/IProcess";
 import RIKiezkasseProcess from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
+import RIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
+import RIKiezkasseProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
 
 import * as AdhMeinberlinDe from "./MeinberlinDe";
 
@@ -44,14 +50,14 @@ export var register = (angular) => {
             AdhMeinberlinAlexanderplatzWorkbench.registerRoutes(
                 RIAlexanderplatzProcess.content_type, "mein.berlin.de")(adhResourceAreaProvider);
 
-            var processType1 = RIBuergerhaushaltProcess.content_type;
-            var registerRoutes1 = AdhIdeaCollectionWorkbench.registerRoutesFactory(processType1);
+            var registerRoutes1 = AdhIdeaCollectionWorkbench.registerRoutesFactory(
+                RIBuergerhaushaltProcess, RIBuergerhaushaltProposal, RIBuergerhaushaltProposalVersion);
             registerRoutes1("mein.berlin.de")(adhResourceAreaProvider);
-            var processType2 = RIIdeaCollectionProcess.content_type;
-            var registerRoutes2 = AdhIdeaCollectionWorkbench.registerRoutesFactory(processType2);
+            var registerRoutes2 = AdhIdeaCollectionWorkbench.registerRoutesFactory(
+                RIIdeaCollectionProcess, RIGeoProposal, RIGeoProposalVersion);
             registerRoutes2("mein.berlin.de")(adhResourceAreaProvider);
-            var processType3 = RIKiezkasseProcess.content_type;
-            var registerRoutes3 = AdhIdeaCollectionWorkbench.registerRoutesFactory(processType3);
+            var registerRoutes3 = AdhIdeaCollectionWorkbench.registerRoutesFactory(
+                RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion);
             registerRoutes3("mein.berlin.de")(adhResourceAreaProvider);
         }])
         .directive("adhMeinberlinDeHeader", ["adhConfig", "adhTopLevelState", AdhMeinberlinDe.headerDirective]);
