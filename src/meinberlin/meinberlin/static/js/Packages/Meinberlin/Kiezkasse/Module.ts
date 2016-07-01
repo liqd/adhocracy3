@@ -8,7 +8,7 @@ import * as AdhEmbed from "../../Embed/Embed";
 import * as AdhProcess from "../../Process/Process";
 import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
 
-import * as AdhIdeaCollection from "../../IdeaCollection/IdeaCollection";
+import * as AdhIdeaCollectionWorkbench from "../../IdeaCollection/Workbench/Workbench";
 
 import RIKiezkasseProcess from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
 
@@ -29,11 +29,11 @@ export var register = (angular) => {
             adhEmbedProvider.registerContext("kiezkasse", ["kiezkassen"]);
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
-            var registerRoutes = AdhIdeaCollection.registerRoutesFactory(processType);
+            var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(processType);
             registerRoutes(processType)(adhResourceAreaProvider);
             registerRoutes(processType, "kiezkasse")(adhResourceAreaProvider);
 
-            var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollection.pkgLocation + "/ProcessHeaderSlot.html";
+            var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {

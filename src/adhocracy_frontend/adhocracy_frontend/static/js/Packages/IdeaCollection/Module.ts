@@ -1,68 +1,18 @@
-import * as AdhAbuseModule from "../Abuse/Module";
-import * as AdhBadgeModule from "../Badge/Module";
-import * as AdhCommentModule from "../Comment/Module";
-import * as AdhHttpModule from "../Http/Module";
-import * as AdhMovingColumnsModule from "../MovingColumns/Module";
-import * as AdhPermissionsModule from "../Permissions/Module";
-import * as AdhProcessModule from "../Process/Module";
-import * as AdhResourceActionsModule from "../ResourceActions/Module";
-import * as AdhResourceAreaModule from "../ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../TopLevelState/Module";
-
-import * as AdhProcess from "../Process/Process";
-import * as AdhResourceArea from "../ResourceArea/ResourceArea";
-
 import * as AdhIdeaCollectionProcessModule from "./Process/Module";
 import * as AdhIdeaCollectionProposalModule from "./Proposal/Module";
-
-import * as IdeaCollection from "./IdeaCollection";
-
-import RIIdeaCollectionProcess from "../../Resources_/adhocracy_meinberlin/resources/idea_collection/IProcess";
+import * as AdhIdeaCollectionWorkbenchModule from "./Workbench/Module";
 
 export var moduleName = "adhIdeaCollection";
 
 export var register = (angular) => {
     AdhIdeaCollectionProcessModule.register(angular);
     AdhIdeaCollectionProposalModule.register(angular);
-
-    var processType = RIIdeaCollectionProcess.content_type;
+    AdhIdeaCollectionWorkbenchModule.register(angular);
 
     angular
         .module(moduleName, [
-            AdhAbuseModule.moduleName,
-            AdhBadgeModule.moduleName,
-            AdhCommentModule.moduleName,
-            AdhHttpModule.moduleName,
             AdhIdeaCollectionProcessModule.moduleName,
             AdhIdeaCollectionProposalModule.moduleName,
-            AdhMovingColumnsModule.moduleName,
-            AdhPermissionsModule.moduleName,
-            AdhProcessModule.moduleName,
-            AdhResourceActionsModule.moduleName,
-            AdhResourceAreaModule.moduleName,
-            AdhTopLevelStateModule.moduleName
-        ])
-        .directive("adhIdeaCollectionWorkbench", [
-            "adhTopLevelState", "adhConfig", "adhHttp", IdeaCollection.workbenchDirective])
-        .directive("adhIdeaCollectionProposalDetailColumn", [
-            "adhConfig", "adhTopLevelState", IdeaCollection.proposalDetailColumnDirective])
-        .directive("adhIdeaCollectionProposalCreateColumn", [
-            "adhConfig", "adhTopLevelState", IdeaCollection.proposalCreateColumnDirective])
-        .directive("adhIdeaCollectionProposalEditColumn", [
-            "adhConfig", "adhTopLevelState", IdeaCollection.proposalEditColumnDirective])
-        .directive("adhIdeaCollectionDetailColumn", ["adhConfig", "adhTopLevelState", IdeaCollection.detailColumnDirective])
-        .directive("adhIdeaCollectionEditColumn", ["adhConfig", "adhTopLevelState", IdeaCollection.editColumnDirective])
-        .directive("adhIdeaCollectionAddProposalButton", [
-            "adhConfig", "adhPermissions", "adhTopLevelState", IdeaCollection.addProposalButtonDirective])
-        .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider: AdhResourceArea.Provider, adhConfig) => {
-            var registerRoutes = IdeaCollection.registerRoutesFactory(processType);
-            registerRoutes(processType)(adhResourceAreaProvider);
-
-            var processHeaderSlot = adhConfig.pkg_path + IdeaCollection.pkgLocation + "/ProcessHeaderSlot.html";
-            adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
-        }])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templates[processType] =
-                "<adh-idea-collection-workbench></adh-idea-collection-workbench>";
-        }]);
+            AdhIdeaCollectionWorkbenchModule.moduleName
+        ]);
 };

@@ -11,7 +11,7 @@ import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
 
 import * as AdhDebateWorkbench from "../../DebateWorkbench/DebateWorkbench";
 import * as AdhMeinberlinAlexanderplatzWorkbench from "../Alexanderplatz/Workbench/Workbench";
-import * as AdhIdeaCollection from "../../IdeaCollection/IdeaCollection";
+import * as AdhIdeaCollectionWorkbench from "../../IdeaCollection/Workbench/Workbench";
 
 import RIAlexanderplatzProcess from "../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess";
 import RIBuergerhaushaltProcess from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
@@ -45,13 +45,13 @@ export var register = (angular) => {
                 RIAlexanderplatzProcess.content_type, "mein.berlin.de")(adhResourceAreaProvider);
 
             var processType1 = RIBuergerhaushaltProcess.content_type;
-            var registerRoutes1 = AdhIdeaCollection.registerRoutesFactory(processType1);
+            var registerRoutes1 = AdhIdeaCollectionWorkbench.registerRoutesFactory(processType1);
             registerRoutes1(processType1, "mein.berlin.de")(adhResourceAreaProvider);
             var processType2 = RIIdeaCollectionProcess.content_type;
-            var registerRoutes2 = AdhIdeaCollection.registerRoutesFactory(processType2);
+            var registerRoutes2 = AdhIdeaCollectionWorkbench.registerRoutesFactory(processType2);
             registerRoutes2(processType2, "mein.berlin.de")(adhResourceAreaProvider);
             var processType3 = RIKiezkasseProcess.content_type;
-            var registerRoutes3 = AdhIdeaCollection.registerRoutesFactory(processType3);
+            var registerRoutes3 = AdhIdeaCollectionWorkbench.registerRoutesFactory(processType3);
             registerRoutes3(processType3, "mein.berlin.de")(adhResourceAreaProvider);
         }])
         .directive("adhMeinberlinDeHeader", ["adhConfig", "adhTopLevelState", AdhMeinberlinDe.headerDirective]);
