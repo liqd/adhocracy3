@@ -46,13 +46,13 @@ export var register = (angular) => {
 
             var processType1 = RIBuergerhaushaltProcess.content_type;
             var registerRoutes1 = AdhIdeaCollectionWorkbench.registerRoutesFactory(processType1);
-            registerRoutes1(processType1, "mein.berlin.de")(adhResourceAreaProvider);
+            registerRoutes1("mein.berlin.de")(adhResourceAreaProvider);
             var processType2 = RIIdeaCollectionProcess.content_type;
             var registerRoutes2 = AdhIdeaCollectionWorkbench.registerRoutesFactory(processType2);
-            registerRoutes2(processType2, "mein.berlin.de")(adhResourceAreaProvider);
+            registerRoutes2("mein.berlin.de")(adhResourceAreaProvider);
             var processType3 = RIKiezkasseProcess.content_type;
             var registerRoutes3 = AdhIdeaCollectionWorkbench.registerRoutesFactory(processType3);
-            registerRoutes3(processType3, "mein.berlin.de")(adhResourceAreaProvider);
+            registerRoutes3("mein.berlin.de")(adhResourceAreaProvider);
         }])
         .directive("adhMeinberlinDeHeader", ["adhConfig", "adhTopLevelState", AdhMeinberlinDe.headerDirective]);
 };

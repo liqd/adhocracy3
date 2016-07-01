@@ -30,8 +30,8 @@ export var register = (angular) => {
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
             var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(processType);
-            registerRoutes(processType)(adhResourceAreaProvider);
-            registerRoutes(processType, "kiezkasse")(adhResourceAreaProvider);
+            registerRoutes()(adhResourceAreaProvider);
+            registerRoutes("kiezkasse")(adhResourceAreaProvider);
 
             var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;

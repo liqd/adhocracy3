@@ -57,7 +57,7 @@ export var register = (angular) => {
             "adhConfig", "adhPermissions", "adhTopLevelState", Workbench.addProposalButtonDirective])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider: AdhResourceArea.Provider, adhConfig) => {
             var registerRoutes = Workbench.registerRoutesFactory(processType);
-            registerRoutes(processType)(adhResourceAreaProvider);
+            registerRoutes()(adhResourceAreaProvider);
 
             var processHeaderSlot = adhConfig.pkg_path + Workbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
