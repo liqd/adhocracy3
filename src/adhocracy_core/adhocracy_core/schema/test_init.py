@@ -1320,3 +1320,32 @@ class TestACM:
              'permissions': [['edit', '']]}) == \
             {'principals': ['system.Everyone'],
              'permissions': [['edit', None]]}
+
+
+class TestDeferredPermmissionCheckValidator:
+
+    def call_fut(self, *args):
+        from . import create_deferred_permission_validator
+        return create_deferred_permission_validator(*args)
+
+    @fixture
+    def kw(self, context, request_):
+        return {'context': context,
+                'request': request_}
+
+    def test_raise_if_user_not_authorized(self, config, node, kw):
+        config.testing_securitypolicy(userid='hank', permissive=False)
+        validator = self.call_fut('permission')
+        with raises(colander.Invalid):
+            validator(node, kw)(node, 'value')
+
+    def test_pass_if_user_authorized(self, config, node, kw):
+        config.testing_securitypolicy(userid='hank', permissive=True)
+        validator = self.call_fut('permission')
+        assert validator(node, kw)(node, 'value') is None
+
+    def test_pass_if_request_binding_is_missing(self, config, node, kw):
+        del kw['request']
+        config.testing_securitypolicy(userid='hank', permissive=False)
+        validator = self.call_fut('permission')
+        assert validator(node, kw)(node, 'value') is None

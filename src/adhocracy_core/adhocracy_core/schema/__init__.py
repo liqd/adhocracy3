@@ -1047,3 +1047,25 @@ class ACM(MappingSchema):
                'permissions': []}
     missing = {'principals': [],
                'permissions': []}
+
+
+def create_deferred_permission_validator(permission: str) -> callable:
+    """Create a deferred permission check validator."""
+    @deferred
+    def deferred_check_permission(node: SchemaNode, kw: dict) -> callable:
+        context = kw['context']
+        request = kw.get('request', None)
+
+        def check_permission(node, value):
+            if request is None:
+                return
+            elif request.has_permission(permission, context):
+                return
+            else:
+                msg = 'Changing this field is not allowed, the {} permission'\
+                      ' is missing'.format(permission)
+                raise Invalid(node, msg)
+
+        return check_permission
+
+    return deferred_check_permission
