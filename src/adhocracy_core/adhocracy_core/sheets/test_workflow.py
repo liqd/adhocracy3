@@ -37,11 +37,16 @@ class TestWorkflow:
         from .workflow import Workflow
         return Workflow()
 
-    def test_create(self, inst, kw):
+    def test_create(self, inst, kw, mocker):
         from adhocracy_core.schema import SingleLine
+        permission_check = mocker.patch('adhocracy_core.sheets.workflow.'
+            'create_deferred_permission_validator').return_value
         inst = inst.bind(**kw)
         assert isinstance(inst, SingleLine)
-        assert inst.validator.choices == ('', 'default', 'alternative')
+        assert inst.validator.validators[0].choices == ('',
+                                                        'default',
+                                                        'alternative')
+        assert inst.validator.validators[1] == permission_check.return_value
         assert inst.widget.values == [('default', 'default'),
                                       ('alternative', 'alternative'),
                                       ('', 'No workflow'),
@@ -200,7 +205,7 @@ class TestWorkflowAssignmentSheet:
         from . import workflow
         assert meta.isheet == workflow.IWorkflowAssignment
         assert meta.schema_class == workflow.WorkflowAssignmentSchema
-        assert meta.permission_edit == 'do_transition'
+        assert meta.permission_edit == 'edit'
 
     def test_create(self, meta, context):
         from zope.interface.verify import verifyObject

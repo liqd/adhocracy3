@@ -2,6 +2,7 @@
 from colander import deferred
 from colander import OneOf
 from colander import drop
+from colander import All
 from deform.widget import SelectWidget
 from deform.widget import Widget
 from pyramid.testing import DummyRequest
@@ -14,6 +15,8 @@ from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import SequenceSchema
+from adhocracy_core.schema import SchemaNode
+from adhocracy_core.schema import create_deferred_permission_validator
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import AnnotationRessourceSheet
@@ -107,6 +110,20 @@ class StateDataList(SequenceSchema):
     data = StateData()
 
 
+def deferred_workflow_validator(node: SchemaNode, kw: dict) -> callable:
+    """Deferred workflow name validator."""
+    context = kw['context']
+    registry = kw['registry']
+    creating = kw['creating']
+    if creating:
+        meta = creating
+    else:
+        iresource = get_iresource(context)
+        meta = registry.content.resources_meta[iresource]
+    workflows = ('', meta.default_workflow) + meta.alternative_workflows
+    return OneOf(workflows)
+
+
 class Workflow(SingleLine):
     """SchemaNode for workflow types.
 
@@ -120,21 +137,16 @@ class Workflow(SingleLine):
 
     @deferred
     def validator(node: MappingSchema, kw: dict):
-        context = kw['context']
-        registry = kw['registry']
-        creating = kw['creating']
-        if creating:
-            meta = creating
-        else:
-            iresource = get_iresource(context)
-            meta = registry.content.resources_meta[iresource]
-        workflows = ('', meta.default_workflow) + meta.alternative_workflows
-        return OneOf(workflows)
+        return All(deferred_workflow_validator(node, kw),
+                   create_deferred_permission_validator('edit_workflow')(node,
+                                                                         kw),
+                   )
 
     @deferred
     def widget(node: MappingSchema, kw: dict) -> SelectWidget:
         """Return widget to select the wanted workflow."""
-        choices = [(w, w) for w in node.validator.choices]
+        valid_names = deferred_workflow_validator(node, kw).choices
+        choices = [(w, w) for w in valid_names]
         choices.remove(('', ''))
         choices.append(('', 'No workflow'))
         return SelectWidget(values=choices)
