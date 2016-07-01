@@ -36,47 +36,9 @@ export var workbenchDirective = (
             isKiezkasse: "=?"
         },
         link: (scope) => {
-            var processType = RIIdeaCollectionProcess;
-            var proposalType = RIGeoProposal;
-            var proposalVersionType = RIGeoProposalVersion;
-
-            if (scope.isKiezkasse) {
-                processType = RIKiezkasseProcess;
-                proposalType = RIKiezkasseProposal;
-                proposalVersionType = RIKiezkasseProposalVersion;
-            } else if (scope.isBuergerhaushalt) {
-                processType = RIBuergerhaushaltProcess;
-                proposalType = RIBuergerhaushaltProposal;
-                proposalVersionType = RIBuergerhaushaltProposalVersion;
-            }
-
             scope.$on("$destroy", adhTopLevelState.bind("view", scope));
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("contentType", scope));
-
-            scope.views = {
-                process: "default",
-                proposal: "default",
-                comment: "default"
-            };
-
-            scope.$watchGroup(["contentType", "view"], (values) => {
-                var contentType = values[0];
-                var view = values[1];
-
-                if (contentType === processType.content_type) {
-                    scope.views.process = view;
-                } else {
-                    scope.views.process = "default";
-                }
-
-                if (contentType === proposalType.content_type || contentType === proposalVersionType.content_type) {
-                    scope.views.proposal = view;
-                } else {
-                    scope.views.proposal = "default";
-                }
-            });
-
             scope.$watch("processUrl", (processUrl) => {
                 if (processUrl) {
                     adhHttp.get(processUrl).then((resource) => {
@@ -142,20 +104,6 @@ export var detailColumnDirective = (
         }
     };
 };
-
-export var editColumnDirective = (
-    adhConfig : AdhConfig.IService,
-    adhTopLevelState : AdhTopLevelState.Service
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/EditColumn.html",
-        link: (scope) => {
-            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
-        }
-    };
-};
-
 
 export var addProposalButtonDirective = (
     adhConfig : AdhConfig.IService,

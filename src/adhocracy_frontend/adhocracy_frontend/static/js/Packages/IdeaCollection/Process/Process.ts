@@ -1,8 +1,6 @@
 /// <reference path="../../../../lib2/types/lodash.d.ts"/>
 /// <reference path="../../../../lib2/types/moment.d.ts"/>
 
-import * as _ from "lodash";
-
 import * as AdhBadge from "../../Badge/Badge";
 import * as AdhConfig from "../../Config/Config";
 import * as AdhHttp from "../../Http/Http";
@@ -14,11 +12,8 @@ import RIBuergerhaushaltProposalVersion from "../../../Resources_/adhocracy_mein
 import RIGeoProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
 import RIKiezkasseProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
 
-import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SILocationReference from "../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
 import * as SIMultiPolygon from "../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
-import * as SIName from "../../../Resources_/adhocracy_core/sheets/name/IName";
-import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/IdeaCollection/Process";
@@ -83,72 +78,6 @@ export var detailDirective = (
 
             scope.showMap = (isShowMap) => {
                 scope.isShowMap = isShowMap;
-            };
-        }
-    };
-};
-
-
-export var editDirective = (
-    adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service,
-    adhShowError,
-    adhSubmitIfValid,
-    moment
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Edit.html",
-        scope: {
-            path: "@"
-        },
-        link: (scope, element) => {
-            var process;
-            scope.data = {};
-            scope.showError = adhShowError;
-            adhHttp.get(scope.path).then((resource) => {
-                process = resource;
-                scope.data.title = process.data[SITitle.nick].title;
-
-                var sheet = process.data[SIWorkflow.nick];
-                _.forEach(["announce", "draft", "participate", "evaluate", "result", "closed"], (stateName : string) => {
-                    var data = AdhProcess.getStateData(sheet, stateName);
-                    scope.data[stateName + "_description"] = data.description;
-                    scope.data[stateName + "_start_date"] = moment(data.start_date).format("YYYY-MM-DD");
-                });
-
-                scope.data.currentWorkflowState = process.data[SIWorkflow.nick].workflow_state;
-            });
-            adhHttp.options(scope.path, {importOptions: false}).then((raw) => {
-                // extract available transitions
-                scope.data.availableWorkflowStates = AdhUtil.deepPluck(raw, [
-                    "data", "PUT", "request_body", "data", SIWorkflow.nick, "workflow_state"]);
-            });
-            scope.submit = () => {
-                return adhSubmitIfValid(scope, element, scope.ideaCollectionProcessForm, () => {
-                    process.data[SITitle.nick].title = scope.data.title;
-                    process.data[SIName.nick] = undefined;
-                    process.data[SIImageReference.nick] = undefined;
-
-                    if (_.includes(scope.data.availableWorkflowStates, scope.data.workflowState)) {
-                        process.data[SIWorkflow.nick] = {
-                            workflow_state: scope.data.workflowState
-                        };
-                    } else {
-                        process.data[SIWorkflow.nick] = {};
-                    }
-
-                    process.data[SIWorkflow.nick].state_data = _.map(
-                        ["announce", "draft", "participate", "evaluate", "result", "closed"], (stateName : string) => {
-                        return {
-                            name: stateName,
-                            description: scope.data[stateName + "_description"],
-                            start_date: scope.data[stateName + "_start_date"]
-                        };
-                    });
-
-                    return adhHttp.put(process.path, process);
-                });
             };
         }
     };
