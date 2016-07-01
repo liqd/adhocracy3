@@ -203,7 +203,7 @@ def index_item_badge(resource, default) -> [str]:
     return badge_names
 
 
-def index_workflow_state(resource, default) -> [str]:
+def index_workflow_state(resource, default) -> str:
     """Return value for the workflow_state index."""
     registry = get_current_registry(resource)
     state = registry.content.get_sheet_field(resource,

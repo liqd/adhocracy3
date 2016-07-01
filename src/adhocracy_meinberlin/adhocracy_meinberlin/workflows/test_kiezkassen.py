@@ -44,9 +44,9 @@ def app_god(app_god):
 
 @mark.usefixtures('integration')
 def test_includeme_add_sample_workflow(registry):
-    from adhocracy_core.workflows import AdhocracyACLWorkflow
+    from adhocracy_core.workflows import ACLLocalRolesWorkflow
     workflow = registry.content.workflows['kiezkassen']
-    assert isinstance(workflow, AdhocracyACLWorkflow)
+    assert isinstance(workflow, ACLLocalRolesWorkflow)
 
 
 @mark.usefixtures('integration')

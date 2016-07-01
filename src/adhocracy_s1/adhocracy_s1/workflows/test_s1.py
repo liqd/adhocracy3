@@ -159,9 +159,9 @@ class TestChangeChildrenToSelectedRejected:
 
 @mark.usefixtures('integration')
 def test_s1_includeme_add_workflow(registry):
-    from adhocracy_core.workflows import AdhocracyACLWorkflow
+    from adhocracy_core.workflows import ACLLocalRolesWorkflow
     workflow = registry.content.workflows['s1']
-    assert isinstance(workflow, AdhocracyACLWorkflow)
+    assert isinstance(workflow, ACLLocalRolesWorkflow)
 
 
 @mark.usefixtures('integration')
@@ -335,9 +335,9 @@ class TestS1Workflow:
 
 @mark.usefixtures('integration')
 def test_s1_content_includeme_add_workflow(registry):
-    from adhocracy_core.workflows import AdhocracyACLWorkflow
+    from adhocracy_core.workflows import ACLLocalRolesWorkflow
     workflow = registry.content.workflows['s1_content']
-    assert isinstance(workflow, AdhocracyACLWorkflow)
+    assert isinstance(workflow, ACLLocalRolesWorkflow)
 
 
 @mark.usefixtures('integration')

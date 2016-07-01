@@ -1,5 +1,7 @@
 title: Private Standard
 defaults: standard
+add_local_role_participant_to_default_group: False
+states:
 states:
   announce:
     acm:

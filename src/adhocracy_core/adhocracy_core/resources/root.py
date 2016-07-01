@@ -8,6 +8,7 @@ from substanced.objectmap import ObjectMap
 from substanced.util import find_service
 
 from adhocracy_core.interfaces import IPool
+from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.asset import add_assets_service
 from adhocracy_core.resources.organisation import IOrganisation
@@ -75,7 +76,7 @@ def _add_default_group(context, registry):
     if not registry.settings.get('adhocracy.add_default_group',
                                  True):  # pragma: no cover
         return
-    group_name = 'authenticated'
+    group_name = DEFAULT_USER_GROUP_NAME
     groups = find_service(context, 'principals', 'groups')
     appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
                   {'name': group_name},

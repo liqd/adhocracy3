@@ -33,6 +33,7 @@ from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.interfaces import ReferenceComparator
+from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
 from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IPasswordReset
@@ -89,7 +90,7 @@ def add_default_group_to_user(event):
 
 def _get_default_group(context) -> IGroup:
     groups = find_service(context, 'principals', 'groups')
-    default_group = groups.get('authenticated', None)
+    default_group = groups.get(DEFAULT_USER_GROUP_NAME, None)
     return default_group
 
 

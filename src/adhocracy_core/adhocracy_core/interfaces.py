@@ -26,6 +26,9 @@ from substanced.sdi import MANAGE_ROUTE_NAME
 SDI_ROUTE_NAME = MANAGE_ROUTE_NAME
 
 
+DEFAULT_USER_GROUP_NAME = 'default_group'
+
+
 def namedtuple(typename, field_names, verbose=False, rename=False):
     """Like collections.namedtuple but with more functionalities.
 
