@@ -769,6 +769,16 @@ def rename_default_group(root, registry):  # pragma: no cover
     if old_default_group in groups:
         logger.info('Rename default group to {}'.format(new_default_group))
         groups.rename(old_default_group, new_default_group, registry=registry)
+    old_default_group_path = '/principals/groups/' + old_default_group
+    new_default_group_path = '/principals/groups/' + new_default_group
+    for user in root['principals']['users'].values():
+        group_ids = getattr(user, 'group_ids', [])
+        if old_default_group_path in group_ids:
+            logger.info('Update default group name in group_ids'
+                        ' of {}'.format(user))
+            group_ids.remove(old_default_group_path)
+            group_ids.append(new_default_group_path)
+            setattr(user, 'group_ids', group_ids)
 
 
 def includeme(config):  # pragma: no cover
