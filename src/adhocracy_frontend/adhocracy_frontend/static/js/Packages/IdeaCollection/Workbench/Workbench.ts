@@ -146,34 +146,34 @@ export var addProposalButtonDirective = (
 
 
 export var registerRoutesFactory = (
-    ideaCollection : string
+    ideaCollectionType : string
 ) => (
     context : string = ""
 ) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-    var ideaCollectionType = RIIdeaCollectionProcess;
+    var ideaCollection = RIIdeaCollectionProcess;
     var proposalType = RIGeoProposal;
     var proposalVersionType = RIGeoProposalVersion;
 
-    if (ideaCollection === RIKiezkasseProcess.content_type) {
-        ideaCollectionType = RIKiezkasseProcess;
+    if (ideaCollectionType === RIKiezkasseProcess.content_type) {
+        ideaCollection = RIKiezkasseProcess;
         proposalType = RIKiezkasseProposal;
         proposalVersionType = RIKiezkasseProposalVersion;
-    } else if (ideaCollection === RIBuergerhaushaltProcess.content_type) {
-        ideaCollectionType = RIBuergerhaushaltProcess;
+    } else if (ideaCollectionType === RIBuergerhaushaltProcess.content_type) {
+        ideaCollection = RIBuergerhaushaltProcess;
         proposalType = RIBuergerhaushaltProposal;
         proposalVersionType = RIBuergerhaushaltProposalVersion;
     }
 
     adhResourceAreaProvider
-        .default(ideaCollectionType, "", ideaCollection, context, {
+        .default(ideaCollection, "", ideaCollectionType, context, {
             space: "content",
             movingColumns: "is-show-hide-hide"
         })
-        .default(ideaCollectionType, "edit", ideaCollection, context, {
+        .default(ideaCollection, "edit", ideaCollectionType, context, {
             space: "content",
             movingColumns: "is-show-hide-hide"
         })
-        .specific(ideaCollectionType, "edit", ideaCollection, context, [
+        .specific(ideaCollection, "edit", ideaCollectionType, context, [
             "adhHttp", (adhHttp : AdhHttp.Service) => (resource) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.PUT) {
@@ -183,12 +183,12 @@ export var registerRoutesFactory = (
                     }
                 });
             }])
-        .default(ideaCollectionType, "create_proposal", ideaCollection, context, {
+        .default(ideaCollection, "create_proposal", ideaCollectionType, context, {
             space: "content",
             movingColumns: "is-show-show-hide"
         })
-        .specific(ideaCollectionType, "create_proposal", ideaCollection, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service) => (resource) => {
+        .specific(ideaCollection, "create_proposal", ideaCollectionType, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -197,12 +197,12 @@ export var registerRoutesFactory = (
                     }
                 });
             }])
-        .defaultVersionable(proposalType, proposalVersionType, "edit", ideaCollection, context, {
+        .defaultVersionable(proposalType, proposalVersionType, "edit", ideaCollectionType, context, {
             space: "content",
             movingColumns: "is-show-show-hide"
         })
-        .specificVersionable(proposalType, proposalVersionType, "edit", ideaCollection, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service) => (item, version) => {
+        .specificVersionable(proposalType, proposalVersionType, "edit", ideaCollectionType, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item, version) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -213,21 +213,21 @@ export var registerRoutesFactory = (
                     }
                 });
             }])
-        .defaultVersionable(proposalType, proposalVersionType, "", ideaCollection, context, {
+        .defaultVersionable(proposalType, proposalVersionType, "", ideaCollectionType, context, {
             space: "content",
             movingColumns: "is-show-show-hide"
         })
-        .specificVersionable(proposalType, proposalVersionType, "", ideaCollection, context, [
+        .specificVersionable(proposalType, proposalVersionType, "", ideaCollectionType, context, [
             () => (item, version) => {
                 return {
                     proposalUrl: version.path
                 };
             }])
-        .defaultVersionable(proposalType, proposalVersionType, "comments", ideaCollection, context, {
+        .defaultVersionable(proposalType, proposalVersionType, "comments", ideaCollectionType, context, {
             space: "content",
             movingColumns: "is-collapse-show-show"
         })
-        .specificVersionable(proposalType, proposalVersionType, "comments", ideaCollection, context, [
+        .specificVersionable(proposalType, proposalVersionType, "comments", ideaCollectionType, context, [
             () => (item, version) => {
                 return {
                     commentableUrl: version.path,
@@ -235,11 +235,11 @@ export var registerRoutesFactory = (
                     proposalUrl: version.path
                 };
             }])
-        .defaultVersionable(RIComment, RICommentVersion, "", ideaCollection, context, {
+        .defaultVersionable(RIComment, RICommentVersion, "", ideaCollectionType, context, {
             space: "content",
             movingColumns: "is-collapse-show-show"
         })
-        .specificVersionable(RIComment, RICommentVersion, "", ideaCollection, context, ["adhHttp", "$q", (
+        .specificVersionable(RIComment, RICommentVersion, "", ideaCollectionType, context, ["adhHttp", "$q", (
             adhHttp : AdhHttp.Service,
             $q : angular.IQService
         ) => {
