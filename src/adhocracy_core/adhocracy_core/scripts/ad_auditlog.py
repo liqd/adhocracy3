@@ -10,7 +10,7 @@ from pyramid.paster import bootstrap
 from substanced.interfaces import IRoot
 from substanced.util import get_auditlog
 
-from adhocracy_core.interfaces import AuditlogEntry
+from adhocracy_core.interfaces import Activity
 
 
 logger = logging.getLogger(__name__)
@@ -56,15 +56,15 @@ def auditlog_show(root: IRoot,
     _print_auditlog(filtered_by_path)
 
 
-def _filter_by_path(auditlog_entries: [AuditlogEntry],
-                    path: str) -> [AuditlogEntry]:
+def _filter_by_path(auditlog_entries: [Activity],
+                    path: str) -> [Activity]:
     if not path:
         return auditlog_entries
     return [(t, e) for t, e in auditlog_entries
-            if e.resource_path.startswith(path)]
+            if e.object_path.startswith(path)]
 
 
-def _print_auditlog(auditlog_entries: [AuditlogEntry]):
+def _print_auditlog(auditlog_entries: [Activity]):
     pretty_printer = pprint.PrettyPrinter()
     for timestamp, auditlog_entry in auditlog_entries:
         timestamp_str = timestamp.strftime('%Y-%m-%d %H:%M:%S')

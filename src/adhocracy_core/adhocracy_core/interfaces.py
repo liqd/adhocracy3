@@ -554,6 +554,14 @@ class ILocalRolesModfied(IObjectEvent):
     registry = Attribute('The pyramid registry')
 
 
+class IActivitiesAddedToAuditLog(IObjectEvent):
+    """An event type send when :term:`activity` s are added to the auditlog."""
+
+    object = Attribute('The audit log')
+    activities = Attribute('The added activities')
+    request = Attribute('The current pyramid request')
+
+
 class ITokenManger(Interface):  # pragma: no cover
     """ITokenManger interface."""
 
@@ -652,23 +660,9 @@ class AuditlogEntry(namedtuple('AuditlogEntry', ['name',
                                                  'resource_path',
                                                  'user_name',
                                                  'user_path',
-                                                 'sheet_data'])):
-    """Metadata to log which user modifies resources.
-
-    Fields:
-    -------
-
-    name (AuditlogAction):
-        name of action executed by user
-    resource_path: (str):
-        modified resource path (:term:`location`)
-    user_name: (str):
-        name of responsible user
-    user_path:
-        :term:`userid` of responsible user
-    sheet_data:
-        List of sheet content
-    """
+                                                 'sheet_data',
+                                                 ])):
+    """Metadata to log which user modifies resources."""
 
     def __new__(cls,
                 name=None,
@@ -677,11 +671,14 @@ class AuditlogEntry(namedtuple('AuditlogEntry', ['name',
                 user_path=None,
                 sheet_data=None):
         return super().__new__(cls,
-                               name=name,
-                               resource_path=resource_path,
-                               user_name=user_name,
-                               user_path=user_path,
-                               sheet_data=sheet_data)
+                               name,
+                               resource_path,
+                               user_name,
+                               user_path,
+                               sheet_data)
+
+
+deprecated('AuditlogEntry', 'Use SerializedActivity instead')
 
 
 class AuditlogAction(Enum):
@@ -692,6 +689,97 @@ class AuditlogAction(Enum):
     invisible = 'invisible'
     concealed = 'concealed'
     revealed = 'revealed'
+
+
+deprecated('AuditlogAction', 'Use ActivityType instead')
+
+
+class Activity(namedtuple('Activity', ['subject',
+                                       'type',
+                                       'object',
+                                       'target',
+                                       'name',
+                                       'sheet_data',
+                                       ])):
+    """Metadata to log user activities.
+
+    Based on W3C Activity stream v2 Ontology
+    (https://www.w3.org/TR/activitystreams-vocabulary/).
+
+    Fields:
+    -------
+
+    subject: (IResource):
+        user/group that is causing the activity, required
+        `None` means the application is the subject
+    type (ActivityType):
+        name of activity executed by user, required
+    object: (IResource):
+        resource path (:term:`location`) of activity object, required
+    target (IResource):
+        resource path of indirect activity object
+    name (pyramid.i18n.TranslationString):
+        simple, humane readable description of the activity.
+    sheet_data (list):
+        List of sheet appstruct data when changing or deleting resources,
+        not part of the actvity stream ontology
+    """
+
+    def __new__(cls,
+                subject=None,
+                type='',
+                object=None,
+                target=None,
+                name='',
+                sheet_data=None,
+                ):
+        if sheet_data is None:
+            sheet_data = []
+        return super().__new__(cls,
+                               subject,
+                               type,
+                               object,
+                               target,
+                               name,
+                               sheet_data,
+                               )
+
+
+class ActivityType(Enum):
+    """Type of user activity.
+
+    Based on https://www.w3.org/TR/activitystreams-vocabulary.
+    """
+
+    add = 'Add'
+    update = 'Update'
+    remove = 'Remove'
+
+
+class SerializedActivity(namedtuple('SerializedActivity', ['subject_path',
+                                                           'type',
+                                                           'object_path',
+                                                           'target_path',
+                                                           'sheet_data',
+                                                           ])):
+    """Used to store :class:`adhocracy_core.interfaces.Activity`."""
+
+    def __new__(cls,
+                subject_path='',
+                type='',
+                object_path='',
+                target_path='',
+                sheet_data=None,
+                ):
+        if sheet_data is None:
+            sheet_data = []
+        return super().__new__(cls,
+                               subject_path,
+                               type,
+                               object_path,
+                               target_path,
+                               sheet_data,
+                               )
 
 
 SearchResult = namedtuple('SearchResult', ['elements',

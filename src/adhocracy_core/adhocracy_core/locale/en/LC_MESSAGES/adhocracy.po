@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-09-08 01:14+0200\n"
+"POT-Creation-Date: 2016-07-05 16:25+0200\n"
 "PO-Revision-Date: 2015-05-26 21:25+0200\n"
 "Last-Translator: Joscha <joka@jokasis.de>\n"
 "Language-Team: English\n"
@@ -15,18 +15,55 @@ msgstr ""
 "Generated-By: Lingua 3.10\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#. Default: [${site_name} Abuse Complaint
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:116
+#. Default: ${subject_name} added a ${object_type_name} to ${target_title}.
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:208
+msgid "activity_name_add"
+msgstr ""
+
+#. Default: ${subject_name} added the ${object_type_name} ${object_title} to
+#. ${target_type_name} ${target_title}.
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:245
+msgid "activity_description_add"
+msgstr ""
+
+#. Default: ${subject_name} updated ${object_type_name}
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:213
+msgid "activity_name_update"
+msgstr ""
+
+#. Default: ${subject_name} updated ${object_type_name} ${object_title}.
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:251
+msgid "activity_description_update"
+msgstr ""
+
+#. Default: ${subject_name} removed a ${object_type_name} from ${target_title}.
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:217
+msgid "activity_name_remove"
+msgstr ""
+
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:222
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:261
+msgid "activity_missing"
+msgstr ""
+
+#. Default: ${subject_name} removed the ${object_type_name} ${object_title}
+#. from ${target_title}.
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:256
+msgid "activity_description_remove"
+msgstr ""
+
+#. Default: ${site_name} Abuse Complaint
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:117
 msgid "mail_abuse_complaint_subject"
 msgstr "mail_abuse_complaint_subject"
 
-#. Default: [${site_name}] Message from ${sender_name}: ${title}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:146
+#. Default: ${site_name} Message from ${sender_name}: ${title}
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:148
 msgid "mail_sent_message_to_user_subject"
 msgstr "mail_sent_message_to_user_subject"
 
 #. Default: ${text}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:150
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:152
 msgid "mail_sent_message_to_user_body_txt"
 msgstr ""
 "(Deutsche Version weiter unten)\n"
@@ -55,12 +92,12 @@ msgstr ""
 
 #. Default: ${site_name}: Account Verification / Aktivierung Deines
 #. Nutzerkontos
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:179
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:185
 msgid "mail_account_verification_subject"
 msgstr "mail_account_verification_subject"
 
 #. Default: ${frontend_url}${activation_path}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:183
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:189
 msgid "mail_account_verification_body_txt"
 msgstr ""
 "Automatically generated Email. / Automatisch generierte E-Mail.\n"
@@ -98,12 +135,12 @@ msgstr ""
 "Dein \"${site_name}\"-Team"
 
 #. Default: ${site_name}: Reset Password / Passwort neu setzen
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:199
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:205
 msgid "mail_reset_password_subject"
 msgstr "mail_reset_password_subject"
 
 #. Default: ${reset_url}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:203
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:209
 msgid "mail_reset_password_body_txt"
 msgstr ""
 "Automatically generated Email. / Automatisch generierte E-Mail.\n"
@@ -129,14 +166,32 @@ msgstr ""
 "\n"
 "Dein \"${site_name}\"-Team"
 
+#. Default: ${site_name}: ${activity_name}
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:288
+msgid "mail_send_activity_subject"
+msgstr "mail_send_activity_subject"
+
+#. Default: ${activity_description} Visit: ${object_url} .
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:291
+#, fuzzy
+msgid "mail_send_activity_body_txt"
+msgstr ""
+"\n"
+"${activity_description}\n"
+"\n"
+"Click here to visit it: ${object_url}\n"
+"\n"
+"Your \"${site_name}\" Team\n"
+"\n"
+
 #. Default: Invitation to join ${site_name}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:233
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:239
 #, fuzzy
 msgid "mail_invitation_subject"
 msgstr "mail_account_verification_subject"
 
 #. Default: Please click ${reset_url} to join and reset your password.
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:240
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:246
 #, fuzzy
 msgid "mail_invitation_body_txt"
 msgstr ""
@@ -173,3 +228,39 @@ msgstr ""
 "Wir wünschen Dir viel Spaß und Inspiration!\n"
 "\n"
 "Dein \"${site_name}\"-Team"
+
+#: src/adhocracy_core/adhocracy_core/sdi/views/sheets.py:40
+msgid "save"
+msgstr ""
+
+#: src/adhocracy_core/adhocracy_core/sdi/views/sheets.py:32
+msgid "Sheets"
+msgstr ""
+
+#: src/adhocracy_core/adhocracy_core/sdi/views/sheets.py:84
+msgid "add"
+msgstr ""
+
+#: src/adhocracy_core/adhocracy_core/sdi/views/catalogs.py:27
+msgid "Catalogs"
+msgstr ""
+
+#: src/adhocracy_core/adhocracy_core/sdi/views/templates/rename.pt:11
+msgid "Rename Items"
+msgstr ""
+
+#: src/adhocracy_core/adhocracy_core/sdi/views/templates/rename.pt:16
+msgid "Old Name"
+msgstr ""
+
+#: src/adhocracy_core/adhocracy_core/sdi/views/templates/rename.pt:17
+msgid "New Name"
+msgstr ""
+
+#: src/adhocracy_core/adhocracy_core/sdi/views/templates/rename.pt:42
+msgid "Rename all"
+msgstr ""
+
+#: src/adhocracy_core/adhocracy_core/sdi/views/templates/rename.pt:49
+msgid "Cancel"
+msgstr ""

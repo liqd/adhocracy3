@@ -781,6 +781,38 @@ def rename_default_group(root, registry):  # pragma: no cover
             setattr(user, 'group_ids', group_ids)
 
 
+def migrate_auditlogentries_to_activities(root, registry):  # pragma: no cover
+    """Replace AuditlogenEntries with Activities entries."""
+    from adhocracy_core.interfaces import SerializedActivity
+    from adhocracy_core.interfaces import ActivityType
+    from adhocracy_core.interfaces import AuditlogEntry
+    from adhocracy_core.interfaces import AuditlogAction
+    from adhocracy_core.auditing import get_auditlog
+    auditlog = get_auditlog(root)
+    old_entries = [(key, value) for key, value in auditlog.items()]
+    mapping = {AuditlogAction.concealed: ActivityType.remove,
+               AuditlogAction.invisible: ActivityType.remove,
+               AuditlogAction.revealed: ActivityType.update,
+               AuditlogAction.created: ActivityType.add,
+               AuditlogAction.modified: ActivityType.update,
+               (AuditlogAction.concealed,): ActivityType.remove,
+               (AuditlogAction.invisible,): ActivityType.remove,
+               (AuditlogAction.revealed,): ActivityType.update,
+               (AuditlogAction.created,): ActivityType.add,
+               (AuditlogAction.modified,): ActivityType.update,
+               }
+    for key, value in old_entries:
+        if not isinstance(value, AuditlogEntry):
+            break
+        new_value_kwargs = {'type': mapping.get(value.name),
+                            'object_path': value.resource_path,
+                            'subject_path': value.user_path or '',
+                            'sheet_data': value.sheet_data or [],
+                            }
+        auditlog[key] = SerializedActivity()._replace(**new_value_kwargs)
+
+
+@log_migration
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -822,3 +854,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_description_sheet_to_user)
     config.add_evolution_step(add_local_roles_for_workflow_state)
     config.add_evolution_step(rename_default_group)
+    config.add_evolution_step(migrate_auditlogentries_to_activities)

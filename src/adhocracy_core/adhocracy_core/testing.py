@@ -24,11 +24,13 @@ from zope.interface.interfaces import IInterface
 import transaction
 
 from adhocracy_core.authentication import UserTokenHeader
+from adhocracy_core.interfaces import Activity
 from adhocracy_core.interfaces import SheetMetadata
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.interfaces import SearchResult
 from adhocracy_core.interfaces import SearchQuery
+from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.schema import MappingSchema
@@ -223,6 +225,12 @@ def changelog_meta() -> ChangelogMetadata:
 
 
 @fixture
+def activity() -> Activity:
+    """Return activity entry from auditlog."""
+    return Activity()
+
+
+@fixture
 def context() -> testing.DummyResource:
     """Return dummy context with IResource interface."""
     from adhocracy_core.interfaces import IResource
@@ -252,6 +260,12 @@ def item() -> DummyPool:
     from adhocracy_core.interfaces import IItem
     from adhocracy_core.sheets.metadata import IMetadata
     return DummyPool(__provides__=(IItem, IMetadata))
+
+
+@fixture
+def version() -> IItemVersion:
+    """Return resource with IItemVersion interface."""
+    return testing.DummyResource(__provides__=IItemVersion)
 
 
 @fixture
