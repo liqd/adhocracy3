@@ -24,6 +24,7 @@ from adhocracy_core.interfaces import SheetMetadata
 from adhocracy_core.interfaces import Reference
 from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.interfaces import search_query
+from adhocracy_core.schema import SchemaNode
 from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Reference as ReferenceSchema
@@ -364,6 +365,8 @@ def add_sheet_to_registry(metadata: SheetMetadata, registry: Registry):
 def _assert_schema_preserves_super_type_data_structure(schema: MappingSchema):
     super_defaults = []
     for super_schema in schema.__class__.__bases__:
+        if super_schema is SchemaNode:
+            continue
         for child in super_schema().children:
             super_defaults.append((child.name, child.default))
     class_defaults = []
@@ -394,3 +397,4 @@ def includeme(config):  # pragma: no cover
     config.include('.badge')
     config.include('.logbook')
     config.include('.embed')
+    config.include('.notification')
