@@ -93,10 +93,6 @@ export var nonResourcePaths : string[] = [
  * path: ..., data: ...}.  if you want to send other objects over the
  * wire (such as during user login), use $http.
  */
-
-// FIXME: This service should be able to handle any type, not just instances of
-// ``Resources.IResource``.  Methods like ``postNewVersion`` may need additional
-// constraints (e.g. by moving them to subclasses).
 export class Service {
 
     constructor(
