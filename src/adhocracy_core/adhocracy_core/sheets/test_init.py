@@ -376,6 +376,20 @@ class TestBaseResourceSheet:
         cstruct = inst.serialize()
         assert 'only_visible' not in inst.get.call_args[1]['params']
 
+    def test_serialize_with_back_references(self, inst, request_):
+        inst.request = request_
+        inst.get = Mock()
+        inst.get.return_value = {}
+        inst.serialize()
+        assert inst.get.call_args[1]['add_back_references'] is True
+
+    def test_serialize_omit_back_references(self, inst, request_):
+        inst.request = request_
+        inst.get = Mock()
+        inst.get.return_value = {}
+        inst.serialize(add_back_references=False)
+        assert inst.get.call_args[1]['add_back_references'] is False
+
 
 class TestAnnotationRessourceSheet:
 

@@ -12,17 +12,47 @@ def registry(registry_with_content):
     return registry_with_content
 
 
+class TestACLocalRolesState:
+
+    def make_one(self, **kwargs):
+        from . import ACLLocalRolesState
+        return ACLLocalRolesState(**kwargs)
+
+    def test_call_empty(self, context, mocker):
+        set_acl = mocker.patch('adhocracy_core.workflows.set_acl')
+        add_roles = mocker.patch('adhocracy_core.workflows.add_local_roles')
+        inst = self.make_one()
+        inst(context, None, None, None)
+        assert not set_acl.called
+        assert not add_roles.called
+
+    def test_call_with_acl(self, context, mocker, request_):
+        set_acl = mocker.patch('adhocracy_core.workflows.set_acl')
+        inst = self.make_one(acl=[])
+        inst(context, request_, None, None)
+        set_acl.assert_called_with(context, [], registry=request_.registry)
+
+    def test_call_with_local_roles(self, context, mocker, request_):
+        add_local_roles = mocker.patch('adhocracy_core.workflows.add_local_roles')
+        inst = self.make_one(local_roles={})
+        inst(context, request_, None, None)
+        add_local_roles.assert_called_with(context, {},
+                                           registry=request_.registry)
+
+
 class TestAdhocracyACLWorkflow:
 
     @fixture
     def inst(self):
-        from . import AdhocracyACLWorkflow
-        inst = AdhocracyACLWorkflow('draft', 'sample')
+        from . import ACLLocalRolesWorkflow
+        inst = ACLLocalRolesWorkflow('draft', 'sample', )
         return inst
 
     def test_create(self, inst):
         from substanced.workflow import IWorkflow
         from adhocracy_core.interfaces import IAdhocracyWorkflow
+        from . import ACLLocalRolesState
+        assert inst._state_factory == ACLLocalRolesState
         assert IWorkflow.providedBy(inst)
         assert IAdhocracyWorkflow.providedBy(inst)
         from zope.interface.verify import verifyObject
@@ -120,9 +150,9 @@ class TestAddWorkflow:
 
     @fixture
     def mock_workflow(self, monkeypatch):
-        from adhocracy_core.workflows import AdhocracyACLWorkflow
-        mock = Mock(spec=AdhocracyACLWorkflow)
-        monkeypatch.setattr('adhocracy_core.workflows.AdhocracyACLWorkflow',
+        from adhocracy_core.workflows import ACLLocalRolesWorkflow
+        mock = Mock(spec=ACLLocalRolesWorkflow)
+        monkeypatch.setattr('adhocracy_core.workflows.ACLLocalRolesWorkflow',
                             mock)
         return mock
 
@@ -141,11 +171,11 @@ class TestAddWorkflow:
         assert meta['auto_transition'] is False
 
     def test_create(self, registry, mock_meta):
-        from substanced.workflow import ACLWorkflow
+        from . import ACLLocalRolesWorkflow
         self.call_fut(registry, 'package:dummy.yaml', 'dummy')
         workflow = registry.content.workflows['dummy']
         assert workflow.type == 'dummy'
-        assert isinstance(workflow, ACLWorkflow)
+        assert isinstance(workflow, ACLLocalRolesWorkflow)
 
     def test_create_and_add_states(self, registry, mock_meta):
         self.call_fut(registry, 'package:dummy.yaml', 'dummy')
@@ -154,7 +184,16 @@ class TestAddWorkflow:
                         key=lambda x: x['name'])
         assert states[0]['initial'] is False
         assert workflow._states['draft'].acl == [('Deny', 'role:moderator', 'view')]
+        assert workflow._states['draft'].local_roles is None
         assert states[1]['initial'] is True
+
+    def test_create_and_add_states_with_local_roles(self, registry, mock_meta):
+        from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
+        mock_meta.return_value['add_local_role_participant_to_default_group'] = True
+        self.call_fut(registry, 'package:dummy.yaml', 'dummy')
+        workflow = registry.content.workflows['dummy']
+        assert workflow._states['draft'].local_roles == \
+               {'group:' + DEFAULT_USER_GROUP_NAME: {'role:' + 'participant'}}
 
     def test_create_and_add_transitions(self, registry, mock_meta):
         self.call_fut(registry, 'package:dummy.yaml', 'dummy')

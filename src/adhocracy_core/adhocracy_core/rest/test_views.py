@@ -934,6 +934,7 @@ class TestMetaApiView:
         workflows_meta = inst.get()['workflows']
         assert workflows_meta == {'sample': {'initial_state': '',
                                              'auto_transition': 'false',
+                                             'add_local_role_participant_to_default_group': 'false',
                                              'defaults': '',
                                              'states': {},
                                              'transitions': {}}}

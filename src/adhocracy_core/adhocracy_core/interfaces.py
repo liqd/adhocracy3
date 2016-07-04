@@ -26,6 +26,9 @@ from substanced.sdi import MANAGE_ROUTE_NAME
 SDI_ROUTE_NAME = MANAGE_ROUTE_NAME
 
 
+DEFAULT_USER_GROUP_NAME = 'default_group'
+
+
 def namedtuple(typename, field_names, verbose=False, rename=False):
     """Like collections.namedtuple but with more functionalities.
 
@@ -625,7 +628,8 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
 class AuditlogEntry(namedtuple('AuditlogEntry', ['name',
                                                  'resource_path',
                                                  'user_name',
-                                                 'user_path'])):
+                                                 'user_path',
+                                                 'sheet_data'])):
     """Metadata to log which user modifies resources.
 
     Fields:
@@ -639,7 +643,22 @@ class AuditlogEntry(namedtuple('AuditlogEntry', ['name',
         name of responsible user
     user_path:
         :term:`userid` of responsible user
+    sheet_data:
+        List of sheet content
     """
+
+    def __new__(cls,
+                name=None,
+                resource_path=None,
+                user_name=None,
+                user_path=None,
+                sheet_data=None):
+        return super().__new__(cls,
+                               name=name,
+                               resource_path=resource_path,
+                               user_name=user_name,
+                               user_path=user_path,
+                               sheet_data=sheet_data)
 
 
 class AuditlogAction(Enum):

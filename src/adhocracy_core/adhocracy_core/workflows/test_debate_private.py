@@ -13,9 +13,9 @@ def integration(integration):
 
 @mark.usefixtures('integration')
 def test_includeme(registry):
-    from adhocracy_core.workflows import AdhocracyACLWorkflow
+    from adhocracy_core.workflows import ACLLocalRolesWorkflow
     workflow = registry.content.workflows['debate_private']
-    assert isinstance(workflow, AdhocracyACLWorkflow)
+    assert isinstance(workflow, ACLLocalRolesWorkflow)
 
 
 @mark.functional
@@ -33,47 +33,16 @@ class TestDebatePrivateProcess:
 
     @fixture(scope='class')
     def app_router(self, app_settings):
-        """Add a `debate_private` workflow to IProcess resources.
-
-        In addition the global participator role is removed from the user
-        default user group and the global view permission removed.
-        """
-        from pyramid.interfaces import IApplicationCreated
-        from adhocracy_core.authorization import IRootACMExtension
+        """Add a `debate_private` workflow to IProcess resources."""
         from adhocracy_core.testing import make_configurator
-        from adhocracy_core.interfaces import IResourceCreatedAndAdded
-        from adhocracy_core.resources.root import IRootPool
         from adhocracy_core.resources import add_resource_type_to_registry
         from adhocracy_core.resources.process import process_meta
         import adhocracy_core
         configurator = make_configurator(app_settings, adhocracy_core)
         debate_process_meta = process_meta._replace(workflow_name='debate_private')
         add_resource_type_to_registry(debate_process_meta, configurator)
-        configurator.registry.registerAdapter(self._get_root_acm_extension,
-                                              (IRootPool,),IRootACMExtension),
-        configurator.add_subscriber(self._remove_default_group_roles,
-                                    IResourceCreatedAndAdded,
-                                    object_iface=IRootPool)
         app_router = configurator.make_wsgi_app()
         return app_router
-
-    @staticmethod
-    def _get_root_acm_extension(context):
-        acm = \
-            {'principals':            ['everyone', 'authenticated', 'participant', 'moderator',  'creator', 'initiator', 'admin'],
-             'permissions': [['view',  'Allow',      'Deny',          'Allow',       'Allow',      'Allow',   'Allow',     'Allow'],
-             ]}
-        return acm
-
-    @staticmethod
-    def _remove_default_group_roles(event):
-        from pyramid.traversal import find_root
-        from adhocracy_core.resources.subscriber import _get_default_group
-        from adhocracy_core.sheets.principal import IGroup
-        root = find_root(event.object)
-        default = _get_default_group(root)
-        group_sheet = event.registry.content.get_sheet(default, IGroup)
-        group_sheet.set({'roles': []})
 
     def test_create_resources(self, process_url, datadir, app_admin):
         json_file_private = str(datadir.join('private.json'))

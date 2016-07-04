@@ -98,12 +98,13 @@ class TestRoot:
         assert IProcess.providedBy(inst['adhocracy'])
 
     def test_includeme_registry_add_default_group(self, registry, request_):
+        from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
         from substanced.util import find_service
         from adhocracy_core.resources.root import IRootPool
         from adhocracy_core.sheets.principal import IGroup
         inst = registry.content.create(IRootPool.__identifier__)
         groups = find_service(inst, 'principals', 'groups')
-        group = groups['authenticated']
+        group = groups[DEFAULT_USER_GROUP_NAME]
         group_sheet = registry.content.get_sheet(group, IGroup)
         group_users = [x.__name__ for x in group_sheet.get()['users']]
         group_roles = group_sheet.get()['roles']

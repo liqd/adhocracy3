@@ -1,5 +1,6 @@
 defaults: debate
 title: Private Debate
+add_local_role_participant_to_default_group: False
 states:
   announce:
     acm:
