@@ -245,47 +245,26 @@ export var printActionDirective = (
     };
 };
 
-export var editActionDirective = (
+export var viewActionDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhResourceUrl,
     $location : angular.ILocationService
 ) => {
     return {
         restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"edit();\">{{ 'TR__EDIT' | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"link();\">{{ label | translate }}</a>",
         scope: {
             resourcePath: "@",
             parentPath: "=?",
-            class: "@"
+            class: "@",
+            label: "@",
+            view: "@",
         },
         link: (scope) => {
-            scope.edit = () => {
+            scope.link = () => {
                 adhTopLevelState.setCameFrom();
                 var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
-                var url = adhResourceUrl(path, "edit");
-                $location.url(url);
-            };
-        }
-    };
-};
-
-export var moderateActionDirective = (
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhResourceUrl,
-    $location : angular.ILocationService
-) => {
-    return {
-        restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"moderate();\">{{ 'TR__MODERATE' | translate }}</a>",
-        scope: {
-            resourcePath: "@",
-            parentPath: "=?",
-            class: "@"
-        },
-        link: (scope) => {
-            scope.moderate = () => {
-                var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
-                var url = adhResourceUrl(path, "moderate");
+                var url = adhResourceUrl(path, scope.view);
                 $location.url(url);
             };
         }

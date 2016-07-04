@@ -1,14 +1,18 @@
 <div class="action-bar">
-    <adh-edit-action
+    <adh-view-action
         data-ng-if="edit && resourcePath && options.PUT"
         data-class="action-bar-item"
+        data-view="edit"
+        data-label="TR__EDIT"
         data-parent-path="parentPath"
-        data-resource-path="{{resourcePath}}"></adh-edit-action>
-    <adh-moderate-action
+        data-resource-path="{{resourcePath}}"></adh-view-action>
+    <adh-view-action
         data-ng-if="moderate && resourcePath"
         data-class="action-bar-item"
+        data-view="moderate"
+        data-label="TR__MODERATE"
         data-parent-path="parentPath"
-        data-resource-path="{{resourcePath}}"></adh-moderate-action>
+        data-resource-path="{{resourcePath}}"></adh-view-action>
     <adh-assign-badges-action
         data-ng-if="assignBadges && resourcePath"
         data-modals="modals"
