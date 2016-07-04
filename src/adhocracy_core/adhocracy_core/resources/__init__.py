@@ -206,7 +206,7 @@ class ResourceFactory:
             sheet = registry.content.get_sheet(resource, isheet,
                                                request=request)
             if sheet.meta.creatable:
-                sheet.set(struct, send_event=False)
+                sheet.set(struct, send_event=False, autoupdated=autoupdated)
 
         # Fixme: Sideffect. We change here the passed creator because the
         # creator of user resources should always be the created user.
@@ -227,7 +227,9 @@ class ResourceFactory:
                                                request=request)
             sheet.set(metadata,
                       send_event=False,
-                      omit_readonly=False)
+                      omit_readonly=False,
+                      autoupdated=autoupdated
+                      )
 
         if run_after_creation:
             for call in self.meta.after_creation:
