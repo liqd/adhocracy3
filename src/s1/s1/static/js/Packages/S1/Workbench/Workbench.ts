@@ -308,7 +308,7 @@ export var registerRoutes = (
             movingColumns: "is-show-hide-hide"
         })
         .specific(RIS1Process, "create-proposal", processType, context,
-            ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+            ["adhHttp", (adhHttp : AdhHttp.Service) => {
                 return (resource : RIS1Process) => {
                     return adhHttp.options(resource.path).then((options) => {
                         if (options.POST) {
@@ -350,7 +350,7 @@ export var registerRoutes = (
             movingColumns: "is-show-show-hide"
         })
         .specificVersionable(RIProposal, RIProposalVersion, "edit", processType, context,
-            ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+            ["adhHttp", (adhHttp : AdhHttp.Service) => {
                 return (item : RIProposal, version : RIProposalVersion, isVersion : boolean, process : RIS1Process) => {
                     return adhHttp.options(item.path).then((options) => {
                         if (options.POST) {

@@ -130,7 +130,7 @@ export var shareActionDirective = () => {
 
 export var assignBadgesActionDirective = (
     adhConfig: AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service
 ) => {
     return {
