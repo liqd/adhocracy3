@@ -24,8 +24,13 @@
                 data-view="edit"
                 data-label="TR__EDIT"
                 data-resource-path="{{proposalUrl}}">
+            <adh-view-action data-ng-if="proposalItemOptions.PUT"
+                data-class="action-bar-item"
+                data-parent-path="true"
+                data-view="image"
+                data-label="TR__IMAGE_UPLOAD"
+                data-resource-path="{{proposalUrl}}">
             </adh-view-action>
-            <a class="action-bar-item" data-ng-if="proposalItemOptions.POST" data-ng-href="{{ proposalUrl | adhParentPath | adhResourceUrl:'image' }}">{{ "TR__IMAGE_UPLOAD" | translate }}</a>
             <adh-assign-badges-action
                 data-class="action-bar-item"
                 data-modals="modals"
