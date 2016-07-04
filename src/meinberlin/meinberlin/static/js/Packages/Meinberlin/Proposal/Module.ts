@@ -38,13 +38,51 @@ export var register = (angular) => {
                 .registerDirective("meinberlin-proposal-edit")
                 .registerDirective("meinberlin-proposal-list");
         }])
+        .service("adhMeinberlinProposalAdapter", [
+            "adhHttp",
+            "adhPermissions",
+            "adhRate",
+            "adhTopLevelState",
+            "adhGetBadges",
+            "adhPreliminaryNames",
+            "$q",
+            Proposal.Adapter
+        ])
         .directive("adhMeinberlinProposalDetail", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.detailDirective])
+            "adhMeinberlinProposalAdapter",
+            "adhConfig",
+            "adhHttp",
+            "adhPermissions",
+            "adhRate",
+            "adhTopLevelState",
+            "adhGetBadges",
+            "$q",
+            Proposal.detailDirective
+        ])
         .directive("adhMeinberlinProposalListItem", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.listItemDirective])
+            "adhMeinberlinProposalAdapter",
+            "adhConfig",
+            "adhHttp",
+            "adhPermissions",
+            "adhRate",
+            "adhTopLevelState",
+            "adhGetBadges",
+            "$q",
+            Proposal.listItemDirective
+        ])
         .directive("adhMeinberlinProposalMapListItem", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.mapListItemDirective])
+            "adhMeinberlinProposalAdapter",
+            "adhConfig",
+            "adhHttp",
+            "adhPermissions",
+            "adhRate",
+            "adhTopLevelState",
+            "adhGetBadges",
+            "$q",
+            Proposal.mapListItemDirective
+        ])
         .directive("adhMeinberlinProposalCreate", [
+            "adhMeinberlinProposalAdapter",
             "adhConfig",
             "adhHttp",
             "adhPreliminaryNames",
@@ -56,6 +94,7 @@ export var register = (angular) => {
             Proposal.createDirective
         ])
         .directive("adhMeinberlinProposalEdit", [
+            "adhMeinberlinProposalAdapter",
             "adhConfig",
             "adhHttp",
             "adhPermissions",
