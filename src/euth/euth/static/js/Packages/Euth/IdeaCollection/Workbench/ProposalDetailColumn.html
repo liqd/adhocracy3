@@ -19,15 +19,13 @@
         data-value="{{proposalUrl}}">
         <div class="action-bar">
             <adh-view-action data-ng-if="proposalItemOptions.PUT"
-                data-parent-path="true"
                 data-view="edit"
                 data-label="TR__EDIT"
-                data-resource-path="{{proposalUrl}}">
+                data-resource-path="{{proposalUrl | adhParentPath}}">
             <adh-view-action data-ng-if="proposalItemOptions.PUT"
-                data-parent-path="true"
                 data-view="image"
                 data-label="TR__IMAGE_UPLOAD"
-                data-resource-path="{{proposalUrl}}">
+                data-resource-path="{{proposalUrl | adhParentPath}}">
             </adh-view-action>
             <adh-assign-badges-action
                 data-modals="modals"

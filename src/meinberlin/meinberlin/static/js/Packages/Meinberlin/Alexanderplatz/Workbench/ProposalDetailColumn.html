@@ -22,8 +22,7 @@
         data-ng-switch-when="body"
         data-value="{{proposalUrl}}">
         <adh-resource-actions
-            data-resource-path="{{proposalUrl}}"
-            data-parent-path="true"
+            data-resource-path="{{proposalUrl | adhParentPath}}"
             data-edit="true">
         </adh-resource-actions>
         <adh-meinberlin-proposal-detail
