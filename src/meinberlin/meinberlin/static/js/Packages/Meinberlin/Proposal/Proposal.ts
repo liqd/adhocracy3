@@ -72,7 +72,6 @@ class Adapter {
     public bindPath(
         scope : IScope,
         pathKey : string = "path",
-        isKiezkasse : boolean = false,
         isBuergerhaushalt : boolean = false
     ) : void {
         var self = this;
@@ -100,9 +99,7 @@ class Adapter {
                     var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
                     var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
 
-                    if (isKiezkasse) {
-                        var kiezkasseSheet : SIKiezkasseProposal.Sheet = resource.data[SIKiezkasseProposal.nick];
-                    } else if (isBuergerhaushalt) {
+                    if (isBuergerhaushalt) {
                         var buergerhaushaltSheet : SIBuergerhaushaltProposal.Sheet = resource.data[SIBuergerhaushaltProposal.nick];
                     }
 
@@ -131,19 +128,19 @@ class Adapter {
                             polygon: polygon,
                             assignments: assignments
                         };
-                        if (isKiezkasse) {
-                            scope.data.budget = kiezkasseSheet.budget;
-                            scope.data.creatorParticipate = kiezkasseSheet.creator_participate;
-                            scope.data.locationText = kiezkasseSheet.location_text;
-                        } else if (isBuergerhaushalt) {
+                        if (isBuergerhaushalt) {
                             scope.data.budget = buergerhaushaltSheet.budget;
                             scope.data.locationText = buergerhaushaltSheet.location_text;
                         }
-                    });
+                    }).then(() => self._bindPath(scope, resource));
                 });
             }
             self.adhPermissions.bindScope(scope, () => scope[pathKey]);
         });
+    }
+
+    protected _bindPath(scope, resource) : void {
+        throw new Error("Not implemented!");
     }
 
     private fill(
@@ -234,6 +231,15 @@ class Adapter {
         self.fill(scope, proposalVersion, isKiezkasse, isBuergerhaushalt);
 
         return self.adhHttp.deepPost([proposalVersion]);
+    }
+}
+
+class KiezkassenAdapter extends Adapter {
+    protected _bindPath(scope : IScope, resource) : void {
+        var kiezkasseSheet : SIKiezkasseProposal.Sheet = resource.data[SIKiezkasseProposal.nick];
+        scope.data.budget = kiezkasseSheet.budget;
+        scope.data.creatorParticipate = kiezkasseSheet.creator_participate;
+        scope.data.locationText = kiezkasseSheet.location_text;
     }
 }
 
