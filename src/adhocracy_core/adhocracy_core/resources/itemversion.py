@@ -30,7 +30,7 @@ def update_last_tag(version, registry, options):
     tags_sheet = registry.content.get_sheet(item,
                                             adhocracy_core.sheets.tags.ITags,
                                             request=request)
-    tags_sheet.set({'LAST': version})
+    tags_sheet.set({'LAST': version}, autoupdated=True)
 
 
 def notify_new_itemversion_created(context, registry, options):
