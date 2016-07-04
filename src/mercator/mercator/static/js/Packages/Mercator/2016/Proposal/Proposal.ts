@@ -349,7 +349,7 @@ var fill = (data : IFormData, resource) => {
 };
 
 var create = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (scope) => {
     var data : IFormData = scope.data;
@@ -390,7 +390,7 @@ var create = (
 };
 
 var edit = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (scope) => {
     var data : IFormData = scope.data;
@@ -430,7 +430,7 @@ var edit = (
 
 var moderate = (
     $q : angular.IQService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhCredentials : AdhCredentials.Service,
     adhTopLevelState : AdhTopLevelState.Service
@@ -495,7 +495,7 @@ var moderate = (
 
 var get = (
     $q : ng.IQService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhGetBadges : AdhBadge.IGetBadgeAssignments
 ) => (path : string) : ng.IPromise<IDetailData> => {
@@ -652,7 +652,7 @@ var get = (
 export var createDirective = (
     $location : angular.ILocationService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhResourceUrl
@@ -699,7 +699,7 @@ export var editDirective = (
     $q : angular.IQService,
     $location : angular.ILocationService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhResourceUrl,
@@ -757,7 +757,7 @@ export var moderateDirective = (
     $q : angular.IQService,
     $location : angular.ILocationService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhResourceUrl,
@@ -827,7 +827,7 @@ export var listing = (adhConfig : AdhConfig.IService) => {
 export var listItem = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhGetBadges : AdhBadge.IGetBadgeAssignments
 ) => {
@@ -1005,7 +1005,7 @@ export var mercatorProposalFormController2016 = (
 export var detailDirective = (
     $q : ng.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhPermissions : AdhPermissions.Service,
     adhGetBadges : AdhBadge.IGetBadgeAssignments,

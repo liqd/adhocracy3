@@ -95,7 +95,7 @@ var createBadgeFacets = (badgeGroups, badges) : AdhListing.IFacetItem[] => {
 };
 
 export var getBadgeFacets = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     $q : angular.IQService
 ) => (
     path : string
@@ -124,7 +124,7 @@ export var getBadgeFacets = (
     };
 
 export var getBadgesFactory = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     $q : angular.IQService
 ) : IGetBadgeAssignments => (
     resource : SIBadgeable.HasSheet,
@@ -165,7 +165,7 @@ export var getBadgesFactory = (
 };
 
 var bindPath = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     $q : angular.IQService
 ) => (
@@ -210,7 +210,7 @@ var bindPath = (
 
 export var badgeAssignment = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     $q : angular.IQService,

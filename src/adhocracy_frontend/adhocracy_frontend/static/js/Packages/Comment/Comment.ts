@@ -64,7 +64,7 @@ export interface ICommentResourceScope extends angular.IScope {
 
 
 export var update = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     $q : angular.IQService
 ) => (
     scope : ICommentResourceScope,
@@ -109,7 +109,7 @@ export var update = (
 };
 
 export var bindPath = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     $q : angular.IQService
 ) => (
     scope : ICommentResourceScope,
@@ -124,7 +124,7 @@ export var bindPath = (
 };
 
 export var postCreate = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : ICommentResourceScope,
@@ -151,7 +151,7 @@ export var postCreate = (
 };
 
 export var postEdit = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : ICommentResourceScope,
@@ -170,7 +170,7 @@ export var postEdit = (
 
 export var commentDetailDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
@@ -276,7 +276,7 @@ export var commentDetailDirective = (
 
 export var commentCreateDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => {
     var _postCreate = postCreate(adhHttp, adhPreliminaryNames);
@@ -313,7 +313,7 @@ export var commentCreateDirective = (
 
 export var adhCommentListing = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     $location : angular.ILocationService
@@ -375,7 +375,7 @@ export var adhCommentListing = (
 export var adhCreateOrShowCommentListing = (
     adhConfig : AdhConfig.IService,
     adhDone,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhCredentials : AdhCredentials.Service
 ) => {

@@ -29,7 +29,7 @@ export interface IScope {
 
 
 var postCreate = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : IScope,
@@ -65,7 +65,7 @@ var postCreate = (
 
 export var createDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhShowError,
     adhSubmitIfValid,

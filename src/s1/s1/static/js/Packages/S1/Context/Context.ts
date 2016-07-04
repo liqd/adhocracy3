@@ -28,7 +28,7 @@ export var headerDirective = (
 
 export var stateIndicatorDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -55,7 +55,7 @@ export var stateIndicatorDirective = (
  */
 export var meetingSelectorDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {

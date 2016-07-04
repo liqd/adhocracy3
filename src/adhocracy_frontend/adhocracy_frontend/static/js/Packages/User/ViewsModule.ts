@@ -66,7 +66,7 @@ export var register = (angular) => {
                         templateUrl: "/static/js/templates/CreatePasswordReset.html"
                     };
                 })
-                .when("register", ["adhHttp", (adhHttp : AdhHttp.Service<any>) : AdhTopLevelState.IAreaInput => {
+                .when("register", ["adhHttp", (adhHttp : AdhHttp.Service) : AdhTopLevelState.IAreaInput => {
                     return {
                         templateUrl: "/static/js/templates/Register.html",
                         route: (path, search) => {

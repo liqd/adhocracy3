@@ -437,7 +437,7 @@ export var registerDirective = (
 
 export var passwordResetDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhShowError
@@ -477,7 +477,7 @@ export var passwordResetDirective = (
 export var createPasswordResetDirective = (
     adhConfig : AdhConfig.IService,
     adhCredentials : AdhCredentials.Service,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhEmbed : AdhEmbed.Service,
@@ -572,7 +572,7 @@ export var metaDirective = (
             path: "@",
             name: "@?"
         },
-        controller: ["adhHttp", "$translate", "$scope", (adhHttp : AdhHttp.Service<any>, $translate, $scope) => {
+        controller: ["adhHttp", "$translate", "$scope", (adhHttp : AdhHttp.Service, $translate, $scope) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
@@ -616,7 +616,7 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
             me: "=?"
         },
         controller: ["adhHttp", "$scope", "adhTopLevelState", "adhGetBadges", (
-            adhHttp : AdhHttp.Service<any>,
+            adhHttp : AdhHttp.Service,
             $scope,
             adhTopLevelState : AdhTopLevelState.Service,
             adhGetBadges : AdhBadge.IGetBadgeAssignments
@@ -647,7 +647,7 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
 export var userProfileDirective = (
     adhConfig : AdhConfig.IService,
     adhCredentials : AdhCredentials.Service,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhUser : AdhUser.Service,
@@ -688,7 +688,7 @@ export var userProfileDirective = (
 };
 
 
-export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>) => {
+export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserMessage.html",
@@ -753,7 +753,7 @@ export var userDetailColumnDirective = (
  */
 export var adhUserActivityOverviewDirective = (
     adhConfig: AdhConfig.IService,
-    adhHttp: AdhHttp.Service<any>
+    adhHttp: AdhHttp.Service
 ) => {
     return {
         restrict: "E",
@@ -784,7 +784,7 @@ export var adhUserActivityOverviewDirective = (
 };
 
 export var adhUserProfileImageDirective = (
-    adhHttp: AdhHttp.Service<any>,
+    adhHttp: AdhHttp.Service,
     adhConfig: AdhConfig.IService
 ) => {
     return {
@@ -816,7 +816,7 @@ export var adhUserProfileImageDirective = (
 };
 
 export var adhUserProfileImageEditDirective = (
-    adhHttp: AdhHttp.Service<any>,
+    adhHttp: AdhHttp.Service,
     adhPermissions: AdhPermissions.Service,
     adhConfig: AdhConfig.IService
 ) => {
