@@ -1,14 +1,12 @@
 <div class="action-bar">
     <adh-view-action
         data-ng-if="edit && resourcePath && options.PUT"
-        data-class="action-bar-item"
         data-view="edit"
         data-label="TR__EDIT"
         data-parent-path="parentPath"
         data-resource-path="{{resourcePath}}"></adh-view-action>
     <adh-view-action
         data-ng-if="moderate && resourcePath"
-        data-class="action-bar-item"
         data-view="moderate"
         data-label="TR__MODERATE"
         data-parent-path="parentPath"
@@ -16,38 +14,31 @@
     <adh-assign-badges-action
         data-ng-if="assignBadges && resourcePath"
         data-modals="modals"
-        data-class="action-bar-item"
         data-resource-with-badges-url="{{resourceWithBadgesUrl}}"
         data-resource-path="{{resourcePath}}"></adh-assign-badges-action>
     <adh-modal-action
         data-ng-if="report"
         data-modals="modals"
         data-modal="abuse"
-        data-label="TR__REPORT"
-        data-class="action-bar-item"></adh-modal-action>
+        data-label="TR__REPORT"></adh-modal-action>
     <adh-modal-action
         data-ng-if="share"
         data-modals="modals"
         data-modal="share"
-        data-label="TR__SHARE"
-        data-class="action-bar-item"></adh-modal-action>
+        data-label="TR__SHARE"></adh-modal-action>
     <adh-hide-action
         data-ng-if="hide && resourcePath && options.hide"
-        data-class="action-bar-item"
         data-parent-path="parentPath"
         data-redirect-url="{{deleteRedirectUrl}}"
         data-resource-path="{{resourcePath}}"></adh-hide-action>
     <adh-resource-widget-delete-action
         data-ng-if="resourceWidgetDelete && resourcePath && options.hide"
-        data-class="action-bar-item"
         data-parent-path="parentPath"
         data-resource-path="{{resourcePath}}"></adh-resource-widget-delete-action>
     <adh-print-action
-        data-ng-if="print"
-        data-class="action-bar-item"></adh-print-action>
+        data-ng-if="print"></adh-print-action>
     <adh-cancel-action
         data-ng-if="cancel && resourcePath"
-        data-class="action-bar-item"
         data-parent-path="parentPath"
         data-resource-path="{{resourcePath}}"></adh-cancel-action>
 </div>
