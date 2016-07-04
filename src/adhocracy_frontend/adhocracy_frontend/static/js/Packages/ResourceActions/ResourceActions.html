@@ -19,14 +19,18 @@
         data-class="action-bar-item"
         data-resource-with-badges-url="{{resourceWithBadgesUrl}}"
         data-resource-path="{{resourcePath}}"></adh-assign-badges-action>
-    <adh-report-action
+    <adh-modal-action
         data-ng-if="report"
         data-modals="modals"
-        data-class="action-bar-item"></adh-report-action>
-    <adh-share-action
+        data-modal="abuse"
+        data-label="TR__REPORT"
+        data-class="action-bar-item"></adh-modal-action>
+    <adh-modal-action
         data-ng-if="share"
         data-modals="modals"
-        data-class="action-bar-item"></adh-share-action>
+        data-modal="share"
+        data-label="TR__SHARE"
+        data-class="action-bar-item"></adh-modal-action>
     <adh-hide-action
         data-ng-if="hide && resourcePath && options.hide"
         data-class="action-bar-item"

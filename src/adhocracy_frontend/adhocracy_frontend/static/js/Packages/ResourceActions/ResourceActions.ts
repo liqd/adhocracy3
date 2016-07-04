@@ -96,33 +96,19 @@ export var resourceActionsDirective = (
     };
 };
 
-export var reportActionDirective = () => {
+export var modalActionDirective = () => {
     return {
         restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"report();\">{{ 'TR__REPORT' | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"toggle();\">{{ label | translate }}</a>",
         scope: {
             class: "@",
             modals: "=",
+            modal: "@",
+            label: "@",
         },
         link: (scope) => {
-            scope.report = () => {
-                scope.modals.toggleModal("abuse");
-            };
-        }
-    };
-};
-
-export var shareActionDirective = () => {
-    return {
-        restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"share();\">{{ 'TR__SHARE' | translate }}</a>",
-        scope: {
-            class: "@",
-            modals: "=",
-        },
-        link: (scope) => {
-            scope.share = () => {
-                scope.modals.toggleModal("share");
+            scope.toggle = () => {
+                scope.modals.toggleModal(scope.modal);
             };
         }
     };
