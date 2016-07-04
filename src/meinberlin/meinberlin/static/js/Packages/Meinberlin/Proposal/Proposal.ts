@@ -57,182 +57,182 @@ export interface IScope extends angular.IScope {
     resource : any;
 }
 
-// FIXME: the following functions duplicate some of the adhResourceWidget functionality
-// They are an experiment on how adhResourceWidget can be improved.  This duplication
-// should be resolved at some point.
-var bindPath = (
-    adhHttp : AdhHttp.Service,
-    adhPermissions : AdhPermissions.Service,
-    adhRate : AdhRate.Service,
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadgeAssignments,
-    $q : angular.IQService
-) => (
-    scope : IScope,
-    pathKey : string = "path",
-    isKiezkasse : boolean = false,
-    isBuergerhaushalt : boolean = false
-) : void => {
-    var getPolygon = () => {
-        var processUrl = adhTopLevelState.get("processUrl");
+    // FIXME: the following functions duplicate some of the adhResourceWidget functionality
+    // They are an experiment on how adhResourceWidget can be improved.  This duplication
+    // should be resolved at some point.
+    var bindPath = (
+        adhHttp : AdhHttp.Service,
+        adhPermissions : AdhPermissions.Service,
+        adhRate : AdhRate.Service,
+        adhTopLevelState : AdhTopLevelState.Service,
+        adhGetBadges : AdhBadge.IGetBadgeAssignments,
+        $q : angular.IQService
+    ) => (
+        scope : IScope,
+        pathKey : string = "path",
+        isKiezkasse : boolean = false,
+        isBuergerhaushalt : boolean = false
+    ) : void => {
+        var getPolygon = () => {
+            var processUrl = adhTopLevelState.get("processUrl");
 
-        return adhHttp.get(processUrl).then((process) => {
-            var locationUrl = process.data[SILocationReference.nick]["location"];
+            return adhHttp.get(processUrl).then((process) => {
+                var locationUrl = process.data[SILocationReference.nick]["location"];
 
-            return adhHttp.get(locationUrl).then((location) => {
-                return location.data[SIMultiPolygon.nick]["coordinates"][0][0];
+                return adhHttp.get(locationUrl).then((location) => {
+                    return location.data[SIMultiPolygon.nick]["coordinates"][0][0];
+                });
             });
+        };
+
+        scope.$watch(pathKey, (value : string) => {
+            if (value) {
+                adhHttp.get(value).then((resource) => {
+                    scope.resource = resource;
+
+                    var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
+                    var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
+                    var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
+                    var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
+                    var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
+
+                    if (isKiezkasse) {
+                        var kiezkasseSheet : SIKiezkasseProposal.Sheet = resource.data[SIKiezkasseProposal.nick];
+                    } else if (isBuergerhaushalt) {
+                        var buergerhaushaltSheet : SIBuergerhaushaltProposal.Sheet = resource.data[SIBuergerhaushaltProposal.nick];
+                    }
+
+                    $q.all([
+                        adhRate.fetchAggregatedRates(rateableSheet.post_pool, resource.path),
+                        getPolygon(),
+                        adhGetBadges(resource)
+                    ]).then((args : any[]) => {
+                        var rates = args[0];
+                        var polygon = args[1];
+                        var assignments = args[2];
+
+                        // FIXME: an adapter should take care of this
+                        var ratesPro = rates["1"] || 0;
+                        var ratesContra = rates["-1"] || 0;
+
+                        scope.data = {
+                            title: titleSheet.title,
+                            detail: descriptionSheet.description,
+                            rateCount: ratesPro - ratesContra,
+                            creator: metadataSheet.creator,
+                            creationDate: metadataSheet.item_creation_date,
+                            commentCount: resource.data[SICommentable.nick].comments_count,
+                            lng: pointSheet.coordinates[0],
+                            lat: pointSheet.coordinates[1],
+                            polygon: polygon,
+                            assignments: assignments
+                        };
+                        if (isKiezkasse) {
+                            scope.data.budget = kiezkasseSheet.budget;
+                            scope.data.creatorParticipate = kiezkasseSheet.creator_participate;
+                            scope.data.locationText = kiezkasseSheet.location_text;
+                        } else if (isBuergerhaushalt) {
+                            scope.data.budget = buergerhaushaltSheet.budget;
+                            scope.data.locationText = buergerhaushaltSheet.location_text;
+                        }
+                    });
+                });
+            }
+            adhPermissions.bindScope(scope, () => scope[pathKey]);
         });
     };
 
-    scope.$watch(pathKey, (value : string) => {
-        if (value) {
-            adhHttp.get(value).then((resource) => {
-                scope.resource = resource;
+    var fill = (
+        scope : IScope,
+        proposalVersion,
+        isKiezkasse : boolean = false,
+        isBuergerhaushalt : boolean = false
+    ) : void => {
 
-                var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
-                var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
-                var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
-                var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
-                var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
-
-                if (isKiezkasse) {
-                    var kiezkasseSheet : SIKiezkasseProposal.Sheet = resource.data[SIKiezkasseProposal.nick];
-                } else if (isBuergerhaushalt) {
-                    var buergerhaushaltSheet : SIBuergerhaushaltProposal.Sheet = resource.data[SIBuergerhaushaltProposal.nick];
-                }
-
-                $q.all([
-                    adhRate.fetchAggregatedRates(rateableSheet.post_pool, resource.path),
-                    getPolygon(),
-                    adhGetBadges(resource)
-                ]).then((args : any[]) => {
-                    var rates = args[0];
-                    var polygon = args[1];
-                    var assignments = args[2];
-
-                    // FIXME: an adapter should take care of this
-                    var ratesPro = rates["1"] || 0;
-                    var ratesContra = rates["-1"] || 0;
-
-                    scope.data = {
-                        title: titleSheet.title,
-                        detail: descriptionSheet.description,
-                        rateCount: ratesPro - ratesContra,
-                        creator: metadataSheet.creator,
-                        creationDate: metadataSheet.item_creation_date,
-                        commentCount: resource.data[SICommentable.nick].comments_count,
-                        lng: pointSheet.coordinates[0],
-                        lat: pointSheet.coordinates[1],
-                        polygon: polygon,
-                        assignments: assignments
-                    };
-                    if (isKiezkasse) {
-                        scope.data.budget = kiezkasseSheet.budget;
-                        scope.data.creatorParticipate = kiezkasseSheet.creator_participate;
-                        scope.data.locationText = kiezkasseSheet.location_text;
-                    } else if (isBuergerhaushalt) {
-                        scope.data.budget = buergerhaushaltSheet.budget;
-                        scope.data.locationText = buergerhaushaltSheet.location_text;
-                    }
-                });
+        if (isKiezkasse) {
+            proposalVersion.data[SIKiezkasseProposal.nick] = new SIKiezkasseProposal.Sheet({
+                budget: scope.data.budget,
+                creator_participate: scope.data.creatorParticipate,
+                location_text: scope.data.locationText
+            });
+        } else if (isBuergerhaushalt) {
+            proposalVersion.data[SIBuergerhaushaltProposal.nick] = new SIBuergerhaushaltProposal.Sheet({
+                budget: scope.data.budget,
+                location_text: scope.data.locationText
             });
         }
-        adhPermissions.bindScope(scope, () => scope[pathKey]);
-    });
-};
-
-var fill = (
-    scope : IScope,
-    proposalVersion,
-    isKiezkasse : boolean = false,
-    isBuergerhaushalt : boolean = false
-) : void => {
-
-    if (isKiezkasse) {
-        proposalVersion.data[SIKiezkasseProposal.nick] = new SIKiezkasseProposal.Sheet({
-            budget: scope.data.budget,
-            creator_participate: scope.data.creatorParticipate,
-            location_text: scope.data.locationText
+        proposalVersion.data[SITitle.nick] = new SITitle.Sheet({
+            title: scope.data.title
         });
-    } else if (isBuergerhaushalt) {
-        proposalVersion.data[SIBuergerhaushaltProposal.nick] = new SIBuergerhaushaltProposal.Sheet({
-            budget: scope.data.budget,
-            location_text: scope.data.locationText
+        proposalVersion.data[SIDescription.nick] = new SIDescription.Sheet({
+            description: scope.data.detail
         });
-    }
-    proposalVersion.data[SITitle.nick] = new SITitle.Sheet({
-        title: scope.data.title
-    });
-    proposalVersion.data[SIDescription.nick] = new SIDescription.Sheet({
-        description: scope.data.detail
-    });
-    if (scope.data.lng && scope.data.lat) {
-        proposalVersion.data[SIPoint.nick] = new SIPoint.Sheet({
-            coordinates: [scope.data.lng, scope.data.lat]
+        if (scope.data.lng && scope.data.lat) {
+            proposalVersion.data[SIPoint.nick] = new SIPoint.Sheet({
+                coordinates: [scope.data.lng, scope.data.lat]
+            });
+        }
+    };
+
+    var postCreate = (
+        adhHttp : AdhHttp.Service,
+        adhPreliminaryNames : AdhPreliminaryNames.Service
+    ) => (
+        scope : IScope,
+        poolPath : string,
+        isKiezkasse : boolean = false,
+        isBuergerhaushalt : boolean = false
+    ) => {
+        var proposalClass = RIGeoProposal;
+        var proposalVersionClass = RIGeoProposalVersion;
+
+        if (isKiezkasse) {
+            proposalClass = RIKiezkasseProposal;
+            proposalVersionClass = RIKiezkasseProposalVersion;
+        } else if (isBuergerhaushalt) {
+            proposalClass = RIBuergerhaushaltProposal;
+            proposalVersionClass = RIBuergerhaushaltProposalVersion;
+        }
+
+        var proposal = new proposalClass({preliminaryNames: adhPreliminaryNames});
+        proposal.parent = poolPath;
+        var proposalVersion = new proposalVersionClass({preliminaryNames: adhPreliminaryNames});
+
+        proposalVersion.parent = proposal.path;
+        proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+            follows: [proposal.first_version_path]
         });
-    }
-};
+        fill(scope, proposalVersion, isKiezkasse, isBuergerhaushalt);
 
-var postCreate = (
-    adhHttp : AdhHttp.Service,
-    adhPreliminaryNames : AdhPreliminaryNames.Service
-) => (
-    scope : IScope,
-    poolPath : string,
-    isKiezkasse : boolean = false,
-    isBuergerhaushalt : boolean = false
-) => {
-    var proposalClass = RIGeoProposal;
-    var proposalVersionClass = RIGeoProposalVersion;
+        return adhHttp.deepPost([proposal, proposalVersion]);
+    };
 
-    if (isKiezkasse) {
-        proposalClass = RIKiezkasseProposal;
-        proposalVersionClass = RIKiezkasseProposalVersion;
-    } else if (isBuergerhaushalt) {
-        proposalClass = RIBuergerhaushaltProposal;
-        proposalVersionClass = RIBuergerhaushaltProposalVersion;
-    }
+    var postEdit = (
+        adhHttp : AdhHttp.Service,
+        adhPreliminaryNames : AdhPreliminaryNames.Service
+    ) => (
+        scope : IScope,
+        oldVersion,
+        isKiezkasse : boolean = false,
+        isBuergerhaushalt : boolean = false
+    ) => {
+        var proposalVersionClass = RIGeoProposalVersion;
 
-    var proposal = new proposalClass({preliminaryNames: adhPreliminaryNames});
-    proposal.parent = poolPath;
-    var proposalVersion = new proposalVersionClass({preliminaryNames: adhPreliminaryNames});
+        if (isKiezkasse) {
+            proposalVersionClass = RIKiezkasseProposalVersion;
+        } else if (isBuergerhaushalt) {
+            proposalVersionClass = RIBuergerhaushaltProposalVersion;
+        }
 
-    proposalVersion.parent = proposal.path;
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
-        follows: [proposal.first_version_path]
-    });
-    fill(scope, proposalVersion, isKiezkasse, isBuergerhaushalt);
+        var proposalVersion = new proposalVersionClass({preliminaryNames: adhPreliminaryNames});
+        proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
+        proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+            follows: [oldVersion.path]
+        });
+        fill(scope, proposalVersion, isKiezkasse, isBuergerhaushalt);
 
-    return adhHttp.deepPost([proposal, proposalVersion]);
-};
-
-var postEdit = (
-    adhHttp : AdhHttp.Service,
-    adhPreliminaryNames : AdhPreliminaryNames.Service
-) => (
-    scope : IScope,
-    oldVersion,
-    isKiezkasse : boolean = false,
-    isBuergerhaushalt : boolean = false
-) => {
-    var proposalVersionClass = RIGeoProposalVersion;
-
-    if (isKiezkasse) {
-        proposalVersionClass = RIKiezkasseProposalVersion;
-    } else if (isBuergerhaushalt) {
-        proposalVersionClass = RIBuergerhaushaltProposalVersion;
-    }
-
-    var proposalVersion = new proposalVersionClass({preliminaryNames: adhPreliminaryNames});
-    proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
-        follows: [oldVersion.path]
-    });
-    fill(scope, proposalVersion, isKiezkasse, isBuergerhaushalt);
-
-    return adhHttp.deepPost([proposalVersion]);
-};
+        return adhHttp.deepPost([proposalVersion]);
+    };
 
 export var detailDirective = (
     adhConfig : AdhConfig.IService,
