@@ -40,6 +40,7 @@ class IDocument(IItem):
 
 
 document_meta = item_meta._replace(
+    content_name='Document',
     iresource=IDocument,
     element_types=(ITag,
                    IParagraph,

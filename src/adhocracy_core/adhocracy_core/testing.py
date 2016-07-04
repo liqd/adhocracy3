@@ -670,6 +670,19 @@ def newest_reset_path(app_router) -> callable:
     return get_newest_reset_path
 
 
+@fixture(scope='class')
+def mails(app_router) -> object:
+    """Return  object to get send_mails."""
+    class Mails:
+
+        def __init__(self):
+            self._mailer = app_router.registry.messenger.mailer
+
+        def send(self) -> list:
+            return self._mailer.outbox
+    return Mails()
+
+
 class AppUser:
     """:class:`webtest.TestApp` wrapper for backend functional testing."""
 

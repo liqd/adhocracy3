@@ -122,6 +122,7 @@ def includeme(config):
     config.include('.websockets')
     config.include('.rest')
     config.include('.stats')
+    config.include('.notification')
     config.registry.registerUtility('', IFixtureAsset,
                                     name='adhocracy_core:test_users_fixture')
 
