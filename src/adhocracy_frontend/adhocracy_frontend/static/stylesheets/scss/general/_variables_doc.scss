@@ -210,15 +210,15 @@ category: Variables
 .color-button-cta-active-background {background-color: $color-button-cta-active-background;}
 
 // some static contrast checks for a11y
-@include check-contrast($color-text-normal, $color-background-base, 7);
-@include check-contrast($color-text-normal, $color-structure-introvert);
-@include check-contrast($color-text-extrovert, $color-background-base);
-@include check-contrast($color-text-extrovert, $color-structure-introvert);
-@include check-contrast($color-text-introvert, $color-background-base);
-@include check-contrast($color-text-introvert, $color-structure-introvert, 3);
-@include check-contrast($color-text-inverted, $color-text-highlight-normal);
-@include check-contrast($color-text-highlight-normal, $color-background-base);
-@include check-contrast($color-text-highlight-normal, $color-background-base-introvert);
-@include check-contrast($color-text-inverted, $color-function-negative);
-@include check-contrast($color-text-normal, $color-function-positive);
-@include check-contrast($color-text-normal, $color-function-neutral);
+$_: contrast-check($color-text-normal, $color-background-base, 7);
+$_: contrast-check($color-text-normal, $color-structure-introvert);
+$_: contrast-check($color-text-extrovert, $color-background-base);
+$_: contrast-check($color-text-extrovert, $color-structure-introvert);
+$_: contrast-check($color-text-introvert, $color-background-base);
+$_: contrast-check($color-text-introvert, $color-structure-introvert, 3);
+$_: contrast-check($color-text-inverted, $color-text-highlight-normal);
+$_: contrast-check($color-text-highlight-normal, $color-background-base);
+$_: contrast-check($color-text-highlight-normal, $color-background-base-introvert);
+$_: contrast-check($color-text-inverted, $color-function-negative);
+$_: contrast-check($color-text-normal, $color-function-positive);
+$_: contrast-check($color-text-normal, $color-function-neutral);
