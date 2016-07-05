@@ -151,45 +151,6 @@ section {
 
 /*doc
 ---
-title: Inline boxes mixin
-name: inline-box
-category: Type
----
-
-```html_example
-<span class="inline-box">Inline box 1</span>
-<span class="inline-box">Inline box 2</span>
-
-<ul class="inline-boxes">
-    <li>Inline box 1</li>
-    <li>Inline box 2</li>
-</ul>
-```
-*/
-
-.inline-box {
-    @media screen {
-        @include inline-block;
-        @include rem(font-size, $font-size-small);
-        @include rem(padding, 0 1rem);
-        color: $color-text-highlight-introvert;
-        border: 1px solid $color-text-highlight-introvert;
-    }
-}
-
-.inline-boxes {
-    @media screen {
-        margin: 0;
-        padding: 0;
-    }
-
-    li {
-        @extend .inline-box;
-    }
-}
-
-/*doc
----
 title: Table
 name: table
 category: Type
