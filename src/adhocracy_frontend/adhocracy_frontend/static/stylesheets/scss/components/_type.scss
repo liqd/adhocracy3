@@ -12,7 +12,7 @@ html {
 
 body {
     color: $color-text-normal;
-    line-height: $line-height-normal;
+    line-height: 1.4;
 
     @media print {
         // scss-lint:disable ImportantRule
@@ -50,6 +50,7 @@ h1, h2, h3, h4, h5, h6 {
     // better kerning (char spacing)
     text-rendering: optimizelegibility;
     color: $color-text-extrovert;
+    line-height: 1.2;
 }
 
 /*doc
@@ -69,7 +70,6 @@ p {
     // break very long words
     word-wrap: break-word;
     hyphens: auto;
-    line-height: $line-height-normal;
 
     @media print {
         text-align: justify;

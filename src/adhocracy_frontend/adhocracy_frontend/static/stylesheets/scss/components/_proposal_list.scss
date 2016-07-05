@@ -46,7 +46,6 @@ $thumbnail-height: 90px;
     @include rem(padding, 1rem 1.25rem 1.25rem 0.875rem);
     display: block;
     border-bottom: 2px solid $color-structure-normal;
-    line-height: 1;
     position: relative;
 
     // reset link styling
