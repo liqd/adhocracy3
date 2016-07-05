@@ -3,7 +3,6 @@ import * as AdhHttp from "../Http/Http";
 import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
-import * as AdhUtil from "../Util/Util";
 
 import * as SIBadge from "../../Resources_/adhocracy_core/sheets/badge/IBadge";
 import * as SIBadgeable from "../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
@@ -69,7 +68,6 @@ export var resourceActionsDirective = (
         restrict: "E",
         scope: {
             resourcePath: "@",
-            parentPath: "=?",
             resourceWithBadgesUrl: "@?",
             deleteRedirectUrl: "@?",
             assignBadges: "=?",
@@ -85,9 +83,8 @@ export var resourceActionsDirective = (
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceActions.html",
         link: (scope, element) => {
-            var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
             scope.modals = new Modals($timeout);
-            adhPermissions.bindScope(scope, path, "options");
+            adhPermissions.bindScope(scope, scope.resourcePath, "options");
 
             scope.$watch("resourcePath", () => {
                 scope.modals.clear();
@@ -96,33 +93,19 @@ export var resourceActionsDirective = (
     };
 };
 
-export var reportActionDirective = () => {
+export var modalActionDirective = () => {
     return {
         restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"report();\">{{ 'TR__REPORT' | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"toggle();\">{{ label | translate }}</a>",
         scope: {
             class: "@",
             modals: "=",
+            modal: "@",
+            label: "@",
         },
         link: (scope) => {
-            scope.report = () => {
-                scope.modals.toggleModal("abuse");
-            };
-        }
-    };
-};
-
-export var shareActionDirective = () => {
-    return {
-        restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"share();\">{{ 'TR__SHARE' | translate }}</a>",
-        scope: {
-            class: "@",
-            modals: "=",
-        },
-        link: (scope) => {
-            scope.share = () => {
-                scope.modals.toggleModal("share");
+            scope.toggle = () => {
+                scope.modals.toggleModal(scope.modal);
             };
         }
     };
@@ -180,16 +163,14 @@ export var hideActionDirective = (
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"hide();\">{{ 'TR__HIDE' | translate }}</a>",
         scope: {
             resourcePath: "@",
-            parentPath: "=?",
             class: "@",
             redirectUrl: "@?",
         },
         link: (scope, element) => {
             scope.hide = () => {
                 return $translate("TR__ASK_TO_CONFIRM_HIDE_ACTION").then((question) => {
-                    var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
                     if ($window.confirm(question)) {
-                        return adhHttp.hide(path).then(() => {
+                        return adhHttp.hide(scope.resourcePath).then(() => {
                             var url = scope.redirectUrl;
                             if (!url) {
                                 var processUrl = adhTopLevelState.get("processUrl");
@@ -211,7 +192,6 @@ export var resourceWidgetDeleteActionDirective = () => {
         require: "^adhMovingColumn",
         scope: {
             resourcePath: "@",
-            parentPath: "=?",
             class: "@"
         },
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
@@ -245,47 +225,24 @@ export var printActionDirective = (
     };
 };
 
-export var editActionDirective = (
+export var viewActionDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhResourceUrl,
     $location : angular.ILocationService
 ) => {
     return {
         restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"edit();\">{{ 'TR__EDIT' | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"link();\">{{ label | translate }}</a>",
         scope: {
             resourcePath: "@",
-            parentPath: "=?",
-            class: "@"
+            class: "@",
+            label: "@",
+            view: "@",
         },
         link: (scope) => {
-            scope.edit = () => {
+            scope.link = () => {
                 adhTopLevelState.setCameFrom();
-                var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
-                var url = adhResourceUrl(path, "edit");
-                $location.url(url);
-            };
-        }
-    };
-};
-
-export var moderateActionDirective = (
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhResourceUrl,
-    $location : angular.ILocationService
-) => {
-    return {
-        restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"moderate();\">{{ 'TR__MODERATE' | translate }}</a>",
-        scope: {
-            resourcePath: "@",
-            parentPath: "=?",
-            class: "@"
-        },
-        link: (scope) => {
-            scope.moderate = () => {
-                var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
-                var url = adhResourceUrl(path, "moderate");
+                var url = adhResourceUrl(scope.resourcePath, scope.view);
                 $location.url(url);
             };
         }
@@ -301,7 +258,6 @@ export var cancelActionDirective = (
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"cancel();\">{{ 'TR__CANCEL' | translate }}</a>",
         scope: {
             resourcePath: "@",
-            parentPath: "=?",
             class: "@"
         },
         link: (scope) => {
@@ -309,8 +265,7 @@ export var cancelActionDirective = (
                 if (!scope.resourcePath) {
                     scope.resourcePath = adhTopLevelState.get("processUrl");
                 }
-                var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
-                var url = adhResourceUrl(path);
+                var url = adhResourceUrl(scope.resourcePath);
                 adhTopLevelState.goToCameFrom(url);
             };
         }

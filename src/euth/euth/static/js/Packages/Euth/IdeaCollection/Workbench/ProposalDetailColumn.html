@@ -18,17 +18,22 @@
         data-ng-switch-when="body"
         data-value="{{proposalUrl}}">
         <div class="action-bar">
-            <adh-edit-action data-ng-if="proposalItemOptions.PUT"
+            <adh-view-action data-ng-if="proposalItemOptions.PUT"
                 data-class="action-bar-item"
-                data-parent-path="true"
-                data-resource-path="{{proposalUrl}}">
-            </adh-edit-action>
-            <a class="action-bar-item" data-ng-if="proposalItemOptions.POST" data-ng-href="{{ proposalUrl | adhParentPath | adhResourceUrl:'image' }}">{{ "TR__IMAGE_UPLOAD" | translate }}</a>
+                data-view="edit"
+                data-label="TR__EDIT"
+                data-resource-path="{{proposalUrl | adhParentPath}}">
+            <adh-view-action data-ng-if="proposalItemOptions.PUT"
+                data-class="action-bar-item"
+                data-view="image"
+                data-label="TR__IMAGE_UPLOAD"
+                data-resource-path="{{proposalUrl | adhParentPath}}">
+            </adh-view-action>
             <adh-assign-badges-action
                 data-class="action-bar-item"
                 data-modals="modals"
                 data-resource-with-badges-url="{{processUrl}}"
-                data-resource-path="{{proposalUrl}}">
+                data-resource-path="{{proposalUrl | adhParentPath}}">
             </adh-assign-badges-action>
         </div>
         <ul class="alerts">
