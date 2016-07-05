@@ -21,16 +21,24 @@ for project in $projects; do
     done
 
     # create compass config
-    cat <<EOF > etc/compass_${project}.rb
-http_path = "/"
-css_dir = "$builddir/stylesheets"
-sass_dir = "$builddir/stylesheets/scss"
-fonts_dir = "$builddir/fonts"
-http_fonts_path = "../fonts"
-images_dir = "$builddir/images"
-javascripts_dir = "$builddir/js"
-sourcemap = true
-add_import_path "$builddir/stylesheets/scss"
+    cat <<EOF > Gruntfile_${project}.js
+module.exports = function(grunt) {
+    grunt.initConfig({
+        sass: {
+            options: {
+                sourceMap: true,
+                outputStyle: "compressed"
+            },
+            dist: {
+                files: {
+                    "$builddir/stylesheets/a3.css": "$builddir/stylesheets/scss/a3.scss",
+                }
+            }
+        }
+    });
+
+    grunt.loadNpmTasks('grunt-sass');
+};
 EOF
 
     # create hologram config
@@ -42,7 +50,7 @@ index: type
 EOF
 
     # run hologram
-    bin/compass compile -c etc/compass_${project}.rb
+    bin/grunt --gruntfile "Gruntfile_${project}.js" sass
     bin/hologram etc/hologram_${project}.yml
 
     # clean up
