@@ -102,7 +102,7 @@ Proposal detail article.
     padding: 0;
 
     .proposal-detail-meta-item {
-        @include gallery(3 of 12);
+        @include grid-same-width(4);
 
         &:nth-child(2) {
             text-align: center;

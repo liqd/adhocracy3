@@ -93,9 +93,9 @@ $thumbnail-height: 90px;
 }
 
 .proposal-list-item-col-left {
-    @include span(8 of 12 first);
+    @include grid-span(8, 0);
 }
 
 .proposal-list-item-col-right {
-    @include span(4 of 12 last);
+    @include grid-span(4, 8);
 }

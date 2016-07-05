@@ -1,9 +1,8 @@
-@import "susy";
-
-@import "grid";
+@import "../../lib/sass-planifolia/sass/math";
+@import "../../lib/sass-planifolia/sass/contrast";
+@import "../../lib/sass-planifolia/sass/grid";
 
 @import "general/future";
-@import "../../lib/sass-planifolia/sass/contrast";
 
 @import "general/fonts";
 @import "third_party/adhocracy3-icons-rails";
@@ -17,6 +16,7 @@
 @import "general/variables_doc";
 
 @import "general/mixins";
+@import "grid";
 @import "layout";
 
 @import "components/type";

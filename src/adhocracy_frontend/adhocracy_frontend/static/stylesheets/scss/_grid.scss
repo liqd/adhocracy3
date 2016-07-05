@@ -1,17 +1,21 @@
 // http://susydocs.oddbird.net/en/latest/settings/
 
-$susy: (
-    gutters: 0.1
-);
+@mixin container {
+    &::after {
+        content: "";
+        display: block;
+        clear: both;
+    }
+}
 
 .row {
-    @include container;
+    @include clearfix;
 }
 
 .cols-2 {
-    @include gallery(1 of 2);
+    @include grid-same-width(2);
 }
 
 .cols-3 {
-    @include gallery(1 of 3);
+    @include grid-same-width(3);
 }
