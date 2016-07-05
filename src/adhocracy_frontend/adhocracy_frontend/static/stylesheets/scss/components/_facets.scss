@@ -60,6 +60,7 @@
     @include rem(margin-right, 10px);
     @include rem(padding, 0 10px);
     display: inline-block;
+    vertical-align: middle;
     background: $color-button-cta-base;
     color: $color-button-cta-text;
     padding-right: 1.5em;

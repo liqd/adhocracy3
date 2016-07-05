@@ -3,6 +3,7 @@
     @include rem(height, $button-height);
     @include text-align(center);
     display: inline-block;
+    vertical-align: middle;
     border: 0;
     cursor: pointer;
     font-weight: $font-weight-normal;

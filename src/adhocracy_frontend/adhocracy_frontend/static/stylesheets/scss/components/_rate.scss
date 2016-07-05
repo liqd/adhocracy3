@@ -43,6 +43,7 @@ $arrow-width: 1rem;
     @include rem(min-width, 100px);
     @include rem(padding, 0 10px);
     display: inline-block;
+    vertical-align: middle;
     position: relative;
     margin-left: $arrow-width;
     text-transform: uppercase;
