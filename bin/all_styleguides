@@ -13,6 +13,7 @@ for project in $projects; do
 
     mkdir -p $builddir
     find $builddir -type l -exec rm {} +
+    ln -s "$(pwd)/src/current/current/build/lib" "$builddir/."
 
     # merge static directories
     for dir in `printf "src/$project/$project/static\nsrc/adhocracy_frontend/adhocracy_frontend/static" | uniq`; do
