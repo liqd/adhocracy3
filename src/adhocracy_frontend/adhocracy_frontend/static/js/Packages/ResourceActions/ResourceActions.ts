@@ -96,7 +96,7 @@ export var resourceActionsDirective = (
 export var modalActionDirective = () => {
     return {
         restrict: "E",
-        template: "<a class=\"action-bar-item {{class}}\" href=\"\" data-ng-click=\"toggle();\">{{ label | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"toggle();\">{{ label | translate }}</a>",
         scope: {
             class: "@",
             modals: "=",
@@ -118,7 +118,7 @@ export var assignBadgesActionDirective = (
 ) => {
     return {
         restrict: "E",
-        template: "<a data-ng-if=\"badgesExist && badgeAssignmentPoolOptions.PUT\" class=\"action-bar-item {{class}}\""
+        template: "<a data-ng-if=\"badgesExist && badgeAssignmentPoolOptions.PUT\" class=\"{{class}}\""
             + "href=\"\" data-ng-click=\"assignBadges();\">{{ 'TR__MANAGE_BADGE_ASSIGNMENTS' | translate }}</a>",
         scope: {
             resourcePath: "@",
@@ -160,7 +160,7 @@ export var hideActionDirective = (
 ) => {
     return {
         restrict: "E",
-        template: "<a class=\"action-bar-item {{class}}\" href=\"\" data-ng-click=\"hide();\">{{ 'TR__HIDE' | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"hide();\">{{ 'TR__HIDE' | translate }}</a>",
         scope: {
             resourcePath: "@",
             class: "@",
@@ -188,7 +188,7 @@ export var hideActionDirective = (
 export var resourceWidgetDeleteActionDirective = () => {
     return {
         restrict: "E",
-        template: "<a class=\"action-bar-item {{class}}\" href=\"\" data-ng-click=\"delete();\">{{ 'TR__DELETE' | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"delete();\">{{ 'TR__DELETE' | translate }}</a>",
         require: "^adhMovingColumn",
         scope: {
             resourcePath: "@",
@@ -208,7 +208,7 @@ export var printActionDirective = (
 ) => {
     return {
         restrict: "E",
-        template: "<a class=\"action-bar-item {{class}}\" href=\"\" data-ng-click=\"print();\">{{ 'TR__PRINT' | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"print();\">{{ 'TR__PRINT' | translate }}</a>",
         require: "?^adhMovingColumn",
         scope: {
             class: "@"
@@ -232,7 +232,7 @@ export var viewActionDirective = (
 ) => {
     return {
         restrict: "E",
-        template: "<a class=\"action-bar-item {{class}}\" href=\"\" data-ng-click=\"link();\">{{ label | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"link();\">{{ label | translate }}</a>",
         scope: {
             resourcePath: "@",
             class: "@",
@@ -255,7 +255,7 @@ export var cancelActionDirective = (
 ) => {
     return {
         restrict: "E",
-        template: "<a class=\"action-bar-item {{class}}\" href=\"\" data-ng-click=\"cancel();\">{{ 'TR__CANCEL' | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"cancel();\">{{ 'TR__CANCEL' | translate }}</a>",
         scope: {
             resourcePath: "@",
             class: "@"
