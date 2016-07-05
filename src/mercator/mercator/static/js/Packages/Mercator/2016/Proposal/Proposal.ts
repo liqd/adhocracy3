@@ -1026,6 +1026,13 @@ export var detailDirective = (
             get($q, adhHttp, adhTopLevelState, adhGetBadges)(scope.path).then((data) => {
                 scope.data = data;
             });
+
+            scope.$on("$destroy", adhTopLevelState.bind("processState", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("view", scope, "proposalTab"));
+
+            scope.showBlogTabs = () => {
+                return scope.data && scope.data.winner.name && scope.processState === "result";
+            };
         }
     };
 };
