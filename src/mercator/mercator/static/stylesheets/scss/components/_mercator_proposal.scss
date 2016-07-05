@@ -56,7 +56,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     @include rem(padding, 0 1rem 1px);
     border: 1px solid $color-structure-normal;
     border-width: 1px 0;
-    font-weight: bold;
+    font-weight: $font-weight-extrovert;
     line-height: 1.5;
 
     &.active {
@@ -67,7 +67,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 .mercator-proposal-form-annotation-heading {
     @include rem(margin, -$font-size-normal -$font-size-normal $font-size-normal);
     background: $color-background-base;
-    font-weight: normal;
+    font-weight: $font-weight-medium;
     text-transform: uppercase;
 }
 
@@ -251,7 +251,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     strong {
         @include rem(font-size, $font-size-large);
         display: block;
-        font-weight: normal;
+        font-weight: $font-weight-medium;
     }
 
     @media print {

@@ -73,7 +73,7 @@ Dialog for login related flow (login, register, password reset).
 .login-title {
     @include rem(margin, 0 0 2rem);
     font-size: 100%;
-    font-weight: normal;
+    font-weight: $font-weight-medium;
     line-height: inherit;
     text-align: left;
 }
