@@ -13,6 +13,7 @@ html {
 body {
     color: $color-text-normal;
     line-height: 1.4;
+    font-family: $font-family-normal;
 
     @media print {
         // scss-lint:disable ImportantRule
