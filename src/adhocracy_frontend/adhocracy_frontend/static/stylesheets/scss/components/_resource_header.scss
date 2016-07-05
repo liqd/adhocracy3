@@ -85,3 +85,49 @@ actions (edit, share, report, print, ...).
         font-weight: bold;
     }
 }
+
+/*doc
+---
+title: image modifier
+name: resource-header.m-image
+parent: resource-header
+---
+
+Resource headers can have a background image.
+
+```html_example
+<div class="resource-header-wrapper" style="background-image: url('/static/images/sample.jpg')">
+    <header class="resource-header m-image">
+        <div class="resource-header-navigation">
+            <div class="resource-header-breadcrumbs">
+                <a href="#">← to process</a>
+            </div>
+            <a href="#" class="resource-header-actions">…</a>
+        </div>
+        <div class="resource-header-main">
+            <h1 class="resource-header-title">Johannisthal</h1>
+            <ul class="resource-header-meta">
+                <li>Bebauungsplanverfahren 184a</li>
+                <li>Öffentliche auslegung</li>
+                <li>22.9.-22.10.15</li>
+            </ul>
+            <div class="resource-header-action"><a href="#" class="button-cta">Create proposal</a></div>
+        </div>
+    </header>
+</div>
+```
+*/
+.resource-header.m-image {
+    color: $color-text-inverted;
+    background: rgba($color-brand-one-introvert, 0.7);
+
+    .resource-header-title,
+    .resource-header-meta {
+        color: inherit;
+    }
+}
+
+.resource-header-wrapper {
+    background-size: cover;
+    background-position: 50%;
+}
