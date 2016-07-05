@@ -315,6 +315,15 @@ export var registerRoutes = (
                 proposalUrl: resource.path
             };
         })
+        .default(RIProposal, "blog", processType, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide"
+        })
+        .specific(RIProposal, "blog", processType, context, () => (resource : RIProposal) => {
+            return {
+                proposalUrl: resource.path
+            };
+        })
         .default(RIProposal, "moderate", processType, context, {
             space: "content",
             movingColumns: "is-collapse-show-hide"
