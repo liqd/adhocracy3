@@ -40,7 +40,7 @@
     }
 
     .moving-column-menu-sorts {
-        @include inline-block;
+        display: inline-block;
     }
 
     .moving-column-body {

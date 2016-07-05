@@ -28,7 +28,7 @@
     padding: 0;
 
     .tab {
-        @include inline-block;
+        display: inline-block;
         list-style: none;
 
         .tab-button {
@@ -61,7 +61,7 @@
 }
 
 .tabset-panes {
-    @include single-transition(height, 0.5s);
+    transition: height 0.5s;
     background: $color-background-base-introvert;
     overflow: hidden;
 }

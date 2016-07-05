@@ -44,7 +44,7 @@
 }
 
 .sort-header {
-    @include inline-block;
+    display: inline-block;
     margin-bottom: 0;
 }
 
@@ -55,11 +55,11 @@
 
 .facet-toggle {
     @include ellipsis(12em);
-    @include inline-block;
     @include rem(left, -18px);
     @include rem(line-height, 20px);
     @include rem(margin-right, 10px);
     @include rem(padding, 0 10px);
+    display: inline-block;
     background: $color-button-cta-base;
     color: $color-button-cta-text;
     padding-right: 1.5em;

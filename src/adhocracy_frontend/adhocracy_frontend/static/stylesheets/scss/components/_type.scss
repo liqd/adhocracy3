@@ -169,9 +169,9 @@ category: Type
 
 .inline-box {
     @media screen {
-        @include inline-block;
         @include rem(font-size, $font-size-small);
         @include rem(padding, 0 1rem);
+        display: inline-block;
         color: $color-text-highlight-introvert;
         border: 1px solid $color-text-highlight-introvert;
     }

@@ -239,9 +239,9 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-budget-col {
-    @include inline-block;
     @include rem(margin-bottom, 20px);
     @include rem(padding-right, 2rem);
+    display: inline-block;
     color: $color-text-introvert;
 
     &.requested {
@@ -259,7 +259,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 
         strong {
             @include rem(font-size, $font-size-normal);
-            @include inline-block;
+            display: inline-block;
             font-weight: $font-weight-extrovert;
         }
     }

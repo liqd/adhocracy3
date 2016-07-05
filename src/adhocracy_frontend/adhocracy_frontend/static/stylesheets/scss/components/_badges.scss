@@ -19,9 +19,9 @@ Badges for labeling things
 
 .badge {
     @include rem(padding, 0 5px);
-    @include inline-block;
     @include rem(margin-right, 5px);
     @include rem(font-size, $font-size-smaller);
+    display: inline-block;
     background: $color-brand-two-normal;
     color: $color-text-inverted;
     line-height: $badge-line-height;
@@ -69,10 +69,10 @@ The description of a badge assignment. The same modifiers as for `badge` apply.
 }
 
 .badge-toggle {
-    @include inline-block;
     @include rem(border-radius, 5px);
     @include rem(margin-right, 10px);
     @include rem(padding, 5px);
+    display: inline-block;
     background: $color-structure-introvert;
     cursor: pointer;
 }

@@ -169,7 +169,7 @@ category: Variables
 */
 
 .example-color {
-    @include inline-block;
+    display: inline-block;
     height: 3rem;
     width: 3rem;
     border: 1px solid $color-structure-introvert;

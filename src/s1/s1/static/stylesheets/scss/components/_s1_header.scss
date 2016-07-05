@@ -5,9 +5,9 @@
 }
 
 .s1-header-logo-link {
-    @include inline-block;
     @include rem(line-height, 30px);
     @include rem(top, 10px);
+    display: inline-block;
     color: $color-text-introvert;
     position: absolute;
     left: 0;
@@ -27,7 +27,7 @@
     @include rem(margin-left, 140px);
     white-space: nowrap;
     text-align: center;
-    
+
     > * {
         // spacing between buttons
         @include rem(margin-right, 10px);

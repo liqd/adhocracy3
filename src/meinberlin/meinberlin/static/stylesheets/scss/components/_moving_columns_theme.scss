@@ -43,9 +43,9 @@
 }
 
 .moving-column-tab {
-    @include inline-block;
     @include rem(font-size, $font-size-small);
     @include rem(margin, 0 30px 0 5px);
+    display: inline-block;
     background: $color-background-base-introvert;
     color: $color-text-introvert;
     float: left;

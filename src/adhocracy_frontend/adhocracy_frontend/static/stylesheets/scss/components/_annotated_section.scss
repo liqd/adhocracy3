@@ -27,8 +27,8 @@ A section with a additional annotation, typically displayed in a second column.
 
     .annotated-section-body,
     .annotated-section-annotation {
-        @include inline-block;
         @include rem(font-size, $font-size-normal);
+        display: inline-block;
         vertical-align: top;
     }
 

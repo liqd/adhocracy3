@@ -90,7 +90,7 @@
     }
 
     .meinberlin-proposal-detail-meta-item-text {
-        @include inline-block;
+        display: inline-block;
         margin: 0;
         text-align: left;
     }
