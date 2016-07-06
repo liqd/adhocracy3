@@ -34,6 +34,7 @@ def test_add_changelog_created_with_parent(event, pool, changelog):
     event.object.__parent__ = pool
     add_changelog_created(event)
     assert changelog['parent'].modified is True
+    assert changelog['parent'].autoupdated is True
 
 
 def test_add_changelog_followed_with_item_parent(event, item, changelog):

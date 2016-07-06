@@ -28,6 +28,7 @@ def add_changelog_created(event):
     parent = event.object.__parent__
     if parent is not None:
         _add_changelog(event.registry, parent, key='modified', value=True)
+        _add_changelog(event.registry, parent, key='autoupdated', value=True)
 
 
 def add_changelog_modified_and_descendants(event):
