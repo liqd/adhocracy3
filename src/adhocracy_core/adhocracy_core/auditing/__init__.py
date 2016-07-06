@@ -14,6 +14,7 @@ from logging import getLogger
 from adhocracy_core.events import ActivitiesAddedToAuditLog
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.utils import now
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -241,7 +242,7 @@ def generate_activity_description(activity: Activity,
         - `target_title`
     """
     mapping = {'subject_name': _get_subject_name(activity.subject, registry),
-               'object_title': _get_title(activity.target, registry),
+               'object_title': _get_title(activity.object, registry),
                'object_type_name': _get_type_name(activity.object, registry),
                'target_title': _get_title(activity.target, registry),
                'target_type_name': _get_type_name(activity.target, registry),
@@ -286,7 +287,9 @@ def _get_type_name(context: IResource, registry: Registry) -> str:
 
 
 def _get_title(context: IResource, registry: Registry) -> str:
-    from adhocracy_core.sheets.title import ITitle
+    from adhocracy_core.sheets.comment import IComment
+    if IItem.providedBy(context):
+        context = registry.content.get_sheet_field(context, ITags, 'LAST')
     if ITitle.providedBy(context):
         name = registry.content.get_sheet_field(context, ITitle, 'title')
     else:
