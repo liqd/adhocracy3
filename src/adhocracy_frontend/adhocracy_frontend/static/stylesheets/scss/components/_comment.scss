@@ -204,7 +204,7 @@ parent: comment
     }
 
     .comment-header-edited {
-        @include inline-block;
+        display: inline-block;
         color: $color-structure-introvert;
         font-style: italic;
 
@@ -261,7 +261,8 @@ parent: comment
     }
 
     .rate {
-        @include inline-block;
+        display: inline-block;
+        vertical-align: middle;
     }
 }
 

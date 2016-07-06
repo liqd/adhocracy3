@@ -39,10 +39,11 @@ $line-height: (24/12);
 $arrow-width: 1rem;
 
 .like-button {
-    @include inline-block;
     @include rem(font-size, $font-size-small);
     @include rem(min-width, 100px);
     @include rem(padding, 0 10px);
+    display: inline-block;
+    vertical-align: middle;
     position: relative;
     margin-left: $arrow-width;
     text-transform: uppercase;
@@ -197,7 +198,7 @@ Click show results
     }
 
     .rate-button-container {
-        @include inline-block;
+        display: inline-block;
         position: relative;
     }
 

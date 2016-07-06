@@ -94,7 +94,7 @@ The menu should always have the same state as its columns.
 */
 .moving-column {
     // layout
-    @include transition(width 0.5s, left 0.5s);
+    transition: width 0.5s, left 0.5s;
     position: absolute;
     top: 0;
     bottom: 0;
@@ -227,9 +227,9 @@ States:
     .moving-column-menu-sort-option,
     .moving-column-menu-button,
     .moving-column-menu-sort-label {
-        @include inline-block;
         @include rem(font-size, $font-size-small);
         @include rem(margin-right, 30px);
+        display: inline-block;
         color: $color-text-highlight-introvert;
         font-weight: $font-weight-introvert;
         float: left;
@@ -248,9 +248,9 @@ States:
             position: relative;
 
             &:after {
-                @include inline-block;
                 @include rem(right, -1rem);
                 @include rem(width, 1rem);
+                display: inline-block;
                 content: "|";
                 position: absolute;
                 text-align: center;
@@ -276,9 +276,9 @@ States:
     float: right;
 
     .moving-column-menu-nav-button {
-        @include inline-block;
         @include rem(min-width, 3.5rem);
         @include rem(padding, 0 0.5rem);
+        display: inline-block;
         font-weight: $font-weight-extrovert;
         text-align: center;
         vertical-align: baseline;

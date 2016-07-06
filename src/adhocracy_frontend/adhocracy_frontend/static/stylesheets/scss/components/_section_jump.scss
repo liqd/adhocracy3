@@ -44,7 +44,6 @@ combination with `.jump-navigation.m-narrow.m-unnumbered`.
 }
 
 .section-jump-cover {
-    @include span(full);
     @include rem(padding, 15px 10px 10px);
     border-bottom: 2px solid $color-structure-normal;
 

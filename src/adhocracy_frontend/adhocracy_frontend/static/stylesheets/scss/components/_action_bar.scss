@@ -66,8 +66,8 @@ An action can trigger showing a modal below the action bar.
 }
 
 .action-bar-item {
-    @include inline-block;
     @include rem(margin-right, 2rem);
+    display: inline-block;
     position: relative;
     text-decoration: none;
 
@@ -88,8 +88,8 @@ An action can trigger showing a modal below the action bar.
 
 .action-bar {
     @include rem(font-size, $font-size-small);
-    @include inline-block;
     @include rem(padding, 0 7px);
+    display: inline-block;
     background: $color-structure-normal;
     width: 100%;
     margin-bottom: 1px;

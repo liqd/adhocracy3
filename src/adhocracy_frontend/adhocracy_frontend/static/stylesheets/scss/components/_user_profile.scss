@@ -26,7 +26,7 @@
     }
 
     .user-profile-info-icon {
-        @include inline-block;
+        display: inline-block;
         line-height: 1;
         font-size: 400%;
 
@@ -81,7 +81,7 @@
     .user-profile-image-edit-button {
         @include rem(width, $image-base-size);
         @include rem(height, $image-base-size);
-        @include border-radius(50%);
+        border-radius: 50%;
 
         position: absolute;
         top: 0;
@@ -137,7 +137,7 @@
 }
 
 .user-profile-image {
-    @include border-radius(50%);
+    border-radius: 50%;
 }
 
 .user-meta.user-profile-image {

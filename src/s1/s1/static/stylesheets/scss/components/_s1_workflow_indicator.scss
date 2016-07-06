@@ -3,7 +3,7 @@ $state-height: 15px;
 
 .s1-states {
     @include clearfix;
-    @include border-radius($state-height / 2);
+    border-radius: $state-height / 2;
     border: 1px solid $color-brand-one-normal;
     list-style: none;
     padding: 0;
@@ -29,7 +29,7 @@ $state-height: 15px;
     }
 
     &:first-child {
-        @include border-radius(($state-height / 2) 0 0 ($state-height / 2));
+        border-radius: ($state-height / 2) 0 0 ($state-height / 2);
 
         &:before {
             display: none;
@@ -37,7 +37,7 @@ $state-height: 15px;
     }
 
     &:last-child {
-        @include border-radius(0 ($state-height / 2) ($state-height / 2) 0);
+        border-radius: 0 ($state-height / 2) ($state-height / 2) 0;
     }
 
     &:after, &:before {

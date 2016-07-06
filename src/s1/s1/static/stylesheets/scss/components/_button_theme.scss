@@ -37,7 +37,7 @@ Narrower cta button
     }
 
     &.m-menu-action {
-        @include border-radius(0);
+        border-radius: 0;
         color: $color-brand-one-normal;
         font-size: $font-size-small;
 
@@ -128,10 +128,10 @@ cta button variant
 
 .button-group {
     @include clearfix;
-    @include inline-block;
+    display: inline-block;
 
     .button {
-        @include border-radius(0);
+        border-radius: 0;
         float: left;
 
         &:first-child {

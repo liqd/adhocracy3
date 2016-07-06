@@ -15,7 +15,7 @@ A mixin to style a button used with a section
 @mixin action-section-button {
     @include disguised-link;
     @include rem(font-size, $font-size-small);
-    @include inline-block;
+    display: inline-block;
     text-align: center;
 
     i {
