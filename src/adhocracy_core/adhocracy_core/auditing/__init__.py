@@ -90,8 +90,6 @@ def add_to_auditlog(activities: [Activity],
 
     The audit database is created if missing. If the `zodbconn.uri.audit`
     value is not specified in the config, auditing does not happen.
-    `activities` is serialized to a :class:`adhocracy_core.interfaces.Auditlog`
-    to make them persistent.
     """
     auditlog = get_auditlog(request.root)
     event = ActivitiesAddedToAuditLog(auditlog, activities, request)
