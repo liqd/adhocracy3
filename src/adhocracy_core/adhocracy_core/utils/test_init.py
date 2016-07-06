@@ -196,7 +196,9 @@ class TestGetVisibilityChange:
                                       registry=None,
                                       old_appstruct={},
                                       new_appstruct={},
-                                      request=None)
+                                      request=None,
+                                      autoupdated=False,
+                                      )
         return event
 
     def call_fut(self, event):
