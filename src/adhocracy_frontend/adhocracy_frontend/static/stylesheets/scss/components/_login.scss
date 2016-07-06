@@ -1,33 +1,5 @@
 /*doc
 ---
-title: textbox
-name: textbox
-category: Widgets
----
-
-A simple box containing text.
-
-```html_example
-<div class="textbox">
-    <p>textbox</p>
-</div>
-<div class="textbox m-unobtrusive">
-    <p>unobtrusive textbox</p>
-</div>
-```
-*/
-.textbox {
-    @include rem(padding, 1rem);
-    @include rem(margin-bottom, 1rem);
-    background-color: $color-structure-introvert;
-
-    .m-unobtrusive {
-        color: $color-text-introvert;
-    }
-}
-
-/*doc
----
 title: Login
 name: login
 category: Widgets
@@ -101,7 +73,7 @@ Dialog for login related flow (login, register, password reset).
 .login-title {
     @include rem(margin, 0 0 2rem);
     font-size: 100%;
-    font-weight: normal;
+    font-weight: $font-weight-medium;
     line-height: inherit;
     text-align: left;
 }

@@ -128,11 +128,6 @@ category: Variables
         <td></td>
     </tr>
     <tr>
-        <td><div class="example-color color-background-mask"></div></td>
-        <td><code>color-background-mask</code></td>
-        <td>Mask behind an modal</td>
-    </tr>
-    <tr>
         <td colspan="3"><strong>Button colors</strong></td>
     </tr>
     <tr>
@@ -196,7 +191,6 @@ category: Variables
 
 .color-background-base {background-color: $color-background-base;}
 .color-background-base-introvert {background-color: $color-background-base-introvert;}
-.color-background-mask {background-color: $color-background-mask;}
 
 .color-structure-normal {background-color: $color-structure-normal;}
 .color-structure-introvert {background-color: $color-structure-introvert;}

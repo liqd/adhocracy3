@@ -36,7 +36,7 @@ Banner showing up if the browser is not supported.
     h1 {
         @include rem(margin, 0 0 5px);
         @include rem(font-size, $font-size-plus);
-        font-weight: $font-weight-normal;
+        font-weight: $font-weight-medium;
     }
 
     .language-block {
