@@ -69,27 +69,26 @@ class TestUpdateAuditlogCallback:
 
     def test_ignore_if_no_real_change(self, request_, add_to, changelog,
                                       context):
-        changelog['/nup'] = changelog['']._replace(last_version=context,
-                                                   followed_by=context,
-                                                   changed_descendants=True,
-                                                   changed_backrefs=False,
-                                                   )
+        changelog['/'] = changelog['']._replace(last_version=context,
+                                                followed_by=context,
+                                                changed_descendants=True,
+                                                changed_backrefs=False,
+                                                )
         self.call_fut(request_, None)
         assert add_to.call_args[0][0] == []
 
     def test_ignore_if_autoupdated_change(self, request_, add_to, changelog,
                                           context):
-            changelog['/nup'] = changelog['']._replace(created=True,
-                                                       resource=context,
-                                                       autoupdated=True)
-            self.call_fut(request_, None)
-            assert add_to.call_args[0][0] == []
+        changelog['/'] = changelog['']._replace(created=True,
+                                                resource=context,
+                                                autoupdated=True)
+        self.call_fut(request_, None)
+        assert add_to.call_args[0][0] == []
 
     def test_add_add_activity_if_created(self, request_, add_to, changelog,
                                           context, parent):
         from adhocracy_core.interfaces import ActivityType
-        changelog['/resource'] = changelog['']._replace(created=True,
-                                                        resource=context)
+        changelog['/'] = changelog['']._replace(created=True, resource=context)
         self.call_fut(request_, None)
         added_activity = add_to.call_args[0][0][0]
         assert added_activity.type == ActivityType.add
@@ -99,21 +98,25 @@ class TestUpdateAuditlogCallback:
     def test_add_update_activity_if_modified(self, request_, add_to, changelog,
                                              context):
         from adhocracy_core.interfaces import ActivityType
-        changelog['/resource']  = changelog['']._replace(modified=True,
-                                                         resource=context)
+        changelog['/'] = changelog['']._replace(modified=True, resource=context)
         self.call_fut(request_, None)
         added_activity = add_to.call_args[0][0][0]
         assert added_activity.type == ActivityType.update
         assert added_activity.object == context
 
-    def test_add_update_activity_if_version_created(self, request_, add_to,
-                                                    changelog, version, item):
+    def test_add_update_item_activity_if_version_created(
+        self, request_, add_to, changelog, version):
         from adhocracy_core.interfaces import ActivityType
-        changelog['/resource'] = changelog['']._replace(created=True,
-                                                        resource=version)
+        changelog['/'] = changelog['']._replace(created=True, resource=version)
         self.call_fut(request_, None)
         added_activity = add_to.call_args[0][0][0]
         assert added_activity.type == ActivityType.update
+
+    def test_set_target_to_item_if_version(
+        self, request_, add_to, changelog, version, item):
+        changelog['/'] = changelog['']._replace(created=True, resource=version)
+        self.call_fut(request_, None)
+        added_activity = add_to.call_args[0][0][0]
         assert added_activity.target == item
 
     def test_add_remove_activity_if_concealed(self, request_, add_to, changelog,
@@ -121,8 +124,9 @@ class TestUpdateAuditlogCallback:
         """Concealed == hidden or removed."""
         from adhocracy_core.interfaces import ActivityType
         from adhocracy_core.interfaces import VisibilityChange
-        changelog['/resource']  = changelog[''].\
-            _replace(visibility=VisibilityChange.concealed, resource=context)
+        changelog['/']  = changelog['']._replace(
+            visibility=VisibilityChange.concealed,
+            resource=context)
         self.call_fut(request_, None)
         added_activity = add_to.call_args[0][0][0]
         assert added_activity.type == ActivityType.remove
@@ -131,8 +135,7 @@ class TestUpdateAuditlogCallback:
     def test_add_sheet_data_if_created(self, request_, add_to, changelog,
                                        context, mock_sheet, registry):
         registry.content.get_sheets_create.return_value = [mock_sheet]
-        changelog['/resource'] = changelog['']._replace(created=True,
-                                                        resource=context)
+        changelog['/'] = changelog['']._replace(created=True, resource=context)
         self.call_fut(request_, None)
         added_activity = add_to.call_args[0][0][0]
         registry.content.get_sheets_create.assert_called_with(context)
@@ -142,8 +145,7 @@ class TestUpdateAuditlogCallback:
     def test_add_sheet_data_if_modified(self, request_, add_to, changelog,
                                         context, mock_sheet, registry):
         registry.content.get_sheets_edit.return_value = [mock_sheet]
-        changelog['/resource'] = changelog['']._replace(modified=True,
-                                                        resource=context)
+        changelog['/'] = changelog['']._replace(modified=True, resource=context)
         self.call_fut(request_, None)
         added_activity = add_to.call_args[0][0][0]
         registry.content.get_sheets_edit.assert_called_with(context)
@@ -152,19 +154,18 @@ class TestUpdateAuditlogCallback:
 
     def test_add_name(self, request_, add_to, changelog, context,
                       mock_generate_activity_name):
-        changelog['/resource'] = changelog['']._replace(modified=True,
-                                                        resource=context)
+        changelog['/'] = changelog['']._replace(modified=True, resource=context)
         self.call_fut(request_, None)
         added_activity = add_to.call_args[0][0][0]
         assert added_activity.name == mock_generate_activity_name.return_value
 
     def test_add_published(self, request_, add_to, changelog, context, mocker):
         now = mocker.patch('adhocracy_core.auditing.now', autospec=True)
-        changelog['/resource'] = changelog['']._replace(modified=True,
-                                                        resource=context)
+        changelog['/'] = changelog['']._replace(modified=True, resource=context)
         self.call_fut(request_, None)
         added_activity = add_to.call_args[0][0][0]
         assert added_activity.published == now.return_value
+
 
 
 class TestAuditlog:
