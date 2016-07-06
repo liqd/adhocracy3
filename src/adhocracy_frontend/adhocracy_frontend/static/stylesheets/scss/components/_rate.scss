@@ -90,7 +90,6 @@ $arrow-width: 1rem;
         // :focus is sometimes set on click and then stays.
         // That's why it is skipped here.
         &:hover {
-            // scss-lint:disable NestingDepth
             background: $color-button-cta-base;
 
             .supporting .text-unsupport {

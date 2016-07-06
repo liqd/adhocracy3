@@ -137,9 +137,7 @@ The menu should always have the same state as its columns.
 
     @media print {
         position: static;
-        // scss-lint:disable ImportantRule
         width: auto !important;
-        // scss-lint:enable ImportantRule
         border: 0;
 
         &:not(.has-focus) {
