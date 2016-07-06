@@ -118,7 +118,7 @@ rather than in response to user action.
 
 .map-list-navigate {
     @include rem(font-size, $font-size-normal);
-    font-weight: bold;
+    font-weight: $font-weight-extrovert;
 
     &:hover, &:focus {
         text-decoration: none;
@@ -168,7 +168,7 @@ rather than in response to user action.
     width: 100%;
 
     &.m-empty {
-        font-weight: bold;
+        font-weight: $font-weight-extrovert;
         text-align: center;
     }
 }

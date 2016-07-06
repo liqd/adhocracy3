@@ -7,7 +7,7 @@ a {
 }
 
 .disguised-link {
-    font-weight: normal;
+    font-weight: $font-weight-medium;
 
     &, &:hover,
     &:focus {

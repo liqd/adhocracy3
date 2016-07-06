@@ -137,14 +137,12 @@
                         </div>
 
                         <h3>{{ "TR__MERCATOR_PROPOSAL_LOCATION_LABEL" | translate }}:</h3>
-                        <ul class="inline-boxes">
-                            <li data-ng-if="data.location.location_is_online" class="inline-box-online">{{ "TR__ONLINE" | translate }}</li>
-                            <li data-ng-if="data.location.location_specific_1">{{ data.location.location_specific_1 }}</li>
-                            <li data-ng-if="data.location.location_specific_2">{{ data.location.location_specific_2 }}</li>
-                            <li data-ng-if="data.location.location_specific_3">{{ data.location.location_specific_3 }}</li>
-                            <li data-ng-if="data.location.location_is_linked_to_ruhr">{{ "TR__MERCATOR_PROPOSAL_RUHR" | translate }}</li>
-                            <li data-ng-if="data.finance.other_sources">{{ data.finance.other_sources }}</li>
-                        </ul>
+                        <span class="badge" data-ng-if="data.location.location_is_online">{{ "TR__ONLINE" | translate }}</span>
+                        <span class="badge" data-ng-if="data.location.location_specific_1">{{ data.location.location_specific_1 }}</span>
+                        <span class="badge" data-ng-if="data.location.location_specific_2">{{ data.location.location_specific_2 }}</span>
+                        <span class="badge" data-ng-if="data.location.location_specific_3">{{ data.location.location_specific_3 }}</span>
+                        <span class="badge" data-ng-if="data.location.location_is_linked_to_ruhr">{{ "TR__MERCATOR_PROPOSAL_RUHR" | translate }}</span>
+                        <span class="badge" data-ng-if="data.finance.other_sources">{{ data.finance.other_sources }}</span>
 
                         <a class="action-section-button" data-ng-href="{{ path | adhResourceUrl:'comments:finance'}}">
                             <i class="icon-speechbubble"></i> {{ data.finance.commentCount }}

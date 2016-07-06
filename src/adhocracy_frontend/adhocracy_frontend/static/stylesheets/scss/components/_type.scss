@@ -12,7 +12,8 @@ html {
 
 body {
     color: $color-text-normal;
-    line-height: $line-height-normal;
+    line-height: 1.4;
+    font-family: $font-family-normal;
 
     @media print {
         // scss-lint:disable ImportantRule
@@ -50,6 +51,7 @@ h1, h2, h3, h4, h5, h6 {
     // better kerning (char spacing)
     text-rendering: optimizelegibility;
     color: $color-text-extrovert;
+    line-height: 1.2;
 }
 
 /*doc
@@ -69,7 +71,6 @@ p {
     // break very long words
     word-wrap: break-word;
     hyphens: auto;
-    line-height: $line-height-normal;
 
     @media print {
         text-align: justify;
@@ -146,45 +147,6 @@ section {
 
     h2 {
         @include rem(font-size, 1.1rem);
-    }
-}
-
-/*doc
----
-title: Inline boxes mixin
-name: inline-box
-category: Type
----
-
-```html_example
-<span class="inline-box">Inline box 1</span>
-<span class="inline-box">Inline box 2</span>
-
-<ul class="inline-boxes">
-    <li>Inline box 1</li>
-    <li>Inline box 2</li>
-</ul>
-```
-*/
-
-.inline-box {
-    @media screen {
-        @include rem(font-size, $font-size-small);
-        @include rem(padding, 0 1rem);
-        display: inline-block;
-        color: $color-text-highlight-introvert;
-        border: 1px solid $color-text-highlight-introvert;
-    }
-}
-
-.inline-boxes {
-    @media screen {
-        margin: 0;
-        padding: 0;
-    }
-
-    li {
-        @extend .inline-box;
     }
 }
 
@@ -308,7 +270,7 @@ li {
 }
 
 dt {
-    font-weight: bold;
+    font-weight: $font-weight-extrovert;
 }
 
 /*doc
