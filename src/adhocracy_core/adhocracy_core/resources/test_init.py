@@ -368,11 +368,13 @@ class TestResourceFactory:
         meta = resource_meta._replace(iresource=IResource, use_autonaming=True)
         user = testing.DummyResource()
 
-        resource = self.make_one(meta)(parent=pool, creator=user)
+        resource = self.make_one(meta)(parent=pool, creator=user,
+                                       autoupdated=True)
 
         assert IResourceCreatedAndAdded.providedBy(events[0])
         assert events[0].object == resource
         assert events[0].parent == pool
+        assert events[0].autoupdated is True
 
     def test_notify_new_resource_created_and_added_ignore_if_not_send_event(
             self, resource_meta, config, pool):

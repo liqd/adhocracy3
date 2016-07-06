@@ -482,6 +482,7 @@ class IResourceCreatedAndAdded(IObjectEvent):
     parent = Attribute('The parent of the new resource')
     registry = Attribute('The pyramid registry')
     creator = Attribute('User resource object of the authenticated User')
+    autoupdated = Attribute('Creation was caused automatically by application')
 
 
 class IResourceWillBeDeleted(IObjectEvent):

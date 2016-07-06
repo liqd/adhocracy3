@@ -16,8 +16,9 @@ class ResourceCreatedAndAddedUnitTest(unittest.TestCase):
         parent = testing.DummyResource()
         registry = testing.DummyResource()
         creator = testing.DummyResource()
+        autoupdated = True
 
-        inst = self.make_one(context, parent, registry, creator)
+        inst = self.make_one(context, parent, registry, creator, autoupdated)
 
         assert IResourceCreatedAndAdded.providedBy(inst)
         assert verifyObject(IResourceCreatedAndAdded, inst)

@@ -137,6 +137,8 @@ def includeme(config):
     """Register subscriber to update transaction changelog."""
     config.add_subscriber(add_changelog_created,
                           IResourceCreatedAndAdded)
+    config.add_subscriber(add_changelog_autoupdated,
+                          IResourceCreatedAndAdded)
     config.add_subscriber(add_changelog_modified_and_descendants,
                           IResourceSheetModified)
     config.add_subscriber(add_changelog_autoupdated,

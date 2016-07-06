@@ -29,14 +29,18 @@ class ResourceCreatedAndAdded:
     :param parent(adhocracy_core.interfaces.IResource):
     :param registry(pyramid.registry.Registry):
     :param creator(adhocracy_core.resource.principal.IUser):
+    :param: autoupdated(bool): The creation was caused by the application,
+        for example :term:`service` resources or automatic updates of
+        referencing resources.
     """
 
-    def __init__(self, object, parent, registry, creator):
+    def __init__(self, object, parent, registry, creator, autoupdated):
         """Initialize self."""
         self.object = object
         self.parent = parent
         self.registry = registry
         self.creator = creator
+        self.autoupdated = autoupdated
 
 
 @implementer(IResourceWillBeDeleted)
