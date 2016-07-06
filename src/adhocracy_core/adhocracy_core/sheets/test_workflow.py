@@ -205,7 +205,7 @@ class TestWorkflowAssignmentSheet:
         from . import workflow
         assert meta.isheet == workflow.IWorkflowAssignment
         assert meta.schema_class == workflow.WorkflowAssignmentSchema
-        assert meta.permission_edit == 'edit'
+        assert meta.permission_edit == 'do_transition'
 
     def test_create(self, meta, context):
         from zope.interface.verify import verifyObject
