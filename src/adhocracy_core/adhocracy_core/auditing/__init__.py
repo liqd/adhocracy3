@@ -17,6 +17,7 @@ from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.tags import ITags
+from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.utils import now
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -111,16 +112,38 @@ def update_auditlog_callback(request: Request, response: Response) -> None:
     store the audit entry it adds an additional transaction.
     """
     changelog = request.registry.changelog
-    changes = _filter_trival_changes(changelog.values())
+    changes = _filter_trival_changes(changelog.values(), request.registry)
     activities = _create_activities(changes, request)
     activities = _add_name_to_activities(activities, request.registry)
     add_to_auditlog(activities, request)
     transaction.commit()
 
 
-def _filter_trival_changes(changes: [ChangelogMetadata]) -> []:
-    return [x for x in changes if _is_activity(x) and
-            not x.autoupdated]
+def _filter_trival_changes(changes: [ChangelogMetadata],
+                           registry: Registry) -> []:
+    return [x for x in changes if
+            _is_activity(x)
+            and not x.autoupdated
+            and not _is_first_version(x, registry)
+            ]
+
+
+def _is_activity(change: ChangelogMetadata) -> bool:
+    data_changed = change.created or change.modified
+    visibility_changed = change.visibility in [VisibilityChange.concealed,
+                                               VisibilityChange.revealed]
+    return data_changed or visibility_changed
+
+
+def _is_first_version(change: ChangelogMetadata, registry) -> bool:
+    is_version = IItemVersion.providedBy(change.resource)
+    if is_version:
+        follows = registry.content.get_sheet_field(change.resource,
+                                                   IVersionable,
+                                                   'follows')
+        return follows == []
+    else:
+        return False
 
 
 def _create_activities(changes: [ChangelogMetadata],
@@ -130,23 +153,17 @@ def _create_activities(changes: [ChangelogMetadata],
         activity_type = _get_entry_name(change)
         sheets = _get_content_sheets(change, request.registry)
         sheet_data = _get_sheet_data(sheets, request)
-        target = _get_target(change)
+        object = _get_object(change)
+        target = _get_target(object)
         activity = Activity()._replace(subject=request.user,
                                        type=activity_type,
-                                       object=change.resource,
+                                       object=object,
                                        sheet_data=sheet_data,
                                        target=target,
                                        published=now(),
                                        )
         activities.append(activity)
     return activities
-
-
-def _is_activity(change: ChangelogMetadata) -> bool:
-    data_changed = change.created or change.modified
-    visibility_changed = change.visibility in [VisibilityChange.concealed,
-                                               VisibilityChange.revealed]
-    return data_changed or visibility_changed
 
 
 def _get_entry_name(change: ChangelogMetadata) -> str:
@@ -182,18 +199,23 @@ def _get_sheet_data(sheets: [ISheet], request: Request) -> {}:
     return sheet_data
 
 
-def _get_target(change: ChangelogMetadata) -> IResource:
-    if IItemVersion.providedBy(change.resource):
-        item = find_interface(change.resource, IItem)
-        return item
-    elif IComment.providedBy(change.resource):
+def _get_target(object: IResource) -> IResource:
+    if IComment.providedBy(object):
         # assuming all comments from one service are commenting a
         # single process content
-        comments_service = find_service(change.resource, 'comments')
+        comments_service = find_service(object, 'comments')
         commented_content = comments_service and comments_service.__parent__
         return commented_content
     else:
-        return change.resource.__parent__
+        return object.__parent__
+
+
+def _get_object(change: ChangelogMetadata) -> IResource:
+    if IItemVersion.providedBy(change.resource):
+        item = find_interface(change.resource, IItem)
+        return item
+    else:
+        return change.resource
 
 
 def _add_name_to_activities(activities: [Activity],

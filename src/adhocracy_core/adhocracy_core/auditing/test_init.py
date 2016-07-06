@@ -90,6 +90,13 @@ class TestUpdateAuditlogCallback:
         self.call_fut(request_, None)
         assert add_to.call_args[0][0] == []
 
+    def test_ignore_if_first_version(
+        self, request_, registry, add_to, changelog, version, item):
+        changelog['/'] = changelog['']._replace(created=True, resource=version)
+        registry.content.get_sheet_field = Mock(return_value=[])
+        self.call_fut(request_, None)
+        assert add_to.call_args[0][0] == []
+
     def test_add_add_activity_if_created(self, request_, add_to, changelog,
                                           context, parent):
         from adhocracy_core.interfaces import ActivityType
@@ -110,21 +117,35 @@ class TestUpdateAuditlogCallback:
         assert added_activity.object == context
 
     def test_add_update_item_activity_if_version_created(
-        self, request_, add_to, changelog, version):
+        self, request_, registry, add_to, changelog, item, version):
         from adhocracy_core.interfaces import ActivityType
         changelog['/'] = changelog['']._replace(created=True, resource=version)
+        registry.content.get_sheet_field = Mock()
         self.call_fut(request_, None)
         added_activity = add_to.call_args[0][0][0]
         assert added_activity.type == ActivityType.update
 
-    def test_set_target_to_item_if_version(
-        self, request_, add_to, changelog, version, item):
-        changelog['/'] = changelog['']._replace(created=True, resource=version)
+    def test_add_object(self, request_, add_to, changelog, context):
+        changelog['/'] = changelog['']._replace(created=True, resource=context)
         self.call_fut(request_, None)
         added_activity = add_to.call_args[0][0][0]
-        assert added_activity.target == item
+        assert added_activity.object == context
 
-    def test_set_target_to_commented_content_if_comment_created(
+    def test_add_item_as_object_if_version(
+        self, request_, registry, add_to, changelog, version, item):
+        changelog['/'] = changelog['']._replace(created=True, resource=version)
+        registry.content.get_sheet_field = Mock()
+        self.call_fut(request_, None)
+        added_activity = add_to.call_args[0][0][0]
+        assert added_activity.object == item
+
+    def test_add_target(self, request_, add_to, changelog, context, parent):
+        changelog['/'] = changelog['']._replace(created=True, resource=context)
+        self.call_fut(request_, None)
+        added_activity = add_to.call_args[0][0][0]
+        assert added_activity.target == parent
+
+    def test_add_commented_content_as_target_if_comment_created(
         self, request_, add_to, changelog, pool, service, comment):
         service['comment'] = comment
         pool['comments'] = service
