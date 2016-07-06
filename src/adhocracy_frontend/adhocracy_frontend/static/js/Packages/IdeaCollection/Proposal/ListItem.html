@@ -22,7 +22,7 @@
             <li class="meta-list-item"><i class="meta-list-meta-item-icon icon-voting"></i
             > {{ data.rateCount | signum }} {{ "TR__RATES" | translate }}</li>
             <li class="meta-list-item"
-            data-ng-if="isKiezkasse || isBuergerhaushalt"><i class="meta-list-meta-item-icon icon-pin-detail"></i
+            data-ng-if="processOptions.hasLocationText"><i class="meta-list-meta-item-icon icon-pin-detail"></i
             > {{data.locationText}}</li>
         </ul>
     </div>
