@@ -10,11 +10,11 @@ from pyramid.traversal import resource_path
 from pyramid.request import Request
 from pyramid.response import Response
 from BTrees.OOBTree import OOBTree
-from datetime import datetime
 from logging import getLogger
 from adhocracy_core.events import ActivitiesAddedToAuditLog
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.utils import now
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IResource
@@ -62,7 +62,7 @@ class AuditLog(OOBTree):
         if activity.sheet_data:
             kwargs['sheet_data'] = activity.sheet_data
         entry = SerializedActivity()._replace(**kwargs)
-        self[datetime.utcnow()] = entry
+        self[activity.published] = entry
 
 
 def get_auditlog(context: IResource) -> AuditLog:
@@ -132,6 +132,7 @@ def _create_activities(changes: [ChangelogMetadata],
                                        object=change.resource,
                                        sheet_data=sheet_data,
                                        target=target,
+                                       published=now(),
                                        )
         activities.append(activity)
     return activities

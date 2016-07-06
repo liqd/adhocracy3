@@ -158,6 +158,14 @@ class TestUpdateAuditlogCallback:
         added_activity = add_to.call_args[0][0][0]
         assert added_activity.name == mock_generate_activity_name.return_value
 
+    def test_add_published(self, request_, add_to, changelog, context, mocker):
+        now = mocker.patch('adhocracy_core.auditing.now', autospec=True)
+        changelog['/resource'] = changelog['']._replace(modified=True,
+                                                        resource=context)
+        self.call_fut(request_, None)
+        added_activity = add_to.call_args[0][0][0]
+        assert added_activity.published == now.return_value
+
 
 class TestAuditlog:
 
@@ -175,14 +183,16 @@ class TestAuditlog:
         from adhocracy_core.interfaces import SerializedActivity
         subject = testing.DummyResource(__name__='subject')
         object = testing.DummyResource(__name__='object')
+        published= datetime.datetime.utcnow()
         activity = activity._replace(subject=subject,
                                      type='create',
                                      object=object,
+                                     published=published,
                                      )
         inst.add(activity)
         key, value = inst.items()[0]
         assert isinstance(value, SerializedActivity)
-        assert isinstance(key, datetime.datetime)
+        assert key == published
         assert value.subject_path == 'subject'
         assert value.type == 'create'
         assert value.object_path == 'object'
@@ -190,14 +200,17 @@ class TestAuditlog:
         assert value.target_path == ''
 
     def test_add_activity_with_target_and_sheet_data(self, inst, activity):
+        import datetime
         subject = testing.DummyResource(__name__='subject')
         object = testing.DummyResource(__name__='object')
         target = testing.DummyResource(__name__='target')
+        published= datetime.datetime.utcnow()
         activity = activity._replace(subject=subject,
                                      type='create',
                                      object=object,
                                      target=target,
                                      sheet_data=[{'y': 'z'}],
+                                     published=published
                                      )
         inst.add(activity)
         key, value = inst.items()[0]

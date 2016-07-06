@@ -700,6 +700,7 @@ class Activity(namedtuple('Activity', ['subject',
                                        'target',
                                        'name',
                                        'sheet_data',
+                                       'published',
                                        ])):
     """Metadata to log user activities.
 
@@ -723,6 +724,8 @@ class Activity(namedtuple('Activity', ['subject',
     sheet_data (list):
         List of sheet appstruct data when changing or deleting resources,
         not part of the actvity stream ontology
+    published (datetime.DateTime):
+        the date/time the activity was published, required
     """
 
     def __new__(cls,
@@ -732,6 +735,7 @@ class Activity(namedtuple('Activity', ['subject',
                 target=None,
                 name='',
                 sheet_data=None,
+                published=None,
                 ):
         if sheet_data is None:
             sheet_data = []
@@ -742,6 +746,7 @@ class Activity(namedtuple('Activity', ['subject',
                                target,
                                name,
                                sheet_data,
+                               published,
                                )
 
 
