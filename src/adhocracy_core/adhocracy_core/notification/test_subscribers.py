@@ -13,13 +13,15 @@ class TestSendActivityNotificationEmails:
     @fixture
     def activity(self, activity):
         from adhocracy_core.interfaces import ActivityType
-        from adhocracy_core.sheets.notification import IFollowable
         return activity._replace(
             subject=testing.DummyResource(),
             type=ActivityType.add,
-            object=testing.DummyResource(__provides__=IFollowable),
-            target=testing.DummyResource(__provides__=IFollowable),
         )
+
+    @fixture
+    def followable(self):
+        from adhocracy_core.sheets.notification import IFollowable
+        return testing.DummyResource(__provides__=IFollowable)
 
     @fixture
     def registry(self, registry, mock_messenger):
@@ -45,43 +47,56 @@ class TestSendActivityNotificationEmails:
         assert not mock_messenger.send_activity_mail.called
 
     def test_ignore_if_no_follower(self, event, activity, mock_catalogs,
-                                   mock_messenger, search_result):
+                                   mock_messenger, search_result, followable):
+        activity = activity._replace(target=followable)
         event.activities = [activity]
-        mock_catalogs.search.return_value =\
-            search_result._replace(elements=[])
+        mock_catalogs.search.return_value = search_result._replace(elements=[])
         self.call_fut(event)
         assert not mock_messenger.send_activity_mail.called
 
     def test_ignore_if_follower_is_subject(self, event, activity, mock_catalogs,
-                                           mock_messenger, search_result):
+                                           mock_messenger, search_result, followable):
+        activity = activity._replace(target=followable)
         event.activities = [activity]
-        mock_catalogs.search.return_value =\
-            search_result._replace(elements=[activity.subject])
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[activity.subject])
         self.call_fut(event)
         assert not mock_messenger.send_activity_mail.called
 
     def test_ignore_if_no_followable(self, event, activity, mock_catalogs,
-                                     mock_messenger, search_result):
-        from zope.interface.declarations import noLongerProvides
-        from adhocracy_core.sheets.notification import IFollowable
-        noLongerProvides(activity.object, IFollowable)
-        noLongerProvides(activity.target, IFollowable)
+                                     mock_messenger, search_result, context):
+        activity = activity._replace(target=context)
         event.activities = [activity]
         other_user = testing.DummyResource()
-        mock_catalogs.search.return_value =\
-            search_result._replace(elements=[other_user])
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[other_user])
         self.call_fut(event)
         assert not mock_messenger.send_activity_mail.called
 
-    def test_send_emails_to_followers(self, event, activity, mock_catalogs,
-                                      mock_messenger, search_result):
+    def test_send_activity_to_target_followers(self, event, activity,
+                                               mock_catalogs, followable,
+                                               mock_messenger, search_result):
+        activity = activity._replace(target=followable)
         event.activities = [activity]
-        other_user = testing.DummyResource()
-        mock_catalogs.search.return_value =\
-            search_result._replace(elements=[other_user])
+        user = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
         self.call_fut(event)
         mock_messenger.send_activity_mail.assert_called_with(
-            other_user, activity, event.request)
+            user, activity, event.request)
+
+    def test_send_activity_to_object_followers(self, event, activity,
+                                             mock_catalogs, followable,
+                                             mock_messenger, search_result):
+        activity = activity._replace(target=followable)
+        event.activities = [activity]
+        user = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
+        self.call_fut(event)
+        mock_messenger.send_activity_mail.assert_called_with(
+            user, activity, event.request)
+
 
 
 @fixture
