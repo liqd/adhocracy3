@@ -167,8 +167,8 @@ export var registerRoutesFactory = (
             space: "content",
             movingColumns: "is-show-show-hide"
         })
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource) => {
         .specific(ideaCollection, "create_proposal", ideaCollection.content_type, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service) => (resource) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -181,8 +181,8 @@ export var registerRoutesFactory = (
             space: "content",
             movingColumns: "is-show-show-hide"
         })
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item, version) => {
         .specificVersionable(proposalType, proposalVersionType, "edit", ideaCollection.content_type, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service) => (item, version) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
