@@ -24,7 +24,8 @@ export var workbenchDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html",
         scope: {
             isBuergerhaushalt: "=?",
-            isKiezkasse: "=?"
+            isKiezkasse: "=?",
+            processOptions: "="
         },
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("view", scope));

@@ -6,6 +6,7 @@ import * as AdhHttp from "../../Http/Http";
 import * as AdhMapping from "../../Mapping/Mapping";
 import * as AdhPermissions from "../../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../../PreliminaryNames/PreliminaryNames";
+import * as AdhProcess from "../../Process/Process";
 import * as AdhRate from "../../Rate/Rate";
 import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
 import * as AdhUtil from "../../Util/Util";
@@ -54,6 +55,7 @@ export interface IScope extends angular.IScope {
     selectedState? : string;
     isKiezkasse : boolean;
     isBuergerhaushalt : boolean;
+    processOptions : AdhProcess.IProcessOptions;
     resource : any;
 }
 
@@ -249,7 +251,8 @@ export var detailDirective = (
         scope: {
             path: "@",
             isKiezkasse: "=?",
-            isBuergerhaushalt: "=?"
+            isBuergerhaushalt: "=?",
+            processOptions : "="
         },
         link: (scope : IScope) => {
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
@@ -273,7 +276,8 @@ export var listItemDirective = (
         scope: {
             path: "@",
             isKiezkasse: "=?",
-            isBuergerhaushalt: "=?"
+            isBuergerhaushalt: "=?",
+            processOptions : "="
         },
         link: (scope : IScope) => {
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
@@ -307,7 +311,8 @@ export var mapListItemDirective = (
         scope: {
             path: "@",
             isKiezkasse: "=?",
-            isBuergerhaushalt: "=?"
+            isBuergerhaushalt: "=?",
+            processOptions : "="
         },
         link: (scope : IScope, element, attrs, mapListing : AdhMapping.MapListingController) => {
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
@@ -348,7 +353,8 @@ export var createDirective = (
         scope: {
             poolPath: "@",
             isKiezkasse: "=?",
-            isBuergerhaushalt: "=?"
+            isBuergerhaushalt: "=?",
+            processOptions : "="
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         link: (scope, element) => {

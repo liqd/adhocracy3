@@ -31,7 +31,8 @@ export var detailDirective = (
         scope: {
             path: "@",
             isBuergerhaushalt: "=?",
-            isKiezkasse: "=?"
+            isKiezkasse: "=?",
+            processOptions: "="
         },
         link: (scope) => {
             AdhBadge.getBadgeFacets(adhHttp, $q)(scope.path).then((facets) => {
