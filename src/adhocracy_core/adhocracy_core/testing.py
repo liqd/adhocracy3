@@ -671,16 +671,9 @@ def newest_reset_path(app_router) -> callable:
 
 
 @fixture(scope='class')
-def mails(app_router) -> object:
-    """Return  object to get send_mails."""
-    class Mails:
-
-        def __init__(self):
-            self._mailer = app_router.registry.messenger.mailer
-
-        def send(self) -> list:
-            return self._mailer.outbox
-    return Mails()
+def send_mails(app_router) -> list:
+    """Return send mails."""
+    return app_router.registry.messenger.mailer.outbox
 
 
 class AppUser:

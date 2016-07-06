@@ -51,7 +51,7 @@ class TestUpdateAuditlogCallback:
         item['versions']['version'] = version
         return item
 
-    @fixture()
+    @fixture
     def parent(self, context):
         parent = testing.DummyResource()
         parent['child'] = context
