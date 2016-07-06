@@ -9,12 +9,14 @@ from pyramid.traversal import find_interface
 from pyramid.traversal import resource_path
 from pyramid.request import Request
 from pyramid.response import Response
+from substanced.util import find_service
 from BTrees.OOBTree import OOBTree
 from logging import getLogger
 from adhocracy_core.events import ActivitiesAddedToAuditLog
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.title import ITitle
+from adhocracy_core.sheets.tags import ITags
 from adhocracy_core.utils import now
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -25,6 +27,7 @@ from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.interfaces import SerializedActivity
 from adhocracy_core.interfaces import ActivityType
 from adhocracy_core.interfaces import Activity
+from adhocracy_core.resources.comment import IComment
 from adhocracy_core.utils import get_iresource
 
 logger = getLogger(__name__)
@@ -180,11 +183,17 @@ def _get_sheet_data(sheets: [ISheet], request: Request) -> {}:
 
 
 def _get_target(change: ChangelogMetadata) -> IResource:
-        if IItemVersion.providedBy(change.resource):
-            item = find_interface(change.resource, IItem)
-            return item
-        else:
-            return change.resource.__parent__
+    if IItemVersion.providedBy(change.resource):
+        item = find_interface(change.resource, IItem)
+        return item
+    elif IComment.providedBy(change.resource):
+        # assuming all comments from one service are commenting a
+        # single process content
+        comments_service = find_service(change.resource, 'comments')
+        commented_content = comments_service and comments_service.__parent__
+        return commented_content
+    else:
+        return change.resource.__parent__
 
 
 def _add_name_to_activities(activities: [Activity],
@@ -292,6 +301,8 @@ def _get_title(context: IResource, registry: Registry) -> str:
         context = registry.content.get_sheet_field(context, ITags, 'LAST')
     if ITitle.providedBy(context):
         name = registry.content.get_sheet_field(context, ITitle, 'title')
+    elif IComment.providedBy(context):
+        name = registry.content.get_sheet_field(context, IComment, 'content')
     else:
         name = ''
     return name

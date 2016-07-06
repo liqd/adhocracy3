@@ -97,6 +97,37 @@ class TestSendActivityNotificationEmails:
         mock_messenger.send_activity_mail.assert_called_with(
             user, activity, event.request)
 
+    def test_send_activity_with_object_comments_to_process_followers(
+        self, event, activity, mock_catalogs, mock_messenger, search_result):
+        from adhocracy_core.sheets.notification import IFollowable
+        from adhocracy_core.resources.comment import IComment
+        from adhocracy_core.resources.process import IProcess
+        process = testing.DummyResource(__provides__=(IProcess, IFollowable))
+        process['some_child'] = testing.DummyResource()
+        comment = testing.DummyResource(__provides__=IComment)
+        process['some_child']['comment'] = comment
+
+        activity = activity._replace(object=comment)
+        event.activities = [activity]
+        user = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
+        self.call_fut(event)
+        mock_messenger.send_activity_mail.assert_called_with(
+            user, activity, event.request)
+
+    def test_ignore_if_activity_with_object_comment_but_no_process(
+        self, event, activity, mock_catalogs, mock_messenger, search_result):
+        from adhocracy_core.resources.comment import IComment
+        comment = testing.DummyResource(__provides__=IComment)
+
+        activity = activity._replace(object=comment)
+        event.activities = [activity]
+        user = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
+        self.call_fut(event)
+        assert not mock_messenger.send_activity_mail.called
 
 
 @fixture

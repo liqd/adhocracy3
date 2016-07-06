@@ -1,6 +1,7 @@
 """Subscribers to send activity notifications to users."""
 from collections import defaultdict
 from pyramid.interfaces import IRequest
+from pyramid.traversal import find_interface
 from substanced.util import find_service
 
 from adhocracy_core.interfaces import Activity
@@ -9,6 +10,8 @@ from adhocracy_core.interfaces import Reference
 from adhocracy_core.interfaces import IActivitiesAddedToAuditLog
 from adhocracy_core.sheets.notification import INotification
 from adhocracy_core.sheets.notification import IFollowable
+from adhocracy_core.resources.comment import IComment
+from adhocracy_core.resources.process import IProcess
 
 
 def send_activity_notification_emails(event: IActivitiesAddedToAuditLog):
@@ -25,6 +28,10 @@ def _create_resource_streams(activities: [Activity]) -> [tuple]:
             streams[activity.object].append(activity)
         if IFollowable.providedBy(activity.target):
             streams[activity.target].append(activity)
+        if IComment.providedBy(activity.object):
+            process = find_interface(activity.object, IProcess)
+            if process and IFollowable.providedBy(process):
+                streams[process].append(activity)
     return sorted(streams.items(), key=lambda x: x[1][0].published)
 
 

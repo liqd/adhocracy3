@@ -58,6 +58,11 @@ class TestUpdateAuditlogCallback:
         return parent
 
     @fixture
+    def comment(self):
+        from adhocracy_core.resources.comment import IComment
+        return testing.DummyResource(__provides__=IComment)
+
+    @fixture
     def add_to(self, mocker):
         return mocker.patch('adhocracy_core.auditing.add_to_auditlog')
 
@@ -119,6 +124,15 @@ class TestUpdateAuditlogCallback:
         added_activity = add_to.call_args[0][0][0]
         assert added_activity.target == item
 
+    def test_set_target_to_commented_content_if_comment_created(
+        self, request_, add_to, changelog, pool, service, comment):
+        service['comment'] = comment
+        pool['comments'] = service
+        changelog['/'] = changelog['']._replace(created=True, resource=comment)
+        self.call_fut(request_, None)
+        added_activity = add_to.call_args[0][0][0]
+        assert added_activity.target == pool
+
     def test_add_remove_activity_if_concealed(self, request_, add_to, changelog,
                                               context, parent):
         """Concealed == hidden or removed."""
@@ -165,7 +179,6 @@ class TestUpdateAuditlogCallback:
         self.call_fut(request_, None)
         added_activity = add_to.call_args[0][0][0]
         assert added_activity.published == now.return_value
-
 
 
 class TestAuditlog:
@@ -466,6 +479,20 @@ def test_get_title_return_title_of_last_version_if_item(registry, item):
     call_args_list = registry.content.get_sheet_field.call_args_list
     assert call_args_list[0] == call(item, ITags, 'LAST')
     assert call_args_list[1] == call(version, ITitle, 'title')
+
+
+def test_get_title_return_content_of_last_version_if_comment(registry, item):
+    from mock import call
+    from adhocracy_core.sheets.title import ITitle
+    from adhocracy_core.sheets.tags import ITags
+    from . import _get_title
+    version = testing.DummyResource(__provides__=ITitle)
+    registry.content.get_sheet_field = Mock(side_effect=(version, 'title'))
+    assert _get_title(item, registry) == 'title'
+    call_args_list = registry.content.get_sheet_field.call_args_list
+    assert call_args_list[0] == call(item, ITags, 'LAST')
+    assert call_args_list[1] == call(version, ITitle, 'title')
+
 
 
 def test_get_title_return_empty_if_missing_sheet(registry):

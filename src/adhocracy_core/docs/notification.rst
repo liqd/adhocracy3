@@ -86,3 +86,30 @@ Added content:
     >>> send_mails[-1].body
     'participant2 added the Document "Document Title" to Process "Process Title". Visit: http:.../r/process/document_0000000/ .'
 
+Added comment:
+
+    >>> data = [
+    ...     {'method': 'POST', 'path': document_path + 'comments', 'result_path': '@par1_item','result_first_version_path': '@par1_item/v1',
+    ...      'body': {'content_type': IComment.__identifier__,
+    ...               'data': {}}
+    ...       },
+    ...     {'method': 'POST', 'path': '@par1_item', 'result_path': '@par1_item/v2',
+    ...      'body': {'content_type': ICommentVersion.__identifier__,
+    ...               'data': {'adhocracy_core.sheets.versions.IVersionable': {
+    ...                         'follows': ['@par1_item/v1']
+    ...                        },
+    ...                       'adhocracy_core.sheets.comment.IComment': {
+    ...                         'replyto': document_path_last_version,
+    ...                         'content': 'comment text'
+    ...                        },
+    ...               }},
+    ...       },]
+    >>> resp = app_participant2.batch(data)
+    >>> comment_path = resp.json['responses'][0]['body']['path']
+    >>> comment_path_last_version = resp.json['responses'][1]['body']['path']
+
+   >>> send_mails[-1].subject
+   'Adhocracy: participant2 added a Comment to Document Title.'
+   >>> send_mails[-1].body
+   'participant2 added the Comment "comment text" to Document "Document Title". Visit: http:.../r/process/document_0000000/comments/comment_0000000/ .'
+
