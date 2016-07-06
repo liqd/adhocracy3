@@ -268,7 +268,7 @@ States:
     @include rem(margin-right, 30px);
     @include rem(font-size, 17px);
     float: left;
-    line-height: (24/17);
+    line-height: (24 / 17);
     vertical-align: middle;
 }
 

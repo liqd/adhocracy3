@@ -1,6 +1,8 @@
 files:
   include: '**/*.scss'
-  ignore: '**/third_party/**/*.scss'
+  ignore:
+    - '**/third_party/**/*.scss'
+    - '**/_fonts.scss'
 options:
   formatter: stylish
   merge-default-rules: true
@@ -17,8 +19,9 @@ rules:
   quotes:
     - 2
     - style: double
+
   no-qualifying-elements:
-    - 2
+    - 1
     - allow-element-with-attribute: true
 
   mixins-before-declarations: 2

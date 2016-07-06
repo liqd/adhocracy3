@@ -35,7 +35,7 @@ The button has the is-rate-button-active state.
     }
 }
 
-$line-height: (24/12);
+$line-height: (24 / 12);
 $arrow-width: 1rem;
 
 .like-button {
@@ -56,8 +56,8 @@ $arrow-width: 1rem;
 
     &:before {
         @include rem(border-right, $arrow-width solid $color-button-cta-base);
-        border-top: $line-height/2 * 1em solid $color-structure-transparent;
-        border-bottom: $line-height/2 * 1em solid $color-structure-transparent;
+        border-top: $line-height / 2 * 1em solid $color-structure-transparent;
+        border-bottom: $line-height / 2 * 1em solid $color-structure-transparent;
         content: "";
         position: absolute;
         left: -$arrow-width;
@@ -370,7 +370,7 @@ is bigger and exposes more details.
         text-align: center;
         width: 100%;
 
-        @media only screen and (max-width : $breakpoint-small-device) {
+        @media only screen and (max-width: $breakpoint-small-device) {
             display: none;
         }
     }

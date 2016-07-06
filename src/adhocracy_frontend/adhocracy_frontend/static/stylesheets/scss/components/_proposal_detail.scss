@@ -51,7 +51,7 @@ Proposal detail article.
         color: $color-text-highlight-introvert;
     }
 
-    [class*=icon-] {
+    [class*="icon-"] {
         @include rem(font-size, 17px);
         @include rem(line-height, 17px);
         display: block;

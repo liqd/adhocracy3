@@ -15,17 +15,6 @@ is useable such as the modifiers listed in this category. Don't forget to hide f
 ```
 */
 
-@media screen {
-    .print-only {
-        display: none;
-    }
-}
-
-@media print {
-    .screen-only {
-        display: none;
-    }
-
 /*doc
 ---
 title: Print HREF modifier
@@ -40,14 +29,6 @@ Use this class to display the href of a link after the link text in print mode o
 <a class="m-print-href" href="http://google.com">Google</a>
 ```
 */
-
-    .m-print-href {
-        text-decoration: none;
-
-        &:after {
-            content: " [" attr(href) "]";
-        }
-    }
 
 /*doc
 ---
@@ -66,6 +47,25 @@ If this is placed on an icon the icon will be replaced by the text.
 <p class="m-definition-before" title="Total budget:">50000 &euro;</p>
 ```
 */
+
+@media screen {
+    .print-only {
+        display: none;
+    }
+}
+
+@media print {
+    .screen-only {
+        display: none;
+    }
+
+    .m-print-href {
+        text-decoration: none;
+
+        &:after {
+            content: " [" attr(href) "]";
+        }
+    }
 
     .m-definition-after,
     .m-definition-before {
