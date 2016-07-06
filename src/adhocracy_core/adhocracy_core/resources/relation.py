@@ -68,6 +68,7 @@ def add_relationsservice(context: IPool,
                          options: dict):
     """Add `relations` service to context."""
     registry.content.create(IRelationsService.__identifier__,
+                            autoupdated=True,
                             parent=context)
 
 

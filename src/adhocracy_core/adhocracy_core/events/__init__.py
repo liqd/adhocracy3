@@ -29,14 +29,18 @@ class ResourceCreatedAndAdded:
     :param parent(adhocracy_core.interfaces.IResource):
     :param registry(pyramid.registry.Registry):
     :param creator(adhocracy_core.resource.principal.IUser):
+    :param: autoupdated(bool): The creation was caused by the application,
+        for example :term:`service` resources or automatic updates of
+        referencing resources.
     """
 
-    def __init__(self, object, parent, registry, creator):
+    def __init__(self, object, parent, registry, creator, autoupdated):
         """Initialize self."""
         self.object = object
         self.parent = parent
         self.registry = registry
         self.creator = creator
+        self.autoupdated = autoupdated
 
 
 @implementer(IResourceWillBeDeleted)
@@ -65,6 +69,8 @@ class ResourceSheetModified:
     :param old_appstruct: The old :term:`appstruct` data (dict)
     :param new_appstruct: The new :term:`appstruct` data (dict)
     :param request: The current request or None
+    :param: autoupdated(bool): The modification was caused by a modified
+        referenced resource.
     """
 
     def __init__(self,
@@ -73,7 +79,8 @@ class ResourceSheetModified:
                  registry,
                  old_appstruct,
                  new_appstruct,
-                 request: Request):
+                 request: Request,
+                 autoupdated: bool):
         """Initialize self."""
         self.object = object
         self.isheet = isheet
@@ -81,6 +88,7 @@ class ResourceSheetModified:
         self.old_appstruct = old_appstruct
         self.new_appstruct = new_appstruct
         self.request = request
+        self.autoupdated = autoupdated
 
 
 @implementer(IItemVersionNewVersionAdded)
@@ -91,14 +99,17 @@ class ItemVersionNewVersionAdded:
     :param new_version(adhocracy_core.interfaces.IItemVersion):
     :param registry(pyramid.registry.Registry):
     :param creator(adhocracy_core.resource.principal.IUser':
+    :param: autoupdated(bool): The modification was caused by a modified
+        referenced resource.
     """
 
-    def __init__(self, object, new_version, registry, creator):
+    def __init__(self, object, new_version, registry, creator, autoupdated):
         """Initialize self."""
         self.object = object
         self.new_version = new_version
         self.registry = registry
         self.creator = creator
+        self.autoupdated = autoupdated
 
 
 @implementer(ISheetReferenceNewVersion)

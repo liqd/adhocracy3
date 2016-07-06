@@ -487,6 +487,7 @@ class IResourceCreatedAndAdded(IObjectEvent):
     parent = Attribute('The parent of the new resource')
     registry = Attribute('The pyramid registry')
     creator = Attribute('User resource object of the authenticated User')
+    autoupdated = Attribute('Creation was caused automatically by application')
 
 
 class IResourceWillBeDeleted(IObjectEvent):
@@ -592,12 +593,28 @@ class VisibilityChange(Enum):
 class ChangelogMetadata(namedtuple('ChangelogMetadata',
                                    ['modified',
                                     'created',
+                                    'autoupdated',
                                     'followed_by',
                                     'resource',
                                     'last_version',
                                     'changed_descendants',
                                     'changed_backrefs',
                                     'visibility'])):
+    def __new__(cls,
+                modified: bool=False,
+                created: bool=False,
+                autoupdated: bool=False,
+                followed_by: IResource=None,
+                resource: IResource=None,
+                last_version: IResource=None,
+                changed_descendants: bool=False,
+                changed_backrefs: bool=False,
+                visibility: str=VisibilityChange.visible,
+                ):
+        return super().__new__(cls, modified, created, autoupdated,
+                               followed_by, resource, last_version,
+                               changed_descendants, changed_backrefs,
+                               visibility)
     """Metadata to track modified resources during one transaction.
 
     Fields:
@@ -608,6 +625,9 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
         modified.
     created (bool):
         This resource is created and added to a pool.
+    autoupdated (bool):
+        The modification/creation was caused by a modified referenced
+        resource. This means there is no real content change.
     followed_by (None or IResource):
         A new Version (:class:`adhocracy_core.interfaces.IItemVersion`) follows
         this resource
@@ -623,6 +643,9 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
     visibility (VisibilityChange):
         Tracks the visibility of the resource and whether it has changed
     """
+
+
+changelog_meta = ChangelogMetadata()
 
 
 class AuditlogEntry(namedtuple('AuditlogEntry', ['name',

@@ -1,17 +1,7 @@
 """Transaction changelog for resources."""
 from collections import defaultdict
-from adhocracy_core.interfaces import ChangelogMetadata
-from adhocracy_core.interfaces import VisibilityChange
 
-changelog_meta = ChangelogMetadata(modified=False,
-                                   created=False,
-                                   followed_by=None,
-                                   resource=None,
-                                   last_version=None,
-                                   changed_descendants=False,
-                                   changed_backrefs=False,
-                                   visibility=VisibilityChange.visible,
-                                   )
+from adhocracy_core.interfaces import changelog_meta
 
 
 class Changelog(defaultdict):

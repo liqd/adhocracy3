@@ -175,7 +175,9 @@ class BaseResourceSheet:
             omit=(),
             send_event=True,
             send_reference_event=True,
-            omit_readonly: bool=True) -> bool:
+            omit_readonly: bool=True,
+            autoupdated=False,
+            ) -> bool:
         """Store appstruct.
 
         Read :func:`adhocracy_core.interfaces.IResourceSheet.set`
@@ -195,7 +197,9 @@ class BaseResourceSheet:
                                           self.registry,
                                           appstruct_old,
                                           appstruct,
-                                          self.request)
+                                          self.request,
+                                          autoupdated,
+                                          )
             self.registry.notify(event)
         return bool(appstruct)
 

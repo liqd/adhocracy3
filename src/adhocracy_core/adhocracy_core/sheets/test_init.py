@@ -323,6 +323,14 @@ class TestBaseResourceSheet:
         assert events[0].registry == config.registry
         assert events[0].old_appstruct == {'count': 0}
         assert events[0].new_appstruct == {'count': 2}
+        assert events[0].autoupdated is False
+
+    def test_notify_resource_sheet_modified_autoupdated(self, inst, config):
+        from adhocracy_core.interfaces import IResourceSheetModified
+        from adhocracy_core.testing import create_event_listener
+        events = create_event_listener(config, IResourceSheetModified)
+        inst.set({'count': 2}, autoupdated=True)
+        assert events[0].autoupdated
 
     def test_serialize(self, inst, request_):
         from . import BaseResourceSheet
