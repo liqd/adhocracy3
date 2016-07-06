@@ -1,27 +1,27 @@
-    /// <reference path="../../../../../lib2/types/lodash.d.ts"/>
-/// <reference path="../../../../../lib2/types/moment.d.ts"/>
+/// <reference path="../../../../lib2/types/lodash.d.ts"/>
+/// <reference path="../../../../lib2/types/moment.d.ts"/>
 
 import * as _ from "lodash";
 
-import * as AdhBadge from "../../../Badge/Badge";
-import * as AdhConfig from "../../../Config/Config";
-import * as AdhHttp from "../../../Http/Http";
-import * as AdhPermissions from "../../../Permissions/Permissions";
-import * as AdhProcess from "../../../Process/Process";
-import * as AdhUtil from "../../../Util/Util";
+import * as AdhBadge from "../../Badge/Badge";
+import * as AdhConfig from "../../Config/Config";
+import * as AdhHttp from "../../Http/Http";
+import * as AdhPermissions from "../../Permissions/Permissions";
+import * as AdhProcess from "../../Process/Process";
+import * as AdhUtil from "../../Util/Util";
 
-import RIBuergerhaushaltProposalVersion from "../../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
-import RIGeoProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
-import RIKiezkasseProposalVersion from "../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
+import RIBuergerhaushaltProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
+import RIGeoProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
+import RIKiezkasseProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
 
-import * as SIImageReference from "../../../../Resources_/adhocracy_core/sheets/image/IImageReference";
-import * as SILocationReference from "../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
-import * as SIMultiPolygon from "../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
-import * as SIName from "../../../../Resources_/adhocracy_core/sheets/name/IName";
-import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
-import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
+import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
+import * as SILocationReference from "../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
+import * as SIMultiPolygon from "../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
+import * as SIName from "../../../Resources_/adhocracy_core/sheets/name/IName";
+import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
+import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/Meinberlin/IdeaCollection/Process";
+var pkgLocation = "/IdeaCollection/Process";
 
 
 export var detailDirective = (

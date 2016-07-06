@@ -1,26 +1,26 @@
-/// <reference path="../../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../lib2/types/angular.d.ts"/>
 
-import * as AdhConfig from "../../Config/Config";
-import * as AdhHttp from "../../Http/Http";
-import * as AdhPermissions from "../../Permissions/Permissions";
-import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
-import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
+import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhResourceArea from "../ResourceArea/ResourceArea";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
-import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
-import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
-import RIBuergerhaushaltProcess from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
-import RIBuergerhaushaltProposal from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal";
-import RIBuergerhaushaltProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
-import RIGeoProposal from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
-import RIGeoProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
-import RIIdeaCollectionProcess from "../../../Resources_/adhocracy_meinberlin/resources/idea_collection/IProcess";
-import RIKiezkasseProcess from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
-import RIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
-import RIKiezkasseProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
-import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
-import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
+import RIComment from "../../Resources_/adhocracy_core/resources/comment/IComment";
+import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIBuergerhaushaltProcess from "../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
+import RIBuergerhaushaltProposal from "../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal";
+import RIBuergerhaushaltProposalVersion from "../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
+import RIGeoProposal from "../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
+import RIGeoProposalVersion from "../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
+import RIIdeaCollectionProcess from "../../Resources_/adhocracy_meinberlin/resources/idea_collection/IProcess";
+import RIKiezkasseProcess from "../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
+import RIKiezkasseProposal from "../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
+import RIKiezkasseProposalVersion from "../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
+import * as SIComment from "../../Resources_/adhocracy_core/sheets/comment/IComment";
+import * as SIWorkflow from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-export var pkgLocation = "/Meinberlin/IdeaCollection";
+export var pkgLocation = "/IdeaCollection";
 
 
 export var workbenchDirective = (
