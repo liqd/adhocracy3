@@ -120,7 +120,10 @@ def deferred_workflow_validator(node: SchemaNode, kw: dict) -> callable:
     else:
         iresource = get_iresource(context)
         meta = registry.content.resources_meta[iresource]
-    workflows = ('', meta.default_workflow) + meta.alternative_workflows
+    if meta.default_workflow in meta.alternative_workflows:
+        workflows = ('',) + meta.alternative_workflows
+    else:
+        workflows = ('', meta.default_workflow) + meta.alternative_workflows
     return OneOf(workflows)
 
 

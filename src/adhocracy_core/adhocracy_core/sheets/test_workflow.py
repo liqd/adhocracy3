@@ -52,6 +52,22 @@ class TestWorkflow:
                                       ('', 'No workflow'),
                                       ]
 
+    def test_create_standart_in_alternatives(self, inst, kw, mocker,
+                                             resource_meta):
+        from adhocracy_core.schema import SingleLine
+        kw['creating'] = resource_meta._replace(
+            alternative_workflows=('default',))
+        permission_check = mocker.patch('adhocracy_core.sheets.workflow.'
+                                        'create_deferred_permission_validator').return_value
+        inst = inst.bind(**kw)
+        assert isinstance(inst, SingleLine)
+        assert inst.validator.validators[0].choices == ('',
+                                                        'default')
+        assert inst.validator.validators[1] == permission_check.return_value
+        assert inst.widget.values == [('default', 'default'),
+                                      ('', 'No workflow'),
+                                      ]
+
     def test_serialize_empty_without_workflow(self, inst, kw):
         kw['workflow'] = None
         inst = inst.bind(**kw)
