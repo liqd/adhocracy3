@@ -7,7 +7,6 @@ from adhocracy_core.interfaces import Activity
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.interfaces import Reference
 from adhocracy_core.interfaces import IActivitiesAddedToAuditLog
-from adhocracy_core.interfaces import IResource
 from adhocracy_core.sheets.notification import INotification
 from adhocracy_core.sheets.notification import IFollowable
 
@@ -15,26 +14,26 @@ from adhocracy_core.sheets.notification import IFollowable
 def send_activity_notification_emails(event: IActivitiesAddedToAuditLog):
     """Notify users about activities regarding resources they follow."""
     streams = _create_resource_streams(event.activities)
-    subscriptions = _get_follow_subscriptions(streams.keys(), event.request)
+    subscriptions = _get_follow_subscriptions(streams, event.request)
     _send_emails(subscriptions, streams, event.request)
 
 
-def _create_resource_streams(activities: [Activity]) -> dict:
+def _create_resource_streams(activities: [Activity]) -> [tuple]:
     streams = defaultdict(list)
     for activity in activities:
         if IFollowable.providedBy(activity.object):
             streams[activity.object].append(activity)
         if IFollowable.providedBy(activity.target):
             streams[activity.target].append(activity)
-    return streams
+    return sorted(streams.items(), key=lambda x: x[1][0].published)
 
 
-def _get_follow_subscriptions(resources: [IResource],
+def _get_follow_subscriptions(streams: [tuple],
                               request: IRequest) -> dict:
     context = request.root
     catalogs = find_service(context, 'catalogs')
     subscriptions = defaultdict(set)
-    for resource in resources:
+    for resource in [x for x, y in streams]:
         ref = Reference(None, INotification, 'follow_resources', resource)
         query = search_query._replace(references=(ref,))
         followers = catalogs.search(query).elements
@@ -43,9 +42,9 @@ def _get_follow_subscriptions(resources: [IResource],
     return subscriptions
 
 
-def _send_emails(subscriptions: dict, streams: dict, request: IRequest):
+def _send_emails(subscriptions: dict, streams: [tuple], request: IRequest):
     messenger = request.registry.messenger
-    for resource, activites in streams.items():
+    for resource, activites in streams:
         for follower in subscriptions[resource]:
             for activity in activites:
                 if activity.subject != follower:
