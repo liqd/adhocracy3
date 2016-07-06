@@ -115,7 +115,8 @@ def update_auditlog_callback(request: Request, response: Response) -> None:
 
 
 def _filter_trival_changes(changes: [ChangelogMetadata]) -> []:
-    return [x for x in changes if _is_activity(x)]
+    return [x for x in changes if _is_activity(x) and
+            not x.autoupdated]
 
 
 def _create_activities(changes: [ChangelogMetadata],

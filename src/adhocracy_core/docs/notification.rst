@@ -79,14 +79,8 @@ a notification email is send:
 
     >>> mails = getfixture('mails')
     >>> send_mails = mails.send()
-    >>> len(send_mails)
-    2
-
-#FIXME there should be only 1 mail, we need to filter autoupdates for this.
-
-    >>> activity_mail = [x for x in send_mails if 'added' in x.subject][0]
+    >>> activity_mail = send_mails[0]
     >>> activity_mail.subject
     'Adhocracy: participant2 added a Document to Process Title.'
-
     >>> activity_mail.body
     'participant2 added the Document "Process Title" to Process "Process Title". Visit: http://localhost:6551/r/process/document_0000000/ .'

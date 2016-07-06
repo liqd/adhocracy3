@@ -77,6 +77,14 @@ class TestUpdateAuditlogCallback:
         self.call_fut(request_, None)
         assert add_to.call_args[0][0] == []
 
+    def test_ignore_if_autoupdated_change(self, request_, add_to, changelog,
+                                          context):
+            changelog['/nup'] = changelog['']._replace(created=True,
+                                                       resource=context,
+                                                       autoupdated=True)
+            self.call_fut(request_, None)
+            assert add_to.call_args[0][0] == []
+
     def test_add_add_activity_if_created(self, request_, add_to, changelog,
                                           context, parent):
         from adhocracy_core.interfaces import ActivityType
