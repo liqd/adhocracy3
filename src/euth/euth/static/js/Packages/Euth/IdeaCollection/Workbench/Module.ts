@@ -46,9 +46,11 @@ export var register = (angular) => {
             var registerRoutes1 = AdhIdeaCollectionWorkbench.registerRoutesFactory(
                 RIEuthProcess, RIProposal, RIProposalVersion);
             registerRoutes1()(adhResourceAreaProvider);
+            registerRoutes1("euth")(adhResourceAreaProvider);
             var registerRoutes2 = AdhIdeaCollectionWorkbench.registerRoutesFactory(
                 RIEuthPrivateProcess, RIProposal, RIProposalVersion);
             registerRoutes2()(adhResourceAreaProvider);
+            registerRoutes2("euth")(adhResourceAreaProvider);
             var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType1] = processHeaderSlot;
             adhResourceAreaProvider.processHeaderSlots[processType2] = processHeaderSlot;
