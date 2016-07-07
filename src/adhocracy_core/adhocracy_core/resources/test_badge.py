@@ -67,7 +67,7 @@ class TestParticipantsAssignableBadgeGroup:
                                       resources.badge.IBadgeGroup,
                                       meta.iresource,
                                       )
-        assert meta.workflow_name == 'badge_assignment'
+        assert meta.default_workflow == 'badge_assignment'
 
     @mark.usefixtures('integration')
     def test_create(self, context, registry, meta):

@@ -13,7 +13,6 @@ from adhocracy_core.schema import MappingSchema
 from adhocracy_core.sdi.form import FormView
 from adhocracy_core.sheets.embed import IEmbed
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import create_schema
 
 
@@ -83,7 +82,7 @@ class AddResourceSheetsBase(FormView):
 
     buttons = (_('add'),)
     iresource = None
-    _disabled = (IMetadata, IWorkflowAssignment, IEmbed)
+    _disabled = (IMetadata, IEmbed)
     """Sheets not working with this add view yet, use sheets tabs instead."""
 
     def __init__(self, context: IResource, request: IRequest):

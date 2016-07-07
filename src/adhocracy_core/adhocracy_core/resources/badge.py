@@ -55,7 +55,7 @@ class IParticipantsAssignableBadgeGroup(IBadgeGroup):
 
 participants_assignable_badge_group_meta = badge_group_meta._replace(
     iresource=IParticipantsAssignableBadgeGroup,
-    workflow_name='badge_assignment',
+    default_workflow='badge_assignment',
     element_types=(IBadge,
                    IBadgeGroup,
                    IParticipantsAssignableBadgeGroup,),

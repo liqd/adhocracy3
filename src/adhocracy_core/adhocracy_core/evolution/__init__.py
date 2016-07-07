@@ -722,6 +722,27 @@ def add_description_sheet_to_user(root, registry):  # pragma: no cover
 
 
 @log_migration
+def set_default_workflow(root, registry):  # pragma: no cover
+    """Set default workflow if no workflow in IWorkflowAssignment sheet."""
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
+    catalogs = find_service(root, 'catalogs')
+    for iresource, meta in registry.content.resources_meta.items():
+        has_assignment = IWorkflowAssignment in meta.basic_sheets \
+            or IWorkflowAssignment in meta.extended_sheets
+        if has_assignment and meta.default_workflow:
+            resources = _search_for_interfaces(catalogs, iresource)
+            for resource in resources:
+                sheet = registry.content.get_sheet(resource,
+                                                   IWorkflowAssignment)
+                workflow_name = sheet.get()['workflow']
+                if not workflow_name:
+                    logger.info('Set default workflow {0} for {1}'.format(
+                        meta.default_workflow, resource))
+                    sheet._store_data({'workflow': meta.default_workflow},
+                                      initialize_workflow=False)
+
+
+@log_migration
 def add_local_roles_for_workflow_state(root,
                                        registry):  # pragma: no cover
     """Add local role of the current workflow state for all processes."""
@@ -820,5 +841,6 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(update_workflow_state_acl_for_all_resources)
     config.add_evolution_step(add_controversiality_index)
     config.add_evolution_step(add_description_sheet_to_user)
+    config.add_evolution_step(set_default_workflow)
     config.add_evolution_step(add_local_roles_for_workflow_state)
     config.add_evolution_step(rename_default_group)

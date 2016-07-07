@@ -33,16 +33,3 @@ def test_create_root_with_initial_content(registry):
     inst = registry.content.create(IRootPool.__identifier__)
     assert IRootPool.providedBy(inst)
     assert IProcess.providedBy(inst['mercator'])
-
-
-@mark.usefixtures('integration')
-def test_initialize_workflow(registry, monkeypatch):
-    from adhocracy_mercator.resources.mercator import IProcess
-    from adhocracy_mercator.resources.root import initialize_workflow
-    workflow = registry.content.workflows['mercator']
-    root = testing.DummyResource()
-    mercator = testing.DummyResource(__provides__=IProcess)
-    root['mercator'] = mercator
-    root.__acl__ = [(Allow, 'role:god', ALL_PERMISSIONS)]
-    initialize_workflow(root, registry, {})
-    assert workflow.state_of(mercator) == 'participate'
