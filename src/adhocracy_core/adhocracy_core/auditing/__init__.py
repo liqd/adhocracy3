@@ -4,6 +4,7 @@ import substanced.util
 
 from pyramid.i18n import TranslationStringFactory
 from pyramid.i18n import TranslationString
+from pyramid.httpexceptions import HTTPError
 from pyramid.registry import Registry
 from pyramid.traversal import find_interface
 from pyramid.traversal import resource_path
@@ -111,6 +112,8 @@ def update_auditlog_callback(request: Request, response: Response) -> None:
     This is a response-callback that runs after a request has finished. To
     store the audit entry it adds an additional transaction.
     """
+    if isinstance(response, HTTPError):
+        return
     changelog = request.registry.changelog
     changes = _filter_trival_changes(changelog.values(), request.registry)
     activities = _create_activities(changes, request)

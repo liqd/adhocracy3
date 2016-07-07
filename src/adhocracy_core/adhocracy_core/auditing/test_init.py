@@ -66,6 +66,12 @@ class TestUpdateAuditlogCallback:
     def add_to(self, mocker):
         return mocker.patch('adhocracy_core.auditing.add_to_auditlog')
 
+    def test_ignore_if_error_response(self, request_, mocker):
+        from pyramid.httpexceptions import HTTPError
+        add_to = mocker.patch('adhocracy_core.auditing.add_to_auditlog')
+        self.call_fut(request_, HTTPError())
+        assert not add_to.called
+
     def test_ignore_if_empty_changelog(self, request_, mocker):
         add_to = mocker.patch('adhocracy_core.auditing.add_to_auditlog')
         self.call_fut(request_, None)
