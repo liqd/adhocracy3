@@ -31,6 +31,7 @@ class TestImportUsers:
 
 
     def test_create(self, context, registry, log):
+        from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
         from pyramid.traversal import resource_path
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
@@ -53,13 +54,14 @@ class TestImportUsers:
         groups = locator.get_groups(alice_user_id)
         assert groups == [god_group]
         bob = locator.get_user_by_login('Bob')
-        default_group = context['principals']['groups']['authenticated']
+        default_group = context['principals']['groups'][DEFAULT_USER_GROUP_NAME]
         bob_user_id = resource_path(bob)
         groups = locator.get_groups(bob_user_id)
         assert groups == [default_group]
 
 
     def test_create_default_values(self, context, registry, log):
+        from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
         from pyramid.traversal import resource_path
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
@@ -72,7 +74,7 @@ class TestImportUsers:
         self.call_fut(context, registry, filename)
 
         bob = locator.get_user_by_login('Bob')
-        default_group = context['principals']['groups']['authenticated']
+        default_group = context['principals']['groups'][DEFAULT_USER_GROUP_NAME]
         bob_user_id = resource_path(bob)
         groups = locator.get_groups(bob_user_id)
         assert groups == [default_group]
