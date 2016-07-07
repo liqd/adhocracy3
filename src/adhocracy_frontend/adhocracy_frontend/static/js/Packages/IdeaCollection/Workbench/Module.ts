@@ -2,6 +2,8 @@ import * as AdhAbuseModule from "../../Abuse/Module";
 import * as AdhBadgeModule from "../../Badge/Module";
 import * as AdhCommentModule from "../../Comment/Module";
 import * as AdhHttpModule from "../../Http/Module";
+import * as AdhIdeaCollectionProcessModule from "../Process/Module";
+import * as AdhIdeaCollectionProposalModule from "../Proposal/Module";
 import * as AdhMovingColumnsModule from "../../MovingColumns/Module";
 import * as AdhPermissionsModule from "../../Permissions/Module";
 import * as AdhProcessModule from "../../Process/Module";
@@ -9,26 +11,13 @@ import * as AdhResourceActionsModule from "../../ResourceActions/Module";
 import * as AdhResourceAreaModule from "../../ResourceArea/Module";
 import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
 
-import * as AdhProcess from "../../Process/Process";
-import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
-
-import * as AdhIdeaCollectionProcessModule from "../Process/Module";
-import * as AdhIdeaCollectionProposalModule from "../Proposal/Module";
-
 import * as Workbench from "./Workbench";
-
-import RIGeoProposal from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
-import RIGeoProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
-import RIIdeaCollectionProcess from "../../../Resources_/adhocracy_meinberlin/resources/idea_collection/IProcess";
-
 
 export var moduleName = "adhIdeaCollectionWorkbench";
 
 export var register = (angular) => {
     AdhIdeaCollectionProcessModule.register(angular);
     AdhIdeaCollectionProposalModule.register(angular);
-
-    var processType = RIIdeaCollectionProcess.content_type;
 
     angular
         .module(moduleName, [
@@ -57,22 +46,5 @@ export var register = (angular) => {
             "adhConfig", "adhTopLevelState", "adhResourceUrlFilter", "adhParentPathFilter", Workbench.proposalImageColumnDirective])
         .directive("adhIdeaCollectionDetailColumn", ["adhConfig", "adhTopLevelState", Workbench.detailColumnDirective])
         .directive("adhIdeaCollectionAddProposalButton", [
-            "adhConfig", "adhPermissions", "adhTopLevelState", Workbench.addProposalButtonDirective])
-        .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider: AdhResourceArea.Provider, adhConfig) => {
-            var registerRoutes = Workbench.registerRoutesFactory(RIIdeaCollectionProcess, RIGeoProposal, RIGeoProposalVersion);
-            registerRoutes()(adhResourceAreaProvider);
-
-            var processHeaderSlot = adhConfig.pkg_path + Workbench.pkgLocation + "/ProcessHeaderSlot.html";
-            adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
-        }])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templates[processType] =
-                "<adh-idea-collection-workbench data-process-options=\"processOptions\">" +
-                "</adh-idea-collection-workbench>";
-            adhProcessProvider.processOptions[processType] = {
-                hasLocation: true,
-                proposalClass: RIGeoProposal,
-                proposalVersionClass: RIGeoProposalVersion
-            };
-        }]);
+            "adhConfig", "adhPermissions", "adhTopLevelState", Workbench.addProposalButtonDirective]);
 };
