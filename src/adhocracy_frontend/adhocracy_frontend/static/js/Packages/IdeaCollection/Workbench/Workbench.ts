@@ -23,8 +23,6 @@ export var workbenchDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html",
         scope: {
-            isBuergerhaushalt: "=?",
-            isKiezkasse: "=?",
             processOptions: "="
         },
         link: (scope) => {

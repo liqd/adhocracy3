@@ -45,8 +45,6 @@ export interface IScope extends angular.IScope {
         locationText? : string;
     };
     selectedState? : string;
-    isKiezkasse : boolean;
-    isBuergerhaushalt : boolean;
     processOptions : AdhProcess.IProcessOptions;
     resource : any;
 }
@@ -63,9 +61,7 @@ var bindPath = (
     $q : angular.IQService
 ) => (
     scope : IScope,
-    pathKey : string = "path",
-    isKiezkasse : boolean = false,
-    isBuergerhaushalt : boolean = false
+    pathKey : string = "path"
 ) : void => {
         var getPolygon = () => {
             if (scope.processOptions.hasLocation) {
@@ -146,9 +142,7 @@ var bindPath = (
 
 var fill = (
     scope : IScope,
-    proposalVersion,
-    isKiezkasse : boolean = false,
-    isBuergerhaushalt : boolean = false
+    proposalVersion
 ) : void => {
     // WARNING: proposalSheet is not a regular feature of adhocracy, 
     // but a hack of Buergerhaushalt and Kiezkasse.
@@ -184,9 +178,7 @@ var postCreate = (
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : IScope,
-    poolPath : string,
-    isKiezkasse : boolean = false,
-    isBuergerhaushalt : boolean = false
+    poolPath : string
 ) => {
     var proposalClass = scope.processOptions.proposalClass;
     var proposalVersionClass = scope.processOptions.proposalVersionClass;
@@ -199,7 +191,7 @@ var postCreate = (
     proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
         follows: [proposal.first_version_path]
     });
-    fill(scope, proposalVersion, isKiezkasse, isBuergerhaushalt);
+    fill(scope, proposalVersion);
 
     return adhHttp.deepPost([proposal, proposalVersion]);
 };
@@ -209,9 +201,7 @@ var postEdit = (
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : IScope,
-    oldVersion,
-    isKiezkasse : boolean = false,
-    isBuergerhaushalt : boolean = false
+    oldVersion
 ) => {
     var proposalVersionClass = scope.processOptions.proposalVersionClass;
 
@@ -220,7 +210,7 @@ var postEdit = (
     proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
         follows: [oldVersion.path]
     });
-    fill(scope, proposalVersion, isKiezkasse, isBuergerhaushalt);
+    fill(scope, proposalVersion);
 
     return adhHttp.deepPost([proposalVersion]);
 };
@@ -239,13 +229,11 @@ export var detailDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
         scope: {
             path: "@",
-            isKiezkasse: "=?",
-            isBuergerhaushalt: "=?",
             processOptions : "="
         },
         link: (scope : IScope) => {
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
-                scope, undefined, scope.isKiezkasse, scope.isBuergerhaushalt);
+                scope, undefined);
         }
     };
 };
@@ -264,13 +252,11 @@ export var listItemDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
         scope: {
             path: "@",
-            isKiezkasse: "=?",
-            isBuergerhaushalt: "=?",
             processOptions : "="
         },
         link: (scope : IScope) => {
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
-                scope, undefined, scope.isKiezkasse, scope.isBuergerhaushalt);
+                scope, undefined);
             scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                 if (!proposalVersionUrl) {
                     scope.selectedState = "";
@@ -299,13 +285,11 @@ export var mapListItemDirective = (
         require: "^adhMapListingInternal",
         scope: {
             path: "@",
-            isKiezkasse: "=?",
-            isBuergerhaushalt: "=?",
             processOptions : "="
         },
         link: (scope : IScope, element, attrs, mapListing : AdhMapping.MapListingController) => {
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
-                scope, undefined, scope.isKiezkasse, scope.isBuergerhaushalt);
+                scope, undefined);
 
             var unregister = scope.$watchGroup(["data.lat", "data.lng"], (values : number[]) => {
                 if (typeof values[0] !== "undefined" && typeof values[1] !== "undefined") {
@@ -341,8 +325,6 @@ export var createDirective = (
         restrict: "E",
         scope: {
             poolPath: "@",
-            isKiezkasse: "=?",
-            isBuergerhaushalt: "=?",
             processOptions : "="
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
@@ -367,7 +349,7 @@ export var createDirective = (
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.meinberlinProposalForm, () => {
-                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.poolPath, scope.isKiezkasse, scope.isBuergerhaushalt)
+                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.poolPath)
                         .then((result) => {
                             $location.url(adhResourceUrlFilter(AdhUtil.parentPath(result[1].path)));
                         });
@@ -401,8 +383,6 @@ export var editDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
             path: "@",
-            isKiezkasse: "=?",
-            isBuergerhaushalt: "=?",
             processOptions : "="
         },
         link: (scope, element) => {
@@ -410,11 +390,11 @@ export var editDirective = (
             scope.showError = adhShowError;
             scope.create = false;
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
-                scope, undefined, scope.isKiezkasse, scope.isBuergerhaushalt);
+                scope, undefined);
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.meinberlinProposalForm, () => {
-                    return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.resource, scope.isKiezkasse, scope.isBuergerhaushalt)
+                    return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.resource)
                         .then((result) => {
                             $location.url(adhResourceUrlFilter(AdhUtil.parentPath(result[0].path)));
                     });

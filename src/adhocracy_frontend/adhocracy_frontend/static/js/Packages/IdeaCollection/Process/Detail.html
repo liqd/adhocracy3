@@ -11,8 +11,6 @@
             <adh-listing
                 data-content-type="{{contentType}}"
                 data-custom="{
-                    isBuergerhaushalt: isBuergerhaushalt,
-                    isKiezkasse: isKiezkasse,
                     processOptions: processOptions
                 }"
                 data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
@@ -24,8 +22,6 @@
                 data-sorts="sorts">
                 <adh-idea-collection-proposal-list-item
                     data-path="{{element}}"
-                    data-is-buergerhaushalt="custom.isBuergerhaushalt"
-                    data-is-kiezkasse="custom.isKiezkasse"
                     data-process-options="custom.processOptions">
                 </adh-idea-collection-proposal-list-item>
             </adh-listing>
@@ -42,8 +38,6 @@
                     data-ng-if="processOptions.hasLocation"
                     data-content-type="{{contentType}}"
                     data-custom="{
-                        isBuergerhaushalt: isBuergerhaushalt,
-                        isKiezkasse: isKiezkasse,
                         processOptions: processOptions
                     }"
                     data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
@@ -56,8 +50,6 @@
                     data-sorts="sorts">
                     <adh-idea-collection-proposal-map-list-item
                         data-path="{{item}}"
-                        data-is-buergerhaushalt="custom.isBuergerhaushalt"
-                        data-is-kiezkasse="custom.isKiezkasse"
                         data-process-options="custom.processOptions">
                     </adh-idea-collection-proposal-map-list-item>
                 </adh-map-listing>

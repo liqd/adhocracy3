@@ -25,8 +25,6 @@ export var detailDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
         scope: {
             path: "@",
-            isBuergerhaushalt: "=?",
-            isKiezkasse: "=?",
             processOptions: "="
         },
         link: (scope) => {

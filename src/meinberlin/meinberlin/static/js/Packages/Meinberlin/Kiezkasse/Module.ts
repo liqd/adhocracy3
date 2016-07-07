@@ -42,7 +42,7 @@ export var register = (angular) => {
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[processType] =
-                "<adh-idea-collection-workbench data-is-kiezkasse=\"true\" data-process-options=\"processOptions\">" +
+                "<adh-idea-collection-workbench data-process-options=\"processOptions\">" +
                 "</adh-idea-collection-workbench>";
             adhProcessProvider.processOptions[processType] = {
                 hasCreatorParticipate: true,
