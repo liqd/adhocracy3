@@ -404,8 +404,8 @@ a module by adding a corresponding file to the theme.
 Formatting
 ++++++++++
 
-We have a pre-commit hook with most of the `scss-lint linters
-<https://github.com/causes/scss-lint/blob/master/lib/scss_lint/linter/README.md>`_
+We have a pre-commit hook with most of the `sass-lint linters
+<https://github.com/sasstools/sass-lint/tree/master/docs/rules>`_
 with their default settings, except for the following modifications:
 
 -  4 space indentation.

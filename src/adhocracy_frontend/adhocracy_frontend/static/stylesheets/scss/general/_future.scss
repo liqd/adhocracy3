@@ -38,8 +38,6 @@ This mixin allows to set attributes to placeholders in several browser.
 *This is not part of any W3C standard.*
 */
 @mixin placeholder {
-    // scss-lint:disable VendorPrefix
-
     &::-webkit-input-placeholder {
         @content;
     }
@@ -58,7 +56,6 @@ This mixin allows to set attributes to placeholders in several browser.
 }
 
 .sticky {
-    // scss-lint:disable VendorPrefix
     position: -webkit-sticky;
     position: sticky;
     top: 0;

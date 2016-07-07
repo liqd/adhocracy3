@@ -175,7 +175,7 @@ class ResourceFactory:
                 referenced resource, no real content is modified.
                 Default is False.
             **kwargs: Arbitary keyword arguments. Will be passed along with
--               `creator` and  `autoupdated` to the `after_creation` hook as
+                `creator` and  `autoupdated` to the `after_creation` hook as
                 3rd argument `options`.
 
         Returns:

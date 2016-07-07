@@ -16,18 +16,15 @@ body {
     font-family: $font-family-normal;
 
     @media print {
-        // scss-lint:disable ImportantRule
         padding: 0 1.5em !important;
     }
 }
 
 @media print {
-    *:not([class^=leaflet]) {
-        // scss-lint:disable ImportantRule, ColorVariable
+    *:not([class^="leaflet"]) {
         background-color: initial !important;
         border-color: initial !important;
         color: inherit !important;
-        // scss-lint:enable ImportantRule, ColorVariable
     }
 }
 
