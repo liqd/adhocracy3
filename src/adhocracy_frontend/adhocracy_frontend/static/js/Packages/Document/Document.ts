@@ -93,7 +93,7 @@ export var highlightSelectedParagraph = (
 
 export var bindPath = (
     $q : angular.IQService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhGetBadges? : AdhBadge.IGetBadgeAssignments,
     adhTopLevelState? : AdhTopLevelState.Service
 ) => (
@@ -156,7 +156,7 @@ export var bindPath = (
 };
 
 export var postCreate = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhUploadImage
 ) => (
@@ -227,7 +227,7 @@ export var postCreate = (
 };
 
 export var postEdit = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhUploadImage
 ) => (
@@ -342,7 +342,7 @@ export var postEdit = (
 export var detailDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhGetBadges : AdhBadge.IGetBadgeAssignments,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
@@ -367,7 +367,7 @@ export var detailDirective = (
 export var listItemDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhGetBadges : AdhBadge.IGetBadgeAssignments,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
@@ -398,7 +398,7 @@ export var listItemDirective = (
 export var mapListItemDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhGetBadges : AdhBadge.IGetBadgeAssignments,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
@@ -439,7 +439,7 @@ export var listingDirective = (
 export var createDirective = (
     $location : angular.ILocationService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhShowError,
@@ -504,7 +504,7 @@ export var editDirective = (
     $location : angular.ILocationService,
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhShowError,

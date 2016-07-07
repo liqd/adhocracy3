@@ -3,13 +3,6 @@
         <div class="moving-column-tab">
             <i class="icon-document moving-column-icon"></i>
         </div>
-        <a class="moving-column-menu-button" data-ng-if="proposalItemOptions.POST" data-ng-href="{{ proposalUrl | adhParentPath | adhResourceUrl:'edit' }}">{{ "TR__EDIT" | translate }}</a>
-        <a
-            class="moving-column-menu-button"
-            data-ng-if="badgeAssignmentPoolOptions.POST"
-            data-ng-click="ctrl.toggleOverlay('badges')"
-            href="">{{ "TR__MANAGE_BADGE_ASSIGNMENTS" | translate }}</a>
-
         <div class="moving-column-menu-nav">
             <a class="moving-column-menu-nav-button" data-ng-href="{{ processUrl | adhResourceUrl }}" title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
         </div>
@@ -24,15 +17,29 @@
     <adh-recompile-on-change
         data-ng-switch-when="body"
         data-value="{{proposalUrl}}">
+        <adh-resource-actions
+            data-resource-path="{{proposalUrl | adhParentPath}}"
+            data-resource-with-badges-url="{{processUrl}}"
+            data-ng-if="proposalUrl"
+            data-edit="true"
+            data-assign-badges="true">
+        </adh-resource-actions>
+        <ul class="alerts">
+            <li data-ng-repeat="(id, alert) in modals.alerts" class="alerts-message m-{{alert.mode}}" data-ng-click="modals.removeAlert(id)">
+                {{ alert.message | translate }}
+            </li>
+        </ul>
+        <div class="modal" data-ng-if="modals.modal">
+            <adh-badge-assignment
+                data-ng-if="modals.modal === 'badges'"
+                data-modals="modals"
+                data-path="{{proposalUrl}}">
+            </adh-badge-assignment>
+        </div>
+
         <adh-pcompass-proposal-detail
             data-ng-if="proposalUrl"
             data-path="{{proposalUrl}}">
         </adh-pcompass-proposal-detail>
     </adh-recompile-on-change>
-
-    <adh-badge-assignment
-        data-ng-switch-when="overlays"
-        data-ng-if="overlay === 'badges'"
-        data-path="{{proposalUrl}}">
-    </adh-badge-assignment>
 </div>

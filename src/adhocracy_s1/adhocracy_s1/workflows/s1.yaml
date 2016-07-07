@@ -1,4 +1,5 @@
 initial_state: propose
+add_local_role_participant_to_default_group: True
 states:
   propose:
     title: Participate

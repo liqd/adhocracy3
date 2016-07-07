@@ -2,6 +2,7 @@ title: Standard
 description: Base standard worklow definition.
 initial_state: draft
 auto_transition: False
+add_local_role_participant_to_default_group: True
 states:
   draft:
     title: Draft
@@ -24,7 +25,7 @@ states:
     acm:
       principals:                   [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [view,                     ~,        A,           A,         A,       A,         ~]
+        - [view,                     ~,        ~,           ~,         ~,       ~,         ~]
         - [create_proposal,          ~,        A,           ~,         ~,       ~,         ~]
         - [create_asset,             ~,        A,           ~,         ~,       ~,         ~]
         - [create_comment,           ~,        A,           A,         ~,       ~,         ~]

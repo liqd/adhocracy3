@@ -18,30 +18,16 @@
     <div data-ng-switch-when="body">
         <adh-recompile-on-change
             data-value="{{proposalUrl}}">
-            <div class="action-bar">
-                <adh-edit-action
-                    data-ng-if="proposalUrl && proposalItemOptions.PUT"
-                    data-class="action-bar-item"
-                    data-parent-path="true"
-                    data-resource-path="{{proposalUrl}}"></adh-edit-action>
-                <adh-report-action
-                    data-modals="column"
-                    data-class="action-bar-item"
-                    data-parent-path="true"
-                    data-resource-path="{{proposalUrl}}"></adh-report-action>
-                <a
-                    href=""
-                    class="action-bar-item"
-                    data-ng-click="ctrl.toggleOverlay('badges')"
-                    data-ng-if="badgeAssignmentPoolOptions.POST && badgesExist">{{ "TR__MANAGE_BADGE_ASSIGNMENTS" | translate }}</a>
-                <adh-hide-action
-                    data-ng-if="proposalUrl && proposalItemOptions.hide"
-                    data-class="action-bar-item"
-                    data-parent-path="true"
-                    data-resource-path="{{proposalUrl}}"></adh-hide-action>
-                <adh-print-action
-                    data-class="action-bar-item"></adh-print-action>
-            </div>
+            <adh-resource-actions
+                data-resource-path="{{proposalUrl | adhParentPath}}"
+                data-resource-with-badges-url="{{processUrl}}"
+                data-ng-if="proposalUrl"
+                data-edit="true"
+                data-assign-badges="true"
+                data-report="true"
+                data-hide="true"
+                data-print="true">
+            </adh-resource-actions>
             <adh-meinberlin-proposal-detail
                 data-ng-if="proposalUrl"
                 data-is-buergerhaushalt="isBuergerhaushalt"
@@ -50,17 +36,4 @@
             </adh-meinberlin-proposal-detail>
         </adh-recompile-on-change>
     </div>
-
-    <adh-report-abuse
-        data-ng-switch-when="overlays"
-        data-ng-if="overlay === 'abuse'"
-        data-modals="column"
-        data-url="{{ proposalUrl | adhParentPath | adhResourceUrl | adhCanonicalUrl }}">
-    </adh-report-abuse>
-
-    <adh-badge-assignment
-        data-ng-switch-when="overlays"
-        data-ng-if="overlay === 'badges'"
-        data-path="{{proposalUrl}}">
-    </adh-badge-assignment>
 </div>

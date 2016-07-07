@@ -43,7 +43,7 @@ setup(name='adhocracy_meinberlin',
       main = adhocracy_meinberlin:main
       [console_scripts]
       ad_meinberlin_import_bezirksregions=\
-          adhocracy_meinberlin.scripts.ad_import_geodata:main
+          adhocracy_meinberlin.scripts.ad_import_geodata:import_bezirksregions
       ad_meinberlin_import_bezirke =\
           adhocracy_meinberlin.scripts.ad_import_geodata:main
       ad_meinberlin_create_process_for_region =\

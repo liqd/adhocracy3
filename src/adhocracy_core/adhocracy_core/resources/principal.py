@@ -263,7 +263,7 @@ class PasswordReset(Base):
         password_sheet.set({'password': password}, send_event=False)
         if not user.active:  # pragma: no cover
             user.activate()
-        del self.__parent__[self.__name__]
+        self.__parent__.remove(self.__name__)
         statsd_incr('pwordresets.reset', 1)
 
 
@@ -433,7 +433,7 @@ def delete_not_activated_users(request: Request, age_in_days: int):
                                                              user.email,
                                                              user.name)
         logger.info(msg)
-        del user.__parent__[user.__name__]
+        user.__parent__.remove(user.__name__, registry=request.registry)
 
 
 def delete_password_resets(request: Request, age_in_days: int):
@@ -442,7 +442,7 @@ def delete_password_resets(request: Request, age_in_days: int):
     expired = [u for u in resets.values() if is_older_than(u, age_in_days)]
     for reset in expired:
         logger.info('deleting reset {0}'.format(reset))
-        del resets[reset.__name__]
+        resets.remove(reset.__name__, registry=request.registry)
 
 
 def includeme(config):

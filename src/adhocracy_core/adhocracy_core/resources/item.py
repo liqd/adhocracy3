@@ -25,7 +25,8 @@ def create_initial_content_for_item(context, registry, options):
                                             request=request,
                                             )
     tags_sheet.set({'FIRST': first_version,
-                    'LAST': first_version})
+                    'LAST': first_version},
+                   autoupdated=True)
 
 
 item_meta = pool_meta._replace(

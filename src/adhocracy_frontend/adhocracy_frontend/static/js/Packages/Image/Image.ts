@@ -28,7 +28,7 @@ var pkgLocation = "/Image";
  * FIXME: This should be exptended to cover a broader range of use cases.
  */
 export var uploadImageFactory = (
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service
 ) => (
     poolPath : string,
     flow : Flow,
@@ -68,7 +68,7 @@ export var uploadImageFactory = (
 
 
 export var addImage = (
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service
 ) => (
     resourcePath : string,
     imagePath : string
@@ -94,7 +94,7 @@ export var addImage = (
 
 export var uploadImageDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhUploadImage,
     flowFactory,
@@ -133,7 +133,7 @@ export var uploadImageDirective = (
 };
 
 export var showImageDirective = (
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service
 ) => {
     return {
         restrict: "E",

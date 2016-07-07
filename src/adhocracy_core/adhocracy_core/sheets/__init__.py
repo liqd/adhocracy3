@@ -182,7 +182,9 @@ class BaseResourceSheet:
             omit=(),
             send_event=True,
             send_reference_event=True,
-            omit_readonly: bool=True) -> bool:
+            omit_readonly: bool=True,
+            autoupdated=False,
+            ) -> bool:
         """Store appstruct.
 
         Read :func:`adhocracy_core.interfaces.IResourceSheet.set`
@@ -202,7 +204,9 @@ class BaseResourceSheet:
                                           self.registry,
                                           appstruct_old,
                                           appstruct,
-                                          self.request)
+                                          self.request,
+                                          autoupdated,
+                                          )
             self.registry.notify(event)
         return bool(appstruct)
 
@@ -235,7 +239,7 @@ class BaseResourceSheet:
                                               registry,
                                               send_event=send_event)
 
-    def serialize(self, params: dict=None):
+    def serialize(self, params: dict=None, add_back_references: bool=True):
         """Get sheet appstruct data and serialize.
 
         Read :func:`adhocracy_core.interfaces.IResourceSheet.serialize`
@@ -249,7 +253,9 @@ class BaseResourceSheet:
             'adhocracy.filter_by_visible', True))
         if filter_visible:
             params['only_visible'] = True
-        appstruct = self.get(params=params, omit_defaults=True)
+        appstruct = self.get(params=params,
+                             add_back_references=add_back_references,
+                             omit_defaults=True)
         schema = self.get_schema_with_bindings()
         cstruct = schema.serialize(appstruct)
         return cstruct

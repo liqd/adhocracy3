@@ -23,7 +23,7 @@ export interface IFormScope extends IScope, AdhDocument.IFormScope {
 
 export var bindPath = (
     $q : angular.IQService,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service
 ) => {
     var fn = AdhDocument.bindPath($q, adhHttp);
 
@@ -75,7 +75,7 @@ export var detailDirective = (
     $q : angular.IQService,
     $window : angular.IWindowService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhShowError,
@@ -141,7 +141,7 @@ export var detailDirective = (
 
 export var createDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhShowError,
     adhSubmitIfValid,

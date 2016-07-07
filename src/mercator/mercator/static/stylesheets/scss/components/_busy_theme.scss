@@ -1,5 +1,5 @@
 .busy-bar {
-    @include opacity(1);
+    opacity: 1;
     background: url("/static/images/busy.gif") repeat-x left bottom;
     height: 4px;
     position: absolute;
@@ -13,6 +13,6 @@
     }
 
     &.ng-hide {
-        @include opacity(0);
+        opacity: 0;
     }
 }

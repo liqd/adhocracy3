@@ -4,8 +4,6 @@
             enabled: false
         Comment:
             enabled: false
-        Compass::*:
-            enabled: true
         Indentation:
             width: 4
         LeadingZero:

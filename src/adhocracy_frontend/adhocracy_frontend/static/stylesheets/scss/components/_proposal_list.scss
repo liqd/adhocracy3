@@ -46,7 +46,6 @@ $thumbnail-height: 90px;
     @include rem(padding, 1rem 1.25rem 1.25rem 0.875rem);
     display: block;
     border-bottom: 2px solid $color-structure-normal;
-    line-height: 1;
     position: relative;
 
     // reset link styling
@@ -89,13 +88,13 @@ $thumbnail-height: 90px;
 .proposal-list-item-title {
     @include rem(font-size, $font-size-plus);
     @include rem(margin-bottom, 15px);
-    font-weight: $font-weight-normal;
+    font-weight: $font-weight-medium;
 }
 
 .proposal-list-item-col-left {
-    @include span(8 of 12 first);
+    @include grid-span(8, 0);
 }
 
 .proposal-list-item-col-right {
-    @include span(4 of 12 last);
+    @include grid-span(4, 8);
 }

@@ -3,13 +3,16 @@ import * as AdhHttp from "../Http/Http";
 import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
-import * as AdhUtil from "../Util/Util";
+
+import * as SIBadge from "../../Resources_/adhocracy_core/sheets/badge/IBadge";
+import * as SIBadgeable from "../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
+import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 
 var pkgLocation = "/ResourceActions";
 
 
-class Modals {
-    public overlay : string;
+export class Modals {
+    public modal : string;
     public alerts : {[id : number]: {message : string, mode : string}};
     private lastId : number;
 
@@ -32,36 +35,42 @@ class Modals {
         delete this.alerts[id];
     }
 
-    public showOverlay(key : string) : void {
-        this.overlay = key;
+    public showModal(key : string) : void {
+        this.modal = key;
     }
 
-    public hideOverlay(key? : string) : void {
-        if (typeof key === "undefined" || this.overlay === key) {
-            this.overlay = undefined;
+    public hideModal(key? : string) : void {
+        if (typeof key === "undefined" || this.modal === key) {
+            this.modal = undefined;
         }
     }
 
-    public toggleOverlay(key : string, condition? : boolean) : void {
-        if (condition || (typeof condition === "undefined" && this.overlay !== key)) {
-            this.overlay = key;
-        } else if (this.overlay === key) {
-            this.overlay = undefined;
+    public toggleModal(key : string, condition? : boolean) : void {
+        if (condition || (typeof condition === "undefined" && this.modal !== key)) {
+            this.modal = key;
+        } else if (this.modal === key) {
+            this.modal = undefined;
         }
+    }
+
+    public clear() : void {
+        this.alerts = {};
+        this.modal = undefined;
     }
 }
 
 export var resourceActionsDirective = (
     $timeout : angular.ITimeoutService,
-    adhPermissions : AdhPermissions.Service,
-    adhConfig: AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service
 ) => {
     return {
         restrict: "E",
         scope: {
             resourcePath: "@",
-            parentPath: "=?",
+            resourceWithBadgesUrl: "@?",
             deleteRedirectUrl: "@?",
+            assignBadges: "=?",
             share: "=?",
             hide: "=?",
             resourceWidgetDelete: "=?",
@@ -70,50 +79,80 @@ export var resourceActionsDirective = (
             cancel: "=?",
             edit: "=?",
             moderate: "=?",
+            modals: "=?"
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceActions.html",
         link: (scope, element) => {
-            var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
             scope.modals = new Modals($timeout);
-            adhPermissions.bindScope(scope, path, "options");
+            adhPermissions.bindScope(scope, scope.resourcePath, "options");
+
+            scope.$watch("resourcePath", () => {
+                scope.modals.clear();
+            });
         }
     };
 };
 
-export var reportActionDirective = () => {
+export var modalActionDirective = () => {
     return {
         restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"report();\">{{ 'TR__REPORT' | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"toggle();\">{{ label | translate }}</a>",
         scope: {
             class: "@",
             modals: "=",
+            modal: "@",
+            label: "@",
         },
         link: (scope) => {
-            scope.report = () => {
-                scope.modals.toggleOverlay("abuse");
+            scope.toggle = () => {
+                scope.modals.toggleModal(scope.modal);
             };
         }
     };
 };
 
-export var shareActionDirective = () => {
+export var assignBadgesActionDirective = (
+    adhConfig: AdhConfig.IService,
+    adhHttp : AdhHttp.Service,
+    adhPermissions : AdhPermissions.Service
+) => {
     return {
         restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"report();\">{{ 'TR__SHARE' | translate }}</a>",
+        template: "<a data-ng-if=\"badgesExist && badgeAssignmentPoolOptions.PUT\" class=\"{{class}}\""
+            + "href=\"\" data-ng-click=\"assignBadges();\">{{ 'TR__MANAGE_BADGE_ASSIGNMENTS' | translate }}</a>",
         scope: {
+            resourcePath: "@",
+            resourceWithBadgesUrl: "@?",
             class: "@",
             modals: "=",
         },
         link: (scope) => {
-            scope.report = () => {
-                scope.modals.toggleOverlay("share");
+            var badgeAssignmentPoolPath;
+            scope.$watch("resourcePath", (resourcePath) => {
+                if (resourcePath) {
+                    adhHttp.get(resourcePath).then((badgeable) => {
+                        badgeAssignmentPoolPath = badgeable.data[SIBadgeable.nick].post_pool;
+                    });
+                }
+            });
+            adhPermissions.bindScope(scope, () => badgeAssignmentPoolPath, "badgeAssignmentPoolOptions");
+            var params = {
+                depth: 4,
+                content_type: SIBadge.nick
+            };
+            adhHttp.get(scope.resourceWithBadgesUrl, params).then((response) => {
+                scope.badgesExist = response.data[SIPool.nick].count > 0;
+            });
+
+            scope.assignBadges = () => {
+                scope.modals.toggleModal("badges");
             };
         }
     };
 };
 
 export var hideActionDirective = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhResourceUrlFilter,
     $translate,
@@ -124,16 +163,14 @@ export var hideActionDirective = (
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"hide();\">{{ 'TR__HIDE' | translate }}</a>",
         scope: {
             resourcePath: "@",
-            parentPath: "=?",
             class: "@",
             redirectUrl: "@?",
         },
         link: (scope, element) => {
             scope.hide = () => {
                 return $translate("TR__ASK_TO_CONFIRM_HIDE_ACTION").then((question) => {
-                    var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
                     if ($window.confirm(question)) {
-                        return adhHttp.hide(path).then(() => {
+                        return adhHttp.hide(scope.resourcePath).then(() => {
                             var url = scope.redirectUrl;
                             if (!url) {
                                 var processUrl = adhTopLevelState.get("processUrl");
@@ -155,7 +192,6 @@ export var resourceWidgetDeleteActionDirective = () => {
         require: "^adhMovingColumn",
         scope: {
             resourcePath: "@",
-            parentPath: "=?",
             class: "@"
         },
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
@@ -189,46 +225,24 @@ export var printActionDirective = (
     };
 };
 
-export var editActionDirective = (
+export var viewActionDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhResourceUrl,
     $location : angular.ILocationService
 ) => {
     return {
         restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"edit();\">{{ 'TR__EDIT' | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"link();\">{{ label | translate }}</a>",
         scope: {
             resourcePath: "@",
-            parentPath: "=?",
-            class: "@"
+            class: "@",
+            label: "@",
+            view: "@",
         },
         link: (scope) => {
-            scope.edit = () => {
-                var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
-                var url = adhResourceUrl(path, "edit");
-                $location.url(url);
-            };
-        }
-    };
-};
-
-export var moderateActionDirective = (
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhResourceUrl,
-    $location : angular.ILocationService
-) => {
-    return {
-        restrict: "E",
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"moderate();\">{{ 'TR__MODERATE' | translate }}</a>",
-        scope: {
-            resourcePath: "@",
-            parentPath: "=?",
-            class: "@"
-        },
-        link: (scope) => {
-            scope.moderate = () => {
-                var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
-                var url = adhResourceUrl(path, "moderate");
+            scope.link = () => {
+                adhTopLevelState.setCameFrom();
+                var url = adhResourceUrl(scope.resourcePath, scope.view);
                 $location.url(url);
             };
         }
@@ -244,7 +258,6 @@ export var cancelActionDirective = (
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"cancel();\">{{ 'TR__CANCEL' | translate }}</a>",
         scope: {
             resourcePath: "@",
-            parentPath: "=?",
             class: "@"
         },
         link: (scope) => {
@@ -252,8 +265,7 @@ export var cancelActionDirective = (
                 if (!scope.resourcePath) {
                     scope.resourcePath = adhTopLevelState.get("processUrl");
                 }
-                var path = scope.parentPath ? AdhUtil.parentPath(scope.resourcePath) : scope.resourcePath;
-                var url = adhResourceUrl(path);
+                var url = adhResourceUrl(scope.resourcePath);
                 adhTopLevelState.goToCameFrom(url);
             };
         }

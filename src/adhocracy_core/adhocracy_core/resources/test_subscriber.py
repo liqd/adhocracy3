@@ -345,10 +345,11 @@ class TestAddDefaultGroupToUserSubscriber:
 
     @fixture
     def principals(self, pool, service):
+        from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
         pool['principals'] = service
         pool['principals']['groups'] = service.clone()
         group = testing.DummyResource()
-        pool['principals']['groups']['authenticated'] = group
+        pool['principals']['groups'][DEFAULT_USER_GROUP_NAME] = group
         pool['principals']['users'] = service.clone()
         user = testing.DummyResource()
         pool['principals']['users']['000000'] = user
@@ -366,8 +367,9 @@ class TestAddDefaultGroupToUserSubscriber:
 
     def test_default_group_exists_and_no_group_set(
             self, registry, principals, event, mock_sheet, mock_user_locator):
+        from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
         from adhocracy_core.sheets.principal import IPermissions
-        default_group = principals['groups']['authenticated']
+        default_group = principals['groups'][DEFAULT_USER_GROUP_NAME]
         user = principals['users']['000000']
         event.object = user
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
@@ -379,8 +381,9 @@ class TestAddDefaultGroupToUserSubscriber:
 
     def test_default_group_exists_and_group_set(
             self, registry, principals, event, mock_sheet, mock_user_locator):
+        from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
         from adhocracy_core.sheets.principal import IPermissions
-        default_group = principals['groups']['authenticated']
+        default_group = principals['groups'][DEFAULT_USER_GROUP_NAME]
         other_group = testing.DummyResource()
         user = principals['users']['000000']
         event.object = user
@@ -393,8 +396,9 @@ class TestAddDefaultGroupToUserSubscriber:
 
     def test_default_group_not_exists(
             self, registry, principals, event, mock_sheet):
+        from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
         from adhocracy_core.sheets.principal import IPermissions
-        del principals['groups']['authenticated']
+        del principals['groups'][DEFAULT_USER_GROUP_NAME]
         user = principals['users']['000000']
         event.object = user
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)

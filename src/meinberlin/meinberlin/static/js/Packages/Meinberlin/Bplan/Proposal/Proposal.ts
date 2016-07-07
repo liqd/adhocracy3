@@ -32,7 +32,7 @@ export interface IScope extends angular.IScope {
 
 
 var postCreate = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : IScope,
@@ -62,7 +62,7 @@ var postCreate = (
 
 export var createDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhShowError,
     adhSubmitIfValid
@@ -101,7 +101,7 @@ export var createDirective = (
 
 export var embedDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service
 ) => {
     return {
         restrict: "E",

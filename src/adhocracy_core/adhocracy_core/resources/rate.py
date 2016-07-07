@@ -51,7 +51,9 @@ rates_meta = service_meta._replace(
 
 def add_ratesservice(context: IPool, registry: Registry, options: dict):
     """Add `rates` service to context."""
-    registry.content.create(IRatesService.__identifier__, parent=context)
+    registry.content.create(IRatesService.__identifier__,
+                            autoupdated=True,
+                            parent=context)
 
 
 def includeme(config):

@@ -128,11 +128,6 @@ category: Variables
         <td></td>
     </tr>
     <tr>
-        <td><div class="example-color color-background-mask"></div></td>
-        <td><code>color-background-mask</code></td>
-        <td>Mask behind an overlay</td>
-    </tr>
-    <tr>
         <td colspan="3"><strong>Button colors</strong></td>
     </tr>
     <tr>
@@ -169,7 +164,7 @@ category: Variables
 */
 
 .example-color {
-    @include inline-block;
+    display: inline-block;
     height: 3rem;
     width: 3rem;
     border: 1px solid $color-structure-introvert;
@@ -196,7 +191,6 @@ category: Variables
 
 .color-background-base {background-color: $color-background-base;}
 .color-background-base-introvert {background-color: $color-background-base-introvert;}
-.color-background-mask {background-color: $color-background-mask;}
 
 .color-structure-normal {background-color: $color-structure-normal;}
 .color-structure-introvert {background-color: $color-structure-introvert;}
@@ -210,15 +204,15 @@ category: Variables
 .color-button-cta-active-background {background-color: $color-button-cta-active-background;}
 
 // some static contrast checks for a11y
-@include check-contrast($color-text-normal, $color-background-base, 7);
-@include check-contrast($color-text-normal, $color-structure-introvert);
-@include check-contrast($color-text-extrovert, $color-background-base);
-@include check-contrast($color-text-extrovert, $color-structure-introvert);
-@include check-contrast($color-text-introvert, $color-background-base);
-@include check-contrast($color-text-introvert, $color-structure-introvert, 3);
-@include check-contrast($color-text-inverted, $color-text-highlight-normal);
-@include check-contrast($color-text-highlight-normal, $color-background-base);
-@include check-contrast($color-text-highlight-normal, $color-background-base-introvert);
-@include check-contrast($color-text-inverted, $color-function-negative);
-@include check-contrast($color-text-normal, $color-function-positive);
-@include check-contrast($color-text-normal, $color-function-neutral);
+$_: contrast-check($color-text-normal, $color-background-base, 7);
+$_: contrast-check($color-text-normal, $color-structure-introvert);
+$_: contrast-check($color-text-extrovert, $color-background-base);
+$_: contrast-check($color-text-extrovert, $color-structure-introvert);
+$_: contrast-check($color-text-introvert, $color-background-base);
+$_: contrast-check($color-text-introvert, $color-structure-introvert, 3);
+$_: contrast-check($color-text-inverted, $color-text-highlight-normal);
+$_: contrast-check($color-text-highlight-normal, $color-background-base);
+$_: contrast-check($color-text-highlight-normal, $color-background-base-introvert);
+$_: contrast-check($color-text-inverted, $color-function-negative);
+$_: contrast-check($color-text-normal, $color-function-positive);
+$_: contrast-check($color-text-normal, $color-function-neutral);

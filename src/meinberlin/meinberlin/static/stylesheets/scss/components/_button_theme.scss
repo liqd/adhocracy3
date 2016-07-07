@@ -1,5 +1,5 @@
 @mixin icon-button($base-font-size: $font-size-small) {
-    @include inline-block;
+    display: inline-block;
     @include rem(line-height, 24px);
     @include rem(min-width, 24px);
     @include rem(padding, 0 8px);

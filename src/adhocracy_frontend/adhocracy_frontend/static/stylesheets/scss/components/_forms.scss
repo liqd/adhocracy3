@@ -115,7 +115,7 @@ textarea {
     background-color: $color-background-base-introvert;
 
     @include placeholder {
-        @include opacity(1);
+        opacity: 1;
         color: $color-text-introvert;
     }
 
@@ -197,8 +197,8 @@ Class to add styling to a label when the label itself is used as a container.
 */
 
 .label-text {
-    @include inline-block;
     @include rem(padding-bottom, 0.5rem);
+    display: inline-block;
 }
 
 .input-error {

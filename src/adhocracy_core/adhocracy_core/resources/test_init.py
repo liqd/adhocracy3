@@ -128,10 +128,21 @@ class TestResourceFactory:
         meta = resource_meta._replace(iresource=IResource,
                                       after_creation=(dummy_after_create,))
 
-        inst = self.make_one(meta)(creator=None, kwarg1=True)
+        inst = self.make_one(meta)(kwarg1=True)
 
-        assert inst._options == {'kwarg1': True, 'creator': None}
+        assert inst._options['kwarg1']
+        assert inst._options['creator'] is None
+        assert not inst._options['autoupdated']
         assert inst._registry is registry
+
+    def test_call_with_after_create_and_autoupdate(self, resource_meta,
+                                                   registry):
+        def dummy_after_create(context, registry, options):
+            context._options = options
+        meta = resource_meta._replace(iresource=IResource,
+                                      after_creation=(dummy_after_create,))
+        inst = self.make_one(meta)(autoupdated=True)
+        assert inst._options['autoupdated']
 
     def test_call_without_run_after_create(self, resource_meta):
         def dummy_after_create(context, registry, options):
@@ -360,6 +371,7 @@ class TestResourceFactory:
         registry.content.get_sheet.return_value = mock_sheet
         self.make_one(meta)(appstructs={})
         mock_sheet.set.assert_called_with({'workflow': 'sample'},
+                                          autoupdated=False,
                                           send_event=False)
 
     def test_with_workflow_assignment_but_missing_workflow(
@@ -372,6 +384,7 @@ class TestResourceFactory:
         self.make_one(meta)(appstructs=appstructs)
         mock_sheet.set.assert_called_with({'workflow': 'sample',
                                            'state_data': {}},
+                                          autoupdated=False,
                                           send_event=False)
 
     def test_with_workflow_assignment_but_no_default(
@@ -387,11 +400,13 @@ class TestResourceFactory:
         meta = resource_meta._replace(iresource=IResource, use_autonaming=True)
         user = testing.DummyResource()
 
-        resource = self.make_one(meta)(parent=pool, creator=user)
+        resource = self.make_one(meta)(parent=pool, creator=user,
+                                       autoupdated=True)
 
         assert IResourceCreatedAndAdded.providedBy(events[0])
         assert events[0].object == resource
         assert events[0].parent == pool
+        assert events[0].autoupdated is True
 
     def test_notify_new_resource_created_and_added_ignore_if_not_send_event(
             self, resource_meta, config, pool):

@@ -5,7 +5,7 @@ from pyramid import testing
 
 def test_changelog_create():
     from . import Changelog
-    from . import changelog_meta
+    from adhocracy_core.interfaces import changelog_meta
     inst = Changelog()
     assert inst['/path/'] == changelog_meta
 
@@ -52,7 +52,7 @@ def test_create_changelog():
 
 def test_create_changelog_mapping():
     from adhocracy_core.changelog import create_changelog
-    from adhocracy_core.changelog import changelog_meta
+    from adhocracy_core.interfaces import changelog_meta
     from collections import defaultdict
     changelog = create_changelog()
     assert changelog['/'] == changelog_meta

@@ -31,6 +31,16 @@ exports.config = {
         browser.params.mail = {
             queue_path: getMailQueuePath()
         }
+
+        // https://stackoverflow.com/questions/26584451/
+        // Disable animations so e2e tests run more quickly
+        var disableNgAnimate = function() {
+          angular.module('disableNgAnimate', []).run(['$animate', function($animate) {
+            $animate.enabled(false);
+          }]);
+        };
+
+        browser.addMockModule('disableNgAnimate', disableNgAnimate);
     },
     jasmineNodeOpts: {
         showColors: true,

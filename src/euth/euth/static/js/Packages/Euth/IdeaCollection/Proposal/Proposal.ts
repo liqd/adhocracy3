@@ -42,7 +42,7 @@ export interface IScope extends angular.IScope {
 }
 
 var bindPath = (
-    adhHttp: AdhHttp.Service<any>,
+    adhHttp: AdhHttp.Service,
     adhPermissions: AdhPermissions.Service,
     adhRate: AdhRate.Service,
     adhTopLevelState: AdhTopLevelState.Service,
@@ -103,7 +103,7 @@ var fill = (
 };
 
 var postCreate = (
-    adhHttp: AdhHttp.Service<any>,
+    adhHttp: AdhHttp.Service,
     adhPreliminaryNames: AdhPreliminaryNames.Service
 ) => (
     scope: IScope,
@@ -123,7 +123,7 @@ var postCreate = (
 };
 
 var postEdit = (
-    adhHttp: AdhHttp.Service<any>,
+    adhHttp: AdhHttp.Service,
     adhPreliminaryNames: AdhPreliminaryNames.Service
 ) => (
     scope: IScope,
@@ -139,7 +139,7 @@ var postEdit = (
 
 export var detailDirective = (
     adhConfig: AdhConfig.IService,
-    adhHttp: AdhHttp.Service<any>,
+    adhHttp: AdhHttp.Service,
     adhPermissions: AdhPermissions.Service,
     adhRate: AdhRate.Service,
     adhTopLevelState: AdhTopLevelState.Service,
@@ -160,7 +160,7 @@ export var detailDirective = (
 
 export var listItemDirective = (
     adhConfig: AdhConfig.IService,
-    adhHttp: AdhHttp.Service<any>,
+    adhHttp: AdhHttp.Service,
     adhPermissions: AdhPermissions.Service,
     adhRate: AdhRate.Service,
     adhTopLevelState: AdhTopLevelState.Service,
@@ -190,7 +190,7 @@ export var listItemDirective = (
 
 export var createDirective = (
     adhConfig: AdhConfig.IService,
-    adhHttp: AdhHttp.Service<any>,
+    adhHttp: AdhHttp.Service,
     adhPreliminaryNames: AdhPreliminaryNames.Service,
     adhTopLevelState: AdhTopLevelState.Service,
     adhShowError,
@@ -228,7 +228,7 @@ export var createDirective = (
 
 export var editDirective = (
     adhConfig: AdhConfig.IService,
-    adhHttp: AdhHttp.Service<any>,
+    adhHttp: AdhHttp.Service,
     adhPermissions: AdhPermissions.Service,
     adhPreliminaryNames: AdhPreliminaryNames.Service,
     adhRate: AdhRate.Service,

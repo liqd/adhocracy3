@@ -15,9 +15,9 @@ def integration(integration):
 
 @mark.usefixtures('integration')
 def test_includeme(registry):
-    from adhocracy_core.workflows import AdhocracyACLWorkflow
+    from adhocracy_core.workflows import ACLLocalRolesWorkflow
     workflow = registry.content.workflows['debate']
-    assert isinstance(workflow, AdhocracyACLWorkflow)
+    assert isinstance(workflow, ACLLocalRolesWorkflow)
 
 
 @mark.usefixtures('integration')

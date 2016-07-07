@@ -1,11 +1,12 @@
 @mixin button-base {
-    @include inline-block;
     @include rem(font-size, $font-size-normal);
     @include rem(height, $button-height);
     @include text-align(center);
+    display: inline-block;
+    vertical-align: middle;
     border: 0;
     cursor: pointer;
-    font-weight: $font-weight-normal;
+    font-weight: $font-weight-medium;
     line-height: $button-line-height;
     overflow: hidden;
     padding: 0;
@@ -18,7 +19,7 @@
 
     &.ng-disabled,
     &:disabled {
-        @include opacity(0.5);
+        opacity: 0.5;
         cursor: default;
     }
 }
@@ -86,8 +87,7 @@ be used instead.
 
 .button {
     @include button-base;
-    @include border-radius($font-size-normal);
-    @include border-radius(1rem);
+    @include rem(border-radius, 1rem);
     background: transparent;
     color: $color-button-text;
     text-transform: uppercase;
@@ -109,8 +109,7 @@ be used instead.
     @include button-base;
     @include rem(min-width, 110px);
     @include rem(padding, 0 1rem);
-    @include border-radius($font-size-normal);
-    @include border-radius(1rem);
+    @include rem(border-radius, 1rem);
 }
 
 .button-cta {

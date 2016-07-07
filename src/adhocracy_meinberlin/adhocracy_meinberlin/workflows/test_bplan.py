@@ -32,9 +32,9 @@ def app_admin(app_admin):
 
 @mark.usefixtures('integration')
 def test_includeme_add_bplan_private_workflow(registry):
-    from adhocracy_core.workflows import AdhocracyACLWorkflow
+    from adhocracy_core.workflows import ACLLocalRolesWorkflow
     workflow = registry.content.workflows['bplan_private']
-    assert isinstance(workflow, AdhocracyACLWorkflow)
+    assert isinstance(workflow, ACLLocalRolesWorkflow)
 
 
 @mark.usefixtures('integration')
@@ -50,9 +50,9 @@ def test_initiate_bplan_private_workflow(registry, context):
 
 @mark.usefixtures('integration')
 def test_includeme_add_bplan_workflow(registry):
-    from adhocracy_core.workflows import AdhocracyACLWorkflow
+    from adhocracy_core.workflows import ACLLocalRolesWorkflow
     workflow = registry.content.workflows['bplan']
-    assert isinstance(workflow, AdhocracyACLWorkflow)
+    assert isinstance(workflow, ACLLocalRolesWorkflow)
 
 
 def _post_proposal_item(app_user, path='') -> TestResponse:

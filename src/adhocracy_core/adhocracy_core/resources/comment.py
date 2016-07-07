@@ -60,7 +60,9 @@ comments_meta = service_meta._replace(
 
 def add_commentsservice(context: IPool, registry: Registry, options: dict):
     """Add `comments` service to context."""
-    registry.content.create(ICommentsService.__identifier__, parent=context)
+    registry.content.create(ICommentsService.__identifier__,
+                            parent=context,
+                            autoupdated=True)
 
 
 def includeme(config):

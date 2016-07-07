@@ -118,8 +118,7 @@ def root_view(request):
     """Return the embeddee HTML."""
     if not hasattr(request, 'cachebusted_url'):  # ease testing
         return Response()
-    debug = config_view(request)['debug']
-    css_path = 'stylesheets/a3.css' if debug else 'stylesheets/min/a3.css'
+    css_path = 'stylesheets/a3.css'
     query_params = cachebust_query_params(request)
     result = render(
         'adhocracy_frontend:build/root.html.mako',

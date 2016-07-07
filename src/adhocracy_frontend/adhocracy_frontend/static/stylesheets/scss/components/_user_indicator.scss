@@ -10,7 +10,7 @@ It is usually used in the header bar.
 */
 
 .user-indicator {
-    @include inline-block;
+    display: inline-block;
     vertical-align: middle;
     white-space: nowrap;
     color: $color-text-introvert;

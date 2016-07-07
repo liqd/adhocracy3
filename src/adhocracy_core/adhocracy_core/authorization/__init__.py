@@ -1,4 +1,5 @@
 """Authorization with roles/local roles mapped to adhocracy principals."""
+from copy import copy
 from collections import defaultdict
 from pyramid.security import ALL_PERMISSIONS
 from pyramid.security import Allow
@@ -89,6 +90,19 @@ def set_local_roles(resource, new_local_roles: dict, registry: Registry=None):
     event = LocalRolesModified(resource, new_local_roles, old_local_roles,
                                registry)
     registry.notify(event)
+
+
+def add_local_roles(resource, additional_local_roles: dict,
+                    registry: Registry=None):
+    """Add roles to existing :term:`local role's mapping."""
+    _assert_values_have_set_type(additional_local_roles)
+    old_local_roles = getattr(resource, '__local_roles__', {})
+    local_roles = copy(old_local_roles)
+    for principal, roles in additional_local_roles.items():
+        old_roles = old_local_roles.get(principal, set())
+        roles.update(old_roles)
+        local_roles[principal] = roles
+    set_local_roles(resource, local_roles, registry=registry)
 
 
 def _assert_values_have_set_type(mapping: dict):

@@ -86,7 +86,7 @@ export var getWorkflowState = (
 export class Service {
     constructor(
         private $q : angular.IQService,
-        private adhHttp : AdhHttp.Service<any>
+        private adhHttp : AdhHttp.Service
     ) {}
 
     /**
@@ -137,7 +137,7 @@ export var directiveFactory = (template : string, sheetName : string) => (
     adhRate : Service,
     adhRateEventManager : AdhEventManager.EventManager,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhWebSocket : AdhWebSocket.Service,
     adhPermissions : AdhPermissions.Service,
     adhCredentials : AdhCredentials.Service,

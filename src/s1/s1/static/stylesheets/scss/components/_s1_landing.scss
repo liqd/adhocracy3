@@ -1,7 +1,3 @@
-$susy: (
-    gutters: 0.05
-);
-
 .s1-landing {
     @include container;
     background: $color-background-base-introvert;
@@ -36,17 +32,17 @@ $susy: (
     float: right;
 
     .button {
-        font-weight: bold;
+        font-weight: $font-weight-extrovert;
     }
 }
 
 .s1-landing-section-left {
-    @include span(9 of 12 first);
+    @include grid-span(9, 0);
 }
 
 .s1-landing-section-right {
     @include rem(border-left, 4px solid $color-background-base-introvert);
-    @include span(3 of 12 last);
+    @include grid-span(3, 9);
 }
 
 .s1-landing-section-go {

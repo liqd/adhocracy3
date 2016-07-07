@@ -4,16 +4,6 @@
             <i class="icon-document moving-column-icon"></i>
         </div>
 
-        <a
-            class="moving-column-menu-button"
-            data-ng-if="documentItemOptions.POST"
-            data-ng-click="setCameFrom()"
-            data-ng-href="{{ documentUrl | adhParentPath | adhResourceUrl:'edit' }}">{{ "TR__EDIT" | translate }}</a>
-        <adh-hide-action
-            data-ng-if="proposalUrl && proposalItemOptions.hide"
-            data-class="action-bar-item"
-            data-parent-path="true"
-            data-resource-path="{{proposalUrl}}"></adh-hide-action>
         <div class="moving-column-menu-nav">
             <a class="moving-column-menu-nav-button" data-ng-href="{{ processUrl | adhResourceUrl }}" title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
         </div>
@@ -26,6 +16,11 @@
     </a>
 
     <div data-ng-switch-when="body">
+        <adh-resource-actions
+            data-resource-path="{{documentUrl | adhParentPath}}"
+            data-edit="true"
+            data-hide="true">
+        </adh-resource-actions>
         <adh-document-detail data-path="{{documentUrl}}" data-has-map="true" data-has-badges="true" data-badgeclass="'m-info'"></adh-document-detail>
     </div>
 </div>

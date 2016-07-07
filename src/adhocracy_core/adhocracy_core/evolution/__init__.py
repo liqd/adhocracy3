@@ -271,6 +271,8 @@ def change_pools_autonaming_scheme(root, registry):  # pragma: no cover
     count = len(pools)
     for index, pool in enumerate(pools):
         logger.info('Migrating {0} of {1}: {2}'.format(index + 1, count, pool))
+        if not pool:
+            continue
         if hasattr(pool, '_autoname_last'):
             pool._autoname_lasts = PersistentMapping()
             for prefix in prefixes:
@@ -740,6 +742,66 @@ def set_default_workflow(root, registry):  # pragma: no cover
                                       initialize_workflow=False)
 
 
+@log_migration
+def add_local_roles_for_workflow_state(root,
+                                       registry):  # pragma: no cover
+    """Add local role of the current workflow state for all processes."""
+    from adhocracy_core.authorization import add_local_roles
+    from adhocracy_core.resources.process import IProcess
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
+    catalogs = find_service(root, 'catalogs')
+    resources = _search_for_interfaces(catalogs, IProcess)
+    count = len(resources)
+    for index, resource in enumerate(resources):
+        workflow = registry.content.get_sheet_field(resource,
+                                                    IWorkflowAssignment,
+                                                    'workflow')
+        state_name = workflow.state_of(resource)
+        local_roles = workflow._states[state_name].local_roles
+        logger.info('Update workflow local roles for resource {0} - {1} of {2}'
+                    .format(resource, index + 1, count))
+        if local_roles:
+            add_local_roles(resource, local_roles, registry=registry)
+
+
+@log_migration
+def rename_default_group(root, registry):  # pragma: no cover
+    """Rename default user group."""
+    from adhocracy_core.authorization import add_local_roles
+    from adhocracy_core.authorization import get_local_roles
+    from adhocracy_core.authorization import set_local_roles
+    from adhocracy_core.resources.process import IProcess
+    from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
+    catalogs = find_service(root, 'catalogs')
+    resources = _search_for_interfaces(catalogs, IProcess)
+    old_default_group = 'authenticated'
+    old_default_group_principal = 'group:' + old_default_group
+    new_default_group = DEFAULT_USER_GROUP_NAME
+    new_default_group_principal = 'group:' + DEFAULT_USER_GROUP_NAME
+    for resource in resources:
+        local_roles = get_local_roles(resource)
+        if old_default_group_principal in local_roles:
+            logger.info('Rename default group in local roles'
+                        ' of {0}'.format(resource))
+            old_roles = local_roles.pop(old_default_group_principal)
+            set_local_roles(resource, local_roles)
+            add_local_roles({new_default_group_principal: old_roles})
+    groups = root['principals']['groups']
+    if old_default_group in groups:
+        logger.info('Rename default group to {}'.format(new_default_group))
+        groups.rename(old_default_group, new_default_group, registry=registry)
+    old_default_group_path = '/principals/groups/' + old_default_group
+    new_default_group_path = '/principals/groups/' + new_default_group
+    for user in root['principals']['users'].values():
+        group_ids = getattr(user, 'group_ids', [])
+        if old_default_group_path in group_ids:
+            logger.info('Update default group name in group_ids'
+                        ' of {}'.format(user))
+            group_ids.remove(old_default_group_path)
+            group_ids.append(new_default_group_path)
+            setattr(user, 'group_ids', group_ids)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -780,3 +842,5 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_controversiality_index)
     config.add_evolution_step(add_description_sheet_to_user)
     config.add_evolution_step(set_default_workflow)
+    config.add_evolution_step(add_local_roles_for_workflow_state)
+    config.add_evolution_step(rename_default_group)
