@@ -13,6 +13,7 @@ import * as AdhIdeaCollectionWorkbench from "../../IdeaCollection/Workbench/Work
 import RIBuergerhaushaltProcess from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
 import RIBuergerhaushaltProposal from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal";
 import RIBuergerhaushaltProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
+import * as SIBuergerhaushaltProposal from "../../../Resources_/adhocracy_meinberlin/sheets/burgerhaushalt/IProposal";
 
 
 export var moduleName = "adhMeinberlinBuergerhaushalt";
@@ -41,6 +42,15 @@ export var register = (angular) => {
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[processType] =
-                "<adh-idea-collection-workbench data-is-buergerhaushalt=\"true\"></adh-idea-collection-workbench>";
+                "<adh-idea-collection-workbench data-is-buergerhaushalt=\"true\" data-process-options=\"processOptions\">" +
+                "</adh-idea-collection-workbench>";
+            adhProcessProvider.processOptions[processType] = {
+                hasLocation: true,
+                hasLocationText: true,
+                maxBudget: Infinity,
+                proposalClass: RIBuergerhaushaltProposal,
+                proposalSheet: SIBuergerhaushaltProposal,
+                proposalVersionClass: RIBuergerhaushaltProposalVersion
+            };
         }]);
 };

@@ -67,6 +67,12 @@ export var register = (angular) => {
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[processType] =
-                "<adh-idea-collection-workbench></adh-idea-collection-workbench>";
+                "<adh-idea-collection-workbench data-process-options=\"processOptions\">" +
+                "</adh-idea-collection-workbench>";
+            adhProcessProvider.processOptions[processType] = {
+                hasLocation: true,
+                proposalClass: RIGeoProposal,
+                proposalVersionClass: RIGeoProposalVersion
+            };
         }]);
 };

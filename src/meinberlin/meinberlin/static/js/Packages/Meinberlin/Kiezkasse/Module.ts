@@ -13,6 +13,7 @@ import * as AdhIdeaCollectionWorkbench from "../../IdeaCollection/Workbench/Work
 import RIKiezkasseProcess from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
 import RIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
 import RIKiezkasseProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
+import * as SIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal";
 
 
 export var moduleName = "adhMeinberlinKiezkasse";
@@ -41,6 +42,16 @@ export var register = (angular) => {
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[processType] =
-                "<adh-idea-collection-workbench data-is-kiezkasse=\"true\"></adh-idea-collection-workbench>";
+                "<adh-idea-collection-workbench data-is-kiezkasse=\"true\" data-process-options=\"processOptions\">" +
+                "</adh-idea-collection-workbench>";
+            adhProcessProvider.processOptions[processType] = {
+                hasCreatorParticipate: true,
+                hasLocation: true,
+                hasLocationText: true,
+                maxBudget: 50000,
+                proposalClass: RIKiezkasseProposal,
+                proposalSheet: SIKiezkasseProposal,
+                proposalVersionClass: RIKiezkasseProposalVersion
+            };
         }]);
 };
