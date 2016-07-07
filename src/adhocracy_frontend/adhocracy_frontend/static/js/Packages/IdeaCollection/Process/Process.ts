@@ -6,11 +6,6 @@ import * as AdhConfig from "../../Config/Config";
 import * as AdhHttp from "../../Http/Http";
 import * as AdhPermissions from "../../Permissions/Permissions";
 import * as AdhProcess from "../../Process/Process";
-import * as AdhUtil from "../../Util/Util";
-
-import RIBuergerhaushaltProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
-import RIGeoProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
-import RIKiezkasseProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
 
 import * as SILocationReference from "../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
 import * as SIMultiPolygon from "../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
@@ -59,19 +54,16 @@ export var detailDirective = (
                         var stateName = sheet.workflow_state;
                         scope.currentPhase = AdhProcess.getStateData(sheet, stateName);
 
-                        var locationUrl = resource.data[SILocationReference.nick].location;
-                        adhHttp.get(locationUrl).then((location) => {
-                            var polygon = location.data[SIMultiPolygon.nick].coordinates[0][0];
-                            scope.polygon =  polygon;
-                        });
-
-                        if (scope.isBuergerhaushalt) {
-                            scope.contentType = RIBuergerhaushaltProposalVersion.content_type;
-                        } else if (scope.isKiezkasse) {
-                            scope.contentType = RIKiezkasseProposalVersion.content_type;
-                        } else {
-                            scope.contentType = RIGeoProposalVersion.content_type;
+                        if (scope.processOptions.hasLocation) {
+                            var locationUrl = resource.data[SILocationReference.nick].location;
+                            adhHttp.get(locationUrl).then((location) => {
+                                var polygon = location.data[SIMultiPolygon.nick].coordinates[0][0];
+                                scope.polygon =  polygon;
+                            });
                         }
+
+                        var proposalVersion = scope.processOptions.proposalVersionClass;
+                        scope.contentType = proposalVersion.content_type;
                     });
                 }
             });
