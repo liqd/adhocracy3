@@ -154,8 +154,8 @@ def _create_activities(changes: [ChangelogMetadata],
     activities = []
     for change in changes:
         activity_type = _get_entry_name(change)
-        sheets = _get_content_sheets(change, request.registry)
-        sheet_data = _get_sheet_data(sheets, request)
+        sheets = _get_content_sheets(change, request)
+        sheet_data = _get_sheet_data(sheets)
         object = _get_object(change)
         target = _get_target(object)
         activity = Activity()._replace(subject=request.user,
@@ -183,11 +183,13 @@ def _get_entry_name(change: ChangelogMetadata) -> str:
         raise ValueError('Invalid change state', change)
 
 
-def _get_content_sheets(change: ChangelogMetadata, registry: Registry) -> []:
+def _get_content_sheets(change: ChangelogMetadata, request: Request) -> []:
     if change.created:
-        sheets = registry.content.get_sheets_create(change.resource)
+        sheets = request.registry.content.get_sheets_create(change.resource,
+                                                            request=request)
     else:
-        sheets = registry.content.get_sheets_edit(change.resource)
+        sheets = request.registry.content.get_sheets_edit(change.resource,
+                                                          request=request)
     return sheets
 
 
@@ -196,7 +198,6 @@ def _get_sheet_data(sheets: [ISheet], request: Request) -> {}:
     _disabled = [IMetadata]
     for sheet in sheets:
         if sheet.meta.isheet not in _disabled:
-            sheet.request = request
             sheet_data.append({sheet.meta.isheet:
                                sheet.serialize(add_back_references=False)})
     return sheet_data

@@ -179,7 +179,8 @@ class TestUpdateAuditlogCallback:
         changelog['/'] = changelog['']._replace(created=True, resource=context)
         self.call_fut(request_, None)
         added_activity = add_to.call_args[0][0][0]
-        registry.content.get_sheets_create.assert_called_with(context)
+        registry.content.get_sheets_create.assert_called_with(context,
+                                                              request=request_)
         assert added_activity.sheet_data == [{mock_sheet.meta.isheet:
                                               mock_sheet.serialize()}]
 
@@ -189,7 +190,8 @@ class TestUpdateAuditlogCallback:
         changelog['/'] = changelog['']._replace(modified=True, resource=context)
         self.call_fut(request_, None)
         added_activity = add_to.call_args[0][0][0]
-        registry.content.get_sheets_edit.assert_called_with(context)
+        registry.content.get_sheets_edit.assert_called_with(context,
+                                                            request=request_)
         assert added_activity.sheet_data == [{mock_sheet.meta.isheet:
                                               mock_sheet.serialize()}]
 
