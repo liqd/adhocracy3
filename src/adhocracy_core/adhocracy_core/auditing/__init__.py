@@ -190,14 +190,13 @@ def _get_content_sheets(change: ChangelogMetadata, request: Request) -> []:
     else:
         sheets = request.registry.content.get_sheets_edit(change.resource,
                                                           request=request)
-    return sheets
+    disabled = [IMetadata]
+    return [s for s in sheets if s.meta.isheet not in disabled]
 
 
-def _get_sheet_data(sheets: [ISheet], request: Request) -> {}:
+def _get_sheet_data(sheets: [ISheet]) -> {}:
     sheet_data = []
-    _disabled = [IMetadata]
     for sheet in sheets:
-        if sheet.meta.isheet not in _disabled:
             sheet_data.append({sheet.meta.isheet:
                                sheet.serialize(add_back_references=False)})
     return sheet_data
