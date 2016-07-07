@@ -13,6 +13,7 @@ import * as AdhUtil from "../../Util/Util";
 
 import * as SICommentable from "../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SILocationReference from "../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
 import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 import * as SIMultiPolygon from "../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
@@ -39,7 +40,7 @@ export interface IScope extends angular.IScope {
         lat? : number;
         polygon? : number[][];
         assignments : AdhBadge.IBadgeAssignment[];
-
+        picture? : string;
         budget? : number;
         creatorParticipate? : boolean;
         locationText? : string;
@@ -119,6 +120,9 @@ var bindPath = (
                         scope.data.lng = pointSheet.coordinates[0];
                         scope.data.lat = pointSheet.coordinates[1];
                         scope.data.polygon = polygon;
+                    }
+                    if (scope.processOptions.hasImage) {
+                        scope.data.picture = resource.data[SIImageReference.nick].picture;
                     }
                     // WARNING: proposalSheet is not a regular feature of adhocracy,
                     // but a hack of Buergerhaushalt and Kiezkasse.
