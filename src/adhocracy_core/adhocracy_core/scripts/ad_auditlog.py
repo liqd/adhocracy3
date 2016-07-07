@@ -5,6 +5,7 @@ import inspect
 import logging
 import pprint
 
+from pytz import UTC
 from datetime import datetime
 from pyramid.paster import bootstrap
 from substanced.interfaces import IRoot
@@ -39,8 +40,12 @@ def main():  # pragma: no cover
                         help='Filter for resource path.')
     args = parser.parse_args()
     env = bootstrap(args.ini_file)
-    auditlog_show(env['root'], startdate=args.startdate,
-                  endtdate=args.enddate, path=args.path)
+    startdate = args.startdate and args.startdate.replace(tzinfo=UTC)
+    enddate = args.enddate and args.enddate.replace(tzinfo=UTC)
+    auditlog_show(env['root'],
+                  startdate=startdate,
+                  endtdate=enddate,
+                  path=args.path)
     env['closer']()
 
 

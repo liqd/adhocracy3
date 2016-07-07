@@ -785,6 +785,7 @@ def rename_default_group(root, registry):  # pragma: no cover
 
 def migrate_auditlogentries_to_activities(root, registry):  # pragma: no cover
     """Replace AuditlogenEntries with Activities entries."""
+    from pytz import UTC
     from adhocracy_core.interfaces import SerializedActivity
     from adhocracy_core.interfaces import ActivityType
     from adhocracy_core.interfaces import AuditlogEntry
@@ -792,6 +793,7 @@ def migrate_auditlogentries_to_activities(root, registry):  # pragma: no cover
     from adhocracy_core.auditing import get_auditlog
     auditlog = get_auditlog(root)
     old_entries = [(key, value) for key, value in auditlog.items()]
+    auditlog.clear()
     mapping = {AuditlogAction.concealed: ActivityType.remove,
                AuditlogAction.invisible: ActivityType.remove,
                AuditlogAction.revealed: ActivityType.update,
@@ -811,7 +813,8 @@ def migrate_auditlogentries_to_activities(root, registry):  # pragma: no cover
                             'subject_path': value.user_path or '',
                             'sheet_data': value.sheet_data or [],
                             }
-        auditlog[key] = SerializedActivity()._replace(**new_value_kwargs)
+        new_key = key.replace(tzinfo=UTC)
+        auditlog[new_key] = SerializedActivity()._replace(**new_value_kwargs)
 
 
 @log_migration
