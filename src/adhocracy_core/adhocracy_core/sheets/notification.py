@@ -12,7 +12,7 @@ from adhocracy_core.schema import UniqueReferences
 
 
 class INotification(ISheet):
-    """Market interface for the notification sheet."""
+    """Marker interface for the notification sheet."""
 
 
 class IFollowable(ISheet):
