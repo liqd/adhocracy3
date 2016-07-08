@@ -1,6 +1,9 @@
 .s1-landing {
     @include container;
     background: $color-background-base-introvert;
+    margin: 0 auto;
+    min-width: $moving-column-single-width-min;
+    max-width: $moving-column-single-width-max;
 }
 
 .s1-landing-row,
