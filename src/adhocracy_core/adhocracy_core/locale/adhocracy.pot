@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-07-05 16:25+0200\n"
+"POT-Creation-Date: 2016-07-11 15:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,95 +17,90 @@ msgstr ""
 "Generated-By: Lingua 3.10\n"
 
 #. Default: ${subject_name} added a ${object_type_name} to ${target_title}.
-#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:208
+#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:247
 msgid "activity_name_add"
 msgstr ""
 
-#. Default: ${subject_name} added the ${object_type_name} ${object_title} to
-#. ${target_type_name} ${target_title}.
-#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:245
+#. Default: ${subject_name} added the ${object_type_name} "${object_title}" to
+#. ${target_type_name} "${target_title}".
+#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:285
 msgid "activity_description_add"
 msgstr ""
 
 #. Default: ${subject_name} updated ${object_type_name}
-#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:213
+#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:252
 msgid "activity_name_update"
 msgstr ""
 
-#. Default: ${subject_name} updated ${object_type_name} ${object_title}.
-#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:251
+#. Default: ${subject_name} updated ${object_type_name} "${object_title}".
+#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:291
 msgid "activity_description_update"
 msgstr ""
 
 #. Default: ${subject_name} removed a ${object_type_name} from ${target_title}.
-#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:217
+#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:256
 msgid "activity_name_remove"
 msgstr ""
 
-#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:222
 #: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:261
+#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:302
 msgid "activity_missing"
 msgstr ""
 
-#. Default: ${subject_name} removed the ${object_type_name} ${object_title}
-#. from ${target_title}.
-#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:256
+#. Default: ${subject_name} removed the ${object_type_name} "${object_title}"
+#. from ${target_type_name} "${target_title}".
+#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:296
 msgid "activity_description_remove"
 msgstr ""
 
 #. Default: ${site_name} Abuse Complaint
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:117
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:119
 msgid "mail_abuse_complaint_subject"
 msgstr ""
 
 #. Default: ${site_name} Message from ${sender_name}: ${title}
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:148
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:150
 msgid "mail_sent_message_to_user_subject"
 msgstr ""
 
 #. Default: ${text}
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:152
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:154
 msgid "mail_sent_message_to_user_body_txt"
 msgstr ""
 
 #. Default: ${site_name}: Account Verification / Aktivierung Deines
 #. Nutzerkontos
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:185
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:187
 msgid "mail_account_verification_subject"
 msgstr ""
 
 #. Default: ${frontend_url}${activation_path}
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:189
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:191
 msgid "mail_account_verification_body_txt"
 msgstr ""
 
 #. Default: ${site_name}: Reset Password / Passwort neu setzen
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:205
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:207
 msgid "mail_reset_password_subject"
 msgstr ""
 
 #. Default: ${reset_url}
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:209
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:211
 msgid "mail_reset_password_body_txt"
 msgstr ""
 
 #. Default: ${site_name}: ${activity_name}
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:288
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:294
 msgid "mail_send_activity_subject"
 msgstr ""
 
-#. Default: ${activity_description} Visit: ${object_url} .
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:291
-msgid "mail_send_activity_body_txt"
-msgstr ""
-
 #. Default: Invitation to join ${site_name}
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:239
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:241
 msgid "mail_invitation_subject"
 msgstr ""
 
 #. Default: Please click ${reset_url} to join and reset your password.
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:246
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:248
 msgid "mail_invitation_body_txt"
 msgstr ""
 
