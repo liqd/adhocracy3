@@ -722,6 +722,13 @@ def add_description_sheet_to_user(root, registry):  # pragma: no cover
 
 
 @log_migration
+def remove_token_storage(root, registry):  # pragma: no cover
+    """Remove storage for authentication tokens, not used anymore."""
+    if hasattr(root, '_tokenmanager_storage'):
+        delattr(root, '_tokenmanager_storage')
+
+
+@log_migration
 def set_default_workflow(root, registry):  # pragma: no cover
     """Set default workflow if no workflow in IWorkflowAssignment sheet."""
     from adhocracy_core.sheets.workflow import IWorkflowAssignment
@@ -844,3 +851,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(set_default_workflow)
     config.add_evolution_step(add_local_roles_for_workflow_state)
     config.add_evolution_step(rename_default_group)
+    config.add_evolution_step(remove_token_storage)
