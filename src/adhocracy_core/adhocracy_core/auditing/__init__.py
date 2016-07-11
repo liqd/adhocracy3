@@ -4,6 +4,7 @@ import substanced.util
 
 from pyramid.i18n import TranslationStringFactory
 from pyramid.i18n import TranslationString
+from pyramid.i18n import get_localizer
 from pyramid.registry import Registry
 from pyramid.traversal import find_interface
 from pyramid.traversal import resource_path
@@ -114,7 +115,7 @@ def update_auditlog_callback(request: Request, response: Response) -> None:
     changes = _filter_trival_changes(request)
     if changes:
         activities = _create_activities(changes, request)
-        activities = _add_name_to_activities(activities, request.registry)
+        activities = _add_name_to_activities(activities, request)
         add_to_auditlog(activities, request)
         transaction.commit()
 
@@ -219,16 +220,16 @@ def _get_object(change: ChangelogMetadata) -> IResource:
 
 
 def _add_name_to_activities(activities: [Activity],
-                            registry: Registry) -> [Activity]:
+                            request: Request) -> [Activity]:
     activities_with_name = []
     for activity in activities:
-        name = generate_activity_name(activity, registry)
+        name = generate_activity_name(activity, request)
         activities_with_name.append(activity._replace(name=name))
     return activities_with_name
 
 
 def generate_activity_name(activity: Activity,
-                           registry: Registry) -> TranslationString:
+                           request: Request) -> TranslationString:
     """Create name for activity and return translation string.
 
     The following variables are provided for the translation string:
@@ -237,8 +238,9 @@ def generate_activity_name(activity: Activity,
         - `object_type_name`
         - `target_title`
     """
+    registry = request.registry
     mapping = {'subject_name': _get_subject_name(activity.subject, registry),
-               'object_type_name': _get_type_name(activity.object, registry),
+               'object_type_name': _get_type_name(activity.object, request),
                'target_title': _get_title(activity.target, registry),
                }
     if activity.type == ActivityType.add:
@@ -261,7 +263,7 @@ def generate_activity_name(activity: Activity,
 
 
 def generate_activity_description(activity: Activity,
-                                  registry: Registry) -> TranslationString:
+                                  request: Request) -> TranslationString:
     """Create description for activity and return translation string.
 
     The following variables are provided for the translation string:
@@ -272,11 +274,12 @@ def generate_activity_description(activity: Activity,
         - `target_type_name`
         - `target_title`
     """
+    registry = request.registry
     mapping = {'subject_name': _get_subject_name(activity.subject, registry),
                'object_title': _get_title(activity.object, registry),
-               'object_type_name': _get_type_name(activity.object, registry),
+               'object_type_name': _get_type_name(activity.object, request),
                'target_title': _get_title(activity.target, registry),
-               'target_type_name': _get_type_name(activity.target, registry),
+               'target_type_name': _get_type_name(activity.target, request),
                }
     if activity.type == ActivityType.add:
         name = _('activity_description_add',
@@ -308,13 +311,15 @@ def _get_subject_name(user: IUserBasic, registry: Registry) -> str:
     return name
 
 
-def _get_type_name(context: IResource, registry: Registry) -> str:
+def _get_type_name(context: IResource, request: Request) -> str:
+    localizer = get_localizer(request)
     if context is None:
-        name = ''
+        translated_name = ''
     else:
         iresource = get_iresource(context)
-        name = registry.content.resources_meta[iresource].content_name
-    return name
+        name = request.registry.content.resources_meta[iresource].content_name
+        translated_name = localizer.translate(name)
+    return translated_name
 
 
 def _get_title(context: IResource, registry: Registry) -> str:

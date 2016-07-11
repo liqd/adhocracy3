@@ -5,8 +5,6 @@ from pyramid import testing
 from unittest.mock import Mock
 from pytest import fixture
 from pytest import mark
-from adhocracy_core.interfaces import ChangelogMetadata
-from adhocracy_core.interfaces import VisibilityChange
 
 
 @fixture
@@ -361,44 +359,44 @@ class TestGenerateActivityName:
         return generate_activity_name(*args)
 
     def test_create_translation_with_mapping(
-        self, activity, registry, get_subject_name, get_resource_type,
+        self, activity, request_, get_subject_name, get_resource_type,
         get_title):
         from pyramid.i18n import TranslationString
-        name = self.call_fut(activity, registry)
-        get_subject_name.assert_called_with(activity.subject, registry)
-        get_resource_type.assert_called_with(activity.subject, registry)
-        get_title.assert_called_with(activity.subject, registry)
+        name = self.call_fut(activity, request_)
+        get_subject_name.assert_called_with(activity.subject, request_.registry)
+        get_resource_type.assert_called_with(activity.subject, request_)
+        get_title.assert_called_with(activity.subject, request_.registry)
         assert isinstance(name, TranslationString)
         assert name.mapping == {'subject_name': 'user name',
                                 'object_type_name': 'type name',
                                 'target_title': 'title',
                                 }
 
-    def test_create_missing_translation_if_no_type(self, activity, registry):
+    def test_create_missing_translation_if_no_type(self, activity, request_):
         activity = activity._replace(type=None)
-        name = self.call_fut(activity, registry)
+        name = self.call_fut(activity, request_)
         assert name == 'activity_missing'
 
-    def test_create_add_translation_if_add_activity(self, activity, registry):
+    def test_create_add_translation_if_add_activity(self, activity, request_):
         from adhocracy_core.interfaces import ActivityType
         activity = activity._replace(type=ActivityType.add)
-        name = self.call_fut(activity, registry)
+        name = self.call_fut(activity, request_)
         assert name.default.format_map(name.mapping)
         assert name == 'activity_name_add'
 
     def test_create_add_translation_if_remove_activity(self, activity,
-                                                       registry):
+                                                       request_):
         from adhocracy_core.interfaces import ActivityType
         activity = activity._replace(type=ActivityType.remove)
-        name = self.call_fut(activity, registry)
+        name = self.call_fut(activity, request_)
         assert name.default.format_map(name.mapping)
         assert name == 'activity_name_remove'
 
     def test_create_add_translation_if_update_activity(self, activity,
-                                                       registry):
+                                                       request_):
         from adhocracy_core.interfaces import ActivityType
         activity = activity._replace(type=ActivityType.update)
-        name = self.call_fut(activity, registry)
+        name = self.call_fut(activity, request_)
         assert name.default.format_map(name.mapping)
         assert name == 'activity_name_update'
 
@@ -411,13 +409,13 @@ class TestGenerateActivityDescription:
         return generate_activity_description(*args)
 
     def test_create_translation_with_mapping(
-        self, activity, registry, get_subject_name, get_resource_type,
+        self, activity, request_, get_subject_name, get_resource_type,
         get_title):
         from pyramid.i18n import TranslationString
-        name = self.call_fut(activity, registry)
-        get_subject_name.assert_called_with(activity.subject, registry)
-        get_resource_type.assert_called_with(activity.subject, registry)
-        get_title.assert_called_with(activity.subject, registry)
+        name = self.call_fut(activity, request_)
+        get_subject_name.assert_called_with(activity.subject, request_.registry)
+        get_resource_type.assert_called_with(activity.subject, request_)
+        get_title.assert_called_with(activity.subject, request_.registry)
         assert isinstance(name, TranslationString)
         assert name.mapping == {'subject_name': 'user name',
                                 'object_title': 'title',
@@ -426,29 +424,29 @@ class TestGenerateActivityDescription:
                                 'target_type_name': 'type name',
                                 }
 
-    def test_create_missing_translation_if_no_type(self, activity, registry):
+    def test_create_missing_translation_if_no_type(self, activity, request_):
         activity = activity._replace(type=None)
-        name = self.call_fut(activity, registry)
+        name = self.call_fut(activity, request_)
         assert name == 'activity_missing'
 
-    def test_create_add_translation_if_add_activity(self, activity, registry):
+    def test_create_add_translation_if_add_activity(self, activity, request_):
         from adhocracy_core.interfaces import ActivityType
         activity = activity._replace(type=ActivityType.add)
-        name = self.call_fut(activity, registry)
+        name = self.call_fut(activity, request_)
         assert name.default.format_map(name.mapping)
         assert name == 'activity_description_add'
 
-    def test_create_add_translation_if_remove_activity(self, activity, registry):
+    def test_create_add_translation_if_remove_activity(self, activity, request_):
         from adhocracy_core.interfaces import ActivityType
         activity = activity._replace(type=ActivityType.remove)
-        name = self.call_fut(activity, registry)
+        name = self.call_fut(activity, request_)
         assert name.default.format_map(name.mapping)
         assert name == 'activity_description_remove'
 
-    def test_create_add_translation_if_update_activity(self, activity, registry):
+    def test_create_add_translation_if_update_activity(self, activity, request_):
         from adhocracy_core.interfaces import ActivityType
         activity = activity._replace(type=ActivityType.update)
-        name = self.call_fut(activity, registry)
+        name = self.call_fut(activity, request_)
         assert name.default.format_map(name.mapping)
         assert name == 'activity_description_update'
 
@@ -468,16 +466,29 @@ def test_get_subject_name_return_application_if_no_user(registry):
     assert _get_subject_name(None, registry) == 'Application'
 
 
-def test_get_type_name_return_content_name(context, registry, resource_meta):
+def test_get_type_name_return_content_name(context, request_, registry,
+                                           resource_meta):
     from . import _get_type_name
+    request_.registry = registry
     registry.content.resources_meta[resource_meta.iresource] =\
         resource_meta._replace(content_name='Resource')
-    assert _get_type_name(context, registry) == 'Resource'
+    assert _get_type_name(context, request_) == 'Resource'
 
 
-def test_get_type_name_return_empty_if_none(registry):
+def test_get_type_name_return_translated_content_name(context, request_,
+                                                      registry, resource_meta):
     from . import _get_type_name
-    assert _get_type_name(None, registry) == ''
+    request_.localizer.translate = Mock()
+    request_.registry = registry
+    registry.content.resources_meta[resource_meta.iresource] =\
+        resource_meta._replace(content_name='Resource')
+    assert _get_type_name(context,
+                          request_) is request_.localizer.translate.return_value
+
+
+def test_get_type_name_return_empty_if_none(request_):
+    from . import _get_type_name
+    assert _get_type_name(None, request_) == ''
 
 
 def test_get_title_return_title(registry):

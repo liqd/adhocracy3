@@ -1,4 +1,5 @@
 """Proposal resource types."""
+from pyramid.i18n import TranslationStringFactory
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.resources import add_resource_type_to_registry
@@ -16,6 +17,9 @@ from adhocracy_core.sheets.image import IImageReference
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.relation import IPolarizable
 from adhocracy_core.sheets.title import ITitle
+
+
+_ = TranslationStringFactory('adhocracy')
 
 
 class IProposalVersion(IItemVersion):
@@ -40,7 +44,7 @@ class IProposal(IItem):
     """Proposal versions pool."""
 
 proposal_meta = item_meta._replace(
-    content_name='Proposal',
+    content_name=_('Proposal'),
     iresource=IProposal,
     element_types=(IProposalVersion,),
     extended_sheets=(IBadgeable,

@@ -1,4 +1,5 @@
 """Basic participation process."""
+from pyramid.i18n import TranslationStringFactory
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.pool import pool_meta
@@ -10,12 +11,15 @@ from adhocracy_core.sheets.description import IDescription
 from adhocracy_core.sheets.notification import IFollowable
 
 
+_ = TranslationStringFactory('adhocracy')
+
+
 class IProcess(IPool):
     """Participation Process Pool."""
 
 
 process_meta = pool_meta._replace(
-    content_name='Process',
+    content_name=_('Process'),
     iresource=IProcess,
     permission_create='create_process',
     is_sdi_addable=True,

@@ -109,6 +109,22 @@ msgstr ""
 msgid "mail_invitation_body_txt"
 msgstr ""
 
+#: ././src/adhocracy_core/adhocracy_core/resources/document.py:47
+msgid "Document"
+msgstr ""
+
+#: ././src/adhocracy_core/adhocracy_core/resources/process.py:22
+msgid "Process"
+msgstr ""
+
+#: ././src/adhocracy_core/adhocracy_core/resources/comment.py:43
+msgid "Comment"
+msgstr ""
+
+#: ././src/adhocracy_core/adhocracy_core/resources/proposal.py:47
+msgid "Proposal"
+msgstr ""
+
 #: ././src/adhocracy_core/adhocracy_core/sdi/views/sheets.py:40
 msgid "save"
 msgstr ""
