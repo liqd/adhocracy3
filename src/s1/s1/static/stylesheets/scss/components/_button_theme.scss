@@ -4,14 +4,6 @@
     text-transform: uppercase;
 }
 
-.button-cta,
-.button-cta-secondary,
-.button {
-    @include rem(height, 30px);
-    @include rem(line-height, 30px);
-    @include rem(border-radius, 15px);
-    font-weight: $font-weight-medium;
-
 /*doc
 ---
 title: Call-to-action button narrow
@@ -29,6 +21,14 @@ Narrower cta button
 <a class="button-cta ng-disabled m-narrow" href="">Disabled Link</a>
 ```
 */
+
+.button-cta,
+.button-cta-secondary,
+.button {
+    @include rem(height, 30px);
+    @include rem(line-height, 30px);
+    @include rem(border-radius, 15px);
+    font-weight: $font-weight-medium;
 
     &.m-narrow {
         @include rem(height, 20px);

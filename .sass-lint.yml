@@ -3,6 +3,7 @@ files:
   ignore:
     - '**/third_party/**/*.scss'
     - '**/_fonts.scss'
+    - '**/_fonts_theme.scss'
 options:
   formatter: stylish
   merge-default-rules: true
