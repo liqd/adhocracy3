@@ -105,7 +105,6 @@ class TestUpdateAuditlogCallback:
         from adhocracy_core.interfaces import ActivityType
         changelog['/'] = changelog['']._replace(created=True, resource=context)
         self.call_fut(request_, None)
-        self.call_fut(request_, None)
         assert add_to.call_args[0][1] == request_
         added_activity = add_to.call_args[0][0][0]
         assert added_activity.type == ActivityType.add
@@ -234,6 +233,24 @@ class TestAuditlog:
     def test_add_basic_activity(self, inst, activity):
         import datetime
         from adhocracy_core.interfaces import SerializedActivity
+        object = testing.DummyResource(__name__='object')
+        published= datetime.datetime.utcnow()
+        activity = activity._replace(type='create',
+                                     object=object,
+                                     published=published,
+                                     )
+        inst.add(activity)
+        key, value = inst.items()[0]
+        assert isinstance(value, SerializedActivity)
+        assert key == published
+        assert value.type == 'create'
+        assert value.object_path == 'object'
+        assert value.sheet_data == []
+        assert value.target_path == ''
+
+    def test_add_basic_activity_with_subject(self, inst, activity):
+        import datetime
+        from adhocracy_core.interfaces import SerializedActivity
         subject = testing.DummyResource(__name__='subject')
         object = testing.DummyResource(__name__='object')
         published= datetime.datetime.utcnow()
@@ -244,13 +261,7 @@ class TestAuditlog:
                                      )
         inst.add(activity)
         key, value = inst.items()[0]
-        assert isinstance(value, SerializedActivity)
-        assert key == published
         assert value.subject_path == 'subject'
-        assert value.type == 'create'
-        assert value.object_path == 'object'
-        assert value.sheet_data == []
-        assert value.target_path == ''
 
     def test_add_activity_with_target_and_sheet_data(self, inst, activity):
         import datetime
@@ -535,15 +546,15 @@ def test_get_title_return_title_of_last_version_if_item(registry, item):
 
 def test_get_title_return_content_of_last_version_if_comment(registry, item):
     from mock import call
-    from adhocracy_core.sheets.title import ITitle
+    from adhocracy_core.sheets.comment import IComment
     from adhocracy_core.sheets.tags import ITags
     from . import _get_title
-    version = testing.DummyResource(__provides__=ITitle)
+    version = testing.DummyResource(__provides__=IComment)
     registry.content.get_sheet_field = Mock(side_effect=(version, 'title'))
     assert _get_title(item, registry) == 'title'
     call_args_list = registry.content.get_sheet_field.call_args_list
     assert call_args_list[0] == call(item, ITags, 'LAST')
-    assert call_args_list[1] == call(version, ITitle, 'title')
+    assert call_args_list[1] == call(version, IComment, 'content')
 
 
 

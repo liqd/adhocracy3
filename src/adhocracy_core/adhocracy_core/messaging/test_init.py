@@ -309,8 +309,8 @@ class TestActivityEmail:
                           }
         assert send_mail_args['recipients'] == ['anna@example.org']
         assert send_mail_args['subject'] == 'mail_send_activity_subject'
-        assert send_mail_args['subject'].mapping == wanted_mapping
-        assert send_mail_args['body'].mapping == wanted_mapping
+        send_mail_args['subject'].mapping.update.assert_called_with(wanted_mapping)
+        send_mail_args['body'].mapping.update.assert_called_with(wanted_mapping)
         assert send_mail_args['body'] == 'mail_send_activity_add_update_body_txt'
         assert send_mail_args['request'] == request_
 
