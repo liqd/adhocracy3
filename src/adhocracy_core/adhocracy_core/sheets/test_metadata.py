@@ -28,6 +28,13 @@ class TestIMetadataSchema:
         result = inst.deserialize({})
         assert result == {'deleted': False, 'hidden': False}
 
+    def test_deserialize_hiding_requires_permission(self, context, request_):
+        import colander
+        inst = self.make_one().bind(context=context, request=request_)
+        request_.has_permission = Mock(return_value=False)
+        with raises(colander.Invalid):
+            inst.deserialize({'hidden': False})
+
     def test_serialize_empty(self):
         from colander import null
         inst = self.make_one()
@@ -47,22 +54,6 @@ class TestIMetadataSchema:
         assert result['creation_date'] == now_str
         assert result['item_creation_date'] == now_str
         assert result['modification_date'] == now_str
-
-    def test_deserialize_hiding_requires_permission(self, context, request_):
-        import colander
-        inst = self.make_one().bind(context=context, request=request_)
-        request_.has_permission = Mock(return_value=False)
-        with raises(colander.Invalid):
-            inst.deserialize({'hidden': False})
-        request_.has_permission = Mock(return_value=True)
-        result = inst.deserialize({'hidden': False})
-        assert result['hidden'] is False
-
-    def test_deserialize_delete_doesnt_require_permission(self, context, request_):
-        inst = self.make_one().bind(context=context, request=request_)
-        request_.has_permission = Mock(return_value=True)
-        result = inst.deserialize({'deleted': False})
-        assert result['deleted'] is False
 
 
 class TestMetadataSheet:

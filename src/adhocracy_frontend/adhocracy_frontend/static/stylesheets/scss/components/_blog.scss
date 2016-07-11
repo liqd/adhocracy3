@@ -50,7 +50,7 @@
 
         &.ng-hide-add.ng-hide-add-active,
         &.ng-hide-remove.ng-hide-remove-active {
-            transition: 0.5s linear all;
+            transition: 0.5s linear opacity;
         }
 
         &.ng-hide {

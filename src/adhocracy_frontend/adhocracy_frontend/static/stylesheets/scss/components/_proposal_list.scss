@@ -55,7 +55,7 @@ $thumbnail-height: 90px;
     &.is-not-selected {
         background: $color-background-base-introvert;
 
-        i[class*=icon-],
+        i[class*="icon-"],
         .meta-list-item-budget {
             color: $color-text-highlight-introvert;
         }

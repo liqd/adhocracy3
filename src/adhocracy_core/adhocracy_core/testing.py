@@ -369,6 +369,8 @@ def mock_workflow() -> Mock:
     mock._states = {}
     mock.get_next_states.return_value = []
     mock.state_of.return_value = None
+    mock.type = 'sample'
+    mock._initial_state = 'draft'
     return mock
 
 

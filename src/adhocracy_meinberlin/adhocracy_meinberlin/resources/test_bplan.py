@@ -17,7 +17,7 @@ class TestProposal:
         assert meta.permission_create == 'create_proposal'
         assert meta.use_autonaming
         assert meta.autonaming_prefix == 'proposal_'
-        assert meta.workflow_name == 'bplan_private'
+        assert meta.default_workflow == 'bplan_private'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):
@@ -68,7 +68,7 @@ class TestProcess:
                                         IImageReference,
                                         )
         assert meta.permission_create == 'create_process'
-        assert meta.workflow_name == 'bplan'
+        assert meta.default_workflow == 'bplan'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

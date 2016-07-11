@@ -8,6 +8,7 @@ permissions:
   - [delete,                         ~,         ~,             ~,            A,         A,       ~,         A] # delete resources
   - [hide,                           ~,         ~,             ~,            ~,         ~,       ~,         A] # mark resources as "hidden" because there are legal problems.
   - [do_transition,                  ~,         ~,             ~,            ~,         ~,       A,         A] # default permission to do transition to next workflow state (phase)
+  - [edit_workflow,                  ~,         ~,             ~,            ~,         ~,       A,         A] # assign workfow to resource
   - [message_to_user,                ~,         A,             ~,            ~,         ~,       ~,         ~] # send message to user
   - [report_abuse,                   A,         ~,             ~,            ~,         ~,       ~,         ~] # report abuse, resources that should be hidden
   # create structure

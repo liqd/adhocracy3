@@ -1,16 +1,13 @@
 """Root resource type."""
 
 from pyramid.registry import Registry
-from pyramid.security import Allow
 
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.root import root_meta
 from adhocracy_core.resources.root import create_initial_content_for_app_root
-from adhocracy_core.workflows import transition_to_states
 from adhocracy_core import sheets
 from adhocracy_mercator.resources.mercator import IProcess
-from pyramid.security import ALL_PERMISSIONS
 import adhocracy_core.resources.root
 
 
@@ -22,22 +19,9 @@ def add_mercator_process(context: IPool, registry: Registry, options: dict):
                             appstructs=appstructs)
 
 
-def initialize_workflow(context: IPool, registry: Registry, options: dict):
-    """Initialize mercator workflow."""
-    root = context
-    # at this point the permissions are not setup so we need to add
-    # the god's permissions
-    root.__acl__ = [(Allow, 'role:god', ALL_PERMISSIONS)]
-    mercator_process = root['mercator']
-    transition_to_states(mercator_process,
-                         ['announce', 'participate'],
-                         registry)
-
-
 mercator_root_meta = root_meta._replace(
     after_creation=(create_initial_content_for_app_root,
                     add_mercator_process,
-                    initialize_workflow,
                     adhocracy_core.resources.root.add_example_process
                     ))
 

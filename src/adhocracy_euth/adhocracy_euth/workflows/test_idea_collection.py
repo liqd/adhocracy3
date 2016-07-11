@@ -27,7 +27,7 @@ class TestIdeaCollection:
         from adhocracy_core.resources.badge import badge_meta
         import adhocracy_euth
         configurator = make_configurator(app_settings, adhocracy_euth)
-        core_badge_meta = badge_meta._replace(workflow_name='badge_assignment')
+        core_badge_meta = badge_meta._replace(default_workflow='badge_assignment')
         add_resource_type_to_registry(core_badge_meta, configurator)
         app_router = configurator.make_wsgi_app()
         return app_router

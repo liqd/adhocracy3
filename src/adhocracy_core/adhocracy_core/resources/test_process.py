@@ -27,7 +27,7 @@ class TestProcess:
         assert sheets.notification.IFollowable in meta.basic_sheets
         assert add_assets_service in meta.after_creation
         assert add_badges_service in meta.after_creation
-        assert meta.workflow_name == 'sample'
+        assert meta.default_workflow == 'sample'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

@@ -66,8 +66,8 @@ def _get_processes_with_auto_transition(root: IRoot,
 def _auto_transition_enabled(context: IResource, registry: Registry):
     workflow_assignment = registry.content.get_sheet(context,
                                                      IWorkflowAssignment)
-    workflow = workflow_assignment.get()['workflow']
-    workflow_meta = registry.content.workflows_meta[workflow.type]
+    workflow_name = workflow_assignment.get()['workflow']
+    workflow_meta = registry.content.workflows_meta[workflow_name]
     return workflow_meta['auto_transition']
 
 

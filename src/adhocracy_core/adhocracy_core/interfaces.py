@@ -176,7 +176,7 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
 
         Deferred default values can rely on the following bindings:
 
-            `context`, `registry`
+            `context`, `registry`, `creating`
 
         Deferred validators can rely on the following bindings:
 
@@ -263,7 +263,8 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
                                    'use_autonaming_random',
                                    'is_sdi_addable',
                                    'element_types',
-                                   'workflow_name',
+                                   'default_workflow',
+                                   'alternative_workflows',
                                    'item_type',
                                    ])):
     """Metadata to register Resource Types.
@@ -310,9 +311,12 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
     element_types:
         Set addable content types, class heritage is honored.
 
-    workflow_name:
+    default_workflow:
         Name of workflow to be assigned to instances. Possible workflows can be
         found in :mod:`adhocracy_core.workflows`.
+
+    alternative_workflows:
+        Other workflow names that may be set.
 
     IItem fields:
     -------------

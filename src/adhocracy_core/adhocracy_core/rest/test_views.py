@@ -211,10 +211,11 @@ class TestResourceRESTView:
                                                 'hidden': [True, False]}}
 
     def test_add_workflow_permissions_info(
-            self, request_, context, mock_sheet, mock_workflow):
+            self, request_, registry, context, mock_sheet, mock_workflow):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
         mock_workflow.get_next_states.return_value = ['draft']
-        mock_sheet.get.return_value = {'workflow': mock_workflow}
+        mock_sheet.get.return_value = {'workflow': 'sample'}
+        registry.content.workflows['sample'] = mock_workflow
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IWorkflowAssignment)
         editable_sheets = [mock_sheet]
         inst = self.make_one(context, request_)

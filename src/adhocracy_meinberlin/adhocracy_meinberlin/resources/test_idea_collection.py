@@ -24,7 +24,7 @@ class TestProcess:
         )
         assert add_assets_service in meta.after_creation
         assert meta.permission_create == 'create_process'
-        assert meta.workflow_name == 'standard'
+        assert meta.default_workflow == 'standard'
         assert meta.element_types == (
             resources.proposal.IGeoProposal,
         )

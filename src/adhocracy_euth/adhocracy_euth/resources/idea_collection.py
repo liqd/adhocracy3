@@ -11,7 +11,7 @@ class IProcess(process.IProcess):
 process_meta = process.process_meta._replace(
     iresource=IProcess,
     element_types=(IProposal,),
-    workflow_name='standard',
+    default_workflow='standard',
 )
 
 
@@ -22,7 +22,7 @@ class IPrivateProcess(IProcess):
 private_process_meta = process.process_meta._replace(
     iresource=IPrivateProcess,
     element_types=(IProposal,),
-    workflow_name='standard_private',
+    default_workflow='standard_private',
 )
 
 

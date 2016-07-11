@@ -20,7 +20,7 @@ for project in $projects; do
         cp -ans `readlink -f $dir`/. $builddir
     done
 
-    # create compass config
+    # create sass config
     cat <<EOF > Gruntfile_${project}.js
 module.exports = function(grunt) {
     grunt.initConfig({

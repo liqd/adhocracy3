@@ -11,7 +11,7 @@ class TestProcess:
     def test_meta(self, meta):
         from adhocracy_core.resources.proposal import IProposal
         assert meta.element_types == (IProposal,)
-        assert meta.workflow_name == 'standard'
+        assert meta.default_workflow == 'standard'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

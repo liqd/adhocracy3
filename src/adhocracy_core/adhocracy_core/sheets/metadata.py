@@ -1,7 +1,6 @@
 """Metadata Sheet."""
 from logging import getLogger
 
-from colander import Invalid
 from colander import deferred
 from colander import drop
 from pyramid.registry import Registry
@@ -13,6 +12,7 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import AttributeResourceSheet
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.schema import create_deferred_permission_validator
 from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import DateTime
@@ -44,15 +44,10 @@ class MetadataModifiedByReference(SheetToSheet):
 
 
 @deferred
-def deferred_validate_hidden(node, kw):
+def deferred_check_hide_permission(node, kw) -> deferred:
     """Check hide_permission."""
-    context = kw['context']
-    request = kw['request']
-
-    def check_hide_permisison(node, value):
-        if not request.has_permission('hide', context):
-            raise Invalid(node, 'Changing this field is not allowed')
-    return check_hide_permisison
+    validator = create_deferred_permission_validator('hide')
+    return validator(node, kw)
 
 
 class MetadataSchema(MappingSchema):
@@ -88,7 +83,7 @@ class MetadataSchema(MappingSchema):
     modified_by = Reference(reftype=MetadataModifiedByReference, readonly=True)
     modification_date = DateTime(missing=drop, readonly=True)
     deleted = Boolean()
-    hidden = Boolean(validator=deferred_validate_hidden)
+    hidden = Boolean(validator=deferred_check_hide_permission)
 
 
 metadata_meta = sheet_meta._replace(
