@@ -11,6 +11,8 @@
     color: $color-text-introvert;
     position: absolute;
     left: 0;
+    // IE 10 renders the image only logo with an underline otherwise
+    text-decoration: none;
 
     &:hover, &:focus {
         color: $color-text-normal;

@@ -57,7 +57,7 @@ class TestStandardPublicWithPrivateProcessesConfig:
         from adhocracy_core.resources.process import process_meta
         import adhocracy_core
         configurator = make_configurator(app_settings, adhocracy_core)
-        standard_process_meta = process_meta._replace(workflow_name='standard')
+        standard_process_meta = process_meta._replace(default_workflow='standard')
         add_resource_type_to_registry(standard_process_meta, configurator)
         app_router = configurator.make_wsgi_app()
         return app_router

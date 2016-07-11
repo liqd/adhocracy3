@@ -257,7 +257,7 @@ process_meta = process.process_meta._replace(
     iresource=IProcess,
     element_types=(IMercatorProposal,
                    ),
-    workflow_name='mercator2'
+    default_workflow='mercator2'
 )
 
 

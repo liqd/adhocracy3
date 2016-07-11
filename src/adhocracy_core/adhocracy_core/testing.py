@@ -180,6 +180,7 @@ class DummyRequest(testing.DummyRequest):
         self.errors = []
         self.content_type = 'application/json'
         self.text = ''
+        self.remote_addr = ''
 
     def authenticated_userid(self):
         return None
@@ -355,6 +356,8 @@ def mock_workflow() -> Mock:
     mock._states = {}
     mock.get_next_states.return_value = []
     mock.state_of.return_value = None
+    mock.type = 'sample'
+    mock._initial_state = 'draft'
     return mock
 
 

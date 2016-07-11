@@ -86,7 +86,7 @@ class TestProcess:
         assert meta.permission_create == 'create_process'
         assert meta.element_types == (IMercatorProposal,)
         assert add_assets_service in meta.after_creation
-        assert meta.workflow_name == 'mercator'
+        assert meta.default_workflow == 'mercator'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):
