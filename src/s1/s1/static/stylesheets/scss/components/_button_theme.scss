@@ -129,6 +129,7 @@ cta button variant
 .button-group {
     @include clearfix;
     display: inline-block;
+    vertical-align: middle;
 
     .button {
         border-radius: 0;
