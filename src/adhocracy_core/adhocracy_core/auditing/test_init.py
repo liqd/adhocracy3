@@ -183,6 +183,17 @@ class TestUpdateAuditlogCallback:
         assert added_activity.sheet_data == [{mock_sheet.meta.isheet:
                                               mock_sheet.serialize()}]
 
+    def test_add_sheet_data_if_created_version(self, request_, add_to,
+            changelog, context, mock_sheet, registry, version, item):
+        last_version = Mock()
+        changelog['/'] = changelog['']._replace(created=True,
+                                                resource=version,
+                                                last_version=last_version)
+        registry.content.get_sheet_field = Mock()
+        self.call_fut(request_, None)
+        registry.content.get_sheets_create.assert_called_with(last_version,
+                                                              request=request_)
+
     def test_add_sheet_data_if_modified(self, request_, add_to, changelog,
                                         context, mock_sheet, registry):
         registry.content.get_sheets_edit.return_value = [mock_sheet]

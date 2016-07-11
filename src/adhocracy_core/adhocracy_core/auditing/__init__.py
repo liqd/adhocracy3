@@ -180,16 +180,20 @@ def _get_entry_name(change: ChangelogMetadata) -> str:
         return ActivityType.remove
     elif change.modified:
         return ActivityType.update
-    else: # pragma: no cover
+    else:  # pragma: no cover
         raise ValueError('Invalid change state', change)
 
 
 def _get_content_sheets(change: ChangelogMetadata, request: Request) -> []:
+    if change.last_version:
+        resource = change.last_version
+    else:
+        resource = change.resource
     if change.created:
-        sheets = request.registry.content.get_sheets_create(change.resource,
+        sheets = request.registry.content.get_sheets_create(resource,
                                                             request=request)
     else:
-        sheets = request.registry.content.get_sheets_edit(change.resource,
+        sheets = request.registry.content.get_sheets_edit(resource,
                                                           request=request)
     disabled = [IMetadata]
     return [s for s in sheets if s.meta.isheet not in disabled]
