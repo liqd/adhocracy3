@@ -1,5 +1,10 @@
 <!-- FIXME: may contain links in adh-user-meta -->
 <a class="idea-collection-proposal-list-item {{selectedState}}" href="{{path | adhParentPath | adhResourceUrl }}">
+    <adh-show-image
+        data-css-class="proposal-list-item-image"
+        data-path="{{data.picture}}"
+        data-format="thumbnail"
+    ></adh-show-image>
     <div class="proposal-list-item-col-left">
         <h3 class="idea-collection-proposal-list-item-title">{{data.title}}</h3>
         {{ "TR__BY" | translate }}
