@@ -1,6 +1,13 @@
 <article class="idea-collection-proposal-detail">
     <header class="idea-collection-proposal-detail-header">
 
+        <div class="proposal-detail-image-clip" data-ng-if="data.picture">
+            <adh-show-image
+                data-css-path="proposal-detail-image"
+                data-no-fallback="true"
+                data-path="{{data.picture}}"
+            ></adh-show-image>
+        </div>
         <span
             data-ng-repeat="assignment in data.assignments"
             class="badge"

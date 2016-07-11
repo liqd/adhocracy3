@@ -192,6 +192,22 @@ export var registerRoutesFactory = (
                     }
                 });
             }])
+        .defaultVersionable(proposalType, proposalVersionType, "image", ideaCollection.content_type, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide"
+        })
+        .specificVersionable(proposalType, proposalVersionType, "image", ideaCollection.content_type, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service) => (item, version) => {
+                return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
+                    if (!options.POST) {
+                        throw 401;
+                    } else {
+                        return {
+                            proposalUrl: version.path
+                        };
+                    }
+                });
+            }])
         .defaultVersionable(proposalType, proposalVersionType, "", ideaCollection.content_type, context, {
             space: "content",
             movingColumns: "is-show-show-hide"
