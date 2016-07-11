@@ -111,20 +111,20 @@ def update_auditlog_callback(request: Request, response: Response) -> None:
     This is a response-callback that runs after a request has finished. To
     store the audit entry it adds an additional transaction.
     """
-    changelog = request.registry.changelog
-    changes = _filter_trival_changes(changelog.values(), request.registry)
-    activities = _create_activities(changes, request)
-    activities = _add_name_to_activities(activities, request.registry)
-    add_to_auditlog(activities, request)
-    transaction.commit()
+    changes = _filter_trival_changes(request)
+    if changes:
+        activities = _create_activities(changes, request)
+        activities = _add_name_to_activities(activities, request.registry)
+        add_to_auditlog(activities, request)
+        transaction.commit()
 
 
-def _filter_trival_changes(changes: [ChangelogMetadata],
-                           registry: Registry) -> []:
+def _filter_trival_changes(request: Request) -> []:
+    changes = request.registry.changelog.values()
     return [x for x in changes if
             _is_activity(x)
             and not x.autoupdated
-            and not _is_first_version(x, registry)
+            and not _is_first_version(x, request.registry)
             ]
 
 

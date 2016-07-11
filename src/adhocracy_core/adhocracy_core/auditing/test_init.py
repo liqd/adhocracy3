@@ -69,8 +69,7 @@ class TestUpdateAuditlogCallback:
     def test_ignore_if_empty_changelog(self, request_, mocker):
         add_to = mocker.patch('adhocracy_core.auditing.add_to_auditlog')
         self.call_fut(request_, None)
-        assert add_to.call_args[0][0] == []
-        assert add_to.call_args[0][1] is request_
+        assert not add_to.called
 
     def test_ignore_if_no_real_change(self, request_, add_to, changelog,
                                       context):
@@ -80,7 +79,7 @@ class TestUpdateAuditlogCallback:
                                                 changed_backrefs=False,
                                                 )
         self.call_fut(request_, None)
-        assert add_to.call_args[0][0] == []
+        assert not add_to.called
 
     def test_ignore_if_autoupdated_change(self, request_, add_to, changelog,
                                           context):
@@ -88,20 +87,22 @@ class TestUpdateAuditlogCallback:
                                                 resource=context,
                                                 autoupdated=True)
         self.call_fut(request_, None)
-        assert add_to.call_args[0][0] == []
+        assert not add_to.called
 
     def test_ignore_if_first_version(
         self, request_, registry, add_to, changelog, version, item):
         changelog['/'] = changelog['']._replace(created=True, resource=version)
         registry.content.get_sheet_field = Mock(return_value=[])
         self.call_fut(request_, None)
-        assert add_to.call_args[0][0] == []
+        assert not add_to.called
 
     def test_add_add_activity_if_created(self, request_, add_to, changelog,
                                           context, parent):
         from adhocracy_core.interfaces import ActivityType
         changelog['/'] = changelog['']._replace(created=True, resource=context)
         self.call_fut(request_, None)
+        self.call_fut(request_, None)
+        assert add_to.call_args[0][1] == request_
         added_activity = add_to.call_args[0][0][0]
         assert added_activity.type == ActivityType.add
         assert added_activity.object == context
