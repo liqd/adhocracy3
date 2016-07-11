@@ -127,10 +127,12 @@ cta button variant
 }
 
 .button-group {
+    @include clearfix;
     display: inline-block;
-    
+
     .button {
         border-radius: 0;
+        float: left;
 
         &:first-child {
             @include rem(border-radius, 15px 0 0 15px);
