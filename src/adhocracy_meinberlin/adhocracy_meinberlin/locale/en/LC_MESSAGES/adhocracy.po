@@ -152,7 +152,7 @@ msgid "activity_description_add"
 msgstr ""
 "${User_name} hat den ${object_type_name} \"${content_title}\" im ${target_type_name} ${process_title} hinzugefügt.\n"
 "\n"
-"Hier geht es zum ${object_type_name}: ${object_url}\n"
+"Hier geht es zum ${object_type_name}: ${object_url}"
 
 
 #. Default: ${subject_name} updated ${object_type_name} "${object_title}".
@@ -161,7 +161,7 @@ msgid "activity_description_update"
 msgstr ""
 "${User_name} hat den ${object_type_name} \"${content_title}\" im ${target_type_name} ${process_title} geändert.\n"
 "\n"
-"Hier geht es zum ${object_type_name}: ${object_url}\n"
+"Hier geht es zum ${object_type_name}: ${object_url}"
 
 
 #. Default: ${subject_name} removed the ${object_type_name} "${object_title}"
@@ -171,4 +171,4 @@ msgid "activity_description_remove"
 msgstr ""
 "${User_name} hat den ${object_type_name} \"${content_title}\" im ${target_type_name} ${process_title} gelöscht.\n"
 "\n"
-"Hier geht es zum ${target_type_name}: ${target_url}\n"
+"Hier geht es zum ${target_type_name}: ${target_url}"
