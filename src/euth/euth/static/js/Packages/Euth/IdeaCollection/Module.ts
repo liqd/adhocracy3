@@ -1,13 +1,7 @@
-import * as AdhAbuseModule from "../../Abuse/Module";
-import * as AdhCommentModule from "../../Comment/Module";
-import * as AdhHttpModule from "../../Http/Module";
+import * as AdhEmbedModule from "../../Embed/Module";
 import * as AdhIdeaCollectionModule from "../../IdeaCollection/Module";
-import * as AdhMovingColumnsModule from "../../MovingColumns/Module";
-import * as AdhPermissionsModule from "../../Permissions/Module";
 import * as AdhProcessModule from "../../Process/Module";
-import * as AdhResourceActionsModule from "../../ResourceActions/Module";
 import * as AdhResourceAreaModule from "../../ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
 
 import * as AdhEmbed from "../../Embed/Embed";
 import * as AdhIdeaCollectionWorkbench from "../../IdeaCollection/Workbench/Workbench";
@@ -28,16 +22,10 @@ var processType2 = RIEuthPrivateProcess.content_type;
 export var register = (angular) => {
     angular
         .module(moduleName, [
-            AdhAbuseModule.moduleName,
-            AdhCommentModule.moduleName,
-            AdhHttpModule.moduleName,
+            AdhEmbedModule.moduleName,
             AdhIdeaCollectionModule.moduleName,
-            AdhMovingColumnsModule.moduleName,
-            AdhPermissionsModule.moduleName,
             AdhProcessModule.moduleName,
-            AdhResourceActionsModule.moduleName,
             AdhResourceAreaModule.moduleName,
-            AdhTopLevelStateModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerContext("euth");
