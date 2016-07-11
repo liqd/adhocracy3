@@ -176,11 +176,11 @@ def _get_entry_name(change: ChangelogMetadata) -> str:
             return ActivityType.update
         else:
             return ActivityType.add
-    elif change.modified:
-        return ActivityType.update
     elif change.visibility == VisibilityChange.concealed:
         return ActivityType.remove
-    else:
+    elif change.modified:
+        return ActivityType.update
+    else: # pragma: no cover
         raise ValueError('Invalid change state', change)
 
 
