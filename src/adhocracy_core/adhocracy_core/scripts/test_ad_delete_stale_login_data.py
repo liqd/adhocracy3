@@ -54,10 +54,3 @@ class TestDeleteStaleLoginData:
             self, context, request_, mock_delete_resets, mock_delete_users):
         self.call_fut(context, request_, 30, 10)
         mock_delete_resets.assert_called_with(request_, 10)
-
-    def test_delete_tokens(
-            self, context, request_, mock_auth_policy, mock_token_manger,
-            mock_delete_users, mock_delete_resets):
-        mock_auth_policy.timeout = 10000
-        self.call_fut(context, request_, 30, 10)
-        mock_token_manger.delete_expired_tokens.assert_called_with(10000)
