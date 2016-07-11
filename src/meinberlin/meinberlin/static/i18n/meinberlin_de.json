@@ -1,10 +1,8 @@
 {
-    "TR__CREATE_PROPOSAL": "Vorschlag anlegen",
     "TR__CURRENT_STATE": "Aktueller Status",
     "TR__ERROR_MUST_BE_A_VALID_EMAIL_STRING": "Bitte eine gültige E-Mail-Adresse angeben",
     "TR__ERROR_REQUIRED_DATE": "Bitte ein gültiges Datum angeben",
     "TR__ERROR_REQUIRED_OFFICE_WORKER": "Bitte den Namen einer Sachbearbeiter*in angeben",
-    "TR__HIDE": "löschen",
     "TR__MAP_INCOMPLETE": "Auf der Karte werden nur ortsbezogene Vorschläge angezeigt. [[link:Zur Listenübersicht wechseln.]]",
     "TR__MAP_INCOMPLETE_DOCUMENTS": "Auf der Karte werden nur ortsbezogene Informationen angezeigt. [[link:Zur Listenübersicht wechseln.]]",
     "TR__MEINBERLIN_ALEXANDERPLATZ_DOCUMENT": "Informationen",
