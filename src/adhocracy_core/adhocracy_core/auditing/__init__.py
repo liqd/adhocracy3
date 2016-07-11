@@ -5,6 +5,7 @@ import substanced.util
 from pyramid.i18n import TranslationStringFactory
 from pyramid.i18n import TranslationString
 from pyramid.i18n import get_localizer
+from pyramid.httpexceptions import HTTPError
 from pyramid.registry import Registry
 from pyramid.traversal import find_interface
 from pyramid.traversal import resource_path
@@ -112,6 +113,8 @@ def update_auditlog_callback(request: Request, response: Response) -> None:
     This is a response-callback that runs after a request has finished. To
     store the audit entry it adds an additional transaction.
     """
+    if isinstance(response, HTTPError):
+        return
     changes = _filter_trival_changes(request)
     if changes:
         activities = _create_activities(changes, request)
@@ -152,8 +155,8 @@ def _create_activities(changes: [ChangelogMetadata],
     activities = []
     for change in changes:
         activity_type = _get_entry_name(change)
-        sheets = _get_content_sheets(change, request.registry)
-        sheet_data = _get_sheet_data(sheets, request)
+        sheets = _get_content_sheets(change, request)
+        sheet_data = _get_sheet_data(sheets)
         object = _get_object(change)
         target = _get_target(object)
         activity = Activity()._replace(subject=request.user,
@@ -181,20 +184,20 @@ def _get_entry_name(change: ChangelogMetadata) -> str:
         raise ValueError('Invalid change state', change)
 
 
-def _get_content_sheets(change: ChangelogMetadata, registry: Registry) -> []:
+def _get_content_sheets(change: ChangelogMetadata, request: Request) -> []:
     if change.created:
-        sheets = registry.content.get_sheets_create(change.resource)
+        sheets = request.registry.content.get_sheets_create(change.resource,
+                                                            request=request)
     else:
-        sheets = registry.content.get_sheets_edit(change.resource)
-    return sheets
+        sheets = request.registry.content.get_sheets_edit(change.resource,
+                                                          request=request)
+    disabled = [IMetadata]
+    return [s for s in sheets if s.meta.isheet not in disabled]
 
 
-def _get_sheet_data(sheets: [ISheet], request: Request) -> {}:
+def _get_sheet_data(sheets: [ISheet]) -> {}:
     sheet_data = []
-    _disabled = [IMetadata]
     for sheet in sheets:
-        if sheet.meta.isheet not in _disabled:
-            sheet.request = request
             sheet_data.append({sheet.meta.isheet:
                                sheet.serialize(add_back_references=False)})
     return sheet_data

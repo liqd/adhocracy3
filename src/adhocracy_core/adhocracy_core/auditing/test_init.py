@@ -64,6 +64,12 @@ class TestUpdateAuditlogCallback:
     def add_to(self, mocker):
         return mocker.patch('adhocracy_core.auditing.add_to_auditlog')
 
+    def test_ignore_if_error_response(self, request_, mocker):
+        from pyramid.httpexceptions import HTTPError
+        add_to = mocker.patch('adhocracy_core.auditing.add_to_auditlog')
+        self.call_fut(request_, HTTPError())
+        assert not add_to.called
+
     def test_ignore_if_empty_changelog(self, request_, mocker):
         add_to = mocker.patch('adhocracy_core.auditing.add_to_auditlog')
         self.call_fut(request_, None)
@@ -172,7 +178,8 @@ class TestUpdateAuditlogCallback:
         changelog['/'] = changelog['']._replace(created=True, resource=context)
         self.call_fut(request_, None)
         added_activity = add_to.call_args[0][0][0]
-        registry.content.get_sheets_create.assert_called_with(context)
+        registry.content.get_sheets_create.assert_called_with(context,
+                                                              request=request_)
         assert added_activity.sheet_data == [{mock_sheet.meta.isheet:
                                               mock_sheet.serialize()}]
 
@@ -182,7 +189,8 @@ class TestUpdateAuditlogCallback:
         changelog['/'] = changelog['']._replace(modified=True, resource=context)
         self.call_fut(request_, None)
         added_activity = add_to.call_args[0][0][0]
-        registry.content.get_sheets_edit.assert_called_with(context)
+        registry.content.get_sheets_edit.assert_called_with(context,
+                                                            request=request_)
         assert added_activity.sheet_data == [{mock_sheet.meta.isheet:
                                               mock_sheet.serialize()}]
 
