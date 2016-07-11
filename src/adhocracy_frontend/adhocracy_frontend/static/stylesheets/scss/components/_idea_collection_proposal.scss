@@ -1,18 +1,18 @@
-.meinberlin-proposal-detail {
+.idea-collection-proposal-detail {
     .rate {
         float: right;
     }
 }
 
-.meinberlin-proposal-detail-header,
-.meinberlin-proposal-badge-descriptions,
-.meinberlin-proposal-detail-body {
+.idea-collection-proposal-detail-header,
+.idea-collection-proposal-badge-descriptions,
+.idea-collection-proposal-detail-body {
     @include clearfix;
     @include rem(padding, 0 10px);
     background: $color-background-base;
 }
 
-.meinberlin-proposal-detail-body-comments {
+.idea-collection-proposal-detail-body-comments {
     @include rem(padding-left, 40px);
     float: right;
     text-align: center;
@@ -29,15 +29,15 @@
     }
 }
 
-.meinberlin-proposal-detail-body-comments-icon {
+.idea-collection-proposal-detail-body-comments-icon {
     @include rem(font-size, 20px);
     display: block;
 }
 
-.meinberlin-proposal-detail-header {
+.idea-collection-proposal-detail-header {
     @include rem(padding-top, 30px);
 
-    .meinberlin-proposal-detail-header-title {
+    .idea-collection-proposal-detail-header-title {
         @include rem(font-size, $font-size-normal);
         @include rem(margin, 0 0 30px);
         color: $color-text-normal;
@@ -50,29 +50,29 @@
     }
 }
 
-.meinberlin-proposal-detail-detail {
+.idea-collection-proposal-detail-detail {
     @include rem(margin-bottom, 30px);
     padding-right: 15%;
     white-space: pre-line;
 }
 
-.meinberlin-proposal-detail-meta-item,
-.meinberlin-proposal-detail-author {
+.idea-collection-proposal-detail-meta-item,
+.idea-collection-proposal-detail-author {
     @include rem(font-size, $font-size-small);
     color: $color-text-introvert;
 }
 
-.meinberlin-proposal-detail-author {
+.idea-collection-proposal-detail-author {
     @include rem(margin-bottom, 30px);
 }
 
-.meinberlin-proposal-detail-meta {
+.idea-collection-proposal-detail-meta {
     @include clearfix;
     @include rem(margin, 0 0 40px);
     list-style-type: none;
     padding: 0;
 
-    .meinberlin-proposal-detail-meta-item {
+    .idea-collection-proposal-detail-meta-item {
         @include grid-same-width(4);
 
         &:nth-child(2) {
@@ -80,23 +80,23 @@
         }
     }
 
-    .meinberlin-proposal-detail-meta-participation {
+    .idea-collection-proposal-detail-meta-participation {
         text-align: right;
     }
 
-    .meinberlin-proposal-detail-meta-item-icon {
+    .idea-collection-proposal-detail-meta-item-icon {
         @include rem(margin-right, 8px);
         vertical-align: middle;
     }
 
-    .meinberlin-proposal-detail-meta-item-text {
+    .idea-collection-proposal-detail-meta-item-text {
         display: inline-block;
         margin: 0;
         text-align: left;
     }
 
-    .meinberlin-proposal-detail-meta-item-comments,
-    .meinberlin-proposal-detail-meta-item-location {
+    .idea-collection-proposal-detail-meta-item-comments,
+    .idea-collection-proposal-detail-meta-item-location {
         a {
             color: $color-text-highlight-introvert;
         }
@@ -106,7 +106,7 @@
 /*doc
 ---
 title: Kiezkasse Proposal List Item
-name: meinberlin-proposal-list-item
+name: idea-collection-proposal-list-item
 category: meinberlin
 ---
 
@@ -118,7 +118,7 @@ as metadata.  It serves as an entry to a detail view.
 ```html_example
 <a class="proposal-list-item is-selected" href="" style="overflow:hidden">
     <div class="proposal-list-item-col-left">
-        <h3 class="meinberlin-proposal-list-item-title">A title here</h3>
+        <h3 class="idea-collection-proposal-list-item-title">A title here</h3>
         by Cliff on 12.10.15
         <span class="badge is-realized">is realized</span>
         <span class="badge is-not-realized">is not realized</span>
@@ -138,7 +138,7 @@ as metadata.  It serves as an entry to a detail view.
 ```
 */
 
-.meinberlin-proposal-list-item {
+.idea-collection-proposal-list-item {
     @include clearfix;
     @include rem(padding, 10px);
     color: $color-text-normal;
@@ -152,7 +152,7 @@ as metadata.  It serves as an entry to a detail view.
     }
 
     &.is-selected {
-        .meinberlin-proposal-list-item-detail-link {
+        .idea-collection-proposal-list-item-detail-link {
             background: $color-structure-normal;
         }
     }
@@ -175,7 +175,7 @@ as metadata.  It serves as an entry to a detail view.
     }
 }
 
-.meinberlin-proposal-list-item-title {
+.idea-collection-proposal-list-item-title {
     @include rem(font-size, $font-size-normal);
     @include rem(margin, 0 0 15px);
 }

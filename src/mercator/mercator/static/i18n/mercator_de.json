@@ -82,6 +82,5 @@
     "TR__MERCATOR_PROPOSAL_VALUE_ANNOTATION": "Wie trägt Deine Idee zu zum europäischen Gedanken bei? Was ist so besonders an ihr? Ist sie übertragbar auf andere Länder, Bereiche oder Organisationen? (max. 800 Zeichen)",
     "TR__MERCATOR_PROPOSAL_VALUE_LABEL": "Warum braucht Europa Deine Idee?",
     "TR__MERCATOR_PROPOSAL_WHO_BEHIND": "Wer steckt dahinter?",
-    "TR__PROPOSAL_ADD": "neuer Vorschlag",
-    "TR__PROPOSAL_EMPTY_TEXT": "Noch keine Vorschläge"
+    "TR__PROPOSAL_ADD": "neuer Vorschlag"
 }
