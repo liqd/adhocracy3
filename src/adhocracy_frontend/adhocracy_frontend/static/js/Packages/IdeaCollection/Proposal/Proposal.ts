@@ -120,7 +120,7 @@ var bindPath = (
                         scope.data.lat = pointSheet.coordinates[1];
                         scope.data.polygon = polygon;
                     }
-                    // WARNING: proposalSheet is not a regular feature of adhocracy, 
+                    // WARNING: proposalSheet is not a regular feature of adhocracy,
                     // but a hack of Buergerhaushalt and Kiezkasse.
                     if (proposalSheet) {
                         if (scope.processOptions.maxBudget) {
@@ -144,7 +144,7 @@ var fill = (
     scope : IScope,
     proposalVersion
 ) : void => {
-    // WARNING: proposalSheet is not a regular feature of adhocracy, 
+    // WARNING: proposalSheet is not a regular feature of adhocracy,
     // but a hack of Buergerhaushalt and Kiezkasse.
     var proposalSheet = scope.processOptions.proposalSheet;
     if (proposalSheet && scope.processOptions.hasCreatorParticipate
@@ -229,7 +229,7 @@ export var detailDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
         scope: {
             path: "@",
-            processOptions : "="
+            processOptions: "="
         },
         link: (scope : IScope) => {
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
@@ -252,7 +252,7 @@ export var listItemDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
         scope: {
             path: "@",
-            processOptions : "="
+            processOptions: "="
         },
         link: (scope : IScope) => {
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
@@ -285,7 +285,7 @@ export var mapListItemDirective = (
         require: "^adhMapListingInternal",
         scope: {
             path: "@",
-            processOptions : "="
+            processOptions: "="
         },
         link: (scope : IScope, element, attrs, mapListing : AdhMapping.MapListingController) => {
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
@@ -325,7 +325,7 @@ export var createDirective = (
         restrict: "E",
         scope: {
             poolPath: "@",
-            processOptions : "="
+            processOptions: "="
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         link: (scope, element) => {
@@ -383,7 +383,7 @@ export var editDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
             path: "@",
-            processOptions : "="
+            processOptions: "="
         },
         link: (scope, element) => {
             scope.errors = [];
