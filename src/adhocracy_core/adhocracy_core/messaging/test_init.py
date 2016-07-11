@@ -286,7 +286,8 @@ class TestActivityEmail:
     @fixture
     def activity(self, activity):
         context = testing.DummyResource(__name__='object')
-        return activity._replace(object=context)
+        target = testing.DummyResource(__name__='target')
+        return activity._replace(object=context, target=target)
 
     def test_send_activity(self, inst, user, activity, request_, mocker):
         inst.send_mail = Mock()
@@ -301,6 +302,7 @@ class TestActivityEmail:
         send_mail_args = inst.send_mail.call_args[1]
         wanted_mapping = {'site_name': 'sitename',
                           'object_url': 'http://front.end/robject/',
+                          'target_url': 'http://front.end/rtarget/',
                           'activity_name': activity.name,
                           'activity_description':
                               translate_description.return_value.default,
@@ -308,8 +310,19 @@ class TestActivityEmail:
         assert send_mail_args['recipients'] == ['anna@example.org']
         assert send_mail_args['subject'] == 'mail_send_activity_subject'
         assert send_mail_args['subject'].mapping == wanted_mapping
-        assert send_mail_args['body'] == 'mail_send_activity_body_txt'
         assert send_mail_args['body'].mapping == wanted_mapping
+        assert send_mail_args['body'] == 'mail_send_activity_add_update_body_txt'
         assert send_mail_args['request'] == request_
+
+    def test_send_activity_remove(self, inst, user, activity, request_, mocker):
+        from adhocracy_core.interfaces import ActivityType
+        inst.send_mail = Mock()
+        inst._get_user_email = Mock(return_value='anna@example.org')
+        translate_description = mocker.patch(
+            'adhocracy_core.messaging.generate_activity_description')
+        activity = activity._replace(type=ActivityType.remove)
+        inst.send_activity_mail(user, activity, request_)
+        send_mail_args = inst.send_mail.call_args[1]
+        assert send_mail_args['body'] == 'mail_send_activity_remove_body_txt'
 
 

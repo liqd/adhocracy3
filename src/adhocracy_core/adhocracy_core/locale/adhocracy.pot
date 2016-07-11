@@ -109,6 +109,16 @@ msgstr ""
 msgid "mail_invitation_body_txt"
 msgstr ""
 
+#. Default: ${activity_description} Visit ${target_type_name}: ${target_url} .
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:298
+msgid "mail_send_activity_remove_body_txt"
+msgstr ""
+
+#. Default: ${activity_description} Visit ${object_type_name}: ${object_url} .
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:304
+msgid "mail_send_activity_add_update_body_txt"
+msgstr ""
+
 #: ././src/adhocracy_core/adhocracy_core/resources/document.py:47
 msgid "Document"
 msgstr ""

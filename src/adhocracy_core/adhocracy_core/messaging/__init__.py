@@ -1,4 +1,5 @@
 """Send messages to Principals."""
+from copy import copy
 from collections.abc import Sequence
 from logging import getLogger
 from urllib.request import quote
@@ -16,6 +17,7 @@ from pyramid.i18n import get_localizer
 
 from adhocracy_core.auditing import generate_activity_description
 from adhocracy_core.interfaces import Activity
+from adhocracy_core.interfaces import ActivityType
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.sheets.principal import IUserBasic
@@ -274,23 +276,36 @@ class Messenger:
 
             - `site_name`
             - `object_url`
+            - `target_url`
             - `activity_name`
             - `activity_description`
+            - `object_type_name`
+            - `target_type_name`
         """
         translate = get_localizer(request).translate
-        description = generate_activity_description(activity, request.registry)
-        mapping = {'site_name': self.site_name,
-                   'activity_name': translate(activity.name),
-                   'activity_description': translate(description),
-                   'object_url': self._get_resource_url(activity.object),
-                   }
+        description = generate_activity_description(activity, request)
+        mapping = copy(description.mapping)
+        mapping.update({'site_name': self.site_name,
+                        'activity_name': translate(activity.name),
+                        'activity_description': translate(description),
+                        'object_url': self._get_resource_url(activity.object),
+                        'target_url': self._get_resource_url(activity.target),
+                        })
         subject = _('mail_send_activity_subject',
                     mapping=mapping,
                     default='${site_name}: ${activity_name}')
-        body = _('mail_send_activity_body_txt',
-                 mapping=mapping,
-                 default=u'${activity_description} Visit: ${object_url} .'
-                 )
+        if activity.type == ActivityType.remove:
+            body = _('mail_send_activity_remove_body_txt',
+                     mapping=mapping,
+                     default=u'${activity_description} Visit '
+                             '${target_type_name}: ${target_url} .'
+                     )
+        else:
+            body = _('mail_send_activity_add_update_body_txt',
+                     mapping=mapping,
+                     default=u'${activity_description} Visit '
+                             '${object_type_name}: ${object_url} .'
+                     )
         user_mail = self._get_user_email(user)
         self.send_mail(subject=subject,
                        recipients=[user_mail],

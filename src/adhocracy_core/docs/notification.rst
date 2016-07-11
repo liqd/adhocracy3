@@ -84,7 +84,7 @@ Added content:
     >>> send_mails[-1].subject
     'Adhocracy: participant2 added a Document to Process Title.'
     >>> send_mails[-1].body
-    'participant2 added the Document "Document Title" to Process "Process Title". Visit: http:.../r/process/document_0000000/ .'
+    'participant2 added the Document "Document Title" to Process "Process Title". Visit Document: http:.../r/process/document_0000000/ .'
 
 Added comment:
 
@@ -111,7 +111,7 @@ Added comment:
    >>> send_mails[-1].subject
    'Adhocracy: participant2 added a Comment to Document Title.'
    >>> send_mails[-1].body
-   'participant2 added the Comment "comment text" to Document "Document Title". Visit: http:.../r/process/document_0000000/comments/comment_0000000/ .'
+   'participant2 added the Comment "comment text" to Document "Document Title". Visit Comment: http:.../r/process/document_0000000/comments/comment_0000000/ .'
 
 
 Updated comment:
@@ -130,7 +130,7 @@ Updated comment:
     >>> send_mails[-1].subject
     'Adhocracy: participant2 updated Comment'
     >>> send_mails[-1].body
-    'participant2 updated Comment "updated comment text". Visit: http:.../r/process/document_0000000/comments/comment_0000000/ .'
+    'participant2 updated Comment "updated comment text". Visit Comment: http:.../r/process/document_0000000/comments/comment_0000000/ .'
 
 Updated content:
 
@@ -147,5 +147,5 @@ Updated content:
     >>> send_mails[-1].subject
     'Adhocracy: participant2 updated Document'
     >>> send_mails[-1].body
-    'participant2 updated Document "updated document title". Visit: http:.../r/process/document_0000000/ .'
+    'participant2 updated Document "updated document title". Visit Document: http:.../r/process/document_0000000/ .'
 

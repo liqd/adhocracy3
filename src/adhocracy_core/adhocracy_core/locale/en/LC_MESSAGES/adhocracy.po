@@ -171,19 +171,6 @@ msgstr ""
 msgid "mail_send_activity_subject"
 msgstr "mail_send_activity_subject"
 
-#. Default: ${activity_description} Visit: ${object_url} .
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:291
-#, fuzzy
-msgid "mail_send_activity_body_txt"
-msgstr ""
-"\n"
-"${activity_description}\n"
-"\n"
-"Click here to visit it: ${object_url}\n"
-"\n"
-"Your \"${site_name}\" Team\n"
-"\n"
-
 #. Default: Invitation to join ${site_name}
 #: src/adhocracy_core/adhocracy_core/messaging/__init__.py:239
 #, fuzzy
@@ -228,6 +215,32 @@ msgstr ""
 "Wir wünschen Dir viel Spaß und Inspiration!\n"
 "\n"
 "Dein \"${site_name}\"-Team"
+
+#. Default: ${activity_description} Visit ${target_type_name}: ${target_url} .
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:298
+#, fuzzy
+msgid "mail_send_activity_remove_body_txt"
+msgstr ""
+"\n"
+"${activity_description}\n"
+"\n"
+"Click here to visit it: ${target_url}\n"
+"\n"
+"Your \"${site_name}\" Team\n"
+"\n"
+
+#. Default: ${activity_description} Visit ${object_type_name}: ${object_url} .
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:304
+#, fuzzy
+msgid "mail_send_activity_add_update_body_txt"
+msgstr ""
+"\n"
+"${activity_description}\n"
+"\n"
+"Click here to visit it: ${object_url}\n"
+"\n"
+"Your \"${site_name}\" Team\n"
+"\n"
 
 #: src/adhocracy_core/adhocracy_core/resources/document.py:47
 msgid "Document"
