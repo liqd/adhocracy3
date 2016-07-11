@@ -26,6 +26,9 @@ from substanced.sdi import MANAGE_ROUTE_NAME
 SDI_ROUTE_NAME = MANAGE_ROUTE_NAME
 
 
+DEFAULT_USER_GROUP_NAME = 'default_group'
+
+
 def namedtuple(typename, field_names, verbose=False, rename=False):
     """Like collections.namedtuple but with more functionalities.
 
@@ -173,7 +176,7 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
 
         Deferred default values can rely on the following bindings:
 
-            `context`, `registry`
+            `context`, `registry`, `creating`
 
         Deferred validators can rely on the following bindings:
 
@@ -260,7 +263,8 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
                                    'use_autonaming_random',
                                    'is_sdi_addable',
                                    'element_types',
-                                   'workflow_name',
+                                   'default_workflow',
+                                   'alternative_workflows',
                                    'item_type',
                                    ])):
     """Metadata to register Resource Types.
@@ -307,9 +311,12 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
     element_types:
         Set addable content types, class heritage is honored.
 
-    workflow_name:
+    default_workflow:
         Name of workflow to be assigned to instances. Possible workflows can be
         found in :mod:`adhocracy_core.workflows`.
+
+    alternative_workflows:
+        Other workflow names that may be set.
 
     IItem fields:
     -------------
@@ -390,12 +397,14 @@ class IPool(IResource):  # pragma: no cover
         """
     # TODO remove find_service, substanced.util.find_service does the same
 
-    def delete(name: str, registry: Registry):
+    def remove(name: str,
+               send_events: bool=True,
+               registry: Registry=None,
+               **kwargs):
         """Remove subobject `name` from database.
 
         :raises KeyError: if `name`is not a valid subresource name
         """
-        # TODO add delete/undelete feature
 
 
 class IServicePool(IPool, IService):
@@ -482,6 +491,7 @@ class IResourceCreatedAndAdded(IObjectEvent):
     parent = Attribute('The parent of the new resource')
     registry = Attribute('The pyramid registry')
     creator = Attribute('User resource object of the authenticated User')
+    autoupdated = Attribute('Creation was caused automatically by application')
 
 
 class IResourceWillBeDeleted(IObjectEvent):
@@ -587,12 +597,28 @@ class VisibilityChange(Enum):
 class ChangelogMetadata(namedtuple('ChangelogMetadata',
                                    ['modified',
                                     'created',
+                                    'autoupdated',
                                     'followed_by',
                                     'resource',
                                     'last_version',
                                     'changed_descendants',
                                     'changed_backrefs',
                                     'visibility'])):
+    def __new__(cls,
+                modified: bool=False,
+                created: bool=False,
+                autoupdated: bool=False,
+                followed_by: IResource=None,
+                resource: IResource=None,
+                last_version: IResource=None,
+                changed_descendants: bool=False,
+                changed_backrefs: bool=False,
+                visibility: str=VisibilityChange.visible,
+                ):
+        return super().__new__(cls, modified, created, autoupdated,
+                               followed_by, resource, last_version,
+                               changed_descendants, changed_backrefs,
+                               visibility)
     """Metadata to track modified resources during one transaction.
 
     Fields:
@@ -603,6 +629,9 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
         modified.
     created (bool):
         This resource is created and added to a pool.
+    autoupdated (bool):
+        The modification/creation was caused by a modified referenced
+        resource. This means there is no real content change.
     followed_by (None or IResource):
         A new Version (:class:`adhocracy_core.interfaces.IItemVersion`) follows
         this resource
@@ -620,10 +649,14 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
     """
 
 
+changelog_meta = ChangelogMetadata()
+
+
 class AuditlogEntry(namedtuple('AuditlogEntry', ['name',
                                                  'resource_path',
                                                  'user_name',
-                                                 'user_path'])):
+                                                 'user_path',
+                                                 'sheet_data'])):
     """Metadata to log which user modifies resources.
 
     Fields:
@@ -637,7 +670,22 @@ class AuditlogEntry(namedtuple('AuditlogEntry', ['name',
         name of responsible user
     user_path:
         :term:`userid` of responsible user
+    sheet_data:
+        List of sheet content
     """
+
+    def __new__(cls,
+                name=None,
+                resource_path=None,
+                user_name=None,
+                user_path=None,
+                sheet_data=None):
+        return super().__new__(cls,
+                               name=name,
+                               resource_path=resource_path,
+                               user_name=user_name,
+                               user_path=user_path,
+                               sheet_data=sheet_data)
 
 
 class AuditlogAction(Enum):

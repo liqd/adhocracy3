@@ -1,6 +1,7 @@
 """Basic type with children typically to create process structures."""
 from BTrees.Length import Length
 from pyramid.registry import Registry
+from pyramid.traversal import get_current_registry
 from substanced.folder import Folder
 from substanced.util import find_service
 from substanced.interfaces import IFolder
@@ -18,6 +19,7 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import resource_meta
 from adhocracy_core.resources.base import Base
 from adhocracy_core.utils import now
+from adhocracy_core.utils import find_graph
 
 
 class IBasicPool(IPool):
@@ -92,17 +94,26 @@ class Pool(Base, Folder):
         """Return  the :term:`service` for the given context."""
         return find_service(self, service_name, *sub_service_names)
 
-    def delete(self, name: str, registry: Registry):
+    def remove(self, name, send_events: bool=True, registry: Registry=None,
+               **kwargs):
         """Delete subresource `name` from database.
 
         :raises KeyError: if `name` is not a valid subresource name
         """
         subresource = self[name]
-        event = ResourceWillBeDeleted(object=subresource,
-                                      parent=self,
-                                      registry=registry)
-        registry.notify(event)
-        self.remove(name, registry=registry)
+        registry = registry or get_current_registry(self)
+        if send_events:
+            event = ResourceWillBeDeleted(object=subresource,
+                                          parent=self,
+                                          registry=registry)
+            registry.notify(event)
+        graph = find_graph(subresource)
+        references = list(graph.get_references(subresource))
+        super().remove(name,
+                       registry=registry,
+                       send_events=send_events,
+                       **kwargs)
+        graph.send_back_reference_removal_notificatons(references, registry)
 
 
 pool_meta = resource_meta._replace(

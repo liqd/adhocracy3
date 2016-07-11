@@ -2,7 +2,7 @@
     @extend .print-only;
 
     img {
-        @include inline-block;
+        display: inline-block;
         height: 1.2em;
         width: auto;
     }

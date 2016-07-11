@@ -3,9 +3,9 @@ import * as _ from "lodash";
 import * as AdhConfig from "../Config/Config";
 import * as AdhCredentials from "../User/Credentials";
 import * as AdhHttp from "../Http/Http";
-import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
+import * as AdhResourceActions from "../ResourceActions/ResourceActions";
 import * as AdhResourceUtil from "../Util/ResourceUtil";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
@@ -42,6 +42,7 @@ export interface ICommentResourceScope extends angular.IScope {
     afterCreateComment() : angular.IPromise<void>;
     item : any;
     report? : () => void;
+    modals : AdhResourceActions.Modals;
     // update resource
     update() : angular.IPromise<void>;
     // update outer listing
@@ -63,7 +64,7 @@ export interface ICommentResourceScope extends angular.IScope {
 
 
 export var update = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     $q : angular.IQService
 ) => (
     scope : ICommentResourceScope,
@@ -108,7 +109,7 @@ export var update = (
 };
 
 export var bindPath = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     $q : angular.IQService
 ) => (
     scope : ICommentResourceScope,
@@ -123,7 +124,7 @@ export var bindPath = (
 };
 
 export var postCreate = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : ICommentResourceScope,
@@ -150,7 +151,7 @@ export var postCreate = (
 };
 
 export var postEdit = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : ICommentResourceScope,
@@ -169,25 +170,25 @@ export var postEdit = (
 
 export var commentDetailDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhRecursionHelper,
     $window : Window,
     $q : angular.IQService,
+    $timeout,
     $translate
 ) => {
     var _update = update(adhHttp, $q);
     var _postEdit = postEdit(adhHttp, adhPreliminaryNames);
 
-    var link = (scope : ICommentResourceScope, element, attrs, column? : AdhMovingColumns.MovingColumnController) => {
-        if (column) {
-            scope.report = () => {
-                column.$scope.shared.abuseUrl = scope.data.path;
-                column.toggleOverlay("abuse");
-            };
-        }
+    var link = (scope : ICommentResourceScope) => {
+        scope.modals = new AdhResourceActions.Modals($timeout);
+
+        scope.report = () => {
+            scope.modals.toggleModal("abuse");
+        };
 
         scope.$on("$destroy", adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
             if (!commentVersionUrl) {
@@ -263,7 +264,6 @@ export var commentDetailDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
-        require: "?^adhMovingColumn",
         scope: {
             path: "@",
             onSubmit: "=?"
@@ -276,7 +276,7 @@ export var commentDetailDirective = (
 
 export var commentCreateDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => {
     var _postCreate = postCreate(adhHttp, adhPreliminaryNames);
@@ -313,7 +313,7 @@ export var commentCreateDirective = (
 
 export var adhCommentListing = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     $location : angular.ILocationService
@@ -337,6 +337,11 @@ export var adhCommentListing = (
                 key: "rates",
                 name: "TR__RATES",
                 index: "rates",
+                reverse: true
+            }, {
+                key: "controversiality",
+                name: "TR__CONTROVERSIALITY",
+                index: "controversiality",
                 reverse: true
             }];
             scope.params = {};
@@ -370,7 +375,7 @@ export var adhCommentListing = (
 export var adhCreateOrShowCommentListing = (
     adhConfig : AdhConfig.IService,
     adhDone,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhCredentials : AdhCredentials.Service
 ) => {
@@ -429,15 +434,15 @@ export var adhCreateOrShowCommentListing = (
 };
 
 export var commentColumnDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Column.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["commentCloseUrl", "commentableUrl"]);
-            scope.column = column;
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("commentCloseUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("commentableUrl", scope));
         }
     };
 };

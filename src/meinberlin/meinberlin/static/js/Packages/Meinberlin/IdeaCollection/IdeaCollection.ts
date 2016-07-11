@@ -2,11 +2,9 @@
 
 import * as AdhConfig from "../../Config/Config";
 import * as AdhHttp from "../../Http/Http";
-import * as AdhMovingColumns from "../../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../../Permissions/Permissions";
 import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
-import * as AdhUtil from "../../Util/Util";
 
 import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
@@ -19,10 +17,7 @@ import RIIdeaCollectionProcess from "../../../Resources_/adhocracy_meinberlin/re
 import RIKiezkasseProcess from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
 import RIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
 import RIKiezkasseProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
-import * as SIBadge from "../../../Resources_/adhocracy_core/sheets/badge/IBadge";
-import * as SIBadgeable from "../../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
 import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
-import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 export var pkgLocation = "/Meinberlin/IdeaCollection";
@@ -31,7 +26,7 @@ export var pkgLocation = "/Meinberlin/IdeaCollection";
 export var workbenchDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service
 ) => {
     return {
         restrict: "E",
@@ -96,89 +91,67 @@ export var workbenchDirective = (
 
 export var proposalDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalDetailColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
-            adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
-
-            scope.column = column;
-
-            var badgeAssignmentPoolPath;
-            scope.$watch("proposalUrl", (proposalUrl) => {
-                if (proposalUrl) {
-                    adhHttp.get(proposalUrl).then((proposal) => {
-                        badgeAssignmentPoolPath = proposal.data[SIBadgeable.nick].post_pool;
-                    });
-                }
-            });
-            adhPermissions.bindScope(scope, () => badgeAssignmentPoolPath, "badgeAssignmentPoolOptions");
-
-            var params = {
-                depth: 4,
-                content_type: SIBadge.nick
-            };
-            adhHttp.get(scope.processUrl, params).then((response) => {
-                scope.badgesExist = response.data[SIPool.nick].count > 0;
-            });
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
         }
     };
 };
 
 export var proposalCreateColumnDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalCreateColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
         }
     };
 };
 
 export var proposalEditColumnDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalEditColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
         }
     };
 };
 
 export var detailColumnDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/DetailColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
         }
     };
 };
 
 export var editColumnDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/EditColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
         }
     };
 };
@@ -234,7 +207,7 @@ export var registerRoutesFactory = (
             movingColumns: "is-show-hide-hide"
         })
         .specific(ideaCollectionType, "edit", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (resource) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.PUT) {
                         throw 401;
@@ -248,7 +221,7 @@ export var registerRoutesFactory = (
             movingColumns: "is-show-show-hide"
         })
         .specific(ideaCollectionType, "create_proposal", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (resource) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -262,7 +235,7 @@ export var registerRoutesFactory = (
             movingColumns: "is-show-show-hide"
         })
         .specificVersionable(proposalType, proposalVersionType, "edit", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item, version) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (item, version) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -300,7 +273,7 @@ export var registerRoutesFactory = (
             movingColumns: "is-collapse-show-show"
         })
         .specificVersionable(RIComment, RICommentVersion, "", processType, context, ["adhHttp", "$q", (
-            adhHttp : AdhHttp.Service<any>,
+            adhHttp : AdhHttp.Service,
             $q : angular.IQService
         ) => {
             var getCommentableUrl = (resource) : angular.IPromise<any> => {

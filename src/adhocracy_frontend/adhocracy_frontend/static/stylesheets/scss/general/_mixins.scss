@@ -60,3 +60,11 @@ $rem-px-only: false !default;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+@mixin clearfix {
+    overflow: hidden;
+}
+
+@function font-url($path) {
+    @return url("../fonts/" + $path);
+}

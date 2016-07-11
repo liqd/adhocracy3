@@ -28,7 +28,6 @@
                         class="comment-header-link"
                         title="{{ 'TR__EDIT' | translate }}">
                         <i class="comment-header-icon icon-pencil"></i>
-
                     </a>
                     <a href=""
                         data-ng-click="hide()"
@@ -49,6 +48,21 @@
                     <adh-rate data-refers-to="{{data.path}}"></adh-rate>
                 </adh-recompile-on-change>
             </div>
+        </div>
+
+        <ul class="alerts">
+            <li data-ng-repeat="(id, alert) in modals.alerts" class="alerts-message m-{{alert.mode}}" data-ng-click="modals.removeAlert(id)">
+                {{ alert.message | translate }}
+            </li>
+        </ul>
+
+        <div class="modal" data-ng-if="modals.modal">
+            <adh-report-abuse
+                data-ng-if="modals.modal === 'abuse'"
+                data-modals="modals"
+                class="report-abuse"
+                data-url="{{data.path}}">
+            </adh-report-abuse>
         </div>
 
         <form class="comment-children-edit-form" data-ng-switch-when="1" data-ng-submit="submit()">

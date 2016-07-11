@@ -103,19 +103,32 @@ class TestPoolClass:
         service = inst.find_service('service')
         assert service is inst['service']
 
-    def test_delete_removes_subresource(self, registry, context):
+    def test_remove_removes_subresource(self, registry, context, mocker):
         inst = self._makeOne()
+        mocker.patch('adhocracy_core.resources.pool.find_graph')
         inst['child'] = context
-        inst.delete('child', registry)
+        inst.remove('child', registry=registry)
         assert 'child' not in inst
 
-    def test_delete_sends_deleted_event(self, config, registry, context):
+    def test_remove_sends_deleted_event(self, config, registry, context,
+                                        mocker):
         from adhocracy_core.testing import create_event_listener
         from adhocracy_core.events import IResourceWillBeDeleted
         deleted_listener = create_event_listener(config, IResourceWillBeDeleted)
         inst = self._makeOne()
+        mocker.patch('adhocracy_core.resources.pool.find_graph')
         inst['child'] = context
-        inst.delete('child', registry)
+        inst.remove('child', registry=registry)
         event = deleted_listener[0]
         assert event.parent == inst
         assert event.object == context
+
+    def test_delete_triggers_backreference_removed_events(self, config,
+                                                          registry, context,
+                                                          mocker):
+        inst = self._makeOne()
+        mock_graph = mocker.patch(
+            'adhocracy_core.resources.pool.find_graph').return_value
+        inst['child'] = context
+        inst.remove('child', registry)
+        assert mock_graph.send_back_reference_removal_notificatons.called

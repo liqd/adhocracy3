@@ -13,8 +13,8 @@ category: Widgets
 
     .map-button-clear,
     .map-button-reset {
-        @include inline-block;
         @include rem(padding, 0 10px);
+        display: inline-block;
     }
 }
 
@@ -85,8 +85,8 @@ rather than in response to user action.
 }
 
 .leaflet-marker-icon {
-    @include border-radius(50%);
-    @include box-shadow(0 0 1px 1px $color-text-inverted);
+    border-radius: 50%;
+    box-shadow: 0 0 1px 1px $color-text-inverted;
     background: $color-brand-two-normal;
     color: $color-text-inverted;
     text-align: center;
@@ -118,7 +118,7 @@ rather than in response to user action.
 
 .map-list-navigate {
     @include rem(font-size, $font-size-normal);
-    font-weight: bold;
+    font-weight: $font-weight-extrovert;
 
     &:hover, &:focus {
         text-decoration: none;
@@ -163,12 +163,12 @@ rather than in response to user action.
 }
 
 .map-list-item {
-    @include inline-block;
+    display: inline-block;
     vertical-align: middle;
     width: 100%;
 
     &.m-empty {
-        font-weight: bold;
+        font-weight: $font-weight-extrovert;
         text-align: center;
     }
 }

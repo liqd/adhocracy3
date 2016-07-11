@@ -74,7 +74,7 @@ class DummyPool(testing.DummyResource):
         from substanced.util import find_service
         return find_service(self, service_name, *sub_service_names)
 
-    def delete(self, name, registry):
+    def remove(self, name, registry=None, send_events=False, **kwargs):
         subresource = self[name]
         del self[name]
         subresource.__name__ = None
@@ -351,11 +351,13 @@ def mock_objectmap() -> Mock:
 @fixture
 def mock_workflow() -> Mock:
     """Mock :class:`adhocracy_core.workflows.AdhocracyACLWorkflow`."""
-    from adhocracy_core.workflows import AdhocracyACLWorkflow
-    mock = Mock(spec=AdhocracyACLWorkflow)
+    from adhocracy_core.workflows import ACLLocalRolesWorkflow
+    mock = Mock(spec=ACLLocalRolesWorkflow)
     mock._states = {}
     mock.get_next_states.return_value = []
     mock.state_of.return_value = None
+    mock.type = 'sample'
+    mock._initial_state = 'draft'
     return mock
 
 
@@ -576,7 +578,7 @@ def _is_running(path_to_pid_file) -> bool:
 def add_create_test_users_subscriber(configurator):
     """Register a subscriber to import the test fixture to create users."""
     import_test_fixture = partial(import_fixture,
-                                  'adhocracy_core:test_fixture',
+                                  'adhocracy_core:test_users_fixture',
                                   print_stdout=False)
 
     configurator.add_subscriber(lambda event:

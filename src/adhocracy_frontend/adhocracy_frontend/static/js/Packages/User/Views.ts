@@ -6,8 +6,8 @@ import * as _ from "lodash";
 import * as AdhBadge from "../Badge/Badge";
 import * as AdhConfig from "../Config/Config";
 import * as AdhHttp from "../Http/Http";
-import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhResourceActions from "../ResourceActions/ResourceActions";
 import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhEmbed from "../Embed/Embed";
@@ -437,7 +437,7 @@ export var registerDirective = (
 
 export var passwordResetDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhShowError
@@ -477,7 +477,7 @@ export var passwordResetDirective = (
 export var createPasswordResetDirective = (
     adhConfig : AdhConfig.IService,
     adhCredentials : AdhCredentials.Service,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhEmbed : AdhEmbed.Service,
@@ -572,7 +572,7 @@ export var metaDirective = (
             path: "@",
             name: "@?"
         },
-        controller: ["adhHttp", "$translate", "$scope", (adhHttp : AdhHttp.Service<any>, $translate, $scope) => {
+        controller: ["adhHttp", "$translate", "$scope", (adhHttp : AdhHttp.Service, $translate, $scope) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
@@ -616,7 +616,7 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
             me: "=?"
         },
         controller: ["adhHttp", "$scope", "adhTopLevelState", "adhGetBadges", (
-            adhHttp : AdhHttp.Service<any>,
+            adhHttp : AdhHttp.Service,
             $scope,
             adhTopLevelState : AdhTopLevelState.Service,
             adhGetBadges : AdhBadge.IGetBadgeAssignments
@@ -647,7 +647,7 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
 export var userProfileDirective = (
     adhConfig : AdhConfig.IService,
     adhCredentials : AdhCredentials.Service,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhUser : AdhUser.Service,
@@ -657,16 +657,16 @@ export var userProfileDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfile.html",
         transclude: true,
-        require: "^adhMovingColumn",
         scope: {
-            path: "@"
+            path: "@",
+            modals: "="
         },
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
 
             scope.showMessaging = () => {
                 if (scope.messageOptions.POST) {
-                    column.showOverlay("messaging");
+                    scope.modals.showModal("messaging");
                 } else if (!adhCredentials.loggedIn) {
                     adhTopLevelState.setCameFromAndGo("/login");
                 } else {
@@ -688,15 +688,15 @@ export var userProfileDirective = (
 };
 
 
-export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>) => {
+export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserMessage.html",
         scope: {
-            recipientUrl: "@"
+            recipientUrl: "@",
+            modals: "="
         },
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column)  => {
+        link: (scope)  => {
             adhHttp.get(scope.recipientUrl).then((recipient : RIUser) => {
                 scope.recipientName = recipient.data[SIUserBasic.nick].name;
             });
@@ -707,15 +707,15 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
                     title: scope.message.title,
                     text: scope.message.text
                 }).then(() => {
-                    column.hideOverlay();
-                    column.alert("TR__MESSAGE_STATUS_OK", "success");
+                    scope.modals.hideModal();
+                    scope.modals.alert("TR__MESSAGE_STATUS_OK", "success");
                 }, () => {
                     // FIXME
                 });
             };
 
             scope.cancel = () => {
-                column.hideOverlay();
+                scope.modals.hideModal();
             };
         }
     };
@@ -723,16 +723,18 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
 
 
 export var userDetailColumnDirective = (
+    adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service,
-    adhConfig : AdhConfig.IService
+    adhTopLevelState : AdhTopLevelState.Service,
+    $timeout : angular.ITimeoutService
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserDetailColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["userUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("userUrl", scope));
             adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
+            scope.modals = new AdhResourceActions.Modals($timeout);
         }
     };
 };
@@ -751,7 +753,7 @@ export var userDetailColumnDirective = (
  */
 export var adhUserActivityOverviewDirective = (
     adhConfig: AdhConfig.IService,
-    adhHttp: AdhHttp.Service<any>
+    adhHttp: AdhHttp.Service
 ) => {
     return {
         restrict: "E",
@@ -782,7 +784,7 @@ export var adhUserActivityOverviewDirective = (
 };
 
 export var adhUserProfileImageDirective = (
-    adhHttp: AdhHttp.Service<any>,
+    adhHttp: AdhHttp.Service,
     adhConfig: AdhConfig.IService
 ) => {
     return {
@@ -814,7 +816,7 @@ export var adhUserProfileImageDirective = (
 };
 
 export var adhUserProfileImageEditDirective = (
-    adhHttp: AdhHttp.Service<any>,
+    adhHttp: AdhHttp.Service,
     adhPermissions: AdhPermissions.Service,
     adhConfig: AdhConfig.IService
 ) => {

@@ -163,7 +163,8 @@ class ResourceRESTView:
         workflow_sheets = [s for s in edit_sheets
                            if s.meta.isheet.isOrExtends(IWorkflowAssignment)]
         for sheet in workflow_sheets:
-            workflow = sheet.get()['workflow']
+            workflow_name = sheet.get()['workflow']
+            workflow = self.registry.content.workflows.get(workflow_name, None)
             if workflow is None:
                 states = []
             else:
@@ -255,7 +256,7 @@ class SimpleRESTView(ResourceRESTView):
         """Delete resource."""
         parent = self.context.__parent__
         name = self.context.__name__
-        parent.delete(name, self.registry)
+        parent.remove(name, registry=self.registry)
         if is_batchmode(self.request):
             appstruct = {}
         else:

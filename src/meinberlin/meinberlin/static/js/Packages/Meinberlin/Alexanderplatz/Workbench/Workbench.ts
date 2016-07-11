@@ -2,7 +2,6 @@
 
 import * as AdhConfig from "../../../Config/Config";
 import * as AdhHttp from "../../../Http/Http";
-import * as AdhMovingColumns from "../../../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../../../Permissions/Permissions";
 import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
@@ -37,7 +36,7 @@ export var workbenchDirective = (
 };
 
 export var getProcessPolygon = (
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service
 ) => (processUrl : string) : angular.IPromise<any> => {
     return adhHttp.get(processUrl).then((resource) => {
         var locationUrl = resource.data[SILocationReference.nick].location;
@@ -51,14 +50,13 @@ export var processDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProcessDetailColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("tab", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
 
@@ -89,24 +87,15 @@ export var processDetailColumnDirective = (
 export var documentDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service,
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhHttp : AdhHttp.Service<any>,
-    adhResourceUrl,
-    $location : angular.ILocationService,
-    $window : angular.IWindowService,
-    $translate
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentDetailColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl", "documentUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("documentUrl", scope));
             adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.documentUrl), "documentItemOptions");
-
-            scope.setCameFrom = () => {
-                adhTopLevelState.setCameFrom();
-            };
         }
     };
 };
@@ -119,30 +108,24 @@ export var proposalDetailColumnDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalDetailColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
             adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
-
-            scope.setCameFrom = () => {
-                adhTopLevelState.setCameFrom();
-            };
         }
     };
 };
 
 export var documentCreateColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhResourceUrl
+    adhHttp : AdhHttp.Service,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentCreateColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$watch("processUrl", (processUrl) => {
                 if (processUrl) {
                     getProcessPolygon(adhHttp)(processUrl).then((polygon) => {
@@ -150,27 +133,21 @@ export var documentCreateColumnDirective = (
                     });
                 }
             });
-
-            scope.cancel = () => {
-                var url = adhResourceUrl(scope.processUrl);
-                adhTopLevelState.goToCameFrom(url);
-            };
         }
     };
 };
 
 export var documentEditColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhResourceUrl
+    adhHttp : AdhHttp.Service,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentEditColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl", "documentUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("documentUrl", scope));
             scope.$watch("processUrl", (processUrl) => {
                 if (processUrl) {
                     getProcessPolygon(adhHttp)(processUrl).then((polygon) => {
@@ -178,51 +155,33 @@ export var documentEditColumnDirective = (
                     });
                 }
             });
-
-            scope.cancel = () => {
-                var url = adhResourceUrl(AdhUtil.parentPath(scope.documentUrl));
-                adhTopLevelState.goToCameFrom(url);
-            };
         }
     };
 };
 
 export var proposalCreateColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhResourceUrl
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalCreateColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl"]);
-
-            scope.cancel = () => {
-                var url = adhResourceUrl(scope.processUrl);
-                adhTopLevelState.goToCameFrom(url);
-            };
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
         }
     };
 };
 
 export var proposalEditColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhResourceUrl
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalEditColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
-
-            scope.cancel = () => {
-                var url = adhResourceUrl(AdhUtil.parentPath(scope.proposalUrl));
-                adhTopLevelState.goToCameFrom(url);
-            };
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
         }
     };
 };
@@ -244,7 +203,7 @@ export var registerRoutes = (
             tab: "documents"
         })
         .specific(RIAlexanderplatzProcess, "create_document", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (resource : RIAlexanderplatzProcess) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.canPost(RIGeoDocument.content_type)) {
                         throw 401;
@@ -270,7 +229,7 @@ export var registerRoutes = (
             tab: "documents"
         })
         .specificVersionable(RIGeoDocument, RIGeoDocumentVersion, "edit", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIGeoDocument, version : RIGeoDocumentVersion) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (item : RIGeoDocument, version : RIGeoDocumentVersion) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -308,7 +267,7 @@ export var registerRoutes = (
             tab: "proposals"
         })
         .specific(RIAlexanderplatzProcess, "create_proposal", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (resource : RIAlexanderplatzProcess) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.canPost(RIGeoProposal.content_type)) {
                         throw 401;
@@ -334,7 +293,7 @@ export var registerRoutes = (
             tab: "proposals"
         })
         .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "edit", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;

@@ -122,8 +122,8 @@ class TestBaseResourceSheet:
         assert inst.get() == {'count': 0}
 
     def test_get_with_deferred_default(self, inst):
-        """A dictionary with 'registry' and 'context' is passed to deferred
-        default functions.
+        """A dictionary with 'registry', 'context', 'creating is passed
+        to deferred default functions.
         """
         schema = inst.schema.bind()
         @colander.deferred
@@ -131,7 +131,7 @@ class TestBaseResourceSheet:
             return len(kw)
         schema['count'].default = default
         inst.schema = schema
-        assert inst.get() == {'count': 2}
+        assert inst.get() == {'count': 3}
 
     def test_get_with_omit_defaults(self, inst):
         assert inst.get(omit_defaults=True) == {}
@@ -323,6 +323,14 @@ class TestBaseResourceSheet:
         assert events[0].registry == config.registry
         assert events[0].old_appstruct == {'count': 0}
         assert events[0].new_appstruct == {'count': 2}
+        assert events[0].autoupdated is False
+
+    def test_notify_resource_sheet_modified_autoupdated(self, inst, config):
+        from adhocracy_core.interfaces import IResourceSheetModified
+        from adhocracy_core.testing import create_event_listener
+        events = create_event_listener(config, IResourceSheetModified)
+        inst.set({'count': 2}, autoupdated=True)
+        assert events[0].autoupdated
 
     def test_serialize(self, inst, request_):
         from . import BaseResourceSheet
@@ -375,6 +383,20 @@ class TestBaseResourceSheet:
         inst.get.return_value = {}
         cstruct = inst.serialize()
         assert 'only_visible' not in inst.get.call_args[1]['params']
+
+    def test_serialize_with_back_references(self, inst, request_):
+        inst.request = request_
+        inst.get = Mock()
+        inst.get.return_value = {}
+        inst.serialize()
+        assert inst.get.call_args[1]['add_back_references'] is True
+
+    def test_serialize_omit_back_references(self, inst, request_):
+        inst.request = request_
+        inst.get = Mock()
+        inst.get.return_value = {}
+        inst.serialize(add_back_references=False)
+        assert inst.get.call_args[1]['add_back_references'] is False
 
 
 class TestAnnotationRessourceSheet:

@@ -52,9 +52,9 @@ Vertical
             float: none;
 
             i {
-                @include inline-block;
                 @include rem(margin-right, 8px);
                 @include rem(min-width, 12px);
+                display: inline-block;
             }
 
             &:last-child {

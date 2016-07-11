@@ -274,9 +274,6 @@ Major contenders are `Sass <http://sass-lang.com/>`_,
 with Sass so we will stick with it. CSS developers must read the `Sass
 documentation <http://sass-lang.com/documentation/file.SASS_REFERENCE.html>`_.
 
-We also use `Compass <compass-style.org>`_ — a library providing many useful mixins
-and functions for Sass.
-
 There are many more interesting projects in that ecosystem. Currently, we are
 not using any of these. But we might be using some in the future.
 
@@ -407,8 +404,8 @@ a module by adding a corresponding file to the theme.
 Formatting
 ++++++++++
 
-We have a pre-commit hook with most of the `scss-lint linters
-<https://github.com/causes/scss-lint/blob/master/lib/scss_lint/linter/README.md>`_
+We have a pre-commit hook with most of the `sass-lint linters
+<https://github.com/sasstools/sass-lint/tree/master/docs/rules>`_
 with their default settings, except for the following modifications:
 
 -  4 space indentation.
@@ -495,9 +492,9 @@ Accessibility
    design <http://alistapart.com/article/responsive-web-design>`_
    (relative units like ``%``, ``em``, and ``rem``).
 -  Prefer to define foreground and background colors in the same spot.
-   Use
-   `color-contrast <http://beta.compass-style.org/reference/compass/utilities/color/contrast/>`_
-   by compass.
+   Use `color-contrast
+   <https://xi.github.io/sass-planifolia/#contrast>`_ by
+   sass-planifolia.
 -  While no support for IE < 9 is planned, do not introduce
    incapabilities where not needed (robust).
 

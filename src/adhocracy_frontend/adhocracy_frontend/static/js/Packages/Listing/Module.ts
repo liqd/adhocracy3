@@ -21,5 +21,15 @@ export var register = (angular) => {
         .directive("adhFacets", ["adhConfig", AdhListing.facets])
         .directive("adhListing",
             ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
-                new AdhListing.Listing().createDirective(adhConfig, adhWebSocket)]);
+                new AdhListing.Listing().createDirective(adhConfig, adhWebSocket)])
+        .animation(".listing-results", () => {
+            return {
+                enter: (element, done) => {
+                    element.hide().slideDown(done);
+                },
+                leave: (element, done) => {
+                    element.slideUp(done);
+                }
+            };
+        });
 };

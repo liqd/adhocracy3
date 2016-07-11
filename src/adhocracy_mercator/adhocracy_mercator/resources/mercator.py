@@ -410,7 +410,7 @@ process_meta = process.process_meta._replace(
     element_types=(IMercatorProposal,
                    ),
     is_implicit_addable=True,
-    workflow_name = 'mercator'
+    default_workflow = 'mercator'
 )
 
 

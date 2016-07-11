@@ -10,7 +10,7 @@
     text-align: center;
 
     .meta-list {
-        @include inline-block;
+        display: inline-block;
         margin: 0 auto;
     }
 }

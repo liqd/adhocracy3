@@ -54,16 +54,23 @@ class BaseResourceSheet:
         self.extra_js_url = ''  # used for html forms :mod:`adhocracy_core.sdi`
 
     def get_schema_with_bindings(self) -> colander.MappingSchema:
+        bindings = self._get_basic_bindings()
+        context = bindings.pop('context')
         schema = create_schema(self.meta.schema_class,
-                               self.context,
+                               context,
                                self.request,
-                               registry=self.registry,
-                               creating=self.creating
+                               **bindings
                                )
         schema.name = self.meta.isheet.__identifier__
         is_mandatory = self.creating and self.meta.create_mandatory
         schema.missing = required if is_mandatory else drop
         return schema
+
+    def _get_basic_bindings(self) -> dict:
+        return {'context': self.context,
+                'registry': self.registry,
+                'creating': self.creating,
+                }
 
     @reify
     def _fields(self) -> dict:
@@ -109,10 +116,10 @@ class BaseResourceSheet:
 
     def _get_default_appstruct(self) -> dict:
         appstruct = {}
+        bindings = self._get_basic_bindings()
         for node in self.schema:
             if isinstance(node.default, deferred):
-                default = node.default(node, {'context': self.context,
-                                              'registry': self.registry})
+                default = node.default(node, bindings)
             else:
                 default = node.default
             appstruct[node.name] = default
@@ -175,7 +182,9 @@ class BaseResourceSheet:
             omit=(),
             send_event=True,
             send_reference_event=True,
-            omit_readonly: bool=True) -> bool:
+            omit_readonly: bool=True,
+            autoupdated=False,
+            ) -> bool:
         """Store appstruct.
 
         Read :func:`adhocracy_core.interfaces.IResourceSheet.set`
@@ -195,7 +204,9 @@ class BaseResourceSheet:
                                           self.registry,
                                           appstruct_old,
                                           appstruct,
-                                          self.request)
+                                          self.request,
+                                          autoupdated,
+                                          )
             self.registry.notify(event)
         return bool(appstruct)
 
@@ -228,7 +239,7 @@ class BaseResourceSheet:
                                               registry,
                                               send_event=send_event)
 
-    def serialize(self, params: dict=None):
+    def serialize(self, params: dict=None, add_back_references: bool=True):
         """Get sheet appstruct data and serialize.
 
         Read :func:`adhocracy_core.interfaces.IResourceSheet.serialize`
@@ -242,7 +253,9 @@ class BaseResourceSheet:
             'adhocracy.filter_by_visible', True))
         if filter_visible:
             params['only_visible'] = True
-        appstruct = self.get(params=params, omit_defaults=True)
+        appstruct = self.get(params=params,
+                             add_back_references=add_back_references,
+                             omit_defaults=True)
         schema = self.get_schema_with_bindings()
         cstruct = schema.serialize(appstruct)
         return cstruct

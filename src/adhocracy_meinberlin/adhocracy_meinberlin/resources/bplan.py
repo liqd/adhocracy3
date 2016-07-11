@@ -27,7 +27,7 @@ proposal_meta = proposal.proposal_meta._replace(
     iresource=IProposal,
     element_types=(IProposalVersion,),
     item_type=IProposalVersion,
-    workflow_name = 'bplan_private',
+    default_workflow = 'bplan_private',
 )
 
 
@@ -41,7 +41,7 @@ process_meta = process.process_meta._replace(
     element_types=(IProposal,
                    ),
     is_implicit_addable=True,
-    workflow_name = 'bplan',
+    default_workflow = 'bplan',
     extended_sheets=(adhocracy_meinberlin.sheets.bplan.IProcessSettings,
                      adhocracy_meinberlin.sheets.bplan.IProcessPrivateSettings,
                      adhocracy_core.sheets.embed.IEmbed,

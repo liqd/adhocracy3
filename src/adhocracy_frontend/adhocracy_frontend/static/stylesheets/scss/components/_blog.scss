@@ -35,8 +35,8 @@
 
 .blog {
     .document-form {
-        @include opacity(1);
         @include rem(padding, 1rem);
+        opacity: 1;
         background: $color-background-base-introvert;
 
         .title, .paragraph, .blog-post-edit-title {
@@ -46,16 +46,15 @@
         .paragraph {
             @include rem(font-size, $font-size-small);
             background: $color-background-base;
-            line-height: 1.5;
         }
 
         &.ng-hide-add.ng-hide-add-active,
         &.ng-hide-remove.ng-hide-remove-active {
-            transition: 0.5s linear all;
+            transition: 0.5s linear opacity;
         }
 
         &.ng-hide {
-            @include opacity(0);
+            opacity: 0;
         }
     }
 
@@ -90,11 +89,10 @@
 
 .blog-post-title {
     @include rem(font-size, $font-size-smaller);
-    @include rem(line-height, 15px);
     @include rem(padding, 0 20px);
     background: $color-brand-one-normal;
     float: left;
-    font-weight: $font-weight-normal;
+    font-weight: $font-weight-medium;
     margin: 0;
     text-transform: uppercase;
     position: relative;
@@ -129,7 +127,6 @@
 .blog-post-actions {
     @include rem(font-size, $font-size-small);
     float: right;
-    line-height: 1.25;
 }
 
 .blog-post-actions-item {
@@ -147,8 +144,6 @@
     @include rem(padding, 10px 8px);
 
     p {
-        line-height: 1.5;
-
         &:last-child {
             margin: 0;
         }

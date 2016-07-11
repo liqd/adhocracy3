@@ -506,7 +506,7 @@ export class MapListingController {
 
 export var mapListingInternal = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service
 ) => {
     return {
         scope: {

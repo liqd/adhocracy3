@@ -96,7 +96,6 @@
                 <section data-ng-if="data.winner.name === 'winning' || data.winner.name === 'community'" class="chapter m-jury-decision" id="jury-decision">
                     <section class="jury-decision-section">
                         <h2 class="chapter-header">{{ "TR__MERCATOR_JURY_STATEMENT" | translate }}</h2>
-                        <p>{{ "TR__MERCATOR_PROPOSAL_FUNDING" | translate }}: {{ data.winner.funding }} &euro;</p>
                         <p>{{ data.winner.description }}</p>
                         <div class="jury-decision-section-icon">
                             <i class="icon-star"></i>
@@ -117,12 +116,10 @@
                     <section class="non-action-section">
                         <div class="mercator-proposal-location">
                             <h3>{{ "TR__MERCATOR_PROPOSAL_LOCATION_LABEL" | translate }}:</h3>
-                            <ul class="inline-boxes">
-                                <li data-ng-if="data.location.location_is_online" class="inline-box-online">{{ "TR__ONLINE" | translate }}</li>
-                                <li data-ng-if="data.location.location_is_specific">{{ data.location.location_specific }}</li>
-                                <li data-ng-if="data.location.location_is_linked_to_ruhr">{{ "TR__MERCATOR_PROPOSAL_RUHR" | translate }}</li>
-                                <li data-ng-if="data.finance.other_sources">{{ data.finance.otherSources }}</li>
-                            </ul>
+                            <span class="badge" data-ng-if="data.location.location_is_online">{{ "TR__ONLINE" | translate }}</span>
+                            <span class="badge" data-ng-if="data.location.location_is_specific">{{ data.location.location_specific }}</span>
+                            <span class="badge" data-ng-if="data.location.location_is_linked_to_ruhr">{{ "TR__MERCATOR_PROPOSAL_RUHR" | translate }}</span>
+                            <span class="badge" data-ng-if="data.finance.other_sources">{{ data.finance.otherSources }}</span>
                         </div>
                     </section>
 

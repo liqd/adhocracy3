@@ -9,7 +9,6 @@ import * as AdhHttp from "../Http/Http";
 import * as AdhListing from "../Listing/Listing";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
-import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhUtil from "../Util/Util";
 
 import RIBadgeAssignment from "../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment";
@@ -96,7 +95,7 @@ var createBadgeFacets = (badgeGroups, badges) : AdhListing.IFacetItem[] => {
 };
 
 export var getBadgeFacets = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     $q : angular.IQService
 ) => (
     path : string
@@ -125,7 +124,7 @@ export var getBadgeFacets = (
     };
 
 export var getBadgesFactory = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     $q : angular.IQService
 ) : IGetBadgeAssignments => (
     resource : SIBadgeable.HasSheet,
@@ -166,7 +165,7 @@ export var getBadgesFactory = (
 };
 
 var bindPath = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     $q : angular.IQService
 ) => (
@@ -211,7 +210,7 @@ var bindPath = (
 
 export var badgeAssignment = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     $q : angular.IQService,
@@ -221,12 +220,12 @@ export var badgeAssignment = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Assignment.html",
-        require: "^adhMovingColumn",
         scope: {
+            modals: "=",
             path: "@",
             showDescription: "=?"
         },
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.badgeablePath = scope.path;
             scope.data = {};
 
@@ -266,8 +265,8 @@ export var badgeAssignment = (
 
                             return transaction.commit()
                                 .then((responses) => {
-                                    column.hideOverlay("badges");
-                                    column.alert("TR__BADGE_ASSIGNMENT_UPDATED", "success");
+                                    scope.modals.hideModal("badges");
+                                    scope.modals.alert("TR__BADGE_ASSIGNMENT_UPDATED", "success");
                                 }, (response) => {
                                     scope.serverError = response[0].description;
                                 });
@@ -275,7 +274,7 @@ export var badgeAssignment = (
                     };
 
                     scope.cancel = () => {
-                        column.hideOverlay("badges");
+                        scope.modals.hideModal("badges");
                     };
                 });
             });

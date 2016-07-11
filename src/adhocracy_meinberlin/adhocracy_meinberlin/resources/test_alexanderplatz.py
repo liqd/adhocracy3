@@ -14,7 +14,7 @@ class TestProcess:
         assert meta.iresource is resources.alexanderplatz.IProcess
         assert meta.extended_sheets == (ILocationReference,
                                         )
-        assert meta.workflow_name == 'standard'
+        assert meta.default_workflow == 'standard'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

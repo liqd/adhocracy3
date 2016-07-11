@@ -54,15 +54,15 @@ var bindRedirectsToScope = (scope, adhConfig, adhResourceUrlFilter, $location) =
 
 export var proposalCreateColumnDirective = (
     adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service,
     adhResourceUrlFilter : (path : string) => string,
     $location : angular.ILocationService
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalCreateColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             bindRedirectsToScope(scope, adhConfig, adhResourceUrlFilter, $location);
         }
     };
@@ -80,7 +80,8 @@ export var proposalDetailColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalDetailColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
             adhPermissions.bindScope(scope, () => scope.proposalUrl, "proposalOptions");
 
@@ -102,15 +103,16 @@ export var proposalDetailColumnDirective = (
 
 export var proposalEditColumnDirective = (
     adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service,
     adhResourceUrlFilter : (path : string) => string,
     $location : angular.ILocationService
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalEditColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
             bindRedirectsToScope(scope, adhConfig, adhResourceUrlFilter, $location);
         }
     };
@@ -119,15 +121,16 @@ export var proposalEditColumnDirective = (
 
 export var proposalModerateColumnDirective = (
     adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service,
     adhResourceUrlFilter : (path : string) => string,
     $location : angular.ILocationService
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalModerateColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
             bindRedirectsToScope(scope, adhConfig, adhResourceUrlFilter, $location);
         }
     };
@@ -136,15 +139,15 @@ export var proposalModerateColumnDirective = (
 
 export var proposalListingColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalListingColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
             scope.contentType = RIProposal.content_type;
 
             scope.sorts = [{
@@ -248,7 +251,7 @@ export var registerRoutes = (
             movingColumns: "is-collapse-show-show"
         })
         .specific(RICommentVersion, "", processType, context, ["adhHttp", "$q", (
-            adhHttp : AdhHttp.Service<any>,
+            adhHttp : AdhHttp.Service,
             $q : angular.IQService
         ) => (resource : RICommentVersion) => {
             var specifics = {};
@@ -291,7 +294,7 @@ export var registerRoutes = (
             movingColumns: "is-show-hide-hide"
         })
         .specific(RIProcess, "create_proposal", processType, context, ["adhHttp",
-            (adhHttp : AdhHttp.Service<any>) => {
+            (adhHttp : AdhHttp.Service) => {
                 return (resource : RIProcess) => {
                     return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                         if (!options.POST) {
@@ -316,7 +319,7 @@ export var registerRoutes = (
             space: "content",
             movingColumns: "is-collapse-show-hide"
         })
-        .specific(RIProposal, "moderate", processType, context, ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+        .specific(RIProposal, "moderate", processType, context, ["adhHttp", (adhHttp : AdhHttp.Service) => {
             return (resource : RIProposal) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.canPut(SIWinnerInfo.nick)) {
@@ -333,7 +336,7 @@ export var registerRoutes = (
             space: "content",
             movingColumns: "is-collapse-show-hide"
         })
-        .specific(RIProposal, "edit", processType, context, ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+        .specific(RIProposal, "edit", processType, context, ["adhHttp", (adhHttp : AdhHttp.Service) => {
             return (resource : RIProposal) => {
                 var poolPath = AdhUtil.parentPath(resource.path);
 

@@ -121,7 +121,7 @@ def includeme(config):
     config.include('.rest')
     config.include('.stats')
     config.registry.registerUtility('', IFixtureAsset,
-                                    name='adhocracy_core:test_fixture')
+                                    name='adhocracy_core:test_users_fixture')
 
 
 def _create_authentication_policy(settings, config: Configurator)\

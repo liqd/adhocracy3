@@ -15,15 +15,15 @@ def integration(integration):
 
 @mark.usefixtures('integration')
 def test_includeme_add_stadtforum(registry):
-    from adhocracy_core.workflows import AdhocracyACLWorkflow
+    from adhocracy_core.workflows import ACLLocalRolesWorkflow
     workflow = registry.content.workflows['stadtforum']
-    assert isinstance(workflow, AdhocracyACLWorkflow)
+    assert isinstance(workflow, ACLLocalRolesWorkflow)
 
 @mark.usefixtures('integration')
 def test_includeme_add_stadtforum_poll(registry):
-    from adhocracy_core.workflows import AdhocracyACLWorkflow
+    from adhocracy_core.workflows import ACLLocalRolesWorkflow
     workflow = registry.content.workflows['stadtforum_poll']
-    assert isinstance(workflow, AdhocracyACLWorkflow)
+    assert isinstance(workflow, ACLLocalRolesWorkflow)
 
 
 def _post_poll_item(app_user, path='') -> TestResponse:

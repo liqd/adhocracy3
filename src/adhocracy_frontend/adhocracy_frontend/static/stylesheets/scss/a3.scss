@@ -1,19 +1,6 @@
-@import "susy";
-
-@import "grid";
-
-@import "compass/css3";
-@import "compass/css3/inline-block";
-@import "compass/css3/text-shadow";
-@import "compass/utilities/general/clearfix";
-@import "general/future";
-@import "general/a11y";
-
-@import "general/fonts";
-@import "third_party/adhocracy3-icons-rails";
-
-@import "third_party/normalize";
-@import "general/normalize";
+@import "../../lib/sass-planifolia/sass/math";
+@import "../../lib/sass-planifolia/sass/contrast";
+@import "../../lib/sass-planifolia/sass/grid";
 
 @import "general/variables";
 @import "general/variables_theme";
@@ -21,6 +8,15 @@
 @import "general/variables_doc";
 
 @import "general/mixins";
+@import "general/future";
+
+@import "general/fonts";
+@import "third_party/adhocracy3-icons-rails";
+
+@import "third_party/normalize";
+@import "general/normalize";
+
+@import "grid";
 @import "layout";
 
 @import "components/type";
@@ -59,6 +55,7 @@
 @import "components/markdown";
 @import "components/image_upload";
 @import "components/workflow_switch";
+@import "components/resource_header";
 
 @import "third_party/social_share";
 

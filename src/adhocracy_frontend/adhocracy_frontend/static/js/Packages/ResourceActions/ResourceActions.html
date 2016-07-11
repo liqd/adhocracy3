@@ -1,26 +1,37 @@
 <div class="action-bar">
-    <adh-edit-action
+    <adh-view-action
         data-ng-if="edit && resourcePath && options.PUT"
         data-class="action-bar-item"
-        data-parent-path="parentPath"
-        data-resource-path="{{resourcePath}}"></adh-edit-action>
-    <adh-moderate-action
+        data-view="edit"
+        data-label="TR__EDIT"
+        data-resource-path="{{resourcePath}}"></adh-view-action>
+    <adh-view-action
         data-ng-if="moderate && resourcePath"
         data-class="action-bar-item"
-        data-parent-path="parentPath"
-        data-resource-path="{{resourcePath}}"></adh-moderate-action>
-    <adh-report-action
+        data-view="moderate"
+        data-label="TR__MODERATE"
+        data-resource-path="{{resourcePath}}"></adh-view-action>
+    <adh-assign-badges-action
+        data-ng-if="assignBadges && resourcePath"
+        data-modals="modals"
+        data-class="action-bar-item"
+        data-resource-with-badges-url="{{resourceWithBadgesUrl}}"
+        data-resource-path="{{resourcePath}}"></adh-assign-badges-action>
+    <adh-modal-action
         data-ng-if="report"
         data-modals="modals"
-        data-class="action-bar-item"></adh-report-action>
-    <adh-share-action
+        data-modal="abuse"
+        data-label="TR__REPORT"
+        data-class="action-bar-item"></adh-modal-action>
+    <adh-modal-action
         data-ng-if="share"
         data-modals="modals"
-        data-class="action-bar-item"></adh-share-action>
+        data-modal="share"
+        data-label="TR__SHARE"
+        data-class="action-bar-item"></adh-modal-action>
     <adh-hide-action
         data-ng-if="hide && resourcePath && options.hide"
         data-class="action-bar-item"
-        data-parent-path="parentPath"
         data-redirect-url="{{deleteRedirectUrl}}"
         data-resource-path="{{resourcePath}}"></adh-hide-action>
     <adh-resource-widget-delete-action
@@ -34,26 +45,31 @@
     <adh-cancel-action
         data-ng-if="cancel && resourcePath"
         data-class="action-bar-item"
-        data-parent-path="parentPath"
         data-resource-path="{{resourcePath}}"></adh-cancel-action>
 </div>
 
-<ul class="moving-column-alerts">
-    <li data-ng-repeat="(id, alert) in modals.alerts" class="moving-column-alert m-{{alert.mode}}" data-ng-click="modals.removeAlert(id)">
+<ul class="alerts">
+    <li data-ng-repeat="(id, alert) in modals.alerts" class="alerts-message m-{{alert.mode}}" data-ng-click="modals.removeAlert(id)">
         {{ alert.message | translate }}
     </li>
 </ul>
 
-<div class="action-bar-modal" data-ng-if="modals.overlay">
+<div class="modal" data-ng-if="modals.modal">
     <adh-report-abuse
-        data-ng-if="modals.overlay === 'abuse'"
+        data-ng-if="modals.modal === 'abuse'"
         data-modals="modals"
         class="report-abuse"
-        data-url="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}">
+        data-url="{{ resourcePath | adhResourceUrl | adhCanonicalUrl }}">
     </adh-report-abuse>
 
-    <div data-ng-if="modals.overlay === 'share'">
-        <adh-social-share data-uri="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}"></adh-social-share>
-        <a href="" class="button" data-ng-click="modals.hideOverlay('share')">{{ "TR__CANCEL" | translate }}</a>
+    <adh-badge-assignment
+        data-ng-if="modals.modal === 'badges'"
+        data-modals="modals"
+        data-path="{{resourcePath}}">
+    </adh-badge-assignment>
+
+    <div data-ng-if="modals.modal === 'share'">
+        <adh-social-share data-uri="{{ resourcePath | adhResourceUrl | adhCanonicalUrl }}"></adh-social-share>
+        <a href="" class="button" data-ng-click="modals.hideModal('share')">{{ "TR__CANCEL" | translate }}</a>
     </div>
 </div>

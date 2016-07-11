@@ -15,7 +15,28 @@ def integration(integration):
 
 
 @fixture
-def registry(registry_with_content):
+def mock_sheet_metadata(mock_sheet):
+    from adhocracy_core.sheets import sheet_meta
+    from adhocracy_core.sheets.metadata import  IMetadata
+    mock_sheet_metadata = mock_sheet.copy()
+    mock_sheet_metadata.meta = sheet_meta._replace(isheet=IMetadata)
+    return mock_sheet_metadata
+
+@fixture
+def mock_sheets_create(mock_sheet):
+    return [mock_sheet]
+
+
+@fixture
+def mock_sheets_edit(mock_sheet, mock_sheet_metadata):
+    return [mock_sheet, mock_sheet_metadata]
+
+
+@fixture
+def registry(registry_with_content, mock_sheets_create, mock_sheets_edit):
+    registry_with_content.content.get_sheets_create.return_value = \
+        mock_sheets_create
+    registry_with_content.content.get_sheets_edit.return_value = mock_sheets_edit
     return registry_with_content
 
 
@@ -95,7 +116,7 @@ def test_audit_resources_changes_callback_empty_changelog(request_, context,
     assert len(all_entries) == 0
 
 
-def test_audit_resource_changes_callback(request_, context, changelog,
+def test_audit_resource_changes_callback(request_, context, changelog, registry,
                                          mock_get_user_info):
     from . import audit_resources_changes_callback
     from . import get_auditlog
@@ -153,14 +174,15 @@ class TestAuditlog:
         from BTrees.OOBTree import OOBTree
         assert isinstance(inst, OOBTree)
 
-    def test_add(self, inst):
+    def test_add(self, inst, mocker):
         import datetime
         from adhocracy_core.interfaces import AuditlogEntry
         name = 'created'
         resource_path = '/resource1'
         user_name = 'user1'
         user_path = '/user1'
-        inst.add(name, resource_path, user_name, user_path)
+        mock_sheet_data = mocker.Mock()
+        inst.add(name, resource_path, user_name, user_path, mock_sheet_data)
         key, value = inst.items()[0]
         assert isinstance(key, datetime.datetime)
         assert isinstance(value, AuditlogEntry)
@@ -168,6 +190,7 @@ class TestAuditlog:
         assert value.resource_path == resource_path
         assert value.user_name == user_name
         assert value.user_path == user_path
+        assert value.sheet_data == mock_sheet_data
 
 
 class TestSetAuditlog:
@@ -244,26 +267,30 @@ class TestAddAuditEvent:
         monkeypatch.setattr(auditing, 'get_auditlog', mock)
         return mock
 
-    def call_fut(self, context, name, user_name, user_path):
+    def call_fut(self, context, name, user_name, user_path, sheet_data):
         from . import log_auditevent
         return log_auditevent(context,
-                              name, user_name, user_path)
+                              name, user_name, user_path, sheet_data)
 
     def test_ignore_if_no_auditlog(self, context, mock_get_auditlog,
-                                   mock_auditlog):
+                                   mock_auditlog, mocker):
         mock_get_auditlog.return_value = None
-        self.call_fut(context, 'created', 'user1', '/user1')
+        mock_sheet_data = mocker.Mock()
+        self.call_fut(context, 'created', 'user1', '/user1', mock_sheet_data)
         assert mock_auditlog.add.called is False
 
     def test_add_if_auditlog(self, context, mock_auditlog,
-                             mock_get_auditlog):
+                             mock_get_auditlog, mocker):
         mock_get_auditlog.return_value = mock_auditlog
-        self.call_fut(context, 'created', 'user1', '/user1')
+        mock_sheet_data = mocker.Mock()
+        self.call_fut(context, 'created', 'user1', '/user1', mock_sheet_data)
         assert mock_auditlog.add.called_with('/',
                                              'created',
                                              '/resource1',
                                              'user1',
-                                             '/user1')
+                                             '/user1',
+                                             mock_sheet_data)
+
 
 
 class TestGetAuditActionName:
