@@ -91,7 +91,7 @@ Textinput that represents a title.
 ```
 */
 
-.error-state {
+%error-state {
     border-color: $color-function-negative;
     color: $color-function-negative;
     outline: 1px solid $color-function-negative;
@@ -124,7 +124,7 @@ textarea {
     }
 
     &.ng-dirty.ng-invalid {
-        @extend .error-state;
+        @extend %error-state;
         border-color: $color-function-negative;
         color: $color-function-negative;
         outline: 1px solid $color-function-negative;
@@ -151,7 +151,7 @@ textarea {
     select,
     textarea {
         &.ng-invalid {
-            @extend .error-state;
+            @extend %error-state;
         }
     }
 }
