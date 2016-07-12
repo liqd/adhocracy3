@@ -112,13 +112,6 @@ Proposal detail article.
         @include rem(margin-right, 8px);
         vertical-align: middle;
     }
-
-    .proposal-detail-meta-item-comments,
-    .proposal-detail-meta-item-location {
-        a {
-            color: $color-text-highlight-introvert;
-        }
-    }
 }
 
 .proposal-detail {
