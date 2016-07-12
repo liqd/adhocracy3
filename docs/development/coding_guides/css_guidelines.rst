@@ -14,25 +14,6 @@ applied in any project which needs CSS code.
 - UI designers and graphic designers should also read `CSS and Design`_.
 - JavaScript programmers should also read `CSS, HTML, and JavaScript`_.
 
-Goals
------
-
-There are several goals we want to accomplish by the processes and rules
-described in this document:
-
-1. We want the collaboration within the project to work well. This
-   includes clear responsibilities and a common language in which we can
-   communicate. The collaboration should still work if new people come
-   into the project or the size of the team changes dramatically.
-
-2. We want our code to run smoothly with very few bugs and little
-   maintenance work. It should be easy to add new parts or replace existing
-   ones. It should be easy to derive customized themes.  Using derived themes
-   after an upgrade of the core CSS code should be easy.
-
-3. We want to deliver a great product with a flawless and accessible
-   user experience (UX).
-
 Common Terminology
 ------------------
 
@@ -69,25 +50,10 @@ and *input boxes*.
 
 Widget Objects
 ++++++++++++++
-
 Widgets are the most common objects. They can be reused throughout the UI. A
 typical widget is a *button* or a *login dialog*. While base objects are
 limited to existing HTML elements we can define our own widgets.
 
-Page
-++++
-
-FIXME: definition
-
-A page does not only include all objects that are rendered to screen. It also
-contains some meta data like title, description and image that might be used by
-third part services (facebook, google, …) to render a preview.
-
-Installation
-++++++++++++
-
-An installation includes a complete installment of the product. Apart from all
-pages it also includes some global meta data like title, URL and favicon.
 
 Layout Objects
 ++++++++++++++
@@ -133,25 +99,6 @@ it wherever we want. We could for example define the variable
 ``primary-color`` and use it throughout the UI. This would allow us to
 later change that color in a single place instead of change the complete
 code wich of course improves consistency and makes theming easy.
-
-Mixins
-++++++
-
-Some styling is not specific to an object but instead is shared by many
-different objects. This is called a *mixin* because it can simply be
-added to an object. A typical example would be a gradient: You may want
-to use the same type of gradient, but with different colors and on
-different objects.
-
-Mixins are similar to variables in that they store something that can be
-used anywhere in the UI. But whereas variables store single values, mixins
-can store complex sets of rules.
-
-Adjustments
-+++++++++++
-
-Any code that can not be reused is called an *adjustment*. Adjustments
-should be avoided wherever possible.
 
 Core, Themes, and Default Theme
 +++++++++++++++++++++++++++++++
@@ -224,11 +171,6 @@ JavaScript programmers.
 
 -  JavaScript does not set any CSS on elements. Instead it adds/removes
    states.
--  There is a mechanism to track classes used by JavaScript code. It
-   should help in tracking which classes are actually used and which are
-   dead code. See the CSS typescript module
-   (``/src/adhocracy/adhocracy/frontend/static/js/Adhocracy/Css.ts``)
-   for more information.
 -  Some CSS testing should be done in browser tests, i.e. CSS and JavaScript
    developers should work together on this.
 
@@ -244,24 +186,9 @@ object types. All classes are lowercase and hyphen-separated.
 -  element: class (prefix: widget name)
 -  state: pseudo-class, attribute, class (prefix: ``is-`` or ``has-``)
 -  modifier: class (prefix: ``m-``)
--  mixin: none (handled internally in CSS)
 
 CSS Specifics
 -------------
-
-Framework
-+++++++++
-
-CSS frameworks like `bootstrap <http://getbootstrap.com/>`_ and
-`foundation <http://foundation.zurb.com>`_ have become popular in recent
-years. However we decided to not use any of them because all of those
-frameworks do more than we wanted them to do. For example they all
-include button layouts which collide with our own. This has led to UI bugs
-in the past.
-
-While we do not use a full framework we try to be somewhat compatible in
-both code structure and wording. It may be possible to reuse code from
-those frameworks as modules in our own code.
 
 Preprocessor
 ++++++++++++
@@ -273,16 +200,6 @@ Major contenders are `Sass <http://sass-lang.com/>`_,
 `Stylus <http://learnboost.github.io/stylus/>`_. We had good expiriences
 with Sass so we will stick with it. CSS developers must read the `Sass
 documentation <http://sass-lang.com/documentation/file.SASS_REFERENCE.html>`_.
-
-There are many more interesting projects in that ecosystem. Currently, we are
-not using any of these. But we might be using some in the future.
-
--  https://github.com/Team-Sass/breakpoint
--  https://github.com/simko-io/animated.sass
--  http://susy.oddbird.net/
-
--  http://www.sitepoint.com/my-favorite-sass-tools/
--  http://hackingui.com/front-end/10-best-scss-utilities/
 
 
 Documentation and Style Guide
@@ -324,15 +241,6 @@ including its states and modifiers. Several base objects may be
 included in a single module if they are closely related. The same goes
 for layout, variables, and mixins. Adjustments must go into separate
 modules.
-
-It is recommended to use (modified) modules from 3rd party projects such
-as bootstrap_ or foundation_.
-
-All SCSS files not to be compiled on their own must begin with
-an underscore (``_``). They must be structured into folders reflecting
-the common terminology: ``widgets``, ``layout``, ``base``, ``states``
-(only global states), ``variables``, ``mixins``. Further structure may
-be added as needed.
 
 Variables
 ~~~~~~~~~
@@ -392,14 +300,6 @@ There are two ways to implement mixins in Sass: ``@mixin`` and
 There is no rule about which one is preferred. As ``@mixin`` is simpler to use
 you might by tempted to use it exclusively. Always stop and also consider
 ``@extend``.
-
-Theming
-~~~~~~~
-
-Each theme replicates the directory structure of core. Sass must be
-configured so that both theme and core are in the import path. This
-allows to import all modules from core while making it easy to overwrite
-a module by adding a corresponding file to the theme.
 
 Formatting
 ++++++++++
