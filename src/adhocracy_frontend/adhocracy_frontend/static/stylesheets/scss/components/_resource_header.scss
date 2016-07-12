@@ -101,7 +101,7 @@ parent: resource-header
 Resource headers can have a background image.
 
 ```html_example
-<div class="resource-header-wrapper" style="background-image: url('/static/images/sample.jpg')">
+<div class="image-background" style="background-image: url('/static/images/sample.jpg')">
     <header class="resource-header m-image">
         <div class="resource-header-navigation">
             <div class="resource-header-breadcrumbs">
@@ -130,9 +130,4 @@ Resource headers can have a background image.
     .resource-header-meta {
         color: inherit;
     }
-}
-
-.resource-header-wrapper {
-    background-size: cover;
-    background-position: 50%;
 }

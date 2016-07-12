@@ -1,14 +1,10 @@
 <article class="proposal-detail">
-    <header class="resource-header">
 
-        <div class="proposal-detail-image-clip" data-ng-if="data.picture">
-            <adh-show-image
-                data-css-path="proposal-detail-image"
-                data-no-fallback="true"
-                data-path="{{data.picture}}"
-            ></adh-show-image>
-        </div>
-
+    <adh-background-image
+        data-css-path="proposal-detail-image"
+        data-no-fallback="true"
+        data-path="{{data.picture}}">
+    <header class="resource-header" data-ng-class="{'m-image': data.picture}">
         <div class="resource-header-main">
             <div class="resource-header-meta">
                 <span
@@ -47,6 +43,8 @@
             </div>
         </div>
     </header>
+    </adh-background-image>
+
 
     <section class="proposal-detail-body">
         <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="disguised-link proposal-detail-body-comments">
