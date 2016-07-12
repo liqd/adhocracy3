@@ -95,15 +95,17 @@ $thumbnail-height: 90px;
             background: $color-background-base;
         }
     }
+
+    &.m-contains-image {
+        .proposal-list-item-body {
+            margin-left: $thumbnail-width + $image-margin;
+        }
+    }
 }
 
 .proposal-list-item-image {
     float: left;
     margin-right: $image-margin;
-}
-
-.m-contains-image .proposal-list-item-body {
-    margin-left: $thumbnail-width + $image-margin;
 }
 
 .proposal-list-item-title,
