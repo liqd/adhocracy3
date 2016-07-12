@@ -731,22 +731,21 @@ def remove_token_storage(root, registry):  # pragma: no cover
 @log_migration
 def set_default_workflow(root, registry):  # pragma: no cover
     """Set default workflow if no workflow in IWorkflowAssignment sheet."""
+    from adhocracy_core.utils import get_iresource
     from adhocracy_core.sheets.workflow import IWorkflowAssignment
     catalogs = find_service(root, 'catalogs')
-    for iresource, meta in registry.content.resources_meta.items():
-        has_assignment = IWorkflowAssignment in meta.basic_sheets \
-            or IWorkflowAssignment in meta.extended_sheets
-        if has_assignment and meta.default_workflow:
-            resources = _search_for_interfaces(catalogs, iresource)
-            for resource in resources:
-                sheet = registry.content.get_sheet(resource,
-                                                   IWorkflowAssignment)
-                workflow_name = sheet.get()['workflow']
-                if not workflow_name:
-                    logger.info('Set default workflow {0} for {1}'.format(
-                        meta.default_workflow, resource))
-                    sheet._store_data({'workflow': meta.default_workflow},
-                                      initialize_workflow=False)
+    resources = _search_for_interfaces(catalogs, IWorkflowAssignment)
+    for resource in resources:
+        iresource = get_iresource(resource)
+        meta = registry.content.resources_meta[iresource]
+        default_workflow_name = meta.default_workflow
+        sheet = registry.content.get_sheet(resource, IWorkflowAssignment)
+        workflow_name = sheet.get()['workflow']
+        if not workflow_name and default_workflow_name:
+            logger.info('Set default workflow {0} for {1}'.format(
+                default_workflow_name, resource))
+            sheet._store_data({'workflow': meta.default_workflow},
+                              initialize_workflow=False)
 
 
 @log_migration
@@ -755,14 +754,11 @@ def add_local_roles_for_workflow_state(root,
     """Add local role of the current workflow state for all processes."""
     from adhocracy_core.authorization import add_local_roles
     from adhocracy_core.resources.process import IProcess
-    from adhocracy_core.sheets.workflow import IWorkflowAssignment
     catalogs = find_service(root, 'catalogs')
     resources = _search_for_interfaces(catalogs, IProcess)
     count = len(resources)
     for index, resource in enumerate(resources):
-        workflow = registry.content.get_sheet_field(resource,
-                                                    IWorkflowAssignment,
-                                                    'workflow')
+        workflow = registry.content.get_workflow(resource)
         state_name = workflow.state_of(resource)
         local_roles = workflow._states[state_name].local_roles
         logger.info('Update workflow local roles for resource {0} - {1} of {2}'
