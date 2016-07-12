@@ -33,11 +33,11 @@ actions (edit, share, report, print, ...).
 .resource-header {
     position: relative;
     padding: $padding-small;
-    border-bottom: 1px solid $color-structure-introvert;
+    margin-bottom: $padding-small;
 }
 
 .resource-header-main {
-    @include rem(margin, 3em auto 5rem);
+    @include rem(margin, 3em auto 4rem);
     max-width: 40em;
     text-align: center;
 }
@@ -49,6 +49,7 @@ actions (edit, share, report, print, ...).
 
 .resource-header-title {
     @include rem(margin-bottom, 1.2rem);
+    font-size: 200%;
 }
 
 .resource-header-meta {
@@ -68,6 +69,10 @@ actions (edit, share, report, print, ...).
         &:last-child::after {
             content: none;
         }
+    }
+
+    a {
+        color: inherit;
     }
 }
 
@@ -119,7 +124,7 @@ Resource headers can have a background image.
 */
 .resource-header.m-image {
     color: $color-text-inverted;
-    background: rgba($color-brand-one-introvert, 0.7);
+    background: rgba($color-brand-one-introvert, 0.8);
 
     .resource-header-title,
     .resource-header-meta {
