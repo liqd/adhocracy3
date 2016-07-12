@@ -4,15 +4,21 @@ CSS
 Preface
 -------
 
-This document describes the CSS development process in the context of
-Adhocracy 3. However, it is not specific to Adhocracy 3 and can be
-applied in any project which needs CSS code.
+In recent years, methodologies like
+`OOCSS <https://github.com/stubbornella/oocss/wiki>`_,
+`SMACSS <http://smacss.com>`_,
+`BEM <http://bem.info/method/definitions/>`_,
+`SUIT <https://github.com/suitcss/suit/>`_,
+`Pattern driven Design <http://www.patterndrivendesign.com/>`_, and
+`Atomic Design <http://patternlab.io/about.html>`_ have shifted the
+focus from designing pages to designing systems.
 
-- If you are a CSS developer you should read the whole document.
-- Everyone concerned with the frontend should read `Goals`_ and
-  `Common Terminology`_.
-- UI designers and graphic designers should also read `CSS and Design`_.
-- JavaScript programmers should also read `CSS, HTML, and JavaScript`_.
+The best known application of this is probably `bootstrap
+<https://getbootstrap.com/>`_. But as one of bootstraps main developers
+said: You are encouraged to `build your own bootstrap
+<https://speakerdeck.com/mdo/build-your-own-bootstrap>`_.  This document
+describes the details of how we create our own design system for
+adhocracy3.
 
 Common Terminology
 ------------------
@@ -20,17 +26,8 @@ Common Terminology
 To work together it is important to share a common language.
 Unfortunately, JavaScript programmers, CSS developers, and graphic
 designers sometimes have very different angles on the same things.
-
-With the following terms I try to find (and name) common grounds. This
-terminology is largely based on existing systems like
-`OOCSS <https://github.com/stubbornella/oocss/wiki>`_,
-`SMACSS <http://smacss.com>`_,
-`BEM <http://bem.info/method/definitions/>`_,
-`SUIT <https://github.com/suitcss/suit/>`_, and
-`Pattern Lab <http://patternlab.io/about.html>`_. The basic idea is to apply
-concepts known from object oriented programming (OOP) to CSS code. The
-descriptions are written so that non-programmers should be able to grasp
-them easily.
+The following terminology is therefore based on the tried and tested
+systems mentioned above.
 
 We think of elements in the user interface (UI) as *objects*. A typical
 object might be a link, button or a list. It is important to understand
