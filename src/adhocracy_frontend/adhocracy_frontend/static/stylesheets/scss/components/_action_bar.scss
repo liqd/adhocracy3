@@ -61,7 +61,7 @@ An action can trigger showing a modal below the action bar.
 ```
 */
 .action-bar,
-.action-bar-link {
+.action-bar-item {
     line-height: 2;
 }
 
@@ -99,7 +99,6 @@ An action can trigger showing a modal below the action bar.
     }
 
     .map-switch-item {
-        @extend .action-bar-link;
         @include rem(margin, 0 0 0 5px);
 
         &.m-selected {
