@@ -295,9 +295,11 @@ class ResourceContentRegistry(ContentRegistry):
                                         IWorkflowAssignment,
                                         'workflow')
         except RuntimeConfigurationError:
-            workflow = None
+            name = ''
+        if name:
+            workflow = self.workflows[name]
         else:
-            workflow = self.workflows.get(name, None)
+            workflow = None
         return workflow
 
 
