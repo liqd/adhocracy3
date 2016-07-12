@@ -1,5 +1,5 @@
-<article class="idea-collection-proposal-detail">
-    <header class="idea-collection-proposal-detail-header">
+<article class="proposal-detail">
+    <header class="proposal-detail-header">
 
         <div class="proposal-detail-image-clip" data-ng-if="data.picture">
             <adh-show-image
@@ -17,33 +17,33 @@
                 'm-on-test': assignment.name === 'on_test'
             }">{{ assignment.title | translate }}</span>
 
-        <ul class="idea-collection-proposal-detail-meta">
-            <li data-ng-if="processOptions.hasLocationText" class="idea-collection-proposal-detail-meta-item idea-collection-proposal-detail-meta-item-location">
+        <ul class="proposal-detail-meta">
+            <li data-ng-if="processOptions.hasLocationText" class="proposal-detail-meta-item proposal-detail-meta-item-location">
                 <i class="icon-pin-detail"></i> {{data.locationText}}
             </li>
-            <li class="idea-collection-proposal-detail-meta-item idea-collection-proposal-detail-meta-item-comments">
+            <li class="proposal-detail-meta-item proposal-detail-meta-item-comments">
                 <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="disguised-link">
                     <i class="icon-speechbubble"></i> {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}
                 </a>
             </li>
             <li data-ng-if="!processOptions.maxBudget"></li>
-            <li class="idea-collection-proposal-detail-meta-item idea-collection-proposal-detail-meta-budget">
-                <div data-ng-if="processOptions.maxBudget"><i class="idea-collection-proposal-detail-meta-item-icon icon-budget"></i> {{data.budget | numberOrDash}} &euro;</div>
+            <li class="proposal-detail-meta-item proposal-detail-meta-budget">
+                <div data-ng-if="processOptions.maxBudget"><i class="proposal-detail-meta-item-icon icon-budget"></i> {{data.budget | numberOrDash}} &euro;</div>
             </li>
-            <li class="idea-collection-proposal-detail-meta-item idea-collection-proposal-detail-meta-participation">
+            <li class="proposal-detail-meta-item proposal-detail-meta-participation">
                 <adh-rate data-refers-to="{{path}}"></adh-rate>
             </li>
         </ul>
-        <h1 class="idea-collection-proposal-detail-header-title">{{ data.title }}</h1>
+        <h1 class="proposal-detail-header-title">{{ data.title }}</h1>
     </header>
 
-    <section class="idea-collection-proposal-detail-body">
-        <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="disguised-link idea-collection-proposal-detail-body-comments">
+    <section class="proposal-detail-body">
+        <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="disguised-link proposal-detail-body-comments">
             <i class="icon-speechbubble"></i> {{ data.commentCount }}
         </a>
-        <p class="idea-collection-proposal-detail-detail">{{data.detail}}</p>
+        <p class="proposal-detail-detail">{{data.detail}}</p>
 
-        <p class="idea-collection-proposal-detail-author">
+        <p class="proposal-detail-author">
             {{ "TR__BY" | translate }}
             <adh-user-meta data-path="{{data.creator}}" data-ng-if="data.creator"></adh-user-meta><br/>
             {{ "TR__ON" | translate }}
@@ -51,7 +51,7 @@
         </p>
     </section>
 
-    <section class="idea-collection-proposal-badge-descriptions">
+    <section class="proposal-badge-descriptions">
         <div
             data-ng-repeat="assignment in data.assignments"
             data-ng-if="assignment.description"
