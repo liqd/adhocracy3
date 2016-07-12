@@ -111,6 +111,28 @@ msgstr ""
 "\n"
 "Your \"${site_name}\" Team"
 
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:298
+msgid "mail_send_activity_remove_body_txt"
+msgstr ""
+"${activity_description}\n"
+"\n"
+"Hier geht es zum Prozess: ${target_url}\n"
+"\n"
+"Herzliche Grüße,"
+"\n"
+"Das meinBerlin-Team"
+
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:304
+msgid "mail_send_activity_add_update_body_txt"
+msgstr ""
+"${activity_description}\n"
+"\n"
+"Hier geht es zum Beitrag: ${object_url}\n"
+"\n"
+"Herzliche Grüße,"
+"\n"
+"Das meinBerlin-Team"
+
 
 #: src/adhocracy_core/adhocracy_core/resources/document.py:47
 msgid "Document"
@@ -129,6 +151,10 @@ msgstr "Kommentar"
 #: src/adhocracy_core/adhocracy_core/resources/proposal.py:47
 msgid "Proposal"
 msgstr "Beitrag"
+
+#: src/adhocracy_core/adhocracy_core/resources/idea collection.py:14
+msgid "IdeaCollectionProcess"
+msgstr "Prozess"
 
 #. Default: ${subject_name} added a ${object_type_name} to ${target_title}.
 #: src/adhocracy_core/adhocracy_core/auditing/__init__.py:254
@@ -150,18 +176,14 @@ msgstr "ein ${object_type_name} wurde geändert."
 #: src/adhocracy_core/adhocracy_core/auditing/__init__.py:292
 msgid "activity_description_add"
 msgstr ""
-"${subject_name} hat den ${object_type_name} \"${object_title}\" im ${target_type_name} ${target_title} hinzugefügt.\n"
-"\n"
-"Hier geht es zum ${object_type_name}: ${object_url}"
+"${subject_name} hat den ${object_type_name} \"${object_title}\" im ${target_type_name} ${target_title} hinzugefügt."
 
 
 #. Default: ${subject_name} updated ${object_type_name} "${object_title}".
 #: src/adhocracy_core/adhocracy_core/auditing/__init__.py:298
 msgid "activity_description_update"
 msgstr ""
-"${subject_name} hat den ${object_type_name} \"${object_title}\" im ${target_type_name} ${target_title} geändert.\n"
-"\n"
-"Hier geht es zum ${object_type_name}: ${object_url}"
+"${subject_name} hat den ${object_type_name} \"${object_title}\" im ${target_type_name} ${target_title} geändert."
 
 
 #. Default: ${subject_name} removed the ${object_type_name} "${object_title}"
@@ -169,6 +191,4 @@ msgstr ""
 #: src/adhocracy_core/adhocracy_core/auditing/__init__.py:303
 msgid "activity_description_remove"
 msgstr ""
-"${subject_name} hat den ${object_type_name} \"${object_title}\" im ${target_type_name} ${target_title} gelöscht.\n"
-"\n"
-"Hier geht es zum ${target_type_name}: ${target_url}"
+"${subject_name} hat den ${object_type_name} \"${object_title}\" im ${target_type_name} ${target_title} gelöscht."
