@@ -80,7 +80,7 @@ Vertical
         @include rem(font-size, $font-size-normal);
         float: none;
 
-        i:not(.m-definition-before):not(.m-definition-after), &.meta-list-item-rate {
+        i:not(.m-definition-before), &.meta-list-item-rate {
             display: none;
         }
     }

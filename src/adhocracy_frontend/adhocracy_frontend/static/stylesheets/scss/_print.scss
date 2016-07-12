@@ -43,7 +43,6 @@ If this is placed on an icon the icon will be replaced by the text.
 
 ```html_example
 <p><i class="icon-speechbubble m-definition-before" title="Comments:"></i> 23</p>
-<p class="m-definition-after" title="after VAT">50000 &euro;</p>
 <p class="m-definition-before" title="Total budget:">50000 &euro;</p>
 ```
 */
@@ -67,19 +66,8 @@ If this is placed on an icon the icon will be replaced by the text.
         }
     }
 
-    .m-definition-after,
     .m-definition-before {
         text-transform: capitalize;
-
-        &:after {
-            content: " " attr(title);
-        }
-    }
-
-    .m-definition-before {
-        &:after {
-            content: "";
-        }
 
         &:before {
             content: attr(title) " ";
@@ -87,16 +75,9 @@ If this is placed on an icon the icon will be replaced by the text.
         }
     }
 
-    i.m-definition-before,
-    i.m-definition-after {
+    i.m-definition-before {
         font-size: $font-size-plus !important;
         font-style: normal;
         vertical-align: baseline;
-    }
-
-    i.m-definition-after {
-        &:before {
-            display: none;
-        }
     }
 }
