@@ -29,73 +29,63 @@ designers sometimes have very different angles on the same things.
 The following terminology is therefore based on the tried and tested
 systems mentioned above.
 
-We think of elements in the user interface (UI) as *objects*. A typical
-object might be a link, button or a list. It is important to understand
-the difference between a specific object (e.g. "the safe button in the
-login view") and its *class* ("button").
-
-We distinguish several types of objects. There are also the related
-concepts *state*, *modifier*, *variable*, *mixin*, and *adjustment*.
-
-Base Objects
+Base Styling
 ++++++++++++
 
-When HTML elements are used without any special modifications, they are called
-base objects. The basic styling of these elements sets the prevailing mood for
-a product. This involves general *text styling* as well as *links*, *headings*,
-and *input boxes*.
+Base styling is the styling that applies to HTML elements when no
+additional classes are added. It sets the prevailing mood for a product.
+This involves general *text styling* as well as *links*, *headings*, and
+*input boxes*.
 
-Widget Objects
-++++++++++++++
-Widgets are the most common objects. They can be reused throughout the UI. A
-typical widget is a *button* or a *login dialog*. While base objects are
-limited to existing HTML elements we can define our own widgets.
+Layout
+++++++
 
+The layout defines the position of elements on a page. It is typically
+based on a grid system.
 
-Layout Objects
-++++++++++++++
+Components
+++++++++++
 
-The layout defines the basic structure of a page. Typical layout objects
-are *header*, *main*, *aside*, and *footer*. Of most layout objects there
-is only a single instance on a page (e.g. only one header and footer).
+There are many synonyms for this in the different methodologies:
+Object (OOCSS), module (Smacss), block (BEM), atom/molecule/organism
+(Atomic Design), or pattern (pattern driven design).
 
-The styling of layout objects must only define position and size. Any
-other styling must be applied to objects inside of the them.
+Components are independent of their context and can be reused throughout
+the UI. A typical component is a *button* or a *login dialog*. The rule
+of thumb is: If in doubt, it is a component.
 
-Element Objects
-+++++++++++++++
+Element
++++++++
 
-We call objects within widgets *elements* of that widget. An element may
-be a widget itself. If an element appears in more than one widget it must
-be a widget.
+An element is a part of a component that can not be used on its own. A
+typical example is a menu item (always part of a menu component).
 
 States
 ++++++
 
-Widgets or base objects may have one or more *states* (e.g. *hover*,
-*active*, or *hidden*). States may either be applicable to any object
-(*hidden*) or only to specific objects (*hover*, *active*).
+Components may have different *states* (e.g. *hover*, *active*, or
+*hidden*). States are always bound to specific components (e.g. there is
+no general *active* state).
 
 Modifiers
 +++++++++
 
-Widgets can have derived, modified versions. For example, there could
+Components can have derived, modified versions. For example, there could
 be a button and a *call-to-action* button. In this case, call-to-action
-would be a modifier. In terms of OOP, a modifier is similar to a
-subclass.
+would be a modifier. (If you know about object oriented programming:
+this is similar to a subclass).
 
-This concept is very similar to that of states because both modify an
-object.  The rule of thumb to distinguish the two is that whereas the
-state of a widget usually changes over time, its modifiers don't.
+Modifiers are very similar to states because both modify a component.
+The rule of thumb to distinguish the two is that whereas the state of a
+component usually changes over time, modifiers don't.
 
 Variables
 +++++++++
 
 A variable can be used to define a value in a single place and then use
 it wherever we want. We could for example define the variable
-``primary-color`` and use it throughout the UI. This would allow us to
-later change that color in a single place instead of change the complete
-code wich of course improves consistency and makes theming easy.
+``primary-color`` and use it throughout the UI. This allows us to change
+that color in a single place which makes theming easy.
 
 Core, Themes, and Default Theme
 +++++++++++++++++++++++++++++++
@@ -119,13 +109,13 @@ and any additional themes.
 
 -  UI designers …
 
-   -  must mark any objects, states, modifiers, variables, mixins, and
-      adjustments in wireframes.
+   -  must mark any components, states, modifiers, and variables in
+      wireframes.
 
-   -  may request new objects, states, … from the team.
+   -  may request new components, states, … from the team.
 
-      -  They must decide whether the new object, state, … should be part
-         of core or theme.
+      -  They must decide whether the new component, state, … should be
+         part of core or theme.
 
       -  They must provide semantically rich names for all new features.
          (e.g. "light-foreground" instead of "grey"; see Robert C Martin,
@@ -142,7 +132,7 @@ and any additional themes.
 
    -  must provide values for all variables.
 
-   -  must provide designs for all objects, states, …
+   -  must provide designs for all components, states, …
 
    -  They must provide all necessary information and files as soon as
       possible (to avoid delays, preliminary dummy files may be
@@ -155,8 +145,8 @@ and any additional themes.
 
 -  CSS developers …
 
-   -  must provide a living style guide (breakdown of all existing objects,
-      states, …).
+   -  must provide a living style guide (breakdown of all existing
+      components, states, …).
    -  must report implementation issues as soon as possible.
    -  must implement features as requested.
 
@@ -175,12 +165,11 @@ Selectors
 +++++++++
 
 This section describes which selectors must be used for different
-object types. All classes are lowercase and hyphen-separated.
+types. All classes are lowercase and hyphen-separated.
 
--  widget: class (no prefix)
--  base: tag
+-  component: class (no prefix)
 -  layout: class (prefix: ``l-``)
--  element: class (prefix: widget name)
+-  element: class (prefix: component name)
 -  state: pseudo-class, attribute, class (prefix: ``is-`` or ``has-``)
 -  modifier: class (prefix: ``m-``)
 
@@ -203,9 +192,9 @@ Documentation and Style Guide
 +++++++++++++++++++++++++++++
 
 A style guide in (web)design is an overview of all available colors,
-fonts, and widgets (more generally: objects) used in a product. In the
-context of CSS it can be generated from source code comments. In some
-way this is similar to doctests in python.
+fonts, and components used in a product. In the context of CSS it can be
+generated from source code comments. In some way this is similar to
+doctests in python.
 
 There is a long `list of style guide
 generators <http://vinspee.me/style-guide-guide/>`_. We chose to use
@@ -216,13 +205,10 @@ Hologram is automatically installed when running buildout. You can use
 ``bin/buildout install styleguide`` to build the style guide to
 ``docs/styleguide/``.
 
-All variables, widgets, base objects, states, and modifiers must be
-documented (including HTML examples). Variables and mixins also need
-documentation and examples. As these do not expose selectors which could
-be used in examples it might be necessary to create
-``styleguide-*``-classes. Layout and adjustments must have some kind
-of documentation though it might be hard to give HTML examples for
-those.
+All variables, components, base styles, states, and modifiers must be
+documented (including HTML examples). Variables also need documentation
+and examples. As these do not expose selectors which could be used in
+examples it might be necessary to create ``styleguide-*``-classes.
 
 Common Terminology Considerations
 +++++++++++++++++++++++++++++++++
@@ -233,11 +219,10 @@ defined above.
 Modules
 ~~~~~~~
 
-A module is a SCSS file. Each widget should have its own module
-including its states and modifiers. Several base objects may be
+A module is a SCSS file. Each component should have its own module
+including its states and modifiers. Several base styles may be
 included in a single module if they are closely related. The same goes
-for layout, variables, and mixins. Adjustments must go into separate
-modules.
+for layout, variables, and mixins.
 
 Variables
 ~~~~~~~~~
@@ -276,11 +261,11 @@ Variables
            padding: 2em;
        }
 
-Modifiers
-~~~~~~~~~
+States and Modifiers
+~~~~~~~~~~~~~~~~~~~~
 
-Modifiers are always specific to a widget. They have to be defined
-within the scope of the widget.
+States and modifiers are always specific to a component. They have to be
+defined within the scope of the component.
 
 Mixins
 ~~~~~~
@@ -406,19 +391,19 @@ SVG files.
 Context
 +++++++
 
-One of the most complicated issues in CSS in general is whether objects
+One of the most complicated issues in CSS in general is whether styles
 should change depending on context. On the one hand we talk about
-*responsive design*, on the other, objects should be decoupled (`Law of
-Demeter <http://en.wikipedia.org/wiki/Law_Of_Demeter>`_) to keep the
+*responsive design*, on the other, components should be decoupled (`Law
+of Demeter <http://en.wikipedia.org/wiki/Law_Of_Demeter>`_) to keep the
 code maintainable.
 
 It is important to understand that there are two different kinds of
 context awareness involved here:
 
-1. Objects inherit CSS rules from their context (e.g. ``font-family`` is
-   shared across the whole document if set on the ``html`` element).
-2. CSS code can apply additional styling to an object if it appears in a
-   specific context (e.g. ``#sidebar h2 {color: red;}``).
+1. Elements inherit CSS rules from their context (e.g. ``font-family``
+   is shared across the whole document if set on the ``html`` element).
+2. CSS code can apply additional styling to an element if it appears in
+   a specific context (e.g. ``#sidebar h2 {color: red;}``).
 
 Inheritance is hard to avoid and does little damage. So we should
 embrace it.
