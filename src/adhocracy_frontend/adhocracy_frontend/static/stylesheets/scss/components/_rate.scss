@@ -187,6 +187,9 @@ Click show results
 */
 
 .rate {
+    display: inline-block;
+    vertical-align: middle;
+
     a {
         color: $color-text-highlight-introvert;
         text-decoration: none;

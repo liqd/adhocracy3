@@ -248,11 +248,6 @@ parent: comment
         @include text-align(left);
         float: left;
     }
-
-    .rate {
-        display: inline-block;
-        vertical-align: middle;
-    }
 }
 
 .comment-create-form {
