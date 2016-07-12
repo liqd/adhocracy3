@@ -2,6 +2,7 @@
 <a class="proposal-list-item {{selectedState}}" href="{{path | adhParentPath | adhResourceUrl }}">
     <adh-show-image
         data-css-class="proposal-list-item-image"
+        data-ng-if="processOptions.hasImage"
         data-path="{{data.picture}}"
         data-format="thumbnail"
     ></adh-show-image>
