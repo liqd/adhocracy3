@@ -55,22 +55,19 @@ depends on a lot of factors:
 
 .l-header {
     @include clearfix;
+    @include rem(max-width, $moving-column-single-width-max);
     margin: 0 auto;
     position: relative;
-}
-
-.l-header {
-    @include rem(max-width, $moving-column-single-width-max);
-}
-
-.l-header-left {
-    float: left;
 }
 
 .l-header-left,
 .l-header-right {
     position: relative;
     z-index: 1;
+}
+
+.l-header-left {
+    float: left;
 }
 
 .l-header-right {

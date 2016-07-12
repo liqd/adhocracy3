@@ -37,11 +37,8 @@
 
 
         .listing-empty-text {
-            text-align: center;
-        }
-
-        .listing-empty-text {
             @include rem(padding, 1rem 0);
+            text-align: center;
         }
     }
 }
