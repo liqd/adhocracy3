@@ -177,7 +177,7 @@ CSS preprocessors help a great deal in writing modular, maintainable CSS
 code by offering features like variables, imports, nesting, and mixins.
 Major contenders are `Sass <http://sass-lang.com/>`_,
 `Less <http://lesscss.org/>`_ and
-`Stylus <http://learnboost.github.io/stylus/>`_. We had good expiriences
+`Stylus <http://learnboost.github.io/stylus/>`_. We had good experiences
 with Sass so we will stick with it. CSS developers must read the `Sass
 documentation <http://sass-lang.com/documentation/file.SASS_REFERENCE.html>`_.
 
@@ -403,7 +403,7 @@ Inheritance is hard to avoid and does little damage. So we should
 embrace it.
 
 I am not so sure about child selectors:
-`OOCSS container <https://github.com/stubbornella/oocss/wiki#separate-container-and-content>`_
-and `SMACSS subclassing <http://smacss.com/book/type-module#subclassing>`_ both
+`OOCSS <https://github.com/stubbornella/oocss/wiki#separate-container-and-content>`_
+and `SMACSS <http://smacss.com/book/type-module#subclassing>`_ both
 recommend to avoid them. Still it is a powerful feature. This is still
 an open question.
