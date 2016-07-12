@@ -30,15 +30,6 @@
     font-weight: $font-weight-extrovert;
 }
 
-.s1-landing-section-footer {
-    @include rem(margin-top, 4px);
-    float: right;
-
-    .button {
-        font-weight: $font-weight-extrovert;
-    }
-}
-
 .s1-landing-section-left {
     @include grid-span(9, 0);
 }
@@ -59,8 +50,4 @@
     .button {
         font-weight: $font-weight-extrovert;
     }
-}
-
-.s1-landing-section-footer-more {
-    @extend .m-introvert;
 }

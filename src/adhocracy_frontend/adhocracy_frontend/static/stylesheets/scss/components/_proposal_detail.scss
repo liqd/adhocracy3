@@ -58,11 +58,6 @@ Proposal detail article.
     }
 }
 
-.proposal-detail-body-comments-icon {
-    @include rem(font-size, 20px);
-    display: block;
-}
-
 .proposal-detail-header {
     @include rem(padding-top, 30px);
 
@@ -116,12 +111,6 @@ Proposal detail article.
     .proposal-detail-meta-item-icon {
         @include rem(margin-right, 8px);
         vertical-align: middle;
-    }
-
-    .proposal-detail-meta-item-text {
-        display: inline-block;
-        margin: 0;
-        text-align: left;
     }
 
     .proposal-detail-meta-item-comments,

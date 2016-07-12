@@ -60,13 +60,3 @@
         }
     }
 }
-
-.tabset-panes {
-    transition: height 0.5s;
-    background: $color-background-base-introvert;
-    overflow: hidden;
-}
-
-.tab-pane {
-    @include rem(padding, 1rem);
-}

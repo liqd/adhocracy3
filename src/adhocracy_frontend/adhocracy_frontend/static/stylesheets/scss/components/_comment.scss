@@ -170,17 +170,6 @@ parent: comment
     @include rem(padding-bottom, 20px);
 }
 
-.comment-title {
-    a, a:hover, a:focus, a:active {
-        color: inherit;
-        text-decoration: inherit;
-    }
-}
-
-.comment-content-edit-text {
-    @include rem(margin-bottom, 0.5rem);
-}
-
 .comment-header {
     @include clearfix;
     @include rem(font-size, $font-size-small);

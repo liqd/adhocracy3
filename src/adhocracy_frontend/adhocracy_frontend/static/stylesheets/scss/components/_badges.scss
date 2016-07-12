@@ -48,15 +48,6 @@ The description of a badge assignment. The same modifiers as for `badge` apply.
     @include rem(margin, 15px 0);
 }
 
-.badge-assignment-select {
-    @include rem(margin, 10px 0 10px 1px);
-
-    .badge {
-        outline: 1px solid $color-text-inverted;
-        text-decoration: none;
-    }
-}
-
 .badges-group {
     @include rem(border-radius, 10px 15px);
     @include rem(padding, 10px);

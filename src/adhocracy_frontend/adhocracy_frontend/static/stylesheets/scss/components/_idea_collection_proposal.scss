@@ -29,11 +29,6 @@
     }
 }
 
-.idea-collection-proposal-detail-body-comments-icon {
-    @include rem(font-size, 20px);
-    display: block;
-}
-
 .idea-collection-proposal-detail-header {
     @include rem(padding-top, 30px);
 
@@ -87,12 +82,6 @@
     .idea-collection-proposal-detail-meta-item-icon {
         @include rem(margin-right, 8px);
         vertical-align: middle;
-    }
-
-    .idea-collection-proposal-detail-meta-item-text {
-        display: inline-block;
-        margin: 0;
-        text-align: left;
     }
 
     .idea-collection-proposal-detail-meta-item-comments,
@@ -149,12 +138,6 @@ as metadata.  It serves as an entry to a detail view.
         @include clearfix;
         color: $color-text-normal;
         background: $color-structure-normal;
-    }
-
-    &.is-selected {
-        .idea-collection-proposal-list-item-detail-link {
-            background: $color-structure-normal;
-        }
     }
 
     .badge {

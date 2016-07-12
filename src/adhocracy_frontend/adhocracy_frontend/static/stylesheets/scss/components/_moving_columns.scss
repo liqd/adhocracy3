@@ -209,7 +209,6 @@ States:
     @include rem(padding, 0 0 0 $padding-small);
     background: $color-structure-normal;
 
-    .moving-column-menu-sort-option,
     .moving-column-menu-button {
         text-decoration: none;
 
@@ -222,39 +221,13 @@ States:
          }
     }
 
-    .moving-column-menu-sort-option,
-    .moving-column-menu-button,
-    .moving-column-menu-sort-label {
+    .moving-column-menu-button {
         @include rem(font-size, $font-size-small);
         @include rem(margin-right, 30px);
         display: inline-block;
         color: $color-text-highlight-introvert;
         font-weight: $font-weight-introvert;
         float: left;
-    }
-
-    .moving-column-menu-sort-label {
-        @include rem(margin-right, 1rem);
-        font-style: italic;
-    }
-
-    .moving-column-menu-sort-option {
-        margin: 0;
-
-        &:not(:last-child) {
-            @include rem(margin-right, 1rem);
-            position: relative;
-
-            &:after {
-                @include rem(right, -1rem);
-                @include rem(width, 1rem);
-                display: inline-block;
-                content: "|";
-                position: absolute;
-                text-align: center;
-                color: $color-text-highlight-introvert;
-            }
-        }
     }
 
     @media print {

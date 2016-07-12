@@ -39,7 +39,7 @@
         opacity: 1;
         background: $color-background-base-introvert;
 
-        .title, .paragraph, .blog-post-edit-title {
+        .title, .paragraph {
             @include rem(margin-bottom, 10px);
         }
 
