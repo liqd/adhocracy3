@@ -1242,6 +1242,26 @@ class TestACEPrincipal:
         from . import ACEPrincipalType
         inst.schema_type = ACEPrincipalType
 
+    def test_widget(self, inst):
+        inst.schema_type.valid_principals = ['admin']
+        inst = inst.bind()
+
+        assert inst.widget.values == [('admin', 'admin')]
+
+
+class TestACEPrincipals:
+
+    @fixture
+    def inst(self):
+        from . import ACEPrincipals
+        return ACEPrincipals()
+
+    def test_create(self, inst):
+        from . import SequenceSchema
+        from . import ACEPrincipal
+        assert isinstance(inst, SequenceSchema)
+        assert isinstance(inst['principal'], ACEPrincipal)
+
 
 @fixture
 def mock_registry():
