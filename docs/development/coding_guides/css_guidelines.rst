@@ -87,25 +87,19 @@ it wherever we want. We could for example define the variable
 ``primary-color`` and use it throughout the UI. This allows us to change
 that color in a single place which makes theming easy.
 
-Core, Themes, and Default Theme
-+++++++++++++++++++++++++++++++
+Core and Themes
++++++++++++++++
 
 The project may create multiple CSS-themes for the software. All themes
 share a common core. Themes can theoretically overwrite every aspect of
-the core. Since overwrites come at a run-time cost for the browser, they
-should be kept at a minimum. To make this possible it is advised to keep
-the core small and flexible.
-
-Keeping the core small may conflict with a good UX in the default case.
-To avoid that, a default theme is included to separate the
-default UX from the core.
+the core. Since overwrites have maintenance cost, they should be kept
+at a minimum.
 
 CSS and Design
 --------------
 
-This section describes the collaboration between UI designers, graphic
-designers, and frontend developers. All the rules apply to core, default theme,
-and any additional themes.
+This section describes the collaboration between designers and frontend
+developers. All the rules apply to core and any additional themes.
 
 -  UI designers …
 
