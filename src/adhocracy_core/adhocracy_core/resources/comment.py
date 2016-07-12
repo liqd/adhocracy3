@@ -1,5 +1,6 @@
 """Comment resource type."""
 from pyramid.registry import Registry
+from pyramid.i18n import TranslationStringFactory
 
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
@@ -13,6 +14,9 @@ from adhocracy_core.resources.service import service_meta
 import adhocracy_core.sheets.comment
 import adhocracy_core.sheets.rate
 import adhocracy_core.sheets.relation
+
+
+_ = TranslationStringFactory('adhocracy')
 
 
 class ICommentVersion(IItemVersion):
@@ -36,7 +40,7 @@ class IComment(IItem):
 
 
 comment_meta = item_meta._replace(
-    content_name='Comment',
+    content_name=_('Comment'),
     iresource=IComment,
     element_types=(ICommentVersion,
                    ),

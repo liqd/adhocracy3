@@ -1,4 +1,5 @@
 """Proposal resource type."""
+from pyramid.i18n import TranslationStringFactory
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import ITag
 from adhocracy_core.interfaces import IItem
@@ -16,6 +17,9 @@ import adhocracy_core.sheets.badge
 import adhocracy_core.sheets.document
 import adhocracy_core.sheets.image
 import adhocracy_core.sheets.workflow
+
+
+_ = TranslationStringFactory('adhocracy')
 
 
 class IDocumentVersion(IItemVersion):
@@ -40,6 +44,7 @@ class IDocument(IItem):
 
 
 document_meta = item_meta._replace(
+    content_name=_('Document'),
     iresource=IDocument,
     element_types=(ITag,
                    IParagraph,

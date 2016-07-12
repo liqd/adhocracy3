@@ -110,3 +110,85 @@ msgstr ""
 "Have fun and be inspired!\n"
 "\n"
 "Your \"${site_name}\" Team"
+
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:298
+msgid "mail_send_activity_remove_body_txt"
+msgstr ""
+"${activity_description}\n"
+"\n"
+"Hier geht es zum Prozess: ${target_url}\n"
+"\n"
+"Herzliche Grüße,"
+"\n"
+"Das meinBerlin-Team"
+
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:304
+msgid "mail_send_activity_add_update_body_txt"
+msgstr ""
+"${activity_description}\n"
+"\n"
+"Hier geht es zum Beitrag: ${object_url}\n"
+"\n"
+"Herzliche Grüße,"
+"\n"
+"Das meinBerlin-Team"
+
+
+#: src/adhocracy_core/adhocracy_core/resources/document.py:47
+msgid "Document"
+msgstr "Beitrag"
+
+
+#: src/adhocracy_core/adhocracy_core/resources/process.py:22
+msgid "Process"
+msgstr "Prozess"
+
+
+#: src/adhocracy_core/adhocracy_core/resources/comment.py:43
+msgid "Comment"
+msgstr "Kommentar"
+
+#: src/adhocracy_core/adhocracy_core/resources/proposal.py:47
+msgid "Proposal"
+msgstr "Beitrag"
+
+#: src/adhocracy_core/adhocracy_core/resources/idea collection.py:14
+msgid "IdeaCollectionProcess"
+msgstr "Prozess"
+
+#. Default: ${subject_name} added a ${object_type_name} to ${target_title}.
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:254
+msgid "activity_name_add"
+msgstr "ein ${object_type_name} wurde hinzugefügt."
+
+#. Default: ${subject_name} removed a ${object_type_name} from ${target_title}.
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:263
+msgid "activity_name_remove"
+msgstr "ein ${object_type_name} wurde gelöscht."
+
+#. Default: ${subject_name} updated ${object_type_name}
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:259
+msgid "activity_name_update"
+msgstr "ein ${object_type_name} wurde geändert."
+
+#. Default: ${subject_name} added the ${object_type_name} "${object_title}" to
+#. ${target_type_name} "${target_title}".
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:292
+msgid "activity_description_add"
+msgstr ""
+"${subject_name} hat den ${object_type_name} \"${object_title}\" im ${target_type_name} ${target_title} hinzugefügt."
+
+
+#. Default: ${subject_name} updated ${object_type_name} "${object_title}".
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:298
+msgid "activity_description_update"
+msgstr ""
+"${subject_name} hat den ${object_type_name} \"${object_title}\" im ${target_type_name} ${target_title} geändert."
+
+
+#. Default: ${subject_name} removed the ${object_type_name} "${object_title}"
+#. from ${target_type_name} "${target_title}".
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:303
+msgid "activity_description_remove"
+msgstr ""
+"${subject_name} hat den ${object_type_name} \"${object_title}\" im ${target_type_name} ${target_title} gelöscht."

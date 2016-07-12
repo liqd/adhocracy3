@@ -581,6 +581,12 @@ class TestAddSheetToRegistry:
         from adhocracy_core.sheets import add_sheet_to_registry
         return add_sheet_to_registry(sheet_meta, registry)
 
+    def test_register_valid_empty_mapping_schema(self, sheet_meta, registry):
+        from adhocracy_core.schema import MappingSchema
+        sheet_meta = sheet_meta._replace(schema_class=MappingSchema)
+        self.call_fut(sheet_meta, registry)
+        assert registry.content.sheets_meta == {sheet_meta.isheet: sheet_meta}
+
     def test_register_valid_sheet_sheet_meta(self, sheet_meta, registry):
         self.call_fut(sheet_meta, registry)
         assert registry.content.sheets_meta == {sheet_meta.isheet: sheet_meta}

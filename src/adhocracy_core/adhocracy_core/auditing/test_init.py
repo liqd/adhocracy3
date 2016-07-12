@@ -5,8 +5,6 @@ from pyramid import testing
 from unittest.mock import Mock
 from pytest import fixture
 from pytest import mark
-from adhocracy_core.interfaces import ChangelogMetadata
-from adhocracy_core.interfaces import VisibilityChange
 
 
 @fixture
@@ -15,152 +13,210 @@ def integration(integration):
 
 
 @fixture
-def mock_sheet_metadata(mock_sheet):
-    from adhocracy_core.sheets import sheet_meta
-    from adhocracy_core.sheets.metadata import  IMetadata
-    mock_sheet_metadata = mock_sheet.copy()
-    mock_sheet_metadata.meta = sheet_meta._replace(isheet=IMetadata)
-    return mock_sheet_metadata
-
-@fixture
-def mock_sheets_create(mock_sheet):
-    return [mock_sheet]
-
-
-@fixture
-def mock_sheets_edit(mock_sheet, mock_sheet_metadata):
-    return [mock_sheet, mock_sheet_metadata]
-
-
-@fixture
-def registry(registry_with_content, mock_sheets_create, mock_sheets_edit):
-    registry_with_content.content.get_sheets_create.return_value = \
-        mock_sheets_create
-    registry_with_content.content.get_sheets_edit.return_value = mock_sheets_edit
+def registry(registry_with_content):
     return registry_with_content
 
 
 @fixture
-def user():
-    from adhocracy_core.sheets.principal import IUserBasic
-    user = testing.DummyResource(__provides__=IUserBasic,
-                                 __name__='user1',
-                                 name='god')
-    return user
+def mock_auditlog(mocker):
+    return mocker.patch('adhocracy_core.auditing.AuditLog',
+                        autospec=True)
 
 
 @fixture
-def mock_get_user_info(monkeypatch):
-    import adhocracy_core.auditing
-    mock_get_user_info = Mock(spec=adhocracy_core.auditing)
-    mock_get_user_info.return_value = ('god',
-                                       '/principals/users/000001')
-    monkeypatch.setattr(adhocracy_core.auditing,
-                        '_get_user_info',
-                        mock_get_user_info)
-    return mock_get_user_info
+def mock_generate_activity_name(mocker):
+    return mocker.patch('adhocracy_core.auditing.generate_activity_name',
+                        autospec=True,
+                        return_value='Activity Name')
 
 
-def _get_event_name(index):
-    return 'event_{}'.format(index)
+@mark.usefixtures('mock_generate_activity_name')
+class TestUpdateAuditlogCallback:
 
+    def call_fut(self, *args):
+        from . import update_auditlog_callback
+        return update_auditlog_callback(*args)
 
-def _get_resource_path(index):
-    return '/value1_{}'.format(index)
+    @fixture
+    def request_(self,  request_, registry, changelog):
+        request_.registry = registry
+        request_.registry.changelog = changelog
+        return request_
 
+    @fixture
+    def item(self, item, version):
+        item['versions'] = testing.DummyResource()
+        item['versions']['version'] = version
+        return item
 
-def _get_user_name(index):
-    return 'user{}'.format(index)
+    @fixture
+    def parent(self, context):
+        parent = testing.DummyResource()
+        parent['child'] = context
+        return parent
 
+    @fixture
+    def comment(self):
+        from adhocracy_core.resources.comment import IComment
+        return testing.DummyResource(__provides__=IComment)
 
-def _get_user_path(index):
-    return '/principals/users/user{}'.format(index)
+    @fixture
+    def add_to(self, mocker):
+        return mocker.patch('adhocracy_core.auditing.add_to_auditlog')
 
+    def test_ignore_if_error_response(self, request_, mocker):
+        from pyramid.httpexceptions import HTTPError
+        add_to = mocker.patch('adhocracy_core.auditing.add_to_auditlog')
+        self.call_fut(request_, HTTPError())
+        assert not add_to.called
 
-@fixture
-def context(context):
-    mocked_conn = Mock()
-    mocked_auditconn = Mock()
-    mocked_auditconn.root.return_value = {}
-    mocked_conn.get_connection.return_value = mocked_auditconn
-    context._p_jar = mocked_conn
-    return context
+    def test_ignore_if_empty_changelog(self, request_, mocker):
+        add_to = mocker.patch('adhocracy_core.auditing.add_to_auditlog')
+        self.call_fut(request_, None)
+        assert not add_to.called
 
+    def test_ignore_if_no_real_change(self, request_, add_to, changelog,
+                                      context):
+        changelog['/'] = changelog['']._replace(last_version=context,
+                                                followed_by=context,
+                                                changed_descendants=True,
+                                                changed_backrefs=False,
+                                                )
+        self.call_fut(request_, None)
+        assert not add_to.called
 
-def test_set_auditlog_no_audit_connection(context):
-    from . import get_auditlog
-    from . import set_auditlog
+    def test_ignore_if_autoupdated_change(self, request_, add_to, changelog,
+                                          context):
+        changelog['/'] = changelog['']._replace(created=True,
+                                                resource=context,
+                                                autoupdated=True)
+        self.call_fut(request_, None)
+        assert not add_to.called
 
-    context._p_jar.get_connection \
-        = Mock(name='method', side_effect=KeyError('audit'))
+    def test_ignore_if_first_version(
+        self, request_, registry, add_to, changelog, version, item):
+        changelog['/'] = changelog['']._replace(created=True, resource=version)
+        registry.content.get_sheet_field = Mock(return_value=[])
+        self.call_fut(request_, None)
+        assert not add_to.called
 
-    set_auditlog(context)
+    def test_add_add_activity_if_created(self, request_, add_to, changelog,
+                                          context, parent):
+        from adhocracy_core.interfaces import ActivityType
+        changelog['/'] = changelog['']._replace(created=True, resource=context)
+        self.call_fut(request_, None)
+        assert add_to.call_args[0][1] == request_
+        added_activity = add_to.call_args[0][0][0]
+        assert added_activity.type == ActivityType.add
+        assert added_activity.object == context
+        assert added_activity.target == parent
 
-    assert get_auditlog(context) is None
+    def test_add_update_activity_if_modified(self, request_, add_to, changelog,
+                                             context):
+        from adhocracy_core.interfaces import ActivityType
+        changelog['/'] = changelog['']._replace(modified=True, resource=context)
+        self.call_fut(request_, None)
+        added_activity = add_to.call_args[0][0][0]
+        assert added_activity.type == ActivityType.update
+        assert added_activity.object == context
 
+    def test_add_update_item_activity_if_version_created(
+        self, request_, registry, add_to, changelog, item, version):
+        from adhocracy_core.interfaces import ActivityType
+        changelog['/'] = changelog['']._replace(created=True, resource=version)
+        registry.content.get_sheet_field = Mock()
+        self.call_fut(request_, None)
+        added_activity = add_to.call_args[0][0][0]
+        assert added_activity.type == ActivityType.update
 
-def test_audit_resources_changes_callback_empty_changelog(request_, context,
-                                                          changelog):
-    from . import audit_resources_changes_callback
-    from . import get_auditlog
-    from . import set_auditlog
+    def test_add_object(self, request_, add_to, changelog, context):
+        changelog['/'] = changelog['']._replace(created=True, resource=context)
+        self.call_fut(request_, None)
+        added_activity = add_to.call_args[0][0][0]
+        assert added_activity.object == context
 
-    request_.context = context
-    request_.registry.changelog = changelog
-    set_auditlog(context)
-    response = Mock()
+    def test_add_item_as_object_if_version(
+        self, request_, registry, add_to, changelog, version, item):
+        changelog['/'] = changelog['']._replace(created=True, resource=version)
+        registry.content.get_sheet_field = Mock()
+        self.call_fut(request_, None)
+        added_activity = add_to.call_args[0][0][0]
+        assert added_activity.object == item
 
-    audit_resources_changes_callback(request_, response)
+    def test_add_target(self, request_, add_to, changelog, context, parent):
+        changelog['/'] = changelog['']._replace(created=True, resource=context)
+        self.call_fut(request_, None)
+        added_activity = add_to.call_args[0][0][0]
+        assert added_activity.target == parent
 
-    all_entries = get_auditlog(request_.context).values()
-    assert len(all_entries) == 0
+    def test_add_commented_content_as_target_if_comment_created(
+        self, request_, add_to, changelog, pool, service, comment):
+        service['comment'] = comment
+        pool['comments'] = service
+        changelog['/'] = changelog['']._replace(created=True, resource=comment)
+        self.call_fut(request_, None)
+        added_activity = add_to.call_args[0][0][0]
+        assert added_activity.target == pool
 
+    def test_add_remove_activity_if_concealed(self, request_, add_to, changelog,
+                                              context, parent):
+        """Concealed == hidden or removed."""
+        from adhocracy_core.interfaces import ActivityType
+        from adhocracy_core.interfaces import VisibilityChange
+        changelog['/']  = changelog['']._replace(
+            visibility=VisibilityChange.concealed,
+            resource=context)
+        self.call_fut(request_, None)
+        added_activity = add_to.call_args[0][0][0]
+        assert added_activity.type == ActivityType.remove
+        assert added_activity.target == parent
 
-def test_audit_resource_changes_callback(request_, context, changelog, registry,
-                                         mock_get_user_info):
-    from . import audit_resources_changes_callback
-    from . import get_auditlog
-    from . import set_auditlog
+    def test_add_sheet_data_if_created(self, request_, add_to, changelog,
+                                       context, mock_sheet, registry):
+        registry.content.get_sheets_create.return_value = [mock_sheet]
+        changelog['/'] = changelog['']._replace(created=True, resource=context)
+        self.call_fut(request_, None)
+        added_activity = add_to.call_args[0][0][0]
+        registry.content.get_sheets_create.assert_called_with(context,
+                                                              request=request_)
+        assert added_activity.sheet_data == [{mock_sheet.meta.isheet:
+                                              mock_sheet.serialize()}]
 
-    request_.context = context
-    request_.registry.changelog = changelog
-    registry.changelog = changelog
-    set_auditlog(request_.context)
+    def test_add_sheet_data_if_created_version(self, request_, add_to,
+            changelog, context, mock_sheet, registry, version, item):
+        last_version = Mock()
+        changelog['/'] = changelog['']._replace(created=True,
+                                                resource=version,
+                                                last_version=last_version)
+        registry.content.get_sheet_field = Mock()
+        self.call_fut(request_, None)
+        registry.content.get_sheets_create.assert_called_with(last_version,
+                                                              request=request_)
 
-    changelog['/blublu'] \
-        = changelog['/blublu']._replace(resource=testing.DummyResource())
-    changelog['/'] = changelog['/']._replace(resource=context, created=True)
-    changelog['/blabla'] \
-        = changelog['/blabla']._replace(resource=context, modified=True)
-    registry.changelog = changelog
+    def test_add_sheet_data_if_modified(self, request_, add_to, changelog,
+                                        context, mock_sheet, registry):
+        registry.content.get_sheets_edit.return_value = [mock_sheet]
+        changelog['/'] = changelog['']._replace(modified=True, resource=context)
+        self.call_fut(request_, None)
+        added_activity = add_to.call_args[0][0][0]
+        registry.content.get_sheets_edit.assert_called_with(context,
+                                                            request=request_)
+        assert added_activity.sheet_data == [{mock_sheet.meta.isheet:
+                                              mock_sheet.serialize()}]
 
-    response = Mock()
-    audit_resources_changes_callback(request_, response)
+    def test_add_name(self, request_, add_to, changelog, context,
+                      mock_generate_activity_name):
+        changelog['/'] = changelog['']._replace(modified=True, resource=context)
+        self.call_fut(request_, None)
+        added_activity = add_to.call_args[0][0][0]
+        assert added_activity.name == mock_generate_activity_name.return_value
 
-    all_entries = get_auditlog(request_.context).values()
-    assert len(all_entries) == 2
-
-
-@mark.usefixtures('integration')
-def test_get_user_info(request_, user):
-    from pyramid.traversal import resource_path
-    from adhocracy_core.auditing import _get_user_info
-    request_.user = user
-
-    user_name, user_path = _get_user_info(request_)
-
-    assert user_name == user.name
-    assert user_path == resource_path(user)
-
-
-def test_get_user_info_nouser_in_request(request_):
-    from adhocracy_core.auditing import _get_user_info
-    request_.user = None
-
-    user_name, user_path = _get_user_info(request_)
-
-    assert user_name == ''
-    assert user_path == ''
+    def test_add_published(self, request_, add_to, changelog, context, mocker):
+        now = mocker.patch('adhocracy_core.auditing.now', autospec=True)
+        changelog['/'] = changelog['']._replace(modified=True, resource=context)
+        self.call_fut(request_, None)
+        added_activity = add_to.call_args[0][0][0]
+        assert added_activity.published == now.return_value
 
 
 class TestAuditlog:
@@ -174,43 +230,70 @@ class TestAuditlog:
         from BTrees.OOBTree import OOBTree
         assert isinstance(inst, OOBTree)
 
-    def test_add(self, inst, mocker):
+    def test_add_basic_activity(self, inst, activity):
         import datetime
-        from adhocracy_core.interfaces import AuditlogEntry
-        name = 'created'
-        resource_path = '/resource1'
-        user_name = 'user1'
-        user_path = '/user1'
-        mock_sheet_data = mocker.Mock()
-        inst.add(name, resource_path, user_name, user_path, mock_sheet_data)
+        from adhocracy_core.interfaces import SerializedActivity
+        object = testing.DummyResource(__name__='object')
+        published= datetime.datetime.utcnow()
+        activity = activity._replace(type='create',
+                                     object=object,
+                                     published=published,
+                                     )
+        inst.add(activity)
         key, value = inst.items()[0]
-        assert isinstance(key, datetime.datetime)
-        assert isinstance(value, AuditlogEntry)
-        assert value.name == name
-        assert value.resource_path == resource_path
-        assert value.user_name == user_name
-        assert value.user_path == user_path
-        assert value.sheet_data == mock_sheet_data
+        assert isinstance(value, SerializedActivity)
+        assert key == published
+        assert value.type == 'create'
+        assert value.object_path == 'object'
+        assert value.sheet_data == []
+        assert value.target_path == ''
+
+    def test_add_basic_activity_with_subject(self, inst, activity):
+        import datetime
+        from adhocracy_core.interfaces import SerializedActivity
+        subject = testing.DummyResource(__name__='subject')
+        object = testing.DummyResource(__name__='object')
+        published= datetime.datetime.utcnow()
+        activity = activity._replace(subject=subject,
+                                     type='create',
+                                     object=object,
+                                     published=published,
+                                     )
+        inst.add(activity)
+        key, value = inst.items()[0]
+        assert value.subject_path == 'subject'
+
+    def test_add_activity_with_target_and_sheet_data(self, inst, activity):
+        import datetime
+        subject = testing.DummyResource(__name__='subject')
+        object = testing.DummyResource(__name__='object')
+        target = testing.DummyResource(__name__='target')
+        published= datetime.datetime.utcnow()
+        activity = activity._replace(subject=subject,
+                                     type='create',
+                                     object=object,
+                                     target=target,
+                                     sheet_data=[{'y': 'z'}],
+                                     published=published
+                                     )
+        inst.add(activity)
+        key, value = inst.items()[0]
+        assert value.sheet_data == [{'y': 'z'}]
+        assert value.target_path == 'target'
+
+
+def test_get_auditlog(context, mocker):
+    from . import get_auditlog
+    mock = mocker.patch('substanced.util.get_auditlog', autospec=True)
+    get_auditlog(context)
+    assert mock.called
 
 
 class TestSetAuditlog:
 
-    @fixture
-    def mock_auditlog(self, monkeypatch):
-        from adhocracy_core import auditing
-        mock = Mock(spec=auditing.AuditLog)
-        monkeypatch.setattr(auditing, 'AuditLog', mock)
-        return mock
-
-    @fixture
-    def context_emptyroot(self):
-        context = Mock()
-        mocked_conn = Mock()
-        mocked_auditconn = Mock()
-        mocked_auditconn.root.return_value = {}
-        mocked_conn.get_connection.return_value = mocked_auditconn
-        context._p_jar = mocked_conn
-        return context
+    def call_fut(self, ctx):
+        from . import set_auditlog
+        return set_auditlog(ctx)
 
     @fixture
     def context(self):
@@ -222,144 +305,266 @@ class TestSetAuditlog:
         context._p_jar = mocked_conn
         return context
 
-    def call_fut(self, ctx):
-        from . import set_auditlog
-        return set_auditlog(ctx)
+    @fixture
+    def context_emptyroot(self, context):
+        context._p_jar.get_connection.return_value.root.return_value = {}
+        return context
 
-    def test_set_auditlog_no_previous_auditlog(self,
-                                               context_emptyroot,
-                                               mock_auditlog):
-        from . import set_auditlog
-        set_auditlog(context_emptyroot)
-        assert mock_auditlog.called is True
+    def test_set_auditlog_no_audit_connection(self, context):
+        from . import get_auditlog
+        context._p_jar.get_connection = Mock(name='method',
+                                             side_effect=KeyError('audit'))
+        self.call_fut(context)
+        assert get_auditlog(context) is None
 
     def test_set_auditlog_previous_auditlog(self, context, mock_auditlog):
-        from . import set_auditlog
-        set_auditlog(context)
+        self.call_fut(context)
         assert mock_auditlog.called is False
 
-
-def test_get_auditlog(context, monkeypatch):
-    from . import get_auditlog
-    mock = Mock()
-    monkeypatch.setattr('substanced.util.get_auditlog', mock)
-    get_auditlog(context)
-    assert mock.called
+    def test_set_auditlog_no_previous_auditlog(self, context_emptyroot,
+                                               mock_auditlog):
+        self.call_fut(context_emptyroot)
+        assert mock_auditlog.called is True
 
 
-class TestAddAuditEvent:
+class TestAddToAuditLog:
 
-    @fixture
-    def user(self):
-        return testing.DummyResource(__name__='user',
-                                     name='name')
+    def call_fut(self, *args):
+        from . import add_to_auditlog
+        return add_to_auditlog(*args)
 
     @fixture
-    def mock_auditlog(self):
-        from . import AuditLog
-        mock = Mock(spec=AuditLog)
-        return mock
+    def mock_auditlog(self, mocker, mock_auditlog):
+        mocker.patch('adhocracy_core.auditing.get_auditlog',
+                     autospec=True,
+                     return_value=mock_auditlog)
+        return mock_auditlog
 
-    @fixture
-    def mock_get_auditlog(self, monkeypatch):
-        from adhocracy_core import auditing
-        mock = Mock()
-        monkeypatch.setattr(auditing, 'get_auditlog', mock)
-        return mock
+    def test_ignore_if_no_auditlog(self, activity, mocker, request_):
+        mocker.patch('adhocracy_core.auditing.get_auditlog', return_value=None)
+        assert self.call_fut([activity], request_) is None
 
-    def call_fut(self, context, name, user_name, user_path, sheet_data):
-        from . import log_auditevent
-        return log_auditevent(context,
-                              name, user_name, user_path, sheet_data)
+    def test_add(self, activity, mock_auditlog, request_):
+        self.call_fut([activity], request_)
+        mock_auditlog.add.assert_called_with(activity)
 
-    def test_ignore_if_no_auditlog(self, context, mock_get_auditlog,
-                                   mock_auditlog, mocker):
-        mock_get_auditlog.return_value = None
-        mock_sheet_data = mocker.Mock()
-        self.call_fut(context, 'created', 'user1', '/user1', mock_sheet_data)
-        assert mock_auditlog.add.called is False
-
-    def test_add_if_auditlog(self, context, mock_auditlog,
-                             mock_get_auditlog, mocker):
-        mock_get_auditlog.return_value = mock_auditlog
-        mock_sheet_data = mocker.Mock()
-        self.call_fut(context, 'created', 'user1', '/user1', mock_sheet_data)
-        assert mock_auditlog.add.called_with('/',
-                                             'created',
-                                             '/resource1',
-                                             'user1',
-                                             '/user1',
-                                             mock_sheet_data)
+    def test_add_sends_added_event(self, activity, config, mock_auditlog,
+                                   request_):
+        from adhocracy_core.testing import create_event_listener
+        from adhocracy_core.interfaces import IActivitiesAddedToAuditLog
+        added_listener = create_event_listener(config,
+                                               IActivitiesAddedToAuditLog)
+        self.call_fut([activity], request_)
+        event = added_listener[0]
+        assert event.object == mock_auditlog
+        assert event.activities == [activity]
 
 
+@fixture
+def get_title(mocker):
+    return mocker.patch('adhocracy_core.auditing._get_title',
+                        autospec=True,
+                        return_value='title')
 
-class TestGetAuditActionName:
 
-    def call_fut(change):
-        from . import _get_entry_name
-        return _get_entry_name(change)
+@fixture
+def get_subject_name(mocker):
+    return mocker.patch('adhocracy_core.auditing._get_subject_name',
+                        autospec=True,
+                        return_value='user name')
 
-    def test_get_entry_name_created(self):
-        from . import AuditlogAction
-        from . import _get_entry_name
-        change = ChangelogMetadata(modified=False,
-                                   created=True,
-                                   followed_by=None,
-                                   resource=None,
-                                   last_version=None,
-                                   changed_descendants=False,
-                                   changed_backrefs=False,
-                                   visibility=VisibilityChange.visible)
-        assert _get_entry_name(change) is AuditlogAction.created
 
-    def test_get_entry_name_modified(self):
-        from . import AuditlogAction
-        from . import _get_entry_name
-        change = ChangelogMetadata(modified=True,
-                                   created=False,
-                                   followed_by=None,
-                                   resource=None,
-                                   last_version=None,
-                                   changed_descendants=False,
-                                   changed_backrefs=False,
-                                   visibility=VisibilityChange.visible)
-        assert _get_entry_name(change) is AuditlogAction.modified
+@fixture
+def get_resource_type(mocker):
+    return mocker.patch('adhocracy_core.auditing._get_type_name',
+                        autospec=True,
+                        return_value='type name')
 
-    def test_get_entry_name_concealed(self):
-        from . import AuditlogAction
-        from . import _get_entry_name
-        change = ChangelogMetadata(modified=False,
-                                   created=False,
-                                   followed_by=None,
-                                   resource=None,
-                                   last_version=None,
-                                   changed_descendants=False,
-                                   changed_backrefs=False,
-                                   visibility=VisibilityChange.concealed)
-        assert _get_entry_name(change) is AuditlogAction.concealed
 
-    def test_get_entry_name_revealed(self):
-        from . import AuditlogAction
-        from . import _get_entry_name
-        change = ChangelogMetadata(modified=False,
-                                   created=False,
-                                   followed_by=None,
-                                   resource=None,
-                                   last_version=None,
-                                   changed_descendants=False,
-                                   changed_backrefs=False,
-                                   visibility=VisibilityChange.revealed)
-        assert _get_entry_name(change) is AuditlogAction.revealed
+@mark.usefixtures('get_subject_name', 'get_resource_type', 'get_title')
+class TestGenerateActivityName:
 
-    def test_get_entry_name_visible(self):
-        from . import _get_entry_name
-        change = ChangelogMetadata(modified=False,
-                                   created=False,
-                                   followed_by=None,
-                                   resource=None,
-                                   last_version=None,
-                                   changed_descendants=False,
-                                   changed_backrefs=False,
-                                   visibility=VisibilityChange.visible)
-        with pytest.raises(ValueError):
-            _get_entry_name(change)
+    def call_fut(self, *args):
+        from . import generate_activity_name
+        return generate_activity_name(*args)
+
+    def test_create_translation_with_mapping(
+        self, activity, request_, get_subject_name, get_resource_type,
+        get_title):
+        from pyramid.i18n import TranslationString
+        name = self.call_fut(activity, request_)
+        get_subject_name.assert_called_with(activity.subject, request_.registry)
+        get_resource_type.assert_called_with(activity.subject, request_)
+        get_title.assert_called_with(activity.subject, request_.registry)
+        assert isinstance(name, TranslationString)
+        assert name.mapping == {'subject_name': 'user name',
+                                'object_type_name': 'type name',
+                                'target_title': 'title',
+                                }
+
+    def test_create_missing_translation_if_no_type(self, activity, request_):
+        activity = activity._replace(type=None)
+        name = self.call_fut(activity, request_)
+        assert name == 'activity_missing'
+
+    def test_create_add_translation_if_add_activity(self, activity, request_):
+        from adhocracy_core.interfaces import ActivityType
+        activity = activity._replace(type=ActivityType.add)
+        name = self.call_fut(activity, request_)
+        assert name.default.format_map(name.mapping)
+        assert name == 'activity_name_add'
+
+    def test_create_add_translation_if_remove_activity(self, activity,
+                                                       request_):
+        from adhocracy_core.interfaces import ActivityType
+        activity = activity._replace(type=ActivityType.remove)
+        name = self.call_fut(activity, request_)
+        assert name.default.format_map(name.mapping)
+        assert name == 'activity_name_remove'
+
+    def test_create_add_translation_if_update_activity(self, activity,
+                                                       request_):
+        from adhocracy_core.interfaces import ActivityType
+        activity = activity._replace(type=ActivityType.update)
+        name = self.call_fut(activity, request_)
+        assert name.default.format_map(name.mapping)
+        assert name == 'activity_name_update'
+
+
+@mark.usefixtures('get_subject_name', 'get_resource_type', 'get_title')
+class TestGenerateActivityDescription:
+
+    def call_fut(self, *args):
+        from . import generate_activity_description
+        return generate_activity_description(*args)
+
+    def test_create_translation_with_mapping(
+        self, activity, request_, get_subject_name, get_resource_type,
+        get_title):
+        from pyramid.i18n import TranslationString
+        name = self.call_fut(activity, request_)
+        get_subject_name.assert_called_with(activity.subject, request_.registry)
+        get_resource_type.assert_called_with(activity.subject, request_)
+        get_title.assert_called_with(activity.subject, request_.registry)
+        assert isinstance(name, TranslationString)
+        assert name.mapping == {'subject_name': 'user name',
+                                'object_title': 'title',
+                                'object_type_name': 'type name',
+                                'target_title': 'title',
+                                'target_type_name': 'type name',
+                                }
+
+    def test_create_missing_translation_if_no_type(self, activity, request_):
+        activity = activity._replace(type=None)
+        name = self.call_fut(activity, request_)
+        assert name == 'activity_missing'
+
+    def test_create_add_translation_if_add_activity(self, activity, request_):
+        from adhocracy_core.interfaces import ActivityType
+        activity = activity._replace(type=ActivityType.add)
+        name = self.call_fut(activity, request_)
+        assert name.default.format_map(name.mapping)
+        assert name == 'activity_description_add'
+
+    def test_create_add_translation_if_remove_activity(self, activity, request_):
+        from adhocracy_core.interfaces import ActivityType
+        activity = activity._replace(type=ActivityType.remove)
+        name = self.call_fut(activity, request_)
+        assert name.default.format_map(name.mapping)
+        assert name == 'activity_description_remove'
+
+    def test_create_add_translation_if_update_activity(self, activity, request_):
+        from adhocracy_core.interfaces import ActivityType
+        activity = activity._replace(type=ActivityType.update)
+        name = self.call_fut(activity, request_)
+        assert name.default.format_map(name.mapping)
+        assert name == 'activity_description_update'
+
+
+def test_get_subject_name_return_user_name(context, registry):
+    from adhocracy_core.sheets.principal import IUserBasic
+    from . import _get_subject_name
+    registry.content.get_sheet_field = Mock(return_value='user_name')
+    assert _get_subject_name(context, registry) == 'User_name'
+    registry.content.get_sheet_field.assert_called_with(context, IUserBasic,
+                                                        'name')
+
+
+def test_get_subject_name_return_application_if_no_user(registry):
+    """See https://www.w3.org/TR/activitystreams-vocabulary/#actor-types """
+    from . import _get_subject_name
+    assert _get_subject_name(None, registry) == 'Application'
+
+
+def test_get_type_name_return_content_name(context, request_, registry,
+                                           resource_meta):
+    from . import _get_type_name
+    request_.registry = registry
+    registry.content.resources_meta[resource_meta.iresource] =\
+        resource_meta._replace(content_name='Resource')
+    assert _get_type_name(context, request_) == 'Resource'
+
+
+def test_get_type_name_return_translated_content_name(context, request_,
+                                                      registry, resource_meta):
+    from . import _get_type_name
+    request_.localizer.translate = Mock()
+    request_.registry = registry
+    registry.content.resources_meta[resource_meta.iresource] =\
+        resource_meta._replace(content_name='Resource')
+    assert _get_type_name(context,
+                          request_) is request_.localizer.translate.return_value
+
+
+def test_get_type_name_return_empty_if_none(request_):
+    from . import _get_type_name
+    assert _get_type_name(None, request_) == ''
+
+
+def test_get_title_return_title(registry):
+    from adhocracy_core.sheets.title import ITitle
+    from . import _get_title
+    context = testing.DummyResource(__provides__=ITitle)
+    registry.content.get_sheet_field = Mock(return_value='title')
+    assert _get_title(context, registry) == 'title'
+    registry.content.get_sheet_field.assert_called_with(context, ITitle,
+                                                        'title')
+
+
+def test_get_title_return_title_of_last_version_if_item(registry, item):
+    from mock import call
+    from adhocracy_core.sheets.title import ITitle
+    from adhocracy_core.sheets.tags import ITags
+    from . import _get_title
+    version = testing.DummyResource(__provides__=ITitle)
+    registry.content.get_sheet_field = Mock(side_effect=(version, 'title'))
+    assert _get_title(item, registry) == 'title'
+    call_args_list = registry.content.get_sheet_field.call_args_list
+    assert call_args_list[0] == call(item, ITags, 'LAST')
+    assert call_args_list[1] == call(version, ITitle, 'title')
+
+
+def test_get_title_return_content_of_last_version_if_comment(registry, item):
+    from mock import call
+    from adhocracy_core.sheets.comment import IComment
+    from adhocracy_core.sheets.tags import ITags
+    from . import _get_title
+    version = testing.DummyResource(__provides__=IComment)
+    registry.content.get_sheet_field = Mock(side_effect=(version, 'title'))
+    assert _get_title(item, registry) == 'title'
+    call_args_list = registry.content.get_sheet_field.call_args_list
+    assert call_args_list[0] == call(item, ITags, 'LAST')
+    assert call_args_list[1] == call(version, IComment, 'content')
+
+
+
+def test_get_title_return_empty_if_missing_sheet(registry):
+    from . import _get_title
+    context = testing.DummyResource()
+    assert _get_title(context, registry) == ''
+
+
+def test_get_title_return_empty_string_if_none(registry):
+    from . import _get_title
+    assert _get_title(None, registry) == ''
+

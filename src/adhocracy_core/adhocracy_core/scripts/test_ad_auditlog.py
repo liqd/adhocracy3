@@ -17,9 +17,9 @@ class TestAuditlog:
     def mock_auditlog_entries(self, mocker, mock_timestamp):
         mock_auditlog_entries = Mock()
         mock_auditlog_entry1 = Mock()
-        mock_auditlog_entry1.resource_path = '/path1/x'
+        mock_auditlog_entry1.object_path = '/path1/x'
         mock_auditlog_entry2 = Mock()
-        mock_auditlog_entry2.resource_path = '/path2'
+        mock_auditlog_entry2.object_path = '/path2'
         mock_auditlog_entries.items.return_value = [
             (mock_timestamp, mock_auditlog_entry1),
             (mock_timestamp, mock_auditlog_entry2)]

@@ -31,6 +31,7 @@ class TestImportUsers:
 
 
     def test_create(self, context, registry, log):
+        from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
         from pyramid.traversal import resource_path
         from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
         self._tempfd, filename = mkstemp()

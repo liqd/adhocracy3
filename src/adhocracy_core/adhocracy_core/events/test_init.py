@@ -228,3 +228,24 @@ class IncludemeIntegrationTest(unittest.TestCase):
     def test_register_subsriber_predicats(self):
         assert self.config.get_predlist('event_isheet')
         assert self.config.get_predlist('object_iface')
+
+
+class TestIActivitiesAddedToAuditlog:
+
+    def make_one(self, *args):
+        from adhocracy_core.events import ActivitiesAddedToAuditLog
+        return ActivitiesAddedToAuditLog(*args)
+
+    def test_create(self):
+        from adhocracy_core.interfaces import IActivitiesAddedToAuditLog
+        from adhocracy_core.interfaces import Activity
+        auditlog = object()
+        activities = [Activity()]
+        request = object()
+        inst = self.make_one(auditlog, activities, request)
+        assert IActivitiesAddedToAuditLog.providedBy(inst)
+        assert verifyObject(IActivitiesAddedToAuditLog, inst)
+        assert inst.object == auditlog
+        assert inst.activities == activities
+        assert inst.request == request
+

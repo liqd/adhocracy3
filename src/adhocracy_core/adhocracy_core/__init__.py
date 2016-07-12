@@ -85,10 +85,10 @@ def add_after_commit_hooks(request):
 
 def add_request_callbacks(request):
     """Add request callbacks."""
-    from adhocracy_core.auditing import audit_resources_changes_callback
+    from adhocracy_core.auditing import update_auditlog_callback
     from adhocracy_core.changelog import clear_changelog_callback
     from adhocracy_core.changelog import clear_modification_date_callback
-    request.add_response_callback(audit_resources_changes_callback)
+    request.add_response_callback(update_auditlog_callback)
     request.add_finished_callback(clear_changelog_callback)
     request.add_finished_callback(clear_modification_date_callback)
 
@@ -120,6 +120,7 @@ def includeme(config):
     config.include('.websockets')
     config.include('.rest')
     config.include('.stats')
+    config.include('.notification')
     config.registry.registerUtility('', IFixtureAsset,
                                     name='adhocracy_core:test_users_fixture')
 
