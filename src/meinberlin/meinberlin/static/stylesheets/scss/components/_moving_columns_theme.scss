@@ -52,29 +52,6 @@
     vertical-align: baseline;
 }
 
-.moving-column-menu-switch {
-    @include rem(margin-right, 5px);
-    float: right;
-
-    .moving-column-menu-switch-item {
-        @include rem(padding, 0 8px);
-        background: $color-structure-normal;
-        border-right: 1px solid $color-background-base;
-        color: $color-text-introvert;
-        display: block;
-        float: left;
-
-        &:last-child {
-            border: 0;
-        }
-
-        &:hover, &:active, &.is-active {
-            background: $color-brand-two-normal;
-            color: $color-text-inverted;
-        }
-    }
-}
-
 .moving-column-menu-nav {
     .moving-column-menu-nav-button {
         @include rem(padding, 0 15px);

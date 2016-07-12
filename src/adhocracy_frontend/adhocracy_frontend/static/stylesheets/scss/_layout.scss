@@ -40,7 +40,6 @@ depends on a lot of factors:
 ```html_example
 <div class="l-header">
     <div class="l-header-left placeholder">left</div>
-    <div class="l-header-center placeholder">center</div>
     <div class="l-header-right placeholder">right</div>
 </div>
 ```
@@ -56,17 +55,9 @@ depends on a lot of factors:
 
 .l-header {
     @include clearfix;
+    @include rem(max-width, $moving-column-single-width-max);
     margin: 0 auto;
     position: relative;
-}
-
-.l-header,
-.l-header-center {
-    @include rem(max-width, $moving-column-single-width-max);
-}
-
-.l-header-left {
-    float: left;
 }
 
 .l-header-left,
@@ -75,17 +66,8 @@ depends on a lot of factors:
     z-index: 1;
 }
 
-.l-header-center {
-    position: absolute;
-    left: 0;
-    text-align: center;
-    top: 0;
-    width: 100%;
-    z-index: 0;
-
-    @media print {
-        position: static;
-    }
+.l-header-left {
+    float: left;
 }
 
 .l-header-right {
