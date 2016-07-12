@@ -182,6 +182,7 @@ class DummyRequest(testing.DummyRequest):
         self.errors = []
         self.content_type = 'application/json'
         self.text = ''
+        self.remote_addr = ''
 
     def authenticated_userid(self):
         return None
