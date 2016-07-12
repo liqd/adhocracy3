@@ -1,7 +1,8 @@
 <!-- FIXME: may contain links in adh-user-meta -->
-<a class="proposal-list-item {{selectedState}}" href="{{path | adhParentPath | adhResourceUrl }}">
+<a class="proposal-list-item {{selectedState}}" data-ng-class="{ 'm-contains-image': processOptions.hasImage }" href="{{path | adhParentPath | adhResourceUrl }}">
     <adh-show-image
         data-css-class="proposal-list-item-image"
+        data-ng-if="processOptions.hasImage"
         data-path="{{data.picture}}"
         data-format="thumbnail"
     ></adh-show-image>
