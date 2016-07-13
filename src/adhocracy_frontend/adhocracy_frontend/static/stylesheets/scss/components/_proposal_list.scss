@@ -9,10 +9,9 @@ A proposal list item. How a proposal appears when in a list
 
 ```html_example
 <a class="proposal-list-item" href="#">
-    <img class="proposal-list-item-image" alt="" src="/static/fallback_thumbnail.jpg" />
     <div class="proposal-list-item-body">
         <p class="proposal-list-item-username">Username</p>
-        <h3 class="proposal-list-item-title">Title here</h3>
+        <h3 class="proposal-list-item-title">Default</h3>
         <ul class="meta-list">
             <li class="meta-list-item">
                 <i class="icon-speechbubbles"></i> 0 Comments
@@ -20,18 +19,50 @@ A proposal list item. How a proposal appears when in a list
         </ul>
     </div>
 </a>
-2 columns
-<a class="proposal-list-item" href="#">
-    <div class="proposal-list-item-col-left">
-        <h3 class="proposal-list-item-title">Title here</h3>
+
+<a class="proposal-list-item m-contains-image" href="#">
+    <img class="proposal-list-item-image" alt="" src="/static/fallback_thumbnail.jpg" />
+    <div class="proposal-list-item-body">
         <p class="proposal-list-item-username">Username</p>
-    </div>
-    <div class="proposal-list-item-col-right">
+        <h3 class="proposal-list-item-title">Image</h3>
         <ul class="meta-list">
             <li class="meta-list-item">
                 <i class="icon-speechbubbles"></i> 0 Comments
             </li>
         </ul>
+    </div>
+</a>
+
+<a class="proposal-list-item" href="#">
+    <div class="proposal-list-item-body">
+        <div class="proposal-list-item-col-left">
+            <h3 class="proposal-list-item-title">2 columns</h3>
+            <p class="proposal-list-item-username">Username</p>
+        </div>
+        <div class="proposal-list-item-col-right">
+            <ul class="meta-list">
+                <li class="meta-list-item">
+                    <i class="icon-speechbubbles"></i> 0 Comments
+                </li>
+            </ul>
+        </div>
+    </div>
+</a>
+
+<a class="proposal-list-item m-contains-image" href="#">
+    <img class="proposal-list-item-image" alt="" src="/static/fallback_thumbnail.jpg" />
+    <div class="proposal-list-item-body">
+        <div class="proposal-list-item-col-left">
+            <h3 class="proposal-list-item-title">2 columns and image</h3>
+            <p class="proposal-list-item-username">Username</p>
+        </div>
+        <div class="proposal-list-item-col-right">
+            <ul class="meta-list">
+                <li class="meta-list-item">
+                    <i class="icon-speechbubbles"></i> 0 Comments
+                </li>
+            </ul>
+        </div>
     </div>
 </a>
 ```
@@ -64,15 +95,17 @@ $thumbnail-height: 90px;
             background: $color-background-base;
         }
     }
+
+    &.m-contains-image {
+        .proposal-list-item-body {
+            margin-left: $thumbnail-width + $image-margin;
+        }
+    }
 }
 
 .proposal-list-item-image {
     float: left;
     margin-right: $image-margin;
-}
-
-.proposal-list-item-body {
-    margin-left: $thumbnail-width + $image-margin;
 }
 
 .proposal-list-item-title,
