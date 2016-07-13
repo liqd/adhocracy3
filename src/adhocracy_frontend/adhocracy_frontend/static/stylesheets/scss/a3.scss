@@ -16,7 +16,6 @@
 
 @import "third_party/normalize";
 @import "general/normalize";
-@import "grid";
 @import "general/layout";
 @import "general/print";
 
@@ -62,7 +61,5 @@
 
 // Debug (these should not be importet in productive setups
 @import "debug/placeholder";
-
-@import "overwrite";
 
 @import "theme";

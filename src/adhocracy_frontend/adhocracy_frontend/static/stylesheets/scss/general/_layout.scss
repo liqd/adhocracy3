@@ -1,3 +1,21 @@
+// This is important for iframe resizing
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+/**
+ * When adhocracy is embedded, we have some code that determines its height and
+ * resizes the iframe accordingly.  For this to work, the body must not have
+ * any margins.  Apart from setting `margin: 0` on body we also need to prevent
+ * margin collapsing.  This can be done by adding a small padding both at the
+ * top and the bottom.  The trade-off is that there is some additional padding
+ * which might look strange.
+ */
+body {
+    padding: 1px 0;
+}
+
 .l-content {
     @include rem(top, 40px);
     position: absolute;
@@ -73,4 +91,20 @@ depends on a lot of factors:
     @include rem(max-width, 30rem);
     @include rem(margin, 5rem auto 10rem);
     @include rem(padding, 0.5rem);
+}
+
+@mixin container {
+    @include pie-clearfix;
+}
+
+.row {
+    @include container;
+}
+
+.cols-2 {
+    @include grid-same-width(2);
+}
+
+.cols-3 {
+    @include grid-same-width(3);
 }
