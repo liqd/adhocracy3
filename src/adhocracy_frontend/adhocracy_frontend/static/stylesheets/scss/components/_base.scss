@@ -2,7 +2,7 @@
 ---
 title: Inline
 name: inline
-category: Type
+category: Base
 ---
 */
 
@@ -32,7 +32,7 @@ body {
 ---
 title: Headings
 name: headings
-category: Type
+category: Base
 ---
 
 ```html_example
@@ -55,7 +55,7 @@ h1, h2, h3, h4, h5, h6 {
 ---
 title: Paragraph
 name: p
-category: Type
+category: Base
 ---
 
 ```html_example
@@ -78,7 +78,7 @@ p {
 ---
 title: link
 name: link
-category: Type
+category: Base
 ---
 
 A hyperlink. It may have the following states:
@@ -105,7 +105,7 @@ a {
 ---
 title: Disguised link mixin
 name: disguised-link
-category: Type
+category: Base
 ---
 
 A link that looks like a regular piece of text
@@ -151,7 +151,7 @@ section {
 ---
 title: Table
 name: table
-category: Type
+category: Base
 ---
 
 ```html_example
@@ -209,7 +209,7 @@ table {
 ---
 title: Lists
 name: lists
-category: Type
+category: Base
 ---
 */
 
@@ -274,7 +274,7 @@ dt {
 ---
 title: Blockquote
 name: blockqoute
-category: Type
+category: Base
 ---
 
 ```html_example
@@ -325,7 +325,7 @@ code {
 ---
 title: Preformated
 name: pre
-category: Type
+category: Base
 ---
 
 ```html_example

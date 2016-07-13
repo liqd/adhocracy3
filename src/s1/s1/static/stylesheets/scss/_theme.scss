@@ -1,6 +1,7 @@
 @import "general/mixins";
 @import "general/fonts_theme";
 @import "general/layout_theme";
+@import "components/base_theme";
 @import "components/button_theme";
 @import "components/comment_theme";
 @import "components/login_theme";
@@ -12,5 +13,4 @@
 @import "components/s1_proposal";
 @import "components/s1_user_profile";
 @import "components/s1_workflow_indicator";
-@import "components/type_theme";
 @import "components/user_indicator_theme";
