@@ -32,6 +32,8 @@ export var detailDirective = (
                 scope.facets = facets;
             });
 
+            scope.data = {};
+
             scope.sorts = [{
                 key: "rates",
                 name: "TR__RATES",
@@ -68,7 +70,7 @@ export var detailDirective = (
             adhPermissions.bindScope(scope, () => scope.path);
 
             scope.showMap = (isShowMap) => {
-                scope.isShowMap = isShowMap;
+                scope.data.isShowMap = isShowMap;
             };
         }
     };
