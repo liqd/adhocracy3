@@ -1,9 +1,9 @@
 <div data-ng-switch="transclusionId">
     <div data-ng-switch-when="menu">
         <i class="icon-list moving-column-icon"></i>
-        <a class="moving-column-menu-button"
-            data-ng-if="processOptions.POST"
-            data-ng-href="{{ processUrl | adhResourceUrl:'create_document' }}">{{ "TR__CREATE_DOCUMENT" | translate }}</a>
+        <adh-resource-actions
+            data-resource-path="{{processUrl | adhParentPath}}"
+            data-create-document="true"></adh-resource-actions>
     </div>
 
     <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ processUrl | adhResourceUrl }}">
