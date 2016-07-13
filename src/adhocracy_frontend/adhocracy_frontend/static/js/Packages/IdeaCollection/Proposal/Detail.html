@@ -1,54 +1,56 @@
 <article class="proposal-detail">
-    <header class="proposal-detail-header">
 
-        <div class="proposal-detail-image-clip" data-ng-if="data.picture">
-            <adh-show-image
-                data-css-path="proposal-detail-image"
-                data-no-fallback="true"
-                data-path="{{data.picture}}"
-            ></adh-show-image>
-        </div>
-        <span
-            data-ng-repeat="assignment in data.assignments"
-            class="badge"
-            data-ng-class="{
-                'm-is-realized': assignment.name === 'going_to_be_realized',
-                'm-is-not-realized': assignment.name === 'not_realizeable',
-                'm-on-test': assignment.name === 'on_test'
-            }">{{ assignment.title | translate }}</span>
+    <adh-background-image
+        data-css-path="proposal-detail-image"
+        data-no-fallback="true"
+        data-path="{{data.picture}}">
+        <header class="resource-header" data-ng-class="{'m-image': data.picture}">
+            <div class="resource-header-main">
+                <div class="resource-header-meta">
+                    <span
+                        data-ng-repeat="assignment in data.assignments"
+                        class="badge"
+                        data-ng-class="{
+                            'm-is-realized': assignment.name === 'going_to_be_realized',
+                            'm-is-not-realized': assignment.name === 'not_realizeable',
+                            'm-on-test': assignment.name === 'on_test'
+                        }">{{ assignment.title | translate }}</span>
+                </div>
 
-        <ul class="proposal-detail-meta">
-            <li data-ng-if="processOptions.hasLocationText" class="proposal-detail-meta-item proposal-detail-meta-item-location">
-                <i class="icon-pin-detail"></i> {{data.locationText}}
-            </li>
-            <li class="proposal-detail-meta-item proposal-detail-meta-item-comments">
-                <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="disguised-link">
-                    <i class="icon-speechbubble"></i> {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}
-                </a>
-            </li>
-            <li data-ng-if="!processOptions.maxBudget"></li>
-            <li class="proposal-detail-meta-item proposal-detail-meta-budget">
-                <div data-ng-if="processOptions.maxBudget"><i class="proposal-detail-meta-item-icon icon-budget"></i> {{data.budget | numberOrDash}} &euro;</div>
-            </li>
-            <li class="proposal-detail-meta-item proposal-detail-meta-participation">
-                <adh-rate data-refers-to="{{path}}"></adh-rate>
-            </li>
-        </ul>
-        <h1 class="proposal-detail-header-title">{{ data.title }}</h1>
-    </header>
+                <h1 class="resource-header-title">{{ data.title }}</h1>
+
+                <ul class="resource-header-meta">
+                    <li data-ng-if="processOptions.hasLocationText">
+                        <i class="icon-pin-detail"></i> {{data.locationText}}
+                    </li>
+                    <li data-ng-if="processOptions.maxBudget">
+                        <i class="proposal-detail-meta-item-icon icon-budget"></i> {{data.budget | numberOrDash}} &euro;
+                    </li>
+                    <li>
+                        {{ "TR__BY" | translate }} <adh-user-meta data-path="{{data.creator}}" data-ng-if="data.creator"></adh-user-meta>
+                    </li>
+                    <li>
+                        {{ "TR__ON" | translate }} <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
+                    </li>
+                    <li>
+                        <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}"
+                            ><i class="icon-speechbubble"></i> {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}</a>
+                    </li>
+                </ul>
+
+                <div class="resource-header-action">
+                    <adh-rate data-refers-to="{{path}}"></adh-rate>
+                </div>
+            </div>
+        </header>
+    </adh-background-image>
+
 
     <section class="proposal-detail-body">
         <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="disguised-link proposal-detail-body-comments">
             <i class="icon-speechbubble"></i> {{ data.commentCount }}
         </a>
         <p class="proposal-detail-detail">{{data.detail}}</p>
-
-        <p class="proposal-detail-author">
-            {{ "TR__BY" | translate }}
-            <adh-user-meta data-path="{{data.creator}}" data-ng-if="data.creator"></adh-user-meta><br/>
-            {{ "TR__ON" | translate }}
-            <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
-        </p>
     </section>
 
     <section class="proposal-badge-descriptions">

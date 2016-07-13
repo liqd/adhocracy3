@@ -1,0 +1,23 @@
+/*doc
+---
+title: image background
+name: image-background
+category: Widgets
+---
+
+A container that can contain any content. A background image set on the
+container will be centered and will cover the complete available space.
+
+```html_example
+<div class="image-background" style="background-image: url('/static/images/sample.jpg')">
+    <p>Consequatur laudantium quia quis corrupti rerum cumque. Dignissimos voluptatem ut quia. Quos recusandae consequuntur quos. Officia autem ea consequatur corporis harum quo veniam. Dicta vitae minima corrupti aut in. Dolore aut omnis sit voluptate cumque rem repellat.</p>
+</div>
+<div class="image-background" style="background-image: url('/static/images/sample.jpg')">
+    <p>Consequatur</p>
+</div>
+```
+*/
+.image-background {
+    background-size: cover;
+    background-position: 50%;
+}
