@@ -141,7 +141,7 @@ export var resourceDropdownDirective = (
                 scope.data.modals.clear();
             });
 
-            scope.toggleDropdown = () => {
+            scope.data.toggleDropdown = () => {
                 scope.isShowDropdown = !scope.isShowDropdown;
             };
         }
@@ -159,10 +159,12 @@ export var modalActionDirective = () => {
             modals: "=",
             modal: "@",
             label: "@",
+            toggleDropdown: "=?"
         },
         link: (scope) => {
             scope.toggle = () => {
                 scope.modals.toggleModal(scope.modal);
+                scope.toggleDropdown();
             };
         }
     };
@@ -184,6 +186,7 @@ export var assignBadgesActionDirective = (
             resourceWithBadgesUrl: "@?",
             class: "@",
             modals: "=",
+            toggleDropdown: "=?"
         },
         link: (scope) => {
             var badgeAssignmentPoolPath;
@@ -205,6 +208,7 @@ export var assignBadgesActionDirective = (
 
             scope.assignBadges = () => {
                 scope.modals.toggleModal("badges");
+                scope.toggleDropdown();
             };
         }
     };
