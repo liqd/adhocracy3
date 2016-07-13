@@ -92,8 +92,8 @@ class AddResourceSheetsBase(FormView):
         self.registry = self.request.registry
         self.sheets = self._get_creatable_sheets()
         self.schema = self._get_schema_with_bindings()
-        self.meta = self.registry.resources_meta[self.iresource]
-        content_name = self.meta_content_name or self.iresource.__identifier__
+        self.meta = self.registry.content.resources_meta[self.iresource]
+        content_name = self.meta.content_name or self.iresource.__identifier__
         self.title = _('Add {0}'.format(content_name))
 
     def _get_creatable_sheets(self) -> {}:
