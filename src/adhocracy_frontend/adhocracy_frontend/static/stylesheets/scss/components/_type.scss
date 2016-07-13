@@ -272,38 +272,6 @@ dt {
 
 /*doc
 ---
-title: Deleted
-name: del
-parent: inline
----
-
-```html_example
-<del>Example Text</del>
-```
-*/
-del {
-    text-decoration: line-through;
-    color: $color-function-negative;
-}
-
-/*doc
----
-title: Inserted
-name: ins
-parent: inline
----
-
-```html_example
-<ins>Example Text</ins>
-```
-*/
-ins {
-    text-decoration: underline;
-    color: $color-function-positive;
-}
-
-/*doc
----
 title: Blockquote
 name: blockqoute
 category: Type
@@ -391,33 +359,5 @@ parent: inline
 ```html_example
 <em>Example Text</em>
 <strong>Example Text</strong>
-```
-*/
-
-/*doc
----
-title: Address
-name: address
-category: Type
----
-
-```html_example
-<address>
-    John Q. Public<br />
-    123 Main Street<br />
-    Anywhere, ST 12345
-</address>
-```
-*/
-
-/*doc
----
-title: Time
-name: time
-parent: inline
----
-
-```html_example
-<time datetime="2013-04-18T13:50:47+02:00">18. April 2013 13:50</time>
 ```
 */
