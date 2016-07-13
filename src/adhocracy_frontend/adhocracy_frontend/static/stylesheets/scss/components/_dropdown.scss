@@ -1,0 +1,112 @@
+/*doc
+---
+title: image modifier
+name: resource-header.m-image
+parent: resource-header
+---
+
+Resource headers can have a background image.
+
+```html_example
+<div class="image-background" style="background-image: url('/static/images/sample.jpg')">
+    <header class="resource-header m-image">
+        <div class="resource-header-navigation">
+            <div class="resource-header-breadcrumbs">
+                <a href="#">← to process</a>
+            </div>
+            <a href="#" class="resource-header-actions">…</a>
+        </div>
+        <div class="resource-header-main">
+            <h1 class="resource-header-title">Johannisthal</h1>
+            <ul class="resource-header-meta">
+                <li>Bebauungsplanverfahren 184a</li>
+                <li>Öffentliche auslegung</li>
+                <li>22.9.-22.10.15</li>
+            </ul>
+            <div class="resource-header-action"><a href="#" class="button-cta">Create proposal</a></div>
+        </div>
+    </header>
+</div>
+```
+*/
+
+// The dropdown wrapper (div)
+.dropdown {
+    position: absolute;
+    top: $padding-small;
+    right: $padding-small;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.dropdown-icon {
+    @include rem(margin-right, 3px);
+    @include rem(font-size, 17px);
+    line-height: (24 / 17);
+    vertical-align: middle;
+}
+
+.dropdown-header-icon {
+    float: right;
+}
+
+// The dropdown menu (ul)
+.dropdown-menu {
+    border-radius: 3px;
+    float: left;
+    min-width: 120px;
+    padding: 0;
+    margin: 5px 0 0;
+    background-color: $color-text-inverted;
+    border: 1px solid $color-text-introvert;
+    list-style: none;
+
+    // Links within the dropdown menu
+    li {
+        display: block;
+        padding: 5px;
+        color: $color-text-normal;
+        border: 1px solid $color-text-introvert;
+        white-space: nowrap;
+
+        a {
+            color: inherit;
+        }
+
+        &:hover,
+        &:focus {
+            text-decoration: none;
+            color: $color-brand-two-normal;
+            background-color: $color-structure-normal;
+        }
+    }
+}
+
+// Active state
+.dropdown-menu .active > li {
+    &,
+    &:hover,
+    &:focus {
+        color: $color-brand-two-normal;
+        text-decoration: none;
+        outline: 0;
+        background-color: $color-structure-normal;
+    }
+}
+
+// Menu positioning
+.dropdown-menu-right {
+    left: auto;
+    right: 0;
+}
+
+// Dropdown section headers
+.dropdown-header {
+    display: block;
+    padding: 3px 20px;
+    font-size: $font-size-small;
+    line-height: 1px;
+    color: $color-structure-introvert;
+    white-space: nowrap; // as with > li > a
+}
+

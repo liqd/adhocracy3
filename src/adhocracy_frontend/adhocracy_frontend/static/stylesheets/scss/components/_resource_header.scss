@@ -34,6 +34,7 @@ actions (edit, share, report, print, ...).
     position: relative;
     padding: $padding-small;
     margin-bottom: $padding-small;
+    z-index: 0;
 }
 
 .resource-header-main {
@@ -74,12 +75,6 @@ actions (edit, share, report, print, ...).
     a {
         color: inherit;
     }
-}
-
-.resource-header-actions {
-    position: absolute;
-    top: $padding-small;
-    right: $padding-small;
 }
 
 .resource-header-breadcrumbs {
