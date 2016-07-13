@@ -189,14 +189,14 @@ category: Type
 table {
     td, th {
         @include rem(padding, 0.5rem);
-        @include text-align(start);
+        text-align: left;
         border-top: 1px solid $color-structure-introvert;
         vertical-align: top;
     }
 
     thead, tfoot {
         th {
-            @include text-align(center);
+            text-align: center;
         }
     }
 
