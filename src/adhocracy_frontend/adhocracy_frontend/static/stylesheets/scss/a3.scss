@@ -16,9 +16,9 @@
 
 @import "third_party/normalize";
 @import "general/normalize";
-
 @import "grid";
-@import "layout";
+@import "general/layout";
+@import "general/print";
 
 @import "components/type";
 @import "components/badges";
@@ -64,7 +64,5 @@
 @import "debug/placeholder";
 
 @import "overwrite";
-
-@import "print";
 
 @import "theme";
