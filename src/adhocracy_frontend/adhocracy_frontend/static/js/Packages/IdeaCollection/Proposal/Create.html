@@ -50,7 +50,7 @@
                 data-ng-model="data.budget"
                 name="budget"
                 min="0"
-                max="processOptions.maxBudget"
+                max="{{processOptions.maxBudget}}"
                 required="required" />
             <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.budget, 'required')">
                 {{ "TR__IDEA_COLLECTION_ERROR_REQUIRED_BUDGET" | translate }}
