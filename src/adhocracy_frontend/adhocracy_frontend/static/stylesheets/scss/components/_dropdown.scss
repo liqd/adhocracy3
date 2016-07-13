@@ -62,16 +62,12 @@ Resource headers can have a background image.
     list-style: none;
 
     // Links within the dropdown menu
-    li {
+    a {
         display: block;
         padding: 5px;
         color: $color-text-normal;
         border: 1px solid $color-text-introvert;
         white-space: nowrap;
-
-        a {
-            color: inherit;
-        }
 
         &:hover,
         &:focus {
@@ -83,7 +79,7 @@ Resource headers can have a background image.
 }
 
 // Active state
-.dropdown-menu .active > li {
+.dropdown-menu .active > a {
     &,
     &:hover,
     &:focus {
