@@ -1,6 +1,6 @@
-@mixin stretch {
+.l-content {
+    @include rem(top, 40px);
     position: absolute;
-    top: 0;
     bottom: 0;
     left: 0;
     right: 0;
@@ -10,11 +10,6 @@
         position: static;
         overflow: visible;
     }
-}
-
-.l-content {
-    @include stretch;
-    @include rem(top, 40px);
 }
 
 /*doc
