@@ -37,6 +37,12 @@ actions (edit, share, report, print, ...).
     z-index: 0;
 }
 
+.resource-header-actions {
+    position: absolute;
+    right: $padding-small;
+    top: $padding-small;
+}
+
 .resource-header-main {
     @include rem(margin, 3em auto 4rem);
     max-width: 40em;
@@ -96,14 +102,14 @@ parent: resource-header
 Resource headers can have a background image.
 
 ```html_example
-<div class="image-background" style="background-image: url('/static/images/sample.jpg')">
-    <header class="resource-header m-image">
-        <div class="resource-header-navigation">
-            <div class="resource-header-breadcrumbs">
-                <a href="#">← to process</a>
-            </div>
-            <a href="#" class="resource-header-actions">…</a>
+<header class="resource-header m-image">
+    <div class="resource-header-navigation">
+        <div class="resource-header-breadcrumbs">
+            <a href="#">← to process</a>
         </div>
+        <a href="#" class="resource-header-actions">…</a>
+    </div>
+    <div class="image-background" style="background-image: url('/static/images/sample.jpg')">
         <div class="resource-header-main">
             <h1 class="resource-header-title">Johannisthal</h1>
             <ul class="resource-header-meta">
@@ -113,8 +119,8 @@ Resource headers can have a background image.
             </ul>
             <div class="resource-header-action"><a href="#" class="button-cta">Create proposal</a></div>
         </div>
-    </header>
-</div>
+    </div>
+</header>
 ```
 */
 .resource-header.m-image {
