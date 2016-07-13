@@ -209,24 +209,6 @@ States:
     @include rem(padding, 0 0 0 $padding-small);
     background: $color-structure-normal;
 
-    .moving-column-menu-button {
-        @include rem(font-size, $font-size-small);
-        @include rem(margin-right, 30px);
-        display: inline-block;
-        color: $color-text-highlight-introvert;
-        font-weight: $font-weight-introvert;
-        float: left;
-        text-decoration: none;
-
-        &:hover, &:focus {
-            color: $color-text-highlight-extrovert;
-        }
-
-        &:active, &.is-active {
-            color: $color-text-highlight-normal;
-         }
-    }
-
     @media print {
         display: none;
     }
