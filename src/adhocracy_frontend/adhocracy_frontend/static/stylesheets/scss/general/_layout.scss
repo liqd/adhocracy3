@@ -93,6 +93,27 @@ depends on a lot of factors:
     @include rem(padding, 0.5rem);
 }
 
+/*doc
+---
+title: Grid
+name: grid
+category: Layout
+---
+
+We use a regular 12-column grid with fixed gutters.
+
+```html_example
+<div class="row">
+    <div class="placeholder cols-2">Col 1</div>
+    <div class="placeholder cols-2">Col 2</div>
+</div>
+<div class="row">
+    <div class="placeholder cols-3">Col 1</div>
+    <div class="placeholder cols-3">Col 2</div>
+    <div class="placeholder cols-3">Col 3</div>
+</div>
+```
+*/
 @mixin container {
     @include pie-clearfix;
 }
