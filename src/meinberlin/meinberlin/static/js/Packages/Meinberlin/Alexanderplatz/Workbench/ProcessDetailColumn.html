@@ -6,11 +6,6 @@
         <div class="moving-column-tab" data-ng-if="data.isShowMap">
             <i class="icon-map-filled moving-column-icon"></i>
         </div>
-        <adh-resource-actions
-            data-ng-if="processOptions.canPost(documentItemType) && tab === 'documents'"
-            data-ng-click="setCameFrom()"
-            data-resource-path="{{processUrl | adhParentPath}}"
-            data-create-document="true"></adh-resource-actions>
     </div>
 
     <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ processUrl | adhResourceUrl }}">
@@ -74,6 +69,10 @@
         </div>
 
         <div data-ng-if="tab === 'documents'">
+            <adh-resource-actions
+                data-ng-if="processOptions.canPost(documentItemType)"
+                data-resource-path="{{processUrl}}"
+                data-create-document="true"></adh-resource-actions>
             <div
                 class="map-info-persistent"
                 data-ng-if="data.isShowMap"
