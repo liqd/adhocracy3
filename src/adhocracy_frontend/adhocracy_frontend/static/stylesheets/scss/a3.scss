@@ -1,6 +1,7 @@
 @import "../../lib/sass-planifolia/sass/math";
 @import "../../lib/sass-planifolia/sass/contrast";
 @import "../../lib/sass-planifolia/sass/grid";
+@import "../../lib/sass-planifolia/sass/clearfix";
 
 @import "general/variables";
 @import "general/variables_theme";
@@ -15,11 +16,10 @@
 
 @import "third_party/normalize";
 @import "general/normalize";
+@import "general/layout";
+@import "general/print";
 
-@import "grid";
-@import "layout";
-
-@import "components/type";
+@import "components/base";
 @import "components/badges";
 @import "components/forms";
 @import "components/button";
@@ -61,9 +61,5 @@
 
 // Debug (these should not be importet in productive setups
 @import "debug/placeholder";
-
-@import "overwrite";
-
-@import "print";
 
 @import "theme";

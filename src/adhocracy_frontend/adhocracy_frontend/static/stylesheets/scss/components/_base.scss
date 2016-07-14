@@ -2,7 +2,7 @@
 ---
 title: Inline
 name: inline
-category: Type
+category: Base
 ---
 */
 
@@ -32,7 +32,7 @@ body {
 ---
 title: Headings
 name: headings
-category: Type
+category: Base
 ---
 
 ```html_example
@@ -55,7 +55,7 @@ h1, h2, h3, h4, h5, h6 {
 ---
 title: Paragraph
 name: p
-category: Type
+category: Base
 ---
 
 ```html_example
@@ -78,7 +78,7 @@ p {
 ---
 title: link
 name: link
-category: Type
+category: Base
 ---
 
 A hyperlink. It may have the following states:
@@ -105,7 +105,7 @@ a {
 ---
 title: Disguised link mixin
 name: disguised-link
-category: Type
+category: Base
 ---
 
 A link that looks like a regular piece of text
@@ -151,7 +151,7 @@ section {
 ---
 title: Table
 name: table
-category: Type
+category: Base
 ---
 
 ```html_example
@@ -189,14 +189,14 @@ category: Type
 table {
     td, th {
         @include rem(padding, 0.5rem);
-        @include text-align(start);
+        text-align: left;
         border-top: 1px solid $color-structure-introvert;
         vertical-align: top;
     }
 
     thead, tfoot {
         th {
-            @include text-align(center);
+            text-align: center;
         }
     }
 
@@ -209,7 +209,7 @@ table {
 ---
 title: Lists
 name: lists
-category: Type
+category: Base
 ---
 */
 
@@ -272,41 +272,9 @@ dt {
 
 /*doc
 ---
-title: Deleted
-name: del
-parent: inline
----
-
-```html_example
-<del>Example Text</del>
-```
-*/
-del {
-    text-decoration: line-through;
-    color: $color-function-negative;
-}
-
-/*doc
----
-title: Inserted
-name: ins
-parent: inline
----
-
-```html_example
-<ins>Example Text</ins>
-```
-*/
-ins {
-    text-decoration: underline;
-    color: $color-function-positive;
-}
-
-/*doc
----
 title: Blockquote
 name: blockqoute
-category: Type
+category: Base
 ---
 
 ```html_example
@@ -357,7 +325,7 @@ code {
 ---
 title: Preformated
 name: pre
-category: Type
+category: Base
 ---
 
 ```html_example
@@ -391,33 +359,5 @@ parent: inline
 ```html_example
 <em>Example Text</em>
 <strong>Example Text</strong>
-```
-*/
-
-/*doc
----
-title: Address
-name: address
-category: Type
----
-
-```html_example
-<address>
-    John Q. Public<br />
-    123 Main Street<br />
-    Anywhere, ST 12345
-</address>
-```
-*/
-
-/*doc
----
-title: Time
-name: time
-parent: inline
----
-
-```html_example
-<time datetime="2013-04-18T13:50:47+02:00">18. April 2013 13:50</time>
 ```
 */
