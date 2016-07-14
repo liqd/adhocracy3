@@ -21,3 +21,39 @@ container will be centered and will cover the complete available space.
     background-size: cover;
     background-position: 50%;
 }
+
+/*doc
+---
+title: Image Upload
+name: image-upload
+category: Widgets
+---
+
+<div class="image-upload">
+    <button type="button" class="button-cta-secondary image-upload-button">Change image</button>
+    <a  href="#" class="button image-upload-reset">reset</a>
+    <img src="/static/images/sample.jpg" class="image-upload-preview" width="200" alt="" />
+</div>
+*/
+.image-upload {
+    @include rem(margin, 1.4rem 0);
+
+    .form-footer {
+        @include rem(margin-top, 1rem);
+    }
+
+    &.m-standalone {
+        @include rem(margin-left, 1rem);
+        @include rem(margin-right, 1rem);
+    }
+}
+
+.image-upload-submit-button {
+    @include rem(margin-right, 1rem);
+}
+
+.image-upload-preview {
+    @include rem(margin, 0.7rem 0);
+    @include rem(max-height, 10rem);
+    display: block;
+}
