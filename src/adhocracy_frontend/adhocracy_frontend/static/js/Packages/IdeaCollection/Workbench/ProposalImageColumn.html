@@ -3,10 +3,6 @@
         <div class="moving-column-tab">
             <i class="icon-document moving-column-icon"></i>
         </div>
-        <adh-resource-actions
-            data-resource-path="{{documentUrl | adhParentPath}}"
-            data-cancel="true">
-        </adh-resource-actions>
         <div class="moving-column-menu-nav">
             <a class="moving-column-menu-nav-button" data-ng-href="{{ processUrl | adhResourceUrl }}" title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
         </div>
@@ -16,11 +12,16 @@
         <i class="icon-document moving-column-icon"></i>
     </a>
 
-    <adh-upload-image
-        data-ng-switch-when="body"
-        data-ng-if="proposalUrl"
-        data-path="{{proposalUrl}}"
-        data-pool-path="{{processUrl}}"
-        data-did-complete-upload="goBack()"
-    ></adh-upload-image>
+    <div data-ng-switch-when="body">
+        <adh-resource-actions
+            data-resource-path="{{documentUrl | adhParentPath}}"
+            data-cancel="true">
+        </adh-resource-actions>
+        <adh-upload-image
+            data-ng-if="proposalUrl"
+            data-path="{{proposalUrl}}"
+            data-pool-path="{{processUrl}}"
+            data-did-complete-upload="goBack()"
+        ></adh-upload-image>
+    </div>
 </div>
