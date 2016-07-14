@@ -101,6 +101,12 @@ def reindex_workflow_state(event):
         catalogs.reindex_index(versionable, 'workflow_state')
 
 
+def reindex_comments(event):
+    """Reindex comments index if a backreference is modified/created."""
+    catalogs = find_service(event.object, 'catalogs')
+    catalogs.reindex_index(event.object, 'comments')
+
+
 def includeme(config):
     """Register index subscribers."""
     config.add_subscriber(reindex_tag,
@@ -140,5 +146,8 @@ def includeme(config):
     config.add_subscriber(reindex_user_activation_path,
                           IResourceSheetModified,
                           event_isheet=IUserBasic)
+    config.add_subscriber(reindex_comments,
+                          ISheetBackReferenceModified,
+                          event_isheet=ICommentable)
     # add subscriber to updated allowed index
     config.scan('substanced.objectmap.subscribers')

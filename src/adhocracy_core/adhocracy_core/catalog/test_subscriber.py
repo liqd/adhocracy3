@@ -184,6 +184,11 @@ def test_reindex_workflow_state(event, catalog):
     assert call(event.object['version'], 'workflow_state') in index_calls
     assert call(event.object['other'], 'workflow_state') not in index_calls
 
+def test_reindex_comments_idnex(event, catalog, mock_sheet, registry_with_content):
+    from .subscriber import reindex_comments
+    reindex_comments(event)
+    catalog.reindex_index.assert_called_with(event.object, 'comments')
+
 @mark.usefixtures('integration')
 def test_register_subscriber(registry):
     from adhocracy_core.catalog import subscriber
