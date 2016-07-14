@@ -1,5 +1,11 @@
 <div class="action-bar">
     <adh-view-action
+        data-ng-if="createDocument && resourcePath && options.POST"
+        data-class="action-bar-item"
+        data-view="create_document"
+        data-label="TR__CREATE_DOCUMENT"
+        data-resource-path="{{resourcePath}}"></adh-view-action>
+    <adh-view-action
         data-ng-if="edit && resourcePath && options.PUT"
         data-class="action-bar-item"
         data-view="edit"
