@@ -14,6 +14,8 @@ import * as Workbench from "./Workbench";
 export var moduleName = "adhS1Workbench";
 
 export var register = (angular) => {
+    var processType = RIS1Process.content_type;
+
     angular
         .module(moduleName, [
             AdhCommentModule.moduleName,
@@ -22,7 +24,14 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .config(["adhResourceAreaProvider", Workbench.registerRoutes(RIS1Process.content_type)])
+        .config(["adhResourceAreaProvider", "adhConfig", (
+            adhResourceAreaProvider,
+            adhConfig
+        ) => {
+            var processHeaderSlot = adhConfig.pkg_path + Workbench.pkgLocation + "/ProcessHeaderSlot.html";
+            adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
+            Workbench.registerRoutes(processType)(adhResourceAreaProvider);
+        }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[RIS1Process.content_type] = "<adh-s1-workbench></adh-s1-workbench>";
         }])
