@@ -2,20 +2,14 @@ $state-height: 15px;
 
 .workflow-switch {
     @include clearfix;
-    @include rem(margin, 0 auto 27px);
-    width: $moving-column-single-width-max;
-}
+    @include rem(margin, 0 auto);
+    text-align: center;
 
-.workflow-switch.has-switch .workflow-switch-transcluded {
-    @include grid-span(9, 0);
+    > * {
+        display: inline-block;
+    }
 }
 
 .workflow-switch-container {
-    @include grid-span(3, 9);
-    text-align: center;
-
-    .button {
-        @include rem(line-height, $state-height);
-        height: auto;
-    }
+    margin-left: 20px;
 }

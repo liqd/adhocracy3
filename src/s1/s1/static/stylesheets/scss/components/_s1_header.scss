@@ -1,5 +1,21 @@
+.current-process-title {
+    top: rem(0px);
+    left: rem(170px);
+    position: absolute;
+    display: block;
+    line-height: rem(52px);
+
+    font-size: $font-size-large;
+    text-decoration: none;
+
+    &:hover, &:focus {
+        text-decoration: underline;
+    }
+}
+
 .s1-header {
-    @include rem(padding, 10px 0 17px);
+    margin-top: rem(50px);
+    margin-bottom: rem(10px);
 
     position: relative;
 }
@@ -25,8 +41,6 @@
 }
 
 .s1-header-menu {
-    // space for logo
-    @include rem(margin-left, 140px);
     white-space: nowrap;
     text-align: center;
 
