@@ -9,6 +9,7 @@ import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
 import * as SIWorkflow from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
+import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
 
 var pkgLocation = "/Process";
 
@@ -170,3 +171,23 @@ export var listingDirective = (adhConfig : AdhConfig.IService) => {
         }
     };
 };
+
+export var currentProcessTitleDirective = (
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhHttp: AdhHttp.Service
+) => {
+    return {
+        restrict: "E",
+        scope: {},
+        template: "<a class=\"current-process-title\" data-ng-href=\"{{processUrl | adhResourceUrl}}\">{{processTitle}}</a>",
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.on("processUrl", (processUrl) => {
+                adhHttp.get(processUrl).then((process) => {
+                    scope.processTitle = process.data[SITitle.nick].title;
+                });
+            }));
+        }
+    };
+};
+
