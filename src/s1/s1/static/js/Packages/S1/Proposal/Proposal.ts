@@ -306,7 +306,7 @@ export var listingDirective = (
         },
         link: (scope) => {
             scope.contentType = RIProposalVersion.content_type;
-            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope)); // REFACT is this even neccessary?
             scope.params = {};
 
             if (scope.creator) {
