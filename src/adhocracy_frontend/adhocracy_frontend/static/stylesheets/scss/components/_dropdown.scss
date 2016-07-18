@@ -1,34 +1,55 @@
 /*doc
 ---
-title: image modifier
-name: resource-header.m-image
+title: dropdown
+name: Dropdown
 parent: resource-header
 ---
 
-Resource headers can have a background image.
+A basic dropdown that is currently used for resource actions.
 
 ```html_example
-<div class="image-background" style="background-image: url('/static/images/sample.jpg')">
-    <header class="resource-header m-image">
-        <div class="resource-header-navigation">
-            <div class="resource-header-breadcrumbs">
-                <a href="#">← to process</a>
-            </div>
-            <a href="#" class="resource-header-actions">…</a>
-        </div>
-        <div class="resource-header-main">
-            <h1 class="resource-header-title">Johannisthal</h1>
-            <ul class="resource-header-meta">
-                <li>Bebauungsplanverfahren 184a</li>
-                <li>Öffentliche auslegung</li>
-                <li>22.9.-22.10.15</li>
-            </ul>
-            <div class="resource-header-action"><a href="#" class="button-cta">Create proposal</a></div>
-        </div>
-    </header>
+<div class="dropdown">
+    <div aria-haspopup="isShowDropdown" aria-expanded="isShowDropdown">
+        <i class="icon-three-dots dropdown-icon dropdown-header-icon" role="button" style="display: block;"></i>
+    </div>
+    <ul class="dropdown-menu dropdown-menu-right" data-ng-if="isShowDropdown" aria-labelledby="dropdownMenu1" style="display: block;">
+        <li>
+            <a class="" href="">
+                <i class="icon-pencil dropdown-icon"></i>bearbeiten
+            </a>
+        </li>
+        <li>
+            <a class="" href="">
+                <i class="icon-tags dropdown-icon"></i>Etiketten
+            </a>
+        </li>
+        <li>
+            <a class="" href="">
+                <i class="icon-flag dropdown-icon"></i>melden
+            </a>
+        </li>
+        <li>
+            <a class="" href="">
+                <i class="icon-trash dropdown-icon"></i>löschen
+            </a>
+        </li>
+        <li>
+            <a class="" href="">
+                <i class="icon-print dropdown-icon"></i>drucken
+            </a>
+        </li>
+        <li>
+            <a class="" href="">
+                <i class="icon-x dropdown-icon"></i>abbrechen
+            </a>
+        </li>
+    </ul>
 </div>
 ```
 */
+
+// Very vaguely based on:
+// https://github.com/angular-ui/bootstrap/tree/master/src/dropdown.
 
 // The dropdown wrapper (div)
 .dropdown {
