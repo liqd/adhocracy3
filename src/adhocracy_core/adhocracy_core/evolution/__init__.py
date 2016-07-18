@@ -871,6 +871,17 @@ def add_followable_sheet_to_process(root, registry):  # pragma: no cover
 
 
 @log_migration
+def remove_comment_count_data(root, registry):  # pragma: no cover
+    """Remove comment_count data in ICommentable sheet."""
+    from adhocracy_core.sheets.comment import ICommentable
+    catalogs = find_service(root, 'catalogs')
+    commentables = _search_for_interfaces(catalogs, ICommentable)
+    for commentable in commentables:
+        sheet = registry.content.get_sheet(commentable, ICommentable)
+        sheet.delete_field_values['comment_count']
+
+
+@log_migration
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -917,3 +928,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(migrate_auditlogentries_to_activities)
     config.add_evolution_step(add_notification_sheet_to_user)
     config.add_evolution_step(add_followable_sheet_to_process)
+    config.add_evolution_step(remove_comment_count_data)
