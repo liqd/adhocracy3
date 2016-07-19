@@ -1,16 +1,7 @@
-import * as AdhAbuseModule from "../../Abuse/Module";
-import * as AdhCommentModule from "../../Comment/Module";
-import * as AdhHttpModule from "../../Http/Module";
-import * as AdhMovingColumnsModule from "../../MovingColumns/Module";
-import * as AdhPermissionsModule from "../../Permissions/Module";
 import * as AdhEmbedModule from "../../Embed/Module";
 import * as AdhIdeaCollectionModule from "../../IdeaCollection/Module";
 import * as AdhProcessModule from "../../Process/Module";
-import * as AdhResourceActionsModule from "../../ResourceActions/Module";
 import * as AdhResourceAreaModule from "../../ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
-
-import * as AdhProposalModule from "../Proposal/Module";
 
 import * as AdhEmbed from "../../Embed/Embed";
 import * as AdhIdeaCollectionWorkbench from "../../IdeaCollection/Workbench/Workbench";
@@ -21,26 +12,15 @@ import RIPcompassProcess from "../../../Resources_/adhocracy_pcompass/resources/
 import RIProposal from "../../../Resources_/adhocracy_core/resources/proposal/IProposal";
 import RIProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
 
-import * as Workbench from "./Workbench";
-
 
 export var moduleName = "adhPcompassWorkbench";
 
 export var register = (angular) => {
     angular
         .module(moduleName, [
-            AdhAbuseModule.moduleName,
-            AdhCommentModule.moduleName,
-            AdhHttpModule.moduleName,
-            AdhMovingColumnsModule.moduleName,
-            AdhPermissionsModule.moduleName,
             AdhEmbedModule.moduleName,
             AdhIdeaCollectionModule.moduleName,
             AdhProcessModule.moduleName,
-            AdhProposalModule.moduleName,
-            AdhResourceActionsModule.moduleName,
-            AdhResourceAreaModule.moduleName,
-            AdhTopLevelStateModule.moduleName
             AdhResourceAreaModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
@@ -63,12 +43,5 @@ export var register = (angular) => {
                 proposalClass: RIProposal,
                 proposalVersionClass: RIProposalVersion
             };
-        }])
-        .directive("adhPcompassWorkbench", ["adhTopLevelState", "adhConfig", "adhHttp", Workbench.workbenchDirective])
-        .directive("adhPcompassProposalDetailColumn", [
-            "$timeout", "adhConfig", "adhPermissions", "adhTopLevelState", Workbench.proposalDetailColumnDirective])
-        .directive("adhPcompassProposalCreateColumn", ["adhConfig", "adhTopLevelState", Workbench.proposalCreateColumnDirective])
-        .directive("adhPcompassProposalEditColumn", ["adhConfig", "adhTopLevelState", Workbench.proposalEditColumnDirective])
-        .directive("adhPcompassProcessDetailColumn", [
-            "adhConfig", "adhPermissions", "adhTopLevelState", Workbench.processDetailColumnDirective]);
+        }]);
 };
