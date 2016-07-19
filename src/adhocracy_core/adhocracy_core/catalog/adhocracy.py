@@ -162,7 +162,7 @@ def index_comments(resource, default) -> int:
                                   interfaces=ICommentVersion,
                                   indexes={'tag': 'LAST'},
                                   only_visible=True,
-                                  references=[(None, IComment, 'object',
+                                  references=[(None, IComment, 'refers_to',
                                                resource)
                                               ],
                                   )
