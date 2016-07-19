@@ -3,6 +3,7 @@ import * as AdhCommentModule from "../../Comment/Module";
 import * as AdhHttpModule from "../../Http/Module";
 import * as AdhMovingColumnsModule from "../../MovingColumns/Module";
 import * as AdhPermissionsModule from "../../Permissions/Module";
+import * as AdhEmbedModule from "../../Embed/Module";
 import * as AdhIdeaCollectionModule from "../../IdeaCollection/Module";
 import * as AdhProcessModule from "../../Process/Module";
 import * as AdhResourceActionsModule from "../../ResourceActions/Module";
@@ -11,6 +12,7 @@ import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
 
 import * as AdhProposalModule from "../Proposal/Module";
 
+import * as AdhEmbed from "../../Embed/Embed";
 import * as AdhIdeaCollectionWorkbench from "../../IdeaCollection/Workbench/Workbench";
 import * as AdhProcess from "../../Process/Process";
 import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
@@ -32,6 +34,7 @@ export var register = (angular) => {
             AdhHttpModule.moduleName,
             AdhMovingColumnsModule.moduleName,
             AdhPermissionsModule.moduleName,
+            AdhEmbedModule.moduleName,
             AdhIdeaCollectionModule.moduleName,
             AdhProcessModule.moduleName,
             AdhProposalModule.moduleName,
@@ -40,11 +43,15 @@ export var register = (angular) => {
             AdhTopLevelStateModule.moduleName
             AdhResourceAreaModule.moduleName
         ])
+        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
+            adhEmbedProvider.registerContext("pcompass");
+        }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
             var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
                     RIPcompassProcess, RIProposal, RIProposalVersion);
             registerRoutes()(adhResourceAreaProvider);
+            registerRoutes("pcompass")(adhResourceAreaProvider);
             adhResourceAreaProvider.processHeaderSlots[RIPcompassProcess.content_type] = processHeaderSlot;
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
