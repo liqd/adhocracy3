@@ -1,7 +1,7 @@
-<div class="dropdown">
-    <div aria-haspopup="isShowDropdown" aria-expanded="isShowDropdown">
-        <i class="icon-three-dots dropdown-icon dropdown-header-icon" data-ng-if="!data.modals.modal" data-ng-click="data.toggleDropdown()"></i>
-    </div>
+<div class="dropdown resource-header-actions" data-ng-if="!data.modals.modal">
+    <a href="" tabindex="0" aria-haspopup="isShowDropdown" aria-expanded="isShowDropdown" data-ng-click="data.toggleDropdown()">
+        <i class="icon-three-dots dropdown-icon dropdown-header-icon"></i>
+    </a>
     <div class="dropdown-menu dropdown-menu-right" data-ng-if="isShowDropdown" aria-labelledby="dropdownMenu1">
         <adh-view-action
             data-ng-if="data.edit && data.resourcePath && options.PUT"

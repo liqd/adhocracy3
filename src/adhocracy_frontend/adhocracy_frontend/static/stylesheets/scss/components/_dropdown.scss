@@ -9,9 +9,9 @@ A basic dropdown that is currently used for resource actions.
 
 ```html_example
 <div class="dropdown">
-    <div aria-haspopup="isShowDropdown" aria-expanded="isShowDropdown">
-        <i class="icon-three-dots dropdown-icon dropdown-header-icon" role="button" style="display: block;"></i>
-    </div>
+    <a class="dropdown-button" href="" tabindex="0" aria-haspopup="isShowDropdown" aria-expanded="isShowDropdown" role="button" style="display: block;">
+        <i class="icon-three-dots dropdown-icon dropdown-header-icon"></i>
+    </a>
     <ul class="dropdown-menu dropdown-menu-right" data-ng-if="isShowDropdown" aria-labelledby="dropdownMenu1" style="display: block;">
         <li>
             <a class="" href="">
@@ -53,48 +53,50 @@ A basic dropdown that is currently used for resource actions.
 
 // The dropdown wrapper (div)
 .dropdown {
-    position: absolute;
-    top: $padding-small;
-    right: $padding-small;
     cursor: pointer;
-    z-index: 1;
 }
 
 .dropdown-icon {
     @include rem(margin-right, 3px);
-    @include rem(font-size, 17px);
+    @include rem(font-size, $font-size-normal);
     line-height: (24 / 17);
     vertical-align: middle;
 }
 
 .dropdown-header-icon {
-    float: right;
+    @include rem(font-size, $font-size-plus);
+    color: $color-text-normal;
 }
 
 // The dropdown menu (ul)
 .dropdown-menu {
-    border-radius: 3px;
-    float: left;
-    min-width: 120px;
+    position: absolute;
+    border-radius: 2px;
+    min-width: 10em;
     padding: 0;
     margin: 5px 0 0;
     background-color: $color-text-inverted;
-    border: 1px solid $color-text-introvert;
+    border: 1px solid $color-structure-normal;
     list-style: none;
+    z-index: 1;
 
     // Links within the dropdown menu
     a {
         display: block;
-        padding: 5px;
+        padding: 8px;
         color: $color-text-normal;
-        border: 1px solid $color-text-introvert;
+        border-bottom: 1px solid $color-structure-normal;
         white-space: nowrap;
 
         &:hover,
         &:focus {
             text-decoration: none;
             color: $color-brand-two-normal;
-            background-color: $color-structure-normal;
+            background-color: $color-background-base-introvert;
+        }
+
+        :last-of-type {
+            border-bottom: none;
         }
     }
 }
@@ -107,7 +109,7 @@ A basic dropdown that is currently used for resource actions.
         color: $color-brand-two-normal;
         text-decoration: none;
         outline: 0;
-        background-color: $color-structure-normal;
+        background-color: $color-background-base-introvert;
     }
 }
 
