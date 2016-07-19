@@ -28,16 +28,14 @@ export var register = (angular) => {
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
             var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
-            var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
-                    RIPcompassProcess, RIProposal, RIProposalVersion);
+            var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(RIPcompassProcess, RIProposal, RIProposalVersion);
             registerRoutes()(adhResourceAreaProvider);
             registerRoutes("pcompass")(adhResourceAreaProvider);
             adhResourceAreaProvider.processHeaderSlots[RIPcompassProcess.content_type] = processHeaderSlot;
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[RIPcompassProcess.content_type] =
-                    "<adh-idea-collection-workbench data-process-options=\"processOptions\">" +
-                    "</adh-idea-collection-workbench>";
+                    "<adh-idea-collection-workbench data-process-options=\"processOptions\"></adh-idea-collection-workbench>";
             adhProcessProvider.processOptions[RIPcompassProcess.content_type] = {
                 hasImage: true,
                 proposalClass: RIProposal,
