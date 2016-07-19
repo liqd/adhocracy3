@@ -43,6 +43,8 @@ from adhocracy_core.sheets.badge import IHasBadgesPool
 from adhocracy_core.sheets.badge import ICanBadge
 from adhocracy_core.sheets.description import IDescription
 from adhocracy_core.sheets.image import IImageReference
+from adhocracy_core.sheets.notification import IFollowable
+from adhocracy_core.sheets.notification import INotification
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.relation import ICanPolarize
@@ -722,19 +724,43 @@ def add_description_sheet_to_user(root, registry):  # pragma: no cover
 
 
 @log_migration
+def remove_token_storage(root, registry):  # pragma: no cover
+    """Remove storage for authentication tokens, not used anymore."""
+    if hasattr(root, '_tokenmanager_storage'):
+        delattr(root, '_tokenmanager_storage')
+
+
+@log_migration
+def set_default_workflow(root, registry):  # pragma: no cover
+    """Set default workflow if no workflow in IWorkflowAssignment sheet."""
+    from adhocracy_core.utils import get_iresource
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
+    catalogs = find_service(root, 'catalogs')
+    resources = _search_for_interfaces(catalogs, IWorkflowAssignment)
+    for resource in resources:
+        iresource = get_iresource(resource)
+        meta = registry.content.resources_meta[iresource]
+        default_workflow_name = meta.default_workflow
+        sheet = registry.content.get_sheet(resource, IWorkflowAssignment)
+        workflow_name = sheet.get()['workflow']
+        if not workflow_name and default_workflow_name:
+            logger.info('Set default workflow {0} for {1}'.format(
+                default_workflow_name, resource))
+            sheet._store_data({'workflow': meta.default_workflow},
+                              initialize_workflow=False)
+
+
+@log_migration
 def add_local_roles_for_workflow_state(root,
                                        registry):  # pragma: no cover
     """Add local role of the current workflow state for all processes."""
     from adhocracy_core.authorization import add_local_roles
     from adhocracy_core.resources.process import IProcess
-    from adhocracy_core.sheets.workflow import IWorkflowAssignment
     catalogs = find_service(root, 'catalogs')
     resources = _search_for_interfaces(catalogs, IProcess)
     count = len(resources)
     for index, resource in enumerate(resources):
-        workflow = registry.content.get_sheet_field(resource,
-                                                    IWorkflowAssignment,
-                                                    'workflow')
+        workflow = registry.content.get_workflow(resource)
         state_name = workflow.state_of(resource)
         local_roles = workflow._states[state_name].local_roles
         logger.info('Update workflow local roles for resource {0} - {1} of {2}'
@@ -750,12 +776,14 @@ def rename_default_group(root, registry):  # pragma: no cover
     from adhocracy_core.authorization import get_local_roles
     from adhocracy_core.authorization import set_local_roles
     from adhocracy_core.resources.process import IProcess
+    from adhocracy_core.resources.pool import Pool
     from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
+    from adhocracy_core.sheets.principal import IPermissions
     catalogs = find_service(root, 'catalogs')
     resources = _search_for_interfaces(catalogs, IProcess)
-    old_default_group = 'authenticated'
-    old_default_group_principal = 'group:' + old_default_group
-    new_default_group = DEFAULT_USER_GROUP_NAME
+    old_default_group_name = 'authenticated'
+    old_default_group_principal = 'group:' + old_default_group_name
+    new_default_group_name = DEFAULT_USER_GROUP_NAME
     new_default_group_principal = 'group:' + DEFAULT_USER_GROUP_NAME
     for resource in resources:
         local_roles = get_local_roles(resource)
@@ -766,21 +794,83 @@ def rename_default_group(root, registry):  # pragma: no cover
             set_local_roles(resource, local_roles)
             add_local_roles({new_default_group_principal: old_roles})
     groups = root['principals']['groups']
-    if old_default_group in groups:
-        logger.info('Rename default group to {}'.format(new_default_group))
-        groups.rename(old_default_group, new_default_group, registry=registry)
-    old_default_group_path = '/principals/groups/' + old_default_group
-    new_default_group_path = '/principals/groups/' + new_default_group
-    for user in root['principals']['users'].values():
-        group_ids = getattr(user, 'group_ids', [])
-        if old_default_group_path in group_ids:
-            logger.info('Update default group name in group_ids'
-                        ' of {}'.format(user))
-            group_ids.remove(old_default_group_path)
-            group_ids.append(new_default_group_path)
-            setattr(user, 'group_ids', group_ids)
+    users = [u for u in root['principals']['users'].values()
+             if IPermissions.providedBy(u)]
+    old_default_group = groups[old_default_group_name]
+    users_with_default_group = []
+    for user in users:
+        user_groups = registry.content.get_sheet_field(user,
+                                                       IPermissions,
+                                                       'groups')
+        if old_default_group in user_groups:
+            users_with_default_group.append(user)
+    if old_default_group_name in groups:
+        logger.info('Rename default group '
+                    'to {}'.format(new_default_group_name))
+        folder = super(Pool, groups)   # rename not working with Pool subclass
+        old = folder.remove(old_default_group_name, folder, registry=registry)
+        folder.add(new_default_group_name,
+                   old,
+                   moving=folder,
+                   registry=registry)
+    new_default_group = groups[new_default_group_name]
+    for user in users_with_default_group:
+        logger.info('Update default group name of user {}'.format(user))
+        permission_sheet = registry.content.get_sheet(user, IPermissions)
+        permissions = permission_sheet.get()
+        user_groups = permissions['groups']
+        user_groups.append(new_default_group)
+        permissions['groups'] = user_groups
+        permission_sheet.set(permissions)
 
 
+def migrate_auditlogentries_to_activities(root, registry):  # pragma: no cover
+    """Replace AuditlogenEntries with Activities entries."""
+    from pytz import UTC
+    from adhocracy_core.interfaces import SerializedActivity
+    from adhocracy_core.interfaces import ActivityType
+    from adhocracy_core.interfaces import AuditlogEntry
+    from adhocracy_core.interfaces import AuditlogAction
+    from adhocracy_core.auditing import get_auditlog
+    auditlog = get_auditlog(root)
+    old_entries = [(key, value) for key, value in auditlog.items()]
+    auditlog.clear()
+    mapping = {AuditlogAction.concealed: ActivityType.remove,
+               AuditlogAction.invisible: ActivityType.remove,
+               AuditlogAction.revealed: ActivityType.update,
+               AuditlogAction.created: ActivityType.add,
+               AuditlogAction.modified: ActivityType.update,
+               (AuditlogAction.concealed,): ActivityType.remove,
+               (AuditlogAction.invisible,): ActivityType.remove,
+               (AuditlogAction.revealed,): ActivityType.update,
+               (AuditlogAction.created,): ActivityType.add,
+               (AuditlogAction.modified,): ActivityType.update,
+               }
+    for key, value in old_entries:
+        if not isinstance(value, AuditlogEntry):
+            break
+        new_value_kwargs = {'type': mapping.get(value.name),
+                            'object_path': value.resource_path,
+                            'subject_path': value.user_path or '',
+                            'sheet_data': value.sheet_data or [],
+                            }
+        new_key = key.replace(tzinfo=UTC)
+        auditlog[new_key] = SerializedActivity()._replace(**new_value_kwargs)
+
+
+@log_migration
+def add_notification_sheet_to_user(root, registry):  # pragma: no cover
+    """Add notification sheet to user."""
+    migrate_new_sheet(root, IUser, INotification)
+
+
+@log_migration
+def add_followable_sheet_to_process(root, registry):  # pragma: no cover
+    """Add followable sheet to process."""
+    migrate_new_sheet(root, IProcess, IFollowable)
+
+
+@log_migration
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -820,5 +910,10 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(update_workflow_state_acl_for_all_resources)
     config.add_evolution_step(add_controversiality_index)
     config.add_evolution_step(add_description_sheet_to_user)
+    config.add_evolution_step(set_default_workflow)
     config.add_evolution_step(add_local_roles_for_workflow_state)
     config.add_evolution_step(rename_default_group)
+    config.add_evolution_step(remove_token_storage)
+    config.add_evolution_step(migrate_auditlogentries_to_activities)
+    config.add_evolution_step(add_notification_sheet_to_user)
+    config.add_evolution_step(add_followable_sheet_to_process)

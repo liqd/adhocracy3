@@ -43,6 +43,7 @@ import adhocracy_core.sheets.badge
 import adhocracy_core.sheets.image
 import adhocracy_core.sheets.asset
 import adhocracy_core.sheets.description
+import adhocracy_core.sheets.notification
 
 _ = TranslationStringFactory('adhocracy')
 
@@ -160,6 +161,7 @@ user_meta = pool_meta._replace(
                      adhocracy_core.sheets.badge.ICanBadge,
                      adhocracy_core.sheets.badge.IBadgeable,
                      adhocracy_core.sheets.image.IImageReference,
+                     adhocracy_core.sheets.notification.INotification,
                      ),
     element_types=(),  # we don't want the frontend to post resources here
     use_autonaming=True,
@@ -417,7 +419,11 @@ def groups_and_roles_finder(userid: str, request: Request) -> list:
                                                        IRolesUserLocator)
         groupids = userlocator.get_groupids(userid) or []
         roleids = userlocator.get_role_and_group_roleids(userid) or []
-    return groupids + roleids
+        principals = groupids + roleids
+    if not principals:
+        return None
+    else:
+        return principals
 
 
 def delete_not_activated_users(request: Request, age_in_days: int):

@@ -389,7 +389,7 @@ class TestProcess:
         assert meta.iresource is IProcess
         assert IProcess.isOrExtends(adhocracy_core.resources.process.IProcess)
         assert meta.element_types == (IMercatorProposal,)
-        assert meta.workflow_name == 'mercator2'
+        assert meta.default_workflow == 'mercator2'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

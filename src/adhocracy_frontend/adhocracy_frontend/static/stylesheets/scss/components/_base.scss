@@ -1,0 +1,363 @@
+/*doc
+---
+title: Inline
+name: inline
+category: Base
+---
+*/
+
+html {
+    @include rem-baseline;
+}
+
+body {
+    color: $color-text-normal;
+    line-height: 1.4;
+    font-family: $font-family-normal;
+
+    @media print {
+        padding: 0 1.5em !important;
+    }
+}
+
+@media print {
+    *:not([class^="leaflet"]) {
+        background-color: initial !important;
+        border-color: initial !important;
+        color: inherit !important;
+    }
+}
+
+/*doc
+---
+title: Headings
+name: headings
+category: Base
+---
+
+```html_example
+<h1>Heading 1</h1>
+<h2>Heading 2</h2>
+<h3>Heading 3</h3>
+<h4>Heading 4</h4>
+<h5>Heading 5</h5>
+<h6>Heading 6</h6>
+```
+*/
+h1, h2, h3, h4, h5, h6 {
+    // better kerning (char spacing)
+    text-rendering: optimizelegibility;
+    color: $color-text-extrovert;
+    line-height: 1.2;
+}
+
+/*doc
+---
+title: Paragraph
+name: p
+category: Base
+---
+
+```html_example
+<p>Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.<p>
+<p>Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.</p>
+```
+*/
+p {
+    @include rem(margin, 0 0 1rem);
+    // break very long words
+    word-wrap: break-word;
+    hyphens: auto;
+
+    @media print {
+        text-align: justify;
+    }
+}
+
+/*doc
+---
+title: link
+name: link
+category: Base
+---
+
+A hyperlink. It may have the following states:
+
+-   :hover
+-   :focus
+
+```html_example
+<a href="#">internal link</a>
+<a href="#" rel="external">external link</a>
+<a href="#" class="m-unobtrusive">unobtrusive link</a>
+```
+*/
+a {
+    color: $color-text-highlight-normal;
+
+    &:hover,
+    &:focus {
+        color: $color-text-highlight-introvert;
+    }
+}
+
+/*doc
+---
+title: Disguised link mixin
+name: disguised-link
+category: Base
+---
+
+A link that looks like a regular piece of text
+
+```html_example
+<a class="disguised-link" href="#"><i class="icon-speechbubble"></i> Comments</a><br/>
+When is a <a href="#" class="disguised-link">Link</a> not a link?
+```
+*/
+@mixin disguised-link {
+    color: $color-text-highlight-introvert;
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+        color: $color-text-highlight-normal;
+    }
+}
+
+.disguised-link {
+    @include disguised-link;
+}
+
+// smaller headings
+blockquote,
+article,
+section {
+    h1, h2, h3, h4, h5, h6 {
+        @include rem(font-size, 1rem);
+        @include rem(margin, 10px 0);
+    }
+
+    h1 {
+        @include rem(font-size, 1.2rem);
+    }
+
+    h2 {
+        @include rem(font-size, 1.1rem);
+    }
+}
+
+/*doc
+---
+title: Table
+name: table
+category: Base
+---
+
+```html_example
+<table>
+    <caption>This is a table caption, made with caption</caption>
+    <thead>
+        <tr>
+            <th>Table Header 1</th>
+            <th>Table Header 2</th>
+            <th>Table Header 3</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th>Table Footer 1</th>
+            <td>Table Footer 2</td>
+            <td>Table Footer 3</td>
+        </tr>
+    </tfoot>
+    <tbody>
+        <tr>
+            <th>TD 1.1</th>
+            <td>TD 1.2</td>
+            <td>TD 1.3</td>
+        </tr>
+        <tr>
+            <th>TD 2.1</th>
+            <td>TD 2.2</td>
+            <td>TD 2.3</td>
+        </tr>
+    </tbody>
+</table>
+```
+*/
+table {
+    td, th {
+        @include rem(padding, 0.5rem);
+        text-align: left;
+        border-top: 1px solid $color-structure-introvert;
+        vertical-align: top;
+    }
+
+    thead, tfoot {
+        th {
+            text-align: center;
+        }
+    }
+
+    caption {
+        font-size: small;
+    }
+}
+
+/*doc
+---
+title: Lists
+name: lists
+category: Base
+---
+*/
+
+/*doc
+---
+title: Ordered List
+name: ol
+parent: lists
+---
+
+```html_example
+<ol>
+    <li>larry</li>
+    <li>moe</li>
+    <li>curly</li>
+</ol>
+```
+*/
+/*doc
+---
+title: Unordered List
+name: ul
+parent: lists
+---
+
+```html_example
+<ul>
+    <li>larry</li>
+    <li>moe</li>
+    <li>curly</li>
+</ul>
+```
+*/
+/*doc
+---
+title: Definition List
+name: dl
+parent: lists
+---
+
+```html_example
+<dl>
+    <dt>Defintion Term</dt><dd>Definition data defining the previous term</dd>
+    <dt>Another Definition Term</dt><dd>Definition data defining the previous term</dd>
+</dl>
+```
+*/
+ul, ol {
+    @include rem(padding-left, 1.5rem);
+}
+
+li {
+    line-height: 1.2;
+    margin-left: 0;
+}
+
+dt {
+    font-weight: $font-weight-extrovert;
+}
+
+/*doc
+---
+title: Blockquote
+name: blockqoute
+category: Base
+---
+
+```html_example
+<blockquote>
+    <p>Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.<p>
+    <cite>James T. Kirk</cite>
+</blockquote>
+```
+*/
+blockquote {
+    @include rem(margin, 1.5rem);
+    @include rem(padding-left, 0.5rem);
+    @include rem(border-left, 0.4rem solid $color-text-highlight-normal);
+    position: relative;
+    font-style: italic;
+
+    cite {
+        float: right;
+    }
+}
+
+// figure
+figure {
+    @include rem(margin, 1rem 0);
+}
+
+figcaption {
+    font-size: small;
+}
+
+/*doc
+---
+title: Code
+name: code
+parent: inline
+---
+
+```html_example
+<code>Example Text</code>
+```
+*/
+code {
+    @include rem(font-size, 0.9rem);
+    background-color: $color-structure-introvert;
+}
+
+/*doc
+---
+title: Preformated
+name: pre
+category: Base
+---
+
+```html_example
+<pre>def hello_world(name):
+    s = "Hello %s!" % name
+    print s</pre>
+```
+*/
+pre {
+    @include rem(font-size, 0.9rem);
+    @include rem(margin, 1rem 0);
+    @include rem(max-height, 18rem);
+    @include rem(padding, 0.7rem);
+    display: block;
+    background-color: $color-structure-introvert;
+    border: 1px solid $color-structure-introvert;
+    overflow: auto;
+
+    code {
+        background-color: transparent;
+    }
+}
+
+/*doc
+---
+title: Emphasis
+name: em
+parent: inline
+---
+
+```html_example
+<em>Example Text</em>
+<strong>Example Text</strong>
+```
+*/

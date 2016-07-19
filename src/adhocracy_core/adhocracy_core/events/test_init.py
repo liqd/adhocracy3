@@ -16,8 +16,9 @@ class ResourceCreatedAndAddedUnitTest(unittest.TestCase):
         parent = testing.DummyResource()
         registry = testing.DummyResource()
         creator = testing.DummyResource()
+        autoupdated = True
 
-        inst = self.make_one(context, parent, registry, creator)
+        inst = self.make_one(context, parent, registry, creator, autoupdated)
 
         assert IResourceCreatedAndAdded.providedBy(inst)
         assert verifyObject(IResourceCreatedAndAdded, inst)
@@ -55,9 +56,10 @@ class ResourceSheetModifiedUnitTest(unittest.TestCase):
         request = testing.DummyResource()
         old_appstruct = {}
         new_appstruct = {}
+        autoupdated = True
 
         inst = self.make_one(context, parent, registry, old_appstruct,
-                              new_appstruct, request)
+                              new_appstruct, request, autoupdated)
 
         assert IResourceSheetModified.providedBy(inst)
         assert verifyObject(IResourceSheetModified, inst)
@@ -66,6 +68,7 @@ class ResourceSheetModifiedUnitTest(unittest.TestCase):
         assert inst.old_appstruct is old_appstruct
         assert inst.new_appstruct is new_appstruct
         assert inst.request is request
+        assert inst.autoupdated
 
 
 class ItemNewVersionAddedUnitTest(unittest.TestCase):
@@ -80,8 +83,10 @@ class ItemNewVersionAddedUnitTest(unittest.TestCase):
         new_version = testing.DummyResource()
         registry = testing.DummyResource()
         creator = testing.DummyResource()
+        autoupdated = True
 
-        inst = self.make_one(context, new_version, registry, creator)
+        inst = self.make_one(context, new_version, registry, creator,
+                             autoupdated)
 
         assert IItemVersionNewVersionAdded.providedBy(inst)
         assert verifyObject(IItemVersionNewVersionAdded, inst)
@@ -223,3 +228,24 @@ class IncludemeIntegrationTest(unittest.TestCase):
     def test_register_subsriber_predicats(self):
         assert self.config.get_predlist('event_isheet')
         assert self.config.get_predlist('object_iface')
+
+
+class TestIActivitiesAddedToAuditlog:
+
+    def make_one(self, *args):
+        from adhocracy_core.events import ActivitiesAddedToAuditLog
+        return ActivitiesAddedToAuditLog(*args)
+
+    def test_create(self):
+        from adhocracy_core.interfaces import IActivitiesAddedToAuditLog
+        from adhocracy_core.interfaces import Activity
+        auditlog = object()
+        activities = [Activity()]
+        request = object()
+        inst = self.make_one(auditlog, activities, request)
+        assert IActivitiesAddedToAuditLog.providedBy(inst)
+        assert verifyObject(IActivitiesAddedToAuditLog, inst)
+        assert inst.object == auditlog
+        assert inst.activities == activities
+        assert inst.request == request
+

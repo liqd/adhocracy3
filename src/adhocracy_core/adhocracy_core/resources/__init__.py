@@ -24,6 +24,7 @@ from adhocracy_core.exceptions import ConfigurationError
 from adhocracy_core.events import ResourceCreatedAndAdded
 from adhocracy_core.sheets.name import IName
 from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import get_modification_date
 
 
@@ -40,7 +41,8 @@ resource_meta = ResourceMetadata(content_name='',
                                  use_autonaming_random=False,
                                  is_sdi_addable=False,
                                  element_types=(),
-                                 workflow_name='',
+                                 default_workflow='',
+                                 alternative_workflows=tuple(),
                                  item_type=False,
                                  )
 
@@ -124,14 +126,16 @@ class ResourceFactory:
                    registry=registry)
 
     def _notify_new_resource_created_and_added(self, resource, registry,
-                                               creator):
+                                               creator, autoupdated):
         has_parent = resource.__parent__ is not None
         is_root = IRoot.providedBy(resource)
         if (has_parent or is_root) and registry is not None:
             event = ResourceCreatedAndAdded(object=resource,
                                             parent=resource.__parent__,
                                             registry=registry,
-                                            creator=creator)
+                                            creator=creator,
+                                            autoupdated=autoupdated,
+                                            )
             registry.notify(event)
 
     def __call__(self,
@@ -142,6 +146,7 @@ class ResourceFactory:
                  registry=None,
                  request=None,
                  send_event=True,
+                 autoupdated=False,
                  **kwargs
                  ):
         """Triggered when a ResourceFactory instance is called.
@@ -168,9 +173,12 @@ class ResourceFactory:
             send_event (bool): send
                 :class:`adhocracy_core.interfaces.IResourceCreatedAndAdded`
                 event. Default is True.
+            autoupdated (bool): The creation is caused by a modified
+                referenced resource, no real content is modified.
+                Default is False.
             **kwargs: Arbitary keyword arguments. Will be passed along with
-                       'creator' to the `after_creation` hook as 3rd argument
-                      `options`.
+                `creator` and  `autoupdated` to the `after_creation` hook as
+                3rd argument `options`.
 
         Returns:
             object (IResource): the newly created resource
@@ -198,12 +206,22 @@ class ResourceFactory:
             resource.__parent__ = None
             resource.__name__ = ''
 
+        default_workflow = self.meta.default_workflow
+        has_workflow = IWorkflowAssignment in isheets and default_workflow
+        workflow_assignment = IWorkflowAssignment.__identifier__
+        if has_workflow:
+            if workflow_assignment not in appstructs:
+                appstructs[workflow_assignment] = \
+                    {'workflow': default_workflow}
+            elif 'workflow' not in appstructs[workflow_assignment]:
+                appstructs[workflow_assignment]['workflow'] = default_workflow
+
         for key, struct in appstructs.items():
             isheet = DottedNameResolver().maybe_resolve(key)
             sheet = registry.content.get_sheet(resource, isheet,
                                                request=request)
             if sheet.meta.creatable:
-                sheet.set(struct, send_event=False)
+                sheet.set(struct, send_event=False, autoupdated=autoupdated)
 
         # Fixme: Sideffect. We change here the passed creator because the
         # creator of user resources should always be the created user.
@@ -224,17 +242,22 @@ class ResourceFactory:
                                                request=request)
             sheet.set(metadata,
                       send_event=False,
-                      omit_readonly=False)
+                      omit_readonly=False,
+                      autoupdated=autoupdated
+                      )
 
         if run_after_creation:
             for call in self.meta.after_creation:
                 kwargs['creator'] = creator
+                kwargs['autoupdated'] = autoupdated
                 call(resource, registry, options=kwargs)
 
         if send_event:
             self._notify_new_resource_created_and_added(resource,
                                                         registry,
-                                                        creator)
+                                                        creator,
+                                                        autoupdated,
+                                                        )
 
         return resource
 

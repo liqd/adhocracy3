@@ -43,41 +43,21 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-form-subheading,
-.mercator-proposal-form-heading,
-.mercator-proposal-form-sub-subheading,
-.mercator-proposal-form-annotation-heading {
+.mercator-proposal-form-heading {
     @include rem(margin, 0 0 $font-size-small);
     @include rem(font-size, $font-size-plus);
 }
 
-.mercator-proposal-form-heading,
-.mercator-proposal-form-annotation-heading {
+.mercator-proposal-form-heading {
     @include rem(margin, 0 -1rem 0.8rem);
     @include rem(padding, 0 1rem 1px);
     border: 1px solid $color-structure-normal;
     border-width: 1px 0;
-    font-weight: bold;
-    line-height: 1.5;
+    font-weight: $font-weight-extrovert;
 
     &.active {
         color: $color-text-highlight-normal;
     }
-}
-
-.mercator-proposal-form-annotation-heading {
-    @include rem(margin, -$font-size-normal -$font-size-normal $font-size-normal);
-    background: $color-background-base;
-    font-weight: normal;
-    text-transform: uppercase;
-}
-
-.mercator-proposal-form-sub-subheading {
-    font-weight: $font-weight-extrovert;
-}
-
-.mercator-proposal-form-subheading +
-.mercator-proposal-form-sub-subheading {
-    @include rem(margin-top, -$font-size-normal);
 }
 
 .mercator-proposal-form-nav {
@@ -159,7 +139,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
         padding: 0;
 
         li {
-            @include gallery(1 of 3);
+            @include grid-same-width(3);
             display: inline;
             list-style-type: none;
         }
@@ -177,12 +157,6 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 
 .mercator-proposal-detail-meta {
     @include rem(padding-bottom, 20px);
-
-    .mercator-proposal-detail-meta-item-total-comments {
-        i {
-            color: $color-text-highlight-introvert;
-        }
-    }
 }
 
 .mercator-proposal-cover-show-comments {
@@ -239,9 +213,9 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-budget-col {
-    @include inline-block;
     @include rem(margin-bottom, 20px);
     @include rem(padding-right, 2rem);
+    display: inline-block;
     color: $color-text-introvert;
 
     &.requested {
@@ -251,7 +225,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     strong {
         @include rem(font-size, $font-size-large);
         display: block;
-        font-weight: normal;
+        font-weight: $font-weight-medium;
     }
 
     @media print {
@@ -259,19 +233,10 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 
         strong {
             @include rem(font-size, $font-size-normal);
-            @include inline-block;
+            display: inline-block;
             font-weight: $font-weight-extrovert;
         }
     }
-}
-
-.mercator-proposal-other-sources {
-    @include rem(padding-top, 1rem);
-    clear: left;
-}
-
-.inline-box-online {
-    text-transform: uppercase;
 }
 
 .input-disclaimer {

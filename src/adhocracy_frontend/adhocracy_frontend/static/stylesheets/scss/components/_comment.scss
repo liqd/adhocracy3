@@ -67,7 +67,6 @@ is selected, no state is applied.
 }
 
 .comment-content {
-    line-height: 1.15;
     white-space: pre-line;
 }
 
@@ -171,17 +170,6 @@ parent: comment
     @include rem(padding-bottom, 20px);
 }
 
-.comment-title {
-    a, a:hover, a:focus, a:active {
-        color: inherit;
-        text-decoration: inherit;
-    }
-}
-
-.comment-content-edit-text {
-    @include rem(margin-bottom, 0.5rem);
-}
-
 .comment-header {
     @include clearfix;
     @include rem(font-size, $font-size-small);
@@ -205,7 +193,7 @@ parent: comment
     }
 
     .comment-header-edited {
-        @include inline-block;
+        display: inline-block;
         color: $color-structure-introvert;
         font-style: italic;
 
@@ -252,17 +240,13 @@ parent: comment
 
     .comment-header-column1,
     .comment-header-column2 {
-        @include text-align(right);
+        text-align: right;
         float: right;
     }
 
     .comment-header-column1 {
-        @include text-align(left);
+        text-align: left;
         float: left;
-    }
-
-    .rate {
-        @include inline-block;
     }
 }
 

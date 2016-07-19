@@ -1,8 +1,8 @@
 @mixin icon-button($base-font-size: $font-size-small) {
-    @include inline-block;
     @include rem(line-height, 24px);
     @include rem(min-width, 24px);
     @include rem(padding, 0 8px);
+    display: inline-block;
     background: $color-background-base-introvert;
     color: $color-text-introvert;
 

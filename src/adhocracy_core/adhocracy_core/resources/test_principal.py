@@ -130,6 +130,7 @@ class TestUser:
                 adhocracy_core.sheets.badge.ICanBadge,
                 adhocracy_core.sheets.badge.IBadgeable,
                 adhocracy_core.sheets.image.IImageReference,
+                adhocracy_core.sheets.notification.INotification,
             )
         assert meta.element_types == ()
         assert meta.use_autonaming is True
@@ -517,7 +518,7 @@ class TestGroupsAndRolesFinder:
         return groups_and_roles_finder(userid, request)
 
     def test_userid_wrong(self, request,  mock_user_locator):
-        assert self.call_fut('WRONG', request) == []
+        assert self.call_fut('WRONG', request) == None
         assert mock_user_locator.get_groupids.call_args[0] == ('WRONG',)
         assert mock_user_locator.get_role_and_group_roleids.call_args[0] == ('WRONG',)
 

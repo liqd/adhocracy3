@@ -9,9 +9,9 @@
         @include rem(font-size, $font-size-small);
         @include rem(margin, 0 0 15px);
         color: $color-text-introvert;
-        font-weight: $font-weight-normal;
+        font-weight: inherit;
         letter-spacing: 0.03rem;
-        line-height: 1.15;
+        line-height: inherit;
         text-transform: uppercase;
 
         @media print {

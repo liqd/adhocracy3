@@ -4,14 +4,6 @@
     text-transform: uppercase;
 }
 
-.button-cta,
-.button-cta-secondary,
-.button {
-    @include rem(height, 30px);
-    @include rem(line-height, 30px);
-    @include rem(border-radius, 15px);
-    font-weight: $font-weight-medium;
-
 /*doc
 ---
 title: Call-to-action button narrow
@@ -30,6 +22,14 @@ Narrower cta button
 ```
 */
 
+.button-cta,
+.button-cta-secondary,
+.button {
+    @include rem(height, 30px);
+    @include rem(line-height, 30px);
+    @include rem(border-radius, 15px);
+    font-weight: $font-weight-medium;
+
     &.m-narrow {
         @include rem(height, 20px);
         @include rem(line-height, 20px);
@@ -37,7 +37,7 @@ Narrower cta button
     }
 
     &.m-menu-action {
-        @include border-radius(0);
+        border-radius: 0;
         color: $color-brand-one-normal;
         font-size: $font-size-small;
 
@@ -128,10 +128,11 @@ cta button variant
 
 .button-group {
     @include clearfix;
-    @include inline-block;
+    display: inline-block;
+    vertical-align: middle;
 
     .button {
-        @include border-radius(0);
+        border-radius: 0;
         float: left;
 
         &:first-child {

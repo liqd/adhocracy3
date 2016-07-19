@@ -30,17 +30,13 @@
         line-height: inherit;
         padding-left: 0;
 
-        .moving-column-menu-button {
-            color: $color-brand-one-normal;
-        }
-
         .button {
             margin-right: 17px;
         }
     }
 
     .moving-column-menu-sorts {
-        @include inline-block;
+        display: inline-block;
     }
 
     .moving-column-body {

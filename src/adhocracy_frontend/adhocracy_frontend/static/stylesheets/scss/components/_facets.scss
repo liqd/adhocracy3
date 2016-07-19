@@ -9,7 +9,7 @@
 
     .facet {
         &:not(.m-wide) {
-            @include gallery(6 of 12);
+            @include grid-same-width(2);
             @include rem(margin-bottom, 1rem);
         }
 
@@ -25,7 +25,7 @@
     @include rem(font-size, $font-size-small);
     @include rem(margin, 0 0 15px);
     color: $color-text-introvert;
-    line-height: 1.15;
+    line-height: inherit;
 }
 
 .sort-item,
@@ -44,7 +44,7 @@
 }
 
 .sort-header {
-    @include inline-block;
+    display: inline-block;
     margin-bottom: 0;
 }
 
@@ -55,11 +55,12 @@
 
 .facet-toggle {
     @include ellipsis(12em);
-    @include inline-block;
     @include rem(left, -18px);
     @include rem(line-height, 20px);
     @include rem(margin-right, 10px);
     @include rem(padding, 0 10px);
+    display: inline-block;
+    vertical-align: middle;
     background: $color-button-cta-base;
     color: $color-button-cta-text;
     padding-right: 1.5em;

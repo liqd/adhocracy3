@@ -288,22 +288,18 @@ class ResourceContentRegistry(ContentRegistry):
         return isheet, field, node
 
     def get_workflow(self, context: object) -> IWorkflow:
-        """Get workflow of `context` or None.
-
-        :raises RuntimeConfigurationError: if workflow is not registered
-        """
-        iresource = get_iresource(context)
+        """Get workflow of `context` or None."""
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
         try:
-            name = self.resources_meta[iresource].workflow_name
-        except KeyError:  # ease testing
-            return None
-        if name == '':
-            return None
-        try:
+            name = self.get_sheet_field(context,
+                                        IWorkflowAssignment,
+                                        'workflow')
+        except RuntimeConfigurationError:
+            name = ''
+        if name:
             workflow = self.workflows[name]
-        except KeyError:
-            msg = 'Workflow name is not registered: {0}'.format(name)
-            raise RuntimeConfigurationError(msg)
+        else:
+            workflow = None
         return workflow
 
 

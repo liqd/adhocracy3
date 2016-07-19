@@ -51,16 +51,11 @@ Proposal detail article.
         color: $color-text-highlight-introvert;
     }
 
-    [class*=icon-] {
+    [class*="icon-"] {
         @include rem(font-size, 17px);
         @include rem(line-height, 17px);
         display: block;
     }
-}
-
-.proposal-detail-body-comments-icon {
-    @include rem(font-size, 20px);
-    display: block;
 }
 
 .proposal-detail-header {
@@ -102,7 +97,7 @@ Proposal detail article.
     padding: 0;
 
     .proposal-detail-meta-item {
-        @include gallery(3 of 12);
+        @include grid-same-width(4);
 
         &:nth-child(2) {
             text-align: center;
@@ -116,26 +111,6 @@ Proposal detail article.
     .proposal-detail-meta-item-icon {
         @include rem(margin-right, 8px);
         vertical-align: middle;
-    }
-
-    .proposal-detail-meta-item-text {
-        @include inline-block;
-        margin: 0;
-        text-align: left;
-    }
-
-    .proposal-detail-meta-item-comments,
-    .proposal-detail-meta-item-location {
-        a {
-            color: $color-text-highlight-introvert;
-        }
-    }
-}
-
-.proposal-detail {
-    .rate {
-        float: right;
-        margin-right: 0;
     }
 }
 

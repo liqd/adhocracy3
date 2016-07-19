@@ -55,7 +55,7 @@ class IParticipantsAssignableBadgeGroup(IBadgeGroup):
 
 participants_assignable_badge_group_meta = badge_group_meta._replace(
     iresource=IParticipantsAssignableBadgeGroup,
-    workflow_name='badge_assignment',
+    default_workflow='badge_assignment',
     element_types=(IBadge,
                    IBadgeGroup,
                    IParticipantsAssignableBadgeGroup,),
@@ -78,8 +78,11 @@ badges_service_meta = service_meta._replace(
 def add_badges_service(context: IPool, registry: Registry, options: dict):
     """Add `badge` service to context."""
     creator = options.get('creator')
-    registry.content.create(IBadgesService.__identifier__, parent=context,
-                            registry=registry, creator=creator)
+    registry.content.create(IBadgesService.__identifier__,
+                            parent=context,
+                            registry=registry,
+                            creator=creator,
+                            autoupdated=True)
 
 
 class IBadgeAssignment(ISimple):

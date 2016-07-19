@@ -52,9 +52,9 @@ Vertical
             float: none;
 
             i {
-                @include inline-block;
                 @include rem(margin-right, 8px);
                 @include rem(min-width, 12px);
+                display: inline-block;
             }
 
             &:last-child {
@@ -80,7 +80,7 @@ Vertical
         @include rem(font-size, $font-size-normal);
         float: none;
 
-        i:not(.m-definition-before):not(.m-definition-after), &.meta-list-item-rate {
+        i:not(.m-definition-before), &.meta-list-item-rate {
             display: none;
         }
     }

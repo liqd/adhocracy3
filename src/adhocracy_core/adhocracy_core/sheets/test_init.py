@@ -122,8 +122,8 @@ class TestBaseResourceSheet:
         assert inst.get() == {'count': 0}
 
     def test_get_with_deferred_default(self, inst):
-        """A dictionary with 'registry' and 'context' is passed to deferred
-        default functions.
+        """A dictionary with 'registry', 'context', 'creating is passed
+        to deferred default functions.
         """
         schema = inst.schema.bind()
         @colander.deferred
@@ -131,7 +131,7 @@ class TestBaseResourceSheet:
             return len(kw)
         schema['count'].default = default
         inst.schema = schema
-        assert inst.get() == {'count': 2}
+        assert inst.get() == {'count': 3}
 
     def test_get_with_omit_defaults(self, inst):
         assert inst.get(omit_defaults=True) == {}
@@ -323,6 +323,14 @@ class TestBaseResourceSheet:
         assert events[0].registry == config.registry
         assert events[0].old_appstruct == {'count': 0}
         assert events[0].new_appstruct == {'count': 2}
+        assert events[0].autoupdated is False
+
+    def test_notify_resource_sheet_modified_autoupdated(self, inst, config):
+        from adhocracy_core.interfaces import IResourceSheetModified
+        from adhocracy_core.testing import create_event_listener
+        events = create_event_listener(config, IResourceSheetModified)
+        inst.set({'count': 2}, autoupdated=True)
+        assert events[0].autoupdated
 
     def test_serialize(self, inst, request_):
         from . import BaseResourceSheet
@@ -572,6 +580,12 @@ class TestAddSheetToRegistry:
     def call_fut(self, sheet_meta, registry):
         from adhocracy_core.sheets import add_sheet_to_registry
         return add_sheet_to_registry(sheet_meta, registry)
+
+    def test_register_valid_empty_mapping_schema(self, sheet_meta, registry):
+        from adhocracy_core.schema import MappingSchema
+        sheet_meta = sheet_meta._replace(schema_class=MappingSchema)
+        self.call_fut(sheet_meta, registry)
+        assert registry.content.sheets_meta == {sheet_meta.isheet: sheet_meta}
 
     def test_register_valid_sheet_sheet_meta(self, sheet_meta, registry):
         self.call_fut(sheet_meta, registry)

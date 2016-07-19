@@ -19,7 +19,7 @@ class TestProcess:
     def test_meta(self, meta):
         from .stadtforum import IProcess
         assert meta.iresource is IProcess
-        assert meta.workflow_name == 'stadtforum'
+        assert meta.default_workflow == 'stadtforum'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):
@@ -36,7 +36,7 @@ class TestPoll:
     def test_meta(self, meta):
         from .stadtforum import IPoll
         assert meta.iresource is IPoll
-        assert meta.workflow_name == 'stadtforum_poll'
+        assert meta.default_workflow == 'stadtforum_poll'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

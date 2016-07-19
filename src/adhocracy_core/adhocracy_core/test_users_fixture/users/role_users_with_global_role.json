@@ -22,7 +22,7 @@
   { "name": "participant2",
     "email": "participant2@example.com",
     "initial-password": "password",
-    "roles": ["participant2"]
+    "roles": ["participant"]
   },
   { "name": "authenticated",
     "email": "authenticated@example.com",

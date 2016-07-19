@@ -181,3 +181,13 @@ export var showImageDirective = (
         }
     };
 };
+
+export var backgroundImageDirective = (
+    adhHttp : AdhHttp.Service
+) => {
+    var directive = showImageDirective(adhHttp);
+    directive.template = "<div class=\"image-background {{cssClass}}\" " +
+        "style=\"background-image: url({{ imageUrl }})\"><ng-transclude></ng-transclude></div>";
+    (<angular.IDirective>directive).transclude = true;
+    return directive;
+};

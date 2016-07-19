@@ -466,8 +466,9 @@ def create_validate_activation_path(context,
             # TODO we should use a sheet to activate the user.
             user.activate()
             user.activation_path = None
+            autoupdated = False
             event = ResourceSheetModified(user, IUserBasic, request.registry, {},
-                                          {}, request)
+                                          {}, request, autoupdated)
             registry.notify(event)  # trigger reindex activation_path index
     return validate_activation_path
 

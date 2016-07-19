@@ -4,6 +4,7 @@
             text-align: center;
         }
     }
+
     // FIXME: Possible inconsistency here whether this should be part of 'classes' or added to the tabset css like this
     // will review at a later date
     &.m-button-style {
@@ -28,7 +29,7 @@
     padding: 0;
 
     .tab {
-        @include inline-block;
+        display: inline-block;
         list-style: none;
 
         .tab-button {
@@ -53,19 +54,9 @@
                 border: 1px solid $color-structure-introvert;
                 border-width: 1px 1px 0;
                 color: $color-text-normal;
-                font-weight: bold;
+                font-weight: $font-weight-extrovert;
                 top: 1px;
             }
         }
     }
-}
-
-.tabset-panes {
-    @include single-transition(height, 0.5s);
-    background: $color-background-base-introvert;
-    overflow: hidden;
-}
-
-.tab-pane {
-    @include rem(padding, 1rem);
 }

@@ -24,6 +24,7 @@ def add_logbook_service(context: IPool, registry: Registry, options: dict):
     creator = options.get('creator')
     registry.content.create(ILogbookService.__identifier__,
                             parent=context,
+                            autoupdated=True,
                             creator=creator)
 
 

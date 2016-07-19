@@ -1,27 +1,5 @@
 /*doc
 ---
-title: Text align
-name: text-align
-category: Compability
----
-
-This mixin provides fallbacks for CSS3 values to `text-align`, i.e. `start` and
-`end`.
-*/
-@mixin text-align($value) {
-    @if $value == start {
-        text-align: left;
-        text-align: start;
-    } @else if $value == end {
-        text-align: right;
-        text-align: end;
-    } @else {
-        text-align: $value;
-    }
-}
-
-/*doc
----
 title: Placeholder
 name: placeholder
 category: Compability
@@ -38,8 +16,6 @@ This mixin allows to set attributes to placeholders in several browser.
 *This is not part of any W3C standard.*
 */
 @mixin placeholder {
-    // scss-lint:disable VendorPrefix
-
     &::-webkit-input-placeholder {
         @content;
     }
@@ -58,7 +34,6 @@ This mixin allows to set attributes to placeholders in several browser.
 }
 
 .sticky {
-    // scss-lint:disable VendorPrefix
     position: -webkit-sticky;
     position: sticky;
     top: 0;

@@ -1,0 +1,133 @@
+/*doc
+---
+title: Resource Header
+name: resource-header
+category: Widgets
+---
+
+The resource header should be used as a consistent header for resources such as
+processes, proposals or documents. It contains a title, some meta-information,
+a primary action (e.g. create proposal or like) and a dropdown with resource
+actions (edit, share, report, print, ...).
+
+```html_example
+<header class="resource-header">
+    <div class="resource-header-navigation">
+        <div class="resource-header-breadcrumbs">
+            <a href="#">← to process</a>
+        </div>
+        <a href="#" class="resource-header-actions">…</a>
+    </div>
+    <div class="resource-header-main">
+        <h1 class="resource-header-title">Johannisthal</h1>
+        <ul class="resource-header-meta">
+            <li>Bebauungsplanverfahren 184a</li>
+            <li>Öffentliche auslegung</li>
+            <li>22.9.-22.10.15</li>
+        </ul>
+        <div class="resource-header-action"><a href="#" class="button-cta">Create proposal</a></div>
+    </div>
+</header>
+```
+*/
+.resource-header {
+    position: relative;
+    padding: $padding-small;
+    margin-bottom: $padding-small;
+}
+
+.resource-header-main {
+    @include rem(margin, 3em auto 4rem);
+    max-width: 40em;
+    text-align: center;
+}
+
+.resource-header-meta,
+.resource-header-action {
+    @include rem(margin-bottom, 1.5rem);
+}
+
+.resource-header-title {
+    @include rem(margin-bottom, 1.2rem);
+    font-size: 200%;
+}
+
+.resource-header-meta {
+    text-transform: uppercase;
+    font-size: $font-size-smaller;
+    color: $color-text-introvert;
+    font-weight: bold;
+    list-style: none;
+
+    li {
+        display: inline;
+
+        &::after {
+            content: " / ";
+        }
+
+        &:last-child::after {
+            content: none;
+        }
+    }
+
+    a {
+        color: inherit;
+    }
+}
+
+.resource-header-actions {
+    position: absolute;
+    top: $padding-small;
+    right: $padding-small;
+}
+
+.resource-header-breadcrumbs {
+    a {
+        color: inherit;
+        text-transform: uppercase;
+        font-size: $font-size-small;
+        font-weight: bold;
+    }
+}
+
+/*doc
+---
+title: image modifier
+name: resource-header.m-image
+parent: resource-header
+---
+
+Resource headers can have a background image.
+
+```html_example
+<div class="image-background" style="background-image: url('/static/images/sample.jpg')">
+    <header class="resource-header m-image">
+        <div class="resource-header-navigation">
+            <div class="resource-header-breadcrumbs">
+                <a href="#">← to process</a>
+            </div>
+            <a href="#" class="resource-header-actions">…</a>
+        </div>
+        <div class="resource-header-main">
+            <h1 class="resource-header-title">Johannisthal</h1>
+            <ul class="resource-header-meta">
+                <li>Bebauungsplanverfahren 184a</li>
+                <li>Öffentliche auslegung</li>
+                <li>22.9.-22.10.15</li>
+            </ul>
+            <div class="resource-header-action"><a href="#" class="button-cta">Create proposal</a></div>
+        </div>
+    </header>
+</div>
+```
+*/
+.resource-header.m-image {
+    color: $color-text-inverted;
+    background: rgba($color-brand-one-introvert, 0.8);
+
+    .resource-header-title,
+    .resource-header-meta {
+        color: inherit;
+    }
+}

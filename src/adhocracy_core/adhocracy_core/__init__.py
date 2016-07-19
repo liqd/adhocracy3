@@ -85,10 +85,10 @@ def add_after_commit_hooks(request):
 
 def add_request_callbacks(request):
     """Add request callbacks."""
-    from adhocracy_core.auditing import audit_resources_changes_callback
+    from adhocracy_core.auditing import update_auditlog_callback
     from adhocracy_core.changelog import clear_changelog_callback
     from adhocracy_core.changelog import clear_modification_date_callback
-    request.add_response_callback(audit_resources_changes_callback)
+    request.add_response_callback(update_auditlog_callback)
     request.add_finished_callback(clear_changelog_callback)
     request.add_finished_callback(clear_modification_date_callback)
 
@@ -105,8 +105,6 @@ def includeme(config):
     config.set_authentication_policy(authn_policy)
     config.add_request_method(get_user, name='user', reify=True)
     config.include('.renderers')
-    config.include('.authentication')
-    config.include('.authorization')
     config.include('.evolution')
     config.include('.events')
     config.include('.content')
@@ -122,6 +120,7 @@ def includeme(config):
     config.include('.websockets')
     config.include('.rest')
     config.include('.stats')
+    config.include('.notification')
     config.registry.registerUtility('', IFixtureAsset,
                                     name='adhocracy_core:test_users_fixture')
 
@@ -133,7 +132,8 @@ def _create_authentication_policy(settings, config: Configurator)\
     timeout = 60 * 60 * 24 * 30
     multi_policy = MultiRouteAuthenticationPolicy()
     token_policy = TokenHeaderAuthenticationPolicy(secret,
-                                                   groupfinder=groupfinder,
+                                                   algorithm='HS512',
+                                                   callback=groupfinder,
                                                    timeout=timeout)
     multi_policy.add_policy(None, token_policy)
     session_factory = SignedCookieSessionFactory(secret,

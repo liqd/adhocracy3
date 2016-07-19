@@ -53,7 +53,6 @@ A navigation list containing hash tag links
     li {
         @include rem(font-size, $font-size-small);
         @include rem(padding, 0 0.5rem);
-        line-height: 1.333;
 
         &, a {
             color: $color-text-introvert;

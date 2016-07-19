@@ -49,6 +49,7 @@ def main():
         ('schaue', 'schauen Sie'),
         ('Klicke', 'Klicken Sie'),
         ('gib dabei', 'geben Sie dabei'),
+        ('öchtest Du ', 'öchten Sie '),
         ('Bitte gib', 'Bitte geben Sie'),
         ('Du kannst', 'Sie können'),
         ('Du hast', 'Sie haben'),

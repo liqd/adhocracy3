@@ -58,7 +58,7 @@ A user list item within a listing widget
 
     .user-list-item-button {
         float: right;
-        line-height: $font-size-large/$font-size-normal;
+        line-height: $font-size-large / $font-size-normal;
     }
 
     &.m-me, &:hover, &:focus, &.is-selected {

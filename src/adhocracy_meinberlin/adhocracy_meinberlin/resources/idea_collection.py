@@ -1,4 +1,5 @@
 """Shared idea collection process."""
+from pyramid.i18n import TranslationStringFactory
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import process
 from adhocracy_core.resources import proposal
@@ -6,12 +7,15 @@ from adhocracy_core.sheets.geo import ILocationReference
 from adhocracy_core.sheets.image import IImageReference
 
 
+_ = TranslationStringFactory('adhocracy')
+
+
 class IProcess(process.IProcess):
     """Idea collection participation process."""
 
 
 process_meta = process.process_meta._replace(
-    content_name='IdeaCollectionProcess',
+    content_name=_('IdeaCollectionProcess'),
     iresource=IProcess,
     element_types=(proposal.IGeoProposal,
                    ),
@@ -20,7 +24,7 @@ process_meta = process.process_meta._replace(
         ILocationReference,
         IImageReference,
     ),
-    workflow_name = 'standard',
+    default_workflow = 'standard',
 )
 
 

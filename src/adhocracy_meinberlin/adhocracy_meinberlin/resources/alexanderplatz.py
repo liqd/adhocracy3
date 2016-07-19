@@ -39,7 +39,7 @@ process_meta = document_process_meta._replace(
                    IGeoDocument),
     extended_sheets=(ILocationReference,
                      ),
-    workflow_name='standard',
+    default_workflow='standard',
 )
 
 
