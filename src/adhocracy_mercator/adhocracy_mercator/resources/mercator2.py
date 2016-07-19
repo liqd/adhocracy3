@@ -15,6 +15,7 @@ from adhocracy_core.sheets.description import IDescription
 from adhocracy_core.sheets.rate import ILikeable
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.image import IImageReference
+from adhocracy_core.sheets.logbook import IHasLogbookPool
 from adhocracy_core.resources.comment import add_commentsservice
 from adhocracy_core.resources.rate import add_ratesservice
 from adhocracy_core.resources.badge import add_badge_assignments_service
@@ -236,6 +237,7 @@ proposal_meta = proposal.proposal_meta._replace(
         ICommentable,
         ILikeable,
         IImageReference,
+        IHasLogbookPool,
         adhocracy_mercator.sheets.mercator2.IMercatorSubResources,
         adhocracy_mercator.sheets.mercator2.IUserInfo,
         adhocracy_mercator.sheets.mercator2.IOrganizationInfo,
