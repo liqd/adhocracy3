@@ -18,6 +18,7 @@ states:
         - [create_rate,          ~,         D,           ~,         D,       ~,         ~]
         - [edit_rate,            ~,         ~,           ~,         D,       ~,         ~]
         - [create_comment,       ~,         D,           D,         ~,       D,         ~]
+        - [do_transition,        ~,         ~,           ~,         A,       ~,         ~]
 transitions:
   to_voteable:
     from_state: proposed
@@ -28,3 +29,7 @@ transitions:
   to_rejected:
     from_state: voteable
     to_state: rejected
+  to_proposed:
+    from_state: rejected
+    to_state: proposed
+    callback: adhocracy_s1.workflows.s1.do_transition_to_proposed
