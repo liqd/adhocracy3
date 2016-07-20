@@ -1,6 +1,7 @@
 @import "../../lib/sass-planifolia/sass/math";
 @import "../../lib/sass-planifolia/sass/contrast";
 @import "../../lib/sass-planifolia/sass/grid";
+@import "../../lib/sass-planifolia/sass/clearfix";
 
 @import "general/variables";
 @import "general/variables_theme";
@@ -15,11 +16,10 @@
 
 @import "third_party/normalize";
 @import "general/normalize";
+@import "general/layout";
+@import "general/print";
 
-@import "grid";
-@import "layout";
-
-@import "components/type";
+@import "components/base";
 @import "components/badges";
 @import "components/forms";
 @import "components/button";
@@ -47,12 +47,11 @@
 @import "components/busy";
 @import "components/error_pages";
 @import "components/standalone_wrapper";
-@import "components/proposal_list";
+@import "components/proposal_list_item";
 @import "components/proposal_detail";
 @import "components/proposal_form";
 @import "components/blog";
 @import "components/markdown";
-@import "components/image_upload";
 @import "components/workflow_switch";
 @import "components/resource_header";
 @import "components/image";
@@ -61,9 +60,5 @@
 
 // Debug (these should not be importet in productive setups
 @import "debug/placeholder";
-
-@import "overwrite";
-
-@import "print";
 
 @import "theme";

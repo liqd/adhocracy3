@@ -1,7 +1,7 @@
 @mixin button-base {
     @include rem(font-size, $font-size-normal);
     @include rem(height, $button-height);
-    @include text-align(center);
+    text-align: center;
     display: inline-block;
     vertical-align: middle;
     border: 0;

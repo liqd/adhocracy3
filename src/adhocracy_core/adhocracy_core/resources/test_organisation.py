@@ -29,6 +29,7 @@ class TestOrganisation:
                 adhocracy_core.sheets.pool.IPool,
                 adhocracy_core.sheets.metadata.IMetadata,
                 adhocracy_core.sheets.workflow.IWorkflowAssignment,
+                adhocracy_core.sheets.localroles.ILocalRoles,
                 adhocracy_core.sheets.description.IDescription,
                 adhocracy_core.sheets.image.IImageReference,
                 )

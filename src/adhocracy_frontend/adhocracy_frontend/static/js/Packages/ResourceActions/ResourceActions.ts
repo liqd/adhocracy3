@@ -71,6 +71,7 @@ export var resourceActionsDirective = (
             resourceWithBadgesUrl: "@?",
             deleteRedirectUrl: "@?",
             assignBadges: "=?",
+            createDocument: "=?",
             share: "=?",
             hide: "=?",
             resourceWidgetDelete: "=?",

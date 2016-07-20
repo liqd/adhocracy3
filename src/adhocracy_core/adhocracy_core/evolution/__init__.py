@@ -855,6 +855,12 @@ def reindex_comments(root, registry):  # pragma: no cover
 
 
 @log_migration
+def add_localroles_sheet_to_pools(root, registry):  # pragma: no cover
+    """Add localroles sheet to user."""
+    from adhocracy_core.sheets.localroles import ILocalRoles
+    migrate_new_sheet(root, IPool, ILocalRoles)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -901,5 +907,6 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(migrate_auditlogentries_to_activities)
     config.add_evolution_step(add_notification_sheet_to_user)
     config.add_evolution_step(add_followable_sheet_to_process)
+    config.add_evolution_step(add_localroles_sheet_to_pools)
     config.add_evolution_step(remove_comment_count_data)
     config.add_evolution_step(reindex_comments)

@@ -17,6 +17,7 @@ def test_pool_meta():
                                  adhocracy_core.sheets.pool.IPool,
                                  adhocracy_core.sheets.metadata.IMetadata,
                                  adhocracy_core.sheets.workflow.IWorkflowAssignment,
+                                 adhocracy_core.sheets.localroles.ILocalRoles,
                                  )
     assert meta.element_types == (IPool,)
     assert meta.is_implicit_addable is False

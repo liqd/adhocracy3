@@ -33,6 +33,7 @@ permissions:
   - [view_userextended,              ~,         ~,             ~,            ~,         A,       ~,         A] # view user extended sheet/fields
   - [edit_notification,              ~,         ~,             ~,            ~,         A,       ~,         A] # edit user notification sheet/fields
   - [create_edit_sheet_permissions,  ~,         ~,             ~,            ~,         ~,       ~,         A] # default permission to do transition to next workflow state (phase)
+  - [manage_sheet_local_roles,       ~,         ~,             ~,            ~,         ~,       ~,         A] # read, edit localroles sheet
   - [create_group,                   ~,         ~,             ~,            ~,         ~,       ~,         A] # create user group
   # admin interface (sdi)
   - [sdi.view,                        ~,         ~,             ~,            ~,         ~,       ~,         A] # view the admin interface

@@ -24,9 +24,11 @@ from colander import String as StringType
 from colander import deferred
 from colander import drop
 from colander import null
+from colander import required
 from deform.widget import DateTimeInputWidget
 from deform.widget import SequenceWidget
 from deform.widget import Select2Widget
+from deform.widget import SelectWidget
 from deform_markdown import MarkdownTextAreaWidget
 from deform.widget import filedict
 from pyramid.path import DottedNameResolver
@@ -979,6 +981,20 @@ class ACEPrincipal(SchemaNode):
     """Adhocracy :term:`role` or pyramid system principal."""
 
     schema_type = ACEPrincipalType
+
+    @deferred
+    def widget(self, kw: dict):
+        choices = self.schema_type.valid_principals
+        values = [(x, x) for x in choices]
+        return SelectWidget(values=values)
+
+
+
+class ACEPrincipals(SequenceSchema):
+    """List of Adhocracy :term:`role` or pyramid system principal."""
+
+    principal = ACEPrincipal()
+
 
 
 class ACMCell(SchemaNode):

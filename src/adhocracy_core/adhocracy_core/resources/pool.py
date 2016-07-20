@@ -13,6 +13,7 @@ import adhocracy_core.sheets.pool
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.title
 import adhocracy_core.sheets.workflow
+import adhocracy_core.sheets.localroles
 from adhocracy_core.events import ResourceWillBeDeleted
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
@@ -126,6 +127,7 @@ pool_meta = resource_meta._replace(
                   adhocracy_core.sheets.pool.IPool,
                   adhocracy_core.sheets.metadata.IMetadata,
                   adhocracy_core.sheets.workflow.IWorkflowAssignment,
+                  adhocracy_core.sheets.localroles.ILocalRoles,
                   ),
     extended_sheets=(),
     element_types=(IPool,),
