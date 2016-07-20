@@ -351,6 +351,7 @@ class TestMercatorProposal:
              adhocracy_core.sheets.comment.ICommentable,
              adhocracy_core.sheets.rate.ILikeable,
              adhocracy_core.sheets.image.IImageReference,
+             adhocracy_core.sheets.logbook.IHasLogbookPool,
              adhocracy_mercator.sheets.mercator2.IMercatorSubResources,
              adhocracy_mercator.sheets.mercator2.IUserInfo,
              adhocracy_mercator.sheets.mercator2.IOrganizationInfo,

@@ -179,6 +179,13 @@ def reindex_requested_funding(root, registry):
         catalogs.reindex_index(proposal, 'mercator_requested_funding')
 
 
+@log_migration
+def add_haslogbookpool_sheet_to_mecator2(root, registry):
+    """Add badgeable sheet to proposals versions."""
+    from adhocracy_mercator.resources.mercator2 import IMercatorProposal
+    migrate_new_sheet(root, IMercatorProposal, IHasLogbookPool)
+
+
 def includeme(config):
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(evolve1_add_ititle_sheet_to_proposals)
@@ -194,3 +201,4 @@ def includeme(config):
     config.add_evolution_step(remove_mercator_workflow_assignment_sheet)
     config.add_evolution_step(make_mercator_proposals_badgeable)
     config.add_evolution_step(reindex_requested_funding)
+    config.add_evolution_step(add_haslogbookpool_sheet_to_mecator2)

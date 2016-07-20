@@ -47,7 +47,22 @@
         </div>
     </div>
 
-    <div class="mercator-proposal-detail-view">
+    <div data-ng-if="showBlogTabs()" class="blog-tabs">
+        <a
+            class="blog-tab"
+            data-ng-class="{'is-active': proposalTab !== 'blog'}"
+            data-ng-href="{{ path | adhResourceUrl }}">{{ "TR__MERCATOR_PROPOSAL_TAB_IDEA" | translate }}</a>
+        <a
+            class="blog-tab"
+            data-ng-class="{'is-active': proposalTab === 'blog'}"
+            data-ng-href="{{ path | adhResourceUrl:'blog' }}">{{ "TR__MERCATOR_PROPOSAL_TAB_JOURNEY" | translate }}</a>
+    </div>
+
+    <div data-ng-if="showBlogTabs() && proposalTab === 'blog'" class="blog">
+        <adh-blog data-ng-if="data.logbookPoolPath" data-path="{{ data.logbookPoolPath }}"></adh-blog>
+    </div>
+
+    <div class="mercator-proposal-detail-view" data-ng-if="!showBlogTabs() || proposalTab !== 'blog'">
         <adh-show-image
             data-css-class="mercator-proposal-detail-view-image"
             data-path="{{data.introduction.picture}}"

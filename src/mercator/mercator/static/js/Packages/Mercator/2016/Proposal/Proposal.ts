@@ -26,6 +26,7 @@ import * as SIFinancialPlanning from "../../../../Resources_/adhocracy_mercator/
 import * as SIGoal from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IGoal";
 import * as SIImageReference from "../../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SILocation from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ILocation";
+import * as SILogbook from "../../../../Resources_/adhocracy_core/sheets/logbook/IHasLogbookPool";
 import * as SIMercatorIntroImageMetadata from "../../../../Resources_/adhocracy_mercator/sheets/mercator/IIntroImageMetadata";
 import * as SIMercatorSubResources from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IMercatorSubResources";
 import * as SIMercatorUserInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IUserInfo";
@@ -89,6 +90,7 @@ var topicTrString = (topic : string) : string => {
 
 
 export interface IData {
+    logbookPoolPath : string;
     userInfo : {
         firstName : string;
         lastName : string;
@@ -550,6 +552,8 @@ var get = (
 
                 creationDate: proposal.data[SIMetaData.nick].item_creation_date,
                 creator: proposal.data[SIMetaData.nick].creator,
+                logbookPoolPath: proposal.data[SILogbook.nick].logbook_pool,
+
                 userInfo: {
                     firstName: proposal.data[SIMercatorUserInfo.nick].first_name,
                     lastName: proposal.data[SIMercatorUserInfo.nick].last_name
@@ -1026,6 +1030,13 @@ export var detailDirective = (
             get($q, adhHttp, adhTopLevelState, adhGetBadges)(scope.path).then((data) => {
                 scope.data = data;
             });
+
+            scope.$on("$destroy", adhTopLevelState.bind("processState", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("view", scope, "proposalTab"));
+
+            scope.showBlogTabs = () => {
+                return scope.data && scope.data.winner.name && scope.processState === "result";
+            };
         }
     };
 };
