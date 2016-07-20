@@ -338,9 +338,7 @@ export var registerRoutes = (
         })
         .specific(RIProposal, "edit", processType, context, ["adhHttp", (adhHttp : AdhHttp.Service) => {
             return (resource : RIProposal) => {
-                var poolPath = AdhUtil.parentPath(resource.path);
-
-                return adhHttp.options(poolPath).then((options : AdhHttp.IOptions) => {
+                return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
                     } else {
