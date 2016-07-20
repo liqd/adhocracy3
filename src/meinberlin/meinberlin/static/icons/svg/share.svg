@@ -1,15 +1,1 @@
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-<svg id="svg2985" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
-	<metadata id="metadata2990">
-		<rdf:RDF>
-			<cc:Work rdf:about="">
-				<dc:format>image/svg+xml</dc:format>
-				<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-				<dc:title/>
-			</cc:Work>
-		</rdf:RDF>
-	</metadata>
-	<g id="layer1">
-		<path id="path3823" fill="#666" d="m39.15,15.65c-2.7,0-5,1.2-6.7,3l-15.1-7.8c0.2-0.7,0.3-1.4,0.3-2.2,0-4.8-4-8.7-8.8-8.7s-8.8,4-8.8,8.8,4,8.7,8.8,8.7c2.5,0,4.8-1,6.4-2.7l15.3,7.8c-0.1,0.6-0.2,1.1-0.2,1.7,0,0.7,0.1,1.4,0.3,2l-15.1,7.3c-1.6-1.8-4-3-6.6-3-4.9,0.1-8.9,4-8.9,8.8s4,8.7,8.8,8.7,8.8-3.9,8.8-8.7c0-0.6-0.1-1.2-0.2-1.8l15.2-7.4c1.6,1.7,3.9,2.8,6.5,2.8,4.9,0,8.8-3.9,8.8-8.7s-3.9-8.6-8.8-8.6z"/>
-	</g>
-</svg>
+<svg width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1792 640q0 26-19 45l-512 512q-19 19-45 19t-45-19-19-45v-256h-224q-98 0-175.5 6t-154 21.5-133 42.5-105.5 69.5-80 101-48.5 138.5-17.5 181q0 55 5 123 0 6 2.5 23.5t2.5 26.5q0 15-8.5 25t-23.5 10q-16 0-28-17-7-9-13-22t-13.5-30-10.5-24q-127-285-127-451 0-199 53-333 162-403 875-403h224v-256q0-26 19-45t45-19 45 19l512 512q19 19 19 45z"/></svg>
