@@ -144,6 +144,18 @@ export var resourceDropdownDirective = (
             scope.data.toggleDropdown = () => {
                 scope.isShowDropdown = !scope.isShowDropdown;
             };
+
+            // some jQuery that closes the dropdown when the user clicks somewhere else:
+            element.focusout(() => {
+                $timeout(() => {
+                    if (this.has(document.activeElement).length === 0) {
+                        scope.isShowDropdown = false;
+                    }
+                });
+            });
+            scope.$on("$delete", () => {
+                element.off("focusout");
+            });
         }
     };
 };
@@ -164,7 +176,6 @@ export var modalActionDirective = () => {
         link: (scope) => {
             scope.toggle = () => {
                 scope.modals.toggleModal(scope.modal);
-                scope.toggleDropdown();
             };
         }
     };
