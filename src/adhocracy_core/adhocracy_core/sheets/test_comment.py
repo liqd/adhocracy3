@@ -11,6 +11,29 @@ def test_includeme_register_comment_sheet(config):
     assert config.registry.content.get_sheet(context, IComment)
 
 
+@fixture
+def mock_catalogs(monkeypatch, mock_catalogs) -> Mock:
+    from . import comment
+    monkeypatch.setattr(comment, 'find_service', lambda x, y: mock_catalogs)
+    mock_catalogs.get_index_value = Mock(return_value=0)
+    return mock_catalogs
+
+
+class TestDeferredDefaultCommentCount:
+
+    def call_fut(self, *args):
+        from .comment import deferred_default_comment_count
+        return deferred_default_comment_count(*args)
+
+    def test_deferred_default_comment_count(
+        self, config, node, kw, mock_catalogs, mocker):
+        kw['context'] = Mock()
+        mock_catalogs.get_index_value.return_value = 1
+        result = self.call_fut(node, kw)
+        mock_catalogs.get_index_value.assert_called_with(kw['context'],
+                                                         'comments')
+
+
 class TestCommentableSheet:
 
     @fixture
@@ -31,7 +54,6 @@ class TestCommentableSheet:
         from . import comment
         assert meta.isheet == comment.ICommentable
         assert meta.schema_class == comment.CommentableSchema
-        assert meta.sheet_class == comment.CommentableSheet
 
     def test_create(self, inst, context):
         from zope.interface.verify import verifyObject
@@ -39,30 +61,10 @@ class TestCommentableSheet:
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
 
-    def test_get_empty(self, inst, context):
+    def test_get_empty(self, inst, context, mock_catalogs):
         data = inst.get()
         assert data['post_pool'] == context['comments']
         assert data['comments_count'] == 0
-
-    def test_get_with_comments_count(self, inst):
-        from BTrees.Length import Length
-        data = dict(comments_count=Length(4))
-        setattr(inst.context, inst._annotation_key, data)
-        assert inst.get()['comments_count'] == 4
-
-    def test_set_initial_comments_count(self, inst):
-        inst._get_data_appstruct = Mock(return_value={})
-        inst.set({'comments_count': 4}, omit_readonly=False)
-        data = getattr(inst.context, inst._annotation_key)
-        assert data['comments_count'].value == 4
-
-    def test_set_edit_comments_count(self, inst):
-        from BTrees.Length import Length
-        old_data = dict(comments_count=Length(3))
-        setattr(inst.context, inst._annotation_key, old_data)
-        inst.set({'comments_count': 4}, omit_readonly=False)
-        data = getattr(inst.context, inst._annotation_key)
-        assert data['comments_count'].value == 4
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta, registry):

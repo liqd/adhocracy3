@@ -590,18 +590,7 @@ def add_image_reference_to_organisations(root, registry):  # pragma: no cover
 
 
 def set_comment_count(root, registry):  # pragma: no cover
-    """Set comment_count for all ICommentables."""
-    from adhocracy_core.resources.subscriber import update_comments_count
-    catalogs = find_service(root, 'catalogs')
-    query = search_query._replace(interfaces=ICommentVersion,
-                                  only_visible=True,
-                                  resolve=True)
-    comment_versions = catalogs.search(query).elements
-    count = len(comment_versions)
-    for index, comment in enumerate(comment_versions):
-        logger.info('Set comment_count for resource {0} of {1}'
-                    .format(index + 1, count))
-        update_comments_count(comment, 1, registry)
+    """Outdated."""
 
 
 def remove_duplicated_group_ids(root, registry):  # pragma: no cover
@@ -628,33 +617,7 @@ def add_image_reference_to_proposals(root, registry):  # pragma: no cover
 
 
 def reset_comment_count(root, registry):  # pragma: no cover
-    """Reset comment_count for all ICommentables - See #2194, #2188."""
-    from adhocracy_core.resources.comment import ICommentVersion
-    from adhocracy_core.sheets.comment import ICommentable
-    from adhocracy_core.resources.subscriber import update_comments_count
-    catalogs = find_service(root, 'catalogs')
-    query = search_query._replace(interfaces=ICommentable,
-                                  only_visible=True,
-                                  resolve=True)
-    commentables = catalogs.search(query).elements
-    count = len(commentables)
-    for index, comment in enumerate(commentables):
-        logger.info('Set comment_count to 0 for resource {0} of {1}'
-                    .format(index + 1, count))
-        commentable_sheet = registry.content.get_sheet(comment,
-                                                       ICommentable)
-        commentable_sheet.set({'comments_count': 0}, omit_readonly=False)
-
-    query = search_query._replace(interfaces=ICommentVersion,
-                                  only_visible=True,
-                                  resolve=True,
-                                  indexes={'tag': 'FIRST'})
-    comment_versions = catalogs.search(query).elements
-    count = len(comment_versions)
-    for index, comment in enumerate(comment_versions):
-        logger.info('Recalculate comment_count for resource {0} of {1}'
-                    .format(index + 1, count))
-        update_comments_count(comment, 1, registry)
+    """Outdated."""
 
 
 @log_migration
@@ -871,6 +834,27 @@ def add_followable_sheet_to_process(root, registry):  # pragma: no cover
 
 
 @log_migration
+def remove_comment_count_data(root, registry):  # pragma: no cover
+    """Remove comment_count data in ICommentable sheet."""
+    from adhocracy_core.sheets.comment import ICommentable
+    catalogs = find_service(root, 'catalogs')
+    commentables = _search_for_interfaces(catalogs, ICommentable)
+    for commentable in commentables:
+        sheet = registry.content.get_sheet(commentable, ICommentable)
+        sheet.delete_field_values['comment_count']
+
+
+@log_migration
+def reindex_comments(root, registry):  # pragma: no cover
+    """Update comments index."""
+    from adhocracy_core.sheets.comment import ICommentable
+    catalogs = find_service(root, 'catalogs')
+    resources = _search_for_interfaces(catalogs, ICommentable)
+    for resource in resources:
+        catalogs.reindex_index(resource, 'comments')
+
+
+@log_migration
 def add_localroles_sheet_to_pools(root, registry):  # pragma: no cover
     """Add localroles sheet to user."""
     from adhocracy_core.sheets.localroles import ILocalRoles
@@ -924,3 +908,5 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_notification_sheet_to_user)
     config.add_evolution_step(add_followable_sheet_to_process)
     config.add_evolution_step(add_localroles_sheet_to_pools)
+    config.add_evolution_step(remove_comment_count_data)
+    config.add_evolution_step(reindex_comments)

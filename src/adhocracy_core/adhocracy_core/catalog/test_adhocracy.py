@@ -215,6 +215,7 @@ class TestIndexControversiality:
             query._replace(interfaces=IRate,
                            frequency_of='rate',
                            indexes={'tag': 'LAST'},
+                           only_visible=True,
                            references=[(None, IRate, 'object', context) ],
                            )
 
@@ -253,12 +254,17 @@ class TestIndexComments:
     def test_index_comments(self, item, mock_catalogs, query, search_result):
         from .adhocracy import index_comments
         from adhocracy_core.resources.comment import ICommentVersion
-        item['commentable'] = testing.DummyResource()
+        from adhocracy_core.sheets.comment import IComment
+        commentable = testing.DummyResource()
+        item['commentable'] = commentable
         search_result = search_result._replace(count=5)
         mock_catalogs.search.return_value = search_result
         query = query._replace(root=item,
                                interfaces=ICommentVersion,
                                indexes={'tag': 'LAST'},
+                               only_visible=True,
+                               references=[(None, IComment, 'object', commentable)
+                                           ],
                                )
         assert index_comments(item['commentable'], None) == 5
         assert mock_catalogs.search.call_args[0][0] == query

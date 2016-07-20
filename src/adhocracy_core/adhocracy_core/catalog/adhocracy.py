@@ -15,6 +15,7 @@ from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.resources.comment import ICommentVersion
 from adhocracy_core.sheets.comment import ICommentable
+from adhocracy_core.sheets.comment import IComment
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.sheets.rate import IRateable
@@ -138,6 +139,7 @@ def index_controversiality(resource, default) -> int:
     query = search_query._replace(interfaces=IRate,
                                   frequency_of='rate',
                                   indexes={'tag': 'LAST'},
+                                  only_visible=True,
                                   references=[(None, IRate, 'object', resource)
                                               ],
                                   )
@@ -159,6 +161,10 @@ def index_comments(resource, default) -> int:
     query = search_query._replace(root=item,
                                   interfaces=ICommentVersion,
                                   indexes={'tag': 'LAST'},
+                                  only_visible=True,
+                                  references=[(None, IComment, 'refers_to',
+                                               resource)
+                                              ],
                                   )
     result = catalogs.search(query)
     return result.count
