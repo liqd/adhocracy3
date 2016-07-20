@@ -1,0 +1,59 @@
+/*doc
+---
+title: image background
+name: image-background
+category: Widgets
+---
+
+A container that can contain any content. A background image set on the
+container will be centered and will cover the complete available space.
+
+```html_example
+<div class="image-background" style="background-image: url('/static/images/sample.jpg')">
+    <p>Consequatur laudantium quia quis corrupti rerum cumque. Dignissimos voluptatem ut quia. Quos recusandae consequuntur quos. Officia autem ea consequatur corporis harum quo veniam. Dicta vitae minima corrupti aut in. Dolore aut omnis sit voluptate cumque rem repellat.</p>
+</div>
+<div class="image-background" style="background-image: url('/static/images/sample.jpg')">
+    <p>Consequatur</p>
+</div>
+```
+*/
+.image-background {
+    background-size: cover;
+    background-position: 50%;
+}
+
+/*doc
+---
+title: Image Upload
+name: image-upload
+category: Widgets
+---
+
+<div class="image-upload">
+    <button type="button" class="button-cta-secondary image-upload-button">Change image</button>
+    <a  href="#" class="button image-upload-reset">reset</a>
+    <img src="/static/images/sample.jpg" class="image-upload-preview" width="200" alt="" />
+</div>
+*/
+.image-upload {
+    @include rem(margin, 1.4rem 0);
+
+    .form-footer {
+        @include rem(margin-top, 1rem);
+    }
+
+    &.m-standalone {
+        @include rem(margin-left, 1rem);
+        @include rem(margin-right, 1rem);
+    }
+}
+
+.image-upload-submit-button {
+    @include rem(margin-right, 1rem);
+}
+
+.image-upload-preview {
+    @include rem(margin, 0.7rem 0);
+    @include rem(max-height, 10rem);
+    display: block;
+}

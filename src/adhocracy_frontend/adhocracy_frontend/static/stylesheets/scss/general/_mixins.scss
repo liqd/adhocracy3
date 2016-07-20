@@ -61,10 +61,6 @@ $rem-px-only: false !default;
     white-space: nowrap;
 }
 
-@mixin clearfix {
-    overflow: hidden;
-}
-
 @function font-url($path) {
     @return url("../fonts/" + $path);
 }

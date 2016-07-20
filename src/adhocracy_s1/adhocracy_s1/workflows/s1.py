@@ -3,13 +3,20 @@
 from datetime import datetime
 from pytz import UTC
 from pyramid.request import Request
+from pyramid.registry import Registry
 from substanced.util import find_service
+from adhocracy_core.catalog.adhocracy import index_rates
 from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
+from adhocracy_core.resources.proposal import IProposal
+from adhocracy_core.resources.proposal import IProposalVersion
+from adhocracy_core.sheets.description import IDescription
+from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.sheets.tags import ITags
 
 
 def do_transition_to_propose(context: IPool, request: Request, **kwargs):
@@ -115,6 +122,37 @@ def _do_transition(context, request: Request, from_state: str, to_state: str,
             if start_date is not None:
                 _store_state_data(context, to_state, request,
                                   start_date=start_date)
+
+
+def do_transition_to_proposed(context: IProposal,
+                              request: Request,
+                              **kwargs) -> None:
+    """Delete rates for `context` and add renominate info."""
+    rates = find_service(context, 'rates')
+    if rates is None:
+        return
+    last = request.registry.content.get_sheet_field(context, ITags, 'LAST')
+    _add_renominate_info(last, request)
+    _remove_children(rates, request.registry)
+
+
+def _add_renominate_info(version: IProposalVersion, request: Request) -> None:
+    registry = request.registry
+    editor = registry.content.get_sheet_field(request.user, IUserBasic, 'name')
+    rates = index_rates(version)
+    description_sheet = registry.content.get_sheet(version, IDescription)
+    description = description_sheet.get()['description']
+    renominate_info = '\n\n---'\
+                      '\n\nrenominated by: {0}'\
+                      '\nold rating: {1}'\
+                      '\n'.format(editor, rates)
+    description_sheet.set({'description': description + renominate_info})
+
+
+def _remove_children(context: IPool, registry: Registry) -> None:
+    child_names = [x for x in context.keys()]
+    for child in child_names:
+        context.remove(child, registry=registry)
 
 
 def includeme(config):

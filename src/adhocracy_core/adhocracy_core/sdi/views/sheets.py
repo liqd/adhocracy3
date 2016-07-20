@@ -63,7 +63,8 @@ class EditResourceSheets(FormView):
     def _get_editable_sheets(self) -> {}:
         sheets = self.registry.content.get_sheets_edit(self.context,
                                                        self.request)
-        return OrderedDict([(s.meta.isheet.__identifier__, s) for s in sheets])
+        return OrderedDict([(s.meta.isheet.__identifier__.split('.')[-1],
+                             s) for s in sheets])
 
     def save_success(self, appstruct: dict):
         self.active_sheet.set(appstruct)
@@ -91,7 +92,9 @@ class AddResourceSheetsBase(FormView):
         self.registry = self.request.registry
         self.sheets = self._get_creatable_sheets()
         self.schema = self._get_schema_with_bindings()
-        self.title = _('Add {0}'.format(self.iresource.__identifier__))
+        self.meta = self.registry.content.resources_meta[self.iresource]
+        content_name = self.meta.content_name or self.iresource.__identifier__
+        self.title = _('Add {0}'.format(content_name))
 
     def _get_creatable_sheets(self) -> {}:
         sheets = self.registry.content.get_sheets_create(

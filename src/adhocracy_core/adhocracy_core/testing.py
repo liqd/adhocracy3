@@ -944,3 +944,13 @@ def do_transition_to(app_user, path, state) -> TestResponse:
                      {'workflow_state': state}}}
     resp = app_user.put(path, data)
     return resp
+
+
+def get_next_states(app_user, path) -> []:
+    """Get possible transitions to new worklfow states."""
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
+    resp = app_user.options(path).json
+    workflow_datas = [y for x, y in resp['PUT']['request_body']['data'].items()
+                      if IWorkflowAssignment.__identifier__ in x]
+    workflow_data = workflow_datas and workflow_datas[0] or {}
+    return workflow_data.get('workflow_state', [])

@@ -240,18 +240,13 @@ parent: comment
 
     .comment-header-column1,
     .comment-header-column2 {
-        @include text-align(right);
+        text-align: right;
         float: right;
     }
 
     .comment-header-column1 {
-        @include text-align(left);
+        text-align: left;
         float: left;
-    }
-
-    .rate {
-        display: inline-block;
-        vertical-align: middle;
     }
 }
 
