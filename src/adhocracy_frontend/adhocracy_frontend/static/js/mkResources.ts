@@ -888,6 +888,9 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     case "adhocracy_core.sheets.workflow.Workflow":
         resultType = "string";
         break;
+    case "adhocracy_core.sheets.localroles.LocalRole":
+        resultType = "string";
+        break;
     case "adhocracy_mercator.sheets.mercator.StatusEnum":  // FIXME: this needs to go to the mercator package
         resultType = "string";
         break;

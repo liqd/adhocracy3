@@ -405,3 +405,4 @@ def includeme(config):  # pragma: no cover
     config.include('.logbook')
     config.include('.embed')
     config.include('.notification')
+    config.include('.localroles')
