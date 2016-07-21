@@ -14,9 +14,11 @@ import RIS1Process from "../../../Resources_/adhocracy_s1/resources/s1/IProcess"
 import RIProposal from "../../../Resources_/adhocracy_s1/resources/s1/IProposal";
 import RIProposalVersion from "../../../Resources_/adhocracy_s1/resources/s1/IProposalVersion";
 import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
+import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIWorkflowAssignment from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/S1/Workbench";
+export var pkgLocation = "/S1/Workbench";
 
 
 export var s1WorkbenchDirective = (
@@ -248,6 +250,7 @@ export var s1ProposalEditColumnDirective = (
 export var s1LandingDirective = (
     $translate: any,
     adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -255,6 +258,13 @@ export var s1LandingDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Landing.html",
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.on("processUrl", (processUrl) => {
+                adhHttp.get(processUrl).then((process) => {
+                    scope.processTitle = process.data[SITitle.nick].title;
+                    scope.processShortDescription = process.data[SIDescription.nick].short_description;
+                    scope.processDescription = process.data[SIDescription.nick].description;
+                });
+            }));
             $translate("TR__S1_ABOUT_TEXT").then((translated) => {
                 scope.aboutText = translated;
             });

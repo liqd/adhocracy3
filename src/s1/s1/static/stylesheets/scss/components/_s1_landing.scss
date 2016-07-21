@@ -1,9 +1,17 @@
 .s1-landing {
     @include container;
     background: $color-background-base-introvert;
+    min-width: rem($moving-column-single-width-min);
+    max-width: rem($moving-column-single-width-max);
+
+    // center and make scrollable
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
     margin: 0 auto;
-    min-width: $moving-column-single-width-min;
-    max-width: $moving-column-single-width-max;
+    overflow: auto;
 }
 
 .s1-landing-row,

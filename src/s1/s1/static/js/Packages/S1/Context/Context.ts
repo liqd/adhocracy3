@@ -18,7 +18,7 @@ export var headerDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/header.html",
         link: (scope) => {
-            scope.processUrl = adhConfig.custom["s1_process_url"];
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("meeting", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
         }
