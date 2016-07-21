@@ -841,7 +841,7 @@ def remove_comment_count_data(root, registry):  # pragma: no cover
     commentables = _search_for_interfaces(catalogs, ICommentable)
     for commentable in commentables:
         sheet = registry.content.get_sheet(commentable, ICommentable)
-        sheet.delete_field_values['comment_count']
+        sheet.delete_field_values(['comment_count'])
 
 
 @log_migration
