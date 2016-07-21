@@ -198,7 +198,7 @@ class TestResourceRESTView:
         inst = self.make_one(context, request_)
         d = {IMetadata.__identifier__: {}}
         inst._add_metadata_edit_permission_info(d)
-        assert d == {IMetadata.__identifier__: {'deleted': [True, False]}}
+        assert d == {IMetadata.__identifier__: {}}
 
     def test_add_metadata_permissions_info_with_hide_permission(
             self, request_, context):
@@ -207,8 +207,7 @@ class TestResourceRESTView:
         inst = self.make_one(context, request_)
         d = {IMetadata.__identifier__: {}}
         inst._add_metadata_edit_permission_info(d)
-        assert d == {IMetadata.__identifier__: {'deleted': [True, False],
-                                                'hidden': [True, False]}}
+        assert d == {IMetadata.__identifier__: {'hidden': [True, False]}}
 
     def test_add_workflow_permissions_info(
             self, request_, registry, context, mock_sheet, mock_workflow):

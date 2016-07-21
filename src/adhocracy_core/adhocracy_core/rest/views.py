@@ -152,8 +152,7 @@ class ResourceRESTView:
         """Add info if a user may set the hidden metadata fields."""
         if IMetadata.__identifier__ not in cstruct:
             return
-        # everybody who can PUT metadata can delete the resource
-        permission_info = {'deleted': [True, False]}
+        permission_info = {}
         if self.request.has_permission('hide', self.context):
             permission_info['hidden'] = [True, False]
         cstruct[IMetadata.__identifier__] = permission_info
@@ -177,7 +176,7 @@ class ResourceRESTView:
         permission='view',
     )
     def get(self) -> dict:
-        """Get resource data (unless deleted or hidden)."""
+        """Get resource data (unless hidden)."""
         metric = self._get_get_metric_name()
         with statsd_timer(metric, rate=.1, registry=self.registry):
             schema = create_schema(GETResourceResponseSchema,

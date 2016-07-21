@@ -87,24 +87,10 @@ def test_index_visibility_visible(context):
     assert index_visibility(context, 'default') == ['visible']
 
 
-def test_index_visibility_deleted(context):
-    from .adhocracy import index_visibility
-    assert index_visibility(context, 'default') == ['visible']
-    context.deleted = True
-    assert index_visibility(context, 'default') == ['deleted']
-
-
 def test_index_visibility_hidden(context):
     from .adhocracy import index_visibility
     context.hidden = True
     assert index_visibility(context, 'default') == ['hidden']
-
-
-def test_index_visibility_both(context):
-    from .adhocracy import index_visibility
-    context.deleted = True
-    context.hidden = True
-    assert sorted(index_visibility(context, 'default')) == ['deleted', 'hidden']
 
 
 @mark.usefixtures('integration')
@@ -263,7 +249,7 @@ class TestIndexComments:
                                interfaces=ICommentVersion,
                                indexes={'tag': 'LAST'},
                                only_visible=True,
-                               references=[(None, IComment, 'object', commentable)
+                               references=[(None, IComment, 'refers_to', commentable)
                                            ],
                                )
         assert index_comments(item['commentable'], None) == 5

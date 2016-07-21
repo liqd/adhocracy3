@@ -206,17 +206,17 @@ Cannot edit process content::
     >>> 'POST' in moderator.options(participant_proposal).json
     False
 
-Can hide and delete process content
+Can hide process content
     >>> resp = moderator.options(participant_proposal).json
     >>> sorted(resp['PUT']['request_body']['data']
     ...                  ['adhocracy_core.sheets.metadata.IMetadata'])
-    ['deleted', 'hidden']
+    ['hidden']
 
 Can hide and delete process structure
     >>> resp = moderator.options('/organisation/process').json
     >>> sorted(resp['PUT']['request_body']['data']
     ...                  ['adhocracy_core.sheets.metadata.IMetadata'])
-    ['deleted', 'hidden']
+    ['hidden']
 
 
 Initiator

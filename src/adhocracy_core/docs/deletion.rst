@@ -188,13 +188,13 @@ it::
 But they cannot hide it::
 
     >>> pprint(resp['PUT']['request_body']['data']['adhocracy_core.sheets.metadata.IMetadata'])
-    {'deleted': [True, False]}
+    {}
 
 -- that special right is reserved to managers::
 
     >>> resp = moderator.options(document_item).json
     >>> pprint(resp['PUT']['request_body']['data']['adhocracy_core.sheets.metadata.IMetadata'])
-    {'deleted': [True, False], 'hidden': [True, False]}
+    {'hidden': [True, False]}
 
 FIXME: remove deleted flag, not used anymore
 

@@ -26,7 +26,7 @@ class TestIMetadataSchema:
     def test_deserialize_empty(self):
         inst = self.make_one()
         result = inst.deserialize({})
-        assert result == {'deleted': False, 'hidden': False}
+        assert result == {'hidden': False}
 
     def test_deserialize_hiding_requires_permission(self, context, request_):
         import colander
@@ -44,7 +44,6 @@ class TestIMetadataSchema:
         assert result['item_creation_date'] == null
         assert result['modification_date'] == null
         assert result['modified_by'] is None
-        assert result['deleted'] == 'false'
         assert result['hidden'] == 'false'
 
     def test_serialize_empty_and_bind(self, context, mock_now, request_):
