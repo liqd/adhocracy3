@@ -24,10 +24,6 @@ A high-level section of a document with its own heading.
 </div>
 ```
 */
-.chapter-wrapper {
-    counter-reset: chapter-counter;
-}
-
 .chapter {
     @media print {
         border: 0;
@@ -42,9 +38,4 @@ A high-level section of a document with its own heading.
 .chapter-header, .chapter h2 {
     @include rem(margin, 0 0 1rem);
     color: $color-text-introvert;
-
-    &.m-counted:before {
-        content: counter(chapter-counter) ". ";
-        counter-increment: chapter-counter;
-    }
 }
