@@ -35,7 +35,7 @@ export var register = (angular) => {
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[RIPcompassProcess.content_type] =
-                    "<adh-idea-collection-workbench data-process-options=\"processOptions\"></adh-idea-collection-workbench>";
+                "<adh-idea-collection-workbench data-process-options=\"processOptions\"></adh-idea-collection-workbench>";
             adhProcessProvider.processOptions[RIPcompassProcess.content_type] = {
                 hasImage: true,
                 proposalClass: RIProposal,
