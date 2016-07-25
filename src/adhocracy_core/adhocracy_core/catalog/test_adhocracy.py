@@ -263,7 +263,7 @@ class TestIndexComments:
                                interfaces=ICommentVersion,
                                indexes={'tag': 'LAST'},
                                only_visible=True,
-                               references=[(None, IComment, 'object', commentable)
+                               references=[(None, IComment, 'refers_to', commentable)
                                            ],
                                )
         assert index_comments(item['commentable'], None) == 5
