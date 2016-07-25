@@ -65,7 +65,7 @@
             <ol>
                 <li data-ng-repeat="paragraph in data.paragraphs | filter:{deleted: false}">
                     <a
-                        href="#section-jump-chapter-{{$index}}"
+                        href="#section-jump-{{$index}}"
                         data-du-smooth-scroll=""
                         data-du-scrollspy="">{{ $index + 1}}</a>
                 </li>
@@ -73,7 +73,7 @@
         </nav>
 
         <div class="section-jump-main chapter-wrapper" data-du-spy-context="" data-ng-class="{'has-navigation': paragraphCount() > 1}">
-            <section class="action-section chapter" data-ng-repeat="paragraph in data.paragraphs" data-ng-if="!paragraph.deleted" id="section-jump-chapter-{{$index}}">
+            <section class="action-section chapter" data-ng-repeat="paragraph in data.paragraphs" data-ng-if="!paragraph.deleted" id="section-jump-{{$index}}">
                 <label>
                     <textarea
                         data-msd-elastic=""
