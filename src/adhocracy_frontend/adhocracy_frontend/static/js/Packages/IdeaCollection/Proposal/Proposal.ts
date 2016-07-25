@@ -352,7 +352,7 @@ export var createDirective = (
             }
 
             scope.submit = () => {
-                return adhSubmitIfValid(scope, element, scope.meinberlinProposalForm, () => {
+                return adhSubmitIfValid(scope, element, scope.ideaCollectionProposalForm, () => {
                     return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.poolPath)
                         .then((result) => {
                             $location.url(adhResourceUrlFilter(AdhUtil.parentPath(result[1].path)));
@@ -397,7 +397,7 @@ export var editDirective = (
                 scope, undefined);
 
             scope.submit = () => {
-                return adhSubmitIfValid(scope, element, scope.meinberlinProposalForm, () => {
+                return adhSubmitIfValid(scope, element, scope.ideaCollectionProposalForm, () => {
                     return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.resource)
                         .then((result) => {
                             $location.url(adhResourceUrlFilter(AdhUtil.parentPath(result[0].path)));

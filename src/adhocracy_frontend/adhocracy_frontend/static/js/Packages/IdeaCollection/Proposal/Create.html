@@ -2,7 +2,7 @@
     novalidate="novalidate"
     data-ng-submit="submit()"
     class="proposal-form"
-    name="meinberlinProposalForm">
+    name="ideaCollectionProposalForm">
 
     <div class="proposal-form-upper">
         <div class="form-error" data-ng-repeat="error in errors track by $index">
@@ -21,7 +21,7 @@
                 minlength="3"
                 maxlength="100"
                 required="required" />
-            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.title, 'required')">
+            <span class="input-error" data-ng-show="showError(ideaCollectionProposalForm, ideaCollectionProposalForm.title, 'required')">
                 {{ "TR__IDEA_COLLECTION_ERROR_REQUIRED_TITLE" | translate }}
             </span>
         </label>
@@ -37,7 +37,7 @@
                 maxlength="500"
                 required="required"></textarea>
 
-            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.detail, 'required')">
+            <span class="input-error" data-ng-show="showError(ideaCollectionProposalForm, ideaCollectionProposalForm.detail, 'required')">
                 {{ "TR__IDEA_COLLECTION_ERROR_REQUIRED_DETAIL" | translate }}
             </span>
         </label>
@@ -52,10 +52,10 @@
                 min="0"
                 max="{{processOptions.maxBudget}}"
                 required="required" />
-            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.budget, 'required')">
+            <span class="input-error" data-ng-show="showError(ideaCollectionProposalForm, ideaCollectionProposalForm.budget, 'required')">
                 {{ "TR__IDEA_COLLECTION_ERROR_REQUIRED_BUDGET" | translate }}
             </span>
-            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.budget, 'number')">
+            <span class="input-error" data-ng-show="showError(ideaCollectionProposalForm, ideaCollectionProposalForm.budget, 'number')">
                 {{ "TR__ERROR_MUST_BE_A_NUMBER" | translate }}
             </span>
         </label>
@@ -68,7 +68,7 @@
                 name="creatorParticipate"
                 />
                 {{ "TR__IDEA_COLLECTION_I_WANT_TO_BE_PART" | translate }}
-            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.creatorParticipate, 'required')">
+            <span class="input-error" data-ng-show="showError(ideaCollectionProposalForm, ideaCollectionProposalForm.creatorParticipate, 'required')">
                 {{ "TR__IDEA_COLLECTION_ERROR_REQUIRED_I_WANT_TO_BE_PART" | translate }}
             </span>
         </label>
@@ -83,7 +83,7 @@
                 name="locationText"
                 maxlength="100"
                 required="required" />
-            <span class="input-error" data-ng-show="showError(meinberlinProposalForm, meinberlinProposalForm.locationText, 'required')">
+            <span class="input-error" data-ng-show="showError(ideaCollectionProposalForm, ideaCollectionProposalForm.locationText, 'required')">
                 {{ "TR__IDEA_COLLECTION_ERROR_REQUIRED_LOCATION_TEXT" | translate }}
             </span>
         </label>
