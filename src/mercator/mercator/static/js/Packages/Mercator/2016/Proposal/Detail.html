@@ -107,7 +107,7 @@
                 </ol>
             </nav>
 
-            <div class="section-jump-main chapter-wrapper" data-du-spy-context="">
+            <div class="section-jump-main" data-du-spy-context="">
                 <section data-ng-if="data.winner.name === 'winning' || data.winner.name === 'community'" class="jury-decision-section" id="jury-decision">
                     <h2>{{ "TR__MERCATOR_JURY_STATEMENT" | translate }}</h2>
                     <p>{{ data.winner.description }}</p>
@@ -115,9 +115,9 @@
                         <i class="icon-star"></i>
                     </div>
                 </section>
-                <section class="chapter" id="mercator-proposal-brief">
+                <section id="mercator-proposal-brief">
                     <section class="action-section {{subResourceSelectedState('pitch')}}">
-                        <h2 class="chapter-header m-counted"
+                        <h2 class="m-counted"
                             data-du-scrollspy="mercator-proposal-brief"
                             data-offset="50">{{ "TR__MERCATOR_PROPOSAL_BRIEF" | translate }}</h2>
                         <p>{{ data.introduction.pitch }}</p>
@@ -150,9 +150,9 @@
                     </section>
                 </section>
 
-                <section class="chapter" id="mercator-proposal-about-you">
+                <section id="mercator-proposal-about-you">
                     <section class="non-action-section">
-                        <h2 class="chapter-header m-counted"
+                        <h2 class="m-counted"
                             data-du-scrollspy="mercator-proposal-about-you"
                             data-offset="50">{{ "TR__MERCATOR_PROPOSAL_ABOUT_YOU" | translate }}</h2>
 
@@ -268,9 +268,9 @@
                     </section>
                 </section>
 
-                <section class="chapter" id="mercator-proposal-impact">
+                <section id="mercator-proposal-impact">
                     <section class="action-section {{subResourceSelectedState('challenge')}}">
-                        <h2 class="chapter-header m-counted"
+                        <h2 class="m-counted"
                             data-du-scrollspy="mercator-proposal-impact"
                             data-offset="50">{{ "TR__MERCATOR_PROPOSAL_IMPACT" | translate }}</h2>
                         <h3>{{ "TR__MERCATOR_PROPOSAL_IMPACT_CHALLENGE_LABEL" | translate }}</h3>
@@ -348,9 +348,9 @@
                     </section>
                 </section>
 
-                <section class="chapter" id="mercator-proposal-criteria">
+                <section id="mercator-proposal-criteria">
                     <section class="action-section {{subResourceSelectedState('connectioncohesion')}}">
-                        <h2 class="chapter-header m-counted"
+                        <h2 class="m-counted"
                             data-du-scrollspy="mercator-proposal-criteria"
                             data-offset="50">{{ "TR__MERCATOR_PROPOSAL_CRITERIA" | translate }}</h2>
                         <h3>{{ "TR__MERCATOR_PROPOSAL_STRENGTHEN_LABEL" | translate }}</h3>
@@ -377,9 +377,9 @@
                     </section>
                 </section>
 
-                <section class="chapter" id="mercator-proposal-community" data-ng-if="data.experience || data.heardFrom">
+                <section id="mercator-proposal-community" data-ng-if="data.experience || data.heardFrom">
                     <section class="action-section {{subResourceSelectedState('experience')}}">
-                        <h2 class="chapter-header m-counted"
+                        <h2 class="m-counted"
                             data-du-scrollspy="mercator-proposal-community"
                             data-offset="50">{{ "TR__MERCATOR_PROPOSAL_COMMUNITY" | translate }}</h2>
                         <div data-ng-if="data.experience">
