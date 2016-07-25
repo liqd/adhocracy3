@@ -79,6 +79,7 @@ export var resourceActionsDirective = (
             report: "=?",
             cancel: "=?",
             edit: "=?",
+            image: "=?",
             moderate: "=?",
             modals: "=?"
         },
