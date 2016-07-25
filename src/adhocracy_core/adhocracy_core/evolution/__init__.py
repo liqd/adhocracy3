@@ -739,7 +739,6 @@ def rename_default_group(root, registry):  # pragma: no cover
     from adhocracy_core.authorization import get_local_roles
     from adhocracy_core.authorization import set_local_roles
     from adhocracy_core.resources.process import IProcess
-    from adhocracy_core.resources.pool import Pool
     from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
     from adhocracy_core.sheets.principal import IPermissions
     catalogs = find_service(root, 'catalogs')
@@ -770,12 +769,7 @@ def rename_default_group(root, registry):  # pragma: no cover
     if old_default_group_name in groups:
         logger.info('Rename default group '
                     'to {}'.format(new_default_group_name))
-        folder = super(Pool, groups)   # rename not working with Pool subclass
-        old = folder.remove(old_default_group_name, folder, registry=registry)
-        folder.add(new_default_group_name,
-                   old,
-                   moving=folder,
-                   registry=registry)
+        groups.move(old_default_group_name, new_default_group_name)
     new_default_group = groups[new_default_group_name]
     for user in users_with_default_group:
         logger.info('Update default group name of user {}'.format(user))
