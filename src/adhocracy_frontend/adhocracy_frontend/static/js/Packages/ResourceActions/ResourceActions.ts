@@ -156,7 +156,7 @@ export var resourceDropdownDirective = (
             // some jQuery that closes the dropdown when the user clicks somewhere else:
             element.focusout(() => {
                 $timeout(() => {
-                    if (this.has(document.activeElement).length === 0) {
+                    if (element.has(document.activeElement).length === 0) {
                         scope.isShowDropdown = false;
                     }
                 });
