@@ -41,9 +41,8 @@ A generic list item. How a resource appears when in a list
 ```
 */
 
-$image-margin: 11px;
+$thumbnail-margin: 11px;
 $thumbnail-width: 105px;
-$thumbnail-height: 90px;
 
 .list-item {
     @include container;
@@ -73,14 +72,15 @@ $thumbnail-height: 90px;
 
     &.m-contains-image {
         .list-item-body {
-            margin-left: $thumbnail-width + $image-margin;
+            margin-left: $thumbnail-width + $thumbnail-margin;
         }
     }
 }
 
 .list-item-image {
     float: left;
-    margin-right: $image-margin;
+    width: $thumbnail-width;
+    margin-right: $thumbnail-margin;
 }
 
 .list-item-title,
