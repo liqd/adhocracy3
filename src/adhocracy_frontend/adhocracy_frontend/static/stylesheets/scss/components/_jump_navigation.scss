@@ -96,4 +96,16 @@ A navigation list containing hash tag links
             margin-left: 2rem;
         }
     }
+
+    &.m-bg {
+        background-color: $color-structure-normal;
+
+        .jump-navigation a {
+            background: $color-background-base-introvert;
+
+            &.active {
+                background: $color-background-base;
+            }
+        }
+    }
 }
