@@ -3,7 +3,6 @@
     data-ng-submit="submit()"
     class="document-form"
     name="documentForm">
-<div class="section-jump" id="section-jump-top">
     <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
 
     <div class="section-jump-cover">
@@ -65,7 +64,7 @@
             <ol>
                 <li data-ng-repeat="paragraph in data.paragraphs | filter:{deleted: false}">
                     <a
-                        href="#section-jump-{{$index}}"
+                        href="#jump-{{$index}}"
                         data-du-smooth-scroll=""
                         data-du-scrollspy="">{{ $index + 1}}</a>
                 </li>
@@ -73,7 +72,7 @@
         </nav>
 
         <div class="jump-navigation-main" data-du-spy-context="" data-ng-class="{'has-navigation': paragraphCount() > 1}">
-            <section class="action-section" data-ng-repeat="paragraph in data.paragraphs" data-ng-if="!paragraph.deleted" id="section-jump-{{$index}}">
+            <section class="action-section" data-ng-repeat="paragraph in data.paragraphs" data-ng-if="!paragraph.deleted" id="jump-{{$index}}">
                 <label>
                     <textarea
                         data-msd-elastic=""
@@ -103,6 +102,4 @@
             </footer>
         </div><!-- /.jump-navigation-main -->
     </div><!-- /.jump-navigation-wrapper -->
-</div><!-- /.section-jump -->
-<!-- DATA SUBMIT -->
 </form>

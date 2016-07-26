@@ -1,4 +1,4 @@
-<div class="section-jump" id="section-jump-top">
+<div>
     <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
     <div class="section-jump-cover">
         <span data-ng-repeat="badge in data.assignments" class="badge {{badgeclass}}">{{ badge.title }}</span>
@@ -16,7 +16,7 @@
             <ol>
                 <li data-ng-repeat="paragraph in data.paragraphs">
                     <a
-                        href="#section-jump-{{$index}}"
+                        href="#jump-{{$index}}"
                         data-du-smooth-scroll=""
                         data-du-scrollspy="">{{ $index + 1}}</a>
                 </li>
@@ -24,7 +24,7 @@
         </nav>
 
         <div class="jump-navigation-main" data-du-spy-context="" data-ng-class="{'has-navigation': data.paragraphs.length > 1}">
-            <section class="action-section {{paragraph.selectedState}}" data-ng-repeat="paragraph in data.paragraphs" id="section-jump-{{$index}}">
+            <section class="action-section {{paragraph.selectedState}}" data-ng-repeat="paragraph in data.paragraphs" id="jump-{{$index}}">
                 <adh-parse-markdown data-parsetext="paragraph.body"></adh-parse-markdown>
                 <a class="action-section-button" data-ng-href="{{ paragraph.path | adhParentPath | adhResourceUrl:'comments' }}">
                     <i class="icon-speechbubble"></i> {{ paragraph.commentCount }}
@@ -32,4 +32,4 @@
             </section>
         </div><!-- /.jump-navigation-main -->
     </div><!-- /.jump-navigation-wrapper -->
-</div><!-- /.section-jump -->
+</div>
