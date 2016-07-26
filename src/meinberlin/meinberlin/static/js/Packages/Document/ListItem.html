@@ -1,6 +1,6 @@
 <a data-ng-href="{{ path | adhParentPath | adhResourceUrl }}"
     data-ng-class="{'m-contains-images': data.picture}"
-    class="list-item meinberlin-alexanderplatz-list-item {{ selectedState }}">
+    class="list-item {{ selectedState }}">
     <adh-show-image
         data-ng-if="data.picture"
         data-path="{{data.picture}}"
