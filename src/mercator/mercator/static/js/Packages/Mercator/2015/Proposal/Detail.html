@@ -59,9 +59,9 @@
             data-image-metadata-nick="adhocracy_mercator.sheets.mercator.IIntroImageMetadata"
         ></adh-show-image>
 
-        <div class="section-jump-body">
+        <div class="jump-navigation-wrapper m-narrow">
 
-            <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="">
+            <nav class="jump-navigation m-unnumbered" data-adh-sticky="">
                 <ol>
                     <li data-ng-if="data.winnerBadgeAssignment"><a
                         href="#jury-decision"
@@ -97,7 +97,7 @@
                 </ol>
             </nav>
 
-            <div class="section-jump-main" data-du-spy-context="">
+            <div class="jump-navigation-main" data-du-spy-context="">
                 <section data-ng-if="data.winnerBadgeAssignment" class="jury-decision-section" id="jury-decision">
                     <h2>{{ "TR__MERCATOR_JURY_STATEMENT" | translate }}</h2>
                     <p>{{ data.winnerBadgeAssignment.description }}</p>
@@ -331,7 +331,7 @@
 
                 </footer>
 
-            </div><!-- /.mercator-detail-body -->
-        </div><!-- /.section-jump-body -->
+            </div><!-- /.jump-navigation-main -->
+        </div><!-- /.jump-navigation-wrapper -->
     </div><!-- /.mercator-proposal-detail-view -->
 </div>

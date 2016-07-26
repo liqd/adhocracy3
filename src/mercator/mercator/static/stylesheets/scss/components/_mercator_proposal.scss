@@ -119,9 +119,9 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-detail-view-image {
-    float: left;
     width: 100%;
     border-bottom: 2px solid $color-structure-normal;
+    vertical-align: bottom;
 
     @media print {
         float: none;
