@@ -52,34 +52,3 @@ combination with `.jump-navigation.m-narrow.m-unnumbered`.
         padding: 0;
     }
 }
-
-.section-jump-body {
-    background-color: $color-background-base-introvert;
-    clear: left;
-}
-
-.section-jump-navigation {
-    @include rem(padding-top, 1rem);
-    text-align: center;
-    width: $section-jump-navigation-width;
-    float: left;
-
-    @media print {
-        display: none;
-    }
-}
-
-.section-jump-main {
-    @include clearfix;
-    background-color: $color-background-base;
-
-    &.has-navigation {
-        @include rem(margin-left, $section-jump-navigation-width);
-        border-left: 2px solid $color-structure-normal;
-
-        @media print {
-            border: 0;
-            margin: 0;
-        }
-    }
-}

@@ -72,3 +72,28 @@ A navigation list containing hash tag links
         }
     }
 }
+
+.jump-navigation-wrapper {
+    @include container;
+    background-color: $color-background-base-introvert;
+
+    .jump-navigation {
+        float: left;
+        width: (101% / 6) - 1%;
+    }
+
+    .jump-navigation-main {
+        margin-left: (101% / 6);
+        background: $color-background-base;
+    }
+
+    &.m-narrow {
+        .jump-navigation {
+            width: 2rem;
+        }
+
+        .jump-navigation-main {
+            margin-left: 2rem;
+        }
+    }
+}
