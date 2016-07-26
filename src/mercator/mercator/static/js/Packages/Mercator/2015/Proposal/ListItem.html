@@ -5,21 +5,21 @@
         'm-winner': data.winnerBadgeAssignment.name === 'winning',
         'm-community-award': data.winnerBadgeAssignment.name === 'community'
     }"
-    class="proposal-list-item m-contains-image {{ selectedState }}">
+    class="list-item m-contains-image {{ selectedState }}">
     <adh-show-image
-        data-css-class="proposal-list-item-image"
+        data-css-class="list-item-image"
         data-path="{{data.introduction.picture}}"
         data-format="thumbnail"
         data-image-metadata-nick="adhocracy_mercator.sheets.mercator.IIntroImageMetadata"
     ></adh-show-image>
-    <div class="proposal-list-item-body">
-        <p class="proposal-list-item-username">
+    <div class="list-item-body">
+        <p class="list-item-username">
             {{data.user_info.first_name}}<span data-ng-if="data.organization_info.name">,
                 {{data.organization_info.name}}
             </span>
         </p>
-        <h3 class="proposal-list-item-title">{{ data.title.title }}</h3>
-        <ul class="meta-list proposal-list-item-meta-list">
+        <h3 class="list-item-title">{{ data.title.title }}</h3>
+        <ul class="meta-list list-item-meta-list">
             <li class="meta-list-item meta-list-item-date">
                 <adh-time data-datetime="data.user_info.createtime" data-format="D/M/YYYY"></adh-time>
             </li>

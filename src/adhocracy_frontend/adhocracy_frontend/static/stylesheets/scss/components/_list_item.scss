@@ -1,17 +1,17 @@
 /*doc
 ---
-title: Proposal List Item
-name: proposal-list-item
-category: Proposal
+title: List Item
+name: list-item
+parent: listing
 ---
 
-A proposal list item. How a proposal appears when in a list
+A generic list item. How a resource appears when in a list
 
 ```html_example
-<a class="proposal-list-item" href="#">
-    <div class="proposal-list-item-body">
-        <p class="proposal-list-item-username">Username</p>
-        <h3 class="proposal-list-item-title">Default</h3>
+<a class="list-item" href="#">
+    <div class="list-item-body">
+        <p class="list-item-username">Username</p>
+        <h3 class="list-item-title">Default</h3>
         <ul class="meta-list">
             <li class="meta-list-item">
                 <i class="icon-speechbubbles"></i> 0 Comments
@@ -20,11 +20,11 @@ A proposal list item. How a proposal appears when in a list
     </div>
 </a>
 
-<a class="proposal-list-item m-contains-image" href="#">
-    <img class="proposal-list-item-image" alt="" src="/static/fallback_thumbnail.jpg" />
-    <div class="proposal-list-item-body">
-        <p class="proposal-list-item-username">Username</p>
-        <h3 class="proposal-list-item-title">Image</h3>
+<a class="list-item m-contains-image" href="#">
+    <img class="list-item-image" alt="" src="/static/fallback_thumbnail.jpg" />
+    <div class="list-item-body">
+        <p class="list-item-username">Username</p>
+        <h3 class="list-item-title">Image</h3>
         <ul class="meta-list">
             <li class="meta-list-item">
                 <i class="icon-speechbubbles"></i> 0 Comments
@@ -33,13 +33,13 @@ A proposal list item. How a proposal appears when in a list
     </div>
 </a>
 
-<a class="proposal-list-item" href="#">
-    <div class="proposal-list-item-body">
-        <div class="proposal-list-item-col-left">
-            <h3 class="proposal-list-item-title">2 columns</h3>
-            <p class="proposal-list-item-username">Username</p>
+<a class="list-item" href="#">
+    <div class="list-item-body">
+        <div class="list-item-col-left">
+            <h3 class="list-item-title">2 columns</h3>
+            <p class="list-item-username">Username</p>
         </div>
-        <div class="proposal-list-item-col-right">
+        <div class="list-item-col-right">
             <ul class="meta-list">
                 <li class="meta-list-item">
                     <i class="icon-speechbubbles"></i> 0 Comments
@@ -49,14 +49,14 @@ A proposal list item. How a proposal appears when in a list
     </div>
 </a>
 
-<a class="proposal-list-item m-contains-image" href="#">
-    <img class="proposal-list-item-image" alt="" src="/static/fallback_thumbnail.jpg" />
-    <div class="proposal-list-item-body">
-        <div class="proposal-list-item-col-left">
-            <h3 class="proposal-list-item-title">2 columns and image</h3>
-            <p class="proposal-list-item-username">Username</p>
+<a class="list-item m-contains-image" href="#">
+    <img class="list-item-image" alt="" src="/static/fallback_thumbnail.jpg" />
+    <div class="list-item-body">
+        <div class="list-item-col-left">
+            <h3 class="list-item-title">2 columns and image</h3>
+            <p class="list-item-username">Username</p>
         </div>
-        <div class="proposal-list-item-col-right">
+        <div class="list-item-col-right">
             <ul class="meta-list">
                 <li class="meta-list-item">
                     <i class="icon-speechbubbles"></i> 0 Comments
@@ -72,7 +72,7 @@ $image-margin: 11px;
 $thumbnail-width: 105px;
 $thumbnail-height: 90px;
 
-.proposal-list-item {
+.list-item {
     @include container;
     @include rem(padding, 1rem 1.25rem 1.25rem 0.875rem);
     display: block;
@@ -97,37 +97,37 @@ $thumbnail-height: 90px;
     }
 
     &.m-contains-image {
-        .proposal-list-item-body {
+        .list-item-body {
             margin-left: $thumbnail-width + $image-margin;
         }
     }
 }
 
-.proposal-list-item-image {
+.list-item-image {
     float: left;
     margin-right: $image-margin;
 }
 
-.proposal-list-item-title,
-.proposal-list-item-username {
+.list-item-title,
+.list-item-username {
     margin: 0;
 }
 
-.proposal-list-item-username {
+.list-item-username {
     @include rem(font-size, $font-size-small);
     @include rem(margin-bottom, 15px);
 }
 
-.proposal-list-item-title {
+.list-item-title {
     @include rem(font-size, $font-size-plus);
     @include rem(margin-bottom, 15px);
     font-weight: $font-weight-medium;
 }
 
-.proposal-list-item-col-left {
+.list-item-col-left {
     @include grid-span(8, 0);
 }
 
-.proposal-list-item-col-right {
+.list-item-col-right {
     @include grid-span(4, 8);
 }

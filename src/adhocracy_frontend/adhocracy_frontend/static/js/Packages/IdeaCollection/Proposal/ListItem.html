@@ -1,14 +1,14 @@
 <!-- FIXME: may contain links in adh-user-meta -->
-<a class="proposal-list-item {{selectedState}}" data-ng-class="{ 'm-contains-image': processOptions.hasImage }" href="{{path | adhParentPath | adhResourceUrl }}">
+<a class="list-item {{selectedState}}" data-ng-class="{ 'm-contains-image': processOptions.hasImage }" href="{{path | adhParentPath | adhResourceUrl }}">
     <adh-show-image
-        data-css-class="proposal-list-item-image"
+        data-css-class="list-item-image"
         data-ng-if="processOptions.hasImage"
         data-path="{{data.picture}}"
         data-format="thumbnail"
     ></adh-show-image>
-    <div class="proposal-list-item-body">
-        <div class="proposal-list-item-col-left">
-            <h3 class="proposal-list-item-title">{{data.title}}</h3>
+    <div class="list-item-body">
+        <div class="list-item-col-left">
+            <h3 class="list-item-title">{{data.title}}</h3>
             {{ "TR__BY" | translate }}
             <adh-user-meta data-path="{{data.creator}}" data-ng-if="data.creator"></adh-user-meta>
             {{ "TR__ON" | translate }}
@@ -22,7 +22,7 @@
                     'm-on-test': assignment.name === 'on_test'
                 }">{{ assignment.title | translate }}</span>
         </div>
-        <div class="proposal-list-item-col-right">
+        <div class="list-item-col-right">
             <ul class="meta-list m-vertical">
                 <li class="meta-list-item"><i class="meta-list-meta-item-icon icon-speechbubble-unfilled"></i
                 > {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}</li>

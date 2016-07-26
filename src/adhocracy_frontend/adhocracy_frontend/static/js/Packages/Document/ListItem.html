@@ -1,11 +1,11 @@
-<a data-ng-href="{{ path | adhParentPath | adhResourceUrl }}" class="proposal-list-item m-contains-image {{ selectedState }}">
+<a data-ng-href="{{ path | adhParentPath | adhResourceUrl }}" class="list-item m-contains-image {{ selectedState }}">
     <adh-show-image
-        data-css-class="proposal-list-item-image"
+        data-css-class="list-item-image"
         data-path="{{data.picture}}"
         data-format="thumbnail"
     ></adh-show-image>
-    <div class="proposal-list-item-body">
-        <h3 class="proposal-list-item-title">{{ data.title }}</h3>
+    <div class="list-item-body">
+        <h3 class="list-item-title">{{ data.title }}</h3>
         <ul class="meta-list">
             <li class="meta-list-item">
                 <i class="icon-speechbubbles"></i> {{ data.commentCountTotal }} {{ "TR__COMMENTS" | translate }}
