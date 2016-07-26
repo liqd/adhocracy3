@@ -39,7 +39,7 @@ selected. If no proposal is selected, no state is applied.
 }
 
 .mercator-proposal-form-heading {
-    @include rem(margin, 0 -1rem 0.8rem);
+    @include rem(margin, 1rem -1rem 0.8rem);
     @include rem(padding, 0 1rem 1px);
     border: 1px solid $color-structure-normal;
     border-width: 1px 0;
@@ -47,6 +47,10 @@ selected. If no proposal is selected, no state is applied.
 
     &.active {
         color: $color-text-highlight-normal;
+    }
+
+    .mercator-proposal-form-section:first-child & {
+        margin-top: 0;
     }
 }
 
