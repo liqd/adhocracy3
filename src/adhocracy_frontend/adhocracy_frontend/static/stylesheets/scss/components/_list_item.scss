@@ -10,58 +10,31 @@ A generic list item. How a resource appears when in a list
 ```html_example
 <a class="list-item" href="#">
     <div class="list-item-body">
-        <p class="list-item-username">Username</p>
+        <div class="list-item-author">by user on 2016-04-15</div>
         <h3 class="list-item-title">Default</h3>
-        <ul class="meta-list">
+        <ul class="list-item-meta meta-list">
             <li class="meta-list-item">
                 <i class="icon-speechbubbles"></i> 0 Comments
             </li>
         </ul>
+        <div class="list-item-badges">
+            <span class="badge">accepted</span>
+        </div>
     </div>
 </a>
 
 <a class="list-item m-contains-image" href="#">
     <img class="list-item-image" alt="" src="/static/fallback_thumbnail.jpg" />
     <div class="list-item-body">
-        <p class="list-item-username">Username</p>
+        <div class="list-item-author">by user on 2016-04-15</div>
         <h3 class="list-item-title">Image</h3>
-        <ul class="meta-list">
+        <ul class="list-item-meta meta-list">
             <li class="meta-list-item">
                 <i class="icon-speechbubbles"></i> 0 Comments
             </li>
         </ul>
-    </div>
-</a>
-
-<a class="list-item" href="#">
-    <div class="list-item-body">
-        <div class="list-item-col-left">
-            <h3 class="list-item-title">2 columns</h3>
-            <p class="list-item-username">Username</p>
-        </div>
-        <div class="list-item-col-right">
-            <ul class="meta-list">
-                <li class="meta-list-item">
-                    <i class="icon-speechbubbles"></i> 0 Comments
-                </li>
-            </ul>
-        </div>
-    </div>
-</a>
-
-<a class="list-item m-contains-image" href="#">
-    <img class="list-item-image" alt="" src="/static/fallback_thumbnail.jpg" />
-    <div class="list-item-body">
-        <div class="list-item-col-left">
-            <h3 class="list-item-title">2 columns and image</h3>
-            <p class="list-item-username">Username</p>
-        </div>
-        <div class="list-item-col-right">
-            <ul class="meta-list">
-                <li class="meta-list-item">
-                    <i class="icon-speechbubbles"></i> 0 Comments
-                </li>
-            </ul>
+        <div class="list-item-badges">
+            <span class="badge">accepted</span>
         </div>
     </div>
 </a>
@@ -74,14 +47,16 @@ $thumbnail-height: 90px;
 
 .list-item {
     @include container;
-    @include rem(padding, 1rem 1.25rem 1.25rem 0.875rem);
     display: block;
     border-bottom: 2px solid $color-structure-normal;
     position: relative;
+    padding: 1.25em 1em;
 
     // reset link styling
-    color: inherit;
-    text-decoration: none;
+    &, &:hover, &:focus {
+        color: inherit;
+        text-decoration: inherit;
+    }
 
     &.is-not-selected {
         background: $color-background-base-introvert;
@@ -108,16 +83,26 @@ $thumbnail-height: 90px;
     margin-right: $image-margin;
 }
 
+.list-item-title,
+.list-item-author {
+    @include rem(margin, 0 0 0.8rem);
+}
+
 .list-item-title {
     @include rem(font-size, $font-size-plus);
-    @include rem(margin, 0 0 15px);
     font-weight: $font-weight-medium;
 }
 
-.list-item-col-left {
-    @include grid-span(8, 0);
+.list-item-author {
+    @include rem(font-size, $font-size-small);
+    color: $color-text-introvert;
 }
 
-.list-item-col-right {
-    @include grid-span(4, 8);
+.list-item-meta {
+    float: left;
+    padding: 0;
+}
+
+.list-item-badges {
+    float: right;
 }

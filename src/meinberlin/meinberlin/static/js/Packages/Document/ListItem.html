@@ -8,16 +8,14 @@
         data-format="thumbnail"
     ></adh-show-image>
     <div class="list-item-body">
-        <div class="list-item-col-left">
+        <h3 class="list-item-title">{{ data.title }}</h3>
+        <ul class="meta-list list-item-meta">
+            <li class="meta-list-item">
+                <i class="icon-speechbubble-unfilled"></i> {{ data.commentCountTotal }} {{ "TR__COMMENTS" | translate }}
+            </li>
+        </ul>
+        <div class="list-item-badges">
             <span data-ng-repeat="badge in data.assignments" class="badge m-info">{{ badge.title }}</span>
-            <h3 class="list-item-title">{{ data.title }}</h3>
-        </div>
-        <div class="list-item-col-right">
-            <ul class="meta-list">
-                <li class="meta-list-item">
-                    <i class="icon-speechbubble-unfilled"></i> {{ data.commentCountTotal }} {{ "TR__COMMENTS" | translate }}
-                </li>
-            </ul>
         </div>
     </div>
 </a>
