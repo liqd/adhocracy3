@@ -30,64 +30,45 @@ A navigation list containing hash tag links
 <nav class="jump-navigation m-narrow">
     <ol>
         <li><a>Element</a></li>
-        <li class="active"><a>Element (LI Active)</a></li>
-        <li><a class="active">Element (A active)</a></li>
+        <li><a class="active">Element (active)</a></li>
     </ol>
 </nav>
 ```
 */
 
 .jump-navigation {
-
-    &, a {
-        color: $color-text-introvert;
-    }
+    color: $color-text-introvert;
 
     ul, ol {
-        @include rem(padding, 1rem);
         counter-reset: jump-counter;
         list-style: none;
         margin: 0;
+        padding: 0;
     }
 
-    li {
+    a {
         @include rem(font-size, $font-size-small);
-        @include rem(padding, 0 0.5rem);
+        @include rem(padding, 0.25em 0.5em);
+        display: block;
+        text-decoration: none;
+        margin-bottom: 1px;
+        color: inherit;
 
-        &, a {
-            color: $color-text-introvert;
-        }
-
-        a {
-            display: block;
-            text-decoration: none;
-        }
-
-        a:before {
+        &:before {
             content: counter(jump-counter) ". ";
             counter-increment: jump-counter;
         }
 
         // active class automaticall added by du-scrollspy plugin
         // https://www.npmjs.com/package/angular-scroll#-du-scrollspy-
-        &.active, &.active a, .active {
+        &.active {
             color: $color-text-highlight-normal;
         }
     }
 
     &.m-unnumbered {
-        ol a:before {
+        a:before {
             content: "";
-        }
-    }
-
-    &.m-narrow {
-        ol {
-            padding: 0;
-        }
-
-        li a {
-            @include rem(margin, 0 0 1rem);
         }
     }
 }
