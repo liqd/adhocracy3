@@ -110,11 +110,12 @@ class Pool(Base, Folder):
             registry.notify(event)
         graph = find_graph(subresource)
         references = list(graph.get_references(subresource))
-        super().remove(name,
-                       registry=registry,
-                       send_events=send_events,
-                       **kwargs)
+        res = super().remove(name,
+                             registry=registry,
+                             send_events=send_events,
+                             **kwargs)
         graph.send_back_reference_removal_notificatons(references, registry)
+        return res
 
 
 pool_meta = resource_meta._replace(

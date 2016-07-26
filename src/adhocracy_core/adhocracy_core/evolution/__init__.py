@@ -739,7 +739,6 @@ def rename_default_group(root, registry):  # pragma: no cover
     from adhocracy_core.authorization import get_local_roles
     from adhocracy_core.authorization import set_local_roles
     from adhocracy_core.resources.process import IProcess
-    from adhocracy_core.resources.pool import Pool
     from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
     from adhocracy_core.sheets.principal import IPermissions
     catalogs = find_service(root, 'catalogs')
@@ -748,43 +747,38 @@ def rename_default_group(root, registry):  # pragma: no cover
     old_default_group_principal = 'group:' + old_default_group_name
     new_default_group_name = DEFAULT_USER_GROUP_NAME
     new_default_group_principal = 'group:' + DEFAULT_USER_GROUP_NAME
-    for resource in resources:
-        local_roles = get_local_roles(resource)
-        if old_default_group_principal in local_roles:
-            logger.info('Rename default group in local roles'
-                        ' of {0}'.format(resource))
-            old_roles = local_roles.pop(old_default_group_principal)
-            set_local_roles(resource, local_roles)
-            add_local_roles({new_default_group_principal: old_roles})
     groups = root['principals']['groups']
-    users = [u for u in root['principals']['users'].values()
-             if IPermissions.providedBy(u)]
-    old_default_group = groups[old_default_group_name]
-    users_with_default_group = []
-    for user in users:
-        user_groups = registry.content.get_sheet_field(user,
-                                                       IPermissions,
-                                                       'groups')
-        if old_default_group in user_groups:
-            users_with_default_group.append(user)
     if old_default_group_name in groups:
+        for resource in resources:
+            local_roles = get_local_roles(resource)
+            if old_default_group_principal in local_roles:
+                logger.info('Rename default group in local roles'
+                            ' of {0}'.format(resource))
+                old_roles = local_roles.pop(old_default_group_principal)
+                set_local_roles(resource, local_roles)
+                add_local_roles({new_default_group_principal: old_roles})
+        users = [u for u in root['principals']['users'].values()
+                 if IPermissions.providedBy(u)]
+        old_default_group = groups[old_default_group_name]
+        users_with_default_group = []
+        for user in users:
+            user_groups = registry.content.get_sheet_field(user,
+                                                           IPermissions,
+                                                           'groups')
+            if old_default_group in user_groups:
+                users_with_default_group.append(user)
         logger.info('Rename default group '
                     'to {}'.format(new_default_group_name))
-        folder = super(Pool, groups)   # rename not working with Pool subclass
-        old = folder.remove(old_default_group_name, folder, registry=registry)
-        folder.add(new_default_group_name,
-                   old,
-                   moving=folder,
-                   registry=registry)
-    new_default_group = groups[new_default_group_name]
-    for user in users_with_default_group:
-        logger.info('Update default group name of user {}'.format(user))
-        permission_sheet = registry.content.get_sheet(user, IPermissions)
-        permissions = permission_sheet.get()
-        user_groups = permissions['groups']
-        user_groups.append(new_default_group)
-        permissions['groups'] = user_groups
-        permission_sheet.set(permissions)
+        groups.move(old_default_group_name, new_default_group_name)
+        new_default_group = groups[new_default_group_name]
+        for user in users_with_default_group:
+            logger.info('Update default group name of user {}'.format(user))
+            permission_sheet = registry.content.get_sheet(user, IPermissions)
+            permissions = permission_sheet.get()
+            user_groups = permissions['groups']
+            user_groups.append(new_default_group)
+            permissions['groups'] = user_groups
+            permission_sheet.set(permissions)
 
 
 def migrate_auditlogentries_to_activities(root, registry):  # pragma: no cover
