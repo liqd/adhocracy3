@@ -108,19 +108,9 @@ $thumbnail-height: 90px;
     margin-right: $image-margin;
 }
 
-.list-item-title,
-.list-item-username {
-    margin: 0;
-}
-
-.list-item-username {
-    @include rem(font-size, $font-size-small);
-    @include rem(margin-bottom, 15px);
-}
-
 .list-item-title {
     @include rem(font-size, $font-size-plus);
-    @include rem(margin-bottom, 15px);
+    @include rem(margin, 0 0 15px);
     font-weight: $font-weight-medium;
 }
 
