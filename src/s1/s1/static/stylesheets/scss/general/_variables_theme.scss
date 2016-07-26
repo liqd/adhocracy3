@@ -7,9 +7,7 @@ $color-brand-two-introvert: #7fcdee;
 $color-brand-two-extrovert: #1f80aa;
 
 // Text colors
-$color-text-normal: #333;
-$color-text-introvert: #666;
-$color-text-highlight-normal: $color-brand-two-introvert;
+$color-text-highlight-normal: $color-brand-two-normal;
 $color-text-highlight-introvert: $color-brand-two-introvert;
 $color-text-highlight-extrovert: $color-brand-two-extrovert;
 
@@ -18,12 +16,6 @@ $color-function-winner: #f79321;
 
 $font-family-normal: "Roboto", sans-serif;
 $font-family-serif: "Merriweather", serif;
-
-$font-size-smaller: 9px;
-$font-size-small: 10px;
-$font-size-normal: 12px;
-$font-size-plus: 14px;
-$font-size-large: 18px;
 
 //Other
 $moving-column-single-width-max: $font-size-normal * 64;
