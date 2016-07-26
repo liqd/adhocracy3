@@ -145,6 +145,14 @@ export var resourceDropdownDirective = (
                 scope.isShowDropdown = !scope.isShowDropdown;
             };
 
+            scope.data.isShowDropdownMenu = true;
+            scope.$watch("data.modals.lastId", (id : number) => {
+                if (id !== 0) {
+                    scope.data.isShowDropdownMenu = false;
+                    $timeout(() => scope.data.isShowDropdownMenu = true, 3000);
+                }
+            });
+
             // some jQuery that closes the dropdown when the user clicks somewhere else:
             element.focusout(() => {
                 $timeout(() => {
