@@ -208,15 +208,9 @@ Cannot edit process content::
 
 Can hide process content
     >>> resp = moderator.options(participant_proposal).json
-    >>> sorted(resp['PUT']['request_body']['data']
-    ...                  ['adhocracy_core.sheets.metadata.IMetadata'])
-    ['hidden']
-
-Can hide and delete process structure
-    >>> resp = moderator.options('/organisation/process').json
-    >>> sorted(resp['PUT']['request_body']['data']
-    ...                  ['adhocracy_core.sheets.metadata.IMetadata'])
-    ['hidden']
+    >>> 'adhocracy_core.sheets.metadata.IMetadata' \
+    ...     in resp['PUT']['request_body']['data']
+    True
 
 
 Initiator

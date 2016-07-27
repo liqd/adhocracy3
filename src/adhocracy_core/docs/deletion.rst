@@ -43,7 +43,7 @@ Hiding an existing resource is only possible for updatable
 resources, i.e. *not* for Versions (which are immutable and hence don't
 allow PUT).
 
-Anyone with the *hide_resource* permission (typically granted to the manager
+Anyone with the *hide* permission (typically granted to the manager
 role) can *hide* a resource by PUTting an update with *IMetadata { hidden:
 true }*. Likewise they can un-hide a hidden resource by PUTting an update with
 *IMetadata { hidden: false }*. Nobody else can change the value of the
@@ -62,7 +62,7 @@ The effect of these flags is as follows:
   parameter *include=hidden* can be used to include hidden resources in
   pool listings and other search queries.  If its value is *hidden*,
   resources will be found regardless of the value of their *hidden*
-  flag.  However, only those with *hide_resource* permission are ever
+  flag.  However, only those with *hide* permission are ever
   able to view the contents of hidden resources.  It's also possible to
   set *include=visible* to get only non-hidden
   resources, but it's not necessary since that is the default.
@@ -71,7 +71,7 @@ The effect of these flags is as follows:
   FIXME Not implemented yet, since the frontend doesn't yet need it: The
   frontend can override this by adding the parameter *include=hidden* to
   the GET request, just as in search queries.  Managers (those with
-  *hide_resource* permission) can view hidden resources in this way.
+  *hide* permission) can view hidden resources in this way.
   Those without this permission will still get a *410 Gone* if the
   resource is hidden.
 * The body of the *410 Gone* is a small JSON document that explains why
@@ -193,10 +193,9 @@ But they cannot hide it::
 -- that special right is reserved to managers::
 
     >>> resp = moderator.options(document_item).json
-    >>> pprint(resp['PUT']['request_body']['data']['adhocracy_core.sheets.metadata.IMetadata'])
-    {'hidden': [True, False]}
-
-FIXME: remove deleted flag, not used anymore
+    >>> 'adhocracy_core.sheets.metadata.IMetadata' \
+    ...     in resp['PUT']['request_body']['data']
+    True
 
 Note: normally the sheets listed in the OPTIONS response are just mapped to
 empty dictionaries, the contained fields are not listed. But IMetadata is a
@@ -205,9 +204,6 @@ Therefore, the presence of the 'deleted' and/or 'hidden' fields indicates
 that PUTting a new value for this field is allowed. Once more, the
 corresponding value is just a stub (the empty string) and doesn't have any
 meaning.
-
-FIXME: remove the special 'hidden' field for option requests, not need if
-deleted flag is removed
 
 Lets hide pool2::
 
