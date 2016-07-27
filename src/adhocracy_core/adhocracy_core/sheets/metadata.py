@@ -89,7 +89,7 @@ metadata_meta = sheet_meta._replace(
     editable=True,
     creatable=True,
     readable=True,
-    permission_edit='delete',
+    permission_edit='hide',
 )
 
 

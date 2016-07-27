@@ -73,6 +73,7 @@ class TestMetadataSheet:
         assert inst.meta.creatable is True
         assert inst.meta.readable is True
         assert inst.meta.sheet_class is AttributeResourceSheet
+        assert inst.meta.permission_edit == 'hide'
 
     @mark.usefixtures('integration')
     def test_includeme_register_sheet(self, meta, config):

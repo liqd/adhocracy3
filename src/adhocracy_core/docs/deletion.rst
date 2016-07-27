@@ -187,8 +187,8 @@ it::
 
 But they cannot hide it::
 
-    >>> pprint(resp['PUT']['request_body']['data']['adhocracy_core.sheets.metadata.IMetadata'])
-    {}
+    >>> 'PUT' not in resp
+    True
 
 -- that special right is reserved to managers::
 
