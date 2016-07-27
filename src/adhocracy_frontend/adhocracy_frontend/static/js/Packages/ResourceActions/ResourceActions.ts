@@ -173,7 +173,7 @@ export var modalActionDirective = () => {
         restrict: "E",
         transclude: true,
         template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"toggle();\">" +
-            "<ng-transclude></ng-transclude>{{ label | translate }}</a>",
+            "<ng-transclude></ng-transclude> {{ label | translate }}</a>",
         scope: {
             class: "@",
             modals: "=",
@@ -198,7 +198,7 @@ export var assignBadgesActionDirective = (
         restrict: "E",
         transclude: true,
         template: "<a data-ng-if=\"badgesExist && badgeAssignmentPoolOptions.PUT\" class=\"{{class}}\" href=\"\"" +
-            "data-ng-click=\"assignBadges();\"><ng-transclude></ng-transclude>" +
+            "data-ng-click=\"assignBadges();\"><ng-transclude></ng-transclude> " +
             "{{ 'TR__MANAGE_BADGE_ASSIGNMENTS' | translate }}</a>",
         scope: {
             resourcePath: "@",
@@ -243,7 +243,7 @@ export var hideActionDirective = (
     return {
         restrict: "E",
         transclude: true,
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"hide();\"><ng-transclude></ng-transclude>" +
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"hide();\"><ng-transclude></ng-transclude> " +
             "{{ 'TR__HIDE' | translate }}</a>",
         scope: {
             resourcePath: "@",
@@ -273,7 +273,7 @@ export var resourceWidgetDeleteActionDirective = () => {
     return {
         restrict: "E",
         transclude: true,
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"delete();\"><ng-transclude></ng-transclude>" +
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"delete();\"><ng-transclude></ng-transclude> " +
             "{{ 'TR__DELETE' | translate }}</a>",
         require: "^adhMovingColumn",
         scope: {
@@ -295,7 +295,7 @@ export var printActionDirective = (
     return {
         restrict: "E",
         transclude: true,
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"print();\"><ng-transclude></ng-transclude>" +
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"print();\"><ng-transclude></ng-transclude> " +
             "{{ 'TR__PRINT' | translate }}</a>",
         require: "?^adhMovingColumn",
         scope: {
@@ -321,7 +321,7 @@ export var viewActionDirective = (
     return {
         restrict: "E",
         transclude: true,
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"link();\"><ng-transclude></ng-transclude>{{ label | translate }}</a>",
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"link();\"><ng-transclude></ng-transclude> {{ label | translate }}</a>",
         scope: {
             resourcePath: "@",
             class: "@",
@@ -345,7 +345,7 @@ export var cancelActionDirective = (
     return {
         restrict: "E",
         transclude: true,
-        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"cancel();\"><ng-transclude></ng-transclude>" +
+        template: "<a class=\"{{class}}\" href=\"\" data-ng-click=\"cancel();\"><ng-transclude></ng-transclude> " +
             "{{ 'TR__CANCEL' | translate }}</a>",
         scope: {
             resourcePath: "@",
