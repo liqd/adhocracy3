@@ -34,15 +34,5 @@ export var register = (angular) => {
                     element.slideUp(done);
                 }
             };
-        })
-        .animation(".dropdown-menu", () => {
-            return {
-                enter: (element, done) => {
-                    element.hide().slideDown(done);
-                },
-                leave: (element, done) => {
-                    element.slideUp(done);
-                }
-            };
         });
 };
