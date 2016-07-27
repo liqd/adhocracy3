@@ -77,6 +77,7 @@ align it to the right.
         color: $color-text-normal;
         border-bottom: 1px solid $color-structure-normal;
         white-space: nowrap;
+        text-decoration: none;
 
         &:hover,
         &:focus {
