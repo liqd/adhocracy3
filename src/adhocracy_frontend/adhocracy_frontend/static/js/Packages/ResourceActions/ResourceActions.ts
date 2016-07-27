@@ -153,6 +153,8 @@ export var resourceDropdownDirective = (
                 }
             });
 
+            scope.id = "resourceDropdown" + Math.random();
+
             // some jQuery that closes the dropdown when the user clicks somewhere else:
             element.focusout(() => {
                 $timeout(() => {
