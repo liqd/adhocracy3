@@ -113,4 +113,8 @@ align it to the right.
             width: 1.5em;
         }
     }
+
+    @media print {
+        display: none;
+    }
 }
