@@ -33,6 +33,7 @@ The following data needs to be provided to create a B-Plan:
 - *start_date*: Start time of the praticipation phase
 - *end_date*: End of the participation phase, i.e. start time of the closed
   phase
+- *external_url*: URL of the page where the BPlan process is embedded
 
 Workflows
 ---------
@@ -136,7 +137,9 @@ The username here is just an example, please use your credentials.
     ...                  [{'name': 'participate', 'description': '',
     ...                    'start_date': '2016-03-01T12:00:09'},
     ...                   {'name': 'closed', 'description': '',
-    ...                    'start_date': '2016-03-01T12:00:09'}]}
+    ...                    'start_date': '2016-03-01T12:00:09'}]},
+    ...             'adhocracy_core.sheets.embed.IEmbed':
+    ...                 {'external_url': 'http://embedding-url.com'}
     ...             }}
     >>> resp = testapp.post_json('/orga/', data, headers=auth_header)
     >>> resp.status_code

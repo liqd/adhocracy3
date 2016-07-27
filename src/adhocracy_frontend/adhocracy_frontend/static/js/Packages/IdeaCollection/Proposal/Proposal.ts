@@ -341,18 +341,18 @@ export var createDirective = (
             scope.data.lat = undefined;
             scope.data.lng = undefined;
 
-            adhHttp.get(scope.poolPath).then((pool) => {
-                if (scope.processOptions.hasLocation) {
+            if (scope.processOptions.hasLocation) {
+                adhHttp.get(scope.poolPath).then((pool) => {
                     var locationUrl = pool.data[SILocationReference.nick]["location"];
                     adhHttp.get(locationUrl).then((location) => {
                         var polygon = location.data[SIMultiPolygon.nick]["coordinates"][0][0];
                         scope.data.polygon = polygon;
                     });
-                }
-            });
+                });
+            }
 
             scope.submit = () => {
-                return adhSubmitIfValid(scope, element, scope.meinberlinProposalForm, () => {
+                return adhSubmitIfValid(scope, element, scope.ideaCollectionProposalForm, () => {
                     return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.poolPath)
                         .then((result) => {
                             $location.url(adhResourceUrlFilter(AdhUtil.parentPath(result[1].path)));
@@ -397,7 +397,7 @@ export var editDirective = (
                 scope, undefined);
 
             scope.submit = () => {
-                return adhSubmitIfValid(scope, element, scope.meinberlinProposalForm, () => {
+                return adhSubmitIfValid(scope, element, scope.ideaCollectionProposalForm, () => {
                     return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.resource)
                         .then((result) => {
                             $location.url(adhResourceUrlFilter(AdhUtil.parentPath(result[0].path)));

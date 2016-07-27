@@ -1,11 +1,9 @@
 """:term:`local roles` sheet."""
-from colander import Length
 from colander import OneOf
 from colander import drop
 from colander import required
 from colander import deferred
 from deform.widget import SelectWidget
-from pyramid.traversal import resource_path
 from substanced.util import find_service
 
 from adhocracy_core.authorization import get_local_roles
@@ -15,15 +13,10 @@ from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.sheets import AnnotationRessourceSheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
-from adhocracy_core.schema import ACEPrincipal
 from adhocracy_core.schema import ACEPrincipals
 from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import SequenceSchema
-from adhocracy_core.schema import TupleSchema
-from adhocracy_core.schema import SchemaNode
 from adhocracy_core.schema import SingleLine
-from adhocracy_core.schema import ACEPrincipalType
-from adhocracy_core.sheets.principal import get_group_choices
 
 
 class ILocalRoles(ISheet, ISheetReferenceAutoUpdateMarker):
@@ -40,7 +33,8 @@ class GroupID(SingleLine):
         from adhocracy_core.resources.principal import IGroup
         context = kw['context']
         groups = find_service(context, 'principals', 'groups')
-        groupids = [resource_path(y) for x,y in groups.items() if IGroup.providedBy(y)]
+        groupids = ['group:' + x for x, y in groups.items()
+                    if IGroup.providedBy(y)]
         return OneOf(groupids)
 
     @deferred
@@ -49,7 +43,8 @@ class GroupID(SingleLine):
         from adhocracy_core.resources.principal import IGroup
         context = kw['context']
         groups = find_service(context, 'principals', 'groups')
-        values = [(resource_path(y), x) for x,y in groups.items() if IGroup.providedBy(y)]
+        values = [('group:' + x, x) for x, y in groups.items()
+                  if IGroup.providedBy(y)]
         return SelectWidget(values=values)
 
 
@@ -80,7 +75,8 @@ class LocalRolesSheet(AnnotationRessourceSheet):
 
     def _get_data_appstruct(self):
         roles = get_local_roles(self.context)
-        roles_list = [{'principal': x, 'roles': list(y)} for x,y in roles.items()]
+        roles_list = [{'principal': x, 'roles': list(y)}
+                      for x, y in roles.items()]
         return {'local_roles': roles_list}
 
     def _store_data(self, appstruct):

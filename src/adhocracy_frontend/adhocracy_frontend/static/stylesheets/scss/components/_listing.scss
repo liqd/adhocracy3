@@ -20,6 +20,10 @@ a form for creating new elements. This form is then always visible.
         <li class="listing-element debug-placeholder">Element1</li>
         <li class="listing-element debug-placeholder">Element2</li>
     </ol>
+    <a href="#" class="load-more">
+        <span class="load-more-numbers">2 of 20</span>
+        <span class="load-more-text">load more</span>
+    </a>
 </div>
 ```
 */

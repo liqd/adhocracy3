@@ -13,6 +13,7 @@ import * as angularCache from "angularCache";  if (angularCache) { ; };
 import * as angularTranslate from "angularTranslate";  if (angularTranslate) { ; };
 import * as angularTranslateLoader from "angularTranslateLoader";  if (angularTranslateLoader) { ; };
 import * as angularElastic from "angularElastic";  if (angularElastic) { ; };
+import * as angularFlow from "angularFlow";  if (angularFlow) { ; };
 
 import * as modernizr from "modernizr";
 import * as moment from "moment";
@@ -32,6 +33,7 @@ import * as AdhDoneModule from "./Packages/Done/Module";
 import * as AdhEmbedModule from "./Packages/Embed/Module";
 import * as AdhEventManagerModule from "./Packages/EventManager/Module";
 import * as AdhHttpModule from "./Packages/Http/Module";
+import * as AdhIdeaCollectionModule from "./Packages/IdeaCollection/Module";
 import * as AdhImageModule from "./Packages/Image/Module";
 import * as AdhInjectModule from "./Packages/Inject/Module";
 import * as AdhListingModule from "./Packages/Listing/Module";
@@ -87,10 +89,12 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "ngAnimate",
         "ngAria",
         "ngMessages",
+        "flow",
         AdhCommentModule.moduleName,
         AdhConfigModule.moduleName,
         AdhCrossWindowMessagingModule.moduleName,
         AdhEmbedModule.moduleName,
+        AdhIdeaCollectionModule.moduleName,
         AdhPcompassModule.moduleName,
         AdhProcessModule.moduleName,
         AdhResourceAreaModule.moduleName,
@@ -172,6 +176,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhEmbedModule.register(angular);
     AdhEventManagerModule.register(angular);
     AdhHttpModule.register(angular, config);
+    AdhIdeaCollectionModule.register(angular);
     AdhImageModule.register(angular);
     AdhInjectModule.register(angular);
     AdhListingModule.register(angular);

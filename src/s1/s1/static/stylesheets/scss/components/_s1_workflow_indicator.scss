@@ -6,12 +6,13 @@ $state-height: 15px;
     border-radius: $state-height / 2;
     border: 1px solid $color-brand-one-normal;
     list-style: none;
+    width: 573px;
     padding: 0;
     margin: 0;
 }
 
 .s1-state {
-    @include rem(font-size, $font-size-small);
+    @include rem(font-size, $font-size-smaller);
     @include rem(line-height, $state-height);
     color: $color-brand-one-normal;
     float: left;

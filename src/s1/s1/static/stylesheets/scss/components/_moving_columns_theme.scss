@@ -1,6 +1,7 @@
 .moving-column {
     &.is-collapse {
-        @include rem(top, 21px);
+        // header has same height of a button
+        @include rem(top, 30px);
         border-bottom: 0;
         border-top: 0;
         z-index: 10;

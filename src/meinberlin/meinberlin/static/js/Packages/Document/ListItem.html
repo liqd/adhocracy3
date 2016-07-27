@@ -1,23 +1,21 @@
 <a data-ng-href="{{ path | adhParentPath | adhResourceUrl }}"
     data-ng-class="{'m-contains-images': data.picture}"
-    class="proposal-list-item meinberlin-alexanderplatz-proposal-list-item {{ selectedState }}">
+    class="list-item {{ selectedState }}">
     <adh-show-image
         data-ng-if="data.picture"
         data-path="{{data.picture}}"
-        data-css-class="proposal-list-item-image"
+        data-css-class="list-item-image"
         data-format="thumbnail"
     ></adh-show-image>
-    <div class="proposal-list-item-body">
-        <div class="proposal-list-item-col-left">
+    <div class="list-item-body">
+        <h3 class="list-item-title">{{ data.title }}</h3>
+        <ul class="meta-list list-item-meta">
+            <li class="meta-list-item">
+                <i class="icon-speechbubble-unfilled"></i> {{ data.commentCountTotal }} {{ "TR__COMMENTS" | translate }}
+            </li>
+        </ul>
+        <div class="list-item-badges">
             <span data-ng-repeat="badge in data.assignments" class="badge m-info">{{ badge.title }}</span>
-            <h3 class="proposal-list-item-title">{{ data.title }}</h3>
-        </div>
-        <div class="proposal-list-item-col-right">
-            <ul class="meta-list">
-                <li class="meta-list-item">
-                    <i class="icon-speechbubble-unfilled"></i> {{ data.commentCountTotal }} {{ "TR__COMMENTS" | translate }}
-                </li>
-            </ul>
         </div>
     </div>
 </a>

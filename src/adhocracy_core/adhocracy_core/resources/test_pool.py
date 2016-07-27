@@ -133,3 +133,12 @@ class TestPoolClass:
         inst['child'] = context
         inst.remove('child', registry)
         assert mock_graph.send_back_reference_removal_notificatons.called
+
+    def test_delete_returns_deleted_element(self, config, registry, context,
+                                            mocker):
+        inst = self._makeOne()
+        mock_graph = mocker.patch(
+            'adhocracy_core.resources.pool.find_graph').return_value
+        inst['child'] = context
+        res = inst.remove('child', registry)
+        assert res == context

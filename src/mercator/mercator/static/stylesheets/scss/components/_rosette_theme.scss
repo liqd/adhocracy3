@@ -63,3 +63,8 @@ Add a winning rosette or similar to an element. Must have a position:relative or
         }
     }
 }
+
+// HACk: The rosette conflicts with pie-clearfix
+.list-item.has-rosette {
+    @include clearfix;
+}

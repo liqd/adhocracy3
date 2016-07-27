@@ -1,0 +1,16 @@
+h1, h2, h3, h4, h5, h6 {
+    &.active {
+        color: $color-text-highlight-normal;
+    }
+
+}
+
+body,
+moving-column-body {
+    counter-reset: h2;
+}
+
+h2.m-counted:before {
+    counter-increment: h2;
+    content: counter(h2) ". ";
+}

@@ -1,3 +1,4 @@
+import * as AdhEmbedModule from "../../Embed/Module";
 import * as AdhIdeaCollectionModule from "../../IdeaCollection/Module";
 import * as AdhProcessModule from "../../Process/Module";
 import * as AdhResourceAreaModule from "../../ResourceArea/Module";
@@ -10,6 +11,8 @@ import RIGeoProposal from "../../../Resources_/adhocracy_core/resources/proposal
 import RIGeoProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
 import RIIdeaCollectionProcess from "../../../Resources_/adhocracy_meinberlin/resources/idea_collection/IProcess";
 
+import * as AdhEmbed from "../../Embed/Embed";
+
 
 export var moduleName = "adhMeinberlinIdeaCollection";
 
@@ -17,11 +20,20 @@ export var register = (angular) => {
     var processType = RIIdeaCollectionProcess.content_type;
 
     angular
-        .module(moduleName, [,
+        .module(moduleName, [
+            AdhEmbedModule.moduleName,
             AdhIdeaCollectionModule.moduleName,
             AdhProcessModule.moduleName,
             AdhResourceAreaModule.moduleName,
         ])
+        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
+            adhEmbedProvider
+                .registerDirective("meinberlin-proposal-detail")
+                .registerDirective("meinberlin-proposal-list-item")
+                .registerDirective("meinberlin-proposal-create")
+                .registerDirective("meinberlin-proposal-edit")
+                .registerDirective("meinberlin-proposal-list");
+        }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider: AdhResourceArea.Provider, adhConfig) => {
             var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
                 RIIdeaCollectionProcess, RIGeoProposal, RIGeoProposalVersion);

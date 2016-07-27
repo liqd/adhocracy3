@@ -34,16 +34,14 @@ class TestLocalRole:
         groups['group'] = testing.DummyResource(__provides__=IGroup)
         groups['non_group'] = testing.DummyResource()
         inst = inst.bind(context=context)
-        assert inst['principal'].validator.choices ==\
-               ['/principals/groups/group']
+        assert inst['principal'].validator.choices == ['group:group']
 
     def test_create_principal_widget(self, inst, context, groups):
         from adhocracy_core.resources.principal import IGroup
         groups['group'] = testing.DummyResource(__provides__=IGroup)
         groups['non_group'] = testing.DummyResource()
         inst = inst.bind(context=context)
-        assert inst['principal'].widget.values == [('/principals/groups/group',
-                                                    'group')]
+        assert inst['principal'].widget.values == [('group:group', 'group')]
 
     def test_deserialize_non_acl_role(self, inst):
         from colander import Invalid
