@@ -13,37 +13,25 @@ align it to the right.
     <a class="dropdown-button" href="#" aria-haspopup="true" aria-expanded="true" id="dropdownButton">
         <i class="icon-three-dots" title="Actions"></i>
     </a>
-    <ul class="dropdown-menu m-right" aria-labelledby="dropdownButton">
-        <li>
-            <a href="#">
-                <i class="icon-pencil"></i> bearbeiten
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                <i class="icon-tags"></i> Etiketten
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                <i class="icon-flag"></i> melden
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                <i class="icon-trash"></i> löschen
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                <i class="icon-print"></i> drucken
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                <i class="icon-x"></i> abbrechen
-            </a>
-        </li>
+    <div class="dropdown-menu" aria-labelledby="dropdownButton">
+        <a href="#">
+            <i class="icon-pencil"></i> bearbeiten
+        </a>
+        <a href="#">
+            <i class="icon-tags"></i> Etiketten
+        </a>
+        <a href="#">
+            <i class="icon-flag"></i> melden
+        </a>
+        <a href="#">
+            <i class="icon-trash"></i> löschen
+        </a>
+        <a href="#">
+            <i class="icon-print"></i> drucken
+        </a>
+        <a href="#">
+            <i class="icon-x"></i> abbrechen
+        </a>
     </ul>
 </div>
 ```
@@ -85,10 +73,6 @@ align it to the right.
     border: 1px solid $color-structure-normal;
     border-radius: 2px;
     text-align: left;
-
-    li {
-        display: block;
-    }
 
     a {
         display: block;
