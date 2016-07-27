@@ -2,7 +2,7 @@
     float: right;
 }
 
-.proposal-list-item-meta-list {
+.list-item-meta {
     padding-bottom: 0;
 
     .meta-list-item-budget {
@@ -16,10 +16,6 @@
             color: $color-text-highlight-normal;
         }
     }
-}
-
-.meta-list-item-badge {
-    float: right;
 }
 
 .mercator-proposal-detail-meta-list {
