@@ -5,8 +5,10 @@ name: section-jump
 category: Widgets
 ---
 
-A widget with a header, a left navigation and a main section. Often used in
-combination with `.jump-navigation.m-narrow.m-unnumbered`.
+A widget with a header, a left navigation and a main section.
+
+**Deprecated**: Use [resource-header](#resource-header) for the upper and
+[jump-navigation](#jump-navigation) for the lower part.
 
 ```html_example
 <div class="section-jump" id="section-jump-top">
@@ -14,12 +16,14 @@ combination with `.jump-navigation.m-narrow.m-unnumbered`.
         <h1 class="section-jump-cover-header">Section Jump header</h1>
     </div>
 
-    <div class="section-jump-body">
-        <nav class="section-jump-navigation">
-            1.
+    <div class="jump-navigation-wrapper m-narrow">
+        <nav class="jump-navigation">
+            <ol>
+                <li><a></a></li>
+            </ol>
         </nav>
 
-        <div class="section-jump-main">
+        <div class="jump-navigation-main">
             <div style="padding: 1em">
                 Lorem ipsum Ullamco laboris commodo sit commodo nulla adipisicing in fugiat nostrud mollit irure esse velit reprehenderit commodo dolor.
                 Lorem ipsum Ullamco laboris commodo sit commodo nulla adipisicing in fugiat nostrud mollit irure esse velit reprehenderit commodo dolor.
