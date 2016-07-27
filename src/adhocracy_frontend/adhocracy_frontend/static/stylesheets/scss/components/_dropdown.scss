@@ -85,14 +85,15 @@ align it to the right.
             background-color: $color-background-base-introvert;
         }
 
-        &:last-child {
-            border-bottom: 0;
-        }
-
         i {
             display: inline-block;
             width: 1.5em;
         }
+    }
+
+    > a:last-child,
+    :last-child a {
+        border-bottom: 0;
     }
 
     @media print {
