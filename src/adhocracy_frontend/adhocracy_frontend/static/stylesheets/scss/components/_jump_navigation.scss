@@ -5,34 +5,71 @@ name: jump-navigation
 category: Widgets
 ---
 
-A navigation list containing hash tag links
+A navigation list to jump to subsections. You may want to make the navigation
+sticky.
+
+Available modifiers:
+
+-   `m-narrow` (wrapper)
+-   `m-bg` (wrapper)
+-   `m-unnumbered` (navigation)
 
 ```html_example
-<strong>Numbered</strong>
-<nav class="jump-navigation">
-    <ol>
-        <li><a>Element</a></li>
-        <li class="active"><a>Element (LI Active)</a></li>
-        <li><a class="active">Element (A active)</a></li>
-    </ol>
-</nav>
+<h3>Default</h3>
+<div class="jump-navigation-wrapper">
+    <nav class="jump-navigation">
+        <ol>
+            <li><a>Element</a></li>
+            <li><a>Element</a></li>
+            <li><a class="active">Active</a></li>
+        </ol>
+    </nav>
+    <div class="jump-navigation-main">
+        <p>Consectetur dignissimos sint aut. Sapiente perspiciatis sunt voluptas dolor voluptas mollitia. Similique excepturi accusantium sit aut ullam dolore. Omnis excepturi et est est dolorum expedita. Qui et eveniet doloribus molestiae. Voluptate voluptas numquam molestiae aut impedit corrupti omnis tempora.</p>
+    </div>
+</div>
 
-<strong>Unumbered</strong>
-<nav class="jump-navigation m-unnumbered">
-    <ol>
-        <li><a>Element</a></li>
-        <li class="active"><a>Element (LI Active)</a></li>
-        <li><a class="active">Element (A active)</a></li>
-    </ol>
-</nav>
+<h3>Unnumbered</h3>
+<div class="jump-navigation-wrapper">
+    <nav class="jump-navigation m-unnumbered">
+        <ol>
+            <li><a>Element</a></li>
+            <li><a>Element</a></li>
+            <li><a class="active">Active</a></li>
+        </ol>
+    </nav>
+    <div class="jump-navigation-main">
+        <p>Consectetur dignissimos sint aut. Sapiente perspiciatis sunt voluptas dolor voluptas mollitia. Similique excepturi accusantium sit aut ullam dolore. Omnis excepturi et est est dolorum expedita. Qui et eveniet doloribus molestiae. Voluptate voluptas numquam molestiae aut impedit corrupti omnis tempora.</p>
+    </div>
+</div>
 
-<strong>Narrow</strong>
-<nav class="jump-navigation m-narrow">
-    <ol>
-        <li><a>Element</a></li>
-        <li><a class="active">Element (active)</a></li>
-    </ol>
-</nav>
+<h3>Narrow</h3>
+<div class="jump-navigation-wrapper m-narrow">
+    <nav class="jump-navigation">
+        <ol>
+            <li><a></a></li>
+            <li><a></a></li>
+            <li><a class="active"></a></li>
+        </ol>
+    </nav>
+    <div class="jump-navigation-main">
+        <p>Consectetur dignissimos sint aut. Sapiente perspiciatis sunt voluptas dolor voluptas mollitia. Similique excepturi accusantium sit aut ullam dolore. Omnis excepturi et est est dolorum expedita. Qui et eveniet doloribus molestiae. Voluptate voluptas numquam molestiae aut impedit corrupti omnis tempora.</p>
+    </div>
+</div>
+
+<h3>Background</h3>
+<div class="jump-navigation-wrapper m-bg">
+    <nav class="jump-navigation">
+        <ol>
+            <li><a>Element</a></li>
+            <li><a>Element</a></li>
+            <li><a class="active">Active</a></li>
+        </ol>
+    </nav>
+    <div class="jump-navigation-main">
+        <p>Consectetur dignissimos sint aut. Sapiente perspiciatis sunt voluptas dolor voluptas mollitia. Similique excepturi accusantium sit aut ullam dolore. Omnis excepturi et est est dolorum expedita. Qui et eveniet doloribus molestiae. Voluptate voluptas numquam molestiae aut impedit corrupti omnis tempora.</p>
+    </div>
+</div>
 ```
 */
 
