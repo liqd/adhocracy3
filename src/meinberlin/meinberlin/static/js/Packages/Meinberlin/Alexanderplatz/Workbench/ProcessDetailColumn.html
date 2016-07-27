@@ -47,24 +47,35 @@
             <adh-wait condition="data.isShowMap">
                 <adh-map-listing
                     data-ng-if="polygon"
+                    data-custom="{
+                        processOptions: processOptions
+                    }"
                     data-path="{{processUrl}}"
                     data-polygon="polygon"
                     data-ng-show="data.isShowMap"
                     data-no-create-form="true"
                     data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
                     data-content-type="{{proposalType}}">
-                    <adh-meinberlin-proposal-map-list-item data-path="{{item}}"></adh-meinberlin-proposal-map-list-item>
+                    <adh-idea-collection-proposal-map-list-item
+                        data-path="{{item}}"
+                        data-process-options="custom.processOptions">
+                    </adh-idea-collection-proposal-map-list-item>
                 </adh-map-listing>
             </adh-wait>
 
             <adh-listing
                 data-path="{{processUrl}}"
+                data-custom="{
+                    processOptions: processOptions
+                }"
                 data-ng-show="!data.isShowMap"
                 data-no-create-form="true"
                 data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
                 data-content-type="{{proposalType}}">
-                <adh-meinberlin-proposal-list-item data-path="{{element}}">
-                </adh-meinberlin-proposal-list-item>
+                <adh-idea-collection-proposal-list-item
+                    data-path="{{element}}"
+                    data-process-options="custom.processOptions">
+                </adh-idea-collection-proposal-list-item>
             </adh-listing>
         </div>
 
