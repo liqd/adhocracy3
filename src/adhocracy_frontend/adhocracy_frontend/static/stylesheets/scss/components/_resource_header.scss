@@ -37,12 +37,6 @@ actions (edit, share, report, print, ...).
     z-index: 0;
 }
 
-.resource-header-actions {
-    position: absolute;
-    right: $padding-small;
-    top: $padding-small;
-}
-
 .resource-header-main {
     @include rem(margin, 3em auto 4rem);
     max-width: 40em;
@@ -81,6 +75,12 @@ actions (edit, share, report, print, ...).
     a {
         color: inherit;
     }
+}
+
+.resource-header-actions {
+    position: absolute;
+    right: $padding-small;
+    top: $padding-small;
 }
 
 .resource-header-breadcrumbs {
