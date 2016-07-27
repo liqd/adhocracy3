@@ -1,46 +1,47 @@
 /*doc
 ---
-title: dropdown
-name: Dropdown
+title: Dropdown
+name: dropdown
 parent: resource-header
 ---
 
-A basic dropdown that is currently used for resource actions.
+A basic dropdown to trigger actions. The `m-right` modifier can be used to
+align it to the right.
 
 ```html_example
 <div class="dropdown">
-    <a class="dropdown-button" href="" tabindex="0" aria-haspopup="isShowDropdown" aria-expanded="isShowDropdown" role="button" style="display: block;">
-        <i class="icon-three-dots dropdown-icon dropdown-header-icon"></i>
+    <a class="dropdown-button" href="#" aria-haspopup="true" aria-expanded="true" id="dropdownButton">
+        <i class="icon-three-dots" title="Actions"></i>
     </a>
-    <ul class="dropdown-menu dropdown-menu-right" data-ng-if="isShowDropdown" aria-labelledby="dropdownMenu1" style="display: block;">
+    <ul class="dropdown-menu m-right" aria-labelledby="dropdownButton">
         <li>
-            <a class="" href="">
-                <i class="icon-pencil dropdown-icon"></i>bearbeiten
+            <a href="#">
+                <i class="icon-pencil"></i> bearbeiten
             </a>
         </li>
         <li>
-            <a class="" href="">
-                <i class="icon-tags dropdown-icon"></i>Etiketten
+            <a href="#">
+                <i class="icon-tags"></i> Etiketten
             </a>
         </li>
         <li>
-            <a class="" href="">
-                <i class="icon-flag dropdown-icon"></i>melden
+            <a href="#">
+                <i class="icon-flag"></i> melden
             </a>
         </li>
         <li>
-            <a class="" href="">
-                <i class="icon-trash dropdown-icon"></i>löschen
+            <a href="#">
+                <i class="icon-trash"></i> löschen
             </a>
         </li>
         <li>
-            <a class="" href="">
-                <i class="icon-print dropdown-icon"></i>drucken
+            <a href="#">
+                <i class="icon-print"></i> drucken
             </a>
         </li>
         <li>
-            <a class="" href="">
-                <i class="icon-x dropdown-icon"></i>abbrechen
+            <a href="#">
+                <i class="icon-x"></i> abbrechen
             </a>
         </li>
     </ul>
@@ -51,38 +52,47 @@ A basic dropdown that is currently used for resource actions.
 // Very vaguely based on:
 // https://github.com/angular-ui/bootstrap/tree/master/src/dropdown.
 
-// The dropdown wrapper (div)
 .dropdown {
-    cursor: pointer;
+    position: relative;
+    text-align: left;
+
+    &.m-right {
+        text-align: right;
+
+        .dropdown-menu {
+            left: auto;
+            right: 0;
+        }
+    }
 }
 
-.dropdown-icon {
-    @include rem(margin-right, 3px);
-    @include rem(font-size, $font-size-normal);
-    line-height: (24 / 17);
-    vertical-align: middle;
-}
-
-.dropdown-header-icon {
+.dropdown-button {
     @include rem(font-size, $font-size-plus);
     color: $color-text-normal;
+    display: inline-block;
+    width: 1.4em;
+    text-align: center;
 }
 
-// The dropdown menu (ul)
 .dropdown-menu {
     position: absolute;
-    border-radius: 2px;
+    left: 0;
     min-width: 10em;
     padding: 0;
-    margin: 5px 0 0;
+    margin: 0;
+    z-index: 1;
     background-color: $color-text-inverted;
     border: 1px solid $color-structure-normal;
-    z-index: 1;
+    border-radius: 2px;
+    text-align: left;
 
-    // Links within the dropdown menu
+    li {
+        display: block;
+    }
+
     a {
         display: block;
-        padding: 8px;
+        padding: 0.5em;
         color: $color-text-normal;
         border-bottom: 1px solid $color-structure-normal;
         white-space: nowrap;
@@ -94,14 +104,13 @@ A basic dropdown that is currently used for resource actions.
             background-color: $color-background-base-introvert;
         }
 
-        :last-of-type {
-            border-bottom: none;
+        &:last-child {
+            border-bottom: 0;
+        }
+
+        i {
+            display: inline-block;
+            width: 1.5em;
         }
     }
-}
-
-// Menu positioning
-.dropdown-menu-right {
-    left: auto;
-    right: 0;
 }

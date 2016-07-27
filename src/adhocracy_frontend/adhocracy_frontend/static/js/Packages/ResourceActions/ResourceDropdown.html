@@ -1,28 +1,28 @@
-<div class="dropdown resource-header-actions" data-ng-if="!data.modals.modal && data.isShowDropdownMenu">
-    <a href="" tabindex="0" aria-haspopup="isShowDropdown" aria-expanded="isShowDropdown" data-ng-click="data.toggleDropdown()">
-        <i class="icon-three-dots dropdown-icon dropdown-header-icon"></i>
+<div class="dropdown m-right resource-header-actions" data-ng-if="!data.modals.modal && data.isShowDropdownMenu">
+    <a class="dropdown-button" href="" aria-haspopup="isShowDropdown" aria-expanded="isShowDropdown" data-ng-click="data.toggleDropdown()">
+        <i class="icon-three-dots"></i>
     </a>
-    <div class="dropdown-menu dropdown-menu-right" data-ng-if="isShowDropdown" aria-labelledby="dropdownMenu1">
+    <div class="dropdown-menu" data-ng-if="isShowDropdown" aria-labelledby="dropdownMenu1">
         <adh-view-action
             data-ng-if="data.edit && data.resourcePath && options.PUT"
             data-view="edit"
             data-label="TR__EDIT"
             data-resource-path="{{data.resourcePath}}">
-            <i class="icon-pencil dropdown-icon"></i>
+            <i class="icon-pencil"></i>
         </adh-view-action>
         <adh-view-action
             data-ng-if="data.image && data.resourcePath && options.PUT"
             data-view="image"
             data-label="TR__IMAGE_UPLOAD"
             data-resource-path="{{data.resourcePath}}">
-            <i class="icon-picture-file dropdown-icon"></i>
+            <i class="icon-picture-file"></i>
         </adh-view-action>
         <adh-view-action
             data-ng-if="data.moderate && data.resourcePath"
             data-view="moderate"
             data-label="TR__MODERATE"
             data-resource-path="{{resourcePath}}">
-            <i class="icon-picture-file dropdown-icon"></i>
+            <i class="icon-picture-file"></i>
         </adh-view-action>
         <adh-assign-badges-action
         data-ng-if="data.assignBadges && data.resourcePath"
@@ -30,7 +30,7 @@
             data-resource-with-badges-url="{{data.resourceWithBadgesUrl}}"
             data-resource-path="{{data.resourcePath}}"
             data-toggle-dropdown="data.toggleDropdown">
-            <i class="icon-tags dropdown-icon"></i>
+            <i class="icon-tags"></i>
         </adh-assign-badges-action>
         <adh-modal-action
             data-ng-if="data.report"
@@ -38,33 +38,33 @@
             data-modal="abuse"
             data-label="TR__REPORT"
             data-toggle-dropdown="data.toggleDropdown">
-            <i class="icon-flag dropdown-icon"></i>
+            <i class="icon-flag"></i>
         </adh-modal-action>
         <adh-modal-action
             data-ng-if="data.share"
             data-modals="data.modals"
             data-modal="share"
             data-label="TR__SHARE">
-        <i class="icon-share dropdown-icon"></i>
+        <i class="icon-share"></i>
         </adh-modal-action>
         <adh-hide-action
             data-ng-if="data.hide && data.resourcePath && options.hide"
             data-redirect-url="{{data.deleteRedirectUrl}}"
             data-resource-path="{{data.resourcePath}}">
-        <i class="icon-trash dropdown-icon"></i>
+        <i class="icon-trash"></i>
         </adh-hide-action>
         <adh-resource-widget-delete-action
             data-ng-if="data.resourceWidgetDelete && data.resourcePath && options.hide"
             data-resource-path="{{data.resourcePath}}">
-            <i class="icon-trash dropdown-icon"></i>
+            <i class="icon-trash"></i>
         </adh-resource-widget-delete-action>
         <adh-print-action data-ng-if="data.print">
-            <i class="icon-print dropdown-icon"></i>
+            <i class="icon-print"></i>
         </adh-print-action>
         <adh-cancel-action
             data-ng-if="data.cancel && data.resourcePath"
             data-resource-path="{{data.resourcePath}}">
-            <i class="icon-x dropdown-icon"></i>
+            <i class="icon-x"></i>
         </adh-cancel-action>
     </div>
 </div>
