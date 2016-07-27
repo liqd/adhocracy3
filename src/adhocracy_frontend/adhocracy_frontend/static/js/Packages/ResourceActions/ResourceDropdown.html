@@ -25,7 +25,7 @@
             <i class="icon-picture-file"></i>
         </adh-view-action>
         <adh-assign-badges-action
-        data-ng-if="data.assignBadges && data.resourcePath"
+            data-ng-if="data.assignBadges && data.resourcePath"
             data-modals="data.modals"
             data-resource-with-badges-url="{{data.resourceWithBadgesUrl}}"
             data-resource-path="{{data.resourcePath}}"
@@ -45,13 +45,13 @@
             data-modals="data.modals"
             data-modal="share"
             data-label="TR__SHARE">
-        <i class="icon-share"></i>
+            <i class="icon-share"></i>
         </adh-modal-action>
         <adh-hide-action
             data-ng-if="data.hide && data.resourcePath && options.hide"
             data-redirect-url="{{data.deleteRedirectUrl}}"
             data-resource-path="{{data.resourcePath}}">
-        <i class="icon-trash"></i>
+            <i class="icon-trash"></i>
         </adh-hide-action>
         <adh-resource-widget-delete-action
             data-ng-if="data.resourceWidgetDelete && data.resourcePath && options.hide"
