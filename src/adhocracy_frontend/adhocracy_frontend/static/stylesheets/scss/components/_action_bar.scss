@@ -158,7 +158,7 @@ The messages are informational by default, but can have the modifieres
 `m-error` and `m-success`.
 
 ```html_example
-<ul class="alerts static-example">
+<ul class="alerts" style="position: static">
     <li class="alerts-message">Info</li>
     <li class="alerts-message m-error">Error</li>
     <li class="alerts-message m-success">Success</li>
