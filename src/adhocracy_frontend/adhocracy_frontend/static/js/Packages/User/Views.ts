@@ -864,7 +864,7 @@ export var adhUserProfileDescriptionEditDirective = (
                     scope.description = user.data[SIDescription.nick].description;
                 });
             });
-            var saveUpdatedUserDescription = () => {
+            scope.didClickSave = () => {
                 adhHttp.get(scope.path).then((oldUser) => {
                     var patch = {
                         content_type: oldUser.content_type,
@@ -876,14 +876,6 @@ export var adhUserProfileDescriptionEditDirective = (
                     });
                     adhHttp.put(oldUser.path, patch);
                 });
-            };
-            scope.saveShortDescription = (shortDscription) => {
-                scope.short_description = shortDscription;
-                saveUpdatedUserDescription();
-            };
-            scope.saveDescription = (description) => {
-                scope.description = description;
-                saveUpdatedUserDescription();
             };
         }
     };

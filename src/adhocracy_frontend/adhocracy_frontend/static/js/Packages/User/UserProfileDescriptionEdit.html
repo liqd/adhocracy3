@@ -4,13 +4,13 @@
         data-parsetext="short_description"
         data-title="{{ 'TR__SHORT_DESCRIPTION' | translate }}"
         data-is-editable="userOptions.PUT"
-        data-save-changes="saveShortDescription(markdown)"
+        data-did-click-save="didClickSave()"
     ></adh-inline-editable-markdown>
     <adh-inline-editable-markdown
         class="user-description-long"
         data-parsetext="description"
         data-is-editable="userOptions.PUT"
         data-title="{{ 'TR__DESCRIPTION' | translate }}"
-        data-save-changes="saveDescription(markdown)"
+        data-did-click-save="didClickSave()"
     ></adh-inline-editable-markdown>
 </div>
