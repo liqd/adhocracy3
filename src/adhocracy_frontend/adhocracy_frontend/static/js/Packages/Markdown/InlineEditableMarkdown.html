@@ -13,14 +13,14 @@
         <a href="" class="button-cta-secondary inline-editable-markdown-edit-button"
             data-ng-if="isEditable && ! isEditing"
             data-ng-click="startEditing()"
-        ><span>{{ "TR__EDIT_MARKDOWN" | translate:{title: title} }}</span></a>
+        ><span>{{ "TR__EDIT_TITLE" | translate:{title: title} }}</span></a>
         <adh-help-link 
             data-ng-if="isEditing"
             data-support-url="https://simplemde.com/markdown-guide"></adh-help-link>
         <a href="" class="button-cta-secondary inline-editable-markdown-submit-button"
             data-ng-if="isEditable && isEditing"
             data-ng-click="saveChanges()"
-        ><span>{{ "TR__SAVE_MARKDOWN" | translate:{title: title} }}</span></a>
+        ><span>{{ "TR__SAVE_TITLE" | translate:{title: title} }}</span></a>
         <a href="" class="button-cta-secondary inline-editable-markdown-cancel-button"
             data-ng-if="isEditable && isEditing"
             data-ng-click="cancelEditing()"
