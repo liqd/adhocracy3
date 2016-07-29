@@ -25,6 +25,7 @@ import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/
 import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
+import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
 
 var pkgLocation = "/User";
 
@@ -840,6 +841,44 @@ export var adhUserProfileImageEditDirective = (
             scope.$watch("path", (path) => {
                 adhPermissions.bindScope(scope, () => scope.path, "userOptions");
             });
+        }
+    };
+};
+
+export var adhUserProfileDescriptionEditDirective = (
+    adhHttp: AdhHttp.Service,
+    adhPermissions: AdhPermissions.Service,
+    adhConfig: AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        scope: {
+            path: "@"
+        },
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfileDescriptionEdit.html",
+        link: (scope) => {
+            scope.$watch("path", (path) => {
+                adhPermissions.bindScope(scope, () => scope.path, "userOptions");
+                adhHttp.get(scope.path).then((user) => {
+                    scope.short_description = user.data[SIDescription.nick].short_description;
+                    scope.description = user.data[SIDescription.nick].description;
+                });
+            });
+            var saveUpdatedUserDescription = () => {
+                adhHttp.get(scope.path).then((user) => {
+                    user.data[SIDescription.nick].short_description = scope.short_description;
+                    user.data[SIDescription.nick].description = scope.description;
+                    adhHttp.put(scope.path, user);
+                });
+            };
+            scope.saveShortDescription = (shortDscription) => {
+                scope.short_description = shortDscription;
+                saveUpdatedUserDescription();
+            };
+            scope.saveDescription = (description) => {
+                scope.description = description;
+                saveUpdatedUserDescription();
+            };
         }
     };
 };

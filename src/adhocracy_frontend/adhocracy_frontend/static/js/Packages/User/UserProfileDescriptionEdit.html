@@ -1,0 +1,14 @@
+<div class="user-description">
+    <adh-inline-editable-markdown
+        class="user-description-short"
+        data-parsetext="{{short_description}}"
+        data-is-editable="userOptions.PUT"
+        data-save-changes="saveShortDescription(markdown)"
+    ></adh-inline-editable-markdown>
+    <adh-inline-editable-markdown
+        class="user-description-long"
+        data-parsetext="{{description}}"
+        data-is-editable="userOptions.PUT"
+        data-save-changes="saveDescription(markdown)"
+    ></adh-inline-editable-markdown>
+</div>
