@@ -167,20 +167,6 @@ textarea {
 
 /*doc
 ---
-title: error text
-name: error-text
-parent: input
----
-
-When text is in error it shows in an invalid color state
-
-```html_example
-<span class="input-error">Please enter your first name</span>
-```
-*/
-
-/*doc
----
 title: label text
 name: label-text
 parent: input
@@ -246,23 +232,6 @@ checked.
 <label>
     <input name="radio-example" type="radio" />
     The other option
-</label>
-```
-*/
-
-/*doc
----
-title: label
-name: label
-category: Inputs
----
-
-A label can be used to describe an input.
-
-```html_example
-<label>
-    <input type="text" />
-    description
 </label>
 ```
 */

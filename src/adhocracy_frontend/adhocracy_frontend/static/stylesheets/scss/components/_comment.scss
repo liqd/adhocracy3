@@ -249,37 +249,3 @@ parent: comment
         float: left;
     }
 }
-
-.comment-create-form {
-    @include clearfix;
-}
-
-.comment-create-form-text,
-.comment-edit-form-text {
-    @include rem(min-height, 5.8rem);
-}
-
-.comment-edit-form-text {
-    min-height: 1px;
-}
-
-.comment-create-form-button-submit {
-    float: right;
-}
-
-/*doc
----
-title: Comment Create Form
-name: comment-create-form
-parent: comment
----
-
-```html_example
-<form class="comment-create-form">
-    <textarea class="comment-create-form-text"></textarea>
-    <footer class="form-footer">
-        <input class="comment-create-form-button-submit button-cta form-footer-button-cta" type="submit" value="Submit">
-    </footer>
-</form>
-```
-*/
