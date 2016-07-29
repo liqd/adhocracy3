@@ -894,9 +894,14 @@ export var adhHelpLinkDirective = (
 ) => {
     return {
         restrict: "E",
+        scope: {
+            supportUrl: "@?"
+        },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/HelpLink.html",
         link: (scope) => {
-            scope.supportUrl = adhConfig.support_url;
+            if ( ! scope.supportUrl) {
+                scope.supportUrl = adhConfig.support_url;
+            }
         }
     };
 };
