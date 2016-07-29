@@ -1,4 +1,4 @@
-<div class="section-jump" id="section-jump-top">
+<div>
     <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
     <div class="section-jump-cover">
         <span data-ng-repeat="badge in data.assignments" class="badge {{badgeclass}}">{{ badge.title }}</span>
@@ -11,25 +11,25 @@
         </ul>
     </div><!-- /.cover -->
 
-    <div class="section-jump-body">
-        <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="" data-ng-if="data.paragraphs.length > 1">
+    <div class="jump-navigation-wrapper m-narrow">
+        <nav class="jump-navigation m-unnumbered" data-adh-sticky="" data-ng-if="data.paragraphs.length > 1">
             <ol>
                 <li data-ng-repeat="paragraph in data.paragraphs">
                     <a
-                        href="#section-jump-{{$index}}"
+                        href="#jump-{{$index}}"
                         data-du-smooth-scroll=""
                         data-du-scrollspy="">{{ $index + 1}}</a>
                 </li>
             </ol>
         </nav>
 
-        <div class="section-jump-main" data-du-spy-context="" data-ng-class="{'has-navigation': data.paragraphs.length > 1}">
-            <section class="action-section {{paragraph.selectedState}}" data-ng-repeat="paragraph in data.paragraphs" id="section-jump-{{$index}}">
+        <div class="jump-navigation-main" data-du-spy-context="" data-ng-class="{'has-navigation': data.paragraphs.length > 1}">
+            <section class="action-section {{paragraph.selectedState}}" data-ng-repeat="paragraph in data.paragraphs" id="jump-{{$index}}">
                 <adh-parse-markdown data-parsetext="paragraph.body"></adh-parse-markdown>
                 <a class="action-section-button" data-ng-href="{{ paragraph.path | adhParentPath | adhResourceUrl:'comments' }}">
                     <i class="icon-speechbubble"></i> {{ paragraph.commentCount }}
                 </a>
             </section>
-        </div><!-- /.section-jump-main -->
-    </div><!-- /.section-jump-body -->
-</div><!-- /.section-jump -->
+        </div><!-- /.jump-navigation-main -->
+    </div><!-- /.jump-navigation-wrapper -->
+</div>

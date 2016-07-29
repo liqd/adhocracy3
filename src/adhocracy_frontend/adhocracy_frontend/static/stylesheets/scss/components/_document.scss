@@ -15,15 +15,15 @@ A form for creating documents. This contains a <a href="#section-jump">section j
             <input type="text" placeholder="Add a title here." class="m-title">
         </label>
     </div>
-    <div class="section-jump-body">
-        <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered">
+    <div class="jump-navigation-wrapper m-narrow">
+        <nav class="jump-navigation m-unnumbered">
             <ol>
                 <li>
                     <a href="#section-jump-0">1</a>
                 </li>
             </ol>
         </nav>
-        <div class="section-jump-main">
+        <div class="jump-navigation-main">
             <section id="section-jump-0">
                 <label>
                     <textarea></textarea>
