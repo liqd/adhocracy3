@@ -9,3 +9,17 @@
         margin-bottom: 5px;
     }
 }
+
+.inline-editable-markdown {
+
+    .inline-editable-markdown-edit-button-container {
+        text-align: right;
+        margin-bottom: rem(10px);
+
+        .inline-editable-markdown-edit-button {
+            padding: 0 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            font-size: $font-size-smaller;
+        }
+    }
+}

@@ -1,0 +1,27 @@
+<div class="inline-editable-markdown">
+    <adh-parse-markdown
+        data-ng-if="! isEditing"
+        data-parsetext="parsetext"></adh-parse-markdown>
+    <textarea 
+        data-ng-if="isEditing"
+        data-ng-model="parsetext"></textarea>
+    <div class="inline-editable-markdown-edit-button-container">
+        <a href="" class="button-cta-secondary inline-editable-markdown-edit-button"
+            data-ng-if="isEditable && ! isEditing"
+            data-ng-click="startEditing()"
+        ><span>{{ "TR__EDIT_MARKDOWN" | translate:{title: title} }}</span></a>
+        <a href="" class="button-cta-secondary inline-editable-markdown-submit-button"
+            data-ng-if="isEditable && isEditing"
+            data-ng-click="saveChanges()"
+        ><span>{{ "TR__SAVE_MARKDOWN" | translate:{title: title} }}</span></a>
+        <a href="" class="button-cta-secondary inline-editable-markdown-cancel-button"
+            data-ng-if="isEditable && isEditing"
+            data-ng-click="cancelEditing()"
+        ><span>{{ "TR__CANCEL" | translate }}</span></a>
+    </div>
+    <!--
+        TODO form with textarea and submit / cancel buttons 
+        TODO show placeholder when there is no content yet
+        TODO link markdown guide: https://simplemde.com/markdown-guide
+    -->
+</div>

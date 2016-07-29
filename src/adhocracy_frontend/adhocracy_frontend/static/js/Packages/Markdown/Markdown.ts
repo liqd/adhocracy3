@@ -1,6 +1,7 @@
 /// <reference path="../../../lib2/types/angular.d.ts"/>
 
 import * as AdhConfig from "../Config/Config";
+var pkgLocation = "/Markdown";
 
 
 export var parseMarkdown = (adhConfig : AdhConfig.IService, markdownit) => {
@@ -22,6 +23,36 @@ export var parseMarkdown = (adhConfig : AdhConfig.IService, markdownit) => {
                     wrapper.html("");
                 }
             });
+        }
+    };
+};
+
+// REFACT would be really nice to use the markdown editor that SDI already has
+// see: https://simplemde.com
+export var inlineEditableMarkdownDirective = (
+    adhConfig: AdhConfig.IService
+) => {
+    return {
+        scope: {
+            // REFACT consider = as parseMarkdown uses it, < would also be nice
+            parsetext: "@",
+            isEditable: "@",
+            title: "@",
+            saveChangesCallback: "&saveChanges" // gets the changed markdown as 'markdown' keyword argument
+        },
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/InlineEditableMarkdown.html",
+        link: (scope) => {
+            scope.startEditing = () => {
+                scope.isEditing = true;
+            };
+            scope.cancelEditing = () => {
+                scope.isEditing = false;
+            };
+            scope.saveChanges = () => {
+                scope.saveChangesCallback({markdown: scope.parsetext});
+                scope.cancelEditing();
+            }
         }
     };
 };
