@@ -37,8 +37,8 @@ export var register = (angular) => {
         ])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[processType] = "<adh-meinberlin-alexanderplatz-workbench " +
-                "data-process-options=\"processOptions\"></adh-meinberlin-alexanderplatz-workbench>";
-            adhProcessProvider.processOptions[processType] = {
+                "data-process-properties=\"processProperties\"></adh-meinberlin-alexanderplatz-workbench>";
+            adhProcessProvider.processProperties[processType] = {
                 hasLocation: true,
                 proposalClass: RIGeoProposal,
                 proposalVersionClass: RIGeoProposalVersion

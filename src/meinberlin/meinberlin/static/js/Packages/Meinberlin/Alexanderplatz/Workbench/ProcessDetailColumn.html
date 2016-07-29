@@ -48,7 +48,7 @@
                 <adh-map-listing
                     data-ng-if="polygon"
                     data-custom="{
-                        processOptions: processOptions
+                        processProperties: processProperties
                     }"
                     data-path="{{processUrl}}"
                     data-polygon="polygon"
@@ -58,7 +58,7 @@
                     data-content-type="{{proposalType}}">
                     <adh-idea-collection-proposal-map-list-item
                         data-path="{{item}}"
-                        data-process-options="custom.processOptions">
+                        data-process-properties="custom.processProperties">
                     </adh-idea-collection-proposal-map-list-item>
                 </adh-map-listing>
             </adh-wait>
@@ -66,7 +66,7 @@
             <adh-listing
                 data-path="{{processUrl}}"
                 data-custom="{
-                    processOptions: processOptions
+                    processProperties: processProperties
                 }"
                 data-ng-show="!data.isShowMap"
                 data-no-create-form="true"
@@ -74,7 +74,7 @@
                 data-content-type="{{proposalType}}">
                 <adh-idea-collection-proposal-list-item
                     data-path="{{element}}"
-                    data-process-options="custom.processOptions">
+                    data-process-properties="custom.processProperties">
                 </adh-idea-collection-proposal-list-item>
             </adh-listing>
         </div>
