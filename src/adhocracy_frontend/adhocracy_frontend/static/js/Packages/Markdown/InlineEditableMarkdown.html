@@ -3,6 +3,7 @@
         data-ng-if="! isEditing"
         data-parsetext="parsetext"></adh-parse-markdown>
     <textarea 
+        placeholder="{{ title }}"
         data-ng-if="isEditing"
         data-ng-model="$parent.parsetext"></textarea>
     <div class="inline-editable-markdown-edit-button-container">
