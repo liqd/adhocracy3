@@ -865,10 +865,16 @@ export var adhUserProfileDescriptionEditDirective = (
                 });
             });
             var saveUpdatedUserDescription = () => {
-                adhHttp.get(scope.path).then((user) => {
-                    user.data[SIDescription.nick].short_description = scope.short_description;
-                    user.data[SIDescription.nick].description = scope.description;
-                    adhHttp.put(scope.path, user);
+                adhHttp.get(scope.path).then((oldUser) => {
+                    var patch = {
+                        content_type: oldUser.content_type,
+                        data: {}
+                    };
+                    patch.data[SIDescription.nick] = new SIDescription.Sheet({
+                        short_description: scope.short_description,
+                        description: scope.description
+                    });
+                    adhHttp.put(oldUser.path, patch);
                 });
             };
             scope.saveShortDescription = (shortDscription) => {
