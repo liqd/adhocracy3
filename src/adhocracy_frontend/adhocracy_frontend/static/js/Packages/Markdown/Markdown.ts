@@ -34,11 +34,11 @@ export var inlineEditableMarkdownDirective = (
 ) => {
     return {
         scope: {
-            // REFACT consider = as parseMarkdown uses it, < would also be nice
-            parsetext: "@",
-            isEditable: "@",
+            parsetext: "=",
+            isEditable: "=",
             title: "@",
             saveChangesCallback: "&saveChanges" // gets the changed markdown as 'markdown' keyword argument
+            // REFACT consider to use the binding to get the data out and then only notify via didClickSave() instead of saveChangesCallback(markdown)
         },
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/InlineEditableMarkdown.html",
@@ -52,7 +52,7 @@ export var inlineEditableMarkdownDirective = (
             scope.saveChanges = () => {
                 scope.saveChangesCallback({markdown: scope.parsetext});
                 scope.cancelEditing();
-            }
+            };
         }
     };
 };

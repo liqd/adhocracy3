@@ -4,7 +4,7 @@
         data-parsetext="parsetext"></adh-parse-markdown>
     <textarea 
         data-ng-if="isEditing"
-        data-ng-model="parsetext"></textarea>
+        data-ng-model="$parent.parsetext"></textarea>
     <div class="inline-editable-markdown-edit-button-container">
         <a href="" class="button-cta-secondary inline-editable-markdown-edit-button"
             data-ng-if="isEditable && ! isEditing"
@@ -20,8 +20,8 @@
         ><span>{{ "TR__CANCEL" | translate }}</span></a>
     </div>
     <!--
-        TODO form with textarea and submit / cancel buttons 
         TODO show placeholder when there is no content yet
+        TODO add labels for screen readers
         TODO link markdown guide: https://simplemde.com/markdown-guide
     -->
 </div>
