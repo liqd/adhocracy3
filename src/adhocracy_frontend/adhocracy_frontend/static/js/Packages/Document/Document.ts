@@ -485,7 +485,6 @@ export var createDirective = (
                 if (scope.data) {
                     return _.filter(scope.data.paragraphs, (p) => !p.deleted).length;
                 }
-                return;
             };
 
             scope.cancel = () => {
@@ -548,7 +547,6 @@ export var editDirective = (
                 if (scope.data) {
                     return _.filter(scope.data.paragraphs, (p) => !p.deleted).length;
                 }
-                return;
             };
 
             bindPath($q, adhHttp)(scope, undefined, scope.hasMap);
