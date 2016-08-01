@@ -20,10 +20,10 @@
                 <h1 class="resource-header-title">{{ data.title }}</h1>
 
                 <ul class="resource-header-meta">
-                    <li data-ng-if="processOptions.hasLocationText">
+                    <li data-ng-if="processProperties.hasLocationText">
                         <i class="icon-pin-detail"></i> {{data.locationText}}
                     </li>
-                    <li data-ng-if="processOptions.maxBudget">
+                    <li data-ng-if="processProperties.maxBudget">
                         <i class="proposal-detail-meta-item-icon icon-budget"></i> {{data.budget | numberOrDash}} &euro;
                     </li>
                     <li>
@@ -67,7 +67,7 @@
         </div>
     </section>
 
-    <section data-ng-if="processOptions.hasLocation">
+    <section data-ng-if="processProperties.hasLocation">
         <adh-map-detail data-ng-if="data.polygon && data.lng && data.lat" data-lng="data.lng" data-lat="data.lat" data-polygon="data.polygon" data-height="250"></adh-map-detail>
     </section>
 

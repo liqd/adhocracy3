@@ -25,7 +25,7 @@ export var detailDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
         scope: {
             path: "@",
-            processOptions: "="
+            processProperties: "="
         },
         link: (scope) => {
             AdhBadge.getBadgeFacets(adhHttp, $q)(scope.path).then((facets) => {
@@ -54,7 +54,7 @@ export var detailDirective = (
                         var stateName = sheet.workflow_state;
                         scope.currentPhase = AdhProcess.getStateData(sheet, stateName);
 
-                        if (scope.processOptions.hasLocation) {
+                        if (scope.processProperties.hasLocation) {
                             var locationUrl = resource.data[SILocationReference.nick].location;
                             adhHttp.get(locationUrl).then((location) => {
                                 var polygon = location.data[SIMultiPolygon.nick].coordinates[0][0];
@@ -62,7 +62,7 @@ export var detailDirective = (
                             });
                         }
 
-                        var proposalVersion = scope.processOptions.proposalVersionClass;
+                        var proposalVersion = scope.processProperties.proposalVersionClass;
                         scope.contentType = proposalVersion.content_type;
                     });
                 }
