@@ -158,6 +158,8 @@ image_meta = asset_meta._replace(
     iresource=IImage,
     is_implicit_addable=True,
     extended_sheets=(adhocracy_core.sheets.image.IImageMetadata,),
+    use_autonaming=False,
+    use_autonaming_random=True,
 )._add(after_creation=(add_image_size_downloads,))
 
 
