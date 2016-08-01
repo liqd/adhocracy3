@@ -34,6 +34,7 @@
 .icon-flag:before,
 .icon-key:before,
 .icon-list:before,
+.icon-list-column:before,
 .icon-list-filled:before,
 .icon-mail:before,
 .icon-mail-filled:before,
@@ -41,22 +42,31 @@
 .icon-minus:before,
 .icon-partou-logo:before,
 .icon-pencil:before,
+.icon-picture-file:before,
 .icon-pig:before,
 .icon-pointy-rectangle-left:before,
 .icon-pointy-rectangle-right:before,
+.icon-print:before,
+.icon-refresh:before,
 .icon-reply:before,
+.icon-share:before,
 .icon-speechbubble:before,
 .icon-speechbubble-document:before,
 .icon-speechbubble-unfilled:before,
 .icon-speechbubbles:before,
+.icon-tags:before,
+.icon-three-dots:before,
 .icon-tick:before,
+.icon-trash:before,
 .icon-user:before,
 .icon-user-unfilled:before,
 .icon-users:before,
+.icon-volume:before,
 .icon-vote:before,
 .icon-vote-down:before,
 .icon-vote-filled:before,
 .icon-vote-up:before,
+.icon-voting:before,
 .icon-x:before {
   display: inline-block;
   font-family: "adhocracy3-icons";
@@ -77,33 +87,43 @@
 .icon-back-to-top:before { content: "\f102"; }
 .icon-ban-circle:before { content: "\f103"; }
 .icon-calendar:before { content: "\f104"; }
-.icon-collapse:before { content: "\f105"; }
-.icon-document:before { content: "\f106"; }
-.icon-documents:before { content: "\f107"; }
-.icon-flag:before { content: "\f108"; }
-.icon-key:before { content: "\f109"; }
-.icon-list:before { content: "\f10a"; }
-.icon-list-filled:before { content: "\f10b"; }
-.icon-mail:before { content: "\f10c"; }
-.icon-mail-filled:before { content: "\f10d"; }
-.icon-map-pin:before { content: "\f10e"; }
-.icon-minus:before { content: "\f10f"; }
-.icon-partou-logo:before { content: "\f110"; }
-.icon-pencil:before { content: "\f111"; }
-.icon-pig:before { content: "\f112"; }
-.icon-pointy-rectangle-left:before { content: "\f113"; }
-.icon-pointy-rectangle-right:before { content: "\f114"; }
-.icon-reply:before { content: "\f115"; }
-.icon-speechbubble:before { content: "\f116"; }
-.icon-speechbubble-document:before { content: "\f117"; }
-.icon-speechbubble-unfilled:before { content: "\f118"; }
-.icon-speechbubbles:before { content: "\f119"; }
-.icon-tick:before { content: "\f11a"; }
-.icon-user:before { content: "\f11b"; }
-.icon-user-unfilled:before { content: "\f11c"; }
-.icon-users:before { content: "\f11d"; }
-.icon-vote:before { content: "\f11e"; }
-.icon-vote-down:before { content: "\f11f"; }
-.icon-vote-filled:before { content: "\f120"; }
-.icon-vote-up:before { content: "\f121"; }
-.icon-x:before { content: "\f122"; }
+.icon-collapse:before { content: "\f11f"; }
+.icon-document:before { content: "\f105"; }
+.icon-documents:before { content: "\f106"; }
+.icon-flag:before { content: "\f107"; }
+.icon-key:before { content: "\f108"; }
+.icon-list:before { content: "\f109"; }
+.icon-list-column:before { content: "\f120"; }
+.icon-list-filled:before { content: "\f10a"; }
+.icon-mail:before { content: "\f10b"; }
+.icon-mail-filled:before { content: "\f10c"; }
+.icon-map-pin:before { content: "\f10d"; }
+.icon-minus:before { content: "\f10e"; }
+.icon-partou-logo:before { content: "\f121"; }
+.icon-pencil:before { content: "\f10f"; }
+.icon-picture-file:before { content: "\f122"; }
+.icon-pig:before { content: "\f110"; }
+.icon-pointy-rectangle-left:before { content: "\f111"; }
+.icon-pointy-rectangle-right:before { content: "\f112"; }
+.icon-print:before { content: "\f123"; }
+.icon-refresh:before { content: "\f124"; }
+.icon-reply:before { content: "\f113"; }
+.icon-share:before { content: "\f125"; }
+.icon-speechbubble:before { content: "\f114"; }
+.icon-speechbubble-document:before { content: "\f115"; }
+.icon-speechbubble-unfilled:before { content: "\f116"; }
+.icon-speechbubbles:before { content: "\f117"; }
+.icon-tags:before { content: "\f126"; }
+.icon-three-dots:before { content: "\f127"; }
+.icon-tick:before { content: "\f118"; }
+.icon-trash:before { content: "\f128"; }
+.icon-user:before { content: "\f119"; }
+.icon-user-unfilled:before { content: "\f11a"; }
+.icon-users:before { content: "\f11b"; }
+.icon-volume:before { content: "\f129"; }
+.icon-vote:before { content: "\f12a"; }
+.icon-vote-down:before { content: "\f11c"; }
+.icon-vote-filled:before { content: "\f12b"; }
+.icon-vote-up:before { content: "\f11d"; }
+.icon-voting:before { content: "\f12c"; }
+.icon-x:before { content: "\f11e"; }
