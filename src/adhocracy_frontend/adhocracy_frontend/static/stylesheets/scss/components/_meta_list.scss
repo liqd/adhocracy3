@@ -22,21 +22,6 @@ A Meta list of items, often with icons
         20,000 €
     </li>
 </ul>
-Vertical
-<ul class="meta-list m-vertical">
-    <li class="meta-list-item">
-        <i class="icon-speechbubbles"></i>
-        12 Comments
-    </li>
-    <li class="meta-list-item">
-        <i class="icon-calendar"></i>
-        3/6/2015
-    </li>
-    <li class="meta-list-item">
-        <i class="icon-pig"></i>
-        20,000 €
-    </li>
-</ul>
 ```
 */
 
@@ -45,23 +30,6 @@ Vertical
     @include rem(padding, 0 0 20px);
     margin: 0;
     list-style: none;
-
-    &.m-vertical {
-        .meta-list-item {
-            @include rem(margin-bottom, 15px);
-            float: none;
-
-            i {
-                @include rem(margin-right, 8px);
-                @include rem(min-width, 12px);
-                display: inline-block;
-            }
-
-            &:last-child {
-                margin-bottom: 0;
-            }
-        }
-    }
 }
 
 .meta-list-item {

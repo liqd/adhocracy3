@@ -41,7 +41,7 @@ class TestLocalRole:
         groups['group'] = testing.DummyResource(__provides__=IGroup)
         groups['non_group'] = testing.DummyResource()
         inst = inst.bind(context=context)
-        assert inst['principal'].widget.values == [('group', 'group')]
+        assert inst['principal'].widget.values == [('group:group', 'group')]
 
     def test_deserialize_non_acl_role(self, inst):
         from colander import Invalid

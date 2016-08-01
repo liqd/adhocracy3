@@ -23,7 +23,7 @@ export var workbenchDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html",
         scope: {
-            processOptions: "="
+            processProperties: "="
         },
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("view", scope));

@@ -21,7 +21,7 @@ export interface IStateData {
     start_date : string;
 }
 
-export interface IProcessOptions {
+export interface IProcessProperties {
     hasCreatorParticipate? : boolean;
     hasImage? : boolean;
     hasLocation? : boolean;
@@ -52,12 +52,12 @@ export var getStateData = (sheet : SIWorkflow.Sheet, name : string) : IStateData
 
 export class Provider implements angular.IServiceProvider {
     public templates : {[processType : string]: string};
-    public processOptions : {[processType : string]: IProcessOptions};
+    public processProperties : {[processType : string]: IProcessProperties};
     public $get;
 
     constructor () {
         this.templates = {};
-        this.processOptions = {};
+        this.processProperties = {};
 
         this.$get = ["$injector", ($injector) => {
             return new Service(this, $injector);
@@ -78,11 +78,11 @@ export class Service {
         return this.provider.templates[processType];
     }
 
-    public getProcessOptions(processType : string) : IProcessOptions {
-        if (!this.provider.processOptions.hasOwnProperty(processType)) {
+    public getProcessProperties(processType : string) : IProcessProperties {
+        if (!this.provider.processProperties.hasOwnProperty(processType)) {
             return;
         }
-        return this.provider.processOptions[processType];
+        return this.provider.processProperties[processType];
     }
 }
 
@@ -138,7 +138,7 @@ export var processViewDirective = (
         link: (scope, element) => {
             adhTopLevelState.on("processType", (processType) => {
                 if (processType) {
-                    scope.processOptions = adhProcess.getProcessOptions(processType);
+                    scope.processProperties = adhProcess.getProcessProperties(processType);
                     var template = adhProcess.getTemplate(processType);
                     element.html(template);
                     $compile(element.contents())(scope);

@@ -41,9 +41,9 @@ export var register = (angular) => {
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             _.forEach([RIEuthProcess, RIEuthPrivateProcess], (processType) => {
                 adhProcessProvider.templates[processType.content_type] =
-                    "<adh-idea-collection-workbench data-process-options=\"processOptions\">" +
+                    "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
                     "</adh-idea-collection-workbench>";
-                adhProcessProvider.processOptions[processType.content_type] = {
+                adhProcessProvider.processProperties[processType.content_type] = {
                     hasImage: true,
                     proposalClass: RIProposal,
                     proposalVersionClass: RIProposalVersion
