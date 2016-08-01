@@ -37,7 +37,3 @@
     @include rem(padding, 0 30px);
     font-weight: $font-weight-extrovert;
 }
-
-.button, .button-cta, .button-cta-secondary {
-    text-transform: capitalize;
-}
