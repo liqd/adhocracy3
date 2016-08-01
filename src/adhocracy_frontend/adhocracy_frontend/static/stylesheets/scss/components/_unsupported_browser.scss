@@ -30,7 +30,7 @@ Banner showing up if the browser is not supported.
 */
 .unsupported-browser {
     @include clearfix;
-    @include rem(padding, 1rem 1rem 0.5rem);
+    @include rem(padding, $padding);
     background: $color-structure-normal;
 
     h1 {

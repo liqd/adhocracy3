@@ -19,7 +19,7 @@
 }
 
 .comment {
-    @include rem(padding, 0 10px);
+    @include rem(padding, 0 $padding);
 }
 
 .comment-children {

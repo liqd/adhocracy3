@@ -49,7 +49,7 @@
 }
 
 .listing-results {
-    @include rem(padding, 1rem);
+    @include rem(padding, $padding);
     border-bottom: 2px solid $color-structure-normal;
 }
 

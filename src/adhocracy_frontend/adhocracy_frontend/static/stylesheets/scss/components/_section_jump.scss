@@ -48,7 +48,7 @@ A widget with a header, a left navigation and a main section.
 }
 
 .section-jump-cover {
-    @include rem(padding, 15px 10px 10px);
+    @include rem(padding, $padding);
     border-bottom: 2px solid $color-structure-normal;
 
     @media print {

@@ -46,10 +46,10 @@ $thumbnail-width: 105px;
 
 .list-item {
     @include container;
+    @include rem(padding, 1.25em $padding);
     display: block;
     border-bottom: 2px solid $color-structure-normal;
     position: relative;
-    padding: 1.25em 1em;
 
     // reset link styling
     &, &:hover, &:focus {

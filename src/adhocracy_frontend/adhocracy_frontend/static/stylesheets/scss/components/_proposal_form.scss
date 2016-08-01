@@ -27,10 +27,10 @@ A simple proposal form.
 
 .proposal-form {
     .form-footer {
-        @include rem(padding, 0 1rem);
+        @include rem(padding, 0 $padding);
     }
 }
 
 .proposal-form-upper {
-    @include rem(padding, 1rem);
+    @include rem(padding, $padding);
 }

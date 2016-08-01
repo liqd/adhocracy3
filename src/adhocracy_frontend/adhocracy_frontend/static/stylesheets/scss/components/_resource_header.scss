@@ -32,8 +32,8 @@ actions (edit, share, report, print, ...).
 */
 .resource-header {
     position: relative;
-    padding: $padding-small;
-    margin-bottom: $padding-small;
+    padding: $padding;
+    margin-bottom: $padding;
     z-index: 0;
 }
 
@@ -79,8 +79,8 @@ actions (edit, share, report, print, ...).
 
 .resource-header-actions {
     position: absolute;
-    right: $padding-small;
-    top: $padding-small;
+    right: 0;
+    top: 0;
 }
 
 .resource-header-breadcrumbs {

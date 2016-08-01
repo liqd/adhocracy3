@@ -112,7 +112,7 @@ textarea {
     }
 
     @include rem(margin-bottom, 0.5rem);
-    @include rem(padding, 0.25rem 1rem);
+    @include rem(padding, 0.25rem $padding);
     display: block;
     width: 100%;
     border: 1px solid $color-structure-introvert;
