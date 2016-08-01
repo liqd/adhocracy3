@@ -1,6 +1,8 @@
 """image resource type."""
 import io
 
+from pyramid.authentication import Everyone
+from pyramid.authorization import Allow
 from pyramid.response import FileResponse
 from pyramid.registry import Registry
 from substanced.file import File
@@ -8,7 +10,9 @@ from PIL import Image
 from ZODB.blob import BlobError
 import transaction
 
+from adhocracy_core.authorization import set_acl
 from adhocracy_core.interfaces import Dimensions
+from adhocracy_core.interfaces import IResource
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.asset import IAsset
 from adhocracy_core.resources.asset import IAssetDownload
@@ -17,6 +21,13 @@ from adhocracy_core.resources.asset import asset_download_meta
 from adhocracy_core.resources.asset import asset_meta
 from adhocracy_core.utils import get_matching_isheet
 import adhocracy_core.sheets.image
+
+
+def allow_view_eveyone(context: IResource, registry: Registry,
+                       options: dict):
+    """Add view permission for everyone for `context`."""
+    acl = [(Allow, Everyone, 'view')]
+    set_acl(context, acl, registry=registry)
 
 
 class IImageDownload(IAssetDownload):
@@ -120,7 +131,7 @@ image_download_meta = asset_download_meta._replace(
     iresource=IImageDownload,
     use_autonaming=True,
     content_class=ImageDownload,
-)
+)._add(after_creation=(allow_view_eveyone,))
 
 
 class IImage(IAsset):

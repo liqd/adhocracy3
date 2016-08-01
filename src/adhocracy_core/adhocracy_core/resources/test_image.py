@@ -45,6 +45,8 @@ class TestImageDownload:
         assert issubclass(meta.content_class, asset.AssetDownload)
         assert meta.permission_create == 'create_asset_download'
         assert meta.use_autonaming
+        assert meta.after_creation == (image.allow_view_eveyone,
+                                       )
 
     def test_get_response_return_asset_parent_data(self, inst, registry,
                                                    mock_sheet, asset):
@@ -98,6 +100,15 @@ class TestImageDownload:
         response = inst.get_response(registry)
         assert response is inst._get_response.return_value
         inst._upload_crop_and_resize.assert_called_with(original)
+
+    def test_allow_view_everyone(context, registry, mocker):
+        from . import image
+        from .image import allow_view_eveyone
+        set_acl = mocker.spy(image, 'set_acl')
+        allow_view_eveyone(context, registry, {})
+        set_acl.assert_called_with(context,
+                                   [('Allow', 'system.Everyone', 'view')],
+                                   registry=registry)
 
     @fixture
     def mock_file(self, mock_open):
@@ -246,4 +257,3 @@ class TestImage:
         assert meta['detail'].dimensions == Dimensions(height=800, width=800)
         assert meta['thumbnail'] == res['0000001']
         assert meta['thumbnail'].dimensions == Dimensions(height=100, width=100)
-
