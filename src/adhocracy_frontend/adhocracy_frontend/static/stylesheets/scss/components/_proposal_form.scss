@@ -26,8 +26,6 @@ A simple proposal form.
 */
 
 .proposal-form {
-    padding: 0;
-
     .form-footer {
         @include rem(padding, 0 1rem);
     }
