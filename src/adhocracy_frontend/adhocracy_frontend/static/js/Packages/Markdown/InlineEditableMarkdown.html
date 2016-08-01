@@ -4,7 +4,7 @@
         <adh-parse-markdown
             data-ng-if="! isEditing"
             data-parsetext="parsetext"></adh-parse-markdown>
-        <textarea 
+        <textarea
             placeholder="{{ title }}"
             data-ng-if="isEditing"
             data-ng-model="$parent.parsetext"></textarea>
@@ -14,7 +14,7 @@
             data-ng-if="isEditable && ! isEditing"
             data-ng-click="startEditing()"
         ><span>{{ "TR__EDIT_TITLE" | translate:{title: title} }}</span></a>
-        <adh-help-link 
+        <adh-help-link
             data-ng-if="isEditing"
             data-support-url="https://simplemde.com/markdown-guide"></adh-help-link>
         <a href="" class="button-cta-secondary inline-editable-markdown-submit-button"
