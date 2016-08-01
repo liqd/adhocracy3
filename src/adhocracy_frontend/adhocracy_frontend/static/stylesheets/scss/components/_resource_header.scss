@@ -18,14 +18,16 @@ actions (edit, share, report, print, ...).
         </div>
         <a href="#" class="resource-header-actions">…</a>
     </div>
-    <div class="resource-header-main">
-        <h1 class="resource-header-title">Johannisthal</h1>
-        <ul class="resource-header-meta">
-            <li>Bebauungsplanverfahren 184a</li>
-            <li>Öffentliche auslegung</li>
-            <li>22.9.-22.10.15</li>
-        </ul>
-        <div class="resource-header-action"><a href="#" class="button-cta">Create proposal</a></div>
+    <div class="resource-header-main-wrapper">
+        <div class="resource-header-main">
+            <h1 class="resource-header-title">Johannisthal</h1>
+            <ul class="resource-header-meta">
+                <li>Bebauungsplanverfahren 184a</li>
+                <li>Öffentliche auslegung</li>
+                <li>22.9.-22.10.15</li>
+            </ul>
+            <div class="resource-header-action"><a href="#" class="button-cta">Create proposal</a></div>
+        </div>
     </div>
 </header>
 ```
@@ -35,6 +37,10 @@ actions (edit, share, report, print, ...).
     padding: $padding-small;
     margin-bottom: $padding-small;
     z-index: 0;
+}
+
+.resource-header-main-wrapper {
+    padding: 1px;  // clear margins
 }
 
 .resource-header-main {
@@ -110,22 +116,26 @@ Resource headers can have a background image.
         <a href="#" class="resource-header-actions">…</a>
     </div>
     <div class="image-background" style="background-image: url('/static/images/sample.jpg')">
-        <div class="resource-header-main">
-            <h1 class="resource-header-title">Johannisthal</h1>
-            <ul class="resource-header-meta">
-                <li>Bebauungsplanverfahren 184a</li>
-                <li>Öffentliche auslegung</li>
-                <li>22.9.-22.10.15</li>
-            </ul>
-            <div class="resource-header-action"><a href="#" class="button-cta">Create proposal</a></div>
+        <div class="resource-header-main-wrapper">
+            <div class="resource-header-main">
+                <h1 class="resource-header-title">Johannisthal</h1>
+                <ul class="resource-header-meta">
+                    <li>Bebauungsplanverfahren 184a</li>
+                    <li>Öffentliche auslegung</li>
+                    <li>22.9.-22.10.15</li>
+                </ul>
+                <div class="resource-header-action"><a href="#" class="button-cta">Create proposal</a></div>
+            </div>
         </div>
     </div>
 </header>
 ```
 */
 .resource-header.m-image {
-    color: $color-text-inverted;
-    background: rgba($color-brand-one-introvert, 0.8);
+    .resource-header-main-wrapper {
+        color: $color-text-inverted;
+        background: rgba($color-brand-one-introvert, 0.8);
+    }
 
     .resource-header-title,
     .resource-header-meta {
