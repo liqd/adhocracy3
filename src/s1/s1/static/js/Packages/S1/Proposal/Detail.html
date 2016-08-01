@@ -39,7 +39,10 @@
         </adh-background-image>
     </header>
 
-    <div class="s1-proposal-detail-text">
+    <section class="proposal-detail-body">
+        <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="disguised-link proposal-detail-body-comments">
+            <i class="icon-speechbubble"></i> {{ data.commentCount }}
+        </a>
         <adh-parse-markdown data-parsetext="data.description"></adh-parse-markdown>
-    </div>
+    </section>
 </div>
