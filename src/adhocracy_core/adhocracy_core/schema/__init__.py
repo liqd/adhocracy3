@@ -24,7 +24,6 @@ from colander import String as StringType
 from colander import deferred
 from colander import drop
 from colander import null
-from colander import required
 from deform.widget import DateTimeInputWidget
 from deform.widget import SequenceWidget
 from deform.widget import Select2Widget
@@ -989,12 +988,10 @@ class ACEPrincipal(SchemaNode):
         return SelectWidget(values=values)
 
 
-
 class ACEPrincipals(SequenceSchema):
     """List of Adhocracy :term:`role` or pyramid system principal."""
 
     principal = ACEPrincipal()
-
 
 
 class ACMCell(SchemaNode):
