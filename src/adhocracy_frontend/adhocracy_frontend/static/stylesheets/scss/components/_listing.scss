@@ -59,6 +59,10 @@ a form for creating new elements. This form is then always visible.
     margin-top: 0;
 }
 
+.listing-empty-text {
+    @include rem(padding, $padding);
+}
+
 .load-more {
     display: block;
     line-height: 2;
