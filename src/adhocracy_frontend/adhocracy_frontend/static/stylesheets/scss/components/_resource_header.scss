@@ -7,16 +7,9 @@ category: Widgets
 
 The resource header should be used as a consistent header for resources such as
 processes, proposals or documents. It contains a title, some meta-information,
-a primary action (e.g. create proposal or like) and a dropdown with resource
-actions (edit, share, report, print, ...).
+and a primary action (e.g. create proposal or like).
 
 ```html_example
-<div class="resource-navigation">
-    <div class="resource-navigation-breadcrumbs">
-        <a href="#">← to process</a>
-    </div>
-    <a href="#" class="resource-navigation-actions">…</a>
-</div>
 <header class="resource-header">
     <div class="resource-header-main-wrapper">
         <div class="resource-header-main">
@@ -83,26 +76,6 @@ actions (edit, share, report, print, ...).
     }
 }
 
-.resource-navigation {
-    padding: $padding;
-}
-
-.resource-navigation-actions {
-    position: absolute;
-    right: 0;
-    top: 0;
-}
-
-.resource-navigation-breadcrumbs {
-    a {
-        color: inherit;
-        text-transform: uppercase;
-        text-decoration: none;
-        font-size: $font-size-small;
-        font-weight: bold;
-    }
-}
-
 /*doc
 ---
 title: image modifier
@@ -113,12 +86,6 @@ parent: resource-header
 Resource headers can have a background image.
 
 ```html_example
-<div class="resource-navigation">
-    <div class="resource-navigation-breadcrumbs">
-        <a href="#">← to process</a>
-    </div>
-    <a href="#" class="resource-navigation-actions">…</a>
-</div>
 <header class="resource-header m-image">
     <div class="image-background" style="background-image: url('/static/images/sample.jpg')">
         <div class="resource-header-main-wrapper">
@@ -145,5 +112,50 @@ Resource headers can have a background image.
     .resource-header-title,
     .resource-header-meta {
         color: inherit;
+    }
+}
+
+/*doc
+---
+title: Resource Navigation
+name: resource-navigation
+parent: resource-header
+---
+
+The resource navigation is usually displayed above the resource header, but it
+may also be used on its own. It contains breadcrumbs and a dropdown with
+resource actions (edit, share, report, print, ...).
+
+```html_example
+<div class="resource-navigation">
+    <nav class="resource-navigation-breadcrumbs">
+        <a href="#">← to process</a>
+        <a href="#">← to propoposal</a>
+    </nav>
+    <div class="dropdown m-right resource-navigation-actions">
+        <a href="#" class="dropdown-button">
+            <i class="icon-three-dots"></i>
+        </a>
+    </div>
+</div>
+```
+*/
+.resource-navigation {
+    padding: $padding;
+}
+
+.resource-navigation-actions {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.resource-navigation-breadcrumbs {
+    a {
+        color: inherit;
+        text-transform: uppercase;
+        text-decoration: none;
+        font-size: $font-size-small;
+        font-weight: bold;
     }
 }
