@@ -11,13 +11,13 @@ a primary action (e.g. create proposal or like) and a dropdown with resource
 actions (edit, share, report, print, ...).
 
 ```html_example
-<header class="resource-header">
-    <div class="resource-navigation">
-        <div class="resource-navigation-breadcrumbs">
-            <a href="#">← to process</a>
-        </div>
-        <a href="#" class="resource-navigation-actions">…</a>
+<div class="resource-navigation">
+    <div class="resource-navigation-breadcrumbs">
+        <a href="#">← to process</a>
     </div>
+    <a href="#" class="resource-navigation-actions">…</a>
+</div>
+<header class="resource-header">
     <div class="resource-header-main-wrapper">
         <div class="resource-header-main">
             <h1 class="resource-header-title">Johannisthal</h1>
@@ -83,6 +83,10 @@ actions (edit, share, report, print, ...).
     }
 }
 
+.resource-navigation {
+    padding: $padding;
+}
+
 .resource-navigation-actions {
     position: absolute;
     right: 0;
@@ -109,13 +113,13 @@ parent: resource-header
 Resource headers can have a background image.
 
 ```html_example
-<header class="resource-header m-image">
-    <div class="resource-navigation">
-        <div class="resource-navigation-breadcrumbs">
-            <a href="#">← to process</a>
-        </div>
-        <a href="#" class="resource-navigation-actions">…</a>
+<div class="resource-navigation">
+    <div class="resource-navigation-breadcrumbs">
+        <a href="#">← to process</a>
     </div>
+    <a href="#" class="resource-navigation-actions">…</a>
+</div>
+<header class="resource-header m-image">
     <div class="image-background" style="background-image: url('/static/images/sample.jpg')">
         <div class="resource-header-main-wrapper">
             <div class="resource-header-main">
