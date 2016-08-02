@@ -12,11 +12,11 @@ actions (edit, share, report, print, ...).
 
 ```html_example
 <header class="resource-header">
-    <div class="resource-header-navigation">
-        <div class="resource-header-breadcrumbs">
+    <div class="resource-navigation">
+        <div class="resource-navigation-breadcrumbs">
             <a href="#">← to process</a>
         </div>
-        <a href="#" class="resource-header-actions">…</a>
+        <a href="#" class="resource-navigation-actions">…</a>
     </div>
     <div class="resource-header-main-wrapper">
         <div class="resource-header-main">
@@ -83,13 +83,13 @@ actions (edit, share, report, print, ...).
     }
 }
 
-.resource-header-actions {
+.resource-navigation-actions {
     position: absolute;
     right: 0;
     top: 0;
 }
 
-.resource-header-breadcrumbs {
+.resource-navigation-breadcrumbs {
     a {
         color: inherit;
         text-transform: uppercase;
@@ -109,11 +109,11 @@ Resource headers can have a background image.
 
 ```html_example
 <header class="resource-header m-image">
-    <div class="resource-header-navigation">
-        <div class="resource-header-breadcrumbs">
+    <div class="resource-navigation">
+        <div class="resource-navigation-breadcrumbs">
             <a href="#">← to process</a>
         </div>
-        <a href="#" class="resource-header-actions">…</a>
+        <a href="#" class="resource-navigation-actions">…</a>
     </div>
     <div class="image-background" style="background-image: url('/static/images/sample.jpg')">
         <div class="resource-header-main-wrapper">
