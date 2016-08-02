@@ -1,17 +1,3 @@
-/*doc
----
-title: Action section button mixin
-name: action-section-button-mixin
-category: Widgets
----
-
-A mixin to style a button used with a section
-
-```html_example
-<a class="action-section-button"><i class="icon-speechbubble"></i>12</a>
-```
-*/
-
 @mixin action-section-button {
     @include disguised-link;
     @include rem(font-size, $font-size-small);
@@ -35,9 +21,9 @@ A mixin to style a button used with a section
 
 /*doc
 ---
-title: Action section
+title: Action Section
 name: action-section
-category: Widgets
+category: Components
 ---
 
 A section of any content with a corresponding 'action button' EG Show Comments

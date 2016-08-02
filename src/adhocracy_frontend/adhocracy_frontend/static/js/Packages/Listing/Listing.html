@@ -7,7 +7,7 @@
     </div>
     <div class="action-bar" data-ng-if="facets.length > 0 || sorts.length > 1">
         <a data-ng-if="facets.length > 0" class="action-bar-item" data-ng-class="{ 'm-selected': showFilter }" data-ng-click="toggleFilter();" href="">{{ "TR__FILTER_BY" | translate }}</a>
-        <span class="facet-group" data-ng-repeat="facet in facets">
+        <span data-ng-repeat="facet in facets">
             <a
                 href=""
                 title="{{ item.name | translate }}"
@@ -23,7 +23,7 @@
     </div>
     <div class="listing-results" data-ng-if="showFilter || showSort">
         <adh-facets data-ng-if="showFilter" data-facets="facets" data-update="update" data-toggle-item="toggleItem" data-enable-item="enableItem" data-disable-item="disableItem"></adh-facets>
-        <div data-ng-if="showSort">
+        <div class="sorts" data-ng-if="showSort">
             <h3 class="sort-header">{{ "TR__SORT_BY" | translate }}</h3>
             <a
                 href=""
