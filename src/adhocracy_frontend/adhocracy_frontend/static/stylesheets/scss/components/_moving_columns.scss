@@ -21,48 +21,27 @@ States:
 -   is-show-show-collapse
 
 ```html_example
-<div class="moving-columns" style="height: 10em; position: relative;">
-    <div class="moving-column moving-column-structure">
-        <div class="debug-placeholder moving-column-menu">
-            <a>action</a>
-        </div>
-        <div class="debug-placeholder moving-column-body">structure column
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-        </div>
+<div class="moving-columns is-collapse-show-hide" style="height: 10em; position: relative;">
+    <div class="moving-column is-collapse" style="width: 2em; left: calc(25% - 1em)">
+        <div class="moving-column-menu">menu</div>
+        <div class="moving-column-body">body</div>
+        <div class="moving-column-collapsed">collapsed</div>
     </div>
-    <div class="moving-column moving-column-content">
-        <div class="debug-placeholder moving-column-menu">menu</div>
-        <div class="debug-placeholder moving-column-body">content column</div>
+    <div class="moving-column is-show" style="width: 50%; left: calc(25% + 1em)">
+        <div class="moving-column-menu">menu</div>
+        <div class="moving-column-body">
+            <p>Quis sed iusto minus. Distinctio veritatis quisquam quam dolores laborum voluptas. Ducimus voluptas occaecati quod labore eum eos quo neque. Ullam molestias eos recusandae et. Non alias tempora dolor repudiandae animi sunt est non. Saepe dolor qui neque est fuga rerum dolores sunt.</p>
+            <p>Delectus sed amet a autem quod in. Suscipit repellat ratione aperiam voluptates est unde qui. Atque aut dicta asperiores saepe deserunt quo. Laudantium aut beatae excepturi sed.</p>
+            <p>Harum omnis minus nobis possimus. Aut nihil eveniet doloremque ducimus. Illo quam et mollitia. Eaque libero et est facilis non perferendis. Quia et ipsum similique ipsa.</p>
+        </div>
+        <div class="moving-column-collapsed">collapsed</div>
     </div>
-    <div class="moving-column moving-column-content2">
-        <div class="debug-placeholder moving-column-menu">menu</div>
-        <div class="debug-placeholder moving-column-body">secondary-content-column</div>
+    <div class="moving-column is-hide" style="width: 0%; left: calc(75% + 1em)">
+        <div class="moving-column-menu">menu</div>
+        <div class="moving-column-body">body</div>
+        <div class="moving-column-collapsed">collapsed</div>
     </div>
 </div>
-<a onclick="$('.moving-columns').toggleClass('is-collapse-show-show')">click me</a>
 ```
 */
 
@@ -181,23 +160,17 @@ name: moving-column-menu
 parent: moving-columns
 ---
 
-States:
-
--   `is-show` (*default*)
--   `is-hidden`
--   `is-collapsed`
-
 **Warning**: This widget currently has a fixed height.
 
 ```html_example
 <div class="moving-column-menu">
-    <span class="debug-placeholder">icon</span>
-    <span class="debug-placeholder">button</span>
-    <span class="debug-placeholder">button</span>
-    <span class="debug-placeholder">button</span>
-    <span class="debug-placeholder">button</span>
-    <span class="debug-placeholder">icon</span>
-    <span class="debug-placeholder">icon</span>
+    <i class="icon-speechbubble-unfilled moving-column-icon"></i>
+    <div class="moving-column-menu-nav">
+        <a
+            class="moving-column-menu-nav-button"
+            href="#"
+            title="close"><i class="icon-x moving-column-menu-nav-icon"></i></a>
+    </div>
 </div>
 ```
 */
