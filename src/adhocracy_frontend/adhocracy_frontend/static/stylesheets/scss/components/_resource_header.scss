@@ -141,16 +141,17 @@ resource actions (edit, share, report, print, ...).
 ```
 */
 .resource-navigation {
+    @include pie-clearfix;
     padding: $padding;
 }
 
 .resource-navigation-actions {
-    position: absolute;
-    right: 0;
-    top: 0;
+    float: right;
 }
 
 .resource-navigation-breadcrumbs {
+    float: left;
+
     a {
         color: inherit;
         text-transform: uppercase;
