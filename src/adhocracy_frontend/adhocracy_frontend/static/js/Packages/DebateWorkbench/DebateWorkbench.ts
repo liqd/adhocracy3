@@ -53,8 +53,7 @@ export var documentDetailColumnDirective = (
 
 export var documentCreateColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhResourceUrl
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
@@ -67,8 +66,7 @@ export var documentCreateColumnDirective = (
 
 export var documentEditColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhResourceUrl
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
