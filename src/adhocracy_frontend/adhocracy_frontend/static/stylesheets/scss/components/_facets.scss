@@ -5,8 +5,9 @@ name: facets
 parent: listing
 ---
 
-Facets can be used to filter a collection. From each facet, a user can choose a
-single item.
+Facets can be used to filter a list. From each facet, a user can choose a single item,
+e.g. from the budget facet, the user may choose "0 - 5000 €" to display only proposals
+with budgets in that range.
 
 ```html_example
 <div class="facets">
@@ -115,9 +116,8 @@ name: facet-toggle
 parent: facets
 ---
 
-If facets are collapsed, facet toggles can be used to indicate the currently
-selected items in a compact way. By clicking on it, you can deactivate the
-facet item.
+When facets are collapsed, facet toggles indicate the currently selected items
+in a compact way. By clicking on it, you can deactivate the facet item.
 
 ```html_example
 <a href="#" class="facet-toggle">
