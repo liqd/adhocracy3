@@ -11,34 +11,21 @@ and a primary action (e.g. create proposal or like).
 
 ```html_example
 <header class="resource-header">
-    <div class="resource-header-main-wrapper">
-        <div class="resource-header-main">
-            <h1 class="resource-header-title">Johannisthal</h1>
-            <ul class="resource-header-meta">
-                <li>Bebauungsplanverfahren 184a</li>
-                <li>Öffentliche auslegung</li>
-                <li>22.9.-22.10.15</li>
-            </ul>
-            <div class="resource-header-action"><a href="#" class="button-cta">Create proposal</a></div>
-        </div>
-    </div>
+    <h1 class="resource-header-title">Johannisthal</h1>
+    <ul class="resource-header-meta">
+        <li>Bebauungsplanverfahren 184a</li>
+        <li>Öffentliche auslegung</li>
+        <li>22.9.-22.10.15</li>
+    </ul>
+    <div class="resource-header-action"><a href="#" class="button-cta">Create proposal</a></div>
 </header>
 ```
 */
 .resource-header {
+    @include rem(padding, 3rem 4rem 4rem);
     position: relative;
-    padding: $padding;
     margin-bottom: $padding;
     z-index: 0;
-}
-
-.resource-header-main-wrapper {
-    padding: 1px;  // clear margins
-}
-
-.resource-header-main {
-    @include rem(margin, 3em auto 4rem);
-    max-width: 40em;
     text-align: center;
 }
 
@@ -86,28 +73,22 @@ parent: resource-header
 Resource headers can have a background image.
 
 ```html_example
-<header class="resource-header m-image">
-    <div class="image-background" style="background-image: url('/static/images/sample.jpg')">
-        <div class="resource-header-main-wrapper">
-            <div class="resource-header-main">
-                <h1 class="resource-header-title">Johannisthal</h1>
-                <ul class="resource-header-meta">
-                    <li>Bebauungsplanverfahren 184a</li>
-                    <li>Öffentliche auslegung</li>
-                    <li>22.9.-22.10.15</li>
-                </ul>
-                <div class="resource-header-action"><a href="#" class="button-cta">Create proposal</a></div>
-            </div>
-        </div>
-    </div>
-</header>
+<div class="image-background" style="background-image: url('/static/images/sample.jpg')">
+    <header class="resource-header m-image">
+        <h1 class="resource-header-title">Johannisthal</h1>
+        <ul class="resource-header-meta">
+            <li>Bebauungsplanverfahren 184a</li>
+            <li>Öffentliche auslegung</li>
+            <li>22.9.-22.10.15</li>
+        </ul>
+        <div class="resource-header-action"><a href="#" class="button-cta">Create proposal</a></div>
+    </header>
+</div>
 ```
 */
 .resource-header.m-image {
-    .resource-header-main-wrapper {
-        color: $color-text-inverted;
-        background: rgba($color-brand-one-introvert, 0.8);
-    }
+    color: $color-text-inverted;
+    background: rgba($color-brand-one-introvert, 0.8);
 
     .resource-header-title,
     .resource-header-meta {
