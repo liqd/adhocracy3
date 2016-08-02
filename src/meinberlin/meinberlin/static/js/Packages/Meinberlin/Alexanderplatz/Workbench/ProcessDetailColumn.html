@@ -1,4 +1,4 @@
-<div data-ng-switch="transclusionId" class="tabset m-full-width m-button-style">
+<div data-ng-switch="transclusionId">
     <div data-ng-switch-when="menu">
         <div class="moving-column-tab" data-ng-if="!data.isShowMap">
             <i class="icon-list-column moving-column-icon"></i>
@@ -21,20 +21,16 @@
         <div class="action-bar">
             <adh-map-switch data-model="data.isShowMap"></adh-map-switch>
         </div>
-        <ul class="tabset-tabs">
-            <li class="tab"
-                data-ng-class="{'is-active': tab === 'proposals'}">
+        <div class="tabs">
             <a
-                class="tab-button"
+                class="tab"
+                data-ng-class="{'is-active': tab === 'proposals'}"
                 data-ng-href="{{ processUrl | adhResourceUrl:'proposals' }}">{{ "TR__PROPOSALS" | translate }}</a>
-            </li>
-            <li class="tab"
-                data-ng-class="{'is-active': tab === 'documents'}">
-                <a
-                    class="tab-button"
-                    data-ng-href="{{ processUrl | adhResourceUrl }}">{{ "TR__MEINBERLIN_ALEXANDERPLATZ_DOCUMENT" | translate }}</a>
-            </li>
-        </ul>
+            <a
+                class="tab"
+                data-ng-class="{'is-active': tab === 'documents'}"
+                data-ng-href="{{ processUrl | adhResourceUrl }}">{{ "TR__MEINBERLIN_ALEXANDERPLATZ_DOCUMENT" | translate }}</a>
+        </div>
 
         <div data-ng-if="tab === 'proposals'">
             <div

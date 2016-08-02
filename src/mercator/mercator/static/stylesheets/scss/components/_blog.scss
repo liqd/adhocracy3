@@ -1,38 +1,3 @@
-.blog-tabs {
-    @include rem(font-size, $font-size-small);
-    @include rem(line-height, 30px);
-    border: 2px solid $color-structure-normal;
-    border-width: 2px 0 3px;
-    clear: left;
-    overflow: hidden;
-    text-transform: uppercase;
-}
-
-.blog-tab {
-    background: $color-background-base-introvert;
-    color: $color-text-introvert;
-    text-align: center;
-    float: left;
-    text-decoration: none;
-    width: 50%;
-
-    &:first-child {
-        border-right: 2px solid $color-structure-normal;
-    }
-
-    &:last-child {
-        border-left: 2px solid $color-structure-normal;
-    }
-
-    &:hover, &:focus, &:active, &.is-active {
-        background: $color-background-base;
-    }
-
-    &:active, &.is-active {
-        color: $color-text-highlight-normal;
-    }
-}
-
 .blog {
     .document-form {
         @include rem(padding, 1rem);
