@@ -14,14 +14,16 @@
             data-css-path="document-detail-image"
             data-no-fallback="true"
             data-path="{{data.picture}}">
-            <div class="resource-header-main">
-                <h1 class="resource-header-title">{{ data.title }}</h1>
+            <div class="resource-header-main-wrapper">
+                <div class="resource-header-main">
+                    <h1 class="resource-header-title">{{ data.title }}</h1>
 
-                <ul class="resource-header-meta">
-                    <li>
-                        <i class="icon-speechbubble"></i> {{ data.commentCountTotal }} {{ "TR__COMMENTS_TOTAL" | translate }}
-                    </li>
-                </ul>
+                    <ul class="resource-header-meta">
+                        <li>
+                            <i class="icon-speechbubble"></i> {{ data.commentCountTotal }} {{ "TR__COMMENTS_TOTAL" | translate }}
+                        </li>
+                    </ul>
+                </div>
             </div>
         </adh-background-image>
     </header>

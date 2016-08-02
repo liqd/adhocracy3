@@ -21,10 +21,6 @@
     <adh-recompile-on-change
         data-ng-switch-when="body"
         data-value="{{proposalUrl}}">
-        <adh-resource-actions
-            data-resource-path="{{proposalUrl | adhParentPath}}"
-            data-edit="true">
-        </adh-resource-actions>
         <adh-idea-collection-proposal-detail
             data-ng-if="proposalUrl"
             data-path="{{proposalUrl}}"
