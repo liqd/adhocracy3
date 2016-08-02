@@ -187,6 +187,17 @@ Add a + sign to a button
 }
 
 
+/*doc
+---
+title: Help Link
+name: help-link
+category: Widgets
+---
+
+```html_example
+<a href="#" class="help-link" title="Help">?</a>
+```
+*/
 .help-link {
     @extend .button-cta-secondary;
     @include rem(min-width, unquote("#{$button-line-height}rem"));

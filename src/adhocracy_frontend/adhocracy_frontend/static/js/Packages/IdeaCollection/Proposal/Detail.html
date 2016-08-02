@@ -1,4 +1,4 @@
-<article class="proposal-detail">
+<article>
     <header class="resource-header" data-ng-class="{'m-image': data.picture}">
         <div class="resource-header-navigation">
             <adh-resource-dropdown
@@ -14,7 +14,6 @@
             </adh-resource-dropdown>
         </div>
         <adh-background-image
-            data-css-path="proposal-detail-image"
             data-no-fallback="true"
             data-path="{{data.picture}}">
             <div class="resource-header-main-wrapper">
@@ -37,7 +36,7 @@
                             <i class="icon-pin-detail"></i> {{data.locationText}}
                         </li>
                         <li data-ng-if="processProperties.maxBudget">
-                            <i class="proposal-detail-meta-item-icon icon-budget"></i> {{data.budget | numberOrDash}} &euro;
+                            <i class="icon-budget"></i> {{data.budget | numberOrDash}} &euro;
                         </li>
                         <li>
                             {{ "TR__BY" | translate }} <adh-user-meta data-path="{{data.creator}}" data-ng-if="data.creator"></adh-user-meta>
@@ -60,14 +59,14 @@
     </header>
 
 
-    <section class="proposal-detail-body">
-        <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="disguised-link proposal-detail-body-comments">
+    <section class="action-section">
+        <p>{{data.detail}}</p>
+        <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="action-section-button">
             <i class="icon-speechbubble"></i> {{ data.commentCount }}
         </a>
-        <p class="proposal-detail-detail">{{data.detail}}</p>
     </section>
 
-    <section class="proposal-badge-descriptions">
+    <section>
         <div
             data-ng-repeat="assignment in data.assignments"
             data-ng-if="assignment.description"

@@ -32,7 +32,7 @@ A user list item within a listing widget
 */
 
 .user-list-item-link {
-    @include rem(padding, 20px 20px 20px 1rem);
+    @include rem(padding, $padding);
     background: $color-background-base-introvert;
     border-bottom: 2px solid $color-structure-normal;
     display: block;

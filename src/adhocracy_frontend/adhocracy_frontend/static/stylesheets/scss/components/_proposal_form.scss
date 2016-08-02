@@ -26,22 +26,11 @@ A simple proposal form.
 */
 
 .proposal-form {
-    padding: 0;
-
-    label,
-    .input-error {
-        display: block;
-    }
-
-    .map-buttons {
-        background: $color-background-base;
-    }
-
     .form-footer {
-        @include rem(padding, 0 1rem);
+        @include rem(padding, 0 $padding);
     }
 }
 
 .proposal-form-upper {
-    @include rem(padding, 1rem);
+    @include rem(padding, $padding);
 }

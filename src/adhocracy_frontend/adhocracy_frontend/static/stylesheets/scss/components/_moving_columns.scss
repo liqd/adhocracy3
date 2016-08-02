@@ -206,7 +206,7 @@ States:
     @include rem(font-size, $font-size-small);
     @include rem(height, $moving-column-menu-height);
     @include rem(line-height, $moving-column-menu-height);
-    @include rem(padding, 0 0 0 $padding-small);
+    @include rem(padding, 0 0 0 $padding);
     background: $color-structure-normal;
 
     @media print {

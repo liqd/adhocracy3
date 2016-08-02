@@ -13,7 +13,7 @@ category: Widgets
 
     .map-button-clear,
     .map-button-reset {
-        @include rem(padding, 0 10px);
+        @include rem(padding, 0 $padding);
         display: inline-block;
     }
 }
@@ -41,7 +41,7 @@ time.
 */
 .map-info {
     @include rem(font-size, $font-size-small);
-    @include rem(padding, 5px);
+    @include rem(padding, 5px $padding);
     background: $color-text-normal;
     color: $color-text-inverted;
     width: 100%;
@@ -80,7 +80,7 @@ rather than in response to user action.
 */
 .map-info-persistent {
     @include rem(font-size, $font-size-small);
-    @include rem(padding, 5px);
+    @include rem(padding, 5px $padding);
     background: $color-background-base-introvert;
 }
 

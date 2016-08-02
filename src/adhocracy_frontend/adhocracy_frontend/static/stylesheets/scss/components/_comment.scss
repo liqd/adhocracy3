@@ -55,7 +55,7 @@ is selected, no state is applied.
 
 .comment {
     @include rem(margin, 1rem 0);
-    @include rem(padding, 0 1rem);
+    @include rem(padding, 0 $padding);
 
     &.is-not-selected {
         background: $color-background-base-introvert;

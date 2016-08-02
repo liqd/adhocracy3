@@ -1,11 +1,12 @@
 @import "components/base_theme";
-@import "components/annotated_section_theme";
 @import "components/busy_theme";
-@import "components/jury_decision_theme";
-@import "components/mercator_proposal";
 @import "components/meta_list_theme";
 @import "components/rate_theme";
 @import "components/badges_theme";
-@import "components/rosette_theme";
 @import "components/section_jump_theme";
 @import "print_theme";
+
+@import "components/annotated_section";
+@import "components/jury_decision";
+@import "components/mercator_proposal";
+@import "components/rosette";

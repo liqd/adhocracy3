@@ -65,7 +65,7 @@ States:
 
 .action-section,
 .non-action-section {
-    @include rem(padding, 1rem 48px 30px 1rem);
+    @include rem(padding, 1rem 48px 30px $padding);
     position: relative;
 
     > p:last-of-type {
@@ -83,7 +83,7 @@ States:
     .action-section-button {
         @include action-section-button;
         @include rem(max-width, 36px);
-        @include rem(right, 1rem);
+        @include rem(right, $padding);
         @include rem(top, 1rem);
         position: absolute;
     }
