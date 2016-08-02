@@ -129,8 +129,8 @@ resource actions (edit, share, report, print, ...).
 ```html_example
 <div class="resource-navigation">
     <nav class="resource-navigation-breadcrumbs">
-        <a href="#">← to process</a>
-        <a href="#">← to propoposal</a>
+        <a href="#">to process</a>
+        <a href="#">to propoposal</a>
     </nav>
     <div class="dropdown m-right resource-navigation-actions">
         <a href="#" class="dropdown-button">
@@ -157,5 +157,9 @@ resource actions (edit, share, report, print, ...).
         text-decoration: none;
         font-size: $font-size-small;
         font-weight: bold;
+
+        &:before {
+            content: "← ";
+        }
     }
 }
