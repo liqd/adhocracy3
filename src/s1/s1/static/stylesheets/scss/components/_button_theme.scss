@@ -23,47 +23,6 @@
     }
 }
 
-.button-cta,
-.button-cta-secondary {
-    &:active, &.is-active {
-        color: $color-text-inverted;
-    }
-}
-
-.button-cta-secondary {
-    border: 0;
-    color: $color-text-normal;
-
-    &:hover, &:focus {
-        background: $color-brand-one-introvert;
-    }
-
-    &:active, &.is-active {
-        background: $color-brand-one-extrovert;
-        color: $color-text-inverted;
-    }
-
-    &.m-introvert {
-        color: $color-brand-one-normal;
-    }
-
-    &.ng-disabled,
-    &:disabled {
-        &:hover,
-        &:focus,
-        &:active {
-            background: transparent;
-            color: $color-text-normal;
-        }
-    }
-}
-
-.button-cta {
-    &:active, &.is-active {
-        background: $color-brand-one-extrovert;
-    }
-}
-
 .button-group {
     @include clearfix;
     display: inline-block;
