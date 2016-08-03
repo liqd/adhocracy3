@@ -1,5 +1,7 @@
 <div class="resource-navigation" data-ng-if="cancelUrl">
-    <adh-go-to-came-from data-default="cancelUrl"></adh-go-to-came-from>
+    <div class="resource-navigation-breadcrumbs">
+        <adh-go-to-came-from data-default="cancelUrl"></adh-go-to-came-from>
+    </div>
 </div>
 <form name="imageUpload" data-ng-submit="submit()" data-ng-if="$flow.support" class="image-upload m-standalone">
     <span class="label-text">{{ "TR__IMAGE_UPLOAD" | translate }}</span>
