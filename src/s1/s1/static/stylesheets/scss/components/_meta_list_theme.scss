@@ -5,29 +5,3 @@
         @include rem(margin-right, 23px);
     }
 }
-
-.s1-meta-list-actions {
-    text-align: center;
-
-    .meta-list {
-        display: inline-block;
-        margin: 0 auto;
-    }
-}
-
-.meta-list-item-comments {
-    a {
-        color: $color-brand-one-extrovert;
-        text-decoration: none;
-
-        &:focus, &:hover, &:active {
-            .meta-list-item-comments-icon:before {
-                @extend .icon-speechbubble;
-            }
-        }
-
-        &:active {
-            color: $color-text-highlight-normal;
-        }
-    }
-}
