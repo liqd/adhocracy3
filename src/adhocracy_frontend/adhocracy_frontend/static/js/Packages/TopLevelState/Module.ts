@@ -18,5 +18,6 @@ export var register = (angular) => {
         .directive("adhDefaultHeader", ["adhConfig", "adhTopLevelState", AdhTopLevelState.defaultHeaderDirective])
         .directive("adhRoutingError", ["adhConfig", AdhTopLevelState.routingErrorDirective])
         .directive("adhSpace", ["adhTopLevelState", AdhTopLevelState.spaceDirective])
-        .directive("adhView", ["adhTopLevelState", "$compile", AdhTopLevelState.viewFactory]);
+        .directive("adhView", ["adhTopLevelState", "$compile", AdhTopLevelState.viewFactory])
+        .directive("adhGoToCameFrom", ["adhTopLevelState", AdhTopLevelState.goToCameFromDirective]);
 };
