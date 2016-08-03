@@ -1,4 +1,11 @@
 <div data-ng-switch="transclusionId">
+    <div data-ng-switch-when="menu">
+        <div class="moving-column-menu-nav">
+            <a
+                class="button m-menu-action"
+                data-ng-href="{{ processUrl | adhResourceUrl:meeting }}">{{ 'TR__CLOSE' | translate }} X</a>
+        </div>
+    </div>
     <adh-recompile-on-change
         data-ng-switch-when="body"
         data-value="{{proposalUrl}}">
