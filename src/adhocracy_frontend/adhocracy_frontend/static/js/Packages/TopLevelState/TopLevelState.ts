@@ -496,12 +496,12 @@ export var goToCameFromDirective = (adhTopLevelState : Service) => {
         template: "<div class=\"resource-navigation-breadcrumbs\"><a href=\"\" data-ng-click=\"cancel()\">" +
             "{{\"TR__CANCEL\" | translate}}</a></div>",
         scope: {
-			default: "="
-		},
+            default: "="
+        },
         link: (scope) => {
             scope.cancel = () => {
-				adhTopLevelState.goToCameFrom(scope.default);
-			};
+                adhTopLevelState.goToCameFrom(scope.default);
+            };
         }
     };
 };
