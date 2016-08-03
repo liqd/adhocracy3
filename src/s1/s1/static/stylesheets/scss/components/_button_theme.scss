@@ -3,8 +3,9 @@
 .button-cta-secondary {
     line-height: 2;
     height: 2em;
+    border-radius: 0.4em;
+    border-width: 1px;
     text-transform: uppercase;
-    @include rem(border-radius, 15px);
     font-weight: $font-weight-medium;
 
     &.m-menu-action {
@@ -28,11 +29,11 @@
         float: left;
 
         &:first-child {
-            @include rem(border-radius, 15px 0 0 15px);
+            border-radius: 0.4em 0 0 0.4em;
         }
 
         &:last-child {
-            @include rem(border-radius, 0 15px 15px 0);
+            border-radius: 0 0.4em 0.4em 0;
         }
     }
 }
