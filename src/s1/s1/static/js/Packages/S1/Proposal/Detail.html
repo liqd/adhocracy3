@@ -9,34 +9,29 @@
             data-print="true">
         </adh-resource-dropdown>
     </div>
-    <adh-background-image
-        data-css-path="proposal-detail-image"
-        data-no-fallback="true"
-        data-path="{{data.picture}}">
-        <header class="resource-header" data-ng-class="{'m-image': data.picture}">
-            <h1 class="resource-header-title">{{ data.title }}</h1>
+    <header class="resource-header">
+        <h1 class="resource-header-title">{{ data.title }}</h1>
 
-            <ul class="resource-header-meta">
-                <li>
-                    {{ "TR__BY" | translate }} <adh-user-meta data-path="{{data.creator}}" data-ng-if="data.creator"></adh-user-meta>
-                </li>
-                <li>
-                    {{ "TR__ON" | translate }} <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
-                </li>
-                <li>
-                    {{ data.rateCount }} {{ "TR__SUPPORTERS" | translate }}
-                </li>
-                <li>
-                    <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}"
-                        ><i class="icon-speechbubble"></i> {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}</a>
-                </li>
-            </ul>
+        <ul class="resource-header-meta">
+            <li>
+                {{ "TR__BY" | translate }} <adh-user-meta data-path="{{data.creator}}" data-ng-if="data.creator"></adh-user-meta>
+            </li>
+            <li>
+                {{ "TR__ON" | translate }} <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
+            </li>
+            <li>
+                {{ data.rateCount }} {{ "TR__SUPPORTERS" | translate }}
+            </li>
+            <li>
+                <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}"
+                    ><i class="icon-speechbubble"></i> {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}</a>
+            </li>
+        </ul>
 
-            <div class="resource-header-action">
-                <adh-rate data-refers-to="{{path}}"></adh-rate>
-            </div>
-        </header>
-    </adh-background-image>
+        <div class="resource-header-action">
+            <adh-rate data-refers-to="{{path}}"></adh-rate>
+        </div>
+    </header>
 
     <section class="action-section">
         <adh-parse-markdown data-parsetext="data.description"></adh-parse-markdown>
