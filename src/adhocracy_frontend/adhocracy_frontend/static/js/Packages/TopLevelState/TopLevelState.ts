@@ -488,3 +488,19 @@ export var routingErrorDirective = (adhConfig  : AdhConfig.IService) => {
         }]
     };
 };
+
+
+export var goToCameFromDirective = (adhTopLevelState : Service) => {
+    return {
+        restrict: "E",
+        template: "<a href=\"\" data-ng-click=\"cancel()\">{{\"TR__CANCEL\" | translate}}</a>",
+        scope: {
+            default: "="
+        },
+        link: (scope) => {
+            scope.cancel = () => {
+                adhTopLevelState.goToCameFrom(scope.default);
+            };
+        }
+    };
+};
