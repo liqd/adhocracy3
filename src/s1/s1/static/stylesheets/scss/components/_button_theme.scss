@@ -17,6 +17,10 @@
             color: $color-brand-one-extrovert;
         }
     }
+
+    &.m-round {
+        min-width: 2em;
+    }
 }
 
 .button-group {
