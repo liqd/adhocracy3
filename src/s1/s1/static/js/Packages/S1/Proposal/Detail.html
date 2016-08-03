@@ -35,10 +35,10 @@
         </header>
     </adh-background-image>
 
-    <section class="proposal-detail-body">
-        <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="disguised-link proposal-detail-body-comments">
+    <section class="action-section">
+        <adh-parse-markdown data-parsetext="data.description"></adh-parse-markdown>
+        <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="action-section-button">
             <i class="icon-speechbubble"></i> {{ data.commentCount }}
         </a>
-        <adh-parse-markdown data-parsetext="data.description"></adh-parse-markdown>
     </section>
 </div>
