@@ -4,24 +4,6 @@
     text-transform: uppercase;
 }
 
-/*doc
----
-title: Call-to-action button narrow
-name: button.button-cta.m-narrow
-parent: button
----
-
-Narrower cta button
-
-```html_example
-<a class="button-cta m-narrow" href="">Link</a>
-<button type="button" class="button-cta m-narrow">Button</button>
-<input type="submit" class="button-cta m-narrow" value="Submit" />
-<input type="submit" class="button-cta m-narrow" value="Disabled" disabled="disabled" />
-<a class="button-cta ng-disabled m-narrow" href="">Disabled Link</a>
-```
-*/
-
 .button-cta,
 .button-cta-secondary,
 .button {
@@ -29,12 +11,6 @@ Narrower cta button
     @include rem(line-height, 30px);
     @include rem(border-radius, 15px);
     font-weight: $font-weight-medium;
-
-    &.m-narrow {
-        @include rem(height, 20px);
-        @include rem(line-height, 20px);
-        @include rem(border-radius, 10px);
-    }
 
     &.m-menu-action {
         border-radius: 0;
