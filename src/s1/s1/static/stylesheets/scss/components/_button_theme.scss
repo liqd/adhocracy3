@@ -2,11 +2,6 @@
 .button-cta,
 .button-cta-secondary {
     text-transform: uppercase;
-}
-
-.button-cta,
-.button-cta-secondary,
-.button {
     @include rem(height, 30px);
     @include rem(line-height, 30px);
     @include rem(border-radius, 15px);
