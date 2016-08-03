@@ -24,6 +24,9 @@
                     {{ "TR__ON" | translate }} <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
                 </li>
                 <li>
+                    {{ data.rateCount }} {{ "TR__SUPPORTERS" | translate }}
+                </li>
+                <li>
                     <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}"
                         ><i class="icon-speechbubble"></i> {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}</a>
                 </li>
