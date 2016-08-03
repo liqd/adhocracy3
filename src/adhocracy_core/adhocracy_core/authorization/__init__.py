@@ -59,11 +59,8 @@ class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
                 permission: str) -> ACLPermitsResult:
         """Check `permission` for `context`. Read interface docstring."""
         with statsd_timer('authorization', rate=.1):
-            local_roles = get_local_roles_all(context)
-            principals_with_roles = set(principals)
-            for principal, roles in local_roles.items():
-                if principal in principals:
-                    principals_with_roles.update(roles)
+            principals_with_roles = get_principals_with_local_roles(context,
+                                                                    principals)
             return super().permits(context, principals_with_roles, permission)
 
 
@@ -221,6 +218,17 @@ def create_fake_god_request(registry):
     request.registry = registry
     request.__cached_principals__ = ['role:god']
     return request
+
+
+def get_principals_with_local_roles(context: IResource,
+                                    principals: list) -> list:
+    """Get a copy of pricipals list with added local roles."""
+    local_roles = get_local_roles_all(context)
+    principals_with_roles = set(principals)
+    for principal, roles in local_roles.items():
+        if principal in principals:
+            principals_with_roles.update(roles)
+    return list(principals_with_roles)
 
 
 def includeme(config):
