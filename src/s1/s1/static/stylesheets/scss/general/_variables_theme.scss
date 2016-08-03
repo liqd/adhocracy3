@@ -10,9 +10,11 @@ $color-brand-two-extrovert: darken($color-brand-two-normal, 10%);
 $color-text-highlight-normal: $color-brand-two-normal;
 $color-text-highlight-introvert: $color-brand-two-introvert;
 $color-text-highlight-extrovert: $color-brand-two-extrovert;
+$color-text-introvert: #666;
 
 // Function colors
 $color-function-winner: #f79321;
+$color-function-negative: $color-brand-one-normal;
 
 $font-family-normal: "Roboto", sans-serif;
 $font-family-serif: "Merriweather", serif;
