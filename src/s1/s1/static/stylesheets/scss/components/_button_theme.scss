@@ -1,9 +1,9 @@
 .button,
 .button-cta,
 .button-cta-secondary {
+    line-height: 2;
+    height: 2em;
     text-transform: uppercase;
-    @include rem(height, 30px);
-    @include rem(line-height, 30px);
     @include rem(border-radius, 15px);
     font-weight: $font-weight-medium;
 
