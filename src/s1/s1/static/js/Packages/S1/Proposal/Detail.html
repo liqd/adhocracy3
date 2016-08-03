@@ -9,34 +9,31 @@
             data-print="true">
         </adh-resource-dropdown>
     </div>
-    <header class="resource-header" data-ng-class="{'m-image': data.picture}">
-        <adh-background-image
-            data-css-path="proposal-detail-image"
-            data-no-fallback="true"
-            data-path="{{data.picture}}">
-            <div class="resource-header-main">
+    <adh-background-image
+        data-css-path="proposal-detail-image"
+        data-no-fallback="true"
+        data-path="{{data.picture}}">
+        <header class="resource-header" data-ng-class="{'m-image': data.picture}">
+            <h1 class="resource-header-title">{{ data.title }}</h1>
 
-                <h1 class="resource-header-title">{{ data.title }}</h1>
+            <ul class="resource-header-meta">
+                <li>
+                    {{ "TR__BY" | translate }} <adh-user-meta data-path="{{data.creator}}" data-ng-if="data.creator"></adh-user-meta>
+                </li>
+                <li>
+                    {{ "TR__ON" | translate }} <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
+                </li>
+                <li>
+                    <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}"
+                        ><i class="icon-speechbubble"></i> {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}</a>
+                </li>
+            </ul>
 
-                <ul class="resource-header-meta">
-                    <li>
-                        {{ "TR__BY" | translate }} <adh-user-meta data-path="{{data.creator}}" data-ng-if="data.creator"></adh-user-meta>
-                    </li>
-                    <li>
-                        {{ "TR__ON" | translate }} <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
-                    </li>
-                    <li>
-                        <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}"
-                            ><i class="icon-speechbubble"></i> {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}</a>
-                    </li>
-                </ul>
-
-                <div class="resource-header-action">
-                    <adh-rate data-refers-to="{{path}}"></adh-rate>
-                </div>
+            <div class="resource-header-action">
+                <adh-rate data-refers-to="{{path}}"></adh-rate>
             </div>
-        </adh-background-image>
-    </header>
+        </header>
+    </adh-background-image>
 
     <section class="proposal-detail-body">
         <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="disguised-link proposal-detail-body-comments">
