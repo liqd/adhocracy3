@@ -8,16 +8,6 @@
     text-transform: uppercase;
     font-weight: $font-weight-medium;
 
-    &.m-menu-action {
-        border-radius: 0;
-        color: $color-brand-one-normal;
-        font-size: $font-size-small;
-
-        &:hover:enabled, &:focus:enabled, &.is-active {
-            color: $color-brand-one-extrovert;
-        }
-    }
-
     &.m-round {
         min-width: 2em;
     }

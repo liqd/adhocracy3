@@ -25,10 +25,13 @@
         }
     }
 
+    .moving-column-body {
+        background: $color-background-base;
+        border-bottom: 0;
+    }
+
     .moving-column-menu {
         background: transparent;
-        font-size: inherit;
-        line-height: inherit;
         padding-left: 0;
 
         .button {
@@ -36,29 +39,20 @@
         }
     }
 
-    .moving-column-menu-sorts {
-        display: inline-block;
-    }
-
-    .moving-column-body {
-        background: $color-background-base;
-        border-bottom: 0;
-    }
-
-    .moving-column-tab {
-        display: none;
-    }
-
-    .moving-column-menu-nav-button {
-        background: transparent;
-        color: $color-brand-one-normal;
-        text-transform: uppercase;
-    }
-
     .moving-column-menu-nav {
         .button:last-child {
             margin-right: 5px;
         }
+    }
+
+    .moving-column-menu-nav-button {
+        background: transparent;
+        color: $color-text-introvert;
+        text-transform: uppercase;
+    }
+
+    .moving-column-tab {
+        display: none;
     }
 
     .moving-column-expand {
