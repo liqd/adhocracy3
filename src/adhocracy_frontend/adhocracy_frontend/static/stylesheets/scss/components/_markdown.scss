@@ -13,7 +13,7 @@
 .inline-editable-markdown {
     .inline-editable-markdown-edit-button-container {
         @include rem(margin-bottom, 10px);
-        text-align: right;
+        text-align: center;
         padding: 0 10px;
     }
 }
