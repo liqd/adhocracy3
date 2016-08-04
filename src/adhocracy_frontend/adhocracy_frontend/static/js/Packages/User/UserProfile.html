@@ -6,18 +6,23 @@
 
     <adh-user-profile-image-edit data-path="{{path}}"></adh-user-profile-image-edit>
 
-    <h1 data-itemprop="name" class="user-profile-info-name">
-        <span class="user-profile-info-name-text">{{userBasic.name}}</span>
-        <span data-ng-repeat="assignment in assignments">
-            <span class="badge">{{ assignment.title }}</span>
-        </span>
-    </h1>
     <div class="resource-navigation">
         <adh-resource-dropdown
             data-messaging="true"
             data-user-url="path">
         </adh-resource-dropdown>
     </div>
+    <header class="resource-header">
+        <div class="resource-header-meta">
+            <span
+                data-ng-repeat="assignment in assignments"
+                class="badge">{{ assignment.title | translate }}
+            </span>
+        </div>
+
+        <h1 class="resource-header-title">{{ userBasic.name }}</h1>
+
+    </header>
     <div class="user-profile-info-proposals">
         <adh-inject></adh-inject>
     </div><!-- .user-profile-info-proposals -->
