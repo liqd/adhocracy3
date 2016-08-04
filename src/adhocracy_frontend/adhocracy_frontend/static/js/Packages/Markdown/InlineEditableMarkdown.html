@@ -1,10 +1,9 @@
 <div class="inline-editable-markdown"
-    data-ng-if="! isEmpty || isEditable"
-    >
+    data-ng-if="!isEmpty || isEditable">
     <label>
         <span class="label-text sr-only">{{ title }}</span>
         <span
-            data-ng-if="isEditable && isEmpty && ! isEditing"
+            data-ng-if="isEditable && isEmpty && !isEditing"
             data-ng-click="startEditing()"
             class="inline-editable-markdown-empty-placeholder">
             {{ "TR__ADD_TITLE" | translate:{title: title} }}…
@@ -13,7 +12,8 @@
             data-ng-if="! isEditing"
             data-ng-click="startEditing()"
             data-parsetext="data.parsetext"></adh-parse-markdown>
-        <a href=""><i
+        <a href="">
+            <i
             data-ng-if=" isEditable && ! isEditing"
             data-ng-click="startEditing()"
             class="icon-pencil inline-editable-markdown-edit-button"></i>
@@ -30,11 +30,13 @@
             data-support-url="https://simplemde.com/markdown-guide"></adh-help-link>
         <a href="" class="button-cta-secondary inline-editable-markdown-submit-button"
             data-ng-if="isEditable && isEditing"
-            data-ng-click="saveChanges()"
-        ><span>{{ "TR__SAVE_TITLE" | translate:{title: title} }}</span></a>
+            data-ng-click="saveChanges()">
+            <span>{{ "TR__SAVE_TITLE" | translate:{title: title} }}</span>
+        </a>
         <a href="" class="button-cta-secondary inline-editable-markdown-cancel-button"
             data-ng-if="isEditable && isEditing"
-            data-ng-click="cancelEditing()"
-        ><span>{{ "TR__CANCEL" | translate }}</span></a>
+            data-ng-click="cancelEditing()">
+            <span>{{ "TR__CANCEL" | translate }}</span>
+        </a>
     </div>
 </div>
