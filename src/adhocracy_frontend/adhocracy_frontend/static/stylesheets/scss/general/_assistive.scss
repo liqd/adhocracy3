@@ -1,0 +1,29 @@
+/*doc
+---
+title: Screen reader only modifier
+name: sr-only
+category: Screen Reader
+---
+
+Use this class to display extra information to screen readers only.
+This is most usefull for labels that duplicate information also available
+in placeholders for the benefit of people using screen readers.
+
+```html_example
+<label>
+    <span class="label-text sr-only">Some title</span>
+    <textarea placeholder="some title" ></textarea>
+</label>
+```
+*/
+// Inspired by bootstraps .sr-only class.
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    border: 0;
+}
