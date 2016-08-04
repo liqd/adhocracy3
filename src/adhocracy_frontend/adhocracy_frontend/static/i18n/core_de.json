@@ -171,7 +171,7 @@
     "TR__REPORT_PLACEHOLDER": "Bitte erkläre, wieso du diesen Beitrag melden möchtest.",
     "TR__RESET": "Zurücksetzen",
     "TR__SAVE": "speichern",
-    "TR__SAVE_TITLE": "{{ title }} sichern",
+    "TR__SAVE_TITLE": "{{ title }} speichern",
     "TR__SHARE": "teilen",
     "TR__SHORT_DESCRIPTION": "Kurzbeschreibung",
     "TR__SHOWING_LIMIT_TOTAL": "Zeige {{currentLimit}}/{{totalCount}} an.",
