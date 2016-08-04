@@ -43,6 +43,9 @@ export var inlineEditableMarkdownDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/InlineEditableMarkdown.html",
         link: (scope) => {
             scope.isEditing = false;
+            scope.$watch("parsetext", (parsetext) => {
+                scope.isEmpty = parsetext.trim().length === 0;
+            });
             scope.startEditing = () => {
                 scope.originalMarkdown = scope.parsetext;
                 scope.isEditing = true;

@@ -1,12 +1,18 @@
 <div class="inline-editable-markdown">
     <label>
         <span class="label-text sr-only">{{ title }}</span>
+        <span
+            data-ng-if="isEditable && isEmpty && ! isEditing"
+            data-ng-click="startEditing()"
+            class="inline-editable-markdown-empty-placeholder">
+            {{ "TR__ADD_TITLE" | translate:{title: title} }}…
+        </span>
         <adh-parse-markdown
             data-ng-if="! isEditing"
             data-ng-click="startEditing()"
             data-parsetext="parsetext"></adh-parse-markdown>
             <i
-                data-ng-if="! isEditing"
+                data-ng-if=" isEditable && ! isEditing"
                 data-ng-click="startEditing()"
                 class="icon-pencil inline-editable-markdown-edit-button"></i>
         <textarea
