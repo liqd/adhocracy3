@@ -20,6 +20,7 @@ import RIComment from "../../Resources_/adhocracy_core/resources/comment/ICommen
 import RIProposal from "../../Resources_/adhocracy_core/resources/proposal/IProposal";
 import RIRate from "../../Resources_/adhocracy_core/resources/rate/IRate";
 import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
+import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
 import * as SIHasAssetPool from "../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
 import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
@@ -668,6 +669,7 @@ export var userProfileDirective = (
                 adhHttp.resolve(scope.path)
                     .then((res) => {
                         scope.userBasic = res.data[SIUserBasic.nick];
+                        scope.userShortDescription = res.data[SIDescription.nick].short_description;
                         adhGetBadges(res).then((assignments) => {
                             scope.assignments = assignments;
                         });
