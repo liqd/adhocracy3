@@ -769,7 +769,7 @@ def rename_default_group(root, registry):  # pragma: no cover
                 users_with_default_group.append(user)
         logger.info('Rename default group '
                     'to {}'.format(new_default_group_name))
-        groups.move(old_default_group_name, new_default_group_name)
+        groups.rename(old_default_group_name, new_default_group_name)
         new_default_group = groups[new_default_group_name]
         for user in users_with_default_group:
             logger.info('Update default group name of user {}'.format(user))
