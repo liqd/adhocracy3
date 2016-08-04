@@ -664,16 +664,6 @@ export var userProfileDirective = (
         link: (scope) => {
             adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
 
-            scope.showMessaging = () => {
-                if (scope.messageOptions.POST) {
-                    scope.modals.showModal("messaging");
-                } else if (!adhCredentials.loggedIn) {
-                    adhTopLevelState.setCameFromAndGo("/login");
-                } else {
-                    // FIXME
-                }
-            };
-
             if (scope.path) {
                 adhHttp.resolve(scope.path)
                     .then((res) => {
