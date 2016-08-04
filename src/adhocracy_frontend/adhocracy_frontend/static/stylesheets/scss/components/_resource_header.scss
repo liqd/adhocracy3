@@ -39,6 +39,12 @@ and a primary action (e.g. create proposal or like).
     font-size: 200%;
 }
 
+.resource-header-description {
+    font-size: 120%;
+    list-style: none;
+    padding: 0;
+}
+
 .resource-header-meta {
     text-transform: uppercase;
     font-size: $font-size-smaller;
