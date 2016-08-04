@@ -134,5 +134,14 @@
 
 
 .user-description {
-    margin-top: -4.5rem;
+    // counteract margin bottom from the username
+    @include rem(margin-top, -72px);
+
+    textarea {
+        text-align: center;
+    }
+
+    .inline-editable-markdown-edit-button-container {
+        text-align: center;
+    }
 }
