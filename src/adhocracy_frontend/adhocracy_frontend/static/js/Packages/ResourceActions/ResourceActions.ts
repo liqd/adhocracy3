@@ -81,6 +81,8 @@ export var resourceActionsDirective = (
             edit: "=?",
             image: "=?",
             moderate: "=?",
+            messaging: "=?",
+            userUrl: "=?",
             modals: "=?"
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceActions.html",
@@ -116,6 +118,8 @@ export var resourceDropdownDirective = (
             edit: "=?",
             image: "=?",
             moderate: "=?",
+            messaging: "=?",
+            userUrl: "=?",
             modals: "=?"
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceDropdown.html",
@@ -134,6 +138,8 @@ export var resourceDropdownDirective = (
                 edit: scope.edit,
                 image: scope.image,
                 moderate: scope.moderate,
+                messaging: scope.messaging,
+                userUrl: scope.userUrl,
                 modals: scope.modals
             };
             scope.data.modals = new Modals($timeout);
