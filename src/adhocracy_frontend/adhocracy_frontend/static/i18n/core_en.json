@@ -144,6 +144,7 @@
     "TR__PASSWORD_RESET_CLOSE_THIS_TAB_AND_PROCEED": "Your password has been successfully set. You can now close this tab and go back to {{siteName}}.",
     "TR__PASSWORD_RESET_TITLE": "Set new password",
     "TR__PLEASE_SPECIFY": "Please specify",
+    "TR__PLEASE_KEEP_THIS_SHORT": "Hint: Please keep it short and sweet.",
     "TR__PREVIOUS": "previous",
     "TR__PRINT": "print",
     "TR__PROPOSALS": "proposals",

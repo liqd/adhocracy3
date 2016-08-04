@@ -18,7 +18,7 @@
                 data-ng-click="startEditing()"
                 class="icon-pencil inline-editable-markdown-edit-button"></i>
         <textarea
-            placeholder="{{ title }}"
+            placeholder="{{ title }} - {{ 'TR__PLEASE_KEEP_THIS_SHORT' | translate }}"
             data-msd-elastic=""
             data-ng-if="isEditing"
             data-ng-model="$parent.parsetext"></textarea>

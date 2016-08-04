@@ -138,6 +138,7 @@
     "TR__PASSWORD_RESET_CLOSE_THIS_TAB_AND_PROCEED": "Votre mot de passé a été enregistré avec succès. Vous pouvez maintenant fermer cet onglet et retourner à la page {{siteName}}.",
     "TR__PASSWORD_RESET_TITLE": "Saisissez un nouveau mot de passe",
     "TR__PLEASE_SPECIFY": "Merci de préciser votre demande",
+    "TR__PLEASE_KEEP_THIS_SHORT": "Allusion: Les plus courtes sont les meilleures.",
     "TR__PREVIOUS": "précédent",
     "TR__PRINT": "imprimer",
     "TR__PROPOSALS": "propositions",
