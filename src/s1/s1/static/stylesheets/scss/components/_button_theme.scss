@@ -23,6 +23,44 @@
     }
 }
 
+/*doc
+---
+title: Call-to-action button variant
+name: button.button-cta.m-variant
+parent: button
+---
+
+cta button variant
+
+```html_example
+<a class="button-cta m-variant" href="">Link</a>
+<button type="button" class="button-cta m-variant">Button</button>
+<input type="submit" class="button-cta m-variant" value="Submit" />
+<input type="submit" class="button-cta m-variant" value="Disabled" disabled="disabled" />
+<a class="button-cta ng-disabled m-variant" href="">Disabled Link</a>
+```
+*/
+
+.button-cta.m-variant {
+    @extend .button-cta;
+    background: $color-brand-two-normal;
+    color: $color-text-inverted;
+
+    &:hover:enabled, &:focus:enabled {
+        background: $color-brand-two-introvert;
+    }
+
+    &.ng-disabled,
+    &:disabled {
+        &:hover,
+        &:focus,
+        &:active {
+            background: $color-brand-two-normal;
+            color: $color-text-inverted;
+        }
+    }
+}
+
 .button-group {
     @include clearfix;
     display: inline-block;
