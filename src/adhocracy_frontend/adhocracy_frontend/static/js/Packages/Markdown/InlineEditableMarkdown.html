@@ -12,10 +12,11 @@
         <adh-parse-markdown
             data-ng-if="! isEditing"
             data-ng-click="startEditing()"
-            <i
-                data-ng-if=" isEditable && ! isEditing"
-                data-ng-click="startEditing()"
-                class="icon-pencil inline-editable-markdown-edit-button"></i>
+            data-parsetext="data.parsetext"></adh-parse-markdown>
+        <i
+            data-ng-if=" isEditable && ! isEditing"
+            data-ng-click="startEditing()"
+            class="icon-pencil inline-editable-markdown-edit-button"></i>
         <textarea
             placeholder="{{ title }} - {{ 'TR__PLEASE_KEEP_THIS_SHORT' | translate }}"
             data-msd-elastic=""
