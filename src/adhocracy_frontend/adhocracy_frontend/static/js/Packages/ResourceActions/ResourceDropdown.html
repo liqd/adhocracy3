@@ -50,7 +50,7 @@
         <adh-hide-action
             data-ng-if="data.hide && data.resourcePath && options.hide"
             data-redirect-url="{{data.deleteRedirectUrl}}"
-            data-resource-path="{{data.resourcePath}}">
+            data-resource-path="{{data.resourcePath | adhParentPath}}">
             <i class="icon-trash"></i>
         </adh-hide-action>
         <adh-resource-widget-delete-action
