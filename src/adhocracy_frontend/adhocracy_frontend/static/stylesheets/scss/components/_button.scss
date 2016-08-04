@@ -178,19 +178,31 @@ Add a + sign to a button
 ```
 */
 
+/*doc
+---
+title: Button round modifier
+name: button.m-round
+parent: button
+---
+
+```html_example
+<a href="#" class="button m-round" title="Help">?</a>
+<a href="#" class="button-cta m-round" title="Help">?</a>
+<a href="#" class="button-cta-secondary m-round" title="Help">?</a>
+```
+*/
+
 .button-cta,
 .button-cta-secondary,
 .button {
     &.m-add:before {
         content: "+ ";
     }
-}
 
-
-.help-link {
-    @extend .button-cta-secondary;
-    @include rem(min-width, unquote("#{$button-line-height}rem"));
-    @include rem(margin-left, 1rem);
-    padding-left: 0;
-    padding-right: 0;
+    &.m-round {
+        @include rem(min-width, unquote("#{$button-line-height}rem"));
+        padding-left: 0;
+        padding-right: 0;
+        border-radius: 50%;
+    }
 }

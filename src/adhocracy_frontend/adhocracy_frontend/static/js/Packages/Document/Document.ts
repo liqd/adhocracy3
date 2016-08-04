@@ -455,7 +455,8 @@ export var createDirective = (
             path: "@",
             hasMap: "=?",
             hasImage: "=?",
-            polygon: "=?"
+            polygon: "=?",
+            cancelUrl: "=?"
         },
         link: (scope : IFormScope, element) => {
             scope.errors = [];
@@ -481,7 +482,11 @@ export var createDirective = (
                 scope.data.paragraphs[index].deleted = true;
             };
 
-            scope.paragraphCount = () => _.filter(scope.data.paragraphs, (p) => !p.deleted).length;
+            scope.paragraphCount = () => {
+                if (scope.data) {
+                    return _.filter(scope.data.paragraphs, (p) => !p.deleted).length;
+                }
+            };
 
             scope.cancel = () => {
                 var processUrl = adhTopLevelState.get("processUrl");
@@ -521,7 +526,8 @@ export var editDirective = (
             hasMap: "=?",
             hasBadges: "=?",
             hasImage: "=?",
-            polygon: "=?"
+            polygon: "=?",
+            cancelUrl: "=?"
         },
         link: (scope : IFormScope, element) => {
             scope.errors = [];
@@ -539,7 +545,11 @@ export var editDirective = (
                 scope.data.paragraphs[index].deleted = true;
             };
 
-            scope.paragraphCount = () => _.filter(scope.data.paragraphs, (p) => !p.deleted).length;
+            scope.paragraphCount = () => {
+                if (scope.data) {
+                    return _.filter(scope.data.paragraphs, (p) => !p.deleted).length;
+                }
+            };
 
             bindPath($q, adhHttp)(scope, undefined, scope.hasMap);
 

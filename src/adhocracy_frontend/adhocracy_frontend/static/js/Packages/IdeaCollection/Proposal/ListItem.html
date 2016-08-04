@@ -1,8 +1,8 @@
 <!-- FIXME: may contain links in adh-user-meta -->
-<a class="list-item {{selectedState}}" data-ng-class="{ 'm-contains-image': processOptions.hasImage }" href="{{path | adhParentPath | adhResourceUrl }}">
+<a class="list-item {{selectedState}}" data-ng-class="{ 'm-contains-image': processProperties.hasImage }" href="{{path | adhParentPath | adhResourceUrl }}">
     <adh-show-image
         data-css-class="list-item-image"
-        data-ng-if="processOptions.hasImage"
+        data-ng-if="processProperties.hasImage"
         data-path="{{data.picture}}"
         data-format="thumbnail"
     ></adh-show-image>
@@ -20,7 +20,7 @@
             <li class="meta-list-item"><i class="meta-list-meta-item-icon icon-voting"></i
             > {{ data.rateCount | signum }} {{ "TR__RATES" | translate }}</li>
             <li class="meta-list-item"
-            data-ng-if="processOptions.hasLocationText"><i class="meta-list-meta-item-icon icon-pin-detail"></i
+            data-ng-if="processProperties.hasLocationText"><i class="meta-list-meta-item-icon icon-pin-detail"></i
             > {{data.locationText}}</li>
         </ul>
         <div class="list-item-badges">

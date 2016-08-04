@@ -32,6 +32,7 @@ class TestOrganisation:
                 adhocracy_core.sheets.localroles.ILocalRoles,
                 adhocracy_core.sheets.description.IDescription,
                 adhocracy_core.sheets.image.IImageReference,
+                adhocracy_core.sheets.notification.IFollowable,
                 )
         assert meta.extended_sheets == \
             (adhocracy_core.sheets.asset.IHasAssetPool,)

@@ -855,6 +855,23 @@ def add_localroles_sheet_to_pools(root, registry):  # pragma: no cover
     migrate_new_sheet(root, IPool, ILocalRoles)
 
 
+@log_migration
+def allow_image_download_view_for_everyone(root, registry):  # pragma: no cover
+    """Add acls to image downloads to allow view for everyone."""
+    from adhocracy_core.resources.image import IImageDownload
+    from adhocracy_core.resources.image import allow_view_eveyone
+    catalogs = find_service(root, 'catalogs')
+    image_downloads = _search_for_interfaces(catalogs, IImageDownload)
+    for image_download in image_downloads:
+        allow_view_eveyone(image_download, registry, {})
+
+
+@log_migration
+def add_followable_sheet_to_organisation(root, registry):  # pragma: no cover
+    """Add followable sheet to orgnisations."""
+    migrate_new_sheet(root, IOrganisation, IFollowable)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -904,3 +921,5 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_localroles_sheet_to_pools)
     config.add_evolution_step(remove_comment_count_data)
     config.add_evolution_step(reindex_comments)
+    config.add_evolution_step(allow_image_download_view_for_everyone)
+    config.add_evolution_step(add_followable_sheet_to_organisation)

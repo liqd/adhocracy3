@@ -1,17 +1,3 @@
-/*doc
----
-title: Action section button mixin
-name: action-section-button-mixin
-category: Widgets
----
-
-A mixin to style a button used with a section
-
-```html_example
-<a class="action-section-button"><i class="icon-speechbubble"></i>12</a>
-```
-*/
-
 @mixin action-section-button {
     @include disguised-link;
     @include rem(font-size, $font-size-small);
@@ -35,9 +21,9 @@ A mixin to style a button used with a section
 
 /*doc
 ---
-title: Action section
+title: Action Section
 name: action-section
-category: Widgets
+category: Components
 ---
 
 A section of any content with a corresponding 'action button' EG Show Comments
@@ -65,7 +51,7 @@ States:
 
 .action-section,
 .non-action-section {
-    @include rem(padding, 1rem 48px 30px 1rem);
+    @include rem(padding, 1rem 48px 30px $padding);
     position: relative;
 
     > p:last-of-type {
@@ -83,7 +69,7 @@ States:
     .action-section-button {
         @include action-section-button;
         @include rem(max-width, 36px);
-        @include rem(right, 1rem);
+        @include rem(right, $padding);
         @include rem(top, 1rem);
         position: absolute;
     }

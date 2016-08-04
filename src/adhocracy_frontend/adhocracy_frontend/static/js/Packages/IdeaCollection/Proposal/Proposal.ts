@@ -46,7 +46,7 @@ export interface IScope extends angular.IScope {
         locationText? : string;
     };
     selectedState? : string;
-    processOptions : AdhProcess.IProcessOptions;
+    processProperties : AdhProcess.IProcessProperties;
     resource : any;
 }
 
@@ -65,7 +65,7 @@ var bindPath = (
     pathKey : string = "path"
 ) : void => {
         var getPolygon = () => {
-            if (scope.processOptions.hasLocation) {
+            if (scope.processProperties.hasLocation) {
                 var processUrl = adhTopLevelState.get("processUrl");
                 return adhHttp.get(processUrl).then((process) => {
                     var locationUrl = process.data[SILocationReference.nick]["location"];
@@ -89,7 +89,7 @@ var bindPath = (
                 var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
                 var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
 
-                var proposalSheetClass = scope.processOptions.proposalSheet;
+                var proposalSheetClass = scope.processProperties.proposalSheet;
                 if (proposalSheetClass) {
                     var proposalSheet = resource.data[proposalSheetClass.nick];
                 }
@@ -116,24 +116,24 @@ var bindPath = (
                         commentCount: resource.data[SICommentable.nick].comments_count,
                         assignments: assignments
                     };
-                    if (scope.processOptions.hasLocation) {
+                    if (scope.processProperties.hasLocation) {
                         scope.data.lng = pointSheet.coordinates[0];
                         scope.data.lat = pointSheet.coordinates[1];
                         scope.data.polygon = polygon;
                     }
-                    if (scope.processOptions.hasImage) {
+                    if (scope.processProperties.hasImage) {
                         scope.data.picture = resource.data[SIImageReference.nick].picture;
                     }
                     // WARNING: proposalSheet is not a regular feature of adhocracy,
                     // but a hack of Buergerhaushalt and Kiezkasse.
                     if (proposalSheet) {
-                        if (scope.processOptions.maxBudget) {
+                        if (scope.processProperties.maxBudget) {
                             scope.data.budget = proposalSheet.budget;
                         }
-                        if (scope.processOptions.hasCreatorParticipate) {
+                        if (scope.processProperties.hasCreatorParticipate) {
                             scope.data.creatorParticipate = proposalSheet.creator_participate;
                         }
-                        if (scope.processOptions.hasLocationText) {
+                        if (scope.processProperties.hasLocationText) {
                             scope.data.locationText = proposalSheet.location_text;
                         }
                     }
@@ -150,15 +150,15 @@ var fill = (
 ) : void => {
     // WARNING: proposalSheet is not a regular feature of adhocracy,
     // but a hack of Buergerhaushalt and Kiezkasse.
-    var proposalSheet = scope.processOptions.proposalSheet;
-    if (proposalSheet && scope.processOptions.hasCreatorParticipate
-        && scope.processOptions.hasLocationText && scope.processOptions.maxBudget) {
+    var proposalSheet = scope.processProperties.proposalSheet;
+    if (proposalSheet && scope.processProperties.hasCreatorParticipate
+        && scope.processProperties.hasLocationText && scope.processProperties.maxBudget) {
         proposalVersion.data[proposalSheet.nick] = new proposalSheet.Sheet({
             budget: scope.data.budget,
             creator_participate: scope.data.creatorParticipate,
             location_text: scope.data.locationText
         });
-    } else if (proposalSheet && scope.processOptions.hasLocationText && scope.processOptions.maxBudget) {
+    } else if (proposalSheet && scope.processProperties.hasLocationText && scope.processProperties.maxBudget) {
         proposalVersion.data[proposalSheet.nick] = new proposalSheet.Sheet({
             budget: scope.data.budget,
             location_text: scope.data.locationText
@@ -184,8 +184,8 @@ var postCreate = (
     scope : IScope,
     poolPath : string
 ) => {
-    var proposalClass = scope.processOptions.proposalClass;
-    var proposalVersionClass = scope.processOptions.proposalVersionClass;
+    var proposalClass = scope.processProperties.proposalClass;
+    var proposalVersionClass = scope.processProperties.proposalVersionClass;
 
     var proposal = new proposalClass({preliminaryNames: adhPreliminaryNames});
     proposal.parent = poolPath;
@@ -207,7 +207,7 @@ var postEdit = (
     scope : IScope,
     oldVersion
 ) => {
-    var proposalVersionClass = scope.processOptions.proposalVersionClass;
+    var proposalVersionClass = scope.processProperties.proposalVersionClass;
 
     var proposalVersion = new proposalVersionClass({preliminaryNames: adhPreliminaryNames});
     proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
@@ -233,9 +233,10 @@ export var detailDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
         scope: {
             path: "@",
-            processOptions: "="
+            processProperties: "="
         },
         link: (scope : IScope) => {
+            (<any>scope).$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
                 scope, undefined);
         }
@@ -256,7 +257,7 @@ export var listItemDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
         scope: {
             path: "@",
-            processOptions: "="
+            processProperties: "="
         },
         link: (scope : IScope) => {
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
@@ -289,7 +290,7 @@ export var mapListItemDirective = (
         require: "^adhMapListingInternal",
         scope: {
             path: "@",
-            processOptions: "="
+            processProperties: "="
         },
         link: (scope : IScope, element, attrs, mapListing : AdhMapping.MapListingController) => {
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
@@ -329,7 +330,8 @@ export var createDirective = (
         restrict: "E",
         scope: {
             poolPath: "@",
-            processOptions: "="
+            processProperties: "=",
+            cancelUrl: "=?"
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         link: (scope, element) => {
@@ -341,7 +343,7 @@ export var createDirective = (
             scope.data.lat = undefined;
             scope.data.lng = undefined;
 
-            if (scope.processOptions.hasLocation) {
+            if (scope.processProperties.hasLocation) {
                 adhHttp.get(scope.poolPath).then((pool) => {
                     var locationUrl = pool.data[SILocationReference.nick]["location"];
                     adhHttp.get(locationUrl).then((location) => {
@@ -387,7 +389,8 @@ export var editDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
             path: "@",
-            processOptions: "="
+            processProperties: "=",
+            cancelUrl: "=?"
         },
         link: (scope, element) => {
             scope.errors = [];

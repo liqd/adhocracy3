@@ -1,3 +1,59 @@
+/*doc
+---
+title: Facets
+name: facets
+parent: listing
+---
+
+Facets can be used to filter a list. From each facet, a user can choose a single item,
+e.g. from the budget facet, the user may choose "0 - 5000 €" to display only proposals
+with budgets in that range.
+
+```html_example
+<div class="facets">
+    <div class="facet">
+        <h3 class="facet-header">Place</h3>
+        <div class="facet-buttons">
+            <a href="#" class="facet-item button-cta-secondary">Special</a>
+            <a href="#" class="facet-item is-active button-cta-secondary">Online</a>
+            <a href="#" class="facet-item button-cta-secondary">Ruhrgebiet</a>
+        </div>
+    </div>
+    <div class="facet">
+        <h3 class="facet-header">Budget</h3>
+        <div class="facet-buttons">
+            <a href="#" class="facet-item is-active button-cta-secondary">0 - 5000 €</a>
+            <a href="#" class="facet-item button-cta-secondary">5000 - 10000 €</a>
+            <a href="#" class="facet-item button-cta-secondary">10000 - 20000 €</a>
+            <a href="#" class="facet-item button-cta-secondary">20000 - 50000 €</a>
+        </div>
+    </div>
+    <div class="facet">
+        <h3 class="facet-header">Awards</h3>
+        <div class="facet-buttons">
+            <a href="#" class="facet-item button-cta-secondary">Winner</a>
+            <a href="#" class="facet-item button-cta-secondary">Community Award</a>
+        </div>
+    </div>
+</div>
+```
+*/
+
+/*doc
+---
+title: Sorts
+name: sorts
+parent: listing
+---
+
+```html_example
+<div class="sorts">
+    <h3 class="sort-header">Sort by</h3>
+    <a href="#" class="sort-item button-cta-secondary">Date</a>
+    <a href="#" class="sort-item is-active button-cta-secondary">Rates</a>
+</div>
+```
+*/
 .facets {
     @include container;
 
@@ -49,10 +105,27 @@
 }
 
 .listing-results {
-    @include rem(padding, 1rem);
+    @include rem(padding, $padding);
     border-bottom: 2px solid $color-structure-normal;
 }
 
+/*doc
+---
+title: Facet Toggle
+name: facet-toggle
+parent: facets
+---
+
+When facets are collapsed, facet toggles indicate the currently selected items
+in a compact way. By clicking on it, you can deactivate the facet item.
+
+```html_example
+<a href="#" class="facet-toggle">
+    10000 - 20000 €
+    <span class="facet-cancel">x</span>
+</a>
+```
+*/
 .facet-toggle {
     @include ellipsis(12em);
     @include rem(left, -18px);

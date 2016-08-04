@@ -1,3 +1,8 @@
+<div class="resource-navigation">
+    <div class="resource-navigation-breadcrumbs">
+        <adh-go-to-came-from data-default="cancelUrl"></adh-go-to-came-from>
+    </div>
+</div>
 <form
     novalidate="novalidate"
     data-ng-submit="submit()"
@@ -43,14 +48,14 @@
         </label>
 
         <!-- Requested Budget -->
-        <label data-ng-if="processOptions.maxBudget">
+        <label data-ng-if="processProperties.maxBudget">
             <span class="label-text">{{ "TR__IDEA_COLLECTION_BUDGET" | translate }}</span>
             <input
                 type="number"
                 data-ng-model="data.budget"
                 name="budget"
                 min="0"
-                max="{{processOptions.maxBudget}}"
+                max="{{processProperties.maxBudget}}"
                 required="required" />
             <span class="input-error" data-ng-show="showError(ideaCollectionProposalForm, ideaCollectionProposalForm.budget, 'required')">
                 {{ "TR__IDEA_COLLECTION_ERROR_REQUIRED_BUDGET" | translate }}
@@ -61,7 +66,7 @@
         </label>
 
         <!-- Engagement -->
-        <label data-ng-if="processOptions.hasCreatorParticipate" class="form-row">
+        <label data-ng-if="processProperties.hasCreatorParticipate">
             <input
                 type="checkbox"
                 data-ng-model="data.creatorParticipate"
@@ -75,7 +80,7 @@
 
         <!-- LOCATION RELATED INFORMATION -->
         <!-- Related Place -->
-        <label data-ng-if="processOptions.hasLocationText">
+        <label data-ng-if="processProperties.hasLocationText">
             <span class="label-text">{{ "TR__IDEA_COLLECTION_LOCATION_TEXT" | translate }}</span>
             <input
                 type="text"
@@ -90,7 +95,7 @@
     </div>
 
     <!-- Map -->
-    <label data-ng-if="processOptions.hasLocation">
+    <label data-ng-if="processProperties.hasLocation">
         <adh-map-input data-ng-if="data.polygon" data-lng="data.lng" data-lat="data.lat" data-polygon="data.polygon" data-height="250"></adh-map-input>
     </label>
 

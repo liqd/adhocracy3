@@ -1,9 +1,13 @@
+<div class="resource-navigation">
+    <div class="resource-navigation-breadcrumbs">
+        <adh-go-to-came-from data-default="cancelUrl"></adh-go-to-came-from>
+    </div>
+</div>
 <form
     novalidate="novalidate"
     data-ng-submit="submit()"
     class="document-form"
     name="documentForm">
-<div class="section-jump" id="section-jump-top">
     <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
 
     <div class="section-jump-cover">
@@ -60,20 +64,20 @@
         </label>
     </div><!-- /.cover -->
 
-    <div class="section-jump-body">
-        <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="" data-ng-if="paragraphCount() > 1">
+    <div class="jump-navigation-wrapper m-narrow">
+        <nav class="jump-navigation m-unnumbered" data-adh-sticky="" data-ng-if="paragraphCount() > 1">
             <ol>
                 <li data-ng-repeat="paragraph in data.paragraphs | filter:{deleted: false}">
                     <a
-                        href="#section-jump-{{$index}}"
+                        href="#jump-{{$index}}"
                         data-du-smooth-scroll=""
                         data-du-scrollspy="">{{ $index + 1}}</a>
                 </li>
             </ol>
         </nav>
 
-        <div class="section-jump-main" data-du-spy-context="" data-ng-class="{'has-navigation': paragraphCount() > 1}">
-            <section class="action-section" data-ng-repeat="paragraph in data.paragraphs" data-ng-if="!paragraph.deleted" id="section-jump-{{$index}}">
+        <div class="jump-navigation-main" data-du-spy-context="" data-ng-class="{'has-navigation': paragraphCount() > 1}">
+            <section class="action-section" data-ng-repeat="paragraph in data.paragraphs" data-ng-if="!paragraph.deleted" id="jump-{{$index}}">
                 <label>
                     <textarea
                         data-msd-elastic=""
@@ -101,8 +105,6 @@
 
                 <a data-ng-click="cancel()" class="button form-footer-button">{{ "TR__CANCEL" | translate }}</a>
             </footer>
-        </div><!-- /.section-jump-main -->
-    </div><!-- /.section-jump-body -->
-</div><!-- /.section-jump -->
-<!-- DATA SUBMIT -->
+        </div><!-- /.jump-navigation-main -->
+    </div><!-- /.jump-navigation-wrapper -->
 </form>

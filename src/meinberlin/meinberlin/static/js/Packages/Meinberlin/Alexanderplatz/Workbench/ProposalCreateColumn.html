@@ -11,11 +11,11 @@
         </div>
     </a>
 
-    <div class="tabs" data-ng-switch-when="body">
-        <adh-resource-actions
-            data-resource-path="{{processUrl}}"
-            data-cancel="true">
-        </adh-resource-actions>
-        <adh-idea-collection-proposal-create data-pool-path="{{processUrl}}"></adh-idea-collection-proposal-create>
+    <div data-ng-switch-when="body">
+        <adh-idea-collection-proposal-create
+            data-pool-path="{{processUrl}}"
+            data-process-properties="processProperties"
+            data-cancel-url="processUrl | adhResourceUrl:'proposals'">
+        </adh-idea-collection-proposal-create>
     </div>
 </div>

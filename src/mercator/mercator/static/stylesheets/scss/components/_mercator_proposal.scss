@@ -4,13 +4,7 @@ The mercator proposal list item may have the states `is-selected` or
 selected. If no proposal is selected, no state is applied.
 */
 
-$mercator-proposal-form-nav-width: 100% / 12 * 2;
-
 .mercator-proposal-form {
-    width: 100% / 12 * 10 * 0.65;
-    margin-left: $mercator-proposal-form-nav-width;
-    background: $color-background-base;
-
     label {
         display: block;
     }
@@ -33,12 +27,8 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     }
 }
 
-.mercator-proposal-form-container {
-    background: $color-structure-normal;
-}
-
 .mercator-proposal-form-annotation {
-    @include rem(padding, 1rem);
+    @include rem(padding, $padding);
     position: relative;
 }
 
@@ -49,8 +39,8 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-form-heading {
-    @include rem(margin, 0 -1rem 0.8rem);
-    @include rem(padding, 0 1rem 1px);
+    @include rem(margin, 1rem (-1 * $padding) 0.8rem);
+    @include rem(padding, 0 $padding 1px);
     border: 1px solid $color-structure-normal;
     border-width: 1px 0;
     font-weight: $font-weight-extrovert;
@@ -58,55 +48,23 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     &.active {
         color: $color-text-highlight-normal;
     }
-}
 
-.mercator-proposal-form-nav {
-    @extend .jump-navigation;
-    @include rem(font-size, -$font-size-small);
-    @include rem(width, $mercator-proposal-form-nav-width);
-    float: left;
-    padding: 1px 1px 0;
-
-    ul, ol {
-        padding: 0;
-    }
-
-    li {
-        background: $color-background-base-introvert;
-        line-height: 2;
-        margin-bottom: 1px;
-
-        &, a {
-            color: $color-text-highlight-normal;
-            padding-bottom: 0;
-        }
-
-        &.active {
-            background: $color-background-base;
-            text-decoration: underline;
-        }
-
-        &:first-child {
-            padding-top: 1px;
-        }
-    }
-
-    a {
-        text-decoration: none;
+    .mercator-proposal-form-section:first-child & {
+        margin-top: 0;
     }
 }
 
 .mercator-proposal-form-section {
-    @include rem(padding, 0 1rem);
+    @include rem(padding, 0 $padding);
 }
 
 .mercator-proposal-form-section-info {
-    @include rem(padding, 0.5rem 1rem);
+    @include rem(padding, 0.5rem $padding);
     background: $color-background-base-introvert;
 }
 
 .mercator-proposal-form-footer {
-    @include rem(padding, 1rem);
+    @include rem(padding, $padding);
     border-top: 2px solid $color-structure-normal;
 }
 
@@ -119,9 +77,9 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-detail-view-image {
-    float: left;
     width: 100%;
     border-bottom: 2px solid $color-structure-normal;
+    vertical-align: bottom;
 
     @media print {
         float: none;
@@ -173,7 +131,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-detail-footer {
-    @include rem(padding, 10px 1rem);
+    @include rem(padding, 10px $padding);
     border-top: 2px solid  $color-structure-normal;
     overflow: hidden;
 

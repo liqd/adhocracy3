@@ -40,9 +40,9 @@ export var register = (angular) => {
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[processType] =
-                "<adh-idea-collection-workbench data-process-options=\"processOptions\">" +
+                "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
                 "</adh-idea-collection-workbench>";
-            adhProcessProvider.processOptions[processType] = {
+            adhProcessProvider.processProperties[processType] = {
                 hasCreatorParticipate: true,
                 hasLocation: true,
                 hasLocationText: true,

@@ -51,7 +51,7 @@ lingua==3.10
 logilab-common==0.63.2
 mccabe==0.3.1
 meld3==1.0.0
-mock==1.0.1
+mock==2.0.0
 mr.developer==1.31
 multipledispatch==0.4.8
 path.py==8.1.2

@@ -2,7 +2,7 @@
 ---
 title: Action Bar
 name: action-bar
-category: Widgets
+category: Components
 ---
 
 A bar with items that trigger actions. Use this widget to provide a
@@ -88,10 +88,9 @@ An action can trigger showing a modal below the action bar.
 
 .action-bar {
     @include rem(font-size, $font-size-small);
-    @include rem(padding, 0 7px);
-    display: inline-block;
+    @include rem(padding, 0 $padding);
+    @include clearfix;
     background: $color-structure-normal;
-    width: 100%;
     margin-bottom: 1px;
 
     .map-switch {
@@ -117,7 +116,7 @@ An action can trigger showing a modal below the action bar.
 ---
 title: Modal
 name: modal
-category: Widgets
+category: Components
 ---
 
 A modal contains optional interaction (e.g. a form) that is hidden by default
@@ -142,7 +141,7 @@ open/close with a sliding animation.
 */
 .modal {
     border-bottom: 2px solid $color-structure-normal;
-    padding: 1em;
+    padding: $padding;
 }
 
 /*doc
@@ -158,7 +157,7 @@ The messages are informational by default, but can have the modifieres
 `m-error` and `m-success`.
 
 ```html_example
-<ul class="alerts static-example">
+<ul class="alerts" style="position: static">
     <li class="alerts-message">Info</li>
     <li class="alerts-message m-error">Error</li>
     <li class="alerts-message m-success">Success</li>
@@ -177,7 +176,7 @@ The messages are informational by default, but can have the modifieres
 }
 
 .alerts-message {
-    @include rem(padding, 1rem);
+    @include rem(padding, $padding);
     background: $color-function-neutral;
     color: $color-text-normal;
     text-align: center;

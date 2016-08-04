@@ -2,7 +2,7 @@
 ---
 title: Listing
 name: listing
-category: Widgets
+category: Components
 ---
 
 A Listing represents a list of elements that may be filtered and/or sorted.
@@ -35,7 +35,7 @@ a form for creating new elements. This form is then always visible.
 
 .listing-create-form {
     @include rem(margin-bottom, 2rem);
-    @include rem(padding, 1rem 20px 12px);
+    @include rem(padding, $padding);
 
     .comment-create-form-text {
         @include rem(margin-bottom, 20px);
@@ -57,6 +57,10 @@ a form for creating new elements. This form is then always visible.
 
 .listing-elements + .listing-create-form {
     margin-top: 0;
+}
+
+.listing-empty-text {
+    @include rem(padding, $padding);
 }
 
 .load-more {

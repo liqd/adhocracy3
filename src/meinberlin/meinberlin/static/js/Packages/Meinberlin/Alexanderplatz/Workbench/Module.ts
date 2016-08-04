@@ -8,6 +8,8 @@ import * as AdhProcessModule from "../../../Process/Module";
 import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
 import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 
+import RIGeoProposal from "../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
+import RIGeoProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
 import RIAlexanderplatzProcess from "../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess";
 
 import * as AdhProcess from "../../../Process/Process";
@@ -34,8 +36,13 @@ export var register = (angular) => {
             AdhTopLevelStateModule.moduleName
         ])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templates[processType] =
-                "<adh-meinberlin-alexanderplatz-workbench></adh-meinberlin-alexanderplatz-workbench>";
+            adhProcessProvider.templates[processType] = "<adh-meinberlin-alexanderplatz-workbench " +
+                "data-process-properties=\"processProperties\"></adh-meinberlin-alexanderplatz-workbench>";
+            adhProcessProvider.processProperties[processType] = {
+                hasLocation: true,
+                proposalClass: RIGeoProposal,
+                proposalVersionClass: RIGeoProposalVersion
+            };
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider, adhConfig) => {
             var processType = RIAlexanderplatzProcess.content_type;

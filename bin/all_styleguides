@@ -46,7 +46,7 @@ EOF
 source: `realpath $builddir`/stylesheets/scss
 destination: `realpath $builddir`/styleguide
 documentation_assets: ../docs/styleguide_assets
-index: type
+index: base
 EOF
 
     # run hologram
