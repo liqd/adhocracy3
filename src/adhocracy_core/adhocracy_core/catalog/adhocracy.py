@@ -156,10 +156,8 @@ def index_comments(resource, default) -> int:
 
     Only the LAST version of each rate is counted.
     """
-    item = find_interface(resource, IItem)
     catalogs = find_service(resource, 'catalogs')
-    query = search_query._replace(root=item,
-                                  interfaces=ICommentVersion,
+    query = search_query._replace(interfaces=ICommentVersion,
                                   indexes={'tag': 'LAST'},
                                   only_visible=True,
                                   references=[(None, IComment, 'refers_to',
@@ -167,7 +165,17 @@ def index_comments(resource, default) -> int:
                                               ],
                                   )
     result = catalogs.search(query)
-    return result.count
+    comment_count = result.count
+    if comment_count:
+        comment_count += _index_comment_replies(result.elements, default)
+    return comment_count
+
+
+def _index_comment_replies(comment_list, default) -> int:
+    comment_count = 0
+    for comment in comment_list:
+        comment_count += index_comments(comment, default)
+    return comment_count
 
 
 def index_tag(resource, default) -> [str]:
