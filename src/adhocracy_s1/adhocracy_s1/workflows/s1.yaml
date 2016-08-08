@@ -43,4 +43,3 @@ transitions:
   to_propose:
     from_state: result
     to_state: propose
-    callback: adhocracy_s1.workflows.s1.do_transition_to_propose
