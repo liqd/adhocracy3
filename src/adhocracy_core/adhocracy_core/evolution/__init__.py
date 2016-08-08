@@ -882,9 +882,10 @@ def remove_participant_role_from_default_group(root,
     group_sheet = registry.content.get_sheet(default_group, IGroup)
     appstruct = group_sheet.get()
     roles = appstruct['roles']
-    roles.remove('participant')
-    appstruct['roles'] = roles
-    group_sheet.set(appstruct)
+    if 'participant' in roles:
+        roles.remove('participant')
+        appstruct['roles'] = roles
+        group_sheet.set(appstruct)
 
 
 def includeme(config):  # pragma: no cover
