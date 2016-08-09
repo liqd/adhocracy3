@@ -255,19 +255,46 @@ class TestIndexComments:
         from .adhocracy import index_comments
         from adhocracy_core.resources.comment import ICommentVersion
         from adhocracy_core.sheets.comment import IComment
+        comment = testing.DummyResource()
         commentable = testing.DummyResource()
-        item['commentable'] = commentable
-        search_result = search_result._replace(count=5)
-        mock_catalogs.search.return_value = search_result
-        query = query._replace(root=item,
-                               interfaces=ICommentVersion,
+        search_result = search_result._replace(count=1, elements=[comment])
+        search_result_replies = search_result._replace(count=0)
+        mock_catalogs.search.side_effect = [search_result,
+                                            search_result_replies]
+        query = query._replace(interfaces=ICommentVersion,
                                indexes={'tag': 'LAST'},
                                only_visible=True,
-                               references=[(None, IComment, 'refers_to', commentable)
+                               references=[(None, IComment, 'refers_to',
+                                            commentable)
                                            ],
                                )
-        assert index_comments(item['commentable'], None) == 5
-        assert mock_catalogs.search.call_args[0][0] == query
+        assert index_comments(commentable, None) == 1
+        mock_catalogs.search.call_args_list[0][0][0] == query
+
+    def test_index_comments_with_replies(self, item, mock_catalogs, query,
+                                         search_result):
+        from .adhocracy import index_comments
+        from adhocracy_core.resources.comment import ICommentVersion
+        from adhocracy_core.sheets.comment import IComment
+        comment = testing.DummyResource()
+        reply = testing.DummyResource()
+        commentable = testing.DummyResource()
+        search_result = search_result._replace(count=1, elements=[comment])
+        search_result_replies = search_result._replace(count=1,
+                                                       elements=[reply])
+        search_result_no_replies= search_result._replace(count=0)
+        mock_catalogs.search.side_effect = [search_result,
+                                            search_result_replies,
+                                            search_result_no_replies]
+        query = query._replace(interfaces=ICommentVersion,
+                               indexes={'tag': 'LAST'},
+                               only_visible=True,
+                               references=[(None, IComment, 'refers_to',
+                                            comment)
+                                           ],
+                               )
+        assert index_comments(commentable, None) == 2
+        mock_catalogs.search.call_args_list[1][0][0] == query
 
 
 @mark.usefixtures('integration')
