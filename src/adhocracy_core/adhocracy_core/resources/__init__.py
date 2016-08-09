@@ -208,13 +208,13 @@ class ResourceFactory:
 
         default_workflow = self.meta.default_workflow
         has_workflow = IWorkflowAssignment in isheets and default_workflow
-        workflow_assignment = IWorkflowAssignment.__identifier__
+        assignment = IWorkflowAssignment.__identifier__
         if has_workflow:
-            if workflow_assignment not in appstructs:
-                appstructs[workflow_assignment] = \
+            if assignment not in appstructs:
+                appstructs[assignment] = \
                     {'workflow': default_workflow}
-            elif 'workflow' not in appstructs[workflow_assignment]:  # pragma: no branch
-                appstructs[workflow_assignment]['workflow'] = default_workflow
+            elif 'workflow' not in appstructs[assignment]:  # pragma: no branch
+                appstructs[assignment]['workflow'] = default_workflow
 
         for key, struct in appstructs.items():
             isheet = DottedNameResolver().maybe_resolve(key)
