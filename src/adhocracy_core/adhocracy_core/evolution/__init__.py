@@ -872,6 +872,22 @@ def add_followable_sheet_to_organisation(root, registry):  # pragma: no cover
     migrate_new_sheet(root, IOrganisation, IFollowable)
 
 
+@log_migration
+def remove_participant_role_from_default_group(root,
+                                               registry):  # pragma: no cover
+    """Remove global participant role from default group."""
+    from adhocracy_core.sheets.principal import IGroup
+    groups = find_service(root, 'principals', 'groups')
+    default_group = groups.get('default_group')
+    group_sheet = registry.content.get_sheet(default_group, IGroup)
+    appstruct = group_sheet.get()
+    roles = appstruct['roles']
+    if 'participant' in roles:
+        roles.remove('participant')
+        appstruct['roles'] = roles
+        group_sheet.set(appstruct)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -923,3 +939,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(reindex_comments)
     config.add_evolution_step(allow_image_download_view_for_everyone)
     config.add_evolution_step(add_followable_sheet_to_organisation)
+    config.add_evolution_step(remove_participant_role_from_default_group)
