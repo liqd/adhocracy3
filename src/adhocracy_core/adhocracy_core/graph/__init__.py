@@ -7,6 +7,7 @@ from collections.abc import Sequence
 
 from persistent import Persistent
 from pyramid.registry import Registry
+from pyramid.location import lineage
 
 from substanced.util import find_objectmap
 from substanced.objectmap import ObjectMap
@@ -263,6 +264,13 @@ class Graph(Persistent):
                 return True
 
         return False
+
+    def get_refernces_for_removal_notificaton(self,
+                                              context: IResource,
+                                              ) -> [Reference]:
+        references = [ref for ref in self.get_references(context)
+                      if context not in lineage(ref.target)]
+        return references
 
     def send_back_reference_removal_notificatons(self,
                                                  references: [Reference],

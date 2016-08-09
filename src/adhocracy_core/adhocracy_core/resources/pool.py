@@ -109,7 +109,7 @@ class Pool(Base, Folder):
                                           registry=registry)
             registry.notify(event)
         graph = find_graph(subresource)
-        references = list(graph.get_references(subresource))
+        references = graph.get_refernces_for_removal_notificaton(subresource)
         res = super().remove(name,
                              registry=registry,
                              send_events=send_events,
