@@ -19,11 +19,6 @@ from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.tags import ITags
 
 
-def do_transition_to_propose(context: IPool, request: Request, **kwargs):
-    """Do various tasks to complete transition to propose state."""
-    _remove_state_data(context, 'result', 'start_date', request)
-
-
 def do_transition_to_voteable(context: IPool, request: Request, **kwargs):
     """Do transition from state proposed to voteable for all children."""
     for child in context.values():
@@ -71,20 +66,6 @@ def _store_state_data(context: IWorkflowAssignment, state_name: str,
     else:
         data = datas[0]
     data.update(**kwargs)
-    sheet.set({'state_data': state_data})
-
-
-def _remove_state_data(context: IWorkflowAssignment, state_name: str,
-                       key: str, request: Request):
-    sheet = request.registry.content.get_sheet(context, IWorkflowAssignment,
-                                               request=request)
-    state_data = sheet.get()['state_data']
-    datas = [x for x in state_data if x['name'] == state_name]
-    if datas == []:
-        return
-    data = datas[0]
-    if key in data:
-        del data[key]
     sheet.set({'state_data': state_data})
 
 
