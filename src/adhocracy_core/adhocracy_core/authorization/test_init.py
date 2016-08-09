@@ -331,6 +331,30 @@ def test_create_fake_god_request(registry):
     assert req.__cached_principals__ == ['role:god']
 
 
+class TestGetPrincipalsWithLocalRoles:
+
+    def call_fut(self,  *args):
+        from . import get_principals_with_local_roles
+        return get_principals_with_local_roles(*args)
+
+    def test_principals_with_no_local_roles(self, context):
+        principals = ['system.Everyone', 'system.Authenticated']
+        assert set(self.call_fut(context, principals)) == set(principals)
+
+    def test_principals_with_wrong_local_roles(self, context):
+        context.__local_roles__ = {'group:default_group': {'role:participant'}}
+        principals = ['system.Everyone', 'system.Authenticated']
+        assert set(self.call_fut(context, principals)) == set(principals)
+
+    def test_principals_with_local_roles(self, context):
+        context.__local_roles__ = {'group:default_group': {'role:participant'}}
+        principals = ['system.Everyone', 'system.Authenticated',
+                      'group:default_group']
+        principals_with_roles =  list(principals)
+        principals_with_roles.append('role:participant')
+        result = self.call_fut(context, principals)
+        assert set(result) == set(principals_with_roles)
+
 @mark.usefixtures('integration')
 def test_root_acm_extensions_adapter_register(registry, context):
     from . import IRootACMExtension
