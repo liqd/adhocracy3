@@ -213,7 +213,7 @@ class ResourceFactory:
             if workflow_assignment not in appstructs:
                 appstructs[workflow_assignment] = \
                     {'workflow': default_workflow}
-            elif 'workflow' not in appstructs[workflow_assignment]:
+            elif 'workflow' not in appstructs[workflow_assignment]:  # pragma: no branch
                 appstructs[workflow_assignment]['workflow'] = default_workflow
 
         for key, struct in appstructs.items():

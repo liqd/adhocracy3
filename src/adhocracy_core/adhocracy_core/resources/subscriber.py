@@ -195,14 +195,6 @@ def _get_last_version(resource: IItemVersion,
     return last
 
 
-def _get_first_version(resource: IItemVersion,
-                       registry: Registry) -> IItemVersion:
-    """Get first version of  resource' according to the last tag."""
-    item = find_interface(resource, IItem)
-    first = registry.content.get_sheet_field(item, ITags, 'FIRST')
-    return first
-
-
 def _create_new_version(event, appstruct) -> IResource:
     appstructs = _get_writable_appstructs(event.object, event.registry)
     appstructs[IVersionable.__identifier__]['follows'] = [event.object]

@@ -285,7 +285,7 @@ class TestWorkflowAssignmentSheet:
                                     mock_workflow):
         inst = meta.sheet_class(meta, context, registry, request=request_)
         registry.content.workflows['sample'] = mock_workflow
-        inst.set({'workflow': 'sample'})
+        inst.set({'workflow': 'sample', 'workflow_state': 'announced'})
         mock_workflow.initialize.assert_called_with(context, request=request_)
         assert not mock_workflow.transition_to_state.called
 

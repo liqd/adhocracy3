@@ -1120,6 +1120,24 @@ class TestFileStoreType:
         assert inst.deserialize(None, value) == mock_response
         assert mock_response.size == mock_fstat_result.st_size
 
+    def test_deserialize_filedict(self, inst, monkeypatch):
+        from deform.widget import filedict
+        from adhocracy_core import schema
+        import os
+        mock_response = Mock()
+        mock_file_constructor = Mock(spec=schema.File,
+                                     return_value=mock_response)
+        monkeypatch.setattr(schema, 'File', mock_file_constructor)
+        mock_fstat_result = Mock()
+        mock_fstat_result.st_size = 777
+        mock_fstat = Mock(spec=os.fstat, return_value=mock_fstat_result)
+        monkeypatch.setattr(os, 'fstat', mock_fstat)
+        value = filedict([('filename', Mock()),
+                          ('fp', Mock()),
+                         ])
+        assert inst.deserialize(None, value) == mock_response
+        assert mock_response.size == mock_fstat_result.st_size
+
     def test_deserialize_bytesio(self, inst, monkeypatch):
         from adhocracy_core import schema
         from io import BytesIO
