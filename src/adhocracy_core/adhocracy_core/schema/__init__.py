@@ -6,6 +6,7 @@ import decimal
 import io
 import os
 import re
+import string
 
 from colander import All
 from colander import Boolean as BooleanType
@@ -28,6 +29,7 @@ from deform.widget import DateTimeInputWidget
 from deform.widget import SequenceWidget
 from deform.widget import Select2Widget
 from deform.widget import SelectWidget
+from deform.widget import PasswordWidget
 from deform_markdown import MarkdownTextAreaWidget
 from deform.widget import filedict
 from pyramid.path import DottedNameResolver
@@ -679,6 +681,18 @@ class Text(SchemaNode):
     widget = MarkdownTextAreaWidget()
 
 
+@deferred
+def deferred_password_default(node: MappingSchema, kw: dict) -> string:
+    """Return generated password."""
+    return _generate_password()
+
+
+def _generate_password():
+    chars = string.ascii_letters + string.digits + '+_'
+    pwd_len = 20
+    return ''.join(chars[int(c) % len(chars)] for c in os.urandom(pwd_len))
+
+
 class Password(SchemaNode):
     """UTF-8 encoded text.
 
@@ -687,9 +701,10 @@ class Password(SchemaNode):
     """
 
     schema_type = StringType
-    default = ''
+    default = deferred_password_default
     missing = drop
     validator = Length(min=6, max=100)
+    widget = PasswordWidget()
 
 
 @deferred
