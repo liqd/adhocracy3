@@ -665,7 +665,7 @@ class AuditlogEntry(namedtuple('AuditlogEntry', ['name',
                                                  'user_name',
                                                  'user_path',
                                                  'sheet_data',
-                                                 ])):
+                                                 ])):  # pragma: no cover
     """Metadata to log which user modifies resources."""
 
     def __new__(cls,
@@ -741,7 +741,7 @@ class Activity(namedtuple('Activity', ['subject',
                 sheet_data=None,
                 published=None,
                 ):
-        if sheet_data is None:
+        if sheet_data is None:  # pragma: no cover
             sheet_data = []
         return super().__new__(cls,
                                subject,
@@ -780,7 +780,7 @@ class SerializedActivity(namedtuple('SerializedActivity', ['subject_path',
                 target_path='',
                 sheet_data=None,
                 ):
-        if sheet_data is None:
+        if sheet_data is None:  # pragma: no cover
             sheet_data = []
         return super().__new__(cls,
                                subject_path,

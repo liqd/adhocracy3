@@ -223,7 +223,7 @@ class WorkflowAssignmentSheet(AnnotationRessourceSheet):
         super()._store_data(appstruct)
 
     def _initialize(self, name: str):
-        if name != '':
+        if name != '':  # pragma: no branch
             workflow = self.registry.content.workflows[name]
             workflow.initialize(self.context, request=self.request)
 
@@ -232,7 +232,7 @@ class WorkflowAssignmentSheet(AnnotationRessourceSheet):
         appstruct = super()._get_data_appstruct()
         if 'workflow' in appstruct:
             name = appstruct['workflow']
-            if name:
+            if name:  # pragma: no branch
                 workflow = self.registry.content.workflows[name]
                 appstruct['workflow_state'] = workflow.state_of(self.context)
         return appstruct
