@@ -126,11 +126,12 @@ class TestUser:
                                      )
         assert meta.extended_sheets == \
             (adhocracy_core.sheets.principal.IPasswordAuthentication,
-                adhocracy_core.sheets.rate.ICanRate,
-                adhocracy_core.sheets.badge.ICanBadge,
-                adhocracy_core.sheets.badge.IBadgeable,
-                adhocracy_core.sheets.image.IImageReference,
-                adhocracy_core.sheets.notification.INotification,
+             adhocracy_core.sheets.principal.IActivationConfiguration,
+             adhocracy_core.sheets.rate.ICanRate,
+             adhocracy_core.sheets.badge.ICanBadge,
+             adhocracy_core.sheets.badge.IBadgeable,
+             adhocracy_core.sheets.image.IImageReference,
+             adhocracy_core.sheets.notification.INotification,
             )
         assert meta.element_types == ()
         assert meta.use_autonaming is True

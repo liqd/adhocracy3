@@ -3,11 +3,13 @@ from colander import required
 from colander import deferred
 from colander import Invalid
 from colander import All
+from colander import OneOf
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from pyramid.settings import asbool
 from pyramid.traversal import resource_path
 from substanced.util import find_service
 from urllib.parse import urljoin
+from deform.widget import SelectWidget
 import requests
 
 from adhocracy_core.interfaces import ISheet
@@ -324,6 +326,48 @@ password_meta = sheet_meta._replace(
 )
 
 
+class ActivationSetting(SingleLine):
+    """Activation setting.
+
+    Possible values: direct, registration_mail, invitation_mail
+    """
+
+    default = 'registration_mail'
+
+    @deferred
+    def validator(self, kw: dict):
+        """Validator."""
+        return OneOf(('direct', 'registration_mail', 'invitation_mail'))
+
+    @deferred
+    def widget(self, kw: dict) -> SelectWidget:
+        choices = [(x, x) for x in self.validator.choices]
+        return SelectWidget(values=choices)
+
+
+class IActivationConfiguration(ISheet):
+    """Marker interface for the user activation configutation sheet."""
+
+
+class ActivationConfigutationSchema(MappingSchema):
+    """Data structure for user activation configuration.
+
+    `activation`: One of 'direct', 'register' or 'invite'
+    """
+
+    activation = ActivationSetting()
+
+
+activation_configuration_meta = sheet_meta._replace(
+    isheet=IActivationConfiguration,
+    schema_class=ActivationConfigutationSchema,
+    readable=False,
+    creatable=True,
+    editable=False,
+    permission_create='create_user',
+)
+
+
 def includeme(config):
     """Register sheets and activate catalog factory."""
     add_sheet_to_registry(userbasic_meta, config.registry)
@@ -339,3 +383,4 @@ def includeme(config):
     add_sheet_to_registry(password_meta, config.registry)
     add_sheet_to_registry(group_meta, config.registry)
     add_sheet_to_registry(permissions_meta, config.registry)
+    add_sheet_to_registry(activation_configuration_meta, config.registry)
