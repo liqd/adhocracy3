@@ -63,7 +63,7 @@ def main():
                     'type': 'MultiPolygon'}
 
         appstructs = {IName.__identifier__:
-                      {'name': 'stadtbezirk' + _slugify(bezirk)},
+                      {'name': 'stadtbezirk-' + _slugify(bezirk)},
                       IMultiPolygon.__identifier__: geosheet,
                       ITitle.__identifier__: {'title': bezirk}
                       }
