@@ -47,6 +47,7 @@ from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.asset import IAssetData
 from adhocracy_core.sheets.image import IImageReference
+from adhocracy_core.sheets.principal import IActivationConfiguration
 
 logger = getLogger(__name__)
 
@@ -244,21 +245,35 @@ def send_password_reset_mail(event):
     event.registry.messenger.send_password_reset_mail(user, password_reset)
 
 
-def send_activation_mail_or_activate_user(event):
-    """Send mail with activation link if a user is created.
+def apply_user_activation_configuration(event):
+    """Activate user or send activation or invite email.
 
     If the setting "adhocracy.skip_registration_mail" is true, no mail is send
     but the user is activated directly.
     """
-    settings = event.registry.settings
     user = event.object
-    skip_mail = asbool(settings.get('adhocracy.skip_registration_mail', False))
-    if skip_mail:
+    registry = event.registry
+    sheet = registry.content.get_sheet(user, IActivationConfiguration)
+    activation_config = sheet.get()['activation']
+    if _is_activation_disabled(registry):
         user.activate()
-        return
+    elif activation_config == 'direct':
+        user.activate()
+    elif activation_config == 'registration_mail':
+        _send_activation_mail(user, registry)
+    elif activation_config == 'invitation_mail':  # pragma: no branch
+        _send_invitation_mail(user, registry)
+
+
+def _is_activation_disabled(registry):
+    settings = registry.settings
+    return asbool(settings.get('adhocracy.skip_registration_mail', False))
+
+
+def _send_activation_mail(user, registry):
     activation_path = _generate_activation_path()
     user.activation_path = activation_path
-    messenger = getattr(event.registry, 'messenger', None)
+    messenger = getattr(registry, 'messenger', None)
     if messenger is not None:  # ease testing
         messenger.send_registration_mail(user, activation_path)
 
@@ -272,6 +287,18 @@ def _generate_activation_path() -> str:
     # and '/' might cause problems as well, especially if it occurs multiple
     # times in a row.
     return '/activate/' + b64encode(random_bytes, altchars=b'+_').decode()
+
+
+def _send_invitation_mail(user, registry):
+    resets = find_service(user, 'principals', 'resets')
+    reset = registry.content.create(IPasswordReset.__identifier__,
+                                    resets,
+                                    creator=user,
+                                    send_event=False,
+                                    )
+    messenger = getattr(registry, 'messenger', None)
+    if messenger is not None:  # ease testing
+        messenger.send_invitation_mail(user, reset)
 
 
 def update_asset_download(event):
@@ -374,7 +401,7 @@ def includeme(config):
     config.add_subscriber(add_default_group_to_user,
                           IResourceCreatedAndAdded,
                           object_iface=IUser)
-    config.add_subscriber(send_activation_mail_or_activate_user,
+    config.add_subscriber(apply_user_activation_configuration,
                           IResourceCreatedAndAdded,
                           object_iface=IUser)
     config.add_subscriber(update_modification_date_modified_by,
