@@ -722,7 +722,7 @@ class PasswordUnitTest(unittest.TestCase):
         result = inst.serialize()
         assert len(result) == 20
 
-    def test_bind_and_setup_datetime_widget(self):
+    def test_bind_and_setup_password_widget(self):
         from deform.widget import PasswordWidget
         inst = self.make_one().bind()
         widget = inst.widget
