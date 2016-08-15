@@ -47,7 +47,7 @@
     $image-base-size: 200px;
 
     // position nicely on top of the username and center
-    @include rem(margin, 60px auto -60px);
+    @include rem(margin, 1rem auto);
 
     @include rem(height, $image-base-size);
     @include rem(width, $image-base-size);
@@ -132,11 +132,7 @@
     vertical-align: top;
 }
 
-
 .user-description {
-    // counteract margin bottom from the username
-    @include rem(margin-top, -72px);
-
     textarea {
         text-align: center;
     }

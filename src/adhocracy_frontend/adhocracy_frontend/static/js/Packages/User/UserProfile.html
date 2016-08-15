@@ -4,8 +4,6 @@
     data-ng-if="path"
     class="user-profile-info">
 
-    <adh-user-profile-image-edit data-path="{{path}}"></adh-user-profile-image-edit>
-
     <div class="resource-navigation">
         <adh-resource-dropdown
             data-messaging="true"
@@ -19,6 +17,8 @@
                 class="badge">{{ assignment.title | translate }}
             </span>
         </div>
+
+        <adh-user-profile-image-edit data-path="{{path}}"></adh-user-profile-image-edit>
 
         <h1 class="resource-header-title">{{ userBasic.name }}</h1>
 
