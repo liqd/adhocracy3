@@ -668,8 +668,10 @@ export var userProfileDirective = (
 
             scope.$watch("path", (path) => {
                 adhHttp.get(scope.path).then((user) => {
-                    scope.description = user.data[SIDescription.nick].description;
-                    scope.shortDescription = user.data[SIDescription.nick].short_description;
+                    scope.data = {
+                        description: user.data[SIDescription.nick].description,
+                        shortDescription: user.data[SIDescription.nick].short_description,
+                    };
                 });
             });
 
@@ -680,8 +682,8 @@ export var userProfileDirective = (
                         data: {}
                     };
                     patch.data[SIDescription.nick] = new SIDescription.Sheet({
-                        description: scope.description,
-                        short_description: scope.shortDescription,
+                        description: scope.data.description,
+                        short_description: scope.data.shortDescription,
                     });
                     return adhHttp.put(oldUser.path, patch);
                 });
