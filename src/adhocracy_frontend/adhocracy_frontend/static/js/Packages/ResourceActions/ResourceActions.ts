@@ -1,3 +1,5 @@
+import * as _ from "lodash";
+
 import * as AdhConfig from "../Config/Config";
 import * as AdhHttp from "../Http/Http";
 import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
@@ -68,6 +70,11 @@ export var resourceActionsDirective = (
         restrict: "E",
         scope: {
             resourcePath: "@",
+            // If the resource is versionable, some actions should be
+            // performed on the item instead. This is why we need to
+            // know the itemPath. If the resource is not versionable,
+            // itemPath should be the same as resourcePath.
+            itemPath: "@",
             resourceWithBadgesUrl: "@?",
             deleteRedirectUrl: "@?",
             assignBadges: "=?",
@@ -104,6 +111,7 @@ export var resourceDropdownDirective = (
         restrict: "E",
         scope: {
             resourcePath: "@",
+            itemPath: "@",
             resourceWithBadgesUrl: "@?",
             deleteRedirectUrl: "@?",
             assignBadges: "=?",
@@ -121,39 +129,23 @@ export var resourceDropdownDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceDropdown.html",
         link: (scope, element) => {
             scope.data = {
-                resourcePath: scope.resourcePath,
-                resourceWithBadgesUrl: scope.resourceWithBadgesUrl,
-                deleteRedirectUrl: scope.deleteRedirectUrl,
-                assignBadges: scope.assignBadges,
-                share: scope.share,
-                hide: scope.hide,
-                resourceWidgetDelete: scope.resourceWidgetDelete,
-                print: scope.print,
-                report: scope.report,
-                cancel: scope.cancel,
-                edit: scope.edit,
-                image: scope.image,
-                moderate: scope.moderate,
-                modals: scope.modals
+                isShowDropdown: false,
             };
-            scope.data.modals = new Modals($timeout);
-            adhPermissions.bindScope(scope, scope.data.resourcePath, "options");
+
+            scope.modals = new Modals($timeout);
+            adhPermissions.bindScope(scope, scope.resourcePath, "options");
 
             scope.$watch("resourcePath", () => {
-                scope.data.modals.clear();
+                scope.modals.clear();
             });
 
-            scope.data.toggleDropdown = () => {
-                scope.isShowDropdown = !scope.isShowDropdown;
+            scope.toggleDropdown = () => {
+                scope.data.isShowDropdown = !scope.data.isShowDropdown;
             };
 
-            scope.data.isShowDropdownMenu = true;
-            scope.$watch("data.modals.lastId", (id : number) => {
-                if (id !== 0) {
-                    scope.data.isShowDropdownMenu = false;
-                    $timeout(() => scope.data.isShowDropdownMenu = true, 3000);
-                }
-            });
+            scope.showDropdownMenu = () => {
+                return !scope.modals.modal && _.isEmpty(scope.modals.alerts);
+            };
 
             scope.id = "resourceDropdown" + Math.random();
 
@@ -161,7 +153,7 @@ export var resourceDropdownDirective = (
             element.focusout(() => {
                 $timeout(() => {
                     if (!$.contains(element[0], document.activeElement)) {
-                        scope.isShowDropdown = false;
+                        scope.data.isShowDropdown = false;
                     }
                 });
             });
