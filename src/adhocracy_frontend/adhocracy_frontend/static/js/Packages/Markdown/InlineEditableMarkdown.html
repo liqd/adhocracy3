@@ -8,11 +8,11 @@
             class="inline-editable-markdown-empty-placeholder">
             {{ "TR__ADD_TITLE" | translate:{title: title} }}…
         </span>
-        <div
+        <span
             data-ng-if="!isEditing && !isMarkdown"
             data-ng-click="startEditing()">
             {{data.parsetext}}
-        </div>
+        </span>
         <adh-parse-markdown
             data-ng-if="!isEditing && isMarkdown"
             data-ng-click="startEditing()"
