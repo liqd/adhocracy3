@@ -25,6 +25,7 @@
         </a>
         <textarea
             placeholder="{{ title }} - {{ 'TR__PLEASE_KEEP_THIS_SHORT' | translate }}"
+            maxlength="{{maxlength}}"
             data-msd-elastic=""
             data-ng-if="isEditing"
             data-ng-model="data.parsetext"></textarea>

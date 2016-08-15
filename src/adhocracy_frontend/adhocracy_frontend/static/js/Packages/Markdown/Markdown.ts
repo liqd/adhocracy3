@@ -38,6 +38,7 @@ export var inlineEditableMarkdownDirective = (
             isEditable: "=",
             markdown: "=",
             title: "@",
+            maxlength: "=",
             didClickSave: "&"
         },
         restrict: "E",
