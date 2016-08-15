@@ -139,7 +139,6 @@ export var register = (angular) => {
             "adhConfig", "adhPermissions", "adhTopLevelState", "$timeout", AdhUserViews.userDetailColumnDirective])
         .directive("adhUserProfileImage", ["adhHttp", "adhConfig", AdhUserViews.adhUserProfileImageDirective])
         .directive("adhUserProfileImageEdit", ["adhHttp", "adhPermissions", "adhConfig", AdhUserViews.adhUserProfileImageEditDirective])
-        .directive("adhUserProfileDescriptionEdit", ["adhHttp", "adhPermissions", "adhConfig", AdhUserViews.adhUserProfileDescriptionEditDirective])
         .directive("adhUserActivityOverview", ["adhConfig", "adhHttp", AdhUserViews.adhUserActivityOverviewDirective])
         .directive("adhHelpLink", ["adhConfig", AdhUserViews.adhHelpLinkDirective]);
 };

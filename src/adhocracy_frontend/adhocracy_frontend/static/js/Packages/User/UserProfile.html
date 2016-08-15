@@ -13,7 +13,24 @@
         </span>
     </h1>
 
-    <adh-user-profile-description-edit data-path="{{path}}"></adh-user-profile-description-edit>
+    <div class="user-description">
+        <adh-inline-editable-markdown
+            class="user-description-short"
+            data-parsetext="shortDescription"
+            data-title="{{ 'TR__SHORT_DESCRIPTION' | translate }}"
+            data-is-editable="options.PUT"
+            data-did-click-save="saveDescription()"
+            markdown="true"
+        ></adh-inline-editable-markdown>
+        <adh-inline-editable-markdown
+            class="user-description-long"
+            data-parsetext="description"
+            data-is-editable="options.PUT"
+            data-title="{{ 'TR__DESCRIPTION' | translate }}"
+            data-did-click-save="saveDescription()"
+            markdown="true"
+        ></adh-inline-editable-markdown>
+    </div>
 
     <a href="" data-ng-click="showMessaging()" class="user-profile-info-button">
         <i class="icon-mail user-profile-info-icon"></i>
