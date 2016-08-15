@@ -52,7 +52,6 @@ from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
 from adhocracy_core.sheets.badge import get_assignable_badges
 from adhocracy_core.sheets.badge import IBadgeAssignment
-from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.sheets.pool import IPool as IPoolSheet
 from adhocracy_core.sheets.versions import IVersionable
@@ -102,7 +101,6 @@ class ResourceRESTView:
             put_sheets = [(s.meta.isheet.__identifier__, empty) for s in edits]
             if put_sheets:
                 put_sheets_dict = dict(put_sheets)
-                self._add_metadata_edit_permission_info(put_sheets_dict)
                 self._add_workflow_edit_permission_info(put_sheets_dict, edits)
                 cstruct['PUT']['request_body']['data'] = put_sheets_dict
             else:
@@ -148,16 +146,6 @@ class ResourceRESTView:
             del cstruct['POST']
         return cstruct
 
-    def _add_metadata_edit_permission_info(self, cstruct: dict):
-        """Add info if a user may set the hidden metadata fields."""
-        if IMetadata.__identifier__ not in cstruct:
-            return
-        # everybody who can PUT metadata can delete the resource
-        permission_info = {'deleted': [True, False]}
-        if self.request.has_permission('hide', self.context):
-            permission_info['hidden'] = [True, False]
-        cstruct[IMetadata.__identifier__] = permission_info
-
     def _add_workflow_edit_permission_info(self, cstruct: dict, edit_sheets):
         """Add info if a user may set the workflow_state workflow field."""
         workflow_sheets = [s for s in edit_sheets
@@ -177,7 +165,7 @@ class ResourceRESTView:
         permission='view',
     )
     def get(self) -> dict:
-        """Get resource data (unless deleted or hidden)."""
+        """Get resource data (unless hidden)."""
         metric = self._get_get_metric_name()
         with statsd_timer(metric, rate=.1, registry=self.registry):
             schema = create_schema(GETResourceResponseSchema,

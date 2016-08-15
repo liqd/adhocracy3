@@ -9,7 +9,6 @@ from substanced.catalog import IndexFactory
 from substanced.util import find_service
 from adhocracy_core.catalog.index import ReferenceIndex
 from adhocracy_core.exceptions import RuntimeConfigurationError
-from adhocracy_core.utils import is_deleted
 from adhocracy_core.utils import is_hidden
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import search_query
@@ -43,7 +42,7 @@ class AdhocracyCatalogIndexes:
     """
 
     tag = catalog.Keyword()
-    private_visibility = catalog.Keyword()  # visible / deleted / hidden
+    private_visibility = catalog.Keyword()  # visible / hidden
     badge = catalog.Keyword()
     item_badge = catalog.Keyword()
     title = catalog.Field()
@@ -81,18 +80,12 @@ def index_item_creation_date(resource, default) -> str:
 def index_visibility(resource, default) -> [str]:
     """Return value for the private_visibility index.
 
-    The return value will be one of [visible], [deleted], [hidden], or
-    [deleted, hidden].
+    Te return value will be one of [visible], [hidden]
     """
-    # FIXME: be more dry, this almost the same like what
-    # utils.get_reason_if_blocked is doing
-    result = []
-    if is_deleted(resource):
-        result.append('deleted')
     if is_hidden(resource):
-        result.append('hidden')
-    if not result:
-        result.append('visible')
+        result = ['hidden']
+    else:
+        result = ['visible']
     return result
 
 

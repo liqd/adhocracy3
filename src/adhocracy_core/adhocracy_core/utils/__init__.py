@@ -179,18 +179,6 @@ def is_batchmode(request: Request) -> bool:
     return getattr(request, '__is_batchmode__', False)
 
 
-def is_deleted(resource: IResource) -> dict:
-    """Check whether a resource is deleted.
-
-    This also returns True for descendants of deleted resources, as a positive
-    deleted status is inherited.
-    """
-    for context in lineage(resource):
-        if getattr(context, 'deleted', False):
-            return True
-    return False
-
-
 def is_hidden(resource: IResource) -> dict:
     """Check whether a resource is hidden.
 
@@ -206,10 +194,8 @@ def is_hidden(resource: IResource) -> dict:
 def get_reason_if_blocked(resource: IResource) -> str:
     """Check if a resource is blocked and return Reason, None otherwise."""
     reason = None
-    if is_deleted(resource):
-        reason = 'deleted'
     if is_hidden(resource):
-        reason = 'both' if reason else 'hidden'
+        reason = 'hidden'
     return reason
 
 
@@ -256,13 +242,8 @@ def extract_events_from_changelog_metadata(meta: ChangelogMetadata) -> list:
 @dispatch(ResourceSheetModified)
 def get_visibility_change(event):
     """Return changed visbility for `event.object`."""
-
-    is_deleted = event.new_appstruct.get('deleted', False)
-    is_hidden = event.new_appstruct.get('hidden', False)
-    was_deleted = event.old_appstruct['deleted']
-    was_hidden = event.old_appstruct['hidden']
-    was_visible = not (was_hidden or was_deleted)
-    is_visible = not (is_hidden or is_deleted)
+    was_visible = not event.old_appstruct['hidden']
+    is_visible = not event.new_appstruct.get('hidden', False)
     if was_visible:
         if is_visible:
             return VisibilityChange.visible

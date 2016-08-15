@@ -185,31 +185,6 @@ class TestResourceRESTView:
                   'OPTIONS': {}}
         assert wanted == response
 
-    def test_add_metadata_permissions_info_no_metadata(self, request_, context):
-        inst = self.make_one(context, request_)
-        d = {'DummySheet': {}}
-        inst._add_metadata_edit_permission_info(d)
-        assert d == {'DummySheet': {}}
-
-    def test_add_metadata_permissions_info_without_hide_permission(
-            self, request_, context):
-        from adhocracy_core.sheets.metadata import IMetadata
-        request_.has_permission = Mock(return_value=False)
-        inst = self.make_one(context, request_)
-        d = {IMetadata.__identifier__: {}}
-        inst._add_metadata_edit_permission_info(d)
-        assert d == {IMetadata.__identifier__: {'deleted': [True, False]}}
-
-    def test_add_metadata_permissions_info_with_hide_permission(
-            self, request_, context):
-        from adhocracy_core.sheets.metadata import IMetadata
-        request_.has_permission = Mock(return_value=True)
-        inst = self.make_one(context, request_)
-        d = {IMetadata.__identifier__: {}}
-        inst._add_metadata_edit_permission_info(d)
-        assert d == {IMetadata.__identifier__: {'deleted': [True, False],
-                                                'hidden': [True, False]}}
-
     def test_add_workflow_permissions_info(
             self, request_, registry, context, mock_sheet, mock_workflow):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment

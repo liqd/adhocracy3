@@ -234,7 +234,7 @@ def _add_colander_invalid_error(error: Invalid, request: IRequest,
 def validate_visibility(view: callable):
     """Decorator for :term:`view` to check if `context` is visible.
 
-    :raises HTTPGone: if `context` is deleted or hidden and request method
+    :raises HTTPGone: if `context` is hidden and request method
                       is GET, HEAD, or POST.
     """
     def wrapped_view(context: IResource, request: IRequest):

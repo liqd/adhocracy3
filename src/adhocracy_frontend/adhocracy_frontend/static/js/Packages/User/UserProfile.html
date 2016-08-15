@@ -23,7 +23,14 @@
         <h1 class="resource-header-title">{{ userBasic.name }}</h1>
 
         <div class="resource-header-description">
-            <adh-user-profile-description-edit data-path="{{path}}"></adh-user-profile-description-edit>
+            <adh-inline-editable-markdown
+                class="user-description-short"
+                data-parsetext="shortDescription"
+                data-title="{{ 'TR__SHORT_DESCRIPTION' | translate }}"
+                data-is-editable="options.PUT"
+                data-did-click-save="saveDescription()"
+                data-maxlength="200"
+            ></adh-inline-editable-markdown>
         </div>
     </header>
 

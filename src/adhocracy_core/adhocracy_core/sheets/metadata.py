@@ -69,9 +69,6 @@ class MetadataSchema(MappingSchema):
 
     `modification_date`: Modification date of this resource. defaults to now.
 
-    `deleted`: whether the resource is marked as deleted (only shown to those
-    that specifically ask for it)
-
     `hidden`: whether the resource is marked as hidden (only shown to those
     that have special permissions and ask for it)
 
@@ -82,7 +79,6 @@ class MetadataSchema(MappingSchema):
     item_creation_date = DateTime(missing=drop, readonly=True)
     modified_by = Reference(reftype=MetadataModifiedByReference, readonly=True)
     modification_date = DateTime(missing=drop, readonly=True)
-    deleted = Boolean()
     hidden = Boolean(validator=deferred_check_hide_permission)
 
 
@@ -93,7 +89,7 @@ metadata_meta = sheet_meta._replace(
     editable=True,
     creatable=True,
     readable=True,
-    permission_edit='delete',
+    permission_edit='hide',
 )
 
 

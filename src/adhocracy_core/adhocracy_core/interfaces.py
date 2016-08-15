@@ -901,7 +901,7 @@ class SearchQuery(namedtuple('Query', ['interfaces',
     depth (int):
        path depth to search descendants
     only_visible (bool):
-        filter hidden and deleted resources
+        filter hidden resources
     allows ([str], str):
         filter resources that don't allow the :term:`principals <principal>`
         the given permission ([principal], permission).
