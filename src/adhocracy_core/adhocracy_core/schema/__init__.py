@@ -704,7 +704,7 @@ class Password(SchemaNode):
     default = deferred_password_default
     missing = drop
     validator = Length(min=6, max=100)
-    widget = PasswordWidget()
+    widget = PasswordWidget(redisplay=True)
 
 
 @deferred
