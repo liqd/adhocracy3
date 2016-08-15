@@ -121,34 +121,22 @@ export var resourceDropdownDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceDropdown.html",
         link: (scope, element) => {
             scope.data = {
-                resourcePath: scope.resourcePath,
-                resourceWithBadgesUrl: scope.resourceWithBadgesUrl,
-                deleteRedirectUrl: scope.deleteRedirectUrl,
-                assignBadges: scope.assignBadges,
-                share: scope.share,
-                hide: scope.hide,
-                resourceWidgetDelete: scope.resourceWidgetDelete,
-                print: scope.print,
-                report: scope.report,
-                cancel: scope.cancel,
-                edit: scope.edit,
-                image: scope.image,
-                moderate: scope.moderate,
-                modals: scope.modals
+                isShowDropdown: false,
+                isShowDropdownMenu: true,
             };
-            scope.data.modals = new Modals($timeout);
-            adhPermissions.bindScope(scope, scope.data.resourcePath, "options");
+
+            scope.modals = new Modals($timeout);
+            adhPermissions.bindScope(scope, scope.resourcePath, "options");
 
             scope.$watch("resourcePath", () => {
-                scope.data.modals.clear();
+                scope.modals.clear();
             });
 
-            scope.data.toggleDropdown = () => {
-                scope.isShowDropdown = !scope.isShowDropdown;
+            scope.toggleDropdown = () => {
+                scope.data.isShowDropdown = !scope.data.isShowDropdown;
             };
 
-            scope.data.isShowDropdownMenu = true;
-            scope.$watch("data.modals.lastId", (id : number) => {
+            scope.$watch("modals.lastId", (id : number) => {
                 if (id !== 0) {
                     scope.data.isShowDropdownMenu = false;
                     $timeout(() => scope.data.isShowDropdownMenu = true, 3000);
@@ -161,7 +149,7 @@ export var resourceDropdownDirective = (
             element.focusout(() => {
                 $timeout(() => {
                     if (!$.contains(element[0], document.activeElement)) {
-                        scope.isShowDropdown = false;
+                        scope.data.isShowDropdown = false;
                     }
                 });
             });
