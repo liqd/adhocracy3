@@ -60,8 +60,10 @@ export var inlineEditableMarkdownDirective = (
                 }
             });
             scope.startEditing = () => {
-                scope.originalMarkdown = scope.parsetext;
-                scope.isEditing = true;
+                if (scope.isEditable) {
+                    scope.originalMarkdown = scope.parsetext;
+                    scope.isEditing = true;
+                }
             };
             scope.cancelEditing = () => {
                 scope.parsetext = scope.originalMarkdown;
