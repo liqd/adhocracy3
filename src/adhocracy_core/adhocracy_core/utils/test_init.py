@@ -157,32 +157,16 @@ class TestGetMatchingIsheet:
         assert self.call_fut(context, IPredicateSheet) is None
 
 
-def test_get_reason_blocked_not_deleted_not_hidden(context):
+def test_get_reason_blocked_not_hidden(context):
     from . import get_reason_if_blocked
-    context.deleted = False
     context.hidden = False
     assert get_reason_if_blocked(context) == None
 
 
-def test_get_reason_blocked_is_deleted_not_hidden(context):
-    from . import get_reason_if_blocked
-    context.deleted = True
-    context.hidden = False
-    assert get_reason_if_blocked(context) == 'deleted'
-
-
 def test_get_reason_blocked_not_hidden_is_hidden(context):
     from . import get_reason_if_blocked
-    context.deleted = False
     context.hidden = True
     assert get_reason_if_blocked(context) == 'hidden'
-
-
-def test_get_reason_blocked_is_hidden_is_hidden(context):
-    from . import get_reason_if_blocked
-    context.deleted = True
-    context.hidden = True
-    assert get_reason_if_blocked(context) == 'both'
 
 
 class TestGetVisibilityChange:
@@ -207,26 +191,20 @@ class TestGetVisibilityChange:
 
     def test_newly_hidden(self, event):
         from adhocracy_core.interfaces import VisibilityChange
-        event.old_appstruct = {'deleted': False, 'hidden': False}
-        event.new_appstruct = {'deleted': False, 'hidden': True}
+        event.old_appstruct = {'hidden': False}
+        event.new_appstruct = {'hidden': True}
         assert self.call_fut(event) == VisibilityChange.concealed
-
-    def test_newly_undeleted(self, event):
-        from adhocracy_core.interfaces import VisibilityChange
-        event.old_appstruct = {'deleted': True, 'hidden': False}
-        event.new_appstruct = {'deleted': False, 'hidden': False}
-        assert self.call_fut(event) == VisibilityChange.revealed
 
     def test_no_change_invisible(self, event):
         from adhocracy_core.interfaces import VisibilityChange
-        event.old_appstruct = {'deleted': False, 'hidden': True}
-        event.new_appstruct = {'deleted': False, 'hidden': True}
+        event.old_appstruct = {'hidden': True}
+        event.new_appstruct = {'hidden': True}
         assert self.call_fut(event) == VisibilityChange.invisible
 
     def test_no_change_visible(self, event):
         from adhocracy_core.interfaces import VisibilityChange
-        event.old_appstruct = {'deleted': False, 'hidden': False}
-        event.new_appstruct = {'deleted': False, 'hidden': False}
+        event.old_appstruct = {'hidden': False}
+        event.new_appstruct = {'hidden': False}
         assert self.call_fut(event) == VisibilityChange.visible
 
     def test_return_invisible_if_deleted_event(self, context, pool):
@@ -254,55 +232,6 @@ def test_get_modification_date_cached():
     registry = testing.DummyResource(__date__=now)
     result = get_modification_date(registry)
     assert result is registry.__modification_date__
-
-
-def test_is_deleted_attribute_is_true(context):
-    from . import is_deleted
-    context.deleted = True
-    assert is_deleted(context) is True
-
-
-def test_is_deleted_attribute_is_false(context):
-    from . import is_deleted
-    context.deleted = False
-    assert is_deleted(context) is False
-
-
-def test_is_deleted_attribute_not_set(context):
-    from . import is_deleted
-    assert is_deleted(context) is False
-
-
-def test_is_deleted_parent_attribute_is_true(context):
-    from . import is_deleted
-    child = testing.DummyResource()
-    context['child'] = child
-    context.deleted = True
-    assert is_deleted(child) is True
-
-
-def test_is_deleted_parent_attribute_is_false(context):
-    from . import is_deleted
-    child = testing.DummyResource()
-    context['child'] = child
-    context.deleted = False
-    assert is_deleted(child) is False
-
-
-def test_is_deleted_parent_attribute_not_set(context):
-    from . import is_deleted
-    child = testing.DummyResource()
-    context['child'] = child
-    assert is_deleted(child) is False
-
-
-def test_is_deleted_parent_attrib_true_child_attrib_false(context):
-    from . import is_deleted
-    child = testing.DummyResource()
-    context['child'] = child
-    context.deleted = True
-    child.deleted = False
-    assert is_deleted(child) is True
 
 
 def test_is_hidden_attribute_is_true(context):

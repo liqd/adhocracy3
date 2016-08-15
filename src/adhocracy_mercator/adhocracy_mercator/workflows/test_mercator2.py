@@ -131,8 +131,7 @@ class TestMercator2:
                                                     proposal0_url):
         from adhocracy_mercator.sheets.mercator2 import ITopic
         resp = app_participant.options(proposal0_url)
-        data = resp.json_body['PUT']['request_body']['data']
-        assert ITopic.__identifier__ not in data
+        assert 'PUT' not in resp.json_body
 
     def test_evaluate_moderator_can_update_winnerinfo(self,
                                                       app_moderator,
@@ -223,5 +222,4 @@ class TestMercator2:
                                                   proposal0_url):
         from adhocracy_mercator.sheets.mercator2 import ITopic
         resp = app_participant.options(proposal0_url)
-        data = resp.json_body['PUT']['request_body']['data']
-        assert ITopic.__identifier__ not in data
+        assert 'PUT' not in resp.json_body
