@@ -43,7 +43,7 @@ export var inlineEditableMarkdownDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/InlineEditableMarkdown.html",
         link: (scope) => {
             scope.isEditing = false;
-            // Sorry for the hubhub with the watches here, but the template has multiple levels of child 
+            // Sorry for the hubhub with the watches here, but the template has multiple levels of child
             // scopes (due to nested ng-if's), so we need a way to ensure that we can get a notification back
             // here when the value is changed deep inside. data = {} is that way.
             // REFACT would be nice to enhance scope with $bind()...
