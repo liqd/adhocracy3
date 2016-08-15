@@ -51,15 +51,11 @@ export var inlineEditableMarkdownDirective = (
             // REFACT would be nice to enhance scope with $bind()...
             scope.data = { parsetext: scope.parsetext };
             scope.$watch("parsetext", (parsetext) => {
-                scope.isEmpty = 0 === parsetext.trim().length;
-                if (scope.data.parsetext !== parsetext) {
-                    scope.data.parsetext = parsetext;
-                }
+                scope.isEmpty = !parsetext || 0 === parsetext.trim().length;
+                scope.data.parsetext = parsetext;
             });
             scope.$watch("data.parsetext", (parsetext) => {
-                if (scope.parsetext !== parsetext) {
-                    scope.parsetext = parsetext;
-                }
+                scope.parsetext = parsetext;
             });
             scope.startEditing = () => {
                 if (scope.isEditable) {
