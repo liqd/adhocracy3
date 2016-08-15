@@ -1,3 +1,5 @@
+import * as _ from "lodash";
+
 import * as AdhConfig from "../Config/Config";
 import * as AdhHttp from "../Http/Http";
 import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
@@ -122,7 +124,6 @@ export var resourceDropdownDirective = (
         link: (scope, element) => {
             scope.data = {
                 isShowDropdown: false,
-                isShowDropdownMenu: true,
             };
 
             scope.modals = new Modals($timeout);
@@ -136,12 +137,9 @@ export var resourceDropdownDirective = (
                 scope.data.isShowDropdown = !scope.data.isShowDropdown;
             };
 
-            scope.$watch("modals.lastId", (id : number) => {
-                if (id !== 0) {
-                    scope.data.isShowDropdownMenu = false;
-                    $timeout(() => scope.data.isShowDropdownMenu = true, 3000);
-                }
-            });
+            scope.showDropdownMenu = () => {
+                return !scope.modals.modal && _.isEmpty(scope.modals.alerts);
+            };
 
             scope.id = "resourceDropdown" + Math.random();
 
