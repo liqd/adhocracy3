@@ -140,7 +140,7 @@ export class Service {
             POST: !!raw.data.POST,
             HEAD: !!raw.data.HEAD,
             DELETE: !!raw.data.DELETE,
-            hide: Boolean(metadata && _.has(metadata, "hidden")),
+            hide: !!metadata,
             canPost: (contentType : string) => {
                 if (raw.data.POST) {
                     var postOptions = raw.data.POST.request_body;
