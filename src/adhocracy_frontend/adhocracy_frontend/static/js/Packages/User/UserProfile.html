@@ -4,10 +4,10 @@
     data-ng-if="path"
     class="user-profile-info">
 
-    <div class="resource-navigation">
+    <div class="resource-navigation" data-ng-if="messageOptions.POST">
         <adh-resource-dropdown
             data-resource-path="{{path}}"
-            data-messaging="true">
+            data-messaging="messageOptions.POST">
         </adh-resource-dropdown>
     </div>
     <header class="resource-header">
