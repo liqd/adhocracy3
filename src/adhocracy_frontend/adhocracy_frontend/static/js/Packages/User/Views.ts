@@ -667,12 +667,18 @@ export var userProfileDirective = (
             adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
 
             scope.$watch("path", (path) => {
-                adhHttp.get(scope.path).then((user) => {
-                    scope.data = {
-                        description: user.data[SIDescription.nick].description,
-                        shortDescription: user.data[SIDescription.nick].short_description,
-                    };
-                });
+                if (path) {
+                    adhHttp.get(path).then((user) => {
+                        scope.userBasic = user.data[SIUserBasic.nick];
+                        scope.data = {
+                            description: user.data[SIDescription.nick].description,
+                            shortDescription: user.data[SIDescription.nick].short_description,
+                        };
+                        adhGetBadges(user).then((assignments) => {
+                            scope.assignments = assignments;
+                        });
+                    });
+                }
             });
 
             scope.saveDescription = () => {
@@ -688,17 +694,6 @@ export var userProfileDirective = (
                     return adhHttp.put(oldUser.path, patch);
                 });
             };
-
-            if (scope.path) {
-                adhHttp.resolve(scope.path)
-                    .then((res) => {
-                        scope.userBasic = res.data[SIUserBasic.nick];
-                        scope.userShortDescription = res.data[SIDescription.nick].short_description;
-                        adhGetBadges(res).then((assignments) => {
-                            scope.assignments = assignments;
-                        });
-                    });
-            }
         }
     };
 };
