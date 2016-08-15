@@ -9,12 +9,12 @@
             {{ "TR__ADD_TITLE" | translate:{title: title} }}…
         </span>
         <div
-            data-ng-if="!isEditing && !markdown"
+            data-ng-if="!isEditing && !isMarkdown"
             data-ng-click="startEditing()">
             {{data.parsetext}}
         </div>
         <adh-parse-markdown
-            data-ng-if="!isEditing && markdown"
+            data-ng-if="!isEditing && isMarkdown"
             data-ng-click="startEditing()"
             data-parsetext="data.parsetext"></adh-parse-markdown>
         <a href="">
@@ -32,7 +32,7 @@
     </label>
     <div class="inline-editable-markdown-edit-button-container">
         <adh-help-link
-            data-ng-if="isEditing && markdown"
+            data-ng-if="isEditing && isMarkdown"
             data-support-url="https://simplemde.com/markdown-guide"></adh-help-link>
         <a href="" class="button-cta-secondary inline-editable-markdown-submit-button"
             data-ng-if="isEditable && isEditing"

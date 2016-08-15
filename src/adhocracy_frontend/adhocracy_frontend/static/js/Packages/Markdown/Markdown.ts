@@ -36,7 +36,7 @@ export var inlineEditableMarkdownDirective = (
         scope: {
             parsetext: "=",
             isEditable: "=",
-            markdown: "=",
+            isMarkdown: "=",
             title: "@",
             maxlength: "=",
             didClickSave: "&"
