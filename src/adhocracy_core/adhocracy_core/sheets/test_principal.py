@@ -531,6 +531,9 @@ class TestActivationConfigurationSheet:
         assert isinstance(inst, AnnotationRessourceSheet)
         assert inst.meta.isheet == IActivationConfiguration
         assert inst.meta.schema_class == ActivationConfigutationSchema
+        assert inst.meta.readable is True
+        assert inst.meta.editable is False
+        assert inst.meta.creatable is True
         assert inst.meta.permission_create == 'activate_user'
 
     def test_get_empty(self, meta, context):

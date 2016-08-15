@@ -361,7 +361,7 @@ class ActivationConfigutationSchema(MappingSchema):
 activation_configuration_meta = sheet_meta._replace(
     isheet=IActivationConfiguration,
     schema_class=ActivationConfigutationSchema,
-    readable=False,
+    readable=True,
     creatable=True,
     editable=False,
     permission_create='activate_user',
