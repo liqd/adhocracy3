@@ -663,7 +663,31 @@ export var userProfileDirective = (
             modals: "="
         },
         link: (scope) => {
+            adhPermissions.bindScope(scope, () => scope.path);
             adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
+
+            scope.$watch("path", (path) => {
+                adhHttp.get(scope.path).then((user) => {
+                    scope.data = {
+                        description: user.data[SIDescription.nick].description,
+                        shortDescription: user.data[SIDescription.nick].short_description,
+                    };
+                });
+            });
+
+            scope.saveDescription = () => {
+                return adhHttp.get(scope.path).then((oldUser) => {
+                    var patch = {
+                        content_type: oldUser.content_type,
+                        data: {}
+                    };
+                    patch.data[SIDescription.nick] = new SIDescription.Sheet({
+                        description: scope.data.description,
+                        short_description: scope.data.shortDescription,
+                    });
+                    return adhHttp.put(oldUser.path, patch);
+                });
+            };
 
             scope.showMessaging = () => {
                 if (scope.messageOptions.POST) {
@@ -841,42 +865,6 @@ export var adhUserProfileImageEditDirective = (
             scope.$watch("path", (path) => {
                 adhPermissions.bindScope(scope, () => scope.path, "userOptions");
             });
-        }
-    };
-};
-
-export var adhUserProfileDescriptionEditDirective = (
-    adhHttp: AdhHttp.Service,
-    adhPermissions: AdhPermissions.Service,
-    adhConfig: AdhConfig.IService
-) => {
-    return {
-        restrict: "E",
-        scope: {
-            path: "@"
-        },
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfileDescriptionEdit.html",
-        link: (scope) => {
-            scope.$watch("path", (path) => {
-                adhPermissions.bindScope(scope, () => scope.path, "userOptions");
-                adhHttp.get(scope.path).then((user) => {
-                    scope.short_description = user.data[SIDescription.nick].short_description;
-                    scope.description = user.data[SIDescription.nick].description;
-                });
-            });
-            scope.didClickSave = () => {
-                adhHttp.get(scope.path).then((oldUser) => {
-                    var patch = {
-                        content_type: oldUser.content_type,
-                        data: {}
-                    };
-                    patch.data[SIDescription.nick] = new SIDescription.Sheet({
-                        short_description: scope.short_description,
-                        description: scope.description
-                    });
-                    adhHttp.put(oldUser.path, patch);
-                });
-            };
         }
     };
 };
