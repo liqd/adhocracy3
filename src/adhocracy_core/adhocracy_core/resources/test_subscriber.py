@@ -495,15 +495,6 @@ class TestApplyUserActivationConfiguration:
         assert mock_messenger.send_registration_mail.called is False
         assert mock_messenger.send_invitation_mail.called is False
 
-    def test_activate_user_if_skip_settings_is_set(self, event, mock_messenger,
-                                                   mock_sheet):
-        mock_sheet.get.return_value = {'activation': 'registration_mail'}
-        event.registry.settings['adhocracy.skip_registration_mail'] = 'true'
-        self.call_fut(event)
-        assert event.object.activate.called
-        assert mock_messenger.send_registration_mail.called is False
-        assert mock_messenger.send_invitation_mail.called is False
-
     def test_send_registration_mail(self, event, mock_messenger, mock_sheet):
         mock_sheet.get.return_value = {'activation': 'registration_mail'}
         self.call_fut(event)

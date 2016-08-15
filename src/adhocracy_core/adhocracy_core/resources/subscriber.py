@@ -9,7 +9,6 @@ import requests
 from pyramid.interfaces import IApplicationCreated
 from pyramid.registry import Registry
 from pyramid.request import Request
-from pyramid.settings import asbool
 from pyramid.traversal import find_interface
 from pyramid.i18n import TranslationStringFactory
 from substanced.util import find_service
@@ -246,28 +245,17 @@ def send_password_reset_mail(event):
 
 
 def apply_user_activation_configuration(event):
-    """Activate user or send activation or invite email.
-
-    If the setting "adhocracy.skip_registration_mail" is true, no mail is send
-    but the user is activated directly.
-    """
+    """Activate user or send activation or invite email."""
     user = event.object
     registry = event.registry
     sheet = registry.content.get_sheet(user, IActivationConfiguration)
     activation_config = sheet.get()['activation']
-    if _is_activation_disabled(registry):
-        user.activate()
-    elif activation_config == 'direct':
+    if activation_config == 'direct':
         user.activate()
     elif activation_config == 'registration_mail':
         _send_activation_mail(user, registry)
     elif activation_config == 'invitation_mail':  # pragma: no branch
         _send_invitation_mail(user, registry)
-
-
-def _is_activation_disabled(registry):
-    settings = registry.settings
-    return asbool(settings.get('adhocracy.skip_registration_mail', False))
 
 
 def _send_activation_mail(user, registry):
