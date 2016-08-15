@@ -4,24 +4,24 @@
     </a>
     <div class="dropdown-menu" data-ng-if="data.isShowDropdown" aria-labelledby="{{id}}">
         <adh-view-action
-            data-ng-if="edit && resourcePath && options.PUT"
+            data-ng-if="edit && itemPath && options.PUT"
             data-view="edit"
             data-label="TR__EDIT"
-            data-resource-path="{{resourcePath}}">
+            data-resource-path="{{itemPath}}">
             <i class="icon-pencil"></i>
         </adh-view-action>
         <adh-view-action
-            data-ng-if="image && resourcePath && options.PUT"
+            data-ng-if="image && itemPath && options.PUT"
             data-view="image"
             data-label="TR__IMAGE_UPLOAD"
-            data-resource-path="{{resourcePath}}">
+            data-resource-path="{{itemPath}}">
             <i class="icon-picture-file"></i>
         </adh-view-action>
         <adh-view-action
-            data-ng-if="moderate && resourcePath"
+            data-ng-if="moderate && itemPath"
             data-view="moderate"
             data-label="TR__MODERATE"
-            data-resource-path="{{resourcePath}}">
+            data-resource-path="{{itemPath}}">
             <i class="icon-picture-file"></i>
         </adh-view-action>
         <adh-assign-badges-action
@@ -48,22 +48,22 @@
             <i class="icon-share"></i>
         </adh-modal-action>
         <adh-hide-action
-            data-ng-if="hide && resourcePath && options.hide"
+            data-ng-if="hide && itemPath && options.hide"
             data-redirect-url="{{deleteRedirectUrl}}"
-            data-resource-path="{{resourcePath | adhParentPath}}">
+            data-resource-path="{{itemPath}}">
             <i class="icon-trash"></i>
         </adh-hide-action>
         <adh-resource-widget-delete-action
-            data-ng-if="resourceWidgetDelete && resourcePath && options.hide"
-            data-resource-path="{{resourcePath}}">
+            data-ng-if="resourceWidgetDelete && itemPath && options.hide"
+            data-resource-path="{{itemPath}}">
             <i class="icon-trash"></i>
         </adh-resource-widget-delete-action>
         <adh-print-action data-ng-if="print">
             <i class="icon-print"></i>
         </adh-print-action>
         <adh-cancel-action
-            data-ng-if="cancel && resourcePath"
-            data-resource-path="{{resourcePath}}">
+            data-ng-if="cancel && itemPath"
+            data-resource-path="{{itemPath}}">
             <i class="icon-x"></i>
         </adh-cancel-action>
     </div>
@@ -80,7 +80,7 @@
         data-ng-if="modals.modal === 'abuse'"
         data-modals="modals"
         class="report-abuse"
-        data-url="{{ resourcePath | adhResourceUrl | adhCanonicalUrl }}">
+        data-url="{{ itemPath | adhResourceUrl | adhCanonicalUrl }}">
     </adh-report-abuse>
 
     <adh-badge-assignment
@@ -90,7 +90,7 @@
     </adh-badge-assignment>
 
     <div data-ng-if="modals.modal === 'share'">
-        <adh-social-share data-uri="{{ resourcePath | adhResourceUrl | adhCanonicalUrl }}"></adh-social-share>
+        <adh-social-share data-uri="{{ itemPath | adhResourceUrl | adhCanonicalUrl }}"></adh-social-share>
         <a href="" class="button" data-ng-click="modals.hideModal('share')">{{ "TR__CANCEL" | translate }}</a>
     </div>
 </div>

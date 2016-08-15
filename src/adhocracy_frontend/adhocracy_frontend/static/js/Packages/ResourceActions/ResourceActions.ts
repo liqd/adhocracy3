@@ -70,6 +70,11 @@ export var resourceActionsDirective = (
         restrict: "E",
         scope: {
             resourcePath: "@",
+            // If the resource is versionable, some actions should be
+            // performed on the item instead. This is why we need to
+            // know the itemPath. If the resource is not versionable,
+            // itemPath should be the same as resourcePath.
+            itemPath: "@",
             resourceWithBadgesUrl: "@?",
             deleteRedirectUrl: "@?",
             assignBadges: "=?",
@@ -106,6 +111,7 @@ export var resourceDropdownDirective = (
         restrict: "E",
         scope: {
             resourcePath: "@",
+            itemPath: "@",
             resourceWithBadgesUrl: "@?",
             deleteRedirectUrl: "@?",
             assignBadges: "=?",
