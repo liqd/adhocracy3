@@ -3,6 +3,7 @@
 Read :mod:`substanced.catalog.subscribers` for default reindex subscribers.
 """
 
+from pyramid.traversal import get_current_registry
 from substanced.util import find_service
 
 from adhocracy_core.utils import get_visibility_change
@@ -15,6 +16,7 @@ from adhocracy_core.interfaces import IItem
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.rate import IRateable
+from adhocracy_core.sheets.comment import IComment
 from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.badge import IBadgeable
@@ -104,7 +106,20 @@ def reindex_workflow_state(event):
 def reindex_comments(event):
     """Reindex comments index if a backreference is modified/created."""
     catalogs = find_service(event.object, 'catalogs')
-    catalogs.reindex_index(event.object, 'comments')
+    commentables = _get_affected_commentables(event.object)
+    for commentable in commentables:
+        catalogs.reindex_index(commentable, 'comments')
+
+
+def _get_affected_commentables(commentable):
+    registry = get_current_registry(commentable)
+    commentables = [commentable]
+    while IComment.providedBy(commentable):
+        commentable = registry.content.get_sheet_field(commentable, IComment,
+                                                       'refers_to')
+        if commentable:
+            commentables.append(commentable)
+    return commentables
 
 
 def includeme(config):

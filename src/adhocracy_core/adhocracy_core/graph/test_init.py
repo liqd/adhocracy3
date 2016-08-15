@@ -662,6 +662,33 @@ class TestGraphIsInSubtree:
         assert result is True
 
 
+class TestGraphGetReferncesForRemovalNotificaton:
+
+    def call_fut(self, objectmap, *args, **kwargs):
+        from adhocracy_core.graph import Graph
+        graph = Graph(objectmap.root)
+        return graph.get_refernces_for_removal_notificaton(*args, **kwargs)
+
+    def test_no_references(self, context, objectmap):
+        resource = testing.DummyResource()
+        result = self.call_fut(objectmap, resource)
+        assert list(result) == []
+
+    def test_with_references(self, context, objectmap):
+        resource, resource2 = create_dummy_resources(parent=context, count=2)
+        objectmap.connect(resource, resource2, SheetToSheet)
+        result = self.call_fut(objectmap, resource)
+        reference = result[0]
+        assert reference.target == resource2
+
+    def test_ignore_child_references(self, context, objectmap):
+        resource, resource2 = create_dummy_resources(parent=context, count=2)
+        objectmap.connect(resource, resource2, SheetToSheet)
+        resource['child'] = resource2
+        result = self.call_fut(objectmap, resource)
+        assert result == []
+
+
 class TestGraphSendBackReferenceRemovedNotifications:
 
     def call_fut(self, objectmap, *args, **kwargs):
@@ -672,7 +699,6 @@ class TestGraphSendBackReferenceRemovedNotifications:
     def test_send_events(self, context, mocker, config, registry, objectmap):
         from adhocracy_core.testing import create_event_listener
         from adhocracy_core.interfaces import ISheetBackReferenceRemoved
-        from adhocracy_core.interfaces import ISheet
         added_listener = create_event_listener(config,
                                                ISheetBackReferenceRemoved)
         reference = mocker.Mock()

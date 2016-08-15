@@ -22,12 +22,11 @@
 
         <h1 class="resource-header-title">{{ userBasic.name }}</h1>
 
-        <ul class="resource-header-meta">
-            <li>
-                {{userShortDescription}}
-            </li>
-        </ul>
+        <div class="resource-header-description">
+            <adh-user-profile-description-edit data-path="{{path}}"></adh-user-profile-description-edit>
+        </div>
     </header>
+
     <div class="user-profile-info-proposals">
         <adh-inject></adh-inject>
     </div><!-- .user-profile-info-proposals -->

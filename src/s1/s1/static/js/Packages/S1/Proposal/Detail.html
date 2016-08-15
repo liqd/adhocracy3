@@ -1,7 +1,8 @@
 <div data-ng-if="data.title">
     <div class="resource-navigation">
         <adh-resource-dropdown
-            data-resource-path="{{path | adhParentPath}}"
+            data-resource-path="{{path}}"
+            data-item-path="{{path | adhParentPath}}"
             data-ng-if="path"
             data-edit="true"
             data-report="true"

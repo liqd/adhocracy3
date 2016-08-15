@@ -836,14 +836,55 @@ export var adhUserProfileImageEditDirective = (
     };
 };
 
+export var adhUserProfileDescriptionEditDirective = (
+    adhHttp: AdhHttp.Service,
+    adhPermissions: AdhPermissions.Service,
+    adhConfig: AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        scope: {
+            path: "@"
+        },
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfileDescriptionEdit.html",
+        link: (scope) => {
+            scope.$watch("path", (path) => {
+                adhPermissions.bindScope(scope, () => scope.path, "userOptions");
+                adhHttp.get(scope.path).then((user) => {
+                    scope.short_description = user.data[SIDescription.nick].short_description;
+                    scope.description = user.data[SIDescription.nick].description;
+                });
+            });
+            scope.didClickSave = () => {
+                adhHttp.get(scope.path).then((oldUser) => {
+                    var patch = {
+                        content_type: oldUser.content_type,
+                        data: {}
+                    };
+                    patch.data[SIDescription.nick] = new SIDescription.Sheet({
+                        short_description: scope.short_description,
+                        description: scope.description
+                    });
+                    adhHttp.put(oldUser.path, patch);
+                });
+            };
+        }
+    };
+};
+
 export var adhHelpLinkDirective = (
     adhConfig: AdhConfig.IService
 ) => {
     return {
         restrict: "E",
+        scope: {
+            supportUrl: "@?"
+        },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/HelpLink.html",
         link: (scope) => {
-            scope.supportUrl = adhConfig.support_url;
+            if ( ! scope.supportUrl) {
+                scope.supportUrl = adhConfig.support_url;
+            }
         }
     };
 };
