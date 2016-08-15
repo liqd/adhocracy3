@@ -668,10 +668,14 @@ export var userProfileDirective = (
 
             scope.$watch("path", (path) => {
                 adhHttp.get(scope.path).then((user) => {
+                    scope.userBasic = user.data[SIUserBasic.nick];
                     scope.data = {
                         description: user.data[SIDescription.nick].description,
                         shortDescription: user.data[SIDescription.nick].short_description,
                     };
+                    adhGetBadges(user).then((assignments) => {
+                        scope.assignments = assignments;
+                    });
                 });
             });
 
@@ -698,16 +702,6 @@ export var userProfileDirective = (
                     // FIXME
                 }
             };
-
-            if (scope.path) {
-                adhHttp.resolve(scope.path)
-                    .then((res) => {
-                        scope.userBasic = res.data[SIUserBasic.nick];
-                        adhGetBadges(res).then((assignments) => {
-                            scope.assignments = assignments;
-                        });
-                    });
-            }
         }
     };
 };
