@@ -288,6 +288,8 @@ var getMeeting = (proposal : RIProposal, process : RIS1Process) => {
         return processState === "propose" ? "current" : "next";
     } else if (proposalState === "votable") {
         return "current";
+    } else if (processState !== "result") {
+        return "archive";
     } else {
         var processDecisionDate = AdhUtil.deepPluck(
             AdhProcess.getStateData(process.data[SIWorkflowAssignment.nick], "result"), ["start_date"]);
