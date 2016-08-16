@@ -164,6 +164,20 @@ export var getBadgesFactory = (
     }
 };
 
+export var getAssignableBadgePaths = (rawOptions) : string[] => {
+    var requestBodyOptions : {content_type : string}[] = AdhUtil.deepPluck(rawOptions, [
+        "data", "POST", "request_body"
+    ]);
+
+    var assignableBadgeOptions = _.find(
+        requestBodyOptions,
+        (body) => body.content_type === RIBadgeAssignment.content_type);
+
+    return AdhUtil.deepPluck(assignableBadgeOptions, [
+        "data", SIBadgeAssignment.nick, "badge"
+    ]);
+};
+
 var bindPath = (
     adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
@@ -181,17 +195,7 @@ var bindPath = (
             return $q.when();
         }
 
-        var requestBodyOptions : {content_type : string}[] = AdhUtil.deepPluck(rawOptions, [
-            "data", "POST", "request_body"
-        ]);
-
-        var assignableBadgeOptions = _.find(
-            requestBodyOptions,
-            (body) => body.content_type === RIBadgeAssignment.content_type);
-
-        var assignableBadgePaths : string[] = AdhUtil.deepPluck(assignableBadgeOptions, [
-            "data", SIBadgeAssignment.nick, "badge"
-        ]);
+        var assignableBadgePaths : string[] = getAssignableBadgePaths(rawOptions);
 
         return $q.all(_.map(assignableBadgePaths, (b) => adhHttp.get(b).then(extractBadge))).then((badges : any) => {
             scope.badges = _.keyBy(badges, "path");
