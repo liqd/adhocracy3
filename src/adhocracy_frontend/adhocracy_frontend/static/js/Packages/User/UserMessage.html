@@ -28,11 +28,15 @@
             {{ "TR__ERROR_REQUIRED_MESSAGE" | translate }}</span>
 
         <footer class="form-footer">
-            <input
-                type="submit"
-                value="{{ 'TR__MESSAGE_SEND' | translate }}"
-                class="button-cta form-footer-button-cta" />
-            <a href="" class="button form-footer-button" data-ng-click="cancel()" >{{ "TR__CANCEL" | translate }}</a>
+            <div class="form-footer-right">
+                <input
+                    type="submit"
+                    value="{{ 'TR__MESSAGE_SEND' | translate }}"
+                    class="button-cta" />
+            </div>
+            <div class="form-footer-left">
+                <a href="" class="button" data-ng-click="cancel()" >{{ "TR__CANCEL" | translate }}</a>
+            </div>
         </footer>
     </form>
 </div>

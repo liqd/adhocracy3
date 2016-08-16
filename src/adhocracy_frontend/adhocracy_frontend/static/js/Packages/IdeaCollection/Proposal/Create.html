@@ -101,15 +101,18 @@
 
     <!-- DATA SUBMIT -->
     <footer class="form-footer">
-        <input
-            type="submit"
-            name="submit"
-            value="{{ 'TR__PUBLISH' | translate }}"
-            class="button-cta form-footer-button-cta" />
-
-        <a
-            href=""
-            data-ng-click="cancel()"
-            class="button form-footer-button">{{ "TR__CANCEL" | translate }}</a>
+        <div class="form-footer-right">
+            <input
+                type="submit"
+                name="submit"
+                value="{{ 'TR__PUBLISH' | translate }}"
+                class="button-cta" />
+        </div>
+        <div class="form-footer-left">
+            <a
+                href=""
+                data-ng-click="cancel()"
+                class="button">{{ "TR__CANCEL" | translate }}</a>
+        </div>
     </footer>
 </form>

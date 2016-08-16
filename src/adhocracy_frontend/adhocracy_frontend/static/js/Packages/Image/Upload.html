@@ -19,8 +19,12 @@
             <img data-flow-img="file" height="120" alt="{{ 'TR__IMAGE_SELECTED' | translate }}" /><br/>{{file.name}}
         </div>
         <div class="form-footer">
-            <input type="submit" ng-value="{{'TR__SUBMIT' | translate}}" class="button-cta image-upload-submit-button" data-ng-disabled="0 === $flow.files.length" />
-            <input type="reset" ng-value="{{'TR__CANCEL' | translate }}" class="button" ng-click="didCancelUpload()"/>
+            <div class="form-footer-right">
+                <input type="submit" ng-value="{{'TR__SUBMIT' | translate}}" class="button-cta image-upload-submit-button" data-ng-disabled="0 === $flow.files.length" />
+            </div>
+            <div class="form-footer-left">
+                <input type="reset" ng-value="{{'TR__CANCEL' | translate }}" class="button" ng-click="didCancelUpload()"/>
+            </div>
         </div>
     </div>
 </form>

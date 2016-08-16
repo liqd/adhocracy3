@@ -29,10 +29,14 @@ A form for creating documents. This contains a <a href="#section-jump">section j
                     <textarea></textarea>
                 </label>
             </section>
+            <a href="" class="button-cta-secondary m-add document-form-add-paragraph-button">add paragraph</a>
             <footer class="form-footer">
-                <a href="" class="button-cta-secondary m-add document-form-add-paragraph-button">add paragraph</a>
-                <input type="submit" name="submit" value="Submit" class="button-cta form-footer-button-cta document-form-submit-button">
-                <a class="button form-footer-button">Cancel</a>
+                <div class="form-footer-right">
+                    <input type="submit" name="submit" value="Submit" class="button-cta form-footer-button-cta document-form-submit-button">
+                </div>
+                <div class="form-footer-left">
+                    <a class="button form-footer-button">Cancel</a>
+                </div>
             </footer>
         </div>
     </div>
@@ -44,7 +48,8 @@ A form for creating documents. This contains a <a href="#section-jump">section j
 
 .document-form {
     .document-form-add-paragraph-button {
-        @include rem(margin-bottom, 45px);
+        @include rem(margin-top, 113px);
+        @include rem(margin-right, $padding);
         float: right;
     }
 
@@ -53,7 +58,7 @@ A form for creating documents. This contains a <a href="#section-jump">section j
     }
 
     .form-footer {
-        @include rem(margin-top, 113px);
+        @include rem(margin-top, 45px);
         @include rem(padding, 0 $padding);
     }
 }

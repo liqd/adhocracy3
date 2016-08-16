@@ -309,11 +309,18 @@ A generic form footer containing one CTA and a regular button
 ```html_example
 
 <footer class="form-footer">
-    <input
-        type="submit"
-        value="Submit"
-        class="button-cta form-footer-button-cta" />
-    <a href="" class="button form-footer-button">Cancel</a>
+    <div class="form-footer-right">
+        <label>
+            <input type="checkbox" /> post anonymously
+        </label>
+        <input
+            type="submit"
+            value="Submit"
+            class="button-cta" />
+    </div>
+    <div class="form-footer-left">
+        <a href="" class="button">Cancel</a>
+    </div>
 </footer>
 ```
 */
@@ -322,15 +329,12 @@ A generic form footer containing one CTA and a regular button
     @include clearfix;
     width: 100%;
 
-    .form-footer-button-cta {
-        float: right;
 
-        + [class^="button"] {
-            @include rem(margin-right, 10px);
-        }
+    .form-footer-left {
+        float: left;
     }
 
-    .form-footer-button {
-        float: left;
+    .form-footer-right {
+        float: right;
     }
 }
