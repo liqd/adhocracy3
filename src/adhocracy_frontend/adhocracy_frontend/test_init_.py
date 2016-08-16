@@ -36,6 +36,7 @@ class ConfigViewTest(unittest.TestCase):
              'profile_images_enabled': True,
              'captcha_enabled': False,
              'captcha_url': 'http://localhost:6542/',
+             'anonymize_enabled': False,
              'support_url': None,
              'terms_url': {
                 'de': None,

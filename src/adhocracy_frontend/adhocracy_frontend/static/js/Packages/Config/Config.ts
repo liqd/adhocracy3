@@ -25,6 +25,7 @@ export interface IService {
     support_url? : string;
     captcha_enabled : boolean;
     captcha_url : string;
+    anonymize_enabled : boolean;
     // the place for instance specific customizations
     // remember to parse (e.g. booleans) where they are used
     custom : {[key : string]: string};

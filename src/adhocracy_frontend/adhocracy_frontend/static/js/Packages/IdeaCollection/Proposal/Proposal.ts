@@ -50,6 +50,7 @@ export interface IScope extends angular.IScope {
     selectedState? : string;
     processProperties : AdhProcess.IProcessProperties;
     resource : any;
+    config? : AdhConfig.IService;
 }
 
 // FIXME: the following functions duplicate some of the adhResourceWidget functionality
@@ -349,6 +350,7 @@ export var createDirective = (
             scope.data = {};
             scope.create = true;
             scope.showError = adhShowError;
+            scope.config = adhConfig;
 
             scope.data.lat = undefined;
             scope.data.lng = undefined;
@@ -409,6 +411,7 @@ export var editDirective = (
         link: (scope, element) => {
             scope.errors = [];
             scope.showError = adhShowError;
+            scope.config = adhConfig;
             scope.create = false;
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
                 scope, undefined);
