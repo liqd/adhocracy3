@@ -148,6 +148,21 @@ class TestPointSheet:
         assert registry.content.get_sheet(context, meta.isheet)
 
 
+class TestGetLocationChoicesGetter:
+
+    def call_fut(self, *args):
+        from .geo import get_location_choices
+        return get_location_choices(*args)
+
+    def test_create_followable_choices(self, request_, mocker):
+        from .geo import IMultiPolygon
+        context = testing.DummyResource()
+        get_choices_mock = mocker.patch(
+            'adhocracy_core.sheets.geo.get_choices_by_interface')
+        result = self.call_fut(context, request_)
+        get_choices_mock.assert_called_with(IMultiPolygon, context, request_)
+
+
 class TestLocationReferenceSheet:
 
     @fixture

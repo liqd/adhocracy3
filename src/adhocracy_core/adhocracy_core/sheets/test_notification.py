@@ -49,17 +49,13 @@ class TestGetFollowChoicesGetter:
         from .notification import get_follow_choices
         return get_follow_choices(*args)
 
-    def test_create_followable_choices(self, request_, mocker, mock_catalogs,
-                                       search_result):
+    def test_create_followable_choices(self, request_, mocker):
         from .notification import IFollowable
-        context = testing.DummyResource(__name__='followable')
-        mocker.patch('adhocracy_core.sheets.notification.find_service',
-                     return_value=mock_catalogs)
-        mock_catalogs.search.return_value = search_result._replace(elements=
-                                                                   [context])
+        context = testing.DummyResource()
+        get_choices_mock = mocker.patch(
+            'adhocracy_core.sheets.notification.get_choices_by_interface')
         result = self.call_fut(context, request_)
-        assert mock_catalogs.search.call_args[0][0].interfaces == IFollowable
-        assert result == [('http://example.comfollowable/', 'followable')]
+        get_choices_mock.assert_called_with(IFollowable, context, request_)
 
 
 class TestFollowableSheet:

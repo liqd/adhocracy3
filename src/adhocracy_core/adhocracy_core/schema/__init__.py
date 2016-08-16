@@ -38,6 +38,7 @@ from pyramid.traversal import resource_path
 from pyramid.traversal import lineage
 from pyramid import security
 from pyramid.traversal import find_interface
+from pyramid.interfaces import IRequest
 from substanced.file import file_upload_widget
 from substanced.file import File
 from substanced.file import USE_MAGIC
@@ -55,6 +56,7 @@ from adhocracy_core.utils import now
 from adhocracy_core.interfaces import SheetReference
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import search_query
 
 
 class SchemaNode(colander.SchemaNode):
@@ -1097,3 +1099,15 @@ def create_deferred_permission_validator(permission: str) -> callable:
         return check_permission
 
     return deferred_check_permission
+
+
+def get_choices_by_interface(interface: IInterface,
+                             context: IResource,
+                             request: IRequest,
+                             ) -> []:
+    """Get choices for resource paths by interface."""
+    catalogs = find_service(context, 'catalogs')
+    query = search_query._replace(interfaces=interface)
+    resources = catalogs.search(query).elements
+    choices = [(request.resource_url(r), resource_path(r)) for r in resources]
+    return choices

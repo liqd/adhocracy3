@@ -1,14 +1,11 @@
 """Notification Sheet."""
-from pyramid.traversal import resource_path
-from substanced.util import find_service
-
 from adhocracy_core.interfaces import ISheet
-from adhocracy_core.interfaces import search_query
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import UniqueReferences
+from adhocracy_core.schema import get_choices_by_interface
 
 
 class INotification(ISheet):
@@ -29,11 +26,7 @@ class NotificationFollowReference(SheetToSheet):
 
 def get_follow_choices(context, request) -> []:
     """Return follow resources choices."""
-    catalogs = find_service(context, 'catalogs')
-    query = search_query._replace(interfaces=IFollowable)
-    resources = catalogs.search(query).elements
-    choices = [(request.resource_url(r), resource_path(r)) for r in resources]
-    return choices
+    return get_choices_by_interface(IFollowable, context, request)
 
 
 class NotificationSchema(MappingSchema):

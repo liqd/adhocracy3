@@ -1405,3 +1405,22 @@ class TestDeferredPermmissionCheckValidator:
         config.testing_securitypolicy(userid='hank', permissive=False)
         validator = self.call_fut('permission')
         assert validator(node, kw)(node, 'value') is None
+
+
+class TestChoicesByInterface:
+
+    def call_fut(self, *args):
+        from . import get_choices_by_interface
+        return get_choices_by_interface(*args)
+
+    def test_create_choices(self, request_, mocker, mock_catalogs,
+                            search_result):
+        from zope.interface.interfaces import IInterface
+        context = testing.DummyResource(__name__='resource')
+        mocker.patch('adhocracy_core.schema.find_service',
+                     return_value=mock_catalogs)
+        mock_catalogs.search.return_value = search_result._replace(elements=
+                                                                   [context])
+        result = self.call_fut(IInterface, context, request_)
+        assert mock_catalogs.search.call_args[0][0].interfaces == IInterface
+        assert result == [('http://example.comresource/', 'resource')]
