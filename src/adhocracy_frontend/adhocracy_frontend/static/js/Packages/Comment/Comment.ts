@@ -23,6 +23,7 @@ var pkgLocation = "/Comment";
 
 
 export interface ICommentResourceScope extends angular.IScope {
+    config? : AdhConfig.IService;
     path : string;
     submit : () => any;
     hide : () => angular.IPromise<void>;
@@ -59,6 +60,8 @@ export interface ICommentResourceScope extends angular.IScope {
         itemPath : string;
         replyPoolPath : string;
         edited : boolean;
+        anonymize? : boolean;
+        anonymizeIsOptional? : boolean;
     };
 }
 
@@ -93,6 +96,10 @@ export var update = (
         // NOTE: this is lexicographic comparison. Might break if the datetime
         // encoding changes.
         scope.data.edited = scope.data.modificationDate > scope.data.creationDate;
+
+        // TODO
+        scope.data.anonymize = false;
+        scope.data.anonymizeIsOptional = true;
 
         var params = {
             elements: "paths",
@@ -147,7 +154,9 @@ export var postCreate = (
     });
     version.parent = item.path;
 
-    return adhHttp.deepPost([item, version]);
+    return adhHttp.deepPost([item, version], {
+        anonymize: scope.data.anonymize,
+    });
 };
 
 export var postEdit = (
@@ -163,7 +172,9 @@ export var postEdit = (
             var resource = AdhResourceUtil.derive(oldVersion, {preliminaryNames: adhPreliminaryNames});
             resource.data[SIComment.nick].content = scope.data.content;
             resource.parent = oldItem.path;
-            return adhHttp.deepPost([resource]);
+            return adhHttp.deepPost([resource], {
+                anonymize: scope.data.anonymize,
+            });
         });
 };
 
@@ -184,6 +195,7 @@ export var commentDetailDirective = (
     var _postEdit = postEdit(adhHttp, adhPreliminaryNames);
 
     var link = (scope : ICommentResourceScope) => {
+        scope.config = adhConfig;
         scope.modals = new AdhResourceActions.Modals($timeout);
 
         scope.report = () => {
@@ -292,9 +304,19 @@ export var commentCreateDirective = (
             hideCancel: "=?"
         },
         link: (scope : ICommentResourceScope) => {
+            scope.config = adhConfig;
+
+            var resetData = () => {
+                scope.data = <any> {
+                    // TODO
+                    anonymize: false,
+                    anonymizeIsOptional: true,
+                };
+            };
+
             scope.submit = () => {
                 return _postCreate(scope, scope.poolPath).then(() => {
-                    scope.data = <any>{};
+                    resetData();
                     if (scope.onSubmit) {
                         scope.onSubmit();
                     }
@@ -306,6 +328,8 @@ export var commentCreateDirective = (
                     scope.onCancel();
                 }
             };
+
+            resetData();
         }
     };
 };
