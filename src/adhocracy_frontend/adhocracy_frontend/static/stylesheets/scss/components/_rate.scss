@@ -116,11 +116,8 @@ category: Components
 
 Rate up or down with counter
 
-The button has the `is-rate-button-active` state.
-rate-difference has the `is-positive` state. Can be `is-negative`.
-
-The whole widget may be disabled, in which case itself and both buttons have
-the `is-disabled` state.
+The buttons may habe the `is-active` state.
+The whole widget may have the `is-disabled` state.
 
 ```html_example
 <div class="rate">
