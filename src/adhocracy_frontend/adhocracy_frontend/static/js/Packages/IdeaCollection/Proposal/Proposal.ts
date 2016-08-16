@@ -44,6 +44,8 @@ export interface IScope extends angular.IScope {
         budget? : number;
         creatorParticipate? : boolean;
         locationText? : string;
+        anonymize? : boolean;
+        anonymizeIsOptional? : boolean;
     };
     selectedState? : string;
     processProperties : AdhProcess.IProcessProperties;
@@ -114,7 +116,11 @@ var bindPath = (
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
                         commentCount: resource.data[SICommentable.nick].comments_count,
-                        assignments: assignments
+                        assignments: assignments,
+
+                        // TODO
+                        anonymize: false,
+                        anonymizeIsOptional: true,
                     };
                     if (scope.processProperties.hasLocation) {
                         scope.data.lng = pointSheet.coordinates[0];
@@ -197,7 +203,9 @@ var postCreate = (
     });
     fill(scope, proposalVersion);
 
-    return adhHttp.deepPost([proposal, proposalVersion]);
+    return adhHttp.deepPost([proposal, proposalVersion], {
+        anonymize: scope.data.anonymize
+    });
 };
 
 var postEdit = (
@@ -216,7 +224,9 @@ var postEdit = (
     });
     fill(scope, proposalVersion);
 
-    return adhHttp.deepPost([proposalVersion]);
+    return adhHttp.deepPost([proposalVersion], {
+        anonymize: scope.data.anonymize
+    });
 };
 
 export var detailDirective = (
@@ -342,6 +352,10 @@ export var createDirective = (
 
             scope.data.lat = undefined;
             scope.data.lng = undefined;
+
+            // TODO
+            scope.data.anonymize = false;
+            scope.data.anonymizeIsOptional = true;
 
             if (scope.processProperties.hasLocation) {
                 adhHttp.get(scope.poolPath).then((pool) => {

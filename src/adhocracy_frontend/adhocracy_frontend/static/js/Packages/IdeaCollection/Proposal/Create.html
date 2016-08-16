@@ -102,6 +102,10 @@
     <!-- DATA SUBMIT -->
     <footer class="form-footer">
         <div class="form-footer-right">
+            <label>
+                <input type="checkbox" data-ng-model="data.anonymize" data-ng-disabled="!data.anonymizeIsOptional" />
+                <span class="label-text" data-ng-class="{'is-disabled': !data.anonymizeIsOptional}">{{ "TR__ANONYMIZE" | translate }}</span>
+            </label>
             <input
                 type="submit"
                 name="submit"
