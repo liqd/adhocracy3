@@ -74,7 +74,6 @@ export var resourceActionsDirective = (
             // know the itemPath. If the resource is not versionable,
             // itemPath should be the same as resourcePath.
             itemPath: "@",
-            resourceWithBadgesUrl: "@?",
             deleteRedirectUrl: "@?",
             assignBadges: "=?",
             createDocument: "=?",
@@ -111,7 +110,6 @@ export var resourceDropdownDirective = (
         scope: {
             resourcePath: "@",
             itemPath: "@",
-            resourceWithBadgesUrl: "@?",
             deleteRedirectUrl: "@?",
             assignBadges: "=?",
             share: "=?",
@@ -197,7 +195,6 @@ export var assignBadgesActionDirective = (
             "{{ 'TR__MANAGE_BADGE_ASSIGNMENTS' | translate }}</a>",
         scope: {
             resourcePath: "@",
-            resourceWithBadgesUrl: "@?",
             class: "@",
             modals: "=",
             toggleDropdown: "=?"
