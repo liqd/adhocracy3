@@ -459,7 +459,7 @@ class TestSendPasswordResetMail:
                                                                    event.object)
 
 
-class TestSendAcitvationMail:
+class TestApplyUserActivationConfiguration:
 
     @fixture
     def registry(self, registry, mock_messenger):
@@ -479,27 +479,59 @@ class TestSendAcitvationMail:
         event.registry = registry
         return event
 
-    def call_fut(self, event):
-        from .subscriber import send_activation_mail_or_activate_user
-        return send_activation_mail_or_activate_user(event)
+    @fixture
+    def mock_sheet(self, registry, mock_sheet):
+        registry.content.get_sheet.return_value = mock_sheet
+        return mock_sheet
 
-    def test_add_activation_path_and_notify_user(self, event, mock_messenger):
+    def call_fut(self, event):
+        from .subscriber import apply_user_activation_configuration
+        return apply_user_activation_configuration(event)
+
+    def test_activate_directly(self, event, mock_messenger, mock_sheet):
+        mock_sheet.get.return_value = {'activation': 'direct'}
+        self.call_fut(event)
+        assert event.object.activate.called
+        assert mock_messenger.send_registration_mail.called is False
+        assert mock_messenger.send_invitation_mail.called is False
+
+    def test_send_registration_mail(self, event, mock_messenger, mock_sheet):
+        mock_sheet.get.return_value = {'activation': 'registration_mail'}
         self.call_fut(event)
         send_mail_call_args = mock_messenger.send_registration_mail.call_args[0]
         assert send_mail_call_args[0] == event.object
         assert send_mail_call_args[1].startswith('/activate/')
         assert event.object.activation_path.startswith('/activate/')
+        assert event.object.activate.called is False
+        assert mock_messenger.send_invitation_mail.called is False
 
-    def test_activate_user_if_skip_settings_is_set(self, event, mock_messenger):
-        event.registry.settings['adhocracy.skip_registration_mail'] = 'true'
-        self.call_fut(event)
-        assert event.object.activate.called
-        assert mock_messenger.send_registration_mail.called is False
-
-    def test_activation_if_messenger_is_none(self, registry, event, mock_messenger):
+    def test_registration_if_messenger_is_none(self, registry, event,
+                                               mock_messenger, mock_sheet):
+        mock_sheet.get.return_value = {'activation': 'registration_mail'}
         registry.messenger = None
         self.call_fut(event)
         assert mock_messenger.send_registration_mail.called is False
+        assert mock_messenger.send_invitation_mail.called is False
+
+    def test_send_invitation_mail(self, event, mock_messenger, mock_sheet,
+                                  registry):
+        mock_sheet.get.return_value = {'activation': 'invitation_mail'}
+        reset_mock = Mock()
+        registry.content.create.return_value = reset_mock
+        self.call_fut(event)
+        send_mail_call_args = mock_messenger.send_invitation_mail.call_args[0]
+        assert send_mail_call_args[0] == event.object
+        assert send_mail_call_args[1] == reset_mock
+        assert event.object.activate.called is False
+        assert mock_messenger.send_registration_mail.called is False
+
+    def test_invitation_if_messenger_is_none(self, registry, event,
+                                             mock_messenger, mock_sheet):
+        mock_sheet.get.return_value = {'activation': 'invitation_mail'}
+        registry.messenger = None
+        self.call_fut(event)
+        assert mock_messenger.send_registration_mail.called is False
+        assert mock_messenger.send_invitation_mail.called is False
 
 
 class TestUpdateDownload:
@@ -665,7 +697,7 @@ def test_register_subscriber(registry):
     assert subscriber.add_default_group_to_user.__name__ in handlers
     assert subscriber.update_modification_date_modified_by.__name__ in handlers
     assert subscriber.send_password_reset_mail.__name__ in handlers
-    assert subscriber.send_activation_mail_or_activate_user.__name__ in handlers
+    assert subscriber.apply_user_activation_configuration.__name__ in handlers
     assert subscriber.update_asset_download.__name__ in handlers
     assert subscriber.update_image_downloads.__name__ in handlers
     assert set_acms_for_app_root.__name__ in handlers

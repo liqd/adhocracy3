@@ -693,13 +693,19 @@ class PasswordUnitTest(unittest.TestCase):
         from adhocracy_core.schema import Password
         return Password()
 
-    def test_serialize_valid_emtpy(self):
+    def test_create(self):
+        from colander import String
         inst = self.make_one()
-        assert inst.deserialize() == colander.drop
+        assert inst.schema_type is String
+        assert isinstance(inst.default, colander.deferred)
 
     def test_deserialize_valid_emtpy(self):
         inst = self.make_one()
-        assert inst.serialize() == ''
+        assert inst.deserialize() == colander.drop
+
+    def test_serialize_valid_emtpy(self):
+        inst = self.make_one()
+        assert inst.serialize() == colander.null
 
     def test_deserialize_valid_with_newlines(self):
         inst = self.make_one()
@@ -709,6 +715,18 @@ class PasswordUnitTest(unittest.TestCase):
         inst = self.make_one()
         with raises(colander.Invalid):
             inst.deserialize(1)
+
+    def test_bind_and_serialize_empty(self):
+        from datetime import datetime
+        inst = self.make_one().bind()
+        result = inst.serialize()
+        assert len(result) == 20
+
+    def test_bind_and_setup_password_widget(self):
+        from deform.widget import PasswordWidget
+        inst = self.make_one().bind()
+        widget = inst.widget
+        assert isinstance(widget, PasswordWidget)
 
 
 class DateTimeUnitTest(unittest.TestCase):
