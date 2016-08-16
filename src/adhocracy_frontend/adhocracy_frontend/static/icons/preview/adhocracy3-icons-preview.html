@@ -170,6 +170,7 @@
 .icon-flag:before,
 .icon-key:before,
 .icon-list:before,
+.icon-list-column:before,
 .icon-list-filled:before,
 .icon-mail:before,
 .icon-mail-filled:before,
@@ -198,6 +199,7 @@
 .icon-volume:before,
 .icon-vote-down:before,
 .icon-vote-up:before,
+.icon-voting:before,
 .icon-x:before {
         display: inline-block;
   font-family: "adhocracy3-icons";
@@ -223,35 +225,37 @@
 .icon-flag:before { content: "\f107"; }
 .icon-key:before { content: "\f108"; }
 .icon-list:before { content: "\f109"; }
-.icon-list-filled:before { content: "\f10a"; }
-.icon-mail:before { content: "\f10b"; }
-.icon-mail-filled:before { content: "\f10c"; }
-.icon-map-pin:before { content: "\f10d"; }
-.icon-minus:before { content: "\f10e"; }
-.icon-pencil:before { content: "\f10f"; }
-.icon-picture-file:before { content: "\f110"; }
-.icon-pig:before { content: "\f111"; }
-.icon-pointy-rectangle-left:before { content: "\f112"; }
-.icon-pointy-rectangle-right:before { content: "\f113"; }
-.icon-print:before { content: "\f114"; }
-.icon-refresh:before { content: "\f115"; }
-.icon-reply:before { content: "\f116"; }
-.icon-share:before { content: "\f117"; }
-.icon-speechbubble:before { content: "\f118"; }
-.icon-speechbubble-document:before { content: "\f119"; }
-.icon-speechbubble-unfilled:before { content: "\f11a"; }
-.icon-speechbubbles:before { content: "\f11b"; }
-.icon-tags:before { content: "\f11c"; }
-.icon-three-dots:before { content: "\f11d"; }
-.icon-tick:before { content: "\f11e"; }
-.icon-trash:before { content: "\f11f"; }
-.icon-user:before { content: "\f120"; }
-.icon-user-unfilled:before { content: "\f121"; }
-.icon-users:before { content: "\f122"; }
-.icon-volume:before { content: "\f123"; }
-.icon-vote-down:before { content: "\f124"; }
-.icon-vote-up:before { content: "\f125"; }
-.icon-x:before { content: "\f126"; }
+.icon-list-column:before { content: "\f10a"; }
+.icon-list-filled:before { content: "\f10b"; }
+.icon-mail:before { content: "\f10c"; }
+.icon-mail-filled:before { content: "\f10d"; }
+.icon-map-pin:before { content: "\f10e"; }
+.icon-minus:before { content: "\f10f"; }
+.icon-pencil:before { content: "\f110"; }
+.icon-picture-file:before { content: "\f111"; }
+.icon-pig:before { content: "\f112"; }
+.icon-pointy-rectangle-left:before { content: "\f113"; }
+.icon-pointy-rectangle-right:before { content: "\f114"; }
+.icon-print:before { content: "\f115"; }
+.icon-refresh:before { content: "\f116"; }
+.icon-reply:before { content: "\f117"; }
+.icon-share:before { content: "\f118"; }
+.icon-speechbubble:before { content: "\f119"; }
+.icon-speechbubble-document:before { content: "\f11a"; }
+.icon-speechbubble-unfilled:before { content: "\f11b"; }
+.icon-speechbubbles:before { content: "\f11c"; }
+.icon-tags:before { content: "\f11d"; }
+.icon-three-dots:before { content: "\f11e"; }
+.icon-tick:before { content: "\f11f"; }
+.icon-trash:before { content: "\f120"; }
+.icon-user:before { content: "\f121"; }
+.icon-user-unfilled:before { content: "\f122"; }
+.icon-users:before { content: "\f123"; }
+.icon-volume:before { content: "\f124"; }
+.icon-vote-down:before { content: "\f125"; }
+.icon-vote-up:before { content: "\f126"; }
+.icon-voting:before { content: "\f127"; }
+.icon-x:before { content: "\f128"; }
     </style>
 
     <!--[if lte IE 8]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
@@ -267,7 +271,7 @@
   <body class="characters-off">
     <div id="page" class="container">
       <header>
-        <h1>adhocracy3-icons contains 39 glyphs:</h1>
+        <h1>adhocracy3-icons contains 41 glyphs:</h1>
         <a onclick="toggleCharacters(); return false;" href="#">Toggle Preview Characters</a>
       </header>
 
@@ -404,6 +408,19 @@
       
       <div class="glyph">
         <div class="preview-glyphs">
+          <span class="step size-12"><span class="letters">Pp</span><i id="icon-list-column" class="icon-list-column"></i></span><span class="step size-14"><span class="letters">Pp</span><i id="icon-list-column" class="icon-list-column"></i></span><span class="step size-16"><span class="letters">Pp</span><i id="icon-list-column" class="icon-list-column"></i></span><span class="step size-18"><span class="letters">Pp</span><i id="icon-list-column" class="icon-list-column"></i></span><span class="step size-21"><span class="letters">Pp</span><i id="icon-list-column" class="icon-list-column"></i></span><span class="step size-24"><span class="letters">Pp</span><i id="icon-list-column" class="icon-list-column"></i></span><span class="step size-36"><span class="letters">Pp</span><i id="icon-list-column" class="icon-list-column"></i></span><span class="step size-48"><span class="letters">Pp</span><i id="icon-list-column" class="icon-list-column"></i></span><span class="step size-60"><span class="letters">Pp</span><i id="icon-list-column" class="icon-list-column"></i></span><span class="step size-72"><span class="letters">Pp</span><i id="icon-list-column" class="icon-list-column"></i></span>
+        </div>
+        <div class="preview-scale">
+          <span class="step">12</span><span class="step">14</span><span class="step">16</span><span class="step">18</span><span class="step">21</span><span class="step">24</span><span class="step">36</span><span class="step">48</span><span class="step">60</span><span class="step">72</span>
+        </div>
+        <div class="usage">
+          <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-list-column" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf10a;" />
+        </div>
+      </div>
+      
+      <div class="glyph">
+        <div class="preview-glyphs">
           <span class="step size-12"><span class="letters">Pp</span><i id="icon-list-filled" class="icon-list-filled"></i></span><span class="step size-14"><span class="letters">Pp</span><i id="icon-list-filled" class="icon-list-filled"></i></span><span class="step size-16"><span class="letters">Pp</span><i id="icon-list-filled" class="icon-list-filled"></i></span><span class="step size-18"><span class="letters">Pp</span><i id="icon-list-filled" class="icon-list-filled"></i></span><span class="step size-21"><span class="letters">Pp</span><i id="icon-list-filled" class="icon-list-filled"></i></span><span class="step size-24"><span class="letters">Pp</span><i id="icon-list-filled" class="icon-list-filled"></i></span><span class="step size-36"><span class="letters">Pp</span><i id="icon-list-filled" class="icon-list-filled"></i></span><span class="step size-48"><span class="letters">Pp</span><i id="icon-list-filled" class="icon-list-filled"></i></span><span class="step size-60"><span class="letters">Pp</span><i id="icon-list-filled" class="icon-list-filled"></i></span><span class="step size-72"><span class="letters">Pp</span><i id="icon-list-filled" class="icon-list-filled"></i></span>
         </div>
         <div class="preview-scale">
@@ -411,7 +428,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-list-filled" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf10a;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf10b;" />
         </div>
       </div>
       
@@ -424,7 +441,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-mail" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf10b;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf10c;" />
         </div>
       </div>
       
@@ -437,7 +454,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-mail-filled" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf10c;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf10d;" />
         </div>
       </div>
       
@@ -450,7 +467,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-map-pin" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf10d;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf10e;" />
         </div>
       </div>
       
@@ -463,7 +480,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-minus" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf10e;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf10f;" />
         </div>
       </div>
       
@@ -476,7 +493,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-pencil" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf10f;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf110;" />
         </div>
       </div>
       
@@ -489,7 +506,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-picture-file" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf110;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf111;" />
         </div>
       </div>
       
@@ -502,7 +519,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-pig" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf111;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf112;" />
         </div>
       </div>
       
@@ -515,7 +532,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-pointy-rectangle-left" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf112;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf113;" />
         </div>
       </div>
       
@@ -528,7 +545,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-pointy-rectangle-right" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf113;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf114;" />
         </div>
       </div>
       
@@ -541,7 +558,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-print" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf114;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf115;" />
         </div>
       </div>
       
@@ -554,7 +571,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-refresh" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf115;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf116;" />
         </div>
       </div>
       
@@ -567,7 +584,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-reply" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf116;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf117;" />
         </div>
       </div>
       
@@ -580,7 +597,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-share" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf117;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf118;" />
         </div>
       </div>
       
@@ -593,7 +610,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-speechbubble" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf118;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf119;" />
         </div>
       </div>
       
@@ -606,7 +623,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-speechbubble-document" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf119;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf11a;" />
         </div>
       </div>
       
@@ -619,7 +636,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-speechbubble-unfilled" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf11a;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf11b;" />
         </div>
       </div>
       
@@ -632,7 +649,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-speechbubbles" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf11b;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf11c;" />
         </div>
       </div>
       
@@ -645,7 +662,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-tags" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf11c;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf11d;" />
         </div>
       </div>
       
@@ -658,7 +675,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-three-dots" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf11d;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf11e;" />
         </div>
       </div>
       
@@ -671,7 +688,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-tick" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf11e;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf11f;" />
         </div>
       </div>
       
@@ -684,7 +701,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-trash" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf11f;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf120;" />
         </div>
       </div>
       
@@ -697,7 +714,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-user" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf120;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf121;" />
         </div>
       </div>
       
@@ -710,7 +727,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-user-unfilled" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf121;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf122;" />
         </div>
       </div>
       
@@ -723,7 +740,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-users" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf122;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf123;" />
         </div>
       </div>
       
@@ -736,7 +753,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-volume" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf123;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf124;" />
         </div>
       </div>
       
@@ -749,7 +766,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-vote-down" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf124;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf125;" />
         </div>
       </div>
       
@@ -762,7 +779,20 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-vote-up" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf125;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf126;" />
+        </div>
+      </div>
+      
+      <div class="glyph">
+        <div class="preview-glyphs">
+          <span class="step size-12"><span class="letters">Pp</span><i id="icon-voting" class="icon-voting"></i></span><span class="step size-14"><span class="letters">Pp</span><i id="icon-voting" class="icon-voting"></i></span><span class="step size-16"><span class="letters">Pp</span><i id="icon-voting" class="icon-voting"></i></span><span class="step size-18"><span class="letters">Pp</span><i id="icon-voting" class="icon-voting"></i></span><span class="step size-21"><span class="letters">Pp</span><i id="icon-voting" class="icon-voting"></i></span><span class="step size-24"><span class="letters">Pp</span><i id="icon-voting" class="icon-voting"></i></span><span class="step size-36"><span class="letters">Pp</span><i id="icon-voting" class="icon-voting"></i></span><span class="step size-48"><span class="letters">Pp</span><i id="icon-voting" class="icon-voting"></i></span><span class="step size-60"><span class="letters">Pp</span><i id="icon-voting" class="icon-voting"></i></span><span class="step size-72"><span class="letters">Pp</span><i id="icon-voting" class="icon-voting"></i></span>
+        </div>
+        <div class="preview-scale">
+          <span class="step">12</span><span class="step">14</span><span class="step">16</span><span class="step">18</span><span class="step">21</span><span class="step">24</span><span class="step">36</span><span class="step">48</span><span class="step">60</span><span class="step">72</span>
+        </div>
+        <div class="usage">
+          <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-voting" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf127;" />
         </div>
       </div>
       
@@ -775,7 +805,7 @@
         </div>
         <div class="usage">
           <input class="class" type="text" readonly="readonly" onClick="this.select();" value=".icon-x" />
-          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf126;" />
+          <input class="point" type="text" readonly="readonly" onClick="this.select();" value="&amp;#xf128;" />
         </div>
       </div>
       
