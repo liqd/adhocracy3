@@ -32,6 +32,7 @@ export var logBackendError : (response : angular.IHttpPromiseCallbackArg<IBacken
 export interface IHttpConfig {
     noCredentials? : boolean;
     noExport? : boolean;
+    anonymize? : boolean;
 }
 
 export interface IHttpOptionsConfig extends IHttpConfig {
@@ -126,6 +127,11 @@ export class Service {
         if (config.noCredentials) {
             _.assign(headers, {
                 "X-User-Token": undefined
+            });
+        }
+        if (config.anonymize) {
+            _.assign(headers, {
+                "X-Anonymize": ""
             });
         }
         return headers;
