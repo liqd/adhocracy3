@@ -301,6 +301,22 @@ def test_is_created_anonymized_false_if_anonymized_creator(context, mocker):
     assert not is_created_anonymized(context)
 
 
+def test_set_anonymized_creator(context):
+    from . import set_anonymized_creator
+    set_anonymized_creator(context, 'userid')
+    assert context.__anonymized_creator__ == 'userid'
+
+
+def test_get_anonymized_creator_return_emptry_string_if_not_set(context):
+    from . import get_anonymized_creator
+    assert get_anonymized_creator(context) == ''
+
+
+def test_get_anonymized_creator_return_userid_if_set(context):
+    from . import get_anonymized_creator
+    context.__anonymized_creator__ = 'userid'
+    assert get_anonymized_creator(context) == 'userid'
+
 
 class TestValidateAnonymizeHeader:
 

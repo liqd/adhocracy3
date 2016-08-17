@@ -176,6 +176,17 @@ class MultiRouteAuthenticationPolicy(CallbackAuthenticationPolicy):
         return headers
 
 
+def set_anonymized_creator(context: object, userid: str):
+    """Store userid of anonymized creator of `context`."""
+    setattr(context, '__anonymized_creator__', userid)
+
+
+def get_anonymized_creator(context: object) -> str:
+    """Get userid of anonymized creator of `context` or empty string."""
+    userid = getattr(context, '__anonymized_creator__', '')
+    return userid
+
+
 def is_created_anonymized(context: object) -> bool:
     """Check if `context` was created anonymized."""
     is_created_anonymized = bool(get_anonymized_creator(context))

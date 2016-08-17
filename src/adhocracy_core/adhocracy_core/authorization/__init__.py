@@ -18,6 +18,7 @@ from substanced.util import set_acl
 from substanced.stats import statsd_timer
 import transaction
 
+from adhocracy_core.authentication import get_anonymized_creator
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IRoleACLAuthorizationPolicy
 from adhocracy_core.events import LocalRolesModified
@@ -61,7 +62,8 @@ class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
         with statsd_timer('authorization', rate=.1):
             principals_with_roles = get_principals_with_local_roles(context,
                                                                     principals)
-            return super().permits(context, principals_with_roles, permission)
+            allow = super().permits(context, principals_with_roles, permission)
+            return allow
 
 
 def set_local_roles(resource, new_local_roles: dict, registry: Registry=None):
@@ -109,7 +111,9 @@ def _assert_values_have_set_type(mapping: dict):
 
 def get_local_roles(resource) -> dict:
     """Return the :term:`local roles <local role>` of the resource."""
-    return getattr(resource, '__local_roles__', {})
+    local_roles = getattr(resource, '__local_roles__', {})
+
+    return local_roles
 
 
 def get_local_roles_all(resource) -> dict:
@@ -224,6 +228,9 @@ def get_principals_with_local_roles(context: IResource,
                                     principals: list) -> list:
     """Get a copy of pricipals list with added local roles."""
     local_roles = get_local_roles_all(context)
+    anonymized_creator = get_anonymized_creator(context)
+    if anonymized_creator:
+        local_roles[anonymized_creator] = {'role:creator'}
     principals_with_roles = set(principals)
     for principal, roles in local_roles.items():
         if principal in principals:

@@ -351,6 +351,7 @@ class PoolRESTView(SimpleRESTView):
                       root_versions=validated.get('root_versions', []),
                       request=self.request,
                       is_batchmode=is_batchmode(self.request),
+                      anonymized_creator=self.request.anonymized_user,
                       )
         iresource = validated['content_type']
         return self.content.create(iresource.__identifier__, **kwargs)
