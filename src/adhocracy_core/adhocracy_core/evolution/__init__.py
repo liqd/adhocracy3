@@ -888,6 +888,13 @@ def remove_participant_role_from_default_group(root,
         group_sheet.set(appstruct)
 
 
+def add_global_anonymous_user(root, registry):  # pragma: no cover
+    """Add  global anonymmous user."""
+    from adhocracy_core.resources.root import _add_anonymous_user
+    _add_anonymous_user(root, registry)
+
+
+@log_migration
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -940,3 +947,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(allow_image_download_view_for_everyone)
     config.add_evolution_step(add_followable_sheet_to_organisation)
     config.add_evolution_step(remove_participant_role_from_default_group)
+    config.add_evolution_step(add_global_anonymous_user)
