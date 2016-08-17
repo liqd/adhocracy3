@@ -9,6 +9,7 @@ from adhocracy_core.sheets.asset import IHasAssetPool
 from adhocracy_core.sheets.badge import IHasBadgesPool
 from adhocracy_core.sheets.description import IDescription
 from adhocracy_core.sheets.notification import IFollowable
+from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
 
 
 _ = TranslationStringFactory('adhocracy')
@@ -37,6 +38,7 @@ process_meta = pool_meta._replace(
                      IHasBadgesPool,
                      IDescription,
                      IFollowable,
+                     IAllowAddAnonymized,
                      ))
 
 

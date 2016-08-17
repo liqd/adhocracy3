@@ -32,10 +32,13 @@ def test_commentservice_meta():
     from .comment import comments_meta
     from .comment import ICommentsService
     from .comment import IComment
+    import adhocracy_core.sheets
     meta = comments_meta
     assert meta.iresource is ICommentsService
     assert meta.element_types == (IComment,)
     assert meta.content_name == 'comments'
+    assert meta.extended_sheets == (adhocracy_core.sheets.anonymize.IAllowAddAnonymized,
+                                    )
 
 
 @mark.usefixtures('integration')

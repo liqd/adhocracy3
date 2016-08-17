@@ -14,6 +14,7 @@ from adhocracy_core.resources.service import service_meta
 import adhocracy_core.sheets.comment
 import adhocracy_core.sheets.rate
 import adhocracy_core.sheets.relation
+import adhocracy_core.sheets.anonymize
 
 
 _ = TranslationStringFactory('adhocracy')
@@ -59,6 +60,8 @@ comments_meta = service_meta._replace(
     iresource=ICommentsService,
     content_name='comments',
     element_types=(IComment,),
+    extended_sheets=(adhocracy_core.sheets.anonymize.IAllowAddAnonymized,
+                     )
 )
 
 

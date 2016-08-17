@@ -25,6 +25,7 @@ class TestProcess:
         assert sheets.description.IDescription in meta.basic_sheets
         assert sheets.workflow.IWorkflowAssignment in meta.basic_sheets
         assert sheets.notification.IFollowable in meta.basic_sheets
+        assert sheets.anonymize.IAllowAddAnonymized in meta.basic_sheets
         assert add_assets_service in meta.after_creation
         assert add_badges_service in meta.after_creation
         assert meta.default_workflow == 'sample'
