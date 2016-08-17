@@ -362,6 +362,28 @@ class TestResourceFactory:
         userid = resource_path(created_user)
         assert created_user.__local_roles__[userid] == {'role:creator'}
 
+    def test_with_anonymized_creator_and_resource_implements_imetadata(
+            self, resource_meta, registry, mock_sheet, mocker):
+        from adhocracy_core.sheets.metadata import IMetadata
+        from pyramid.traversal import resource_path
+        mock_set_anonymized =\
+            mocker.patch('adhocracy_core.resources.set_anonymized_creator')
+        meta = resource_meta._replace(iresource=IResource,
+                                      basic_sheets=(IMetadata,))
+        register_sheet(None, mock_sheet, registry, IMetadata)
+        authenticated_user = testing.DummyResource(__name__='userid')
+        anonymous_user = testing.DummyResource(__name__='anonymous')
+
+        resource = self.make_one(meta)(creator=anonymous_user,
+                                       anonymized_creator=authenticated_user)
+
+        set_appstructs = mock_sheet.set.call_args[0][0]
+        assert set_appstructs['creator'] == anonymous_user
+        assert set_appstructs['modified_by'] == anonymous_user
+        assert getattr(resource, '__local_roles__', None) is None
+        userid = resource_path(authenticated_user)
+        mock_set_anonymized.assert_called_with(resource, userid)
+
     def test_with_workflow_assignment_but_empty_appstruct(
             self, resource_meta, registry, mock_sheet):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment

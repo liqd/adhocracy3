@@ -185,6 +185,7 @@ class TestSystemUser:
         assert meta.basic_sheets == principal.user_meta.basic_sheets
         assert meta.extended_sheets == \
                (adhocracy_core.sheets.rate.ICanRate,
+                adhocracy_core.sheets.principal.IActivationConfiguration,
                 adhocracy_core.sheets.badge.ICanBadge,
                 adhocracy_core.sheets.badge.IBadgeable,
                 adhocracy_core.sheets.image.IImageReference,

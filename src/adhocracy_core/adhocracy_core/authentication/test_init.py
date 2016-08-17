@@ -282,9 +282,7 @@ def test_is_marked_anonymize_true_if_anonymize_header(request_):
 
 def test_is_marked_anonymize_false_if_no_anonymize_header(request_):
     from . import is_marked_anonymize
-    from . import AnonymizeHeader
-    request_.headers[AnonymizeHeader] = ''
-    assert is_marked_anonymize(request_) is True
+    assert is_marked_anonymize(request_) is False
 
 
 def test_is_created_anonymized_true_if_anonymized_creator(context, mocker):

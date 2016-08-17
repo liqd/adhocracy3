@@ -179,6 +179,7 @@ class ISystemUser(IUser):
 system_user_meta = user_meta._replace(
     iresource=ISystemUser,
     extended_sheets=(adhocracy_core.sheets.rate.ICanRate,  # no password sheet
+                     adhocracy_core.sheets.principal.IActivationConfiguration,
                      adhocracy_core.sheets.badge.ICanBadge,
                      adhocracy_core.sheets.badge.IBadgeable,
                      adhocracy_core.sheets.image.IImageReference,

@@ -350,10 +350,22 @@ class TestGetPrincipalsWithLocalRoles:
         context.__local_roles__ = {'group:default_group': {'role:participant'}}
         principals = ['system.Everyone', 'system.Authenticated',
                       'group:default_group']
-        principals_with_roles =  list(principals)
+        principals_with_roles = list(principals)
         principals_with_roles.append('role:participant')
         result = self.call_fut(context, principals)
         assert set(result) == set(principals_with_roles)
+
+    def test_principals_with_anonymized_creator(self, context, mocker):
+        mocker.patch('adhocracy_core.authorization.get_anonymized_creator',
+                     return_value='userid')
+        context.__local_roles__ = {}
+        principals = ['system.Everyone', 'system.Authenticated',
+                      'userid']
+        principals_with_roles = list(principals)
+        principals_with_roles.append('role:creator')
+        result = self.call_fut(context, principals)
+        assert set(result) == set(principals_with_roles)
+
 
 @mark.usefixtures('integration')
 def test_root_acm_extensions_adapter_register(registry, context):

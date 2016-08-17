@@ -91,6 +91,28 @@ class TestRoot:
         assert group_users == ['0000000']
         assert group_roles == ['god']
 
+    def test_create_root_with_anonymous_system_user(self, registry, request_):
+        from substanced.interfaces import IUserLocator
+        from adhocracy_core.resources.principal import ISystemUser
+        from adhocracy_core.resources.root import IRootPool
+        inst = registry.content.create(IRootPool.__identifier__)
+        locator = registry.getMultiAdapter((inst, request_), IUserLocator)
+        anonymous_user = locator.get_user_by_login('anonymous')
+        assert ISystemUser.providedBy(anonymous_user)
+        assert anonymous_user.email == 'sysadmin@test.de'
+
+    def test_create_root_with_anonymous_system_user_with_custom_login(
+            self, registry, request_):
+        from substanced.interfaces import IUserLocator
+        from adhocracy_core.resources.root import IRootPool
+        registry.settings['adhocracy.anonymous_user'] = 'custom_anonymous'
+        registry.settings['adhocracy.anonymous_user_email'] = 'custom@test.de'
+        inst = registry.content.create(IRootPool.__identifier__)
+        locator = registry.getMultiAdapter((inst, request_), IUserLocator)
+        anonymous_user = locator.get_user_by_login('custom_anonymous')
+        assert anonymous_user.email == 'custom@test.de'
+
+
     def test_create_root_with_example_process(self, registry):
         from adhocracy_core.resources.process import IProcess
         from .root import IRootPool
