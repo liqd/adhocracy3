@@ -140,5 +140,6 @@ export var register = (angular) => {
         .directive("adhUserProfileImage", ["adhHttp", "adhConfig", AdhUserViews.adhUserProfileImageDirective])
         .directive("adhUserProfileImageEdit", ["adhHttp", "adhPermissions", "adhConfig", AdhUserViews.adhUserProfileImageEditDirective])
         .directive("adhUserActivityOverview", ["adhConfig", "adhHttp", AdhUserViews.adhUserActivityOverviewDirective])
-        .directive("adhHelpLink", ["adhConfig", AdhUserViews.adhHelpLinkDirective]);
+        .directive("adhHelpLink", ["adhConfig", AdhUserViews.adhHelpLinkDirective])
+        .directive("adhUserWorkbench", ["adhConfig", "adhTopLevelState", AdhUserViews.workbenchDirective]);
 };

@@ -882,6 +882,17 @@ export var adhHelpLinkDirective = (
     };
 };
 
+export var workbenchDirective = (
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html",
+        scope: {}
+    };
+};
+
 export var registerRoutes = (
     context : string = ""
 ) => (
