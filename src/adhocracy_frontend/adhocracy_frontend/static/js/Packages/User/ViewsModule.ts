@@ -102,7 +102,15 @@ export var register = (angular) => {
             "adhUser",
             "adhGetBadges",
             AdhUserViews.userProfileDirective])
-        .directive("adhUserEdit", ["adhConfig", "adhHttp", AdhUserViews.userEditDirective])
+        .directive("adhUserEdit", [
+            "adhConfig",
+            "adhHttp",
+            "adhTopLevelState",
+            "adhShowError",
+            "adhSubmitIfValid",
+            "adhResourceUrlFilter",
+            "$location",
+            AdhUserViews.userEditDirective])
         .directive("adhLogin", [
             "adhConfig",
             "adhUser",

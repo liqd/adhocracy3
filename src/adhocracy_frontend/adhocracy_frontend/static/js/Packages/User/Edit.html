@@ -1,0 +1,52 @@
+<div class="resource-navigation">
+    <div class="resource-navigation-breadcrumbs">
+        <adh-go-to-came-from data-default="path | adhResourceUrl"></adh-go-to-came-from>
+    </div>
+</div>
+
+<form
+    name="userEditForm"
+    class="l-padding"
+    novalidate="novalidate"
+    data-ng-submit="submit()">
+
+    <div class="form-error" data-ng-repeat="error in errors track by $index">
+        <p>{{ error | adhFormatError | translate }}</p>
+    </div>
+
+    <label>
+        <span class="label-text">{{ "TR__USERNAME" | translate }}</span>
+        <input
+            type="text"
+            name="name"
+            required="required"
+            data-ng-model="data.name" />
+        <span class="input-error" data-ng-show="showError(userEditForm, userEditForm.name, 'required')">
+            {{ "TR__ERROR_REQUIRED" | translate }}
+        </span>
+    </label>
+    <label>
+        <span class="label-text">{{ "TR__PASSWORD" | translate }}</span>
+        <input
+            type="password"
+            name="password"
+            data-ng-minlength="6"
+            data-ng-maxlength="100"
+            data-ng-model="data.password" />
+        <span class="input-error" data-ng-show="showError(userEditForm, userEditForm.password, 'minlength')">
+            {{ "TR__ERROR_TOO_SHORT_PASSWORD" | translate }}
+        </span>
+    </label>
+
+    <footer class="form-footer">
+        <input
+            type="submit"
+            name="submit"
+            value="{{ 'TR__PUBLISH' | translate }}"
+            class="button-cta form-footer-button-cta" />
+        <a
+            href=""
+            data-ng-click="cancel()"
+            class="button form-footer-button">{{ "TR__CANCEL" | translate }}</a>
+    </footer>
+</form>
