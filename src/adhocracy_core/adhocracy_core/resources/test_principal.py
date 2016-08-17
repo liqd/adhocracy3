@@ -161,6 +161,41 @@ class TestUser:
         assert user.timezone == timezone(user.tzname)
 
 
+class TestSystemUser:
+
+    @fixture
+    def meta(self):
+        from .principal import system_user_meta
+        return system_user_meta
+
+    def test_meta(self, meta):
+        from . import principal
+        import adhocracy_core.sheets
+        assert meta.iresource is principal.ISystemUser
+        assert issubclass(principal.ISystemUser, principal.IUser)
+        assert meta.content_class == principal.User
+        assert meta.permission_create == 'create_system_user'
+        assert meta.is_implicit_addable is False
+        assert meta.basic_sheets == principal.user_meta.basic_sheets
+        assert meta.extended_sheets == \
+               (adhocracy_core.sheets.rate.ICanRate,
+                adhocracy_core.sheets.badge.ICanBadge,
+                adhocracy_core.sheets.badge.IBadgeable,
+                adhocracy_core.sheets.image.IImageReference,
+                adhocracy_core.sheets.notification.INotification,
+                )
+        assert meta.element_types == ()
+        assert meta.use_autonaming is True
+        assert meta.is_sdi_addable is False
+
+    @mark.usefixtures('integration')
+    def test_create(self, meta, registry, principals):
+        user = registry.content.create(meta.iresource.__identifier__,
+                                       parent=principals['users'])
+        assert principals['users']['0000000'] is user
+        assert meta.iresource.providedBy(user)
+
+
 class TestGroups:
 
     @fixture

@@ -170,6 +170,23 @@ user_meta = pool_meta._replace(
 )
 
 
+class ISystemUser(IUser):
+    """User resource without login/password, created by the application."""
+
+
+system_user_meta = user_meta._replace(
+    iresource=ISystemUser,
+    extended_sheets=(adhocracy_core.sheets.rate.ICanRate,  # no password sheet
+                     adhocracy_core.sheets.badge.ICanBadge,
+                     adhocracy_core.sheets.badge.IBadgeable,
+                     adhocracy_core.sheets.image.IImageReference,
+                     adhocracy_core.sheets.notification.INotification,
+                     ),
+    permission_create='create_system_user',
+    is_sdi_addable=False
+)
+
+
 def allow_create_asset_authenticated(context: IPool,
                                      registry: Registry,
                                      options: dict):
@@ -455,6 +472,7 @@ def includeme(config):
     """Add resource types to registry."""
     add_resource_type_to_registry(principals_meta, config)
     add_resource_type_to_registry(user_meta, config)
+    add_resource_type_to_registry(system_user_meta, config)
     add_resource_type_to_registry(users_meta, config)
     add_resource_type_to_registry(group_meta, config)
     add_resource_type_to_registry(groups_meta, config)
