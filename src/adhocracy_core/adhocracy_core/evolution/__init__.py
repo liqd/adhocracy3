@@ -888,6 +888,13 @@ def remove_participant_role_from_default_group(root,
         group_sheet.set(appstruct)
 
 
+@log_migration
+def add_activation_config_sheet_to_user(root, registry):  # pragma: no cover
+    """Add acitvation configuration sheet to user."""
+    from adhocracy_core.sheets.principal import IActivationConfiguration
+    migrate_new_sheet(root, IUser, IActivationConfiguration)
+
+
 def add_global_anonymous_user(root, registry):  # pragma: no cover
     """Add  global anonymmous user."""
     from adhocracy_core.resources.root import _add_anonymous_user
@@ -962,6 +969,7 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(allow_image_download_view_for_everyone)
     config.add_evolution_step(add_followable_sheet_to_organisation)
     config.add_evolution_step(remove_participant_role_from_default_group)
+    config.add_evolution_step(add_activation_config_sheet_to_user)
     config.add_evolution_step(add_global_anonymous_user)
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_process)
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_comments)

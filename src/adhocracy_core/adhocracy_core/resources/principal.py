@@ -158,6 +158,7 @@ user_meta = pool_meta._replace(
                   adhocracy_core.sheets.pool.IPool,
                   ),
     extended_sheets=(adhocracy_core.sheets.principal.IPasswordAuthentication,
+                     adhocracy_core.sheets.principal.IActivationConfiguration,
                      adhocracy_core.sheets.rate.ICanRate,
                      adhocracy_core.sheets.badge.ICanBadge,
                      adhocracy_core.sheets.badge.IBadgeable,

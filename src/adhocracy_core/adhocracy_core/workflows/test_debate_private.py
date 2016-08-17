@@ -26,12 +26,6 @@ class TestDebatePrivateProcess:
         return '/opin/collaborative_text'
 
     @fixture(scope='class')
-    def app_settings(self, app_settings) -> dict:
-        """Return settings to start the test wsgi app."""
-        app_settings['adhocracy.skip_registration_mail'] = True
-        return app_settings
-
-    @fixture(scope='class')
     def app_router(self, app_settings):
         """Add a `debate_private` workflow to IProcess resources."""
         from adhocracy_core.testing import make_configurator

@@ -6,6 +6,7 @@ import decimal
 import io
 import os
 import re
+import string
 
 from colander import All
 from colander import Boolean as BooleanType
@@ -28,6 +29,7 @@ from deform.widget import DateTimeInputWidget
 from deform.widget import SequenceWidget
 from deform.widget import Select2Widget
 from deform.widget import SelectWidget
+from deform.widget import PasswordWidget
 from deform_markdown import MarkdownTextAreaWidget
 from deform.widget import filedict
 from pyramid.path import DottedNameResolver
@@ -36,6 +38,7 @@ from pyramid.traversal import resource_path
 from pyramid.traversal import lineage
 from pyramid import security
 from pyramid.traversal import find_interface
+from pyramid.interfaces import IRequest
 from substanced.file import file_upload_widget
 from substanced.file import File
 from substanced.file import USE_MAGIC
@@ -53,6 +56,7 @@ from adhocracy_core.utils import now
 from adhocracy_core.interfaces import SheetReference
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import search_query
 
 
 class SchemaNode(colander.SchemaNode):
@@ -679,6 +683,18 @@ class Text(SchemaNode):
     widget = MarkdownTextAreaWidget()
 
 
+@deferred
+def deferred_password_default(node: MappingSchema, kw: dict) -> string:
+    """Return generated password."""
+    return _generate_password()
+
+
+def _generate_password():
+    chars = string.ascii_letters + string.digits + '+_'
+    pwd_len = 20
+    return ''.join(chars[int(c) % len(chars)] for c in os.urandom(pwd_len))
+
+
 class Password(SchemaNode):
     """UTF-8 encoded text.
 
@@ -687,9 +703,10 @@ class Password(SchemaNode):
     """
 
     schema_type = StringType
-    default = ''
+    default = deferred_password_default
     missing = drop
     validator = Length(min=6, max=100)
+    widget = PasswordWidget(redisplay=True)
 
 
 @deferred
@@ -1082,3 +1099,15 @@ def create_deferred_permission_validator(permission: str) -> callable:
         return check_permission
 
     return deferred_check_permission
+
+
+def get_choices_by_interface(interface: IInterface,
+                             context: IResource,
+                             request: IRequest,
+                             ) -> []:
+    """Get choices for resource paths by interface."""
+    catalogs = find_service(context, 'catalogs')
+    query = search_query._replace(interfaces=interface)
+    resources = catalogs.search(query).elements
+    choices = [(request.resource_url(r), resource_path(r)) for r in resources]
+    return choices
