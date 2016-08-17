@@ -709,6 +709,20 @@ export var userProfileDirective = (
 };
 
 
+export var userEditDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Edit.html",
+        scope: {
+            path: "@"
+        }
+    };
+};
+
+
 export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service) => {
     return {
         restrict: "E",
@@ -756,6 +770,20 @@ export var userDetailColumnDirective = (
             scope.$on("$destroy", adhTopLevelState.bind("userUrl", scope));
             adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
             scope.modals = new AdhResourceActions.Modals($timeout);
+        }
+    };
+};
+
+
+export var userEditColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserEditColumn.html",
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("userUrl", scope));
         }
     };
 };
