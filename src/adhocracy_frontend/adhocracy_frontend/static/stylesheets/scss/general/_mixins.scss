@@ -62,5 +62,5 @@ $rem-px-only: false !default;
 }
 
 @function font-url($path) {
-    @return url("../fonts/" + $path);
+    @return url("../fonts/" + $path + "?" + cachebust());
 }
