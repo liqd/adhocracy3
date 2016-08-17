@@ -1,4 +1,5 @@
 """Public py.test fixtures: http://pytest.org/latest/fixture.html."""
+from copy import copy
 from functools import partial
 from unittest.mock import Mock
 from configparser import ConfigParser
@@ -738,10 +739,13 @@ class AppUser:
             path: str,
             cstruct: dict={},
             upload_files: [(str, str, bytes)]=None,
+            extra_headers: dict={},
             ) -> TestResponse:
         """Put request to modify a resource."""
         url = self._build_url(path)
-        kwargs = {'headers': self.header,
+        headers = copy(self.header)
+        headers.update(extra_headers)
+        kwargs = {'headers': headers,
                   'expect_errors': True,
                   }
         if upload_files:
@@ -755,10 +759,13 @@ class AppUser:
              path: str,
              cstruct: dict={},
              upload_files: [(str, str, bytes)]=None,
+             extra_headers: dict={},
              ) -> TestResponse:
         """Post request to create a new resource."""
         url = self._build_url(path)
-        kwargs = {'headers': self.header,
+        headers = copy(self.header)
+        headers.update(extra_headers)
+        kwargs = {'headers': headers,
                   'expect_errors': True,
                   }
         if upload_files:
@@ -783,11 +790,13 @@ class AppUser:
                                   expect_errors=True)
         return resp
 
-    def get(self, path: str, params={}) -> TestResponse:
+    def get(self, path: str, params={}, extra_headers={}) -> TestResponse:
         """Send get request to the backend rest server."""
         url = self._build_url(path)
+        headers = copy(self.header)
+        headers.update(extra_headers)
         resp = self.app.get(url,
-                            headers=self.header,
+                            headers=headers,
                             params=params,
                             expect_errors=True)
         return resp
@@ -891,6 +900,12 @@ def app_god(app_router):
     return AppUser(app_router,
                    user_login='god',
                    user_password='password')
+
+
+@fixture(scope='class')
+def global_anonymization_userid(app_router):
+    """Return userid of global anonymisation user."""
+    return '/principals/users/0000001'
 
 
 @fixture(scope='class')
