@@ -889,7 +889,10 @@ export var workbenchDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html",
-        scope: {}
+        scope: {},
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("view", scope));
+        }
     };
 };
 
@@ -907,5 +910,20 @@ export var registerRoutes = (
             return {
                 userUrl: resource.path
             };
-        });
+        })
+        .default(RIUser, "edit", "", context, {
+            space: "user",
+            movingColumns: "is-show-hide-hide"
+        })
+        .specific(RIUser, "edit", "", context, ["adhHttp", (adhHttp : AdhHttp.Service) => (resource : RIUser) => {
+            return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                if (!options.PUT) {
+                    throw 401;
+                } else {
+                    return {
+                        userUrl: resource.path
+                    };
+                }
+            });
+        }]);
 };
