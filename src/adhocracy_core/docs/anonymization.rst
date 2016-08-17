@@ -57,8 +57,8 @@ Then we make a normal post request with the additional header::
 The creator is set to anonymous::
 
     >>> resp = participant.get(proposal_version_path)
-    >>> resp.json['data']['adhocracy_core.sheets.metadata.IMetadata']['creator']
-    '.../users/0000001/'
+    >>> anonymization_userid in resp.json['data']['adhocracy_core.sheets.metadata.IMetadata']['creator']
+    True
 
 This is only True if the context we are adding to has the 'IAllowAddAnonymized'
 marker sheet and the user has the 'manage_anonymized' permission.

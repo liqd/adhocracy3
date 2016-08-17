@@ -895,6 +895,7 @@ def add_activation_config_sheet_to_user(root, registry):  # pragma: no cover
     migrate_new_sheet(root, IUser, IActivationConfiguration)
 
 
+@log_migration
 def add_global_anonymous_user(root, registry):  # pragma: no cover
     """Add  global anonymmous user."""
     from adhocracy_core.resources.root import _add_anonymous_user
@@ -916,6 +917,7 @@ def add_allow_add_anonymized_sheet_to_comments(root,
     from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
     from adhocracy_core.resources.comment import ICommentsService
     migrate_new_sheet(root, ICommentsService, IAllowAddAnonymized)
+
 
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
