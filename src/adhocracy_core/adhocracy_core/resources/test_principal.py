@@ -33,6 +33,11 @@ def principals(pool_with_catalogs, registry):
     return inst
 
 
+@fixture
+def mock_is_anonymize(mocker):
+    return mocker.patch('adhocracy_core.resources.principal.is_marked_anonymize')
+
+
 class TestPrincipalsService:
 
     @fixture
@@ -643,11 +648,11 @@ class TestDeletePasswordResets:
         assert 'reset' in resets
 
 
-class TestGetUser:
+class TestGetUserOrAnonymous:
 
     def call_fut(self, *args):
-        from .principal import get_user
-        return get_user(*args)
+        from .principal import get_user_or_anonymous
+        return get_user_or_anonymous(*args)
 
     def test_return_none_if_no_authenticated_user(self, request_):
         request_.authenticated_userid = None
@@ -657,8 +662,48 @@ class TestGetUser:
         request_.authenticated_userid = 'userid'
         assert self.call_fut(request_) is None
 
-    def test_return_user_resource(self, request_, mock_user_locator):
+    def test_return_authenticated_user_if_no_anonymize(
+            self, request_, mock_user_locator, mock_is_anonymize):
+        user = testing.DummyResource()
+        mock_is_anonymize.return_value = False
+        request_.authenticated_userid = 'userid'
+        mock_user_locator.get_user_by_userid.return_value = user
+        assert self.call_fut(request_) == user
+        mock_is_anonymize.assert_called_with(request_)
+
+    def test_return_anonymous_user_if_anonymize(
+            self, request_, mock_user_locator, mock_is_anonymize):
+        user = testing.DummyResource()
+        mock_is_anonymize.return_value = True
+        request_.registry.settings['adhocracy.anonymous_user'] = 'anonymous_'
+        mock_user_locator.get_user_by_login.return_value = user
+        assert self.call_fut(request_) == user
+
+
+class TestGetAnonymizedUser:
+
+    def call_fut(self, *args):
+        from .principal import get_anonymized_user
+        return get_anonymized_user(*args)
+
+
+    def test_return_none_if_no_anonymize_request(self, request_,
+                                                 mock_is_anonymize):
+        request_.authenticated_userid = 'userid'
+        mock_is_anonymize.return_value = None
+        assert self.call_fut(request_) is None
+        mock_is_anonymize.assert_called_with(request_)
+
+    def test_return_none_if_anonymize_request_but_no_user(
+            self, request_, mock_is_anonymize):
+        request_.authenticated_userid = None
+        mock_is_anonymize.return_value = True
+        assert self.call_fut(request_) is None
+
+    def test_return_authenticated_user_if_anonymize_request(
+            self, request_, mock_user_locator, mock_is_anonymize):
         user = testing.DummyResource()
         request_.authenticated_userid = 'userid'
+        mock_is_anonymize.return_value = True
         mock_user_locator.get_user_by_userid.return_value = user
         assert self.call_fut(request_) == user

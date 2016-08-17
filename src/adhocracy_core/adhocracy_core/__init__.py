@@ -14,7 +14,8 @@ from adhocracy_core.authentication import MultiRouteAuthenticationPolicy
 from adhocracy_core.interfaces import SDI_ROUTE_NAME
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.resources.principal import groups_and_roles_finder
-from adhocracy_core.resources.principal import get_user
+from adhocracy_core.resources.principal import get_user_or_anonymous
+from adhocracy_core.resources.principal import get_anonymized_user
 from adhocracy_core.auditing import set_auditlog
 from adhocracy_core.auditing import get_auditlog
 from adhocracy_core.interfaces import IFixtureAsset
@@ -103,7 +104,10 @@ def includeme(config):
     config.include('.authorization')
     authn_policy = _create_authentication_policy(settings, config)
     config.set_authentication_policy(authn_policy)
-    config.add_request_method(get_user, name='user', reify=True)
+    # FIXME mv user properties to authentication package
+    config.add_request_method(get_user_or_anonymous, name='user', reify=True)
+    config.add_request_method(get_anonymized_user, name='anonymized_user',
+                              reify=True)
     config.include('.renderers')
     config.include('.evolution')
     config.include('.events')

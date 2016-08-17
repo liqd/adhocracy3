@@ -18,6 +18,10 @@ UserPathHeader = 'X-User-Path'
 """Deprecated: The optional request header to set the userid."""
 
 
+AnonymizeHeader = 'X-Anonymize'
+"""Mark this request to be anonymized."""
+
+
 @implementer(IAuthenticationPolicy)
 class TokenHeaderAuthenticationPolicy(JWTAuthenticationPolicy):
     """Http header token authentication based on :mod:`pyramid_jwt`.
@@ -84,6 +88,11 @@ def validate_user_headers(view: callable):
             raise HTTPBadRequest()
         return view(context, request)
     return wrapped_view
+
+
+def is_marked_anonymize(request: IRequest) -> bool:
+    """Check if request is marked with the Anonymize header."""
+    return AnonymizeHeader in request.headers
 
 
 @implementer(IAuthenticationPolicy)

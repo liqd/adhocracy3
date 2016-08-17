@@ -19,6 +19,7 @@ from zope.interface import Interface
 from zope.interface import implementer
 
 from adhocracy_core.authorization import set_acl
+from adhocracy_core.authentication import is_marked_anonymize
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.interfaces import IResource
@@ -414,17 +415,43 @@ class UserLocatorAdapter(object):
         return sorted(list(roleids))
 
 
-def get_user(request: Request) -> IUser:
-    """Get authenticated user, meant to use as request method 'user'."""
-    userid = request.authenticated_userid
-    if userid is None:
-        return None
+def get_user_or_anonymous(request: Request) -> IUser:
+    """Get authenticated user or anonymous if anonymized request or None.
+
+    Meant to be use as request method 'user'.
+    """
+    if is_marked_anonymize(request):
+        user = _get_anonymous_user(request)
+    else:
+        user = _get_authenticated_user(request)
+    return user
+
+
+def _get_anonymous_user(request: Request) -> IUser:
+    username = request.registry.settings.get('adhocracy.anonymous_user',
+                                             'anonymous')
     adapter = request.registry.queryMultiAdapter((request.context, request),
                                                  IRolesUserLocator)
-    if adapter is None:
+    return adapter.get_user_by_login(username)
+
+
+def _get_authenticated_user(request: Request) -> IUser:
+    userid = request.authenticated_userid
+    adapter = request.registry.queryMultiAdapter((request.context, request),
+                                                 IRolesUserLocator)
+    if adapter is None or not userid:
         return None
     else:
-        user = adapter.get_user_by_userid(userid)
+        return adapter.get_user_by_userid(userid)
+
+
+def get_anonymized_user(request: Request) -> IUser:
+    """Get authenticated user if anonymized request or None.
+
+    Meant to be use as request method 'anonymized_user'.
+    """
+    if is_marked_anonymize(request):
+        user = _get_authenticated_user(request)
         return user
 
 

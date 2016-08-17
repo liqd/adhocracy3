@@ -214,6 +214,7 @@ def request_():
     request = DummyRequest()
     request.registry.settings = {}
     request.user = None
+    request.anonymized_user = None
     request.scheme = 'http'
     request.matched_route = None
     return request

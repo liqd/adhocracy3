@@ -265,3 +265,17 @@ class TestMultiRouteAuthenticationPolicy:
         inst.policies['route2'] = other_policy
         other_policy.forget.return_value = [('2', '2')]
         assert inst.forget(request_) == [('1','1'), ('2', '2')]
+
+
+def test_is_marked_anonymize_true_if_anonymize_header(request_):
+    from . import is_marked_anonymize
+    from . import AnonymizeHeader
+    request_.headers[AnonymizeHeader] = ''
+    assert is_marked_anonymize(request_) is True
+
+
+def test_is_marked_anonymize_false_if_no_anonymize_header(request_):
+    from . import is_marked_anonymize
+    from . import AnonymizeHeader
+    request_.headers[AnonymizeHeader] = ''
+    assert is_marked_anonymize(request_) is True
