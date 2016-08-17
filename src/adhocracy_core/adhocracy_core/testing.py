@@ -393,6 +393,9 @@ def mock_content_registry() -> Mock:
     mock.get_sheets_create.return_value = []
     mock.get_sheet.return_value = None
     mock.get_sheet_field = lambda x, y, z: mock.get_sheet(x, y).get()[z]
+    mock.can_add_anonymized.return_value = False
+    mock.can_edit_anonymized.return_value = False
+    mock.can_delete_anonymized.return_value = False
     return mock
 
 

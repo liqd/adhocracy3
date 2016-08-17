@@ -11,12 +11,15 @@ from substanced.content import add_service_type
 from substanced.workflow import IWorkflow
 from zope.interface.interfaces import IInterface
 
+from adhocracy_core.authentication import is_created_anonymized
 from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.interfaces import SheetMetadata
 from adhocracy_core.interfaces import IResourceSheet
+from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
+from adhocracy_core.sheets.anonymize import ANONYMIZE_PERMISSION
 from adhocracy_core.utils import get_iresource
 
 
@@ -301,6 +304,29 @@ class ResourceContentRegistry(ContentRegistry):
         else:
             workflow = None
         return workflow
+
+    def can_add_anonymized(self, context: object, request: Request) -> bool:
+        """Check if children can be created/added anonymized to `context`."""
+        has_sheet = IAllowAddAnonymized.providedBy(context)
+        has_permission = request.has_permission(ANONYMIZE_PERMISSION, context)
+        return has_sheet and has_permission
+
+    def can_edit_anonymized(self, context: object, request: Request) -> bool:
+        """Check if `context` may be edited anonymously."""
+        can_anonymize = _is_anonymized_and_has_permission(context, request)
+        return can_anonymize
+
+    def can_delete_anonymized(self, context: object, request: Request) -> bool:
+        """Check if `context` may be deleted anonymously."""
+        can_anonymize = _is_anonymized_and_has_permission(context, request)
+        return can_anonymize
+
+
+def _is_anonymized_and_has_permission(context: object,
+                                      request: Request) -> bool:
+    is_anonymized = is_created_anonymized(context)
+    has_permission = request.has_permission(ANONYMIZE_PERMISSION, context)
+    return is_anonymized and has_permission
 
 
 def includeme(config):  # pragma: no cover

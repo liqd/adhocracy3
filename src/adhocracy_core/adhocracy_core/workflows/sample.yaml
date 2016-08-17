@@ -20,6 +20,7 @@ states:
        - [create_relation,   A,           ~,         ~,       ~,             A]
        - [edit_relation,     ~,           ~,         A,       ~,             A]
        - [hide,              ~,           A,         ~,       ~,             A]
+       - [manage_anonymized, A,           ~,         ~,       ~,             ~]
   frozen:
     title: Frozen
 transitions:

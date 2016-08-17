@@ -70,6 +70,10 @@ class TestResourceContentRegistry:
         return policy
 
     @fixture
+    def mock_created_anonymized(self, mocker):
+        return mocker.patch('adhocracy_core.content.is_created_anonymized')
+
+    @fixture
     def context(self):
         return testing.DummyResource(__provides__=(IResource, ISheet))
 
@@ -376,6 +380,46 @@ class TestResourceContentRegistry:
         inst.workflows['sample'] = mock_workflow
         inst.get_sheet_field = Mock(return_value='sample')
         assert inst.get_workflow(context) == mock_workflow
+
+    def test_can_add_anonymized_false_if_parent_has_no_anonymize_sheet(
+            self, inst, context, request_):
+        assert inst.can_add_anonymized(context, request_) is False
+
+    def test_can_add_anonymized_false_if_anonymize_permission_is_missing(
+            self, config, inst, request_):
+        from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
+        context = testing.DummyResource(__provides__=IAllowAddAnonymized)
+        config.testing_securitypolicy(userid='hank', permissive=False)
+        assert inst.can_add_anonymized(context, request_) is False
+
+    def test_can_add_anonymized_true_if_anonymize_sheet_and_permission(
+            self, config, inst, request_):
+        from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
+        context = testing.DummyResource(__provides__=IAllowAddAnonymized)
+        config.testing_securitypolicy(userid='hank', permissive=True)
+        assert inst.can_add_anonymized(context, request_) is True
+
+    def test_can_edit_anonymized_false_if_missing_permission(
+            self, config, inst, context, request_):
+        config.testing_securitypolicy(userid='hank', permissive=False)
+        assert inst.can_edit_anonymized(context, request_) is False
+
+    def test_can_edit_anonymized_true_if_is_anonymized_and_has_permission(
+            self, config, inst, context, request_, mock_created_anonymized):
+        config.testing_securitypolicy(userid='hank', permissive=True)
+        mock_created_anonymized.return_value = True
+        assert inst.can_edit_anonymized(context, request_) is True
+
+    def test_can_delete_anonymized_false_if_missing_permission(
+            self, config, inst, context, request_):
+        config.testing_securitypolicy(userid='hank', permissive=False)
+        assert inst.can_delete_anonymized(context, request_) is False
+
+    def test_can_delete_anonymized_true_if_is_anonymized_and_has_permission(
+            self, config, inst, context, request_, mock_created_anonymized):
+        config.testing_securitypolicy(userid='hank', permissive=True)
+        mock_created_anonymized.return_value = True
+        assert inst.can_delete_anonymized(context, request_) is True
 
 
 @fixture

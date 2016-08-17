@@ -35,6 +35,7 @@ states:
         - [edit_relation,            ~,        ~,           ~,         A,       ~,         ~]
         - [create_badge_assignment,  ~,        ~,           A,         A,       ~,         ~]
         - [hide,                     ~,        ~,           A,         ~,       ~,         ~]
+        - [manage_anonymized,        ~,        A,           ~,         ~,       ~,         ~]
   evaluate:
     title: Evaluate
     acm:
