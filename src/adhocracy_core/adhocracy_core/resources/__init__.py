@@ -14,6 +14,7 @@ from zope.interface import alsoProvides
 from substanced.interfaces import IRoot
 
 from adhocracy_core.authorization import set_local_roles
+from adhocracy_core.authentication import set_anonymized_creator
 from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IItemVersion
@@ -147,6 +148,7 @@ class ResourceFactory:
                  request=None,
                  send_event=True,
                  autoupdated=False,
+                 anonymized_creator=None,
                  **kwargs
                  ):
         """Triggered when a ResourceFactory instance is called.
@@ -176,6 +178,8 @@ class ResourceFactory:
             autoupdated (bool): The creation is caused by a modified
                 referenced resource, no real content is modified.
                 Default is False.
+            anonymized_creator (IResource or None): The resource of the
+                anonymized user, if any.
             **kwargs: Arbitary keyword arguments. Will be passed along with
                 `creator` and  `autoupdated` to the `after_creation` hook as
                 3rd argument `options`.
@@ -223,18 +227,10 @@ class ResourceFactory:
             if sheet.meta.creatable:
                 sheet.set(struct, send_event=False, autoupdated=autoupdated)
 
-        # Fixme: Sideffect. We change here the passed creator because the
-        # creator of user resources should always be the created user.
-        # A better solution would be to have custom adapter to add
-        # resources.
-        # To prevent import circles we do not import at module level.
-        from adhocracy_core.resources.principal import IUser
-        if IUser.providedBy(resource):
+        from adhocracy_core.resources.principal import IUser  # prevent circles
+        if IUser.providedBy(resource):  # TODO Why?
             creator = resource
-
-        if creator is not None:
-            userid = resource_path(creator)
-            set_local_roles(resource, {userid: {'role:creator'}})
+        self._set_local_role_creator(resource, creator, anonymized_creator)
 
         if IMetadata.providedBy(resource):
             metadata = self._get_metadata(resource, creator, registry)
@@ -260,6 +256,17 @@ class ResourceFactory:
                                                         )
 
         return resource
+
+    def _set_local_role_creator(self,
+                                resource: IResource,
+                                creator: IResource,
+                                anonymized_creator: IResource):
+        if creator and not anonymized_creator:
+            userid = resource_path(creator)
+            set_local_roles(resource, {userid: {'role:creator'}})
+        elif creator and anonymized_creator:
+            userid = resource_path(anonymized_creator)
+            set_anonymized_creator(resource, userid)
 
     def _get_metadata(self, resource: IResource, creator: IResource,
                       registry: Registry) -> dict:

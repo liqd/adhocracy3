@@ -1565,7 +1565,7 @@ custom filters:
   user resource url.
   Valid query comparable: 'eq'
   Supports sorting.
-    >>> resp_data = testapp.get('/Documents', params={'creator': '/principals/users/0000002'}).json
+    >>> resp_data = testapp.get('/Documents', params={'creator': '/principals/users/0000003'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/Documents/badges/',
      'http://localhost/Documents/document_0000000/']

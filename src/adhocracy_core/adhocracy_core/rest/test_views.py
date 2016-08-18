@@ -60,7 +60,6 @@ def make_resource(parent, name, iresource):
         return resource
 
 
-
 class TestBuildUpdatedResourcesDict:
 
     @fixture
@@ -126,6 +125,9 @@ class TestResourceRESTView:
         content.get_sheets_read.return_value = [mock_sheet]
         content.get_resources_meta_addable.return_value = [resource_meta]
         content.get_sheets_create.return_value = [mock_sheet]
+        content.can_edit_anonymized.return_value = False
+        content.can_add_anonymized.return_value = False
+        content.can_delete_anonymized.return_value = False
         inst = self.make_one(context, request_)
 
         response = inst.options()
@@ -133,6 +135,7 @@ class TestResourceRESTView:
         wanted = \
         {'GET': {'request_body': {},
          'request_querystring': {},
+         'request_headers': {},
          'response_body': {'content_type': '',
                            'data': {ISheet.__identifier__: {}},
                            'path': ''}},
@@ -140,10 +143,13 @@ class TestResourceRESTView:
          'OPTIONS': {},
          'POST': {'request_body': [{'content_type': IResource.__identifier__,
                                     'data': {ISheet.__identifier__: {}}}],
-                  'response_body': {'content_type': '', 'path': ''}},
-         'DELETE': {},
+                  'response_body': {'content_type': '', 'path': ''},
+                  'request_headers': {},
+                  },
+         'DELETE': {'request_headers': {}},
          'PUT': {'request_body': {'content_type': '',
                                   'data': {ISheet.__identifier__: {}}},
+                 'request_headers': {},
                  'response_body': {'content_type': '', 'path': ''}}}
         assert wanted['GET'] == response['GET']
         assert wanted['POST'] == response['POST']
@@ -174,7 +180,7 @@ class TestResourceRESTView:
         response = inst.options()
         wanted = {'HEAD': {},
                   'OPTIONS': {},
-                  'DELETE': {}}
+                  'DELETE': {'request_headers': {}}}
         assert wanted == response
 
     def test_options_without_delete_permission(self, request_, context):
@@ -184,6 +190,22 @@ class TestResourceRESTView:
         wanted = {'HEAD': {},
                   'OPTIONS': {}}
         assert wanted == response
+
+    def test_options_with_allow_x_anonymize_header(
+            self, request_, context, resource_meta, mock_sheet):
+        content = request_.registry.content
+        content.get_sheets_edit.return_value = [mock_sheet]
+        content.get_resources_meta_addable.return_value = [resource_meta]
+        content.can_edit_anonymized.return_value = True
+        content.can_add_anonymized.return_value = True
+        content.can_delete_anonymized.return_value = True
+        inst = self.make_one(context, request_)
+
+        response = inst.options()
+
+        assert response['POST']['request_headers'] == {'X-Anonymize': []}
+        assert response['PUT']['request_headers'] == {'X-Anonymize': []}
+        assert response['DELETE']['request_headers'] == {'X-Anonymize': []}
 
     def test_add_workflow_permissions_info(
             self, request_, registry, context, mock_sheet, mock_workflow):
@@ -438,6 +460,7 @@ class TestUsersRESTView:
                 root_versions=[],
                 request=request_,
                 is_batchmode=False,
+                anonymized_creator=None,
         )
         assert wanted == response
 
@@ -508,7 +531,9 @@ class TestItemRESTView:
                 appstructs={},
                 root_versions=[],
                 request=request_,
-                is_batchmode=True)
+                is_batchmode=True,
+                anonymized_creator=None,
+                )
         assert wanted == response
 
     def test_post_item(self, request_, context, mock_tags_sheet):
@@ -671,7 +696,9 @@ class TestBadgeAssignmentsRESTView:
     def test_options_ignore_if_no_postable_resources(self, context, request_):
         inst = self.make_one(context, request_)
         response = inst.options()
-        assert response == {'HEAD': {}, 'OPTIONS': {}, 'DELETE': {}}
+        assert response == {'HEAD': {},
+                            'OPTIONS': {},
+                            'DELETE': {'request_headers': {}}}
 
     def test_options_ignore_if_no_postable_assignments_sheets(
             self, request_, context, resource_meta,  mock_sheet):

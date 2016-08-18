@@ -18,6 +18,10 @@ UserPathHeader = 'X-User-Path'
 """Deprecated: The optional request header to set the userid."""
 
 
+AnonymizeHeader = 'X-Anonymize'
+"""Mark this request to be anonymized."""
+
+
 @implementer(IAuthenticationPolicy)
 class TokenHeaderAuthenticationPolicy(JWTAuthenticationPolicy):
     """Http header token authentication based on :mod:`pyramid_jwt`.
@@ -86,6 +90,41 @@ def validate_user_headers(view: callable):
     return wrapped_view
 
 
+def is_marked_anonymize(request: IRequest) -> bool:
+    """Check if request is marked with the Anonymize header."""
+    return AnonymizeHeader in request.headers
+
+
+def validate_anonymize_header(view: callable):
+    """Decorator vor :term:`view` to check if the anonymize header may be set.
+
+    :raise pyramid.httpexceptions.HTTPBadRequest: if anonymize header is set
+        but is not allowed
+    """
+    def wrapped_view(context, request):
+        has_anonymize_header = is_marked_anonymize(request)
+        content = request.registry.content
+        if has_anonymize_header:
+            if request.method == 'POST':
+                allowed = content.can_add_anonymized(context, request)
+            elif request.method == 'PUT':
+                allowed = content.can_edit_anonymized(context, request)
+            elif request.method == 'DELETE':
+                allowed = content.can_delete_anonymized(context, request)
+            else:
+                # for other methods the header makes no sense,
+                # we ignore it to simplify the frontend code
+                allowed = True
+            if not allowed:
+                error = error_entry('header',
+                                    AnonymizeHeader,
+                                    'Anonymize header not allowed')
+                request.errors.append(error)
+                raise HTTPBadRequest()
+        return view(context, request)
+    return wrapped_view
+
+
 @implementer(IAuthenticationPolicy)
 class MultiRouteAuthenticationPolicy(CallbackAuthenticationPolicy):
     """Use different policy to authenticate depending on the request route."""
@@ -135,3 +174,20 @@ class MultiRouteAuthenticationPolicy(CallbackAuthenticationPolicy):
             policy_headers = policy.forget(request)
             headers.extend(policy_headers)
         return headers
+
+
+def set_anonymized_creator(context: object, userid: str):
+    """Store userid of anonymized creator of `context`."""
+    setattr(context, '__anonymized_creator__', userid)
+
+
+def get_anonymized_creator(context: object) -> str:
+    """Get userid of anonymized creator of `context` or empty string."""
+    userid = getattr(context, '__anonymized_creator__', '')
+    return userid
+
+
+def is_created_anonymized(context: object) -> bool:
+    """Check if `context` was created anonymized."""
+    is_created_anonymized = bool(get_anonymized_creator(context))
+    return is_created_anonymized

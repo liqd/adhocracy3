@@ -406,3 +406,4 @@ def includeme(config):  # pragma: no cover
     config.include('.embed')
     config.include('.notification')
     config.include('.localroles')
+    config.include('.anonymize')

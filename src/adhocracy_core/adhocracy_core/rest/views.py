@@ -15,6 +15,7 @@ from zope.interface import Interface
 import colander
 
 from adhocracy_core.authentication import UserTokenHeader
+from adhocracy_core.authentication import AnonymizeHeader
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -99,10 +100,13 @@ class ResourceRESTView:
         if request.has_permission('edit_some', context):
             edits = self.content.get_sheets_edit(context, request)
             put_sheets = [(s.meta.isheet.__identifier__, empty) for s in edits]
+            can_anonymize = self.content.can_edit_anonymized(context, request)
             if put_sheets:
                 put_sheets_dict = dict(put_sheets)
                 self._add_workflow_edit_permission_info(put_sheets_dict, edits)
                 cstruct['PUT']['request_body']['data'] = put_sheets_dict
+                headers_dict = can_anonymize and {AnonymizeHeader: []} or {}
+                cstruct['PUT']['request_headers'] = headers_dict
             else:
                 del cstruct['PUT']
         else:
@@ -118,7 +122,12 @@ class ResourceRESTView:
         else:
             del cstruct['GET']
 
-        if not request.has_permission('delete', context):
+        if request.has_permission('delete', context):
+            can_anonymize = self.content.can_delete_anonymized(context,
+                                                               request)
+            headers_dict = can_anonymize and {AnonymizeHeader: []} or {}
+            cstruct['DELETE']['request_headers'] = headers_dict
+        else:
             del cstruct['DELETE']
 
         is_users = IUsersService.providedBy(context) \
@@ -127,6 +136,7 @@ class ResourceRESTView:
         if request.has_permission('create', self.context) or is_users:
             addables = self.content.get_resources_meta_addable(context,
                                                                request)
+            can_anonymize = self.content.can_add_anonymized(context, request)
             if addables:
                 for resource_meta in addables:
                     iresource = resource_meta.iresource
@@ -140,6 +150,8 @@ class ResourceRESTView:
                     post_data = {'content_type': resource_typ,
                                  'data': sheets_dict}
                     cstruct['POST']['request_body'].append(post_data)
+                headers_dict = can_anonymize and {AnonymizeHeader: []} or {}
+                cstruct['POST']['request_headers'] = headers_dict
             else:
                 del cstruct['POST']
         else:
@@ -339,6 +351,7 @@ class PoolRESTView(SimpleRESTView):
                       root_versions=validated.get('root_versions', []),
                       request=self.request,
                       is_batchmode=is_batchmode(self.request),
+                      anonymized_creator=self.request.anonymized_user,
                       )
         iresource = validated['content_type']
         return self.content.create(iresource.__identifier__, **kwargs)
