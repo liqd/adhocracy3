@@ -288,14 +288,14 @@ def test_is_marked_anonymize_false_if_no_anonymize_header(request_):
 def test_is_created_anonymized_true_if_anonymized_creator(context, mocker):
     from . import is_created_anonymized
     mocker.patch('adhocracy_core.authentication.get_anonymized_creator',
-                 return_value=True)
+                 return_value='userid')
     assert is_created_anonymized(context)
 
 
-def test_is_created_anonymized_false_if_anonymized_creator(context, mocker):
+def test_is_created_anonymized_false_if_no_anonymized_creator(context, mocker):
     from . import is_created_anonymized
     mocker.patch('adhocracy_core.authentication.get_anonymized_creator',
-                 return_value=False)
+                 return_value=None)
     assert not is_created_anonymized(context)
 
 
