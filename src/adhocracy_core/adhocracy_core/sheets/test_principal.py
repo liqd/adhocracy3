@@ -535,6 +535,7 @@ class TestActivationConfigurationSheet:
         assert inst.meta.editable is False
         assert inst.meta.creatable is True
         assert inst.meta.permission_create == 'activate_user'
+        assert inst.meta.permission_view == 'view_userextended'
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context, None)
