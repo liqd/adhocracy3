@@ -113,6 +113,29 @@ class TestSequenceSchema:
         assert inst.widget.readonly
         assert inst.widget.deserialize(inst, ['default']) == colander.null
 
+class TestSequenceOptionalJsonInSchema:
+
+    def make_one(self, **kwargs):
+        from . import SequenceOptionalJsonInSchema
+
+        class AdhocracySequenceExample(SequenceOptionalJsonInSchema):
+            child1 = colander.Schema(typ=colander.Int())
+        return AdhocracySequenceExample(**kwargs).bind()
+
+    def test_create(self):
+        from . import SequenceOptionalJsonInSchema
+        from . import SchemaNode
+        inst = self.make_one()
+        assert isinstance(inst, SequenceOptionalJsonInSchema)
+        assert isinstance(inst, SchemaNode)
+        assert inst.schema_type == colander.Sequence
+        assert inst.default == []
+
+    def test_sequence_wiget_is_set(self):
+        from deform.widget import TextInputWidget
+        inst = self.make_one()
+        assert isinstance(inst.widget,  TextInputWidget)
+
 
 class TestInterface():
 
