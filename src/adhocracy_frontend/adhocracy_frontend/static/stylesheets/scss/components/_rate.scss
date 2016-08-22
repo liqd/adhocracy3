@@ -172,7 +172,6 @@ The whole widget may have the `is-disabled` state.
     &.is-active {
         color: $color-text-inverted;
         text-decoration: none;
-        font-weight: $font-weight-extrovert;
 
         i {
             color: inherit;
