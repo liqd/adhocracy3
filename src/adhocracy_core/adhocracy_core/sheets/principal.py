@@ -28,6 +28,7 @@ from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import TimeZoneName
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Roles
+from adhocracy_core.schema import Boolean
 
 
 class IGroup(ISheet):
@@ -369,6 +370,28 @@ activation_configuration_meta = sheet_meta._replace(
 )
 
 
+class IAnonymizeDefault(ISheet):
+    """Marker interface for the user anonymize default sheet."""
+
+
+class AnonymizeDefaultSchema(MappingSchema):
+    """Data structure for user default anonymize setting.
+
+    `anonymize`:  Boolean setting for anonymization default .
+    """
+
+    anonymize = Boolean()
+
+
+anonymize_default_meta = sheet_meta._replace(
+    isheet=IAnonymizeDefault,
+    schema_class=AnonymizeDefaultSchema,
+    permission_create='create_user',
+    permission_view='view_userextended',
+    permission_edit='edit_userextended',
+)
+
+
 def includeme(config):
     """Register sheets and activate catalog factory."""
     add_sheet_to_registry(userbasic_meta, config.registry)
@@ -385,3 +408,4 @@ def includeme(config):
     add_sheet_to_registry(group_meta, config.registry)
     add_sheet_to_registry(permissions_meta, config.registry)
     add_sheet_to_registry(activation_configuration_meta, config.registry)
+    add_sheet_to_registry(anonymize_default_meta, config.registry)

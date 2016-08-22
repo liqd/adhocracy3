@@ -928,6 +928,13 @@ def add_allow_add_anonymized_sheet_to_items(root,
     migrate_new_sheet(root, IItem, IAllowAddAnonymized)
 
 
+@log_migration
+def add_anonymize_default_sheet_to_user(root, registry):  # pragma: no cover
+    """Add anonymize default sheet to user."""
+    from adhocracy_core.sheets.principal import IAnonymizeDefault
+    migrate_new_sheet(root, IUser, IAnonymizeDefault)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -985,3 +992,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_process)
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_comments)
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_items)
+    config.add_evolution_step(add_anonymize_default_sheet_to_user)
