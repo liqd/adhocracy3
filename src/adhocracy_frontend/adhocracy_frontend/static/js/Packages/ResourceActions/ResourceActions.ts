@@ -95,7 +95,7 @@ export var resourceDropdownDirective = (
             };
 
             scope.modals = new Modals($timeout);
-            adhPermissions.bindScope(scope, scope.resourcePath, "options");
+            adhPermissions.bindScope(scope, () => scope.resourcePath, "options");
 
             scope.$watch("resourcePath", () => {
                 scope.modals.clear();
