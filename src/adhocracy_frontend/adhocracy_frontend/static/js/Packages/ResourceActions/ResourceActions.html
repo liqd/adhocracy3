@@ -28,6 +28,13 @@
         data-class="action-bar-item"
         data-resource-path="{{resourcePath}}"></adh-assign-badges-action>
     <adh-modal-action
+        data-ng-if="messaging"
+        data-modals="modals"
+        data-modal="messaging"
+        data-label="TR__MESSAGING"
+        data-class="action-bar-item">
+    </adh-modal-action>
+    <adh-modal-action
         data-ng-if="report"
         data-modals="modals"
         data-modal="abuse"
@@ -64,6 +71,12 @@
 </ul>
 
 <div class="modal" data-ng-if="modals.modal">
+    <adh-user-message
+        data-ng-if="modals.modal === 'messaging'"
+        data-modals="modals"
+        data-recipient-url="{{resourcePath}}">
+    </adh-user-message>
+
     <adh-report-abuse
         data-ng-if="modals.modal === 'abuse'"
         data-modals="modals"

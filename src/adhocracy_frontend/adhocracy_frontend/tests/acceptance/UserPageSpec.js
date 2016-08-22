@@ -20,9 +20,9 @@ describe("user page", function() {
         annotatorPage.sendMessage(subject, content);
 
         // expect the message widget to disappear
-        var button = element(by.css(".user-profile-info-button"));
-        browser.wait(EC.elementToBeClickable(button), 5000);
-        expect(EC.elementToBeClickable(button)).toBeTruthy();
+        var dropdown = element(by.css(".dropdown"));
+        browser.wait(EC.elementToBeClickable(dropdown), 5000);
+        expect(EC.elementToBeClickable(dropdown)).toBeTruthy();
         done();
     });
 

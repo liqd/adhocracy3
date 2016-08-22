@@ -20,12 +20,12 @@ import RIComment from "../../Resources_/adhocracy_core/resources/comment/ICommen
 import RIProposal from "../../Resources_/adhocracy_core/resources/proposal/IProposal";
 import RIRate from "../../Resources_/adhocracy_core/resources/rate/IRate";
 import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
+import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
 import * as SIHasAssetPool from "../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
 import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
-import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
 
 var pkgLocation = "/User";
 
@@ -693,16 +693,6 @@ export var userProfileDirective = (
                     });
                     return adhHttp.put(oldUser.path, patch);
                 });
-            };
-
-            scope.showMessaging = () => {
-                if (scope.messageOptions.POST) {
-                    scope.modals.showModal("messaging");
-                } else if (!adhCredentials.loggedIn) {
-                    adhTopLevelState.setCameFromAndGo("/login");
-                } else {
-                    // FIXME
-                }
             };
         }
     };

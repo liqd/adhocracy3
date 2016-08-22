@@ -86,6 +86,7 @@ export var resourceActionsDirective = (
             edit: "=?",
             image: "=?",
             moderate: "=?",
+            messaging: "=?",
             modals: "=?"
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceActions.html",
@@ -121,6 +122,7 @@ export var resourceDropdownDirective = (
             edit: "=?",
             image: "=?",
             moderate: "=?",
+            messaging: "=?",
             modals: "=?"
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceDropdown.html",

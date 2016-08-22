@@ -32,6 +32,14 @@
             <i class="icon-tags"></i>
         </adh-assign-badges-action>
         <adh-modal-action
+            data-ng-if="messaging"
+            data-modals="modals"
+            data-modal="messaging"
+            data-label="TR__MESSAGING"
+            data-toggle-dropdown="toggleDropdown">
+            <i class="icon-mail"></i>
+        </adh-modal-action>
+        <adh-modal-action
             data-ng-if="report"
             data-modals="modals"
             data-modal="abuse"
@@ -43,7 +51,8 @@
             data-ng-if="share"
             data-modals="modals"
             data-modal="share"
-            data-label="TR__SHARE">
+            data-label="TR__SHARE"
+            data-toggle-dropdown="data.toggleDropdown">
             <i class="icon-share"></i>
         </adh-modal-action>
         <adh-hide-action
@@ -75,6 +84,12 @@
 </ul>
 
 <div class="modal" data-ng-if="modals.modal">
+    <adh-user-message
+        data-ng-if="modals.modal === 'messaging'"
+        data-modals="modals"
+        data-recipient-url="{{resourcePath}}">
+    </adh-user-message>
+
     <adh-report-abuse
         data-ng-if="modals.modal === 'abuse'"
         data-modals="modals"
