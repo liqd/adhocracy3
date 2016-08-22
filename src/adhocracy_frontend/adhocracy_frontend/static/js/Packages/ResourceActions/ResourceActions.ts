@@ -96,10 +96,19 @@ export var resourceDropdownDirective = (
 
             scope.modals = new Modals($timeout);
             adhPermissions.bindScope(scope, () => scope.resourcePath, "options");
+            adhPermissions.bindScope(scope, () => scope.itemPath, "itemOptions");
 
             scope.$watch("resourcePath", () => {
                 scope.modals.clear();
             });
+
+            scope.canEdit = () => {
+                if (scope.resourcePath === scope.itemPath) {
+                    return scope.options.PUT;
+                } else {
+                    return scope.itemOptions.POST;
+                }
+            };
 
             scope.toggleDropdown = () => {
                 scope.data.isShowDropdown = !scope.data.isShowDropdown;

@@ -4,14 +4,14 @@
     </a>
     <div class="dropdown-menu" data-ng-if="data.isShowDropdown" aria-labelledby="{{id}}">
         <adh-view-action
-            data-ng-if="edit && itemPath && options.PUT"
+            data-ng-if="edit && itemPath && canEdit()"
             data-view="edit"
             data-label="TR__EDIT"
             data-resource-path="{{itemPath}}">
             <i class="icon-pencil"></i>
         </adh-view-action>
         <adh-view-action
-            data-ng-if="image && itemPath && options.PUT"
+            data-ng-if="image && itemPath && canEdit()"
             data-view="image"
             data-label="TR__IMAGE_UPLOAD"
             data-resource-path="{{itemPath}}">
