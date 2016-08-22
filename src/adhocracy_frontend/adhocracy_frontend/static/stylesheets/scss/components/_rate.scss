@@ -116,73 +116,29 @@ category: Components
 
 Rate up or down with counter
 
-The button has the `is-rate-button-active` state.
-rate-difference has the `is-positive` state. Can be `is-negative`.
-
-The whole widget may be disabled, in which case itself and both buttons have
-the `is-disabled` state.
+The buttons may habe the `is-active` state.
+The whole widget may have the `is-disabled` state.
 
 ```html_example
 <div class="rate">
-    <span class="rate-difference is-positive">3</span>
-    <span class="rate-button-container">
-        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
-        <span class="rate-results">+6</span>
-    </span>
-    <span class="rate-button-container">
-        <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
-        <span class="rate-results">-3</span>
-    </span>
+    <a href="" class="rate-pro"><i class="icon-vote-up" title="Vote up"></i> 6</a>
+    <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i> 3</a>
+</div>
+
+<div class="rate">
+    <a href="" class="rate-pro is-active"><i class="icon-vote-up" title="Vote up"></i> 6</a>
+    <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i> 3</a>
+</div>
+
+<div class="rate">
+    <a href="" class="rate-pro"><i class="icon-vote-up" title="Vote up"></i> 6</a>
+    <a href="" class="rate-contra is-active"><i class="icon-vote-down" title="Vote down"></i> 3</a>
 </div>
 
 <div class="rate is-disabled">
-    <span class="rate-difference is-positive">3</span>
-    <span class="rate-button-container">
-        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
-        <span class="rate-results">+6</span>
-    </span>
-    <span class="rate-button-container">
-        <a href="" class="rate-contra is-disabled"><i class="icon-vote-down" title="Vote down"></i></a>
-        <span class="rate-results">-3</span>
-    </span>
+    <a href="" class="rate-pro is-active"><i class="icon-vote-up" title="Vote up"></i> 6</a>
+    <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i> 3</a>
 </div>
-
-<div class="rate m-show-results-persist">
-    <span class="rate-difference is-positive">3</span>
-    <span class="rate-button-container">
-        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
-        <span class="rate-results">+6</span>
-    </span>
-    <span class="rate-button-container">
-        <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
-        <span class="rate-results">-3</span>
-    </span>
-</div>
-
-<div class="rate m-show-results-hover">
-    <span class="rate-difference is-positive">3</span>
-    <span class="rate-button-container">
-        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
-        <span class="rate-results">+6</span>
-    </span>
-    <span class="rate-button-container">
-        <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
-        <span class="rate-results">-3</span>
-    </span>
-</div>
-Hover show results
-<div class="rate is-cast m-show-results-click">
-    <span class="rate-difference is-positive">3</span>
-    <span class="rate-button-container">
-        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
-        <span class="rate-results">+6</span>
-    </span>
-    <span class="rate-button-container">
-        <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
-        <span class="rate-results">-3</span>
-    </span>
-</div>
-Click show results
 ```
 */
 
@@ -190,65 +146,67 @@ Click show results
     display: inline-block;
     vertical-align: middle;
 
-    a {
-        color: $color-text-highlight-introvert;
-        text-decoration: none;
-
-        &.is-disabled {
+    &.is-disabled {
+        &:after {
+            @extend .icon-voting:before;
             cursor: not-allowed;
-        }
-    }
-
-    .rate-button-container {
-        display: inline-block;
-        position: relative;
-    }
-
-    .rate-results {
-        @include rem(font-size, $font-size-small);
-        @include rem(padding-top, 3px);
-        display: block;
-        position: absolute;
-        text-align: center;
-        visibility: hidden;
-        width: 100%;
-    }
-
-    &.m-show-results-persist,
-    &:hover.m-show-results-hover,
-    &:focus.m-show-results-hover,
-    &.is-cast.m-show-results-click {
-        .rate-results {
-            visibility: visible;
-        }
-    }
-
-    .rate-pro {
-        &.is-rate-button-active,
-        &:hover:not(.is-disabled),
-        &:focus:not(.is-disabled),
-        &:active:not(.is-disabled) {
-            color: $color-function-positive;
-        }
-    }
-
-    .rate-contra {
-        &.is-rate-button-active,
-        &:hover:not(.is-disabled),
-        &:focus:not(.is-disabled),
-        &:active:not(.is-disabled) {
-            color: $color-function-negative;
-        }
-    }
-
-    .rate-difference {
-        &.is-positive {
-            color: $color-function-positive;
+            line-height: 1.35;
+            font-size: 150%;
         }
 
-        &.is-negative {
-            color: $color-function-negative;
+        .rate-pro, .rate-contra {
+            display: none;
         }
+    }
+}
+
+.rate-pro,
+.rate-contra {
+    border: 2px solid;
+    padding: 0.3em 0.5em;
+    text-decoration: none;
+    color: $color-text-normal;
+
+    &:hover,
+    &:focus,
+    &.is-active {
+        color: $color-text-inverted;
+        text-decoration: none;
+        font-weight: $font-weight-extrovert;
+
+        i {
+            color: inherit;
+        }
+    }
+}
+
+.rate-pro {
+    border-color: $color-function-positive;
+    padding-right: 0.3em;
+
+    i {
+        color: $color-function-positive;
+    }
+
+    &:hover,
+    &:focus,
+    &.is-active {
+        background-color: $color-function-positive;
+    }
+}
+
+.rate-contra {
+    border-color: $color-function-negative;
+    padding-left: 0.3em;
+
+    i {
+        color: $color-function-negative;
+    }
+
+    &:hover,
+    &:focus,
+    &.is-active {
+        background-color: $color-function-negative;
     }
 }
 
