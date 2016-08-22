@@ -255,7 +255,7 @@ class TestS1Workflow:
         resp = do_transition_to(app_initiator, '/s1', 'select')
         assert resp.status_code == 200
 
-    def test_select_proposal_has_state_votable(self, app_participant):
+    def test_select_proposal_has_state_voteable(self, app_participant):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
         resp = app_participant.get('/s1/proposal_0000000')
         assert resp.json['data'][IWorkflowAssignment.__identifier__]['workflow_state'] == 'voteable'
@@ -275,7 +275,7 @@ class TestS1Workflow:
         next_states = get_next_states(app_participant, '/s1/proposal_0000001')
         assert next_states == []
 
-    def test_select_everybody_can_list_votable_proposals(self, app_participant):
+    def test_select_everybody_can_list_voteable_proposals(self, app_participant):
         from adhocracy_core.sheets.pool import IPool
         resp = app_participant.get('/s1', {'workflow_state': 'voteable'})
         assert resp.json['data'][IPool.__identifier__]['elements'] == \
