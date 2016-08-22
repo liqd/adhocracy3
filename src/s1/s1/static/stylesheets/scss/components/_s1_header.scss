@@ -23,6 +23,7 @@
 .s1-header-logo-link {
     @include rem(line-height, 30px);
     @include rem(top, 10px);
+    @include rem(padding, 0 0.5rem);
     display: inline-block;
     color: $color-text-introvert;
     position: absolute;
@@ -33,11 +34,15 @@
     &:hover, &:focus {
         color: $color-text-normal;
     }
+
+    abbr {
+        border: 0;
+    }
 }
 
 .s1-header-logo {
-    @include rem(font-size, 17px);
-    @include rem(margin-left, 24px);
+    @include rem(height, 2rem);
+    vertical-align: bottom;
 }
 
 .s1-header-menu {
