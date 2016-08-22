@@ -365,6 +365,7 @@ activation_configuration_meta = sheet_meta._replace(
     creatable=True,
     editable=False,
     permission_create='activate_user',
+    permission_view='view_userextended',
 )
 
 
