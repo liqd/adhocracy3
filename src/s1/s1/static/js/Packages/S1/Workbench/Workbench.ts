@@ -274,11 +274,11 @@ export var s1LandingDirective = (
 
 
 /**
- *         | proposed | votable | selected | rejected
- * --------------------------------------------------
- * propose | current  | -       | archive  | archive
- * select  | next     | current | archive  | archive
- * result  | next     | -       | cur/arc  | cur/arc
+ *         | proposed | voteable | selected | rejected
+ * ---------------------------------------------------
+ * propose | current  | -        | archive  | archive
+ * select  | next     | current  | archive  | archive
+ * result  | next     | -        | cur/arc  | cur/arc
  */
 var getMeeting = (proposal : RIProposal, process : RIS1Process) => {
     var processState = process.data[SIWorkflowAssignment.nick].workflow_state;
@@ -286,7 +286,7 @@ var getMeeting = (proposal : RIProposal, process : RIS1Process) => {
 
     if (proposalState === "proposed") {
         return processState === "propose" ? "current" : "next";
-    } else if (proposalState === "votable") {
+    } else if (proposalState === "voteable") {
         return "current";
     } else {
         var processDecisionDate = AdhUtil.deepPluck(
