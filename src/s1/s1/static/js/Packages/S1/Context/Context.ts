@@ -65,6 +65,7 @@ export var meetingSelectorDirective = (
             processUrl: "@"
         },
         link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("meeting", scope));
             adhHttp.get(scope.processUrl).then((process : RIS1Process) => {
                 scope.workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
             });
