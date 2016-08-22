@@ -8,17 +8,17 @@
         data-ng-class="{
             'is-active': myRate === 1,
         }"
-        data-ng-click="toggle(1)">
-        <i class="icon-vote-up" title="{{'TR__RATE_VOTE_UP' | translate}}"></i>
-        {{ rates(1) }}
-    </a>&nbsp;<a
+        data-ng-click="toggle(1)"
+        ><i class="icon-vote-up" title="{{'TR__RATE_VOTE_UP' | translate}}"></i>
+        {{ rates(1) }}</a>
+    <a
         href=""
         class="rate-contra"
         data-ng-class="{
             'is-active': myRate === -1,
         }"
-        data-ng-click="toggle(-1)">
-        <i class="icon-vote-down" title="{{'TR__RATE_VOTE_DOWN' | translate}}"></i>
+        data-ng-click="toggle(-1)"
+        ><i class="icon-vote-down" title="{{'TR__RATE_VOTE_DOWN' | translate}}"></i>
         {{ rates(-1) }}
     </a>
 </div>
