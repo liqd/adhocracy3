@@ -163,7 +163,7 @@ The whole widget may have the `is-disabled` state.
 .rate-pro,
 .rate-contra {
     border: 2px solid;
-    padding: 0 0.5em;
+    padding: 0.3em 0.5em;
     text-decoration: none;
     color: $color-text-normal;
 
@@ -172,6 +172,7 @@ The whole widget may have the `is-disabled` state.
     &.is-active {
         color: $color-text-inverted;
         text-decoration: none;
+        font-weight: $font-weight-extrovert;
 
         i {
             color: inherit;
@@ -181,6 +182,7 @@ The whole widget may have the `is-disabled` state.
 
 .rate-pro {
     border-color: $color-function-positive;
+    padding-right: 0.3em;
 
     i {
         color: $color-function-positive;
@@ -195,6 +197,7 @@ The whole widget may have the `is-disabled` state.
 
 .rate-contra {
     border-color: $color-function-negative;
+    padding-left: 0.3em;
 
     i {
         color: $color-function-negative;
