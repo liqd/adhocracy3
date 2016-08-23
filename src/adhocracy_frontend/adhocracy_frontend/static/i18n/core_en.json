@@ -8,6 +8,7 @@
     "TR__ACTIVATION_SUCCESS_TITLE": "Your account has been activated!",
     "TR__ADD_PARAGRAPH": "add paragraph",
     "TR__ADD_TITLE": "Add {{ title }}",
+    "TR__ANONYMIZE_DEFAULT": "post anonymously by default",
     "TR__ASK_TO_CONFIRM_HIDE_ACTION": "Do you really want to delete this?",
     "TR__BACK_TO_TOP": "back to top",
     "TR__BADGE_ASSIGNMENT_UPDATED": "Badge assignments updated.",
