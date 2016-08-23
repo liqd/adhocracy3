@@ -19,23 +19,36 @@ describe("ratings", function() {
         var comment = page.createComment("c1");
         var rate = page.getRateWidget(comment);
         rate.element(by.css(".rate-pro")).click();
-        expect(rate.element(by.css(".rate-difference")).getText()).toEqual("+1");
+        expect(rate.element(by.css(".rate-pro")).getText()).toEqual("1");
+        expect(rate.element(by.css(".rate-contra")).getText()).toEqual("0");
     });
 
     it("can downvote", function() {
         var comment = page.createComment("c2");
         var rate = page.getRateWidget(comment);
         rate.element(by.css(".rate-contra")).click();
-        expect(rate.element(by.css(".rate-difference")).getText()).toEqual("-1");
+        expect(rate.element(by.css(".rate-pro")).getText()).toEqual("0");
+        expect(rate.element(by.css(".rate-contra")).getText()).toEqual("1");
     });
 
-    it("can vote neutrally", function() {
+    it("can remove vote", function() {
         var comment = page.createComment("c3");
         var rate = page.getRateWidget(comment);
         rate.element(by.css(".rate-pro")).click();
-        expect(rate.element(by.css(".rate-difference")).getText()).toEqual("+1");
-        rate.element(by.css(".is-rate-button-active")).click();
-        expect(rate.element(by.css(".rate-difference")).getText()).toEqual("0");
+        expect(rate.element(by.css(".rate-pro")).getText()).toEqual("1");
+        rate.element(by.css(".rate-pro")).click();
+        expect(rate.element(by.css(".rate-pro")).getText()).toEqual("0");
+    });
+
+    it("can change vote by clicking on the other button", function() {
+        var comment = page.createComment("c3");
+        var rate = page.getRateWidget(comment);
+        rate.element(by.css(".rate-pro")).click();
+        expect(rate.element(by.css(".rate-pro")).getText()).toEqual("1");
+        expect(rate.element(by.css(".rate-contra")).getText()).toEqual("0");
+        rate.element(by.css(".rate-contra")).click();
+        expect(rate.element(by.css(".rate-pro")).getText()).toEqual("0");
+        expect(rate.element(by.css(".rate-contra")).getText()).toEqual("1");
     });
 
     it("is not affected by the edition of the comment", function() {
@@ -47,6 +60,6 @@ describe("ratings", function() {
 
         var changedComment = page.editComment(comment, ["c4 - edited"]);
         var rate2 = page.getRateWidget(changedComment);
-        expect(rate2.element(by.css(".rate-difference")).getText()).toEqual("+1");
+        expect(rate.element(by.css(".rate-pro")).getText()).toEqual("1");
     });
 });
