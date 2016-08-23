@@ -191,3 +191,15 @@ def is_created_anonymized(context: object) -> bool:
     """Check if `context` was created anonymized."""
     is_created_anonymized = bool(get_anonymized_creator(context))
     return is_created_anonymized
+
+
+def includeme(config):  # pragma: no cover
+    """Add request properties `user` and `anonymized_user`."""
+    from adhocracy_core.resources.principal import get_user_or_anonymous
+    from adhocracy_core.resources.principal import get_anonymized_user
+    config.add_request_method(get_user_or_anonymous,
+                              name='user',
+                              reify=True)
+    config.add_request_method(get_anonymized_user,
+                              name='anonymized_user',
+                              reify=True)
