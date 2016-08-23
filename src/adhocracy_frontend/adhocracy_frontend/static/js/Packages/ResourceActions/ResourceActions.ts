@@ -60,7 +60,7 @@ export class Modals {
     }
 }
 
-export var resourceActionsDirective = (
+export var resourceDropdownDirective = (
     $timeout : angular.ITimeoutService,
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service
@@ -73,43 +73,6 @@ export var resourceActionsDirective = (
             // performed on the item instead. This is why we need to
             // know the itemPath. If the resource is not versionable,
             // itemPath should be the same as resourcePath.
-            itemPath: "@",
-            deleteRedirectUrl: "@?",
-            assignBadges: "=?",
-            createDocument: "=?",
-            share: "=?",
-            hide: "=?",
-            resourceWidgetDelete: "=?",
-            print: "=?",
-            report: "=?",
-            cancel: "=?",
-            edit: "=?",
-            image: "=?",
-            moderate: "=?",
-            messaging: "=?",
-            modals: "=?"
-        },
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceActions.html",
-        link: (scope, element) => {
-            scope.modals = new Modals($timeout);
-            adhPermissions.bindScope(scope, scope.resourcePath, "options");
-
-            scope.$watch("resourcePath", () => {
-                scope.modals.clear();
-            });
-        }
-    };
-};
-
-export var resourceDropdownDirective = (
-    $timeout : angular.ITimeoutService,
-    adhConfig : AdhConfig.IService,
-    adhPermissions : AdhPermissions.Service
-) => {
-    return {
-        restrict: "E",
-        scope: {
-            resourcePath: "@",
             itemPath: "@",
             deleteRedirectUrl: "@?",
             assignBadges: "=?",
@@ -132,11 +95,20 @@ export var resourceDropdownDirective = (
             };
 
             scope.modals = new Modals($timeout);
-            adhPermissions.bindScope(scope, scope.resourcePath, "options");
+            adhPermissions.bindScope(scope, () => scope.resourcePath, "options");
+            adhPermissions.bindScope(scope, () => scope.itemPath, "itemOptions");
 
             scope.$watch("resourcePath", () => {
                 scope.modals.clear();
             });
+
+            scope.canEdit = () => {
+                if (scope.resourcePath === scope.itemPath) {
+                    return scope.options.PUT;
+                } else {
+                    return scope.itemOptions.POST;
+                }
+            };
 
             scope.toggleDropdown = () => {
                 scope.data.isShowDropdown = !scope.data.isShowDropdown;
@@ -162,6 +134,19 @@ export var resourceDropdownDirective = (
         }
     };
 };
+
+
+export var resourceActionsDirective = (
+    $timeout : angular.ITimeoutService,
+    adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service
+) => {
+    var directive = resourceDropdownDirective($timeout, adhConfig, adhPermissions);
+    directive.scope["createDocument"] = "=?";
+    directive.templateUrl = adhConfig.pkg_path + pkgLocation + "/ResourceActions.html";
+    return directive;
+};
+
 
 export var modalActionDirective = () => {
     return {
