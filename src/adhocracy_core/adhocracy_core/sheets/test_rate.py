@@ -16,6 +16,23 @@ def integration(config):
     config.include('adhocracy_core.sheets.rate')
 
 
+@fixture
+def user():
+    return testing.DummyResource(__name__='user')
+
+
+@fixture
+def anonymous():
+    return testing.DummyResource(__name__='anonymous')
+
+
+@fixture
+def mock_get_anonymous(mocker, anonymous):
+    mock = mocker.patch('adhocracy_core.resources.principal'
+                        '.get_system_user_anonymous',
+                        return_value=anonymous)
+    return mock
+
 def _make_rateable(provides=IRateable):
     return testing.DummyResource(__provides__=provides)
 
@@ -66,7 +83,7 @@ class TestRateSheet:
         assert meta.schema_class == RateSchema
         assert meta.create_mandatory
 
-    def test_crete(self, meta, context):
+    def test_create(self, meta, context):
         inst = meta.sheet_class(meta, context, None)
         assert inst
 
@@ -86,12 +103,34 @@ class TestRateSheet:
 
         validate_value.assert_called_with(kw['registry'])
         validate_subject.assert_called_with(kw['request'])
-        validate_unique.assert_called_with(kw['context'], kw['registry'])
+        validate_unique.assert_called_with(kw['context'], kw['request'])
+
+    def test_preparer(self, mocker, inst, kw):
+        from .rate import deferred_anonymize_rate_subject
+        assert inst.schema.preparer == deferred_anonymize_rate_subject
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
         assert registry.content.get_sheet(context, meta.isheet)
+
+
+class TestDeferredAnonymizeRateSubject:
+
+    def call_fut(self, *args):
+        from .rate import deferred_anonymize_rate_subject
+        return deferred_anonymize_rate_subject(*args)
+
+    def test_ignore_if_no_anonymized_request(self, node, kw, user):
+        preparer = self.call_fut(node, kw)
+        assert preparer({'subject': user}) == {'subject': user}
+
+    def test_replace_subject_with_anonymous_if_anonymized_request(
+            self, node, kw, user, anonymous, mock_get_anonymous):
+        kw['request'].user = anonymous
+        kw['request'].anonymized_user = user
+        preparer = self.call_fut(node, kw)
+        assert preparer({'subject': user}) == {'subject': anonymous}
 
 
 class TestCreateValidateRateValue:
@@ -141,19 +180,36 @@ class TestCreateValidateSubject:
         from .rate import create_validate_subject
         return create_validate_subject(*args)
 
-    def test_ignore_if_subject_is_loggedin_user(self, node, request_):
-        user = testing.DummyResource()
+    def test_ignore_if_subject_is_authenticated_user(self, node, request_, user):
         request_.user = user
         validator = self.call_fut(request_)
         assert validator(node, {'subject': user}) is None
 
-    def test_ignore_if_subject_is_not_loggedin_user(self, node, request_):
-        user = testing.DummyResource()
-        request_.user = None
+    def test_raise_if_subject_is_not_authenticated_user(
+            self, node, request_, user):
+        request_.user = user
+        other_user = testing.DummyResource()
         validator = self.call_fut(request_)
         with raises(colander.Invalid):
-            node['subject'] = Mock()
-            validator(node,  {'subject': user})
+            node['subject'] = other_user  # used to generate the error message
+            validator(node,  {'subject': other_user})
+
+    def test_raise_if_subject_is_not_authenticated_user_and_anonymized_request(
+            self, node, request_, user, anonymous):
+        request_.user = anonymous
+        request_.anonymized_user = user
+        other_user = testing.DummyResource()
+        validator = self.call_fut(request_)
+        with raises(colander.Invalid):
+            node['subject'] = other_user  # used to generate the error message
+            validator(node,  {'subject': other_user})
+
+    def test_ignore_if_subject_is_anonymous_user_and_anonymized_request(
+            self, node, request_, user, anonymous):
+        request_.user = anonymous
+        request_.anonymized_user = user
+        validator = self.call_fut(request_)
+        assert validator(node, {'subject': anonymous}) is None
 
 
 class TestCreateValidateIsUnique:
@@ -178,52 +234,82 @@ class TestCreateValidateIsUnique:
         monkeypatch.setattr(rate, 'find_service', lambda x, y: mock_catalogs)
         return mock_catalogs
 
-    def test_ignore_if_no_other_rates(self, node, context, registry, query,
-                                      mock_catalogs):
+    @fixture
+    def mock_anonymized_creator(self, mocker):
+        return mocker.patch('adhocracy_core.sheets.rate.get_anonymized_creator',
+                            return_value='')
+
+    @fixture
+    def rate(self):
+        return {'subject': testing.DummyResource(),
+                'object': testing.DummyResource(),
+                'rate': '1'}
+    @fixture
+    def request_(self, request_, user):
+        request_.user = user
+        return request_
+
+    def test_ignore_if_no_equal_rates(
+            self, node, context, request_, rate, query, mock_catalogs,
+            anonymous, mock_get_anonymous):
         from adhocracy_core.interfaces import Reference
         from .rate import IRate
-        subject = testing.DummyResource()
-        object_ = testing.DummyResource()
-        value = {'subject': subject,
-                 'object': object_,
-                 'rate': '1'}
-        validator = self.call_fut(context, registry)
-        assert validator(node, value) is None
-        assert mock_catalogs.search.call_args[0][0] == query._replace(
-                references=(Reference(None, IRate, 'subject', subject),
-                            Reference(None, IRate, 'object', object_)),
+        validator = self.call_fut(context, request_)
+        assert validator(node, rate) is None
+        assert mock_catalogs.search.call_args_list[0][0][0] == query._replace(
+                references=(Reference(None, IRate, 'subject', request_.user),
+                            Reference(None, IRate, 'object', rate['object'])),
+                resolve=True)
+        assert mock_catalogs.search.call_args_list[1][0][0] == query._replace(
+                references=(Reference(None, IRate, 'subject', anonymous),
+                            Reference(None, IRate, 'object', rate['object'])),
                 resolve=True)
 
-    def test_ignore_if_some_but_older_versions(
-            self, node, context, registry, search_result, mock_catalogs,
+    def test_ignore_if_older_versions_of_same_rate(
+            self, node, context, request_, rate, search_result, mock_catalogs,
             mock_versions_sheet):
-        value = {'subject': testing.DummyResource(),
-                 'object': testing.DummyResource(),
-                 'rate': '1'}
         old_version = testing.DummyResource()
-        mock_catalogs.search.return_value = search_result._replace(
-                elements=[old_version])
+        mock_catalogs.search.side_effect =\
+            [search_result._replace(elements=[old_version]),
+             search_result]
         mock_versions_sheet.get.return_value = \
             {'elements': [old_version]}
-        validator = self.call_fut(context, registry)
-        assert validator(node, value) is None
 
-    def test_raise_if_other_rates(
-            self, node, context, registry, search_result, mock_catalogs,
+        validator = self.call_fut(context, request_)
+        assert validator(node, rate) is None
+
+    def test_raise_if_non_anonymized_equal_rates(
+            self, node, context, request_, rate, search_result, mock_catalogs,
             mock_versions_sheet):
-        value = {'subject': testing.DummyResource(),
-                 'object': testing.DummyResource(),
-                 'rate': '1'}
         old_version = testing.DummyResource()
         other_version = testing.DummyResource()
-        mock_catalogs.search.return_value = search_result._replace(
-                elements=[old_version, other_version])
+        mock_catalogs.search.side_effect =\
+            [search_result._replace(elements=[old_version, other_version]),
+             search_result]
         mock_versions_sheet.get.return_value = \
             {'elements': [old_version]}
-        validator = self.call_fut(context, registry)
+
+        validator = self.call_fut(context, request_)
         with raises(colander.Invalid):
             node['object'] = Mock()
-            validator(node, value)
+            validator(node, rate)
+
+    def test_raise_if_anonymized_equal_rates(
+            self, node, context, request_, rate, search_result, mock_catalogs,
+            mock_versions_sheet, mock_anonymized_creator):
+        old_version = testing.DummyResource()
+        other_version = testing.DummyResource()
+        mock_catalogs.search.side_effect =\
+            [search_result,
+             search_result._replace(elements=[old_version, other_version])]
+        mock_versions_sheet.get.return_value = \
+            {'elements': [old_version]}
+        mock_anonymized_creator.return_value = 'user'
+
+        validator = self.call_fut(context, request_)
+        with raises(colander.Invalid):
+            node['object'] = Mock()
+            validator(node, rate)
 
 
 @mark.usefixtures('integration')

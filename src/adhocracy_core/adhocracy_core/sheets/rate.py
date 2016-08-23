@@ -1,12 +1,17 @@
 """Rate sheet."""
+from copy import copy
 from colander import All
 from colander import Invalid
 from colander import deferred
 from pyramid.traversal import find_interface
+from pyramid.traversal import resource_path
 from pyramid.registry import Registry
+from pyramid.interfaces import IRequest
 from substanced.util import find_service
 from zope.interface import implementer
 
+from adhocracy_core.authentication import get_anonymized_creator
+from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IPredicateSheet
 from adhocracy_core.interfaces import IRateValidator
@@ -96,12 +101,32 @@ class RateObjectReference(SheetToSheet):
     target_isheet = IRateable
 
 
+@deferred
+def deferred_anonymize_rate_subject(node, kw: dict) -> callable:
+    """Replace rate subject with anonymous user if anonymize request."""
+    from adhocracy_core.resources.principal import get_system_user_anonymous
+    request = kw['request']
+
+    def anonymize_rate_subject(value):
+        if request.anonymized_user:
+            anonymous = get_system_user_anonymous(request)
+            anonmyized_value = copy(value)
+            anonmyized_value['subject'] = anonymous
+            return anonmyized_value
+        else:
+            return value
+
+    return anonymize_rate_subject
+
+
 class RateSchema(MappingSchema):
     """Rate sheet data structure."""
 
     subject = ReferenceSchema(reftype=RateSubjectReference)
     object = ReferenceSchema(reftype=RateObjectReference)
     rate = Integer()
+
+    preparer = deferred_anonymize_rate_subject
 
     @deferred
     def validator(self, kw: dict) -> callable:
@@ -112,11 +137,11 @@ class RateSchema(MappingSchema):
         registry = kw['registry']
         return All(create_validate_rate_value(registry),
                    create_validate_subject(request),
-                   create_validate_is_unique(context, registry),
+                   create_validate_is_unique(context, request),
                    )
 
 
-def create_validate_subject(request) -> callable:
+def create_validate_subject(request: IRequest) -> callable:
     """Create validator to ensure value['subject'] is current user."""
     def validator(node, value):
         user = request.user
@@ -128,36 +153,76 @@ def create_validate_subject(request) -> callable:
     return validator
 
 
-def create_validate_is_unique(context, registry: Registry) -> callable:
+def create_validate_is_unique(context,
+                              request: IRequest) -> callable:
     """Create validatator to ensure rate version is unique.
 
     Older rate versions with the same subject and object may occur.
     If they belong to a different rate item an error is thrown.
     """
+    def validate_rate_is_unique(node, value):
+        existing = _get_rates_user_non_anonymized(context, request, value)
+        existing += _get_rates_user_anonymized(context, request, value)
+        existing = _remove_following_versions(existing, context, request)
+        if existing:
+            error = Invalid(node, msg='')
+            msg = 'Another rate by the same user already exists'
+            error.add(Invalid(node['object'], msg=msg))
+            raise error
+    return validate_rate_is_unique
+
+
+def _get_rates_user_non_anonymized(context: IResource,
+                                   request: IRequest,
+                                   value: dict) -> [IRate]:
+    catalogs = find_service(context, 'catalogs')
+    authenticated_user = request.anonymized_user or request.user
+    query = search_query._replace(
+        references=(Reference(None, IRate, 'subject', authenticated_user),
+                    Reference(None, IRate, 'object', value['object'])),
+        resolve=True,
+    )
+    rates = catalogs.search(query).elements
+    return rates
+
+
+def _get_rates_user_anonymized(context: IResource,
+                               request: IRequest,
+                               value: dict) -> [IRate]:
+    from adhocracy_core.resources.principal import get_system_user_anonymous
+    catalogs = find_service(context, 'catalogs')
+    anonymous = get_system_user_anonymous(request)
+    query = search_query._replace(
+        references=(Reference(None, IRate, 'subject', anonymous),
+                    Reference(None, IRate, 'object', value['object'])),
+        resolve=True,
+    )
+    rates = catalogs.search(query).elements
+    rates_deanonymized = []
+    authenticated_user = request.anonymized_user or request.user
+    for rate in rates:
+        anonymized_creator = get_anonymized_creator(rate)
+        if anonymized_creator == resource_path(authenticated_user):
+            rates_deanonymized.append(rate)
+    return rates_deanonymized
+
+
+def _remove_following_versions(rates: [IRate],
+                               context: IResource,
+                               request: IRequest) -> [IRate]:
     from adhocracy_core.resources.rate import IRate as IRateItem
     from adhocracy_core.sheets.versions import IVersions
-
-    def validator(node, value):
-        catalogs = find_service(context, 'catalogs')
-        query = search_query._replace(
-            references=(Reference(None, IRate, 'subject', value['subject']),
-                        Reference(None, IRate, 'object', value['object'])),
-            resolve=True,
-        )
-        same_rates = catalogs.search(query).elements
-        if not same_rates:
-            return
-        item = find_interface(context, IRateItem)
-        old_versions = registry.content.get_sheet_field(item,
-                                                        IVersions,
-                                                        'elements')
-        for rate in same_rates:
-            if rate not in old_versions:
-                error = Invalid(node, msg='')
-                msg = 'Another rate by the same user already exists'
-                error.add(Invalid(node['object'], msg=msg))
-                raise error
-    return validator
+    if not rates:
+        return
+    rates_without_context_old_versions = []
+    item = find_interface(context, IRateItem)
+    old_versions = request.registry.content.get_sheet_field(item,
+                                                            IVersions,
+                                                            'elements')
+    for rate in rates:
+        if rate not in old_versions:
+            rates_without_context_old_versions.append(rate)
+    return rates_without_context_old_versions
 
 
 def create_validate_rate_value(registry: Registry) -> callable:

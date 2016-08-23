@@ -435,6 +435,8 @@ def get_system_user_anonymous(request: Request) -> IUser:
                                              'anonymous')
     adapter = request.registry.queryMultiAdapter((request.context, request),
                                                  IRolesUserLocator)
+    if adapter is None:  # ease testing
+        return
     return adapter.get_user_by_login(username)
 
 
