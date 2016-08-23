@@ -102,6 +102,15 @@ export var register = (angular) => {
             "adhUser",
             "adhGetBadges",
             AdhUserViews.userProfileDirective])
+        .directive("adhUserEdit", [
+            "adhConfig",
+            "adhHttp",
+            "adhTopLevelState",
+            "adhShowError",
+            "adhSubmitIfValid",
+            "adhResourceUrlFilter",
+            "$location",
+            AdhUserViews.userEditDirective])
         .directive("adhLogin", [
             "adhConfig",
             "adhUser",
@@ -137,8 +146,10 @@ export var register = (angular) => {
         .directive("adhUserMessage", ["adhConfig", "adhHttp", AdhUserViews.userMessageDirective])
         .directive("adhUserDetailColumn", [
             "adhConfig", "adhPermissions", "adhTopLevelState", "$timeout", AdhUserViews.userDetailColumnDirective])
+        .directive("adhUserEditColumn", ["adhConfig", "adhTopLevelState", AdhUserViews.userEditColumnDirective])
         .directive("adhUserProfileImage", ["adhHttp", "adhConfig", AdhUserViews.adhUserProfileImageDirective])
         .directive("adhUserProfileImageEdit", ["adhHttp", "adhPermissions", "adhConfig", AdhUserViews.adhUserProfileImageEditDirective])
         .directive("adhUserActivityOverview", ["adhConfig", "adhHttp", AdhUserViews.adhUserActivityOverviewDirective])
-        .directive("adhHelpLink", ["adhConfig", AdhUserViews.adhHelpLinkDirective]);
+        .directive("adhHelpLink", ["adhConfig", AdhUserViews.adhHelpLinkDirective])
+        .directive("adhUserWorkbench", ["adhConfig", "adhTopLevelState", AdhUserViews.workbenchDirective]);
 };
