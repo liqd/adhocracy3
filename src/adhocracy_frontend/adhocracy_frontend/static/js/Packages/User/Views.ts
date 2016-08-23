@@ -751,6 +751,7 @@ export var userEditDirective = (
         },
         link: (scope, element) => {
             scope.showError = adhShowError;
+            scope.config = adhConfig;
 
             scope.$watch("path", (path) => {
                 if (path) {
