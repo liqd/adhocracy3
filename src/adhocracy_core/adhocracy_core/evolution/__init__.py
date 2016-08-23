@@ -920,6 +920,22 @@ def add_allow_add_anonymized_sheet_to_comments(root,
 
 
 @log_migration
+def add_allow_add_anonymized_sheet_to_items(root,
+                                            registry):  # pragma: no cover
+    """Add allow add anonymized sheet to items."""
+    from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
+    from adhocracy_core.interfaces import IItem
+    migrate_new_sheet(root, IItem, IAllowAddAnonymized)
+
+
+@log_migration
+def add_anonymize_default_sheet_to_user(root, registry):  # pragma: no cover
+    """Add anonymize default sheet to user."""
+    from adhocracy_core.sheets.principal import IAnonymizeDefault
+    migrate_new_sheet(root, IUser, IAnonymizeDefault)
+
+
+@log_migration
 def add_allow_add_anonymized_sheet_to_rates(root,
                                             registry):  # pragma: no cover
     """Add allow add anonymized sheet to rates service."""
@@ -984,4 +1000,6 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_global_anonymous_user)
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_process)
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_comments)
+    config.add_evolution_step(add_allow_add_anonymized_sheet_to_items)
+    config.add_evolution_step(add_anonymize_default_sheet_to_user)
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_rates)

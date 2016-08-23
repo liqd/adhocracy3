@@ -535,7 +535,35 @@ class TestActivationConfigurationSheet:
         assert inst.meta.editable is False
         assert inst.meta.creatable is True
         assert inst.meta.permission_create == 'activate_user'
+        assert inst.meta.permission_view == 'view_userextended'
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'activation': 'registration_mail'}
+
+
+class TestAnonymizeDefaultSheet:
+
+    @fixture
+    def meta(self):
+        from adhocracy_core.sheets.principal import anonymize_default_meta
+        return anonymize_default_meta
+
+    def test_create(self, meta, context):
+        from adhocracy_core.sheets.principal import IAnonymizeDefault
+        from adhocracy_core.sheets.principal import AnonymizeDefaultSchema
+        from adhocracy_core.sheets import AnnotationRessourceSheet
+        inst = meta.sheet_class(meta, context, None)
+        assert isinstance(inst, AnnotationRessourceSheet)
+        assert inst.meta.isheet == IAnonymizeDefault
+        assert inst.meta.schema_class == AnonymizeDefaultSchema
+        assert inst.meta.readable is True
+        assert inst.meta.editable is True
+        assert inst.meta.creatable is True
+        assert inst.meta.permission_create == 'create_user'
+        assert inst.meta.permission_edit == 'edit_userextended'
+        assert inst.meta.permission_view == 'view_userextended'
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context, None)
+        assert inst.get() == {'anonymize': False}
