@@ -240,7 +240,7 @@ class TestCreateValidateIsUnique:
                             return_value='')
 
     @fixture
-    def rate(self):
+    def value(self):
         return {'subject': testing.DummyResource(),
                 'object': testing.DummyResource(),
                 'rate': '1'}
@@ -250,23 +250,23 @@ class TestCreateValidateIsUnique:
         return request_
 
     def test_ignore_if_no_equal_rates(
-            self, node, context, request_, rate, query, mock_catalogs,
+            self, node, context, request_, value, query, mock_catalogs,
             anonymous, mock_get_anonymous):
         from adhocracy_core.interfaces import Reference
         from .rate import IRate
         validator = self.call_fut(context, request_)
-        assert validator(node, rate) is None
+        assert validator(node, value) is None
         assert mock_catalogs.search.call_args_list[0][0][0] == query._replace(
                 references=(Reference(None, IRate, 'subject', request_.user),
-                            Reference(None, IRate, 'object', rate['object'])),
+                            Reference(None, IRate, 'object', value['object'])),
                 resolve=True)
         assert mock_catalogs.search.call_args_list[1][0][0] == query._replace(
                 references=(Reference(None, IRate, 'subject', anonymous),
-                            Reference(None, IRate, 'object', rate['object'])),
+                            Reference(None, IRate, 'object', value['object'])),
                 resolve=True)
 
     def test_ignore_if_older_versions_of_same_rate(
-            self, node, context, request_, rate, search_result, mock_catalogs,
+            self, node, context, request_, value, search_result, mock_catalogs,
             mock_versions_sheet):
         old_version = testing.DummyResource()
         mock_catalogs.search.side_effect =\
@@ -276,40 +276,31 @@ class TestCreateValidateIsUnique:
             {'elements': [old_version]}
 
         validator = self.call_fut(context, request_)
-        assert validator(node, rate) is None
+        assert validator(node, value) is None
 
     def test_raise_if_non_anonymized_equal_rates(
-            self, node, context, request_, rate, search_result, mock_catalogs,
-            mock_versions_sheet):
-        old_version = testing.DummyResource()
-        other_version = testing.DummyResource()
+            self, node, context, request_, value, search_result, mock_catalogs,
+            mock_versions_sheet, version):
         mock_catalogs.search.side_effect =\
-            [search_result._replace(elements=[old_version, other_version]),
+            [search_result._replace(elements=[version]),
              search_result]
-        mock_versions_sheet.get.return_value = \
-            {'elements': [old_version]}
-
         validator = self.call_fut(context, request_)
         with raises(colander.Invalid):
             node['object'] = Mock()
-            validator(node, rate)
+            validator(node, value)
 
     def test_raise_if_anonymized_equal_rates(
-            self, node, context, request_, rate, search_result, mock_catalogs,
-            mock_versions_sheet, mock_anonymized_creator):
-        old_version = testing.DummyResource()
-        other_version = testing.DummyResource()
+            self, node, context, request_, value, search_result, mock_catalogs,
+            mock_versions_sheet, mock_anonymized_creator, version):
         mock_catalogs.search.side_effect =\
             [search_result,
-             search_result._replace(elements=[old_version, other_version])]
-        mock_versions_sheet.get.return_value = \
-            {'elements': [old_version]}
+             search_result._replace(elements=[version])]
         mock_anonymized_creator.return_value = 'user'
 
         validator = self.call_fut(context, request_)
         with raises(colander.Invalid):
             node['object'] = Mock()
-            validator(node, rate)
+            validator(node, value)
 
 
 @mark.usefixtures('integration')
