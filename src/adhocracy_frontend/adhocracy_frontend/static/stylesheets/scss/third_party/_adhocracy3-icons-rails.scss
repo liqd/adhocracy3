@@ -33,6 +33,7 @@
 .icon-flag:before,
 .icon-key:before,
 .icon-list:before,
+.icon-list-column:before,
 .icon-list-filled:before,
 .icon-mail:before,
 .icon-mail-filled:before,
@@ -61,6 +62,7 @@
 .icon-volume:before,
 .icon-vote-down:before,
 .icon-vote-up:before,
+.icon-voting:before,
 .icon-x:before {
   display: inline-block;
   font-family: "adhocracy3-icons";
@@ -86,32 +88,34 @@
 .icon-flag:before { content: "\f107"; }
 .icon-key:before { content: "\f108"; }
 .icon-list:before { content: "\f109"; }
-.icon-list-filled:before { content: "\f10a"; }
-.icon-mail:before { content: "\f10b"; }
-.icon-mail-filled:before { content: "\f10c"; }
-.icon-map-pin:before { content: "\f10d"; }
-.icon-minus:before { content: "\f10e"; }
-.icon-pencil:before { content: "\f10f"; }
-.icon-picture-file:before { content: "\f110"; }
-.icon-pig:before { content: "\f111"; }
-.icon-pointy-rectangle-left:before { content: "\f112"; }
-.icon-pointy-rectangle-right:before { content: "\f113"; }
-.icon-print:before { content: "\f114"; }
-.icon-refresh:before { content: "\f115"; }
-.icon-reply:before { content: "\f116"; }
-.icon-share:before { content: "\f117"; }
-.icon-speechbubble:before { content: "\f118"; }
-.icon-speechbubble-document:before { content: "\f119"; }
-.icon-speechbubble-unfilled:before { content: "\f11a"; }
-.icon-speechbubbles:before { content: "\f11b"; }
-.icon-tags:before { content: "\f11c"; }
-.icon-three-dots:before { content: "\f11d"; }
-.icon-tick:before { content: "\f11e"; }
-.icon-trash:before { content: "\f11f"; }
-.icon-user:before { content: "\f120"; }
-.icon-user-unfilled:before { content: "\f121"; }
-.icon-users:before { content: "\f122"; }
-.icon-volume:before { content: "\f123"; }
-.icon-vote-down:before { content: "\f124"; }
-.icon-vote-up:before { content: "\f125"; }
-.icon-x:before { content: "\f126"; }
+.icon-list-column:before { content: "\f10a"; }
+.icon-list-filled:before { content: "\f10b"; }
+.icon-mail:before { content: "\f10c"; }
+.icon-mail-filled:before { content: "\f10d"; }
+.icon-map-pin:before { content: "\f10e"; }
+.icon-minus:before { content: "\f10f"; }
+.icon-pencil:before { content: "\f110"; }
+.icon-picture-file:before { content: "\f111"; }
+.icon-pig:before { content: "\f112"; }
+.icon-pointy-rectangle-left:before { content: "\f113"; }
+.icon-pointy-rectangle-right:before { content: "\f114"; }
+.icon-print:before { content: "\f115"; }
+.icon-refresh:before { content: "\f116"; }
+.icon-reply:before { content: "\f117"; }
+.icon-share:before { content: "\f118"; }
+.icon-speechbubble:before { content: "\f119"; }
+.icon-speechbubble-document:before { content: "\f11a"; }
+.icon-speechbubble-unfilled:before { content: "\f11b"; }
+.icon-speechbubbles:before { content: "\f11c"; }
+.icon-tags:before { content: "\f11d"; }
+.icon-three-dots:before { content: "\f11e"; }
+.icon-tick:before { content: "\f11f"; }
+.icon-trash:before { content: "\f120"; }
+.icon-user:before { content: "\f121"; }
+.icon-user-unfilled:before { content: "\f122"; }
+.icon-users:before { content: "\f123"; }
+.icon-volume:before { content: "\f124"; }
+.icon-vote-down:before { content: "\f125"; }
+.icon-vote-up:before { content: "\f126"; }
+.icon-voting:before { content: "\f127"; }
+.icon-x:before { content: "\f128"; }

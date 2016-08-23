@@ -20,12 +20,13 @@ import RIComment from "../../Resources_/adhocracy_core/resources/comment/ICommen
 import RIProposal from "../../Resources_/adhocracy_core/resources/proposal/IProposal";
 import RIRate from "../../Resources_/adhocracy_core/resources/rate/IRate";
 import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
+import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
 import * as SIHasAssetPool from "../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
 import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SIPasswordAuthentication from "../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication";
 import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
-import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
 
 var pkgLocation = "/User";
 
@@ -694,15 +695,79 @@ export var userProfileDirective = (
                     return adhHttp.put(oldUser.path, patch);
                 });
             };
+        }
+    };
+};
 
-            scope.showMessaging = () => {
-                if (scope.messageOptions.POST) {
-                    scope.modals.showModal("messaging");
-                } else if (!adhCredentials.loggedIn) {
-                    adhTopLevelState.setCameFromAndGo("/login");
-                } else {
-                    // FIXME
+
+var postEdit = (
+    adhHttp : AdhHttp.Service
+) => (
+    path : string,
+    data : {
+        name : string;
+        password? : string;
+    }
+) => {
+    return adhHttp.get(path).then((oldUser) => {
+        var patch = {
+            content_type: oldUser.content_type,
+            data: {}
+        };
+        if (oldUser.data[SIUserBasic.nick].name !== data.name) {
+            patch.data[SIUserBasic.nick] = new SIUserBasic.Sheet({
+                name: data.name,
+            });
+        }
+        if (data.password) {
+            patch.data[SIPasswordAuthentication.nick] = new SIPasswordAuthentication.Sheet({
+                password: data.password,
+            });
+        }
+        return adhHttp.put(oldUser.path, patch);
+    });
+};
+
+
+export var userEditDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhShowError,
+    adhSubmitIfValid,
+    adhResourceUrlFilter,
+    $location : angular.ILocationService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Edit.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope, element) => {
+            scope.showError = adhShowError;
+
+            scope.$watch("path", (path) => {
+                if (path) {
+                    adhHttp.get(path).then((user) => {
+                        scope.data = {
+                            name: user.data[SIUserBasic.nick].name,
+                            password: "",
+                        };
+                    });
                 }
+            });
+
+            scope.submit = () => {
+                return adhSubmitIfValid(scope, element, scope.userEditForm, () => {
+                    return postEdit(adhHttp)(scope.path, scope.data).then((result) => {
+                        $location.url(adhResourceUrlFilter(scope.path));
+                    });
+                });
+            };
+
+            scope.cancel = () => {
+                adhTopLevelState.goToCameFrom(adhResourceUrlFilter(scope.path));
             };
         }
     };
@@ -756,6 +821,20 @@ export var userDetailColumnDirective = (
             scope.$on("$destroy", adhTopLevelState.bind("userUrl", scope));
             adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
             scope.modals = new AdhResourceActions.Modals($timeout);
+        }
+    };
+};
+
+
+export var userEditColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserEditColumn.html",
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("userUrl", scope));
         }
     };
 };
@@ -882,6 +961,20 @@ export var adhHelpLinkDirective = (
     };
 };
 
+export var workbenchDirective = (
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html",
+        scope: {},
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("view", scope));
+        }
+    };
+};
+
 export var registerRoutes = (
     context : string = ""
 ) => (
@@ -896,5 +989,20 @@ export var registerRoutes = (
             return {
                 userUrl: resource.path
             };
-        });
+        })
+        .default(RIUser, "edit", "", context, {
+            space: "user",
+            movingColumns: "is-show-hide-hide"
+        })
+        .specific(RIUser, "edit", "", context, ["adhHttp", (adhHttp : AdhHttp.Service) => (resource : RIUser) => {
+            return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                if (!options.PUT) {
+                    throw 401;
+                } else {
+                    return {
+                        userUrl: resource.path
+                    };
+                }
+            });
+        }]);
 };

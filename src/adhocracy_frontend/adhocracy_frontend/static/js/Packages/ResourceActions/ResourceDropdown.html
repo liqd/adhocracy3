@@ -4,14 +4,14 @@
     </a>
     <div class="dropdown-menu" data-ng-if="data.isShowDropdown" aria-labelledby="{{id}}">
         <adh-view-action
-            data-ng-if="edit && itemPath && options.PUT"
+            data-ng-if="edit && itemPath && canEdit()"
             data-view="edit"
             data-label="TR__EDIT"
             data-resource-path="{{itemPath}}">
             <i class="icon-pencil"></i>
         </adh-view-action>
         <adh-view-action
-            data-ng-if="image && itemPath && options.PUT"
+            data-ng-if="image && itemPath && canEdit()"
             data-view="image"
             data-label="TR__IMAGE_UPLOAD"
             data-resource-path="{{itemPath}}">
@@ -27,11 +27,18 @@
         <adh-assign-badges-action
             data-ng-if="assignBadges && resourcePath"
             data-modals="modals"
-            data-resource-with-badges-url="{{resourceWithBadgesUrl}}"
             data-resource-path="{{resourcePath}}"
             data-toggle-dropdown="toggleDropdown">
             <i class="icon-tags"></i>
         </adh-assign-badges-action>
+        <adh-modal-action
+            data-ng-if="messaging"
+            data-modals="modals"
+            data-modal="messaging"
+            data-label="TR__MESSAGING"
+            data-toggle-dropdown="toggleDropdown">
+            <i class="icon-mail"></i>
+        </adh-modal-action>
         <adh-modal-action
             data-ng-if="report"
             data-modals="modals"
@@ -44,7 +51,8 @@
             data-ng-if="share"
             data-modals="modals"
             data-modal="share"
-            data-label="TR__SHARE">
+            data-label="TR__SHARE"
+            data-toggle-dropdown="data.toggleDropdown">
             <i class="icon-share"></i>
         </adh-modal-action>
         <adh-hide-action
@@ -76,6 +84,12 @@
 </ul>
 
 <div class="modal" data-ng-if="modals.modal">
+    <adh-user-message
+        data-ng-if="modals.modal === 'messaging'"
+        data-modals="modals"
+        data-recipient-url="{{resourcePath}}">
+    </adh-user-message>
+
     <adh-report-abuse
         data-ng-if="modals.modal === 'abuse'"
         data-modals="modals"

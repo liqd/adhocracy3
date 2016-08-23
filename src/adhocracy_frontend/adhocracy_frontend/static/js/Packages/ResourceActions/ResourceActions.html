@@ -6,12 +6,12 @@
         data-label="TR__CREATE_DOCUMENT"
         data-resource-path="{{itemPath}}"></adh-view-action>
     <adh-view-action
-        data-ng-if="edit && itemPath && options.PUT"
+        data-ng-if="edit && itemPath && canEdit()"
         data-class="action-bar-item"
         data-view="edit"
         data-label="TR__EDIT"
         data-resource-path="{{itemPath}}"></adh-view-action>
-    <adh-view-action data-ng-if="image && itemPath && options.PUT"
+    <adh-view-action data-ng-if="image && itemPath && canEdit()"
         data-class="action-bar-item"
         data-view="image"
         data-label="TR__IMAGE_UPLOAD"
@@ -26,8 +26,14 @@
         data-ng-if="assignBadges && resourcePath"
         data-modals="modals"
         data-class="action-bar-item"
-        data-resource-with-badges-url="{{resourceWithBadgesUrl}}"
         data-resource-path="{{resourcePath}}"></adh-assign-badges-action>
+    <adh-modal-action
+        data-ng-if="messaging"
+        data-modals="modals"
+        data-modal="messaging"
+        data-label="TR__MESSAGING"
+        data-class="action-bar-item">
+    </adh-modal-action>
     <adh-modal-action
         data-ng-if="report"
         data-modals="modals"
@@ -65,6 +71,12 @@
 </ul>
 
 <div class="modal" data-ng-if="modals.modal">
+    <adh-user-message
+        data-ng-if="modals.modal === 'messaging'"
+        data-modals="modals"
+        data-recipient-url="{{resourcePath}}">
+    </adh-user-message>
+
     <adh-report-abuse
         data-ng-if="modals.modal === 'abuse'"
         data-modals="modals"

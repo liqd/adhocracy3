@@ -8,26 +8,6 @@
     <adh-recompile-on-change
         data-ng-switch-when="body"
         data-value="{{userUrl}}">
-        <div class="action-bar">
-            <adh-modal-action
-                data-modals="modals"
-                data-modal="messaging"
-                data-label="TR__MESSAGING"
-                data-class="action-bar-item"></adh-modal-action>
-        </div>
-        <ul class="alerts">
-            <li data-ng-repeat="(id, alert) in modals.alerts" class="alerts-message m-{{alert.mode}}" data-ng-click="modals.removeAlert(id)">
-                {{ alert.message | translate }}
-            </li>
-        </ul>
-        <div class="modal" data-ng-if="modals.modal">
-            <adh-user-message
-                data-ng-if="modals.modal === 'messaging'"
-                data-modals="modals"
-                data-recipient-url="{{userUrl}}">
-            </adh-user-message>
-        </div>
-
         <adh-user-profile
             data-modals="modals"
             data-path="{{userUrl}}">

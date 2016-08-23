@@ -339,6 +339,10 @@ export class Service implements AdhTopLevelState.IAreaInput {
                 return;
             }
 
+            if (!self.has(resource.content_type, view, processType)) {
+                throw 404;
+            }
+
             return self.getSpecifics(resource, view, processType, embedContext, process).then((specifics : Dict) => {
                 var defaults : Dict = self.getDefaults(resource.content_type, view, processType, embedContext);
 

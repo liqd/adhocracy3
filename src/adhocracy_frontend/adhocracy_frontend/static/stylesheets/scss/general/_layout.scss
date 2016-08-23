@@ -128,3 +128,16 @@ We use a regular 12-column grid with fixed gutters.
 .cols-3 {
     @include grid-same-width(3);
 }
+
+/*doc
+---
+title: Padding
+name: l-padding
+category: Layout
+---
+
+A generic layout class to add padding to the sides of an element.
+*/
+.l-padding {
+    padding: 0 $padding;
+}

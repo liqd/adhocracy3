@@ -3,9 +3,15 @@ from unittest.mock import Mock
 import unittest
 
 from pyramid import testing
+from pyramid.httpexceptions import HTTPBadRequest
 from pytest import fixture
 from pytest import raises
 from pytest import mark
+
+
+@fixture
+def registry(registry_with_content):
+    return registry_with_content
 
 
 class TestTokenHeaderAuthenticationPolicy:
@@ -265,3 +271,99 @@ class TestMultiRouteAuthenticationPolicy:
         inst.policies['route2'] = other_policy
         other_policy.forget.return_value = [('2', '2')]
         assert inst.forget(request_) == [('1','1'), ('2', '2')]
+
+
+def test_is_marked_anonymize_true_if_anonymize_header(request_):
+    from . import is_marked_anonymize
+    from . import AnonymizeHeader
+    request_.headers[AnonymizeHeader] = ''
+    assert is_marked_anonymize(request_) is True
+
+
+def test_is_marked_anonymize_false_if_no_anonymize_header(request_):
+    from . import is_marked_anonymize
+    assert is_marked_anonymize(request_) is False
+
+
+def test_is_created_anonymized_true_if_anonymized_creator(context, mocker):
+    from . import is_created_anonymized
+    mocker.patch('adhocracy_core.authentication.get_anonymized_creator',
+                 return_value='userid')
+    assert is_created_anonymized(context)
+
+
+def test_is_created_anonymized_false_if_no_anonymized_creator(context, mocker):
+    from . import is_created_anonymized
+    mocker.patch('adhocracy_core.authentication.get_anonymized_creator',
+                 return_value=None)
+    assert not is_created_anonymized(context)
+
+
+def test_set_anonymized_creator(context):
+    from . import set_anonymized_creator
+    set_anonymized_creator(context, 'userid')
+    assert context.__anonymized_creator__ == 'userid'
+
+
+def test_get_anonymized_creator_return_emptry_string_if_not_set(context):
+    from . import get_anonymized_creator
+    assert get_anonymized_creator(context) == ''
+
+
+def test_get_anonymized_creator_return_userid_if_set(context):
+    from . import get_anonymized_creator
+    context.__anonymized_creator__ = 'userid'
+    assert get_anonymized_creator(context) == 'userid'
+
+
+class TestValidateAnonymizeHeader:
+
+    def call_fut(self, *args):
+        from . import validate_anonymize_header
+        return validate_anonymize_header(*args)
+
+    @fixture
+    def view(self):
+        return Mock()
+
+    @fixture
+    def mock_is_anonymized(self, mocker):
+        return mocker.patch('adhocracy_core.authentication.is_marked_anonymize')
+
+    @fixture
+    def request_(self, request_, registry):
+        request_.registry = registry
+        return request_
+
+    def test_ignore_if_not_anonymized_request(self, context, request_, view,
+                                              mock_is_anonymized):
+        mock_is_anonymized.return_value = False
+        self.call_fut(view)(context, request_)
+        view.assert_called_with(context, request_)
+
+    @mark.parametrize("request_method, allow_method, allowed, expected",
+                      [('POST', 'can_add_anonymized', True, None),
+                       ('POST', 'can_add_anonymized', False, HTTPBadRequest),
+                       ('PUT', 'can_edit_anonymized', True, None),
+                       ('PUT', 'can_edit_anonymized', False, HTTPBadRequest),
+                       ('DELETE', 'can_delete_anonymized', True, None),
+                       ('DELETE', 'can_delete_anonymized', False, HTTPBadRequest),
+                       ('GET',    '',                      None,  None),
+                       ('OPTIONS','',                      None,  None),
+                       ])
+    def test_validate_anonymized_request(
+            self, context, request_, registry, view, mock_is_anonymized,
+            request_method, allow_method, allowed, expected):
+        mock_is_anonymized.return_value = True
+        if allow_method:
+            mock_allow = getattr(registry.content, allow_method)
+            mock_allow.return_value = allowed
+        request_.method = request_method
+
+        if expected is None:
+            self.call_fut(view)(context, request_)
+            view.assert_called_with(context, request_)
+        else:
+            with raises(HTTPBadRequest):
+                self.call_fut(view)(context, request_)
+

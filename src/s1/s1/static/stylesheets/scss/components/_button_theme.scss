@@ -11,7 +11,14 @@
     &.m-round {
         min-width: 2em;
     }
+
+    &.is-active {
+        background: $color-brand-two-normal;
+        color: $color-text-inverted;
+    }
+
 }
+
 
 /*doc
 ---

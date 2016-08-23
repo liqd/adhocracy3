@@ -1,14 +1,13 @@
 import * as _ from "lodash";
 
+import * as AdhBadge from "../Badge/Badge";
 import * as AdhConfig from "../Config/Config";
 import * as AdhHttp from "../Http/Http";
 import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
-import * as SIBadge from "../../Resources_/adhocracy_core/sheets/badge/IBadge";
 import * as SIBadgeable from "../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
-import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 
 var pkgLocation = "/ResourceActions";
 
@@ -61,7 +60,7 @@ export class Modals {
     }
 }
 
-export var resourceActionsDirective = (
+export var resourceDropdownDirective = (
     $timeout : angular.ITimeoutService,
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service
@@ -75,44 +74,6 @@ export var resourceActionsDirective = (
             // know the itemPath. If the resource is not versionable,
             // itemPath should be the same as resourcePath.
             itemPath: "@",
-            resourceWithBadgesUrl: "@?",
-            deleteRedirectUrl: "@?",
-            assignBadges: "=?",
-            createDocument: "=?",
-            share: "=?",
-            hide: "=?",
-            resourceWidgetDelete: "=?",
-            print: "=?",
-            report: "=?",
-            cancel: "=?",
-            edit: "=?",
-            image: "=?",
-            moderate: "=?",
-            modals: "=?"
-        },
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceActions.html",
-        link: (scope, element) => {
-            scope.modals = new Modals($timeout);
-            adhPermissions.bindScope(scope, scope.resourcePath, "options");
-
-            scope.$watch("resourcePath", () => {
-                scope.modals.clear();
-            });
-        }
-    };
-};
-
-export var resourceDropdownDirective = (
-    $timeout : angular.ITimeoutService,
-    adhConfig : AdhConfig.IService,
-    adhPermissions : AdhPermissions.Service
-) => {
-    return {
-        restrict: "E",
-        scope: {
-            resourcePath: "@",
-            itemPath: "@",
-            resourceWithBadgesUrl: "@?",
             deleteRedirectUrl: "@?",
             assignBadges: "=?",
             share: "=?",
@@ -124,6 +85,7 @@ export var resourceDropdownDirective = (
             edit: "=?",
             image: "=?",
             moderate: "=?",
+            messaging: "=?",
             modals: "=?"
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceDropdown.html",
@@ -133,11 +95,20 @@ export var resourceDropdownDirective = (
             };
 
             scope.modals = new Modals($timeout);
-            adhPermissions.bindScope(scope, scope.resourcePath, "options");
+            adhPermissions.bindScope(scope, () => scope.resourcePath, "options");
+            adhPermissions.bindScope(scope, () => scope.itemPath, "itemOptions");
 
             scope.$watch("resourcePath", () => {
                 scope.modals.clear();
             });
+
+            scope.canEdit = () => {
+                if (scope.resourcePath === scope.itemPath) {
+                    return scope.options.PUT;
+                } else {
+                    return scope.itemOptions.POST;
+                }
+            };
 
             scope.toggleDropdown = () => {
                 scope.data.isShowDropdown = !scope.data.isShowDropdown;
@@ -163,6 +134,19 @@ export var resourceDropdownDirective = (
         }
     };
 };
+
+
+export var resourceActionsDirective = (
+    $timeout : angular.ITimeoutService,
+    adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service
+) => {
+    var directive = resourceDropdownDirective($timeout, adhConfig, adhPermissions);
+    directive.scope["createDocument"] = "=?";
+    directive.templateUrl = adhConfig.pkg_path + pkgLocation + "/ResourceActions.html";
+    return directive;
+};
+
 
 export var modalActionDirective = () => {
     return {
@@ -193,12 +177,11 @@ export var assignBadgesActionDirective = (
     return {
         restrict: "E",
         transclude: true,
-        template: "<a data-ng-if=\"badgesExist && badgeAssignmentPoolOptions.PUT\" class=\"{{class}}\" href=\"\"" +
+        template: "<a data-ng-if=\"assignableBadgePaths.length\" class=\"{{class}}\" href=\"\"" +
             "data-ng-click=\"assignBadges();\"><ng-transclude></ng-transclude> " +
             "{{ 'TR__MANAGE_BADGE_ASSIGNMENTS' | translate }}</a>",
         scope: {
             resourcePath: "@",
-            resourceWithBadgesUrl: "@?",
             class: "@",
             modals: "=",
             toggleDropdown: "=?"
@@ -212,13 +195,11 @@ export var assignBadgesActionDirective = (
                     });
                 }
             });
-            adhPermissions.bindScope(scope, () => badgeAssignmentPoolPath, "badgeAssignmentPoolOptions");
-            var params = {
-                depth: 4,
-                content_type: SIBadge.nick
-            };
-            adhHttp.get(scope.resourceWithBadgesUrl, params).then((response) => {
-                scope.badgesExist = response.data[SIPool.nick].count > 0;
+            adhPermissions.bindScope(scope, () => badgeAssignmentPoolPath, "badgeAssignmentPoolOptions", {importOptions: false});
+            scope.$watch("badgeAssignmentPoolOptions", (rawOptions) => {
+                if (rawOptions) {
+                    scope.assignableBadgePaths = AdhBadge.getAssignableBadgePaths(rawOptions);
+                }
             });
 
             scope.assignBadges = () => {

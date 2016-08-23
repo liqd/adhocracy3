@@ -895,6 +895,46 @@ def add_activation_config_sheet_to_user(root, registry):  # pragma: no cover
     migrate_new_sheet(root, IUser, IActivationConfiguration)
 
 
+@log_migration
+def add_global_anonymous_user(root, registry):  # pragma: no cover
+    """Add  global anonymmous user."""
+    from adhocracy_core.resources.root import _add_anonymous_user
+    _add_anonymous_user(root, registry)
+
+
+@log_migration
+def add_allow_add_anonymized_sheet_to_process(root,
+                                              registry):  # pragma: no cover
+    """Add allow add anonymized sheet to process."""
+    from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
+    migrate_new_sheet(root, IProcess, IAllowAddAnonymized)
+
+
+@log_migration
+def add_allow_add_anonymized_sheet_to_comments(root,
+                                               registry):  # pragma: no cover
+    """Add allow add anonymized sheet to comments service."""
+    from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
+    from adhocracy_core.resources.comment import ICommentsService
+    migrate_new_sheet(root, ICommentsService, IAllowAddAnonymized)
+
+
+@log_migration
+def add_allow_add_anonymized_sheet_to_items(root,
+                                            registry):  # pragma: no cover
+    """Add allow add anonymized sheet to items."""
+    from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
+    from adhocracy_core.interfaces import IItem
+    migrate_new_sheet(root, IItem, IAllowAddAnonymized)
+
+
+@log_migration
+def add_anonymize_default_sheet_to_user(root, registry):  # pragma: no cover
+    """Add anonymize default sheet to user."""
+    from adhocracy_core.sheets.principal import IAnonymizeDefault
+    migrate_new_sheet(root, IUser, IAnonymizeDefault)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -948,3 +988,8 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_followable_sheet_to_organisation)
     config.add_evolution_step(remove_participant_role_from_default_group)
     config.add_evolution_step(add_activation_config_sheet_to_user)
+    config.add_evolution_step(add_global_anonymous_user)
+    config.add_evolution_step(add_allow_add_anonymized_sheet_to_process)
+    config.add_evolution_step(add_allow_add_anonymized_sheet_to_comments)
+    config.add_evolution_step(add_allow_add_anonymized_sheet_to_items)
+    config.add_evolution_step(add_anonymize_default_sheet_to_user)

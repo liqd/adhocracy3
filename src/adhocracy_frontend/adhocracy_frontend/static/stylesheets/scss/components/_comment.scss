@@ -175,7 +175,7 @@ parent: comment
 }
 
 .comment-header {
-    @include clearfix;
+    @include pie-clearfix;
     @include rem(font-size, $font-size-small);
     @include rem(margin-bottom, 10px);
     color: $color-text-introvert;
