@@ -56,3 +56,14 @@ class TestRate:
         rate_index.reindex_resource(rate)
         search_result = set(rate_index.eq(0).execute())
         assert rate in search_result
+
+
+def test_rateservice_meta():
+    from . import rate
+    import adhocracy_core.sheets
+    meta = rate.rates_meta
+    assert meta.iresource is rate.IRatesService
+    assert meta.element_types == (rate.IRate,)
+    assert meta.content_name == 'rates'
+    assert meta.extended_sheets == (adhocracy_core.sheets.anonymize.IAllowAddAnonymized,
+                                    )

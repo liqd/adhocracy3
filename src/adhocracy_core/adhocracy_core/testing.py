@@ -337,7 +337,7 @@ def mock_catalogs(search_result) -> Mock:
 def search_result() -> SearchResult:
     """Return search result."""
     from adhocracy_core.interfaces import search_result
-    return search_result
+    return search_result._replace(elements=[])
 
 
 @fixture

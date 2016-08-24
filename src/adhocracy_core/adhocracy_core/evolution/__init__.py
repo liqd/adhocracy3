@@ -935,6 +935,15 @@ def add_anonymize_default_sheet_to_user(root, registry):  # pragma: no cover
     migrate_new_sheet(root, IUser, IAnonymizeDefault)
 
 
+@log_migration
+def add_allow_add_anonymized_sheet_to_rates(root,
+                                            registry):  # pragma: no cover
+    """Add allow add anonymized sheet to rates service."""
+    from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
+    from adhocracy_core.resources.rate import IRatesService
+    migrate_new_sheet(root, IRatesService, IAllowAddAnonymized)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -993,3 +1002,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_comments)
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_items)
     config.add_evolution_step(add_anonymize_default_sheet_to_user)
+    config.add_evolution_step(add_allow_add_anonymized_sheet_to_rates)
