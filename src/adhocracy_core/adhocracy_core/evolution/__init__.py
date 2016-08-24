@@ -898,8 +898,15 @@ def add_activation_config_sheet_to_user(root, registry):  # pragma: no cover
 @log_migration
 def add_global_anonymous_user(root, registry):  # pragma: no cover
     """Add  global anonymmous user."""
+    from pyramid.request import Request
     from adhocracy_core.resources.root import _add_anonymous_user
-    _add_anonymous_user(root, registry)
+    from adhocracy_core.resources.principal import get_system_user_anonymous
+    request = Request.blank('/dummy')
+    request.registry = registry
+    request.context = root
+    anonymous_user = get_system_user_anonymous(request)
+    if not anonymous_user:
+        _add_anonymous_user(root, registry)
 
 
 @log_migration
