@@ -20,6 +20,7 @@ import RIComment from "../../Resources_/adhocracy_core/resources/comment/ICommen
 import RIProposal from "../../Resources_/adhocracy_core/resources/proposal/IProposal";
 import RIRate from "../../Resources_/adhocracy_core/resources/rate/IRate";
 import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
+import * as SIAnonymizeDefault from "../../Resources_/adhocracy_core/sheets/principal/IAnonymizeDefault";
 import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
 import * as SIHasAssetPool from "../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
 import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
@@ -707,6 +708,7 @@ var postEdit = (
     data : {
         name : string;
         password? : string;
+        anonymize? : boolean;
     }
 ) => {
     return adhHttp.get(path).then((oldUser) => {
@@ -724,6 +726,9 @@ var postEdit = (
                 password: data.password,
             });
         }
+        patch.data[SIAnonymizeDefault.nick] = new SIAnonymizeDefault.Sheet({
+            anonymize: data.anonymize,
+        });
         return adhHttp.put(oldUser.path, patch);
     });
 };
@@ -746,6 +751,7 @@ export var userEditDirective = (
         },
         link: (scope, element) => {
             scope.showError = adhShowError;
+            scope.config = adhConfig;
 
             scope.$watch("path", (path) => {
                 if (path) {
@@ -753,6 +759,7 @@ export var userEditDirective = (
                         scope.data = {
                             name: user.data[SIUserBasic.nick].name,
                             password: "",
+                            anonymize: user.data[SIAnonymizeDefault.nick].anonymize,
                         };
                     });
                 }
