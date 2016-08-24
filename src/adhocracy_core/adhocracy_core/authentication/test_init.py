@@ -341,6 +341,13 @@ class TestValidateAnonymizeHeader:
         self.call_fut(view)(context, request_)
         view.assert_called_with(context, request_)
 
+    def test_ignore_if_anonymied_post_batch_request(
+            self, context, request_, view, mock_is_anonymized):
+        mock_is_anonymized.return_value = True
+        request_.method = 'POST'
+        request_.path = '/batch'
+        self.call_fut(view)(context, request_)
+
     @mark.parametrize("request_method, allow_method, allowed, expected",
                       [('POST', 'can_add_anonymized', True, None),
                        ('POST', 'can_add_anonymized', False, HTTPBadRequest),
@@ -366,4 +373,3 @@ class TestValidateAnonymizeHeader:
         else:
             with raises(HTTPBadRequest):
                 self.call_fut(view)(context, request_)
-
