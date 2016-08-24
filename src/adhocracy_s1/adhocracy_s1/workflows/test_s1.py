@@ -202,6 +202,8 @@ def test_s1_includeme_add_workflow(registry):
     from adhocracy_core.workflows import ACLLocalRolesWorkflow
     workflow = registry.content.workflows['s1']
     assert isinstance(workflow, ACLLocalRolesWorkflow)
+    workflow = registry.content.workflows['s1_private']
+    assert isinstance(workflow, ACLLocalRolesWorkflow)
 
 
 @mark.usefixtures('integration')

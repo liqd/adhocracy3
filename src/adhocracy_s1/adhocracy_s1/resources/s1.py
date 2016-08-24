@@ -14,6 +14,9 @@ process_meta = process.process_meta._replace(
     content_name='S1Process',
     iresource=IProcess,
     default_workflow='s1',
+    alternative_workflows=('s1_private',
+                           )
+
 )
 
 

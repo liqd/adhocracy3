@@ -140,3 +140,4 @@ def includeme(config):
     """Add workflow."""
     config.add_workflow('adhocracy_s1.workflows:s1.yaml', 's1')
     config.add_workflow('adhocracy_s1.workflows:s1_content.yaml', 's1_content')
+    config.add_workflow('adhocracy_s1.workflows:s1_private.yaml', 's1_private')
