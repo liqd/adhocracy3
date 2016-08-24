@@ -1,6 +1,7 @@
 """Subscriber to modify the http response object."""
 from pyramid.interfaces import IRequest
 from pyramid.events import NewResponse
+from adhocracy_core.authentication import AnonymizeHeader
 
 
 def set_response_headers(event: NewResponse):
@@ -17,7 +18,8 @@ def add_cors_headers(event: NewResponse):
     event.response.headers.update({
         'Access-Control-Allow-Origin': origin,
         'Access-Control-Allow-Headers': 'Origin, Content-Type, Accept, '
-                                        'X-User-Path, X-User-Token',
+                                        'X-User-Path, X-User-Token, '
+                                        + AnonymizeHeader,
         'Access-Control-Allow-Credentials': 'true',
         'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS',
     })
