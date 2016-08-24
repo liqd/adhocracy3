@@ -424,17 +424,20 @@ def get_user_or_anonymous(request: Request) -> IUser:
     Meant to be use as request method 'user'.
     """
     if is_marked_anonymize(request):
-        user = _get_anonymous_user(request)
+        user = get_system_user_anonymous(request)
     else:
         user = _get_authenticated_user(request)
     return user
 
 
-def _get_anonymous_user(request: Request) -> IUser:
+def get_system_user_anonymous(request: Request) -> IUser:
+    """Return user used to anonymize other users."""
     username = request.registry.settings.get('adhocracy.anonymous_user',
                                              'anonymous')
     adapter = request.registry.queryMultiAdapter((request.context, request),
                                                  IRolesUserLocator)
+    if adapter is None:  # ease testing
+        return
     return adapter.get_user_by_login(username)
 
 
