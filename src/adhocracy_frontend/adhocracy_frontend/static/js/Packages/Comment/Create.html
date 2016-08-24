@@ -7,10 +7,18 @@
       data-ng-model="data.content"
       placeholder="{{ 'TR__COMMENT_PLACEHOLDER' | translate }}"></textarea>
     <footer class="form-footer">
-        <input class="button-cta form-footer-button-cta"
-            type="submit"
-            value="{{ 'TR__CREATE' | translate }}"
-            data-ng-disabled="!data.content" />
-        <a href="" class="button form-footer-button" data-ng-click="cancel()" data-ng-if="!hideCancel">{{ "TR__CANCEL" | translate }}</a>
+        <div class="form-footer-right">
+            <label data-ng-if="config.anonymize_enabled">
+                <input type="checkbox" data-ng-model="data.anonymize" data-ng-disabled="!data.anonymizeIsOptional" />
+                <span class="label-text" data-ng-class="{'is-disabled': !data.anonymizeIsOptional}">{{ "TR__ANONYMIZE" | translate }}</span>
+            </label>
+            <input class="button-cta"
+                type="submit"
+                value="{{ 'TR__CREATE' | translate }}"
+                data-ng-disabled="!data.content" />
+        </div>
+        <div class="form-footer-left">
+            <a href="" class="button" data-ng-click="cancel()" data-ng-if="!hideCancel">{{ "TR__CANCEL" | translate }}</a>
+        </div>
     </footer>
 </form>

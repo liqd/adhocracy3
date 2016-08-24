@@ -94,16 +94,20 @@
                     </span>
                 </label>
             </section>
+
+            <a href="" class="button-cta-secondary m-add document-form-add-paragraph-button" data-ng-click="addParagraph()">{{ "TR__ADD_PARAGRAPH" | translate }}</a>
+
             <footer class="form-footer">
-                <a href="" class="button-cta-secondary m-add document-form-add-paragraph-button" data-ng-click="addParagraph()">{{ "TR__ADD_PARAGRAPH" | translate }}</a>
-
-                <input
-                    type="submit"
-                    name="submit"
-                    value="{{ 'TR__PUBLISH' | translate }}"
-                    class="button-cta form-footer-button-cta document-form-submit-button" />
-
-                <a data-ng-click="cancel()" class="button form-footer-button">{{ "TR__CANCEL" | translate }}</a>
+                <div class="form-footer-right">
+                    <input
+                        type="submit"
+                        name="submit"
+                        value="{{ 'TR__PUBLISH' | translate }}"
+                        class="button-cta document-form-submit-button" />
+                </div>
+                <div class="form-footer-left">
+                    <a data-ng-click="cancel()" class="button">{{ "TR__CANCEL" | translate }}</a>
+                </div>
             </footer>
         </div><!-- /.jump-navigation-main -->
     </div><!-- /.jump-navigation-wrapper -->
