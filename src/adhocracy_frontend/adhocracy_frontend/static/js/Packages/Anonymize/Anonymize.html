@@ -1,0 +1,4 @@
+<label data-ng-if="isEnabled">
+    <input type="checkbox" data-ng-model="data.model" data-ng-disabled="!isOptional" />
+    <span class="label-text" data-ng-class="{'is-disabled': !isOptional}">{{ "TR__ANONYMIZE" | translate }}</span>
+</label>

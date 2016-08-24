@@ -8,10 +8,10 @@
       placeholder="{{ 'TR__COMMENT_PLACEHOLDER' | translate }}"></textarea>
     <footer class="form-footer">
         <div class="form-footer-right">
-            <label data-ng-if="config.anonymize_enabled">
-                <input type="checkbox" data-ng-model="data.anonymize" data-ng-disabled="!data.anonymizeIsOptional" />
-                <span class="label-text" data-ng-class="{'is-disabled': !data.anonymizeIsOptional}">{{ "TR__ANONYMIZE" | translate }}</span>
-            </label>
+            <adh-anonymize
+                data-url="{{poolPath}}"
+                data-method="POST"
+                data-model="data.anonymize"></adh-anonymize>
             <input class="button-cta"
                 type="submit"
                 value="{{ 'TR__CREATE' | translate }}"
