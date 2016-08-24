@@ -23,7 +23,6 @@ var pkgLocation = "/Comment";
 
 
 export interface ICommentResourceScope extends angular.IScope {
-    config? : AdhConfig.IService;
     path : string;
     submit : () => any;
     hide : () => angular.IPromise<void>;
@@ -61,7 +60,6 @@ export interface ICommentResourceScope extends angular.IScope {
         replyPoolPath : string;
         edited : boolean;
         anonymize? : boolean;
-        anonymizeIsOptional? : boolean;
     };
 }
 
@@ -96,10 +94,6 @@ export var update = (
         // NOTE: this is lexicographic comparison. Might break if the datetime
         // encoding changes.
         scope.data.edited = scope.data.modificationDate > scope.data.creationDate;
-
-        // TODO
-        scope.data.anonymize = false;
-        scope.data.anonymizeIsOptional = true;
 
         var params = {
             elements: "paths",
@@ -195,7 +189,6 @@ export var commentDetailDirective = (
     var _postEdit = postEdit(adhHttp, adhPreliminaryNames);
 
     var link = (scope : ICommentResourceScope) => {
-        scope.config = adhConfig;
         scope.modals = new AdhResourceActions.Modals($timeout);
 
         scope.report = () => {
@@ -304,19 +297,9 @@ export var commentCreateDirective = (
             hideCancel: "=?"
         },
         link: (scope : ICommentResourceScope) => {
-            scope.config = adhConfig;
-
-            var resetData = () => {
-                scope.data = <any> {
-                    // TODO
-                    anonymize: false,
-                    anonymizeIsOptional: true,
-                };
-            };
-
             scope.submit = () => {
                 return _postCreate(scope, scope.poolPath).then(() => {
-                    resetData();
+                    scope.data = <any>{};
                     if (scope.onSubmit) {
                         scope.onSubmit();
                     }
@@ -328,8 +311,6 @@ export var commentCreateDirective = (
                     scope.onCancel();
                 }
             };
-
-            resetData();
         }
     };
 };
