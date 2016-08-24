@@ -77,6 +77,9 @@ adhocracy.canonical_url = http://localhost:6551/static/embed.html#!
 # e.g. account activation.
 adhocracy.redirect_url = ${adhocracy:redirect_url}
 
+# Whether to allow users to post resources anonymously
+adhocracy.anonymize.enabled = false
+
 # If the Adhocracy frontend is embedded in a website from a trusted domain,
 # Adhocracy may pass user authentication token to the embedding website.
 adhocracy.trusted_domains =
