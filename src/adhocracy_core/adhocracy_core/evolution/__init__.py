@@ -900,12 +900,11 @@ def add_global_anonymous_user(root, registry):  # pragma: no cover
     """Add  global anonymmous user."""
     from pyramid.request import Request
     from adhocracy_core.resources.root import _add_anonymous_user
-    from adhocracy_core.interfaces import IRolesUserLocator
-    username = registry.settings.get('adhocracy.anonymous_user', 'anonymous')
+    from adhocracy_core.resources.principal import get_system_user_anonymous
     request = Request.blank('/dummy')
     request.registry = registry
-    adapter = registry.queryMultiAdapter((root, request), IRolesUserLocator)
-    anonymous_user = adapter.get_user_by_login(username)
+    request.context = root
+    anonymous_user = get_system_user_anonymous(request)
     if not anonymous_user:
         _add_anonymous_user(root, registry)
 
