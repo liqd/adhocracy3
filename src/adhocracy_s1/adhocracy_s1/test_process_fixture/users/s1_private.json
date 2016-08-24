@@ -1,0 +1,7 @@
+[
+  { "name": "s1_private_participant",
+    "email": "s1_private_participant@example.com",
+    "initial-password": "secret",
+    "groups": ["s1_private_participants"]
+  }
+]

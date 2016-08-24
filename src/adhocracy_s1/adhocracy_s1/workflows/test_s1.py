@@ -4,6 +4,7 @@ from pytest import mark
 from unittest.mock import Mock
 from webtest import TestResponse
 
+from adhocracy_core.testing import add_resources
 from adhocracy_core.testing import do_transition_to
 from adhocracy_core.testing import get_next_states
 
@@ -230,6 +231,15 @@ def _post_proposal_item(app_user, path='') -> TestResponse:
 
 @mark.functional
 class TestS1Workflow:
+
+    def test_create_process(self, app_admin):
+        from os.path import dirname
+        import adhocracy_s1
+        test_process_file = dirname(adhocracy_s1.__file__) + \
+                            '/test_process_fixture/resources/processes.json'
+        add_resources(app_admin.app_router, test_process_file)
+        resp = app_admin.get('/s1')
+        assert resp.status_code == 200
 
     def test_propose_participant_can_create_proposals(self, app_participant):
         resp = _post_proposal_item(app_participant, path='/s1')
