@@ -37,6 +37,12 @@
             {{ "TR__ERROR_TOO_SHORT_PASSWORD" | translate }}
         </span>
     </label>
+    <label data-ng-if="config.anonymize_enabled">
+        <input
+            type="checkbox"
+            data-ng-model="data.anonymize" />
+        <span class="label-text">{{ "TR__ANONYMIZE_DEFAULT" | translate }}</span>
+    </label>
 
     <footer class="form-footer">
         <input
