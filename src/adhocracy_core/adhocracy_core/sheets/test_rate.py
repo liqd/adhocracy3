@@ -251,9 +251,13 @@ class TestCreateValidateIsUnique:
 
     def test_ignore_if_no_equal_rates(
             self, node, context, request_, value, query, mock_catalogs,
-            anonymous, mock_get_anonymous):
+            anonymous, mock_get_anonymous, version, search_result):
         from adhocracy_core.interfaces import Reference
         from .rate import IRate
+        mock_catalogs.search.side_effect =\
+            [search_result,
+             search_result._replace(elements=[version]),
+             ]
         validator = self.call_fut(context, request_)
         assert validator(node, value) is None
         assert mock_catalogs.search.call_args_list[0][0][0] == query._replace(
