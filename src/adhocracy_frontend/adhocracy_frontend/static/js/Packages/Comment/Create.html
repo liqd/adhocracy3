@@ -8,6 +8,10 @@
       placeholder="{{ 'TR__COMMENT_PLACEHOLDER' | translate }}"></textarea>
     <footer class="form-footer">
         <div class="form-footer-right">
+            <adh-anonymize
+                data-url="{{poolPath}}"
+                data-method="POST"
+                data-model="data.anonymize"></adh-anonymize>
             <input class="button-cta"
                 type="submit"
                 value="{{ 'TR__CREATE' | translate }}"

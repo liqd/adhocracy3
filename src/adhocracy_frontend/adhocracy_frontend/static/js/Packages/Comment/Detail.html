@@ -72,6 +72,10 @@
             <textarea class="comment-edit-form-text" data-msd-elastic="" data-ng-model="data.content"></textarea>
             <footer class="form-footer">
                 <div class="form-footer-right">
+                    <adh-anonymize
+                        data-url="{{item.path}}"
+                        data-method="POST"
+                        data-model="data.anonymize"></adh-anonymize>
                     <input type="submit" class="button-cta" value="{{ 'TR__SAVE' | translate }}" />
                 </div>
                 <div class="form-footer-left">

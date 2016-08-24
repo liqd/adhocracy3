@@ -1,5 +1,6 @@
 import * as AdhAbuse from "../Abuse/Module";
 import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
+import * as AdhAnonymizeModule from "../Anonymize/Module";
 import * as AdhCredentialsModule from "../User/Module";
 import * as AdhDateTimeModule from "../DateTime/Module";
 import * as AdhDoneModule from "../Done/Module";
@@ -23,6 +24,7 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhAbuse.moduleName,
             AdhAngularHelpersModule.moduleName,
+            AdhAnonymizeModule.moduleName,
             AdhCredentialsModule.moduleName,
             AdhDateTimeModule.moduleName,
             AdhDoneModule.moduleName,
