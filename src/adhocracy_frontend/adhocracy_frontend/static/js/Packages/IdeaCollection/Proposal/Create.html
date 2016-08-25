@@ -111,6 +111,7 @@
                 data-ng-if="!create && resource.path"
                 data-url="{{resource.path | adhParentPath}}"
                 data-method="POST"
+                data-local-default="data.createdAnonymously"
                 data-model="data.anonymize"></adh-anonymize>
 
             <input
