@@ -327,13 +327,13 @@ export var listingDirective = (
 
 
 export var renominateProposalDirective = (
+    adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service,
     $window : angular.IWindowService
 ) => {
     return {
         restrict: "E",
-        template: "<button data-ng-click=\"renominate()\">Renominate</button>",
-        // only show when proposal is rejected
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Renominate.html",
         scope: {
             proposalUrl: "=",
         },
