@@ -340,24 +340,27 @@ export var renominateProposalDirective = (
         link: (scope) => {
             scope.$watch("proposalUrl", (proposalUrl) => {
                 adhHttp.get(proposalUrl).then((proposal) => {
-                    scope.proposal = proposal;
-                    scope.isRejected = true; // FIXME get from proposal
+                    var workflow = proposal.data[SIWorkflowAssignment.nick];
+                    scope.isRejected = "rejected" === workflow.workflow_state;
                 });
             });
             scope.renominate = () => {
                 if ( ! $window.confirm("Do you want to renominate this proposal? (Page will reload)")) {
                     return;
                 }
-                adhHttp.get(scope.proposalURL).then((proposal) => {
-/*                    process.data[SIWorkflow.nick] = {
-                        workflow_state: newState
+                adhHttp.get(scope.proposalUrl).then((proposal) => {
+                    var patch = {
+                        content_type: proposal.content_type,
+                        data: {}
                     };
-                    process.data[SIName.nick] = undefined;
-                    adhHttp.put(scope.path, process).then((response) => {
+                    patch.data[SIWorkflowAssignment.nick] = {
+                        workflow_state: "proposed";
+                    };
+                    return adhHttp.put(proposal.path, patch).then(() => {
                         $window.parent.location.reload();
                     });
-*/                });
-            }
+                });
+            };
         }
-    }
-}
+    };
+};
