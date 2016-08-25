@@ -10,6 +10,7 @@ import * as AdhRate from "../../Rate/Rate";
 import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
 import * as AdhUtil from "../../Util/Util";
 
+import RISystemUser from "../../../Resources_/adhocracy_core/resources/principal/ISystemUser";
 import RIProposal from "../../../Resources_/adhocracy_s1/resources/s1/IProposal";
 import RIProposalVersion from "../../../Resources_/adhocracy_s1/resources/s1/IProposalVersion";
 import * as SICommentable from "../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
@@ -37,6 +38,8 @@ export interface IScope extends angular.IScope {
         assignments : AdhBadge.IBadge[];
         workflowState : string;
         decisionDate : string;
+        anonymize? : boolean;
+        createdAnonymously? : boolean;
     };
 }
 
@@ -51,6 +54,7 @@ export interface IFormScope extends IScope {
 
 
 var bindPath = (
+    adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
@@ -99,6 +103,12 @@ var bindPath = (
                         workflowState: workflowAssignmentSheet.workflow_state,
                         decisionDate: AdhProcess.getStateData(workflowAssignmentSheet, workflowAssignmentSheet.workflow_state).start_date
                     };
+
+                    if (adhConfig.anonymize_enabled) {
+                        adhHttp.get(scope.data.creator).then((res) => {
+                            scope.data.createdAnonymously = res.content_type === RISystemUser.content_type;
+                        });
+                    }
                 });
             });
         }
@@ -135,7 +145,9 @@ var postCreate = (
     });
     fill(scope, proposalVersion);
 
-    return adhHttp.deepPost([proposal, proposalVersion]);
+    return adhHttp.deepPost([proposal, proposalVersion], {
+        anonymize: scope.data.anonymize
+    });
 };
 
 var postEdit = (
@@ -152,7 +164,9 @@ var postEdit = (
     });
     fill(scope, proposalVersion);
 
-    return adhHttp.deepPost([proposalVersion]);
+    return adhHttp.deepPost([proposalVersion], {
+        anonymize: scope.data.anonymize
+    });
 };
 
 
@@ -172,7 +186,7 @@ export var detailDirective = (
             path: "@"
         },
         link: (scope : IScope) => {
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
+            bindPath(adhConfig, adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
         }
     };
 };
@@ -193,7 +207,7 @@ export var listItemDirective = (
             path: "@"
         },
         link: (scope : IScope) => {
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
+            bindPath(adhConfig, adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
             scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                 if (!proposalVersionUrl) {
                     scope.selectedState = "";
@@ -270,7 +284,7 @@ export var editDirective = (
         link: (scope : IFormScope, element) => {
             scope.errors = [];
             scope.showError = adhShowError;
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
+            bindPath(adhConfig, adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.S1ProposalForm, () => {
