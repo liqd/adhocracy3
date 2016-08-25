@@ -354,7 +354,7 @@ export var renominateProposalDirective = (
                         data: {}
                     };
                     patch.data[SIWorkflowAssignment.nick] = {
-                        workflow_state: "proposed";
+                        workflow_state: "proposed"
                     };
                     return adhHttp.put(proposal.path, patch).then(() => {
                         $window.parent.location.reload();
