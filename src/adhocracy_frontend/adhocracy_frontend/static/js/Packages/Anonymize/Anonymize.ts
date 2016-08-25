@@ -30,6 +30,7 @@ export var anonymizeDirective = (
         scope: {
             url: "@",
             method: "@",
+            localDefault: "=?",
             model: "=",
         },
         link: (scope) => {
@@ -46,6 +47,7 @@ export var anonymizeDirective = (
                 ]).then((args) => {
                     scope.isOptional = args[1];
                     scope.data.model = scope.isOptional ? adhUser.data.anonymize : false;
+                    scope.data.model = scope.localDefault || scope.data.model;
                 });
 
                 scope.$watch("data.model", (model) => {
