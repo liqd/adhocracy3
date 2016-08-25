@@ -324,3 +324,40 @@ export var listingDirective = (
         }
     };
 };
+
+
+export var renominateProposalDirective = (
+    adhHttp : AdhHttp.Service,
+    $window : angular.IWindowService
+) => {
+    return {
+        restrict: "E",
+        template: "<button data-ng-click=\"renominate()\">Renominate</button>",
+        // only show when proposal is rejected
+        scope: {
+            proposalUrl: "=",
+        },
+        link: (scope) => {
+            scope.$watch("proposalUrl", (proposalUrl) => {
+                adhHttp.get(proposalUrl).then((proposal) => {
+                    scope.proposal = proposal;
+                    scope.isRejected = true; // FIXME get from proposal
+                });
+            });
+            scope.renominate = () => {
+                if ( ! $window.confirm("Do you want to renominate this proposal? (Page will reload)")) {
+                    return;
+                }
+                adhHttp.get(scope.proposalURL).then((proposal) => {
+/*                    process.data[SIWorkflow.nick] = {
+                        workflow_state: newState
+                    };
+                    process.data[SIName.nick] = undefined;
+                    adhHttp.put(scope.path, process).then((response) => {
+                        $window.parent.location.reload();
+                    });
+*/                });
+            }
+        }
+    }
+}

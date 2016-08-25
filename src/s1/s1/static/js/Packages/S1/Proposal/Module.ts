@@ -52,5 +52,6 @@ export var register = (angular) => {
         "$q",
         Proposal.editDirective
     ])
-    .directive("adhS1ProposalListing", ["adhConfig", "adhTopLevelState", Proposal.listingDirective]);
+    .directive("adhS1ProposalListing", ["adhConfig", "adhTopLevelState", Proposal.listingDirective])
+	.directive("adhS1RenominateProposal", ["adhHttp", "$window", Proposal.renominateProposalDirective]);
 };
