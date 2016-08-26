@@ -45,7 +45,6 @@ export interface IRateScope extends angular.IScope {
     refersTo : string;
     showResults : string;
     disabled : boolean;
-    hasCastInSession : boolean;
     myRate : number;
     rates(rate : number) : number;
     optionsPostPool : AdhHttp.IOptions;
@@ -324,7 +323,6 @@ export var directiveFactory = (template : string, sheetName : string) => (
                             })
                             .then(() => undefined);
                     }).finally(() => {
-                        scope.hasCastInSession = true;
                         lock = false;
                     });
                 }
