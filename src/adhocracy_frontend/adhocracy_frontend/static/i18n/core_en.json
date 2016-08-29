@@ -172,6 +172,7 @@
     "TR__RESET": "Reset",
     "TR__SAVE": "save",
     "TR__SAVE_TITLE": "Save {{ title }}",
+    "TR__SETTINGS": "Settings",
     "TR__SHARE": "share",
     "TR__SHORT_DESCRIPTION": "Short description",
     "TR__SHOWING_LIMIT_TOTAL": "Showing {{currentLimit}}/{{totalCount}}.",
