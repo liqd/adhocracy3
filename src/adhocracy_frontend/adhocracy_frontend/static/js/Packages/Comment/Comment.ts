@@ -355,12 +355,15 @@ export var adhCommentListing = (
                 return adhHttp.get(scope.path).then((commentable) => {
                     scope.params[SIComment.nick + ":refers_to"] = scope.path;
                     scope.poolPath = commentable.data[SICommentable.nick].post_pool;
-                    scope.custom = {
-                        refersTo: scope.path,
-                        goToLogin: () => {
-                            return adhTopLevelState.setCameFromAndGo("/login");
-                        }
-                    };
+                    return adhHttp.options(scope.poolPath).then((poolOptions) => {
+                        scope.custom = {
+                            commentability: poolOptions.POST,
+                            refersTo: scope.path,
+                            goToLogin: () => {
+                                return adhTopLevelState.setCameFromAndGo("/login");
+                            }
+                        };
+                    });
                 });
             };
 
