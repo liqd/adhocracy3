@@ -86,7 +86,8 @@ export var resourceDropdownDirective = (
             image: "=?",
             moderate: "=?",
             messaging: "=?",
-            modals: "=?"
+            modals: "=?",
+            settings: "=?"
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ResourceDropdown.html",
         link: (scope, element) => {
