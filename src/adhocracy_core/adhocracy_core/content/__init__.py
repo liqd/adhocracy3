@@ -13,6 +13,7 @@ from zope.interface.interfaces import IInterface
 
 from adhocracy_core.authentication import is_created_anonymized
 from adhocracy_core.exceptions import RuntimeConfigurationError
+from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ResourceMetadata
@@ -307,7 +308,11 @@ class ResourceContentRegistry(ContentRegistry):
 
     def can_add_anonymized(self, context: object, request: Request) -> bool:
         """Check if children can be created/added anonymized to `context`."""
-        has_sheet = IAllowAddAnonymized.providedBy(context)
+        if IItem.providedBy(context):
+            # if item was anonymized you can also add versions anonymized
+            has_sheet = _is_anonymized_and_has_permission(context, request)
+        else:
+            has_sheet = IAllowAddAnonymized.providedBy(context)
         has_permission = request.has_permission(ANONYMIZE_PERMISSION, context)
         return has_sheet and has_permission
 

@@ -399,6 +399,14 @@ class TestResourceContentRegistry:
         config.testing_securitypolicy(userid='hank', permissive=True)
         assert inst.can_add_anonymized(context, request_) is True
 
+    def test_can_add_anonymized_true_if_parent_item_anonymized_and_permission(
+            self, config, inst, request_, mock_created_anonymized):
+        from adhocracy_core.interfaces import IItem
+        context = testing.DummyResource(__provides__=IItem)
+        mock_created_anonymized.return_value = True
+        config.testing_securitypolicy(userid='hank', permissive=True)
+        assert inst.can_add_anonymized(context, request_) is True
+
     def test_can_edit_anonymized_false_if_missing_permission(
             self, config, inst, context, request_):
         config.testing_securitypolicy(userid='hank', permissive=False)
