@@ -2,6 +2,7 @@
 from pyramid.config import Configurator
 
 from adhocracy_core import root_factory
+from adhocracy_core.interfaces import IFixtureAsset
 
 
 def includeme(config):
@@ -20,6 +21,8 @@ def includeme(config):
     config.include('.workflows')
     config.include('.rest')
     config.include('.evolution')
+    config.registry.registerUtility('', IFixtureAsset,
+                                    name='adhocracy_s1:test_process_fixture')
 
 
 def main(global_config, **settings):
