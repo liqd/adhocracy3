@@ -112,6 +112,7 @@ class BaseResourceSheet:
         query = self._get_references_query(params)
         appstruct.update(self._get_reference_appstruct(query))
         if add_back_references:
+            query = self._get_back_references_query(params)
             appstruct.update(self._get_back_reference_appstruct(query))
         return appstruct
 
@@ -131,12 +132,14 @@ class BaseResourceSheet:
 
     def _get_references_query(self, params: dict) -> SearchQuery:
         """Might be overridden in subclasses."""
-        default_params = {'only_visible': False,
-                          'resolve': True,
-                          'allows': (),
-                          'references': [],
-                          }
-        query = search_query._replace(**default_params)
+        query = search_query._replace(resolve=True)
+        if params:
+            query = query._replace(**params)
+            query = query._replace(allows=())  # no view permission check
+        return query
+
+    def _get_back_references_query(self, params: dict) -> SearchQuery:
+        query = search_query._replace(resolve=True)
         if params:
             query = query._replace(**params)
         return query
