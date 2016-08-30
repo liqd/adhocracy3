@@ -46,7 +46,6 @@
             type="password"
             name="password_repeat"
             data-ng-model="data.passwordRepeat"
-            required="required"
             data-ng-class="{'ng-invalid': (input.password !== input.passwordRepeat) && userEditForm.password_repeat.$dirty}"/>
         <span class="input-error" data-ng-show="(input.password !== input.passwordRepeat) && userEditForm.password_repeat.$dirty">
             {{ "TR__ERROR_MATCH_PASSWORD" | translate }}
