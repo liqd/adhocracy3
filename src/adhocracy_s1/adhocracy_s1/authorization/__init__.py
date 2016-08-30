@@ -12,6 +12,7 @@ def root_acm_extension_adapter(root: IResource) -> dict:
     acm = \
         {'principals':                                   ['everyone', 'authenticated', 'participant', 'moderator',  'creator', 'initiator', 'admin'],
          'permissions': [['create_user',                   Deny,        None,            None,          None,         None,      None,        Allow],
+                         ['view',                          Deny,        Allow,           Allow,         Allow,        Allow,     Allow,       Allow],
                          ]}
     return acm
 
