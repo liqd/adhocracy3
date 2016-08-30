@@ -1,4 +1,5 @@
 {
+    "TR__ACTIVATE": "aktivieren",
     "TR__ACTIVATION_CLOSE_THIS_TAB_AND_PROCEED": "Danke für Deine Registrierung. Dein Account ist nun aktiviert. Du kannst diese Seite schließen und zurück gehen zu {{siteName}}.",
     "TR__ACTIVATION_ERROR_1": "Wir werden Dir innerhalb der nächsten 24 Stunden einen neuen Link zur Authentifizierung zusenden. Bitte überprüfe Deine E-Mails und schaue auch im Spam-Ordner nach.",
     "TR__ACTIVATION_ERROR_2": "Bitte entschuldige die Schwierigkeiten und aktiviere Deinen Account innerhalb der nächsten 6 Tage.",
@@ -173,6 +174,7 @@
     "TR__RESET": "Zurücksetzen",
     "TR__SAVE": "speichern",
     "TR__SAVE_TITLE": "{{ title }} speichern",
+    "TR__SETTINGS": "Einstellungen",
     "TR__SHARE": "teilen",
     "TR__SHORT_DESCRIPTION": "Kurzbeschreibung",
     "TR__SHOWING_LIMIT_TOTAL": "Zeige {{currentLimit}}/{{totalCount}} an.",

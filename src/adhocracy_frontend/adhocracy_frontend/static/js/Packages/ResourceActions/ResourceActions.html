@@ -11,6 +11,12 @@
         data-view="edit"
         data-label="TR__EDIT"
         data-resource-path="{{itemPath}}"></adh-view-action>
+    <adh-view-action
+        data-ng-if="settings && itemPath && canEdit()"
+        data-class="action-bar-item"
+        data-view="edit"
+        data-label="TR__SETTINGS"
+        data-resource-path="{{itemPath}}"></adh-view-action>
     <adh-view-action data-ng-if="image && itemPath && canEdit()"
         data-class="action-bar-item"
         data-view="image"

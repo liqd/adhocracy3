@@ -6,7 +6,9 @@
     <div class="resource-navigation" data-ng-if="messageOptions.POST">
         <adh-resource-dropdown
             data-resource-path="{{path}}"
-            data-messaging="messageOptions.POST">
+            data-item-path="{{path}}"
+            data-messaging="messageOptions.POST"
+            data-settings="options.PUT">
         </adh-resource-dropdown>
     </div>
     <header class="resource-header">

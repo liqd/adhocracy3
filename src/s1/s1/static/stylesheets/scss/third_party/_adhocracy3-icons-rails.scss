@@ -82,6 +82,8 @@
   font-smoothing: antialiased;
 }
 
+// some necessary code points have been changed to map to "native" characters
+// so that browsers don't need to download our custom font.
 .icon-add:before { content: "\f130"; }
 .icon-attention:before { content: "\f131"; }
 .icon-back-to-top:before { content: "\f102"; }
@@ -90,40 +92,40 @@
 .icon-collapse:before { content: "\f11f"; }
 .icon-document:before { content: "\f105"; }
 .icon-documents:before { content: "\f132"; }
-.icon-flag:before { content: "\f107"; }
+.icon-flag:before { content: "🏴"; }
 .icon-key:before { content: "\f133"; }
 .icon-list:before { content: "\f109"; }
 .icon-list-column:before { content: "\f134"; }
 .icon-list-filled:before { content: "\f135"; }
-.icon-mail:before { content: "\f10b"; }
-.icon-mail-filled:before { content: "\f12d"; }
+.icon-mail:before { content: "✉"; }
+.icon-mail-filled:before { content: "✉"; }
 .icon-map-pin:before { content: "\f10d"; }
 .icon-minus:before { content: "\f136"; }
-.icon-partou-logo:before { content: "\f121"; }
-.icon-pencil:before { content: "\f10f"; }
+.icon-paas-logo:before { content: "PᴬᴬS"; }
+.icon-pencil:before { content: "🖉"; }
 .icon-picture-file:before { content: "\f122"; }
 .icon-pig:before { content: "\f110"; }
 .icon-pointy-rectangle-left:before { content: "\f111"; }
 .icon-pointy-rectangle-right:before { content: "\f137"; }
-.icon-print:before { content: "\f123"; }
+.icon-print:before { content: "🖨"; }
 .icon-refresh:before { content: "\f124"; }
-.icon-reply:before { content: "\f113"; }
+.icon-reply:before { content: "⤷"; }
 .icon-share:before { content: "\f125"; }
-.icon-speechbubble:before { content: "\f114"; }
-.icon-speechbubble-document:before { content: "\f115"; }
-.icon-speechbubble-unfilled:before { content: "\f116"; }
-.icon-speechbubbles:before { content: "\f117"; }
-.icon-tags:before { content: "\f126"; }
-.icon-three-dots:before { content: "\f127"; }
+.icon-speechbubble:before { content: "💬"; }
+.icon-speechbubble-document:before { content: "💬"; }
+.icon-speechbubble-unfilled:before { content: "💬"; }
+.icon-speechbubbles:before { content: "💬"; }
+.icon-tags:before { content: "🏷"; }
+.icon-three-dots:before { content: "…"; }
 .icon-tick:before { content: "\f138"; }
-.icon-trash:before { content: "\f128"; }
+.icon-trash:before { content: "🗑"; }
 .icon-user:before { content: "\f119"; }
 .icon-user-unfilled:before { content: "\f11a"; }
 .icon-users:before { content: "\f139"; }
 .icon-volume:before { content: "\f129"; }
 .icon-vote:before { content: "\f12e"; }
-.icon-vote-down:before { content: "\f11c"; }
+.icon-vote-down:before { content: "▼"; }
 .icon-vote-filled:before { content: "\f12f"; }
-.icon-vote-up:before { content: "\f11d"; }
-.icon-voting:before { content: "\f12c"; }
-.icon-x:before { content: "\f11e"; }
+.icon-vote-up:before { content: "▲"; }
+.icon-voting:before { content: "▲▼"; }
+.icon-x:before { content: "❌"; }
