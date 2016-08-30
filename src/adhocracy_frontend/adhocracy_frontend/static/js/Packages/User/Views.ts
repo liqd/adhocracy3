@@ -738,6 +738,7 @@ export var userEditDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service,
+    adhUser : AdhUser.Service,
     adhShowError,
     adhSubmitIfValid,
     adhResourceUrlFilter,
@@ -769,6 +770,7 @@ export var userEditDirective = (
                 return adhSubmitIfValid(scope, element, scope.userEditForm, () => {
                     return postEdit(adhHttp)(scope.path, scope.data).then((result) => {
                         $location.url(adhResourceUrlFilter(scope.path));
+                        adhUser.loadUser(scope.path);
                     });
                 });
             };

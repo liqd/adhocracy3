@@ -53,7 +53,7 @@ export class Service {
         });
     }
 
-    private loadUser(userPath) {
+    public loadUser(userPath) {
         var _self : Service = this;
 
         return _self.adhHttp.get(userPath)

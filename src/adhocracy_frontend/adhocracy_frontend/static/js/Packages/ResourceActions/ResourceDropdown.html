@@ -11,6 +11,13 @@
             <i class="icon-pencil"></i>
         </adh-view-action>
         <adh-view-action
+            data-ng-if="settings && itemPath && canEdit()"
+            data-view="edit"
+            data-label="TR__SETTINGS"
+            data-resource-path="{{itemPath}}">
+            <i class="icon-pencil"></i>
+        </adh-view-action>
+        <adh-view-action
             data-ng-if="image && itemPath && canEdit()"
             data-view="image"
             data-label="TR__IMAGE_UPLOAD"
