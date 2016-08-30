@@ -418,7 +418,8 @@ export class Service {
     public postNewVersionNoFork(
         oldVersionPath : string,
         obj : any,
-        rootVersions? : string[]
+        rootVersions? : string[],
+        config? : IHttpOptionsConfig
     ) : angular.IPromise<{ value: any; parentChanged: boolean; }> {
         var _self = this;
 
@@ -473,7 +474,7 @@ export class Service {
             };
 
             return _self
-                .post(dagPath, _obj)
+                .post(dagPath, _obj, config)
                 .then(handleSuccess, <any>handleConflict);
         };
 

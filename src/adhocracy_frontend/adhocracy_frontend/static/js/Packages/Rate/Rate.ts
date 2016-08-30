@@ -9,6 +9,7 @@ import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 import * as AdhResourceUtil from "../Util/ResourceUtil";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUser from "../User/User";
 import * as AdhUtil from "../Util/Util";
 import * as AdhWebSocket from "../WebSocket/WebSocket";
 
@@ -45,7 +46,6 @@ export interface IRateScope extends angular.IScope {
     refersTo : string;
     showResults : string;
     disabled : boolean;
-    hasCastInSession : boolean;
     myRate : number;
     rates(rate : number) : number;
     optionsPostPool : AdhHttp.IOptions;
@@ -144,6 +144,7 @@ export var directiveFactory = (template : string, sheetName : string) => (
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhResourceArea : AdhResourceArea.Service,
+    adhUser : AdhUser.Service,
     adhDone
 ) => {
     "use strict";
@@ -316,15 +317,19 @@ export var directiveFactory = (template : string, sheetName : string) => (
                         newVersion.data[SIRate.nick].object = scope.refersTo;
                         newVersion.data[SIRate.nick].subject = adhCredentials.userPath;
 
-                        return adhHttp.postNewVersionNoFork(version.path, newVersion)
-                            .then(() => {
-                                adhRateEventManager.trigger(scope.refersTo);
-                                scope.auditTrailVisible = false;
-                                return $q.all([updateMyRate(), updateAggregatedRates()]);
-                            })
-                            .then(() => undefined);
+                        var promises = adhConfig.anonymize_enabled ? [adhUser.ready] : [];
+                        $q.all(promises).then(() => {
+                            var userDefault = adhConfig.anonymize_enabled ? adhUser.data.anonymize : false;
+
+                            return adhHttp.postNewVersionNoFork(version.path, newVersion, [], { anonymize: userDefault })
+                                .then(() => {
+                                    adhRateEventManager.trigger(scope.refersTo);
+                                    scope.auditTrailVisible = false;
+                                    return $q.all([updateMyRate(), updateAggregatedRates()]);
+                                })
+                                .then(() => undefined);
+                        });
                     }).finally(() => {
-                        scope.hasCastInSession = true;
                         lock = false;
                     });
                 }

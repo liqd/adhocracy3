@@ -1,4 +1,5 @@
 import * as AdhAngularHelpersModule from "../../AngularHelpers/Module";
+import * as AdhAnonymizeModule from "../../Anonymize/Module";
 import * as AdhBadgeModule from "../../Badge/Module";
 import * as AdhHttpModule from "../../Http/Module";
 import * as AdhPermissionsModule from "../../Permissions/Module";
@@ -14,6 +15,7 @@ export var moduleName = "adhS1Proposal";
 export var register = (angular) => {
     angular.module(moduleName, [
         AdhAngularHelpersModule.moduleName,
+        AdhAnonymizeModule.moduleName,
         AdhBadgeModule.moduleName,
         AdhHttpModule.moduleName,
         AdhPermissionsModule.moduleName,

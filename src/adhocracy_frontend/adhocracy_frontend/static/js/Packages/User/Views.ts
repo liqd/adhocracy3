@@ -20,6 +20,7 @@ import RIComment from "../../Resources_/adhocracy_core/resources/comment/ICommen
 import RIProposal from "../../Resources_/adhocracy_core/resources/proposal/IProposal";
 import RIRate from "../../Resources_/adhocracy_core/resources/rate/IRate";
 import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
+import RISystemUser from "../../Resources_/adhocracy_core/resources/principal/ISystemUser";
 import * as SIAnonymizeDefault from "../../Resources_/adhocracy_core/sheets/principal/IAnonymizeDefault";
 import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
 import * as SIHasAssetPool from "../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
@@ -580,7 +581,8 @@ export var metaDirective = (
                 adhHttp.resolve($scope.path)
                     .then((res) => {
                         $scope.userBasic = res.data[SIUserBasic.nick];
-                        $scope.noLink = !adhResourceArea.has(RIUser.content_type);
+                        // provide no link if either there are no user profiles enabled or user is anonymous
+                        $scope.noLink = !adhResourceArea.has(RIUser.content_type) || (res.content_type === RISystemUser.content_type);
                         adhGetBadges(res).then((assignments) => {
                             $scope.assignments = assignments;
                         });

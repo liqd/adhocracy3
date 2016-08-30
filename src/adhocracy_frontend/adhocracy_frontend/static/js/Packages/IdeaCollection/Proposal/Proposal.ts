@@ -11,6 +11,7 @@ import * as AdhRate from "../../Rate/Rate";
 import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
 import * as AdhUtil from "../../Util/Util";
 
+import RISystemUser from "../../../Resources_/adhocracy_core/resources/principal/ISystemUser";
 import * as SICommentable from "../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
 import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
@@ -45,6 +46,7 @@ export interface IScope extends angular.IScope {
         creatorParticipate? : boolean;
         locationText? : string;
         anonymize? : boolean;
+        createdAnonymously? : boolean;
     };
     selectedState? : string;
     processProperties : AdhProcess.IProcessProperties;
@@ -56,6 +58,7 @@ export interface IScope extends angular.IScope {
 // They are an experiment on how adhResourceWidget can be improved.  This duplication
 // should be resolved at some point.
 var bindPath = (
+    adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
@@ -66,19 +69,19 @@ var bindPath = (
     scope : IScope,
     pathKey : string = "path"
 ) : void => {
-        var getPolygon = () => {
-            if (scope.processProperties.hasLocation) {
-                var processUrl = adhTopLevelState.get("processUrl");
-                return adhHttp.get(processUrl).then((process) => {
-                    var locationUrl = process.data[SILocationReference.nick]["location"];
-                    return adhHttp.get(locationUrl).then((location) => {
-                        return location.data[SIMultiPolygon.nick]["coordinates"][0][0];
-                    });
+    var getPolygon = () => {
+        if (scope.processProperties.hasLocation) {
+            var processUrl = adhTopLevelState.get("processUrl");
+            return adhHttp.get(processUrl).then((process) => {
+                var locationUrl = process.data[SILocationReference.nick]["location"];
+                return adhHttp.get(locationUrl).then((location) => {
+                    return location.data[SIMultiPolygon.nick]["coordinates"][0][0];
                 });
-            } else {
-                return $q.when();
-            }
-        };
+            });
+        } else {
+            return $q.when();
+        }
+    };
 
     scope.$watch(pathKey, (value : string) => {
         if (value) {
@@ -118,6 +121,12 @@ var bindPath = (
                         commentCount: resource.data[SICommentable.nick].comments_count,
                         assignments: assignments
                     };
+
+                    if (adhConfig.anonymize_enabled) {
+                        adhHttp.get(scope.data.creator).then((res) => {
+                            scope.data.createdAnonymously = res.content_type === RISystemUser.content_type;
+                        });
+                    }
                     if (scope.processProperties.hasLocation) {
                         scope.data.lng = pointSheet.coordinates[0];
                         scope.data.lat = pointSheet.coordinates[1];
@@ -242,7 +251,7 @@ export var detailDirective = (
             processProperties: "="
         },
         link: (scope : IScope) => {
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
+            bindPath(adhConfig, adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
                 scope, undefined);
         }
     };
@@ -265,7 +274,7 @@ export var listItemDirective = (
             processProperties: "="
         },
         link: (scope : IScope) => {
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
+            bindPath(adhConfig, adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
                 scope, undefined);
             scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                 if (!proposalVersionUrl) {
@@ -298,7 +307,7 @@ export var mapListItemDirective = (
             processProperties: "="
         },
         link: (scope : IScope, element, attrs, mapListing : AdhMapping.MapListingController) => {
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
+            bindPath(adhConfig, adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
                 scope, undefined);
 
             var unregister = scope.$watchGroup(["data.lat", "data.lng"], (values : number[]) => {
@@ -403,7 +412,7 @@ export var editDirective = (
             scope.showError = adhShowError;
             scope.config = adhConfig;
             scope.create = false;
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
+            bindPath(adhConfig, adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
                 scope, undefined);
 
             scope.submit = () => {

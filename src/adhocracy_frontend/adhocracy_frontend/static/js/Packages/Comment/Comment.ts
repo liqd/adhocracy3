@@ -13,6 +13,7 @@ import * as AdhUtil from "../Util/Util";
 import RIComment from "../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RIExternalResource from "../../Resources_/adhocracy_core/resources/external_resource/IExternalResource";
+import RISystemUser from "../../Resources_/adhocracy_core/resources/principal/ISystemUser";
 import * as SICommentable from "../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIComment from "../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
@@ -50,6 +51,7 @@ export interface ICommentResourceScope extends angular.IScope {
     onCancel() : void;
     data : {
         content : string;
+        createdAnonymously : boolean;
         creator : string;
         creationDate : string;
         modificationDate : string;
@@ -225,6 +227,11 @@ export var commentDetailDirective = (
 
         scope.edit = () => {
             scope.mode = 1;
+            if (adhConfig.anonymize_enabled) {
+                adhHttp.get(scope.data.creator).then((res) => {
+                    scope.data.createdAnonymously = res.content_type === RISystemUser.content_type;
+                });
+            }
         };
 
         scope.cancel = () => {
