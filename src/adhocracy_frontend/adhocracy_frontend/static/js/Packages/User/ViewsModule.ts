@@ -106,6 +106,7 @@ export var register = (angular) => {
             "adhConfig",
             "adhHttp",
             "adhTopLevelState",
+            "adhUser",
             "adhShowError",
             "adhSubmitIfValid",
             "adhResourceUrlFilter",
