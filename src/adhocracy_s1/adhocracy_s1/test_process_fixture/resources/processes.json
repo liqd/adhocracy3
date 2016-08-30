@@ -19,11 +19,6 @@
       "adhocracy_core.sheets.workflow.IWorkflowAssignment": {
         "workflow": "s1_private",
         "workflow_state": "propose"
-      },
-      "adhocracy_core.sheets.localroles.ILocalRoles": {
-        "local_roles": [{"principal": "s1_private_participants",
-                         "roles": ["participant"]}
-                       ]
       }
     }
   }
