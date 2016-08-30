@@ -215,6 +215,7 @@ class TestBaseResourceSheet:
         reference = Reference(None, ISheet, '', context)
         query = search_query._replace(references=[reference],
                                       resolve=True,
+                                      allows=(('admin'), 'view')
                                       )
         sheet_catalogs.search.call_args[0] == query
         assert appstruct['references'] == [source]
@@ -273,6 +274,23 @@ class TestBaseResourceSheet:
                                       )
         assert sheet_catalogs.search.call_args[0][0] == query
         assert appstruct['reference'] == target
+
+    def test_get_reference_without_permission_check(
+            self, inst, context, sheet_catalogs, mock_node_single_reference):
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import search_query
+        from adhocracy_core.interfaces import Reference
+        node = mock_node_single_reference
+        inst.schema.children.append(node)
+
+        appstruct = inst.get()
+
+        reference = Reference(context, ISheet, 'reference', None)
+        query = search_query._replace(references=[reference],
+                                      resolve=True,
+                                      allows=(('admin'), 'view')
+                                      )
+        assert sheet_catalogs.search.call_args[0][0] == query._replace(allows=())
 
     def test_get_references(self, inst, context, sheet_catalogs,
                             mock_node_unique_references):
