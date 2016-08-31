@@ -180,7 +180,7 @@ class TestAddRenominateDescription:
         user = testing.DummyResource()
         registry.content.get_sheet_field = Mock(return_value='username')
         index_rates = mocker.patch('adhocracy_s1.workflows.s1.index_rates',
-                                   return_value=10)
+                                   autospec=True, return_value=10)
         description_sheet = registry.content.get_sheet.return_value = mock_sheet
         description_sheet.get.return_value = {'description': 'old_description'}
         registry.content.get_sheet.return_value = description_sheet
@@ -192,7 +192,7 @@ class TestAddRenominateDescription:
                  '\n\nrenominated by: username' \
                  '\nold rating: 10' \
                  '\n'
-        index_rates.assert_called_with(context)
+        index_rates.assert_called_with(context, 0)
         description_sheet.set.assert_called_with({'description': wanted})
 
 

@@ -120,7 +120,7 @@ def do_transition_to_proposed(context: IProposal,
 def _add_renominate_info(version: IProposalVersion, request: Request) -> None:
     registry = request.registry
     editor = registry.content.get_sheet_field(request.user, IUserBasic, 'name')
-    rates = index_rates(version)
+    rates = index_rates(version, 0)
     description_sheet = registry.content.get_sheet(version, IDescription)
     description = description_sheet.get()['description']
     renominate_info = '\n\n---'\

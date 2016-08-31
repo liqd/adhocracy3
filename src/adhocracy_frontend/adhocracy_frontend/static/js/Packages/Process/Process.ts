@@ -112,13 +112,15 @@ export var workflowSwitchDirective = (
             });
 
             scope.switchState = (newState) => {
+                if ( ! $window.confirm("Will switch to process state " + newState + ". (Page will reload)")) {
+                    return;
+                }
                 adhHttp.get(scope.path).then((process) => {
                     process.data[SIWorkflow.nick] = {
                         workflow_state: newState
                     };
                     process.data[SIName.nick] = undefined;
                     adhHttp.put(scope.path, process).then((response) => {
-                        $window.alert("Switched to process state " + newState + ". Page reloading...");
                         $window.parent.location.reload();
                     });
                 });
