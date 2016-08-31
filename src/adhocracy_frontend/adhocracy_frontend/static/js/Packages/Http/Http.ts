@@ -131,6 +131,7 @@ export class Service {
         }
         if (config.anonymize) {
             _.assign(headers, {
+				// the header is non-empty so it doesn't get deleted by browsers
                 "X-Anonymize": "X-Anonymize"
             });
         }
