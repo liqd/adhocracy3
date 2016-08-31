@@ -106,7 +106,7 @@ def validate_anonymize_header(view: callable):
         content = request.registry.content
         if has_anonymize_header:
             if request.method == 'POST':
-                if request.path == '/batch':
+                if request.path == '/batch' or request.path == '/api/batch':
                     allowed = True
                 else:
                     allowed = content.can_add_anonymized(context, request)
