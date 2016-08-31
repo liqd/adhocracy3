@@ -131,7 +131,7 @@ export class Service {
         }
         if (config.anonymize) {
             _.assign(headers, {
-                "X-Anonymize": ""
+                "X-Anonymize": "X-Anonymize"
             });
         }
         return headers;
