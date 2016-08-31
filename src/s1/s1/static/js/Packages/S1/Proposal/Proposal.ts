@@ -97,6 +97,7 @@ var bindPath = (
                         title: titleSheet.title,
                         description: descriptionSheet.description,
                         rateCount: ratesPro - ratesContra,
+                        create: false,
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
                         commentCount: version.data[SICommentable.nick].comments_count,
@@ -287,7 +288,6 @@ export var editDirective = (
             scope.errors = [];
             scope.showError = adhShowError;
             bindPath(adhConfig, adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
-            scope.data.create = false;
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.S1ProposalForm, () => {
