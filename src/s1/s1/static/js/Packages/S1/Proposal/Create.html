@@ -43,12 +43,12 @@
     <footer class="form-footer s1-proposal-form-footer">
         <div class="form-footer-right">
             <adh-anonymize
-                data-ng-if="create"
+                data-ng-if="data.create"
                 data-url="{{poolPath}}"
                 data-method="POST"
                 data-model="data.anonymize"></adh-anonymize>
             <adh-anonymize
-                data-ng-if="!create && resource.path"
+                data-ng-if="!data.create && resource.path"
                 data-url="{{resource.path | adhParentPath}}"
                 data-method="POST"
                 data-local-default="data.createdAnonymously"
