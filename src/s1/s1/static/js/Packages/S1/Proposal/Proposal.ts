@@ -32,6 +32,7 @@ export interface IScope extends angular.IScope {
         title : string;
         description : string;
         rateCount : number;
+        create? : boolean;
         creator : string;
         creationDate : string;
         commentCount : number;
@@ -241,6 +242,7 @@ export var createDirective = (
             scope.errors = [];
             scope.data = <any>{};
             scope.showError = adhShowError;
+            scope.data.create = true;
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.S1ProposalForm, () => {
@@ -285,6 +287,7 @@ export var editDirective = (
             scope.errors = [];
             scope.showError = adhShowError;
             bindPath(adhConfig, adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
+            scope.data.create = false;
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.S1ProposalForm, () => {
