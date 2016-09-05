@@ -53,7 +53,7 @@ class ACLLocalRolesState(dict):
         if self.local_roles is not None:
             add_local_roles(context,
                             self.local_roles,
-                            registry=registry)
+                            registry)
 
 
 @implementer(IAdhocracyWorkflow)

@@ -60,7 +60,7 @@ class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
             return allow
 
 
-def set_local_roles(resource, new_local_roles: dict, registry: Registry=None):
+def set_local_roles(resource, new_local_roles: dict, registry: Registry):
     """Set the :term:`local role's <local role>` mapping to ``new_local_roles``.
 
     :param new_local_roles: Mapping from :term:`groupid`/:term:`userid` to
@@ -73,20 +73,22 @@ def set_local_roles(resource, new_local_roles: dict, registry: Registry=None):
     :class:`adhocracy_core.interfaces.ILocalRolesModified` to notify others.
     """
     _assert_values_have_set_type(new_local_roles)
+    _set_local_roles(resource, new_local_roles, registry)
+
+
+def _set_local_roles(resource, new_local_roles: dict, registry: Registry):
     old_local_roles = getattr(resource, '__local_roles__', None)
     if new_local_roles == old_local_roles:
-        return None
+        return
     else:
         resource.__local_roles__ = new_local_roles
-    if registry is None:
-        registry = get_current_registry()
     event = LocalRolesModified(resource, new_local_roles, old_local_roles,
                                registry)
     registry.notify(event)
 
 
 def add_local_roles(resource, additional_local_roles: dict,
-                    registry: Registry=None):
+                    registry: Registry):
     """Add roles to existing :term:`local role's mapping."""
     _assert_values_have_set_type(additional_local_roles)
     old_local_roles = getattr(resource, '__local_roles__', {})
@@ -95,7 +97,7 @@ def add_local_roles(resource, additional_local_roles: dict,
         old_roles = old_local_roles.get(principal, set())
         roles.update(old_roles)
         local_roles[principal] = roles
-    set_local_roles(resource, local_roles, registry=registry)
+    set_local_roles(resource, local_roles, registry)
 
 
 def _assert_values_have_set_type(mapping: dict):
@@ -106,7 +108,6 @@ def _assert_values_have_set_type(mapping: dict):
 def get_local_roles(resource) -> dict:
     """Return the :term:`local roles <local role>` of the resource."""
     local_roles = getattr(resource, '__local_roles__', {})
-
     return local_roles
 
 

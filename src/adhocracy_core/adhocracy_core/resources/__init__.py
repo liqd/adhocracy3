@@ -230,7 +230,8 @@ class ResourceFactory:
         from adhocracy_core.resources.principal import IUser  # prevent circles
         if IUser.providedBy(resource):  # TODO Why?
             creator = resource
-        self._set_local_role_creator(resource, creator, anonymized_creator)
+        self._set_local_role_creator(resource, creator, anonymized_creator,
+                                     registry)
 
         if IMetadata.providedBy(resource):
             metadata = self._get_metadata(resource, creator, registry)
@@ -260,10 +261,12 @@ class ResourceFactory:
     def _set_local_role_creator(self,
                                 resource: IResource,
                                 creator: IResource,
-                                anonymized_creator: IResource):
+                                anonymized_creator: IResource,
+                                registry: Registry
+                                ):
         if creator and not anonymized_creator:
             userid = resource_path(creator)
-            set_local_roles(resource, {userid: {'role:creator'}})
+            set_local_roles(resource, {userid: {'role:creator'}}, registry)
         elif creator and anonymized_creator:
             userid = resource_path(anonymized_creator)
             set_anonymized_creator(resource, userid)

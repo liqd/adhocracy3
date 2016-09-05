@@ -122,35 +122,35 @@ class TestRuleACLAuthorizationPolicy:
                                 ['system.Authenticated'], 'view')
 
 
-def test_set_local_roles_non_set_roles(context):
+def test_set_local_roles_non_set_roles(context, registry):
     from . import set_local_roles
     new_roles = {'principal': []}
     with raises(AssertionError):
-        set_local_roles(context, new_roles)
+        set_local_roles(context, new_roles, registry)
 
 
-def test_set_local_roles_new_roles(context):
+def test_set_local_roles_new_roles(context, registry):
     from . import set_local_roles
     new_roles = {'principal': set()}
-    set_local_roles(context, new_roles)
+    set_local_roles(context, new_roles, registry)
     assert context.__local_roles__ is new_roles
 
 
-def test_set_local_roles_non_differ_roles(context):
+def test_set_local_roles_non_differ_roles(context, registry):
     from . import set_local_roles
     old_roles = {'principal': set()}
     context.__local_roles__ = old_roles
     new_roles = {'principal': set()}
-    set_local_roles(context, new_roles)
+    set_local_roles(context, new_roles, registry)
     assert context.__local_roles__ is old_roles
 
 
-def test_set_local_roles_differ_roles(context):
+def test_set_local_roles_differ_roles(context, registry):
     from . import set_local_roles
     old_roles = {'principal': set()}
     context.__local_roles__ = old_roles
     new_roles = {'principal': {'new'}}
-    set_local_roles(context, new_roles)
+    set_local_roles(context, new_roles, registry)
     assert context.__local_roles__ is new_roles
 
 
@@ -163,7 +163,7 @@ def test_set_local_roles_notify_modified(context, config):
     old_roles = {'principal': set()}
     context.__local_roles__ = old_roles
     new_roles = {'principal': {'new'}}
-    set_local_roles(context, new_roles, registry=config.registry)
+    set_local_roles(context, new_roles, config.registry)
     event = events[0]
     assert event.object is context
     assert event.new_local_roles == new_roles
@@ -171,35 +171,35 @@ def test_set_local_roles_notify_modified(context, config):
     assert event.registry == config.registry
 
 
-def test_add_local_roles_non_update_roles(context):
+def test_add_local_roles_non_update_roles(context, registry):
     from . import add_local_roles
     new_roles = {'principal': []}
     with raises(AssertionError):
-        add_local_roles(context, new_roles)
+        add_local_roles(context, new_roles, registry)
 
 
-def test_add_local_roles_new_roles(context):
+def test_add_local_roles_new_roles(context, registry):
     from . import add_local_roles
     new_roles = {'principal': set()}
-    add_local_roles(context, new_roles)
+    add_local_roles(context, new_roles, registry)
     assert context.__local_roles__ == new_roles
 
 
-def test_add_local_roles_non_differ_roles(context):
+def test_add_local_roles_non_differ_roles(context, registry):
     from . import add_local_roles
     old_roles = {'principal': set()}
     context.__local_roles__ = old_roles
     new_roles = {'principal': set()}
-    add_local_roles(context, new_roles)
+    add_local_roles(context, new_roles, registry)
     assert context.__local_roles__ is old_roles
 
 
-def test_add_local_roles_differ_roles(context):
+def test_add_local_roles_differ_roles(context, registry):
     from . import add_local_roles
     old_roles = {'principal': {'old'}, 'principal2': set()}
     context.__local_roles__ = old_roles
     new_roles = {'principal': {'new'}}
-    add_local_roles(context, new_roles)
+    add_local_roles(context, new_roles, registry)
     assert context.__local_roles__ == {'principal': {'old', 'new'},
                                        'principal2': set()}
 
