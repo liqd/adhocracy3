@@ -47,13 +47,8 @@ def acm_extension_adapter(context: IResource) -> dict:
 
 @implementer(IRoleACLAuthorizationPolicy)
 class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
-    """A :term:`authorization policy` supporting :term:`local role`.
 
-    You can get/set local role mapping for an resource with
-     :func:`set_local_roles` and :func:`get_local_roles`.
-
-    The local roles are inherited by children, except the `creator` role.
-    """
+    __doc__ = IRoleACLAuthorizationPolicy.__doc__
 
     def permits(self, context: IResource,
                 principals: list,
