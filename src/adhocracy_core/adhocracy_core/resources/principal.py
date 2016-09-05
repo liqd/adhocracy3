@@ -199,7 +199,7 @@ def allow_create_asset_authenticated(context: IPool,
     This is needed to assure user can create their user image.
     """
     acl = [(Allow, Authenticated, 'create_asset')]
-    set_acl(context, acl, registry=registry)
+    set_acl(context, acl, registry)
 
 
 class IUsersService(IServicePool):
@@ -260,7 +260,7 @@ def deny_view_permission(context: IResource, registry: Registry,
                          options: dict):
     """Remove view permission for everyone for `context`."""
     acl = [(Deny, Everyone, 'view')]
-    set_acl(context, acl, registry=registry)
+    set_acl(context, acl, registry)
 
 
 def hide(context: IResource, registry: Registry, options: dict):

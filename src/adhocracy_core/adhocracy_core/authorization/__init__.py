@@ -6,15 +6,14 @@ from pyramid.security import Allow
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.renderers import render
 from pyramid.security import ACLPermitsResult
-from pyramid.threadlocal import get_current_registry
 from pyramid.traversal import lineage
 from pyramid.registry import Registry
 from pyramid.request import Request
 from pyramid.scripting import get_root
 from zope.interface import implementer
 from zope.interface import Interface
-from substanced.util import get_acl
-from substanced.util import set_acl
+from substanced.util import get_acl as _get_acl
+from substanced.util import set_acl as _set_acl
 from substanced.stats import statsd_timer
 import transaction
 
@@ -186,10 +185,10 @@ def set_acms_for_app_root(event):
     acl = [god_all_permission_ace]
     acl += _get_root_extension_acl(root, event.app.registry)
     acl += _get_root_base_acl()
-    old_acl = get_acl(root, [])
+    old_acl = get_acl(root)
     if old_acl == acl:
         return
-    set_acl(root, acl, event.app.registry)
+    _set_acl(root, acl, registry=event.app.registry)
     transaction.commit()
     closer()
 
@@ -231,6 +230,25 @@ def get_principals_with_local_roles(context: IResource,
         if principal in principals:
             principals_with_roles.update(roles)
     return list(principals_with_roles)
+def get_acl(resource) -> []:
+    """Return the term:`ACL` of the `resource`."""
+    return _get_acl(resource, default=[])
+
+
+def get_acl_all(resource) -> []:
+    """Return term:`ACL` of the `resource` inclusive inherited acl."""
+    acl_all = []
+    for location in lineage(resource):
+        acl = _get_acl(location, default=[])
+        for ace in acl:
+            acl_all.append(ace)
+    return acl_all
+
+
+def set_acl(resource, acl: list, registry: Registry):
+    """Add term:`local_roles` and set the term:`ACL` of the `resource`."""
+
+    _set_acl(resource, acl, registry=registry)
 
 
 def includeme(config):

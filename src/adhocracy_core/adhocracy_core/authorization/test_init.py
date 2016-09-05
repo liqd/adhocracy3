@@ -280,11 +280,11 @@ class TestSetACMSForAppRoot:
         from adhocracy_core import authorization
         from . import god_all_permission_ace
         mock_commit = mocker.patch('transaction.commit')
-        mocker.spy(authorization, 'set_acl')
+        mocker.spy(authorization, '_set_acl')
         self.call_fut(event)
         assert mock_commit.called
         assert root.__acl__[0] == god_all_permission_ace
-        assert authorization.set_acl.called
+        assert authorization._set_acl.called
 
     def test_set_root_acl_after_god_permission(self, root, event, root_acl):
         self.call_fut(event)
@@ -302,10 +302,10 @@ class TestSetACMSForAppRoot:
 
     def test_ignore_if_acl_not_changed(self, mocker, event, root_acl):
         from adhocracy_core import authorization
-        mocker.spy(authorization, 'set_acl')
+        mocker.spy(authorization, '_set_acl')
         self.call_fut(event)
         self.call_fut(event)
-        assert authorization.set_acl.call_count == 1
+        assert authorization._set_acl.call_count == 1
 
 
 @mark.usefixtures('integration')
@@ -313,16 +313,6 @@ def test_get_root_base_acl():
     from . import _get_root_base_acl
     acl = _get_root_base_acl()
     assert acl[0] == ('Allow', 'role:admin', 'edit')
-
-
-def test_set_acl_set_resource_dirty():
-    """Regression test."""
-    from persistent.mapping import PersistentMapping
-    from . import set_acl
-    resource = PersistentMapping()
-    resource._p_jar = Mock()  # make _p_changed property work
-    set_acl(resource, [('Deny', 'role:creator', 'edit')])
-    assert resource._p_changed is True
 
 
 def test_create_fake_god_request(registry):
@@ -365,6 +355,43 @@ class TestGetPrincipalsWithLocalRoles:
         principals_with_roles.append('role:creator')
         result = self.call_fut(context, principals)
         assert set(result) == set(principals_with_roles)
+
+
+
+
+def test_get_acl_return_empty_list_if_no_acl(context):
+    from . import get_acl
+    assert get_acl(context) == []
+
+
+def test_get_acl_return_acl(context):
+    from . import get_acl
+    context.__acl__ = [('allow',)]
+    assert get_acl(context) == [('allow',)]
+
+
+def test_get_acl_all_return_inherited_acl(context):
+    from . import get_acl_all
+    grand_parent = testing.DummyResource(__acl__=[('Allow',)])
+    grand_parent['parent'] = testing.DummyResource()
+    grand_parent['parent']['child'] = context
+    context.__acl__ = [('Deny',)]
+    assert get_acl_all(context) == [('Deny',), ('Allow',)]
+
+
+class TestSetAcl:
+
+    def call_fut(self, *args):
+        from . import set_acl
+        return set_acl(*args)
+
+    def test_set_acl(self, context, registry, mocker):
+        mock_set_acl = mocker.patch('adhocracy_core.authorization._set_acl',
+                                    magic_spec=True)
+        self.call_fut(context, [('Allow',)], registry)
+        mock_set_acl.assert_called_with(context, [('Allow',)],
+                                        registry=registry)
+
 
 
 @mark.usefixtures('integration')

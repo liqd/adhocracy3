@@ -39,7 +39,7 @@ def test_includeme_add_bplan_private_workflow(registry):
 
 @mark.usefixtures('integration')
 def test_initiate_bplan_private_workflow(registry, context):
-    from substanced.util import get_acl
+    from adhocracy_core.authorization import get_acl
     workflow = registry.content.workflows['bplan_private']
     assert workflow.state_of(context) is None
     workflow.initialize(context)
