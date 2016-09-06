@@ -951,6 +951,23 @@ def add_allow_add_anonymized_sheet_to_rates(root,
     migrate_new_sheet(root, IRatesService, IAllowAddAnonymized)
 
 
+@log_migration
+def add_local_roles_to_acl(root, registry):
+    """Add ACE based on local roles to acl (process/organisation, proposal)."""
+    from adhocracy_core.authorization import get_acl
+    from adhocracy_core.authorization import _set_acl_with_local_roles
+    catalogs = find_service(root, 'catalogs')
+    resources = _search_for_interfaces(catalogs, IProposal)
+    resources += _search_for_interfaces(catalogs, IProcess)
+    resources += _search_for_interfaces(catalogs, IOrganisation)
+    count = len(resources)
+    for index, resource in enumerate(resources):
+        logger.info('Add local roles to acl for resource {0} - {1} of {2}'
+                    .format(resource, index + 1, count))
+        acl = get_acl(resource)
+        _set_acl_with_local_roles(resource, acl, registry)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -1010,3 +1027,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_items)
     config.add_evolution_step(add_anonymize_default_sheet_to_user)
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_rates)
+    config.add_evolution_step(add_local_roles_to_acl)

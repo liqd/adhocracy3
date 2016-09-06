@@ -54,10 +54,23 @@ class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
                 permission: str) -> ACLPermitsResult:
         """Check `permission` for `context`. Read interface docstring."""
         with statsd_timer('authorization', rate=.1):
-            principals_with_roles = get_principals_with_local_roles(context,
-                                                                    principals)
-            allow = super().permits(context, principals_with_roles, permission)
+            if _is_creator(context, principals):
+                principals += [CREATOR_ROLEID]
+            allow = super().permits(context, principals, permission)
             return allow
+
+
+def _is_creator(context: IResource, principals: list) -> bool:
+    """Check if one principal of `principals` is creator of `context`."""
+    local_roles = get_local_roles(context)
+    anonymized_creator = get_anonymized_creator(context)
+    for principal in principals:
+        if CREATOR_ROLEID in local_roles.get(principal, tuple()):
+            return True
+        elif principal == anonymized_creator:
+            return True
+    else:
+        return False
 
 
 def set_local_roles(resource, new_local_roles: dict, registry: Registry):
@@ -71,9 +84,13 @@ def set_local_roles(resource, new_local_roles: dict, registry: Registry):
     If the resource's `local roles` and the ``new_local_roles`` differ,
     set the ``new_local_roles`` via setattr and send a
     :class:`adhocracy_core.interfaces.ILocalRolesModified` to notify others.
+    The :term:`ACL` of the resource in updated with the permissions added by
+    the local roles.
     """
     _assert_values_have_set_type(new_local_roles)
     _set_local_roles(resource, new_local_roles, registry)
+    acl = get_acl(resource)
+    _set_acl_with_local_roles(resource, acl, registry)
 
 
 def _set_local_roles(resource, new_local_roles: dict, registry: Registry):
@@ -114,11 +131,10 @@ def get_local_roles(resource) -> dict:
 def get_local_roles_all(resource) -> dict:
     """Return the :term:`local roles <local role>` of the resource and its parents.
 
-    The `creator` role is not inherited by children.
+    The `creator` role is ignored.
     """
     local_roles_all = defaultdict(set)
-    local_roles_all.update(get_local_roles(resource))
-    for location in lineage(resource.__parent__):
+    for location in lineage(resource):
         local_roles = get_local_roles(location)
         for principal, roles in local_roles.items():
             roles_without_creator = filter(lambda x: x != CREATOR_ROLEID,
@@ -136,7 +152,7 @@ def acm_to_acl(acm: dict) -> [str]:
     Permissions for principals with high priority are listed first and override
     succeding permissions. The order is determined by
     :py:data:`adhocracy_core.schema.ROLE_PRINCIPALS`. Pricipals with higher
-    index in this list have higer priority.
+    index in this list have higher priority.
     """
     acl = _migrate_acm_to_acl(acm)
     _sort_by_principal_priority(acl)
@@ -219,25 +235,13 @@ def create_fake_god_request(registry):
     return request
 
 
-def get_principals_with_local_roles(context: IResource,
-                                    principals: list) -> list:
-    """Get a copy of pricipals list with added local roles."""
-    local_roles = get_local_roles_all(context)
-    anonymized_creator = get_anonymized_creator(context)
-    if anonymized_creator:
-        local_roles[anonymized_creator] = {'role:creator'}
-    principals_with_roles = set(principals)
-    for principal, roles in local_roles.items():
-        if principal in principals:
-            principals_with_roles.update(roles)
-    return list(principals_with_roles)
 def get_acl(resource) -> []:
-    """Return the term:`ACL` of the `resource`."""
+    """Return the :term:`ACL` of the `resource`."""
     return _get_acl(resource, default=[])
 
 
 def get_acl_all(resource) -> []:
-    """Return term:`ACL` of the `resource` inclusive inherited acl."""
+    """Return :term:`ACL` of the `resource` inclusive inherited acl."""
     acl_all = []
     for location in lineage(resource):
         acl = _get_acl(location, default=[])
@@ -247,8 +251,39 @@ def get_acl_all(resource) -> []:
 
 
 def set_acl(resource, acl: list, registry: Registry):
-    """Add term:`local_roles` and set the term:`ACL` of the `resource`."""
+    """Add :term:`local_roles` and set the term:`ACL` of the `resource`.
 
+    Every :term:`ACE` in the `acl` has to be a list of 3 strings.
+    Permission given by :term:`local_role` are added to the existing acl.
+    """
+    _assert_list_of_list_of_strings(acl)
+    _set_acl_with_local_roles(resource, acl, registry)
+
+
+def _assert_list_of_list_of_strings(acl: list):
+    for action, principal, permission in acl:
+        assert isinstance(action, str)
+        assert isinstance(principal, str)
+        assert isinstance(permission, str)
+
+
+def _set_acl_with_local_roles(resource, acl: [], registry: Registry) -> []:
+    """Add :term:`local_role` permissions to the :term:`ACL`.
+
+    The creator local role is ignored, it must not be inherited
+    """
+    roles_all = get_local_roles_all(resource)
+    acl_all = acl + get_acl_all(resource)
+    acl_roles = set()
+    for principal, local_roles in roles_all.items():
+        for ace_action, ace_principal, ace_permission in acl_all:
+            if ace_principal == CREATOR_ROLEID:
+                continue
+            if ace_principal in local_roles:
+                local_role_ace = (ace_action, principal, ace_permission)
+                if local_role_ace not in acl_all:
+                    acl_roles.add(local_role_ace)
+    acl = list(acl_roles) + acl
     _set_acl(resource, acl, registry=registry)
 
 
