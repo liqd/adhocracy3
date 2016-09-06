@@ -169,6 +169,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
 
     // register debate workbench
     app.config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
+        adhProcessProvider.names[RICollaborativeTextProcess.content_type] = "TR__PROCESS_COLLABORATIVE_TEXT_EDITING";
         adhProcessProvider.templates[RICollaborativeTextProcess.content_type] =
             "<adh-debate-workbench></adh-debate-workbench>";
     }]);
