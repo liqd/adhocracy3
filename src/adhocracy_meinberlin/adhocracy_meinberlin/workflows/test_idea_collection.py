@@ -42,8 +42,8 @@ class TestIdeaCollection:
                                 'participate')
         assert resp.status_code == 200
 
-    def test_participate_initiator_creates_document(self,
-                                                    process_url,
-                                                    app_initiator):
-        resp = _post_document_item(app_initiator, path=process_url)
+    def test_participate_participant_creates_document(self,
+                                                      process_url,
+                                                      app_participant):
+        resp = _post_document_item(app_participant, path=process_url)
         assert resp.status_code == 200
