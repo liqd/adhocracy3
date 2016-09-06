@@ -7,6 +7,7 @@ import * as AdhUtil from "../Util/Util";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
 import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
+import * as SILocationReference from "../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
 import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
 import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIWorkflow from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
@@ -176,6 +177,11 @@ export var listItemDirective = (
                 }
                 scope.title = process.data[SITitle.nick].title;
                 scope.processName = adhProcess.getName(process.content_type);
+                if (process.data[SILocationReference.nick] && process.data[SILocationReference.nick].location) {
+                    adhHttp.get(process.data[SILocationReference.nick].location).then((loc) => {
+                        scope.locationText = loc.data[SITitle.nick].title;
+                    });
+                }
                 var workflow = process.data[SIWorkflow.nick];
                 scope.participationStartDate = getStateData(workflow, "participate").start_date;
                 scope.participationEndDate = getStateData(workflow, "evaluate").start_date;
