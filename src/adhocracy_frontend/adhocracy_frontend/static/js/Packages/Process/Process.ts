@@ -6,6 +6,7 @@ import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhUtil from "../Util/Util";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
+import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
 import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIWorkflow from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
@@ -163,6 +164,9 @@ export var listItemDirective = (
         },
         link: (scope) => {
             adhHttp.get(scope.path).then((process) => {
+                if (process.data[SIImageReference.nick] && process.data[SIImageReference.nick].picture) {
+                    scope.picture = process.data[SIImageReference.nick].picture;
+                }
                 scope.title = process.data[SITitle.nick].title;
             });
         }
