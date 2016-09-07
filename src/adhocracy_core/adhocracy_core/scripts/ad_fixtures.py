@@ -1,4 +1,5 @@
 """Script to import fixtures to initialize the database."""
+import transaction
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 import logging
@@ -63,6 +64,7 @@ def main():  # pragma: no cover
                     all=args.import_all,
                     custom=args.import_custom,
                     )
+    transaction.commit()
     env['closer']()
 
 
