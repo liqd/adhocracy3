@@ -1,0 +1,8 @@
+[
+  {"path": "/demo",
+    "roles": {"demo_moderators": ["role:moderator"]}
+  },
+  {"path": "/demo",
+    "roles": {"demo_initiators": ["role:initiators"]}
+  }
+]

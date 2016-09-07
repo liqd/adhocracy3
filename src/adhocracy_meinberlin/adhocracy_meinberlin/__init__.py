@@ -2,6 +2,7 @@
 from pyramid.config import Configurator
 
 from adhocracy_core import root_factory
+from adhocracy_core.interfaces import IFixtureAsset
 
 
 def includeme(config):
@@ -18,6 +19,9 @@ def includeme(config):
     config.include('adhocracy_meinberlin.evolution')
     config.add_translation_dirs('adhocracy_core:locale/',
                                 'adhocracy_meinberlin:locale/')
+    config.registry.registerUtility('', IFixtureAsset,
+                                    name='adhocracy_meinberlin:'
+                                         'demo_processes_fixture')
 
 
 def main(global_config, **settings):
