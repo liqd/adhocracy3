@@ -189,6 +189,14 @@ def remove_workflow_state_data_end_date(root, registry):
                                  'start_date': end_date}]})
 
 
+@log_migration
+def update_workflow_state_acl_for_all_resources(root,
+                                                registry):  # pragma: no cover
+    """Update the local :term:`acl` with the current workflow state acl."""
+    from adhocracy_core.workflows import update_workflow_state_acls
+    update_workflow_state_acls(root, registry)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(use_adhocracy_core_title_sheet)
@@ -200,3 +208,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(use_workflow_state_for_participation_time_range)
     config.add_evolution_step(add_image_reference_to_blplan)
     config.add_evolution_step(remove_workflow_state_data_end_date)
+    config.add_evolution_step(update_workflow_state_acl_for_all_resources)
