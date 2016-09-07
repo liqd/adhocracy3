@@ -1,0 +1,181 @@
+[
+  {"path": "/",
+    "creator": "admin",
+    "content_type": "adhocracy_core.resources.organisation.IOrganisation",
+    "data": {"adhocracy_core.sheets.name.IName": {"name": "demo"}
+    }
+  },
+  {
+    "path": "/demo",
+    "creator": "admin",
+    "content_type": "adhocracy_meinberlin.resources.bplan.IProcess",
+    "data": {
+      "adhocracy_core.sheets.name.IName":
+      {"name": "bplan"},
+      "adhocracy_core.sheets.title.ITitle":
+      {"title": "Bplan Test"},
+      "adhocracy_meinberlin.sheets.bplan.IProcessSettings":
+      {"plan_number": "1",
+        "participation_kind": "öffentliche Auslegung"},
+      "adhocracy_meinberlin.sheets.bplan.IProcessPrivateSettings":
+      {"office_worker_email": "moderator@bplan.de"},
+      "adhocracy_core.sheets.description.IDescription":
+      {"description": "Beschreibung",
+        "short_description":"Teaser-Text"},
+      "adhocracy_core.sheets.image.IImageReference":
+      {"picture_description": "copyright caption",
+        "external_picture_url": "https://liqd.net/media/images/platform.2e16d0ba.fill-150x150.png" },
+      "adhocracy_core.sheets.workflow.IWorkflowAssignment":
+      { "state_data": [{"name": "participate", "description": "",
+          "start_date": "2016-03-01T12:00:09"},
+          {"name": "closed", "description": "",
+            "start_date": "2018-03-01T12:00:09"}]},
+      "adhocracy_core.sheets.embed.IEmbed":
+      {"external_url": "http://embedding-url.com"}
+    }
+  },
+  {
+    "path": "/demo",
+    "creator": "admin",
+    "content_type": "adhocracy_meinberlin.resources.collaborative_text.IProcess",
+    "data": {
+      "adhocracy_core.sheets.name.IName":
+      {"name": "collaborative_text"},
+      "adhocracy_core.sheets.title.ITitle":
+      {"title": "Collaborative Textarbeit Test"},
+      "adhocracy_core.sheets.description.IDescription":
+      {"description": "Beschreibung",
+        "short_description":"Teaser-Text"},
+      "adhocracy_core.sheets.image.IImageReference":
+      {"picture_description": "copyright caption",
+        "external_picture_url": "https://liqd.net/media/images/platform.2e16d0ba.fill-150x150.png" },
+      "adhocracy_core.sheets.workflow.IWorkflowAssignment":
+      { "state_data": [{"name": "participate", "description": "",
+          "start_date": "2016-03-01T12:00:09"},
+          {"name": "closed", "description": "",
+            "start_date": "2018-03-01T12:00:09"}]},
+      "adhocracy_core.sheets.embed.IEmbed":
+      {"external_url": "http://embedding-url.com"}
+    }
+  },
+  {
+    "path": "/demo",
+    "creator": "admin",
+    "content_type": "adhocracy_meinberlin.resources.idea_collection.IProcess",
+    "data": {
+      "adhocracy_core.sheets.name.IName":
+      {"name": "idea_collection"},
+      "adhocracy_core.sheets.title.ITitle":
+      {"title": "Ideen-Sammlung Test"},
+      "adhocracy_core.sheets.description.IDescription":
+      {"description": "Beschreibung",
+        "short_description":"Teaser-Text"},
+      "adhocracy_core.sheets.image.IImageReference":
+      {"picture_description": "copyright caption",
+        "external_picture_url": "https://liqd.net/media/images/platform.2e16d0ba.fill-150x150.png" },
+      "adhocracy_core.sheets.workflow.IWorkflowAssignment":
+      { "state_data": [{"name": "participate", "description": "",
+          "start_date": "2016-03-01T12:00:09"},
+          {"name": "closed", "description": "",
+            "start_date": "2018-03-01T12:00:09"}]},
+      "adhocracy_core.sheets.embed.IEmbed":
+      {"external_url": "http://embedding-url.com"}
+    }
+  },
+  {
+    "path": "/demo",
+    "creator": "admin",
+    "content_type": "adhocracy_meinberlin.resources.kiezkassen.IProcess",
+    "data": {
+      "adhocracy_core.sheets.name.IName":
+      {"name": "kiezkasse"},
+      "adhocracy_core.sheets.title.ITitle":
+      {"title": "Kiezkasse Test"},
+      "adhocracy_core.sheets.description.IDescription":
+      {"description": "Beschreibung",
+        "short_description":"Teaser-Text"},
+      "adhocracy_core.sheets.image.IImageReference":
+      {"picture_description": "copyright caption",
+        "external_picture_url": "https://liqd.net/media/images/platform.2e16d0ba.fill-150x150.png" },
+      "adhocracy_core.sheets.workflow.IWorkflowAssignment":
+      { "state_data": [{"name": "participate", "description": "",
+          "start_date": "2016-03-01T12:00:09"},
+          {"name": "closed", "description": "",
+            "start_date": "2018-03-01T12:00:09"}]},
+      "adhocracy_core.sheets.embed.IEmbed":
+      {"external_url": "http://embedding-url.com"}
+    }
+  },
+  {
+    "path": "/demo",
+    "creator": "admin",
+    "content_type": "adhocracy_meinberlin.resources.stadtforum.IProcess",
+    "data": {
+      "adhocracy_core.sheets.name.IName":
+      {"name": "stadtforum"},
+      "adhocracy_core.sheets.title.ITitle":
+      {"title": "Stadtforum Test"},
+      "adhocracy_core.sheets.description.IDescription":
+      {"description": "Beschreibung",
+        "short_description":"Teaser-Text"},
+      "adhocracy_core.sheets.image.IImageReference":
+      {"picture_description": "copyright caption",
+        "external_picture_url": "https://liqd.net/media/images/platform.2e16d0ba.fill-150x150.png" },
+      "adhocracy_core.sheets.workflow.IWorkflowAssignment":
+      { "state_data": [{"name": "participate", "description": "",
+          "start_date": "2016-03-01T12:00:09"},
+          {"name": "closed", "description": "",
+            "start_date": "2018-03-01T12:00:09"}]},
+      "adhocracy_core.sheets.embed.IEmbed":
+      {"external_url": "http://embedding-url.com"}
+    }
+  },
+  {
+    "path": "/demo",
+    "creator": "admin",
+    "content_type": "adhocracy_meinberlin.resources.burgerhaushalt.IProcess",
+    "data": {
+      "adhocracy_core.sheets.name.IName":
+      {"name": "buergerhaushalt"},
+      "adhocracy_core.sheets.title.ITitle":
+      {"title": "Buergerhaushalt Test"},
+      "adhocracy_core.sheets.description.IDescription":
+      {"description": "Beschreibung",
+        "short_description":"Teaser-Text"},
+      "adhocracy_core.sheets.image.IImageReference":
+      {"picture_description": "copyright caption",
+        "external_picture_url": "https://liqd.net/media/images/platform.2e16d0ba.fill-150x150.png" },
+      "adhocracy_core.sheets.workflow.IWorkflowAssignment":
+      { "state_data": [{"name": "participate", "description": "",
+          "start_date": "2016-03-01T12:00:09"},
+          {"name": "closed", "description": "",
+            "start_date": "2018-03-01T12:00:09"}]},
+      "adhocracy_core.sheets.embed.IEmbed":
+      {"external_url": "http://embedding-url.com"}
+    }
+  },
+    {
+    "path": "/demo",
+    "creator": "admin",
+    "content_type": "adhocracy_meinberlin.resources.alexanderplatz.IProcess",
+    "data": {
+      "adhocracy_core.sheets.name.IName":
+      {"name": "alexanderplatz"},
+      "adhocracy_core.sheets.title.ITitle":
+      {"title": "Alexanderplatz Test"},
+      "adhocracy_core.sheets.description.IDescription":
+      {"description": "Beschreibung",
+        "short_description":"Teaser-Text"},
+      "adhocracy_core.sheets.image.IImageReference":
+      {"picture_description": "copyright caption",
+        "external_picture_url": "https://liqd.net/media/images/platform.2e16d0ba.fill-150x150.png" },
+      "adhocracy_core.sheets.workflow.IWorkflowAssignment":
+      { "state_data": [{"name": "participate", "description": "",
+          "start_date": "2016-03-01T12:00:09"},
+          {"name": "closed", "description": "",
+            "start_date": "2018-03-01T12:00:09"}]},
+      "adhocracy_core.sheets.embed.IEmbed":
+      {"external_url": "http://embedding-url.com"}
+    }
+  }
+]
