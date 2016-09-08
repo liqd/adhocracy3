@@ -405,11 +405,12 @@ class IProcess(process.IProcess):
 
 
 process_meta = process.process_meta._replace(
+    content_name='Merator2015Process',
     iresource=IProcess,
     element_types=(IMercatorProposal,
                    ),
     is_implicit_addable=True,
-    workflow_name = 'mercator'
+    default_workflow = 'mercator'
 )
 
 

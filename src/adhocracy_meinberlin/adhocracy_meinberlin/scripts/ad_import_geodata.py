@@ -62,7 +62,8 @@ def main():
                     'part_of': None,
                     'type': 'MultiPolygon'}
 
-        appstructs = {IName.__identifier__: {'name': _slugify(bezirk)},
+        appstructs = {IName.__identifier__:
+                      {'name': 'stadtbezirk-' + _slugify(bezirk)},
                       IMultiPolygon.__identifier__: geosheet,
                       ITitle.__identifier__: {'title': bezirk}
                       }
@@ -113,7 +114,7 @@ def import_bezirksregions():
 
         appstructs = {
             IName.__identifier__: {
-                'name': _slugify(bezirks_region_name)},
+                'name': 'bezirksregion-' + _slugify(bezirks_region_name)},
             IMultiPolygon.__identifier__: geosheet,
             ITitle.__identifier__: {
                 'title': bezirks_region_name}}

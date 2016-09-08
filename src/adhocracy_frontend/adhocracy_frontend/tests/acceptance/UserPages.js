@@ -3,7 +3,7 @@
 var shared = require("./shared.js");
 
 var participantName = "participant";
-var participantEmail = "participant@example.org";
+var participantEmail = "participant@example.com";
 var participantPassword = "password";
 
 var otherParticipantName = "participant2";
@@ -141,7 +141,8 @@ var UserPage = function() {
     };
 
     this.sendMessage = function(subject, content) {
-        element(by.css(".user-profile-info-button")).click();
+        element(by.css(".dropdown")).click();
+        element(by.css(".icon-mail")).click();
         element(by.css("input.user-message-subject")).sendKeys(subject);
         element(by.css("textarea.user-message-text")).sendKeys(content);
         element(by.css("input.button-cta")).click();

@@ -1,4 +1,5 @@
 /// <reference path="../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../lib2/types/leaflet.d.ts"/>
 
 /* tslint:disable:variable-name */
 
@@ -24,6 +25,7 @@ export interface IService {
     support_url? : string;
     captcha_enabled : boolean;
     captcha_url : string;
+    anonymize_enabled : boolean;
     // the place for instance specific customizations
     // remember to parse (e.g. booleans) where they are used
     custom : {[key : string]: string};
@@ -41,4 +43,6 @@ export interface IService {
     piwik_site_id : string;
     piwik_use_cookies : boolean;
     piwik_track_user_id : boolean;
+    map_tile_url : string;
+    map_tile_options : L.TileLayerOptions;
 }

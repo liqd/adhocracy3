@@ -13,23 +13,32 @@ for project in $projects; do
 
     mkdir -p $builddir
     find $builddir -type l -exec rm {} +
+    ln -s "$(pwd)/src/current/current/build/lib" "$builddir/."
 
     # merge static directories
     for dir in `printf "src/$project/$project/static\nsrc/adhocracy_frontend/adhocracy_frontend/static" | uniq`; do
         cp -ans `readlink -f $dir`/. $builddir
     done
 
-    # create compass config
-    cat <<EOF > etc/compass_${project}.rb
-http_path = "/"
-css_dir = "$builddir/stylesheets"
-sass_dir = "$builddir/stylesheets/scss"
-fonts_dir = "$builddir/fonts"
-http_fonts_path = "../fonts"
-images_dir = "$builddir/images"
-javascripts_dir = "$builddir/js"
-sourcemap = true
-add_import_path "$builddir/stylesheets/scss"
+    # create sass config
+    cat <<EOF > Gruntfile_${project}.js
+module.exports = function(grunt) {
+    grunt.initConfig({
+        sass: {
+            options: {
+                sourceMap: true,
+                outputStyle: "compressed"
+            },
+            dist: {
+                files: {
+                    "$builddir/stylesheets/a3.css": "$builddir/stylesheets/scss/a3.scss",
+                }
+            }
+        }
+    });
+
+    grunt.loadNpmTasks('grunt-sass');
+};
 EOF
 
     # create hologram config
@@ -37,11 +46,11 @@ EOF
 source: `realpath $builddir`/stylesheets/scss
 destination: `realpath $builddir`/styleguide
 documentation_assets: ../docs/styleguide_assets
-index: type
+index: base
 EOF
 
     # run hologram
-    bin/compass compile -c etc/compass_${project}.rb
+    bin/grunt --gruntfile "Gruntfile_${project}.js" sass
     bin/hologram etc/hologram_${project}.yml
 
     # clean up

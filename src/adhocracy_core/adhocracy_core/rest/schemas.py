@@ -234,7 +234,7 @@ def _add_colander_invalid_error(error: Invalid, request: IRequest,
 def validate_visibility(view: callable):
     """Decorator for :term:`view` to check if `context` is visible.
 
-    :raises HTTPGone: if `context` is deleted or hidden and request method
+    :raises HTTPGone: if `context` is hidden and request method
                       is GET, HEAD, or POST.
     """
     def wrapped_view(context: IResource, request: IRequest):
@@ -466,8 +466,9 @@ def create_validate_activation_path(context,
             # TODO we should use a sheet to activate the user.
             user.activate()
             user.activation_path = None
+            autoupdated = False
             event = ResourceSheetModified(user, IUserBasic, request.registry, {},
-                                          {}, request)
+                                          {}, request, autoupdated)
             registry.notify(event)  # trigger reindex activation_path index
     return validate_activation_path
 
@@ -1200,16 +1201,22 @@ options_resource_response_data_dict =\
              'request_querystring': {},
              'response_body': {'content_type': '',
                                'data': {},
-                               'path': ''}},
+                               'path': ''},
+             'request_headers': {},
+             },
      'HEAD': {},
      'OPTIONS': {},
      'POST': {'request_body': [],
               'response_body': {'content_type': '',
-                                'path': ''}},
+                                'path': ''},
+              'request_headers': {},
+              },
      'PUT': {'request_body': {'content_type': '',
                               'data': {}},
              'response_body': {'content_type': '',
-                               'path': ''}},
+                               'path': ''},
+             'request_headers': {},
+             },
      'DELETE': {},
      }
 

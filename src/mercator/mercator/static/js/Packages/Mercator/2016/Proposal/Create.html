@@ -1,17 +1,17 @@
-<div class="mercator-proposal-form-container">
-    <nav class="mercator-proposal-form-nav" data-adh-sticky="">
+<div class="jump-navigation-wrapper m-bg">
+    <nav class="jump-navigation" data-adh-sticky="">
         <ol>
-            <li data-du-scrollspy="mercator-proposal-about-you"><a href="#mercator-proposal-about-you" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_ABOUT_YOU" | translate }}</a></li>
-            <li data-du-scrollspy="mercator-proposal-brief"><a href="#mercator-proposal-brief" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_BRIEF" | translate }}</a></li>
-            <li data-du-scrollspy="mercator-proposal-impact" data-offset="50"><a href="#mercator-proposal-impact" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_IMPACT" | translate }}</a></li>
-            <li data-du-scrollspy="mercator-proposal-criteria" data-offset="50"><a href="#mercator-proposal-criteria" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_CRITERIA" | translate }}</a></li>
-            <li data-du-scrollspy="mercator-proposal-finance" data-offset="50"><a href="#mercator-proposal-finance" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_FINANCE_2016" | translate }}</a></li>
-            <li data-du-scrollspy="mercator-proposal-community" data-offset="50"><a href="#mercator-proposal-community" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_COMMUNITY" | translate }}</a></li>
+            <li><a data-du-scrollspy="" href="#mercator-proposal-about-you" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_ABOUT_YOU" | translate }}</a></li>
+            <li><a data-du-scrollspy="" href="#mercator-proposal-brief" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_BRIEF" | translate }}</a></li>
+            <li><a data-du-scrollspy="" data-offset="50" href="#mercator-proposal-impact" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_IMPACT" | translate }}</a></li>
+            <li><a data-du-scrollspy="" data-offset="50" href="#mercator-proposal-criteria" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_CRITERIA" | translate }}</a></li>
+            <li><a data-du-scrollspy="" data-offset="50" href="#mercator-proposal-finance" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_FINANCE_2016" | translate }}</a></li>
+            <li><a data-du-scrollspy="" data-offset="50" href="#mercator-proposal-community" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_COMMUNITY" | translate }}</a></li>
         </ol>
     </nav>
     <form
             novalidate="novalidate"
-            class="mercator-proposal-form"
+            class="mercator-proposal-form jump-navigation-main"
             name="mercatorProposalForm"
             data-ng-submit="submitIfValid()"
             data-du-spy-context=""
@@ -1350,14 +1350,17 @@
         </section>
 
         <footer class="form-footer mercator-proposal-form-footer">
-            <input
-                type="submit"
-                name="submit"
-                value="{{ 'TR__PUBLISH' | translate }}"
-                class="button-cta form-footer-button-cta" />
-
-            <a href="" data-ng-click="cancel()" class="button form-footer-button">
-            {{ "TR__CANCEL" | translate }}</a>
+            <div class="form-footer-right">
+                <input
+                    type="submit"
+                    name="submit"
+                    value="{{ 'TR__PUBLISH' | translate }}"
+                    class="button-cta" />
+            </div>
+            <div class="form-footer-left">
+                <a href="" data-ng-click="cancel()" class="button">
+                {{ "TR__CANCEL" | translate }}</a>
+            </div>
         </footer>
     </form>
 </div><!-- /.mercator-proposal-form-container -->

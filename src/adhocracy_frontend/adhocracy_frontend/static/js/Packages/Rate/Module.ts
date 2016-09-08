@@ -6,6 +6,7 @@ import * as AdhPermissionsModule from "../Permissions/Module";
 import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
 import * as AdhResourceAreaModule from "../ResourceArea/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
+import * as AdhUserModule from "../User/Module";
 import * as AdhWebSocketModule from "../WebSocket/Module";
 
 import * as AdhRate from "./Rate";
@@ -27,6 +28,7 @@ export var register = (angular) => {
             AdhPreliminaryNamesModule.moduleName,
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName,
+            AdhUserModule.moduleName,
             AdhWebSocketModule.moduleName
         ])
         .service("adhRateEventManager", ["adhEventManagerClass", (cls) => new cls()])
@@ -43,6 +45,7 @@ export var register = (angular) => {
             "adhPreliminaryNames",
             "adhTopLevelState",
             "adhResourceArea",
+            "adhUser",
             "adhDone",
             AdhRate.directiveFactory("/Rate.html", SIRateable.nick)])
         .directive("adhLike", [
@@ -57,6 +60,7 @@ export var register = (angular) => {
             "adhPreliminaryNames",
             "adhTopLevelState",
             "adhResourceArea",
+            "adhUser",
             "adhDone",
             AdhRate.directiveFactory("/Like.html", SILikeable.nick)])
         .directive("adhOpinion", [
@@ -71,6 +75,7 @@ export var register = (angular) => {
             "adhPreliminaryNames",
             "adhTopLevelState",
             "adhResourceArea",
+            "adhUser",
             "adhDone",
             AdhRate.directiveFactory("/Opinion.html", SIRateable.nick)]);
 };

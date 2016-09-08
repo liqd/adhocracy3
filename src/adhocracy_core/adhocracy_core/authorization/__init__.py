@@ -1,4 +1,5 @@
 """Authorization with roles/local roles mapped to adhocracy principals."""
+from copy import copy
 from collections import defaultdict
 from pyramid.security import ALL_PERMISSIONS
 from pyramid.security import Allow
@@ -17,6 +18,7 @@ from substanced.util import set_acl
 from substanced.stats import statsd_timer
 import transaction
 
+from adhocracy_core.authentication import get_anonymized_creator
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IRoleACLAuthorizationPolicy
 from adhocracy_core.events import LocalRolesModified
@@ -58,12 +60,10 @@ class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
                 permission: str) -> ACLPermitsResult:
         """Check `permission` for `context`. Read interface docstring."""
         with statsd_timer('authorization', rate=.1):
-            local_roles = get_local_roles_all(context)
-            principals_with_roles = set(principals)
-            for principal, roles in local_roles.items():
-                if principal in principals:
-                    principals_with_roles.update(roles)
-            return super().permits(context, principals_with_roles, permission)
+            principals_with_roles = get_principals_with_local_roles(context,
+                                                                    principals)
+            allow = super().permits(context, principals_with_roles, permission)
+            return allow
 
 
 def set_local_roles(resource, new_local_roles: dict, registry: Registry=None):
@@ -91,6 +91,19 @@ def set_local_roles(resource, new_local_roles: dict, registry: Registry=None):
     registry.notify(event)
 
 
+def add_local_roles(resource, additional_local_roles: dict,
+                    registry: Registry=None):
+    """Add roles to existing :term:`local role's mapping."""
+    _assert_values_have_set_type(additional_local_roles)
+    old_local_roles = getattr(resource, '__local_roles__', {})
+    local_roles = copy(old_local_roles)
+    for principal, roles in additional_local_roles.items():
+        old_roles = old_local_roles.get(principal, set())
+        roles.update(old_roles)
+        local_roles[principal] = roles
+    set_local_roles(resource, local_roles, registry=registry)
+
+
 def _assert_values_have_set_type(mapping: dict):
     for value in mapping.values():
         assert isinstance(value, set)
@@ -98,7 +111,9 @@ def _assert_values_have_set_type(mapping: dict):
 
 def get_local_roles(resource) -> dict:
     """Return the :term:`local roles <local role>` of the resource."""
-    return getattr(resource, '__local_roles__', {})
+    local_roles = getattr(resource, '__local_roles__', {})
+
+    return local_roles
 
 
 def get_local_roles_all(resource) -> dict:
@@ -150,7 +165,8 @@ def _migrate_acm_to_acl(acm: dict) -> dict:
 def _sort_by_principal_priority(acl: list) -> list:
     roles = ROLE_PRINCIPALS.copy()
     roles.reverse()
-    systems = SYSTEM_PRINCIPALS
+    systems = SYSTEM_PRINCIPALS.copy()
+    systems.reverse()
     schema = ACEPrincipal()
     principals = [schema.deserialize(x) for x in roles + systems]
     acl.sort(key=lambda x: principals.index(x[1]))
@@ -206,6 +222,20 @@ def create_fake_god_request(registry):
     request.registry = registry
     request.__cached_principals__ = ['role:god']
     return request
+
+
+def get_principals_with_local_roles(context: IResource,
+                                    principals: list) -> list:
+    """Get a copy of pricipals list with added local roles."""
+    local_roles = get_local_roles_all(context)
+    anonymized_creator = get_anonymized_creator(context)
+    if anonymized_creator:
+        local_roles[anonymized_creator] = {'role:creator'}
+    principals_with_roles = set(principals)
+    for principal, roles in local_roles.items():
+        if principal in principals:
+            principals_with_roles.update(roles)
+    return list(principals_with_roles)
 
 
 def includeme(config):

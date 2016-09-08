@@ -452,7 +452,7 @@ export var defaultHeaderDirective = (
         scope: {},
         link: (scope) => {
             scope.hideHeader = adhConfig.custom["hide_header"];
-            scope.$on("$destroy", adhTopLevelState.bind("customHeader", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("areaHeaderSlot", scope));
         }
     };
 };
@@ -486,5 +486,21 @@ export var routingErrorDirective = (adhConfig  : AdhConfig.IService) => {
             $scope.$on("$destroy", adhTopLevelState.bind("code", $scope));
             $scope.$on("$destroy", adhTopLevelState.bind("message", $scope));
         }]
+    };
+};
+
+
+export var goToCameFromDirective = (adhTopLevelState : Service) => {
+    return {
+        restrict: "E",
+        template: "<a href=\"\" data-ng-click=\"cancel()\">{{\"TR__CANCEL\" | translate}}</a>",
+        scope: {
+            default: "="
+        },
+        link: (scope) => {
+            scope.cancel = () => {
+                adhTopLevelState.goToCameFrom(scope.default);
+            };
+        }
     };
 };

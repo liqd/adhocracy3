@@ -43,36 +43,13 @@
 }
 
 .moving-column-tab {
-    @include inline-block;
     @include rem(font-size, $font-size-small);
     @include rem(margin, 0 30px 0 5px);
+    display: inline-block;
     background: $color-background-base-introvert;
     color: $color-text-introvert;
     float: left;
     vertical-align: baseline;
-}
-
-.moving-column-menu-switch {
-    @include rem(margin-right, 5px);
-    float: right;
-
-    .moving-column-menu-switch-item {
-        @include rem(padding, 0 8px);
-        background: $color-structure-normal;
-        border-right: 1px solid $color-background-base;
-        color: $color-text-introvert;
-        display: block;
-        float: left;
-
-        &:last-child {
-            border: 0;
-        }
-
-        &:hover, &:active, &.is-active {
-            background: $color-brand-two-normal;
-            color: $color-text-inverted;
-        }
-    }
 }
 
 .moving-column-menu-nav {

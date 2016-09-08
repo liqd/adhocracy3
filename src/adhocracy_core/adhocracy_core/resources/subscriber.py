@@ -9,7 +9,6 @@ import requests
 from pyramid.interfaces import IApplicationCreated
 from pyramid.registry import Registry
 from pyramid.request import Request
-from pyramid.settings import asbool
 from pyramid.traversal import find_interface
 from pyramid.i18n import TranslationStringFactory
 from substanced.util import find_service
@@ -26,13 +25,9 @@ from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import ISheetReferenceNewVersion
-from adhocracy_core.interfaces import ISheetBackReferenceAdded
-from adhocracy_core.interfaces import ISheetBackReferenceRemoved
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import IResourceSheetModified
-from adhocracy_core.interfaces import VisibilityChange
-from adhocracy_core.interfaces import search_query
-from adhocracy_core.interfaces import ReferenceComparator
+from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
 from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IPasswordReset
@@ -40,8 +35,6 @@ from adhocracy_core.resources.asset import add_metadata
 from adhocracy_core.resources.asset import IAsset
 from adhocracy_core.resources.image import add_image_size_downloads
 from adhocracy_core.resources.image import IImage
-from adhocracy_core.resources.comment import IComment
-from adhocracy_core.resources.comment import ICommentVersion
 from adhocracy_core.sheets.principal import IPermissions
 from adhocracy_core.sheets.tags import ITags
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
@@ -49,13 +42,11 @@ from adhocracy_core.utils import find_graph
 from adhocracy_core.utils import get_changelog_metadata
 from adhocracy_core.utils import get_iresource
 from adhocracy_core.utils import get_modification_date
-from adhocracy_core.utils import get_visibility_change
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.asset import IAssetData
-from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.sheets.image import IImageReference
-from adhocracy_core import sheets
+from adhocracy_core.sheets.principal import IActivationConfiguration
 
 logger = getLogger(__name__)
 
@@ -89,7 +80,7 @@ def add_default_group_to_user(event):
 
 def _get_default_group(context) -> IGroup:
     groups = find_service(context, 'principals', 'groups')
-    default_group = groups.get('authenticated', None)
+    default_group = groups.get(DEFAULT_USER_GROUP_NAME, None)
     return default_group
 
 
@@ -204,14 +195,6 @@ def _get_last_version(resource: IItemVersion,
     return last
 
 
-def _get_first_version(resource: IItemVersion,
-                       registry: Registry) -> IItemVersion:
-    """Get first version of  resource' according to the last tag."""
-    item = find_interface(resource, IItem)
-    first = registry.content.get_sheet_field(item, ITags, 'FIRST')
-    return first
-
-
 def _create_new_version(event, appstruct) -> IResource:
     appstructs = _get_writable_appstructs(event.object, event.registry)
     appstructs[IVersionable.__identifier__]['follows'] = [event.object]
@@ -225,6 +208,7 @@ def _create_new_version(event, appstruct) -> IResource:
                                           registry=event.registry,
                                           root_versions=event.root_versions,
                                           is_batchmode=event.is_batchmode,
+                                          autoupdated=True,
                                           )
     return new_version
 
@@ -248,7 +232,7 @@ def autoupdate_non_versionable_has_new_version(event):
     if not sheet.meta.editable:
         return
     appstruct = _get_updated_appstruct(event, sheet)
-    sheet.set(appstruct)
+    sheet.set(appstruct, autoupdated=True)
 
 
 def send_password_reset_mail(event):
@@ -260,21 +244,24 @@ def send_password_reset_mail(event):
     event.registry.messenger.send_password_reset_mail(user, password_reset)
 
 
-def send_activation_mail_or_activate_user(event):
-    """Send mail with activation link if a user is created.
-
-    If the setting "adhocracy.skip_registration_mail" is true, no mail is send
-    but the user is activated directly.
-    """
-    settings = event.registry.settings
+def apply_user_activation_configuration(event):
+    """Activate user or send activation or invite email."""
     user = event.object
-    skip_mail = asbool(settings.get('adhocracy.skip_registration_mail', False))
-    if skip_mail:
+    registry = event.registry
+    sheet = registry.content.get_sheet(user, IActivationConfiguration)
+    activation_config = sheet.get()['activation']
+    if activation_config == 'direct':
         user.activate()
-        return
+    elif activation_config == 'registration_mail':
+        _send_activation_mail(user, registry)
+    elif activation_config == 'invitation_mail':  # pragma: no branch
+        _send_invitation_mail(user, registry)
+
+
+def _send_activation_mail(user, registry):
     activation_path = _generate_activation_path()
     user.activation_path = activation_path
-    messenger = getattr(event.registry, 'messenger', None)
+    messenger = getattr(registry, 'messenger', None)
     if messenger is not None:  # ease testing
         messenger.send_registration_mail(user, activation_path)
 
@@ -290,6 +277,18 @@ def _generate_activation_path() -> str:
     return '/activate/' + b64encode(random_bytes, altchars=b'+_').decode()
 
 
+def _send_invitation_mail(user, registry):
+    resets = find_service(user, 'principals', 'resets')
+    reset = registry.content.create(IPasswordReset.__identifier__,
+                                    resets,
+                                    creator=user,
+                                    send_event=False,
+                                    )
+    messenger = getattr(registry, 'messenger', None)
+    if messenger is not None:  # ease testing
+        messenger.send_invitation_mail(user, reset)
+
+
 def update_asset_download(event):
     """Update asset download."""
     add_metadata(event.object, event.registry)
@@ -298,79 +297,6 @@ def update_asset_download(event):
 def update_image_downloads(event):
     """Update image downloads."""
     add_image_size_downloads(event.object, event.registry)
-
-
-def increase_comments_count(event):
-    """Increase comments_count for commentables in :term:`lineage`.
-
-    The incrementation occurs only on the first version.
-    """
-    comment_version = event.reference.source
-    first_version = _get_first_version(comment_version, event.registry)
-    if comment_version == first_version:
-        update_comments_count(comment_version, 1, event.registry)
-
-
-def decrease_comments_count(event):
-    """Decrease comments_count for commentables in :term:`lineage`.
-
-    The decrementation occurs only on the last version.
-    """
-    comment_version = event.reference.source
-    first_version = _get_first_version(comment_version, event.registry)
-    if comment_version == first_version:
-        update_comments_count(comment_version, -1, event.registry)
-
-
-def _get_comments_count(resource, registry):
-    commentable_sheet = registry.content.get_sheet(resource, ICommentable)
-    appstruct = commentable_sheet.get()
-    return appstruct.get('comments_count', 1)
-
-
-def update_comments_count_after_visibility_change(event):
-    """Update comments_count in lineage after visibility change."""
-    visibility = get_visibility_change(event)
-    first_version = _get_first_version(event.object, event.registry)
-    comments_count = _get_comments_count(first_version, event.registry)
-    if visibility == VisibilityChange.concealed:
-        delta = -(comments_count + 1)
-    elif visibility == VisibilityChange.revealed:
-        delta = comments_count + 1
-    else:
-        delta = 0
-    if delta != 0:
-        update_comments_count(first_version, delta, event.registry)
-
-
-def update_comments_count(resource: ICommentVersion,
-                          delta: int,
-                          registry: Registry):
-    """Update all commentable resources related to `resource`.
-
-    Traverse all commentable resources that have a IComment or ISubresource
-    reference to `resource` and update the comment_count value with `delta`.
-
-    Example reference structure that is traversed:
-
-    comment <-IComment- comment <-IComment- comment
-    """
-    catalogs = find_service(resource, 'catalogs')
-    traverse = ReferenceComparator.traverse.value
-    query = search_query._replace(
-        only_visible=True,
-        references=((traverse,
-                     (resource, sheets.comment.IComment, '', None)),
-                    ),
-        resolve=True,
-    )
-    commentables = catalogs.search(query).elements
-    for commentable in commentables:
-        commentable_sheet = registry.content.get_sheet(commentable,
-                                                       ICommentable)
-        old_count = commentable_sheet.get()['comments_count']
-        commentable_sheet.set({'comments_count': old_count + delta},
-                              omit_readonly=False)
 
 
 def download_external_picture_for_created(event: IResourceCreatedAndAdded):
@@ -463,7 +389,7 @@ def includeme(config):
     config.add_subscriber(add_default_group_to_user,
                           IResourceCreatedAndAdded,
                           object_iface=IUser)
-    config.add_subscriber(send_activation_mail_or_activate_user,
+    config.add_subscriber(apply_user_activation_configuration,
                           IResourceCreatedAndAdded,
                           object_iface=IUser)
     config.add_subscriber(update_modification_date_modified_by,
@@ -480,16 +406,6 @@ def includeme(config):
                           IResourceSheetModified,
                           object_iface=IImage,
                           event_isheet=IAssetData)
-    config.add_subscriber(increase_comments_count,
-                          ISheetBackReferenceAdded,
-                          event_isheet=ICommentable)
-    config.add_subscriber(decrease_comments_count,
-                          ISheetBackReferenceRemoved,
-                          event_isheet=ICommentable)
-    config.add_subscriber(update_comments_count_after_visibility_change,
-                          IResourceSheetModified,
-                          object_iface=IComment,
-                          event_isheet=IMetadata)
     config.add_subscriber(download_external_picture_for_created,
                           IResourceCreatedAndAdded,
                           object_iface=IImageReference)

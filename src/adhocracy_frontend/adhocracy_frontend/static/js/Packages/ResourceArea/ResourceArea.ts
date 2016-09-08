@@ -32,13 +32,13 @@ export class Provider implements angular.IServiceProvider {
         factory : (resource) => any;  // values return either Dict or angular.IPromise<Dict>
         type? : string;
     }};
-    public customHeaders : {[processType : string]: string};
+    public processHeaderSlots : {[processType : string]: string};
 
     constructor() {
         var self = this;
         this.defaults = {};
         this.specifics = {};
-        this.customHeaders = {};
+        this.processHeaderSlots = {};
         this.$get = [
             "$q",
             "$injector",
@@ -118,11 +118,6 @@ export class Provider implements angular.IServiceProvider {
             .specific(itemType, view, processType, embedContext, factory, "item")
             .specific(versionType, view, processType, embedContext, factory, "version");
     }
-
-    public customHeader(processType : string, templateUrl : string) : Provider {
-        this.customHeaders[processType] = templateUrl;
-        return this;
-    }
 }
 
 
@@ -189,7 +184,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         private $injector : angular.auto.IInjectorService,
         private $location : angular.ILocationService,
         private $templateRequest : angular.ITemplateRequestService,
-        private adhHttp : AdhHttp.Service<any>,
+        private adhHttp : AdhHttp.Service,
         private adhConfig : AdhConfig.IService,
         private adhCredentials : AdhCredentials.Service,
         private adhEmbed : AdhEmbed.Service,
@@ -344,11 +339,15 @@ export class Service implements AdhTopLevelState.IAreaInput {
                 return;
             }
 
+            if (!self.has(resource.content_type, view, processType)) {
+                throw 404;
+            }
+
             return self.getSpecifics(resource, view, processType, embedContext, process).then((specifics : Dict) => {
                 var defaults : Dict = self.getDefaults(resource.content_type, view, processType, embedContext);
 
                 var meta : Dict = {
-                    customHeader: self.provider.customHeaders[processType],
+                    areaHeaderSlot: self.provider.processHeaderSlots[processType],
                     embedContext: embedContext,
                     processType: processType,
                     processUrl: processUrl,

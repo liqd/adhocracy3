@@ -33,7 +33,7 @@ export class Transaction {
     private committed : boolean;
 
     constructor(
-        private adhHttp : AdhHttp.Service<any>,
+        private adhHttp : AdhHttp.Service,
         private adhCache : AdhCache.Service,
         private adhMetaApi : AdhMetaApi.Service,
         private adhPreliminaryNames : AdhPreliminaryNames.Service,

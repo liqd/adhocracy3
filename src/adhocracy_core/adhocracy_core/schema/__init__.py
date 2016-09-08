@@ -6,6 +6,7 @@ import decimal
 import io
 import os
 import re
+import string
 
 from colander import All
 from colander import Boolean as BooleanType
@@ -26,15 +27,22 @@ from colander import drop
 from colander import null
 from deform.widget import DateTimeInputWidget
 from deform.widget import SequenceWidget
+from deform.widget import Select2Widget
+from deform.widget import SelectWidget
+from deform.widget import PasswordWidget
 from deform_markdown import MarkdownTextAreaWidget
+from deform.widget import filedict
 from pyramid.path import DottedNameResolver
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
 from pyramid.traversal import lineage
 from pyramid import security
 from pyramid.traversal import find_interface
+from pyramid.interfaces import IRequest
+from substanced.file import file_upload_widget
 from substanced.file import File
 from substanced.file import USE_MAGIC
+from substanced.form import FileUploadTempStore
 from substanced.util import get_dotted_name
 from substanced.util import find_service
 from zope.interface.interfaces import IInterface
@@ -49,6 +57,7 @@ from adhocracy_core.utils import now
 from adhocracy_core.interfaces import SheetReference
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import search_query
 
 
 class SchemaNode(colander.SchemaNode):
@@ -568,6 +577,26 @@ def validate_reftype(node: SchemaNode, value: IResource):
         raise Invalid(node, msg=error, value=value)
 
 
+@deferred
+def deferred_select_widget(node, kw) -> Select2Widget:
+    """Return Select2Widget expects `node` to have `choices_getter` `multiple`.
+
+    `choices_getter` is a function attribute accepting `node` and
+    `request` and returning a list with selectable option tuples.
+
+    `multiple` is a boolean attribute enabling multiselect.
+    """
+    choices = []
+    if hasattr(node, 'choices_getter'):
+        context = kw['context']
+        request = kw['request']
+        choices = node.choices_getter(context, request)
+    multiple = getattr(node, 'multiple', False)
+    return Select2Widget(values=choices,
+                         multiple=multiple
+                         )
+
+
 class Reference(Resource):
     """Schema Node to reference a resource that implements a specific sheet.
 
@@ -587,6 +616,8 @@ class Reference(Resource):
     reftype = SheetReference
     backref = False
     validator = All(validate_reftype)
+    multiple = False
+    widget = deferred_select_widget
 
 
 class Resources(SequenceSchema):
@@ -621,6 +652,8 @@ class References(Resources):
     reftype = SheetReference
     backref = False
     validator = All(_validate_reftypes)
+    multiple = True
+    widget = deferred_select_widget
 
 
 class UniqueReferences(References):
@@ -652,6 +685,18 @@ class Text(SchemaNode):
     widget = MarkdownTextAreaWidget()
 
 
+@deferred
+def deferred_password_default(node: MappingSchema, kw: dict) -> string:
+    """Return generated password."""
+    return _generate_password()
+
+
+def _generate_password():
+    chars = string.ascii_letters + string.digits + '+_'
+    pwd_len = 20
+    return ''.join(chars[int(c) % len(chars)] for c in os.urandom(pwd_len))
+
+
 class Password(SchemaNode):
     """UTF-8 encoded text.
 
@@ -660,9 +705,10 @@ class Password(SchemaNode):
     """
 
     schema_type = StringType
-    default = ''
+    default = deferred_password_default
     missing = drop
     validator = Length(min=6, max=100)
+    widget = PasswordWidget(redisplay=True)
 
 
 @deferred
@@ -834,36 +880,58 @@ class Floats(SequenceSchema):
 
 
 class FileStoreType(SchemaType):
-    """Accepts raw file data as per as 'multipart/form-data' upload."""
+    """Accepts `raw file data` or `filedict`.
+
+    `raw file data`: used to make 'multipart/form-data' upload in
+        :class:`adhocracy_core.rest.views.AssetsServiceRESTView` work.
+
+    `filedict`: dictionary with html5 file data, as used for
+        :mod:`adhocracy_core.sdi`.
+    """
 
     SIZE_LIMIT = 16 * 1024 ** 2  # 16 MB
 
-    def serialize(self, node, value):
-        """Serialization is not supported."""
-        raise Invalid(node,
-                      msg='Cannot serialize FileStore',
-                      value=value)
+    def serialize(self, node: SchemaNode, value: File) -> filedict:
+        """Serialize File value to filedict."""
+        if not value:
+            return colander.null
+        cstruct = filedict([('mimetype', value.mimetype),
+                            ('size', value.size),
+                            ('uid', str(hash(value))),
+                            ('filename', value.title),
+                            # prevent file data is written to tmpstore
+                            ('fp', None),
+                            ])
+        return cstruct
 
-    def deserialize(self, node, value):
-        """Deserialize into a File."""
+    def deserialize(self, node: SchemaNode, value: object) -> File:
+        """Deserialize :class:`cgi.file` or class:`deform.widget.filedict` ."""
         if value == null:
             return None
         try:
-            result = File(stream=value.file,
+            filedata, filename = self._get_file_data_and_name(value)
+            filedata.seek(0)
+            result = File(stream=filedata,
                           mimetype=USE_MAGIC,
-                          title=value.filename)
+                          title=filename)
             # We add the size as an extra attribute since get_size() doesn't
             # work before the transaction has been committed
-            if isinstance(value.file, io.BytesIO):
-                result.size = len(value.file.getvalue())
+            if isinstance(filedata, io.BytesIO):
+                result.size = len(filedata.getvalue())
             else:
-                result.size = os.fstat(value.file.fileno()).st_size
+                result.size = os.fstat(filedata.fileno()).st_size
         except Exception as err:
             raise Invalid(node, msg=str(err), value=value)
         if result.size > self.SIZE_LIMIT:
             msg = 'Asset too large: {} bytes'.format(result.size)
             raise Invalid(node, msg=msg, value=value)
         return result
+
+    def _get_file_data_and_name(self, value: object) -> tuple:
+        if isinstance(value, filedict):
+            return value['fp'], value['filename']
+        else:
+            return value.file, value.filename
 
 
 class FileStore(SchemaNode):
@@ -872,6 +940,18 @@ class FileStore(SchemaNode):
     schema_type = FileStoreType
     default = None
     missing = drop
+
+    @deferred
+    def widget(self, kw: dict):
+        if 'request' in kw:
+            return file_upload_widget(self, kw)
+
+    def deserialize(self, cstruct=null):
+        appstruct = super().deserialize(cstruct=cstruct)
+        request = self.bindings.get('request', None)
+        if request:
+            FileUploadTempStore(request).clear()
+        return appstruct
 
 
 class SingleLines(SequenceSchema):
@@ -919,6 +999,18 @@ class ACEPrincipal(SchemaNode):
     """Adhocracy :term:`role` or pyramid system principal."""
 
     schema_type = ACEPrincipalType
+
+    @deferred
+    def widget(self, kw: dict):
+        choices = self.schema_type.valid_principals
+        values = [(x, x) for x in choices]
+        return SelectWidget(values=values)
+
+
+class ACEPrincipals(SequenceSchema):
+    """List of Adhocracy :term:`role` or pyramid system principal."""
+
+    principal = ACEPrincipal()
 
 
 class ACMCell(SchemaNode):
@@ -987,3 +1079,37 @@ class ACM(MappingSchema):
                'permissions': []}
     missing = {'principals': [],
                'permissions': []}
+
+
+def create_deferred_permission_validator(permission: str) -> callable:
+    """Create a deferred permission check validator."""
+    @deferred
+    def deferred_check_permission(node: SchemaNode, kw: dict) -> callable:
+        context = kw['context']
+        request = kw.get('request', None)
+
+        def check_permission(node, value):
+            if request is None:
+                return
+            elif request.has_permission(permission, context):
+                return
+            else:
+                msg = 'Changing this field is not allowed, the {} permission'\
+                      ' is missing'.format(permission)
+                raise Invalid(node, msg)
+
+        return check_permission
+
+    return deferred_check_permission
+
+
+def get_choices_by_interface(interface: IInterface,
+                             context: IResource,
+                             request: IRequest,
+                             ) -> []:
+    """Get choices for resource paths by interface."""
+    catalogs = find_service(context, 'catalogs')
+    query = search_query._replace(interfaces=interface)
+    resources = catalogs.search(query).elements
+    choices = [(request.resource_url(r), resource_path(r)) for r in resources]
+    return choices

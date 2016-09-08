@@ -34,6 +34,7 @@ class IProcess(process.IProcess):
 
 
 process_meta = process.process_meta._replace(
+    content_name='KiezkassenProcess',
     iresource=IProcess,
     element_types=(IProposal,
                    ),
@@ -42,7 +43,7 @@ process_meta = process.process_meta._replace(
         ILocationReference,
         IImageReference,
     ),
-    workflow_name = 'kiezkassen',
+    default_workflow = 'kiezkassen',
 )
 
 

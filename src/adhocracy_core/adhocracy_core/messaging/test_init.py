@@ -263,3 +263,66 @@ class TestSendInvitationMail:
         assert inst.send_mail.call_args[1]['body'] ==\
                'Hi Anna,\n'\
                'please reset your password here http://front.end/password_reset/?path=%252Freset to join sitename.'
+
+
+class TestActivityEmail:
+
+    @fixture
+    def registry(self, config):
+        config.include('pyramid_mailer.testing')
+        config.registry.settings['adhocracy.site_name'] = 'sitename'
+        config.registry.settings['adhocracy.frontend_url'] = 'http://front.end'
+        return config.registry
+
+    @fixture
+    def inst(self, registry):
+        from . import Messenger
+        return Messenger(registry)
+
+    @fixture
+    def user(self):
+        return testing.DummyResource()
+
+    @fixture
+    def activity(self, activity):
+        context = testing.DummyResource(__name__='object')
+        target = testing.DummyResource(__name__='target')
+        return activity._replace(object=context, target=target)
+
+    def test_send_activity(self, inst, user, activity, request_, mocker):
+        inst.send_mail = Mock()
+        inst._get_user_email = Mock(return_value='anna@example.org')
+        translate_description = mocker.patch(
+            'adhocracy_core.messaging.generate_activity_description',
+            autospec=True)
+
+        inst.send_activity_mail(user, activity, request_)
+
+        inst._get_user_email.assert_called_with(user)
+        send_mail_args = inst.send_mail.call_args[1]
+        wanted_mapping = {'site_name': 'sitename',
+                          'object_url': 'http://front.end/robject/',
+                          'target_url': 'http://front.end/rtarget/',
+                          'activity_name': activity.name,
+                          'activity_description':
+                              translate_description.return_value.default,
+                          }
+        assert send_mail_args['recipients'] == ['anna@example.org']
+        assert send_mail_args['subject'] == 'mail_send_activity_subject'
+        send_mail_args['subject'].mapping.update.assert_called_with(wanted_mapping)
+        send_mail_args['body'].mapping.update.assert_called_with(wanted_mapping)
+        assert send_mail_args['body'] == 'mail_send_activity_add_update_body_txt'
+        assert send_mail_args['request'] == request_
+
+    def test_send_activity_remove(self, inst, user, activity, request_, mocker):
+        from adhocracy_core.interfaces import ActivityType
+        inst.send_mail = Mock()
+        inst._get_user_email = Mock(return_value='anna@example.org')
+        translate_description = mocker.patch(
+            'adhocracy_core.messaging.generate_activity_description')
+        activity = activity._replace(type=ActivityType.remove)
+        inst.send_activity_mail(user, activity, request_)
+        send_mail_args = inst.send_mail.call_args[1]
+        assert send_mail_args['body'] == 'mail_send_activity_remove_body_txt'
+
+

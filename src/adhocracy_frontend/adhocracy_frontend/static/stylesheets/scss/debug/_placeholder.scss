@@ -1,17 +1,3 @@
-/*doc
----
-title: debug-placeholder
-name: debug-placeholder
-category: Debug
----
-
-The debug-placeholder is useful only in unfinished drafts and styleguide
-documentation. It can be used to style elements that are not yet done.
-
-```html_example
-<div class="debug-placeholder">debug-placeholder</div>
-```
-*/
 .debug-placeholder {
     @include rem(min-width, 3rem);
     @include rem(min-height, 3rem);
@@ -19,8 +5,4 @@ documentation. It can be used to style elements that are not yet done.
     border: 2px dashed $color-structure-introvert;
     color: $color-text-introvert;
     text-align: center;
-}
-
-.static-example {
-    position: static;
 }

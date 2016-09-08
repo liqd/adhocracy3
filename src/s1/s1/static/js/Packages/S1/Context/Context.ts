@@ -18,7 +18,7 @@ export var headerDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/header.html",
         link: (scope) => {
-            scope.processUrl = adhConfig.custom["s1_process_url"];
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("meeting", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
         }
@@ -28,7 +28,7 @@ export var headerDirective = (
 
 export var stateIndicatorDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -55,7 +55,7 @@ export var stateIndicatorDirective = (
  */
 export var meetingSelectorDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -65,6 +65,7 @@ export var meetingSelectorDirective = (
             processUrl: "@"
         },
         link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("meeting", scope));
             adhHttp.get(scope.processUrl).then((process : RIS1Process) => {
                 scope.workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
             });

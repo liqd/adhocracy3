@@ -1,6 +1,7 @@
 .moving-column {
     &.is-collapse {
-        @include rem(top, 21px);
+        // header has same height of a button
+        @include rem(top, 30px);
         border-bottom: 0;
         border-top: 0;
         z-index: 10;
@@ -24,44 +25,34 @@
         }
     }
 
+    .moving-column-body {
+        background: $color-background-base;
+        border-bottom: 0;
+    }
+
     .moving-column-menu {
         background: transparent;
-        font-size: inherit;
-        line-height: inherit;
         padding-left: 0;
-
-        .moving-column-menu-button {
-            color: $color-brand-one-normal;
-        }
 
         .button {
             margin-right: 17px;
         }
     }
 
-    .moving-column-menu-sorts {
-        @include inline-block;
-    }
-
-    .moving-column-body {
-        background: $color-background-base;
-        border-bottom: 0;
-    }
-
-    .moving-column-tab {
-        display: none;
-    }
-
-    .moving-column-menu-nav-button {
-        background: transparent;
-        color: $color-brand-one-normal;
-        text-transform: uppercase;
-    }
-
     .moving-column-menu-nav {
         .button:last-child {
             margin-right: 5px;
         }
+    }
+
+    .moving-column-menu-nav-button {
+        background: transparent;
+        color: $color-text-introvert;
+        text-transform: uppercase;
+    }
+
+    .moving-column-tab {
+        display: none;
     }
 
     .moving-column-expand {

@@ -3,17 +3,13 @@
         <div class="moving-column-tab">
             <i class="icon-user-unfilled moving-column-icon"></i>
         </div>
-        <a
-            class="moving-column-menu-button"
-            href=""
-            data-ng-click="ctrl.toggleOverlay('messaging')"
-            data-ng-if="messageOptions.POST">{{ "TR__MESSAGING" | translate }}</a>
     </div>
 
     <adh-recompile-on-change
         data-ng-switch-when="body"
         data-value="{{userUrl}}">
         <adh-user-profile
+            data-modals="modals"
             data-path="{{userUrl}}">
 
             <adh-user-activity-overview
@@ -30,10 +26,4 @@
             </section>
         </adh-user-profile>
     </adh-recompile-on-change>
-
-    <adh-user-message
-        data-ng-switch-when="overlays"
-        data-ng-if="overlay === 'messaging'"
-        data-recipient-url="{{userUrl}}">
-    </adh-user-message>
 </div>

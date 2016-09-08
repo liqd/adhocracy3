@@ -61,12 +61,13 @@ def includeme(config):
     config.override_asset(to_override='substanced.sdi:templates/',
                           override_with='substanced.sdi.views:templates/')
     config.include('substanced.folder')
-    config.scan('substanced.db.views')
     config.scan('.views.manage')
     config.scan('.views.login')
     config.scan('.views.contents')
-    config.scan('.views.services')
     config.scan('.views.sheets')
+    config.scan('.views.catalogs')
+    config.scan('substanced.db.views')
+    config.scan('substanced.catalog.views')
 
 
 def _add_sdi_assets(config: Configurator):

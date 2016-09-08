@@ -3,24 +3,3 @@
         @include rem(margin-top, -5px);
     }
 }
-
-.section-jump-main {
-    h3 {
-        @include rem(font-size, $font-size-small);
-        @include rem(margin, 0 0 15px);
-        color: $color-text-introvert;
-        font-weight: $font-weight-normal;
-        letter-spacing: 0.03rem;
-        line-height: 1.15;
-        text-transform: uppercase;
-
-        @media print {
-            @include rem(font-size, $font-size-plus);
-            margin-bottom: 3px;
-        }
-    }
-
-    .chapter {
-        padding: 0;
-    }
-}

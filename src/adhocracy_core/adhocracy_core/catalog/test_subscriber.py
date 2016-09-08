@@ -66,12 +66,8 @@ def test_reindex_user_activation_path(event, catalog):
 
 def test_reindex_badge_index(event, catalog, mock_sheet, registry_with_content):
     from .subscriber import reindex_badge
-    badgeable = testing.DummyResource()
-    mock_sheet.get.return_value = {'object': badgeable}
-    registry_with_content.content.get_sheet.return_value = mock_sheet
-    event.registry = registry_with_content
     reindex_badge(event)
-    catalog.reindex_index.assert_called_with(badgeable, 'badge')
+    catalog.reindex_index.assert_called_with(event.object, 'badge')
 
 
 def test_reindex_item_badge(event, catalog):
@@ -188,6 +184,28 @@ def test_reindex_workflow_state(event, catalog):
     assert call(event.object['version'], 'workflow_state') in index_calls
     assert call(event.object['other'], 'workflow_state') not in index_calls
 
+class TestReindexComments:
+
+    def test_reindex_comments(self, event, catalog, mock_sheet,
+                              registry_with_content):
+        from .subscriber import reindex_comments
+        reindex_comments(event)
+        catalog.reindex_index.assert_called_with(event.object, 'comments')
+
+    def test_reindex_comment_references(self, event, catalog, mock_sheet,
+                                        registry_with_content):
+        from zope.interface import alsoProvides
+        from .subscriber import reindex_comments
+        from adhocracy_core.sheets.comment import IComment
+        alsoProvides(event.object, IComment)
+        reference = testing.DummyResource()
+        registry_with_content.content.get_sheet_field = \
+            Mock(return_value = reference)
+        reindex_comments(event)
+        catalog.reindex_index.assert_any_call(event.object, 'comments')
+        catalog.reindex_index.assert_any_call(reference, 'comments')
+
+
 @mark.usefixtures('integration')
 def test_register_subscriber(registry):
     from adhocracy_core.catalog import subscriber
@@ -201,5 +219,4 @@ def test_register_subscriber(registry):
     assert subscriber.reindex_user_name.__name__ in handlers
     assert subscriber.reindex_user_email.__name__ in handlers
     assert subscriber.reindex_controversiality.__name__ in handlers
-
 

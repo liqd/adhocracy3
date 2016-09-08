@@ -1,12 +1,11 @@
-//brand colors
+// Brand colors
 $color-brand-one-normal: #fcb813;
 $color-brand-one-extrovert: #fcd370;
 $color-brand-two-normal: #00aae5;
 $color-brand-two-introvert: #0097d5;
 $color-brand-two-extrovert: #89c5ec;
 
-// text colors
-$color-text-normal: #333;
+// Text colors
 $color-text-introvert: #808080;
 $color-text-extrovert: #1c1c1b;
 $color-text-highlight-normal: $color-brand-two-normal;
@@ -14,26 +13,15 @@ $color-text-highlight-introvert: #808080;
 $color-text-highlight-extrovert: #333;
 $color-text-inverted: white;
 
-// function colors
-$color-function-valid: #73bf44;
-$color-function-invalid: #f00;
-
-// background colors
+// Background colors
 $color-background-base: white;
 $color-background-base-introvert: #f2f2f2;
 
-// structure colors
+// Structure colors
 $color-structure-normal: #e6e6e6;
 $color-structure-introvert: #ccc;
 
-//font sizes
-$font-size-smaller: 10px;
-$font-size-small: 12px;
-$font-size-normal: 14px;
+// Font sizes
 $font-size-plus: 16px;
 $font-size-large: 18px;
 $font-size-huge: 48px;
-
-//images
-$thumbnail-width: 105px;
-$thumbnail-height: 90px;

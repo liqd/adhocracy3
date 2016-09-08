@@ -2,7 +2,7 @@
 ---
 title: Badges
 name: badge
-category: Type
+category: Components
 ---
 
 Badges for labeling things
@@ -19,18 +19,18 @@ Badges for labeling things
 
 .badge {
     @include rem(padding, 0 5px);
-    @include inline-block;
     @include rem(margin-right, 5px);
     @include rem(font-size, $font-size-smaller);
-    background: $color-structure-normal;
-    color: $color-text-normal;
+    display: inline-block;
+    background: $color-brand-two-normal;
+    color: $color-text-inverted;
     line-height: $badge-line-height;
     text-transform: uppercase;
 }
 
 /*doc
 ---
-title: Badge description
+title: Badge Description
 name: badge-description
 parent: badge
 ---
@@ -48,15 +48,6 @@ The description of a badge assignment. The same modifiers as for `badge` apply.
     @include rem(margin, 15px 0);
 }
 
-.badge-assignment-select {
-    @include rem(margin, 10px 0 10px 1px);
-
-    .badge {
-        outline: 1px solid $color-text-inverted;
-        text-decoration: none;
-    }
-}
-
 .badges-group {
     @include rem(border-radius, 10px 15px);
     @include rem(padding, 10px);
@@ -69,10 +60,10 @@ The description of a badge assignment. The same modifiers as for `badge` apply.
 }
 
 .badge-toggle {
-    @include inline-block;
     @include rem(border-radius, 5px);
     @include rem(margin-right, 10px);
     @include rem(padding, 5px);
+    display: inline-block;
     background: $color-structure-introvert;
     cursor: pointer;
 }

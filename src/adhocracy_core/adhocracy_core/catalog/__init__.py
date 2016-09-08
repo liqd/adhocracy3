@@ -10,6 +10,7 @@ from substanced.interfaces import IIndexingActionProcessor
 from substanced.catalog import CatalogsService
 from substanced.catalog.indexes import AllowsComparator
 from substanced.util import find_objectmap
+from substanced.util import get_oid
 from hypatia.interfaces import IIndex
 from hypatia.interfaces import IResultSet
 from hypatia.query import Query
@@ -278,6 +279,12 @@ class CatalogsServiceAdhocracy(CatalogsService):
             return True
         else:
             return False
+
+    def get_index_value(self, context: IResource, index_name: str):
+        """Get value of index."""
+        index = self.get_index(index_name)
+        oid = get_oid(context)
+        return index.document_repr(oid)
 
     _comparators = set(FieldComparator.__members__) \
         .union(KeywordComparator.__members__) \

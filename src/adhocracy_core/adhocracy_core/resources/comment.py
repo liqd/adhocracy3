@@ -1,5 +1,6 @@
 """Comment resource type."""
 from pyramid.registry import Registry
+from pyramid.i18n import TranslationStringFactory
 
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
@@ -13,6 +14,10 @@ from adhocracy_core.resources.service import service_meta
 import adhocracy_core.sheets.comment
 import adhocracy_core.sheets.rate
 import adhocracy_core.sheets.relation
+import adhocracy_core.sheets.anonymize
+
+
+_ = TranslationStringFactory('adhocracy')
 
 
 class ICommentVersion(IItemVersion):
@@ -36,7 +41,7 @@ class IComment(IItem):
 
 
 comment_meta = item_meta._replace(
-    content_name='Comment',
+    content_name=_('Comment'),
     iresource=IComment,
     element_types=(ICommentVersion,
                    ),
@@ -55,12 +60,16 @@ comments_meta = service_meta._replace(
     iresource=ICommentsService,
     content_name='comments',
     element_types=(IComment,),
+    extended_sheets=(adhocracy_core.sheets.anonymize.IAllowAddAnonymized,
+                     )
 )
 
 
 def add_commentsservice(context: IPool, registry: Registry, options: dict):
     """Add `comments` service to context."""
-    registry.content.create(ICommentsService.__identifier__, parent=context)
+    registry.content.create(ICommentsService.__identifier__,
+                            parent=context,
+                            autoupdated=True)
 
 
 def includeme(config):

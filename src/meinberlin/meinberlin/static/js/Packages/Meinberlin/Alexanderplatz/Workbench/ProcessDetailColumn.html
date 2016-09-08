@@ -1,22 +1,16 @@
-<div data-ng-switch="transclusionId" class="tabset m-full-width m-button-style">
+<div data-ng-switch="transclusionId">
     <div data-ng-switch-when="menu">
         <div class="moving-column-tab" data-ng-if="!data.isShowMap">
-            <i class="icon-list-column moving-column-icon"></i>
+            <i class="icon-list moving-column-icon"></i>
         </div>
         <div class="moving-column-tab" data-ng-if="data.isShowMap">
             <i class="icon-map-filled moving-column-icon"></i>
         </div>
-
-        <a
-            class="moving-column-menu-button"
-            data-ng-click="setCameFrom()"
-            href="{{ processUrl | adhResourceUrl:'create_document'}}"
-            data-ng-if="processOptions.canPost(documentItemType) && tab === 'documents'">{{ "TR__CREATE_DOCUMENT" | translate }}</a>
     </div>
 
     <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ processUrl | adhResourceUrl }}">
         <div class="moving-column-tab" data-ng-if="!data.isShowMap">
-            <i class="icon-list-column moving-column-icon"></i>
+            <i class="icon-list moving-column-icon"></i>
         </div>
         <div class="moving-column-tab" data-ng-if="data.isShowMap">
             <i class="icon-map-filled moving-column-icon"></i>
@@ -27,20 +21,16 @@
         <div class="action-bar">
             <adh-map-switch data-model="data.isShowMap"></adh-map-switch>
         </div>
-        <ul class="tabset-tabs">
-            <li class="tab"
-                data-ng-class="{'is-active': tab === 'proposals'}">
+        <div class="tabs">
             <a
-                class="tab-button"
+                class="tab"
+                data-ng-class="{'is-active': tab === 'proposals'}"
                 data-ng-href="{{ processUrl | adhResourceUrl:'proposals' }}">{{ "TR__PROPOSALS" | translate }}</a>
-            </li>
-            <li class="tab"
-                data-ng-class="{'is-active': tab === 'documents'}">
-                <a
-                    class="tab-button"
-                    data-ng-href="{{ processUrl | adhResourceUrl }}">{{ "TR__MEINBERLIN_ALEXANDERPLATZ_DOCUMENT" | translate }}</a>
-            </li>
-        </ul>
+            <a
+                class="tab"
+                data-ng-class="{'is-active': tab === 'documents'}"
+                data-ng-href="{{ processUrl | adhResourceUrl }}">{{ "TR__MEINBERLIN_ALEXANDERPLATZ_DOCUMENT" | translate }}</a>
+        </div>
 
         <div data-ng-if="tab === 'proposals'">
             <div
@@ -53,28 +43,44 @@
             <adh-wait condition="data.isShowMap">
                 <adh-map-listing
                     data-ng-if="polygon"
+                    data-custom="{
+                        processProperties: processProperties
+                    }"
                     data-path="{{processUrl}}"
                     data-polygon="polygon"
                     data-ng-show="data.isShowMap"
                     data-no-create-form="true"
                     data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
                     data-content-type="{{proposalType}}">
-                    <adh-meinberlin-proposal-map-list-item data-path="{{item}}"></adh-meinberlin-proposal-map-list-item>
+                    <adh-idea-collection-proposal-map-list-item
+                        data-path="{{item}}"
+                        data-process-properties="custom.processProperties">
+                    </adh-idea-collection-proposal-map-list-item>
                 </adh-map-listing>
             </adh-wait>
 
             <adh-listing
                 data-path="{{processUrl}}"
+                data-custom="{
+                    processProperties: processProperties
+                }"
                 data-ng-show="!data.isShowMap"
                 data-no-create-form="true"
                 data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
                 data-content-type="{{proposalType}}">
-                <adh-meinberlin-proposal-list-item data-path="{{element}}">
-                </adh-meinberlin-proposal-list-item>
+                <adh-idea-collection-proposal-list-item
+                    data-path="{{element}}"
+                    data-process-properties="custom.processProperties">
+                </adh-idea-collection-proposal-list-item>
             </adh-listing>
         </div>
 
         <div data-ng-if="tab === 'documents'">
+            <adh-resource-actions
+                data-ng-if="processOptions.canPost(documentItemType)"
+                data-resource-path="{{processUrl}}"
+                data-item-path="{{processUrl}}"
+                data-create-document="true"></adh-resource-actions>
             <div
                 class="map-info-persistent"
                 data-ng-if="data.isShowMap"

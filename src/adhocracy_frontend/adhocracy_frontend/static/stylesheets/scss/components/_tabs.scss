@@ -1,71 +1,36 @@
-.tabset {
-    &.m-full-width {
-        .tab {
-            text-align: center;
-        }
-    }
-    // FIXME: Possible inconsistency here whether this should be part of 'classes' or added to the tabset css like this
-    // will review at a later date
-    &.m-button-style {
-        .tab {
-            &.is-active, & {
-                .tab-button {
-                    top: 0;
-                }
-            }
+/*doc
+---
+title: Tabs
+name: tabs
+category: Navigation
+---
 
-            &.is-active {
-                .tab-button {
-                    border: 0;
-                }
-            }
-        }
-    }
-}
+*Note*: This component uses flexbox, but will degrade gracefully.
 
-.tabset-tabs {
-    margin: 0;
-    padding: 0;
+```html_example
+<div class="tabs">
+    <a href="#" class="tab is-active">Tab 1</a>
+    <a href="#" class="tab">Tab 2</a>
+</div>
+```
+*/
+.tabs {
+    display: flex;
+    margin-bottom: 2px;
+    background: $color-structure-normal;
 
     .tab {
-        @include inline-block;
-        list-style: none;
-
-        .tab-button {
-            @include rem(padding, 0.5rem 1rem);
-            background: $color-structure-introvert;
-            color: $color-text-inverted;
-            display: block;
-            margin-right: 1px;
-            position: relative;
-            top: 1px;
-        }
-
-        &:last-child {
-            .tab-button {
-                margin-right: 0;
-            }
-        }
+        @include rem(padding, 0.5rem 1rem);
+        display: inline-block;
+        flex-grow: 1;
+        text-align: center;
+        color: $color-text-highlight-normal;
+        font-weight: $font-weight-extrovert;
+        text-decoration: none;
 
         &.is-active {
-            .tab-button {
-                background: $color-background-base-introvert;
-                border: 1px solid $color-structure-introvert;
-                border-width: 1px 1px 0;
-                color: $color-text-normal;
-                font-weight: bold;
-                top: 1px;
-            }
+            background: $color-background-base;
+            color: $color-text-normal;
         }
     }
-}
-
-.tabset-panes {
-    @include single-transition(height, 0.5s);
-    background: $color-background-base-introvert;
-    overflow: hidden;
-}
-
-.tab-pane {
-    @include rem(padding, 1rem);
 }

@@ -1,4 +1,5 @@
 """Public py.test fixtures: http://pytest.org/latest/fixture.html."""
+from copy import copy
 from functools import partial
 from unittest.mock import Mock
 from configparser import ConfigParser
@@ -24,11 +25,13 @@ from zope.interface.interfaces import IInterface
 import transaction
 
 from adhocracy_core.authentication import UserTokenHeader
+from adhocracy_core.interfaces import Activity
 from adhocracy_core.interfaces import SheetMetadata
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.interfaces import SearchResult
 from adhocracy_core.interfaces import SearchQuery
+from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.schema import MappingSchema
@@ -74,7 +77,7 @@ class DummyPool(testing.DummyResource):
         from substanced.util import find_service
         return find_service(self, service_name, *sub_service_names)
 
-    def delete(self, name, registry):
+    def remove(self, name, registry=None, send_events=False, **kwargs):
         subresource = self[name]
         del self[name]
         subresource.__name__ = None
@@ -180,6 +183,7 @@ class DummyRequest(testing.DummyRequest):
         self.errors = []
         self.content_type = 'application/json'
         self.text = ''
+        self.remote_addr = ''
 
     def authenticated_userid(self):
         return None
@@ -210,6 +214,7 @@ def request_():
     request = DummyRequest()
     request.registry.settings = {}
     request.user = None
+    request.anonymized_user = None
     request.scheme = 'http'
     request.matched_route = None
     return request
@@ -220,6 +225,12 @@ def changelog_meta() -> ChangelogMetadata:
     """Return changelog metadata."""
     from adhocracy_core.changelog import changelog_meta
     return changelog_meta
+
+
+@fixture
+def activity() -> Activity:
+    """Return activity entry from auditlog."""
+    return Activity()
 
 
 @fixture
@@ -252,6 +263,12 @@ def item() -> DummyPool:
     from adhocracy_core.interfaces import IItem
     from adhocracy_core.sheets.metadata import IMetadata
     return DummyPool(__provides__=(IItem, IMetadata))
+
+
+@fixture
+def version() -> IItemVersion:
+    """Return resource with IItemVersion interface."""
+    return testing.DummyResource(__provides__=IItemVersion)
 
 
 @fixture
@@ -320,7 +337,7 @@ def mock_catalogs(search_result) -> Mock:
 def search_result() -> SearchResult:
     """Return search result."""
     from adhocracy_core.interfaces import search_result
-    return search_result
+    return search_result._replace(elements=[])
 
 
 @fixture
@@ -350,11 +367,13 @@ def mock_objectmap() -> Mock:
 @fixture
 def mock_workflow() -> Mock:
     """Mock :class:`adhocracy_core.workflows.AdhocracyACLWorkflow`."""
-    from adhocracy_core.workflows import AdhocracyACLWorkflow
-    mock = Mock(spec=AdhocracyACLWorkflow)
+    from adhocracy_core.workflows import ACLLocalRolesWorkflow
+    mock = Mock(spec=ACLLocalRolesWorkflow)
     mock._states = {}
     mock.get_next_states.return_value = []
     mock.state_of.return_value = None
+    mock.type = 'sample'
+    mock._initial_state = 'draft'
     return mock
 
 
@@ -374,6 +393,9 @@ def mock_content_registry() -> Mock:
     mock.get_sheets_create.return_value = []
     mock.get_sheet.return_value = None
     mock.get_sheet_field = lambda x, y, z: mock.get_sheet(x, y).get()[z]
+    mock.can_add_anonymized.return_value = False
+    mock.can_edit_anonymized.return_value = False
+    mock.can_delete_anonymized.return_value = False
     return mock
 
 
@@ -474,6 +496,7 @@ def app_settings(request) -> dict:
     settings['zodbconn.uri'] = 'memory://'
     # satisfy substanced
     settings['substanced.secret'] = 'secret'
+    settings['substanced.uploads_tempdir'] = 'var/tmp'
     # extra dependenies
     settings['pyramid.includes'] = [
         # database connection
@@ -574,7 +597,7 @@ def _is_running(path_to_pid_file) -> bool:
 def add_create_test_users_subscriber(configurator):
     """Register a subscriber to import the test fixture to create users."""
     import_test_fixture = partial(import_fixture,
-                                  'adhocracy_core:test_fixture',
+                                  'adhocracy_core:test_users_fixture',
                                   print_stdout=False)
 
     configurator.add_subscriber(lambda event:
@@ -655,6 +678,12 @@ def newest_reset_path(app_router) -> callable:
     return get_newest_reset_path
 
 
+@fixture(scope='class')
+def send_mails(app_router) -> list:
+    """Return send mails."""
+    return app_router.registry.messenger.mailer.outbox
+
+
 class AppUser:
     """:class:`webtest.TestApp` wrapper for backend functional testing."""
 
@@ -714,10 +743,13 @@ class AppUser:
             path: str,
             cstruct: dict={},
             upload_files: [(str, str, bytes)]=None,
+            extra_headers: dict={},
             ) -> TestResponse:
         """Put request to modify a resource."""
         url = self._build_url(path)
-        kwargs = {'headers': self.header,
+        headers = copy(self.header)
+        headers.update(extra_headers)
+        kwargs = {'headers': headers,
                   'expect_errors': True,
                   }
         if upload_files:
@@ -731,10 +763,13 @@ class AppUser:
              path: str,
              cstruct: dict={},
              upload_files: [(str, str, bytes)]=None,
+             extra_headers: dict={},
              ) -> TestResponse:
         """Post request to create a new resource."""
         url = self._build_url(path)
-        kwargs = {'headers': self.header,
+        headers = copy(self.header)
+        headers.update(extra_headers)
+        kwargs = {'headers': headers,
                   'expect_errors': True,
                   }
         if upload_files:
@@ -762,11 +797,13 @@ class AppUser:
                                   expect_errors=True)
         return resp
 
-    def get(self, path: str, params={}) -> TestResponse:
+    def get(self, path: str, params={}, extra_headers={}) -> TestResponse:
         """Send get request to the backend rest server."""
         url = self._build_url(path)
+        headers = copy(self.header)
+        headers.update(extra_headers)
         resp = self.app.get(url,
-                            headers=self.header,
+                            headers=headers,
                             params=params,
                             expect_errors=True)
         return resp
@@ -873,6 +910,12 @@ def app_god(app_router):
 
 
 @fixture(scope='class')
+def global_anonymization_userid(app_router):
+    """Return userid of global anonymisation user."""
+    return '/principals/users/0000001'
+
+
+@fixture(scope='class')
 def mailer(app_router) -> DummyMailer:
     """Return DummyMailer of `app_router` fixture."""
     mailer = app_router.registry.messenger.mailer
@@ -923,3 +966,13 @@ def do_transition_to(app_user, path, state) -> TestResponse:
                      {'workflow_state': state}}}
     resp = app_user.put(path, data)
     return resp
+
+
+def get_next_states(app_user, path) -> []:
+    """Get possible transitions to new worklfow states."""
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
+    resp = app_user.options(path).json
+    workflow_datas = [y for x, y in resp['PUT']['request_body']['data'].items()
+                      if IWorkflowAssignment.__identifier__ in x]
+    workflow_data = workflow_datas and workflow_datas[0] or {}
+    return workflow_data.get('workflow_state', [])

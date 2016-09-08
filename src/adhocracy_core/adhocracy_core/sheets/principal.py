@@ -3,10 +3,13 @@ from colander import required
 from colander import deferred
 from colander import Invalid
 from colander import All
+from colander import OneOf
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from pyramid.settings import asbool
 from pyramid.traversal import resource_path
+from substanced.util import find_service
 from urllib.parse import urljoin
+from deform.widget import SelectWidget
 import requests
 
 from adhocracy_core.interfaces import ISheet
@@ -25,6 +28,7 @@ from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import TimeZoneName
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Roles
+from adhocracy_core.schema import Boolean
 
 
 class IGroup(ISheet):
@@ -218,6 +222,18 @@ captcha_meta = sheet_meta._replace(
 )
 
 
+def get_group_choices(context, request) -> []:
+    """Return group choices based on the `/principals/groups` service."""
+    groups = find_service(context, 'principals', 'groups')
+    if groups is None:
+        return []
+    target_isheet = PermissionsGroupsReference.getTaggedValue('target_isheet')
+    choices = [(request.resource_url(group), name)
+               for name, group in groups.items()
+               if target_isheet.providedBy(group)]
+    return choices
+
+
 class PermissionsSchema(MappingSchema):
     """Permissions sheet data structure.
 
@@ -225,9 +241,8 @@ class PermissionsSchema(MappingSchema):
     """
 
     roles = Roles()
-    groups = UniqueReferences(reftype=PermissionsGroupsReference)
-    # roles_and_group_roles = Roles(readonly=True,
-    #                               default=deferred_roles_and_group_roles)
+    groups = UniqueReferences(reftype=PermissionsGroupsReference,
+                              choices_getter=get_group_choices)
 
 
 class PermissionsAttributeResourceSheet(AttributeResourceSheet):
@@ -312,6 +327,71 @@ password_meta = sheet_meta._replace(
 )
 
 
+class ActivationSetting(SingleLine):
+    """Activation setting.
+
+    Possible values: direct, registration_mail, invitation_mail
+    """
+
+    default = 'registration_mail'
+
+    @deferred
+    def validator(self, kw: dict):
+        """Validator."""
+        return OneOf(('direct', 'registration_mail', 'invitation_mail'))
+
+    @deferred
+    def widget(self, kw: dict) -> SelectWidget:
+        choices = [(x, x) for x in self.validator.choices]
+        return SelectWidget(values=choices)
+
+
+class IActivationConfiguration(ISheet):
+    """Marker interface for the user activation configutation sheet."""
+
+
+class ActivationConfigutationSchema(MappingSchema):
+    """Data structure for user activation configuration.
+
+    `activation`: One of 'direct', 'register' or 'invite'
+    """
+
+    activation = ActivationSetting()
+
+
+activation_configuration_meta = sheet_meta._replace(
+    isheet=IActivationConfiguration,
+    schema_class=ActivationConfigutationSchema,
+    readable=True,
+    creatable=True,
+    editable=False,
+    permission_create='activate_user',
+    permission_view='view_userextended',
+)
+
+
+class IAnonymizeDefault(ISheet):
+    """Marker interface for the user anonymize default sheet."""
+
+
+class AnonymizeDefaultSchema(MappingSchema):
+    """Data structure for user default anonymize setting.
+
+    `anonymize`:  Boolean setting for anonymization default .
+    """
+
+    anonymize = Boolean()
+
+
+anonymize_default_meta = sheet_meta._replace(
+    isheet=IAnonymizeDefault,
+    schema_class=AnonymizeDefaultSchema,
+    permission_create='create_user',
+    permission_view='view_userextended',
+    permission_edit='edit_userextended',
+)
+
+
 def includeme(config):
     """Register sheets and activate catalog factory."""
     add_sheet_to_registry(userbasic_meta, config.registry)
@@ -327,3 +407,5 @@ def includeme(config):
     add_sheet_to_registry(password_meta, config.registry)
     add_sheet_to_registry(group_meta, config.registry)
     add_sheet_to_registry(permissions_meta, config.registry)
+    add_sheet_to_registry(activation_configuration_meta, config.registry)
+    add_sheet_to_registry(anonymize_default_meta, config.registry)

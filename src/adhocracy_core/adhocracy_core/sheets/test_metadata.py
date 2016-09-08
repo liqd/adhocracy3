@@ -26,7 +26,14 @@ class TestIMetadataSchema:
     def test_deserialize_empty(self):
         inst = self.make_one()
         result = inst.deserialize({})
-        assert result == {'deleted': False, 'hidden': False}
+        assert result == {'hidden': False}
+
+    def test_deserialize_hiding_requires_permission(self, context, request_):
+        import colander
+        inst = self.make_one().bind(context=context, request=request_)
+        request_.has_permission = Mock(return_value=False)
+        with raises(colander.Invalid):
+            inst.deserialize({'hidden': False})
 
     def test_serialize_empty(self):
         from colander import null
@@ -37,7 +44,6 @@ class TestIMetadataSchema:
         assert result['item_creation_date'] == null
         assert result['modification_date'] == null
         assert result['modified_by'] is None
-        assert result['deleted'] == 'false'
         assert result['hidden'] == 'false'
 
     def test_serialize_empty_and_bind(self, context, mock_now, request_):
@@ -47,22 +53,6 @@ class TestIMetadataSchema:
         assert result['creation_date'] == now_str
         assert result['item_creation_date'] == now_str
         assert result['modification_date'] == now_str
-
-    def test_deserialize_hiding_requires_permission(self, context, request_):
-        import colander
-        inst = self.make_one().bind(context=context, request=request_)
-        request_.has_permission = Mock(return_value=False)
-        with raises(colander.Invalid):
-            inst.deserialize({'hidden': False})
-        request_.has_permission = Mock(return_value=True)
-        result = inst.deserialize({'hidden': False})
-        assert result['hidden'] is False
-
-    def test_deserialize_delete_doesnt_require_permission(self, context, request_):
-        inst = self.make_one().bind(context=context, request=request_)
-        request_.has_permission = Mock(return_value=True)
-        result = inst.deserialize({'deleted': False})
-        assert result['deleted'] is False
 
 
 class TestMetadataSheet:
@@ -83,6 +73,7 @@ class TestMetadataSheet:
         assert inst.meta.creatable is True
         assert inst.meta.readable is True
         assert inst.meta.sheet_class is AttributeResourceSheet
+        assert inst.meta.permission_edit == 'hide'
 
     @mark.usefixtures('integration')
     def test_includeme_register_sheet(self, meta, config):

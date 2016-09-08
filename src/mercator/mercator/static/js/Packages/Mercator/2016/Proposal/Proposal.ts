@@ -26,6 +26,7 @@ import * as SIFinancialPlanning from "../../../../Resources_/adhocracy_mercator/
 import * as SIGoal from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IGoal";
 import * as SIImageReference from "../../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SILocation from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/ILocation";
+import * as SILogbook from "../../../../Resources_/adhocracy_core/sheets/logbook/IHasLogbookPool";
 import * as SIMercatorIntroImageMetadata from "../../../../Resources_/adhocracy_mercator/sheets/mercator/IIntroImageMetadata";
 import * as SIMercatorSubResources from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IMercatorSubResources";
 import * as SIMercatorUserInfo from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IUserInfo";
@@ -89,6 +90,7 @@ var topicTrString = (topic : string) : string => {
 
 
 export interface IData {
+    logbookPoolPath : string;
     userInfo : {
         firstName : string;
         lastName : string;
@@ -349,7 +351,7 @@ var fill = (data : IFormData, resource) => {
 };
 
 var create = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (scope) => {
     var data : IFormData = scope.data;
@@ -390,7 +392,7 @@ var create = (
 };
 
 var edit = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (scope) => {
     var data : IFormData = scope.data;
@@ -430,7 +432,7 @@ var edit = (
 
 var moderate = (
     $q : angular.IQService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhCredentials : AdhCredentials.Service,
     adhTopLevelState : AdhTopLevelState.Service
@@ -495,9 +497,9 @@ var moderate = (
 
 var get = (
     $q : ng.IQService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges
+    adhGetBadges : AdhBadge.IGetBadgeAssignments
 ) => (path : string) : ng.IPromise<IDetailData> => {
     return adhHttp.get(path).then((proposal) => {
         var subs : {
@@ -550,6 +552,8 @@ var get = (
 
                 creationDate: proposal.data[SIMetaData.nick].item_creation_date,
                 creator: proposal.data[SIMetaData.nick].creator,
+                logbookPoolPath: proposal.data[SILogbook.nick].logbook_pool,
+
                 userInfo: {
                     firstName: proposal.data[SIMercatorUserInfo.nick].first_name,
                     lastName: proposal.data[SIMercatorUserInfo.nick].last_name
@@ -652,7 +656,7 @@ var get = (
 export var createDirective = (
     $location : angular.ILocationService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhResourceUrl
@@ -699,11 +703,11 @@ export var editDirective = (
     $q : angular.IQService,
     $location : angular.ILocationService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhResourceUrl,
-    adhGetBadges : AdhBadge.IGetBadges
+    adhGetBadges : AdhBadge.IGetBadgeAssignments
 ) => {
     return {
         restrict: "E",
@@ -757,11 +761,11 @@ export var moderateDirective = (
     $q : angular.IQService,
     $location : angular.ILocationService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhResourceUrl,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     adhCredentials : AdhCredentials.Service
 ) => {
     return {
@@ -827,9 +831,9 @@ export var listing = (adhConfig : AdhConfig.IService) => {
 export var listItem = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges
+    adhGetBadges : AdhBadge.IGetBadgeAssignments
 ) => {
     return {
         retrict: "E",
@@ -1005,10 +1009,10 @@ export var mercatorProposalFormController2016 = (
 export var detailDirective = (
     $q : ng.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhPermissions : AdhPermissions.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $translate
 ) => {
     return {
@@ -1026,6 +1030,13 @@ export var detailDirective = (
             get($q, adhHttp, adhTopLevelState, adhGetBadges)(scope.path).then((data) => {
                 scope.data = data;
             });
+
+            scope.$on("$destroy", adhTopLevelState.bind("processState", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("view", scope, "proposalTab"));
+
+            scope.showBlogTabs = () => {
+                return scope.data && scope.data.winner.name && scope.processState === "result";
+            };
         }
     };
 };

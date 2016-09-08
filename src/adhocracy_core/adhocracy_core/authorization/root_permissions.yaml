@@ -8,6 +8,7 @@ permissions:
   - [delete,                         ~,         ~,             ~,            A,         A,       ~,         A] # delete resources
   - [hide,                           ~,         ~,             ~,            ~,         ~,       ~,         A] # mark resources as "hidden" because there are legal problems.
   - [do_transition,                  ~,         ~,             ~,            ~,         ~,       A,         A] # default permission to do transition to next workflow state (phase)
+  - [edit_workflow,                  ~,         ~,             ~,            ~,         ~,       A,         A] # assign workfow to resource
   - [message_to_user,                ~,         A,             ~,            ~,         ~,       ~,         ~] # send message to user
   - [report_abuse,                   A,         ~,             ~,            ~,         ~,       ~,         ~] # report abuse, resources that should be hidden
   # create structure
@@ -28,7 +29,20 @@ permissions:
   - [assign_badge,                   ~,         ~,             ~,            A,         ~,       A,         A] # assign a specific badge with a badge assignment resource
   # user, groups, permissions
   - [create_user,                    A,         ~,             ~,            ~,         ~,       ~,         A] # create user (register)
-  - [edit_userextended,              ~,         ~,             ~,            ~,         A,       ~,         A] # edit user extended sheet/fields (email/login name)
-  - [view_userextended,              ~,         ~,             ~,            ~,         A,       ~,         A] # view user extended sheet/fields
+  - [edit_userextended,              ~,         ~,             ~,            ~,         A,       ~,         A] # edit user extended/private sheets
+  - [view_userextended,              ~,         ~,             ~,            ~,         A,       ~,         A] # view user extended/private sheets
+  - [edit_notification,              ~,         ~,             ~,            ~,         A,       ~,         A] # edit user notification sheet/fields
   - [create_edit_sheet_permissions,  ~,         ~,             ~,            ~,         ~,       ~,         A] # default permission to do transition to next workflow state (phase)
+  - [manage_sheet_local_roles,       ~,         ~,             ~,            ~,         ~,       ~,         A] # read, edit localroles sheet
   - [create_group,                   ~,         ~,             ~,            ~,         ~,       ~,         A] # create user group
+  - [activate_user,                  ~,         ~,             ~,            ~,         ~,       ~,         A] # activate user, trigger activation mail
+  - [manage_anonymized,              ~,         ~,             ~,            ~,         ~,       ~,         A] # create, edit, delete resource anonymized
+                                                                                                               # create add depends on the parent AllowAddAnonymized sheet
+  # admin interface (sdi)
+  - [sdi.view,                        ~,         ~,             ~,            ~,         ~,       ~,         A] # view the admin interface
+  - [sdi.view-contents,               ~,         ~,             ~,            ~,         ~,       ~,         A] # view contents tab
+  - [sdi.manage-contents,             ~,         ~,             ~,            ~,         ~,       ~,         A] # delete/copy/rename resources in contents tab
+  - [sdi.add-content,                 ~,         ~,             ~,            ~,         ~,       ~,         A] # add resources
+  - [sdi.manage-sheets,               ~,         ~,             ~,            ~,         ~,       ~,         A] # view/edit sheets tab
+  - [sdi.manage-database,             ~,         ~,             ~,            ~,         ~,       ~,         A] # view/edit database tab
+  - [sdi.manage-catalog,              ~,         ~,             ~,            ~,         ~,       ~,         A] # view/edit catalogs/index tab

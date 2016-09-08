@@ -16,6 +16,7 @@ import colander
 
 from adhocracy_core.authentication import UserTokenHeader
 from adhocracy_core.interfaces import API_ROUTE_NAME
+from adhocracy_core.authentication import AnonymizeHeader
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -53,7 +54,6 @@ from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
 from adhocracy_core.sheets.badge import get_assignable_badges
 from adhocracy_core.sheets.badge import IBadgeAssignment
-from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.sheets.pool import IPool as IPoolSheet
 from adhocracy_core.sheets.versions import IVersionable
@@ -101,11 +101,13 @@ class ResourceRESTView:
         if request.has_permission('edit_some', context):
             edits = self.content.get_sheets_edit(context, request)
             put_sheets = [(s.meta.isheet.__identifier__, empty) for s in edits]
+            can_anonymize = self.content.can_edit_anonymized(context, request)
             if put_sheets:
                 put_sheets_dict = dict(put_sheets)
-                self._add_metadata_edit_permission_info(put_sheets_dict)
                 self._add_workflow_edit_permission_info(put_sheets_dict, edits)
                 cstruct['PUT']['request_body']['data'] = put_sheets_dict
+                headers_dict = can_anonymize and {AnonymizeHeader: []} or {}
+                cstruct['PUT']['request_headers'] = headers_dict
             else:
                 del cstruct['PUT']
         else:
@@ -121,7 +123,12 @@ class ResourceRESTView:
         else:
             del cstruct['GET']
 
-        if not request.has_permission('delete', context):
+        if request.has_permission('delete', context):
+            can_anonymize = self.content.can_delete_anonymized(context,
+                                                               request)
+            headers_dict = can_anonymize and {AnonymizeHeader: []} or {}
+            cstruct['DELETE']['request_headers'] = headers_dict
+        else:
             del cstruct['DELETE']
 
         is_users = IUsersService.providedBy(context) \
@@ -130,6 +137,7 @@ class ResourceRESTView:
         if request.has_permission('create', self.context) or is_users:
             addables = self.content.get_resources_meta_addable(context,
                                                                request)
+            can_anonymize = self.content.can_add_anonymized(context, request)
             if addables:
                 for resource_meta in addables:
                     iresource = resource_meta.iresource
@@ -143,28 +151,21 @@ class ResourceRESTView:
                     post_data = {'content_type': resource_typ,
                                  'data': sheets_dict}
                     cstruct['POST']['request_body'].append(post_data)
+                headers_dict = can_anonymize and {AnonymizeHeader: []} or {}
+                cstruct['POST']['request_headers'] = headers_dict
             else:
                 del cstruct['POST']
         else:
             del cstruct['POST']
         return cstruct
 
-    def _add_metadata_edit_permission_info(self, cstruct: dict):
-        """Add info if a user may set the hidden metadata fields."""
-        if IMetadata.__identifier__ not in cstruct:
-            return
-        # everybody who can PUT metadata can delete the resource
-        permission_info = {'deleted': [True, False]}
-        if self.request.has_permission('hide', self.context):
-            permission_info['hidden'] = [True, False]
-        cstruct[IMetadata.__identifier__] = permission_info
-
     def _add_workflow_edit_permission_info(self, cstruct: dict, edit_sheets):
         """Add info if a user may set the workflow_state workflow field."""
         workflow_sheets = [s for s in edit_sheets
                            if s.meta.isheet.isOrExtends(IWorkflowAssignment)]
         for sheet in workflow_sheets:
-            workflow = sheet.get()['workflow']
+            workflow_name = sheet.get()['workflow']
+            workflow = self.registry.content.workflows.get(workflow_name, None)
             if workflow is None:
                 states = []
             else:
@@ -177,7 +178,7 @@ class ResourceRESTView:
         permission='view',
     )
     def get(self) -> dict:
-        """Get resource data (unless deleted or hidden)."""
+        """Get resource data (unless hidden)."""
         metric = self._get_get_metric_name()
         with statsd_timer(metric, rate=.1, registry=self.registry):
             schema = create_schema(GETResourceResponseSchema,
@@ -256,7 +257,7 @@ class SimpleRESTView(ResourceRESTView):
         """Delete resource."""
         parent = self.context.__parent__
         name = self.context.__name__
-        parent.delete(name, self.registry)
+        parent.remove(name, registry=self.registry)
         if is_batchmode(self.request):
             appstruct = {}
         else:
@@ -351,6 +352,7 @@ class PoolRESTView(SimpleRESTView):
                       root_versions=validated.get('root_versions', []),
                       request=self.request,
                       is_batchmode=is_batchmode(self.request),
+                      anonymized_creator=self.request.anonymized_user,
                       )
         iresource = validated['content_type']
         return self.content.create(iresource.__identifier__, **kwargs)

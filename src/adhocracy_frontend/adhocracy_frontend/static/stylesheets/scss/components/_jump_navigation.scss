@@ -2,93 +2,147 @@
 ---
 title: Jump Navigation
 name: jump-navigation
-category: Widgets
+category: Navigation
 ---
 
-A navigation list containing hash tag links
+A navigation list to jump to subsections. You may want to make the navigation
+sticky.
+
+Available modifiers:
+
+-   `m-narrow` (wrapper)
+-   `m-bg` (wrapper)
+-   `m-unnumbered` (navigation)
 
 ```html_example
-<strong>Numbered</strong>
-<nav class="jump-navigation">
-    <ol>
-        <li><a>Element</a></li>
-        <li class="active"><a>Element (LI Active)</a></li>
-        <li><a class="active">Element (A active)</a></li>
-    </ol>
-</nav>
+<h3>Default</h3>
+<div class="jump-navigation-wrapper">
+    <nav class="jump-navigation">
+        <ol>
+            <li><a>Element</a></li>
+            <li><a>Element</a></li>
+            <li><a class="active">Active</a></li>
+        </ol>
+    </nav>
+    <div class="jump-navigation-main">
+        <p>Consectetur dignissimos sint aut. Sapiente perspiciatis sunt voluptas dolor voluptas mollitia. Similique excepturi accusantium sit aut ullam dolore. Omnis excepturi et est est dolorum expedita. Qui et eveniet doloribus molestiae. Voluptate voluptas numquam molestiae aut impedit corrupti omnis tempora.</p>
+    </div>
+</div>
 
-<strong>Unumbered</strong>
-<nav class="jump-navigation m-unnumbered">
-    <ol>
-        <li><a>Element</a></li>
-        <li class="active"><a>Element (LI Active)</a></li>
-        <li><a class="active">Element (A active)</a></li>
-    </ol>
-</nav>
+<h3>Unnumbered</h3>
+<div class="jump-navigation-wrapper">
+    <nav class="jump-navigation m-unnumbered">
+        <ol>
+            <li><a>Element</a></li>
+            <li><a>Element</a></li>
+            <li><a class="active">Active</a></li>
+        </ol>
+    </nav>
+    <div class="jump-navigation-main">
+        <p>Consectetur dignissimos sint aut. Sapiente perspiciatis sunt voluptas dolor voluptas mollitia. Similique excepturi accusantium sit aut ullam dolore. Omnis excepturi et est est dolorum expedita. Qui et eveniet doloribus molestiae. Voluptate voluptas numquam molestiae aut impedit corrupti omnis tempora.</p>
+    </div>
+</div>
 
-<strong>Narrow</strong>
-<nav class="jump-navigation m-narrow">
-    <ol>
-        <li><a>Element</a></li>
-        <li class="active"><a>Element (LI Active)</a></li>
-        <li><a class="active">Element (A active)</a></li>
-    </ol>
-</nav>
+<h3>Narrow</h3>
+<div class="jump-navigation-wrapper m-narrow">
+    <nav class="jump-navigation">
+        <ol>
+            <li><a></a></li>
+            <li><a></a></li>
+            <li><a class="active"></a></li>
+        </ol>
+    </nav>
+    <div class="jump-navigation-main">
+        <p>Consectetur dignissimos sint aut. Sapiente perspiciatis sunt voluptas dolor voluptas mollitia. Similique excepturi accusantium sit aut ullam dolore. Omnis excepturi et est est dolorum expedita. Qui et eveniet doloribus molestiae. Voluptate voluptas numquam molestiae aut impedit corrupti omnis tempora.</p>
+    </div>
+</div>
+
+<h3>Background</h3>
+<div class="jump-navigation-wrapper m-bg">
+    <nav class="jump-navigation">
+        <ol>
+            <li><a>Element</a></li>
+            <li><a>Element</a></li>
+            <li><a class="active">Active</a></li>
+        </ol>
+    </nav>
+    <div class="jump-navigation-main">
+        <p>Consectetur dignissimos sint aut. Sapiente perspiciatis sunt voluptas dolor voluptas mollitia. Similique excepturi accusantium sit aut ullam dolore. Omnis excepturi et est est dolorum expedita. Qui et eveniet doloribus molestiae. Voluptate voluptas numquam molestiae aut impedit corrupti omnis tempora.</p>
+    </div>
+</div>
 ```
 */
 
 .jump-navigation {
-
-    &, a {
-        color: $color-text-introvert;
-    }
+    color: $color-text-introvert;
 
     ul, ol {
-        @include rem(padding, 1rem);
         counter-reset: jump-counter;
         list-style: none;
         margin: 0;
+        padding: 0;
     }
 
-    li {
+    a {
         @include rem(font-size, $font-size-small);
-        @include rem(padding, 0 0.5rem);
-        line-height: 1.333;
+        @include rem(padding, 0.25em 0.5em);
+        display: block;
+        text-decoration: none;
+        margin-bottom: 1px;
+        color: inherit;
 
-        &, a {
-            color: $color-text-introvert;
-        }
-
-        a {
-            display: block;
-            text-decoration: none;
-        }
-
-        a:before {
+        &:before {
             content: counter(jump-counter) ". ";
             counter-increment: jump-counter;
         }
 
         // active class automaticall added by du-scrollspy plugin
         // https://www.npmjs.com/package/angular-scroll#-du-scrollspy-
-        &.active, &.active a, .active {
+        &.active {
             color: $color-text-highlight-normal;
         }
     }
 
     &.m-unnumbered {
-        ol a:before {
+        a:before {
             content: "";
         }
     }
+}
+
+.jump-navigation-wrapper {
+    @include container;
+    background-color: $color-background-base-introvert;
+
+    .jump-navigation {
+        float: left;
+        width: (101% / 6) - 1%;
+    }
+
+    .jump-navigation-main {
+        margin-left: (101% / 6);
+        background: $color-background-base;
+    }
 
     &.m-narrow {
-        ol {
-            padding: 0;
+        .jump-navigation {
+            width: 2rem;
         }
 
-        li a {
-            @include rem(margin, 0 0 1rem);
+        .jump-navigation-main {
+            margin-left: 2rem;
+        }
+    }
+
+    &.m-bg {
+        background-color: $color-structure-normal;
+
+        .jump-navigation a {
+            background: $color-background-base-introvert;
+
+            &.active {
+                background: $color-background-base;
+            }
         }
     }
 }

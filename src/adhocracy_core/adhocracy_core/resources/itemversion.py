@@ -30,7 +30,7 @@ def update_last_tag(version, registry, options):
     tags_sheet = registry.content.get_sheet(item,
                                             adhocracy_core.sheets.tags.ITags,
                                             request=request)
-    tags_sheet.set({'LAST': version})
+    tags_sheet.set({'LAST': version}, autoupdated=True)
 
 
 def notify_new_itemversion_created(context, registry, options):
@@ -46,7 +46,8 @@ def notify_new_itemversion_created(context, registry, options):
             decide whether they should update themselfes.
         creator:
             User resource that passed to the creation events.
-
+        autupdated:
+            Flag passed to the creation events
     :return: None
 
     """
@@ -54,13 +55,14 @@ def notify_new_itemversion_created(context, registry, options):
     root_versions = options.get('root_versions', [])
     creator = options.get('creator', None)
     is_batchmode = options.get('is_batchmode', False)
+    autoupdated = options['autoupdated']
     old_versions = []
     versionable = registry.content.get_sheet(context, IVersionable)
     follows = versionable.get()['follows']
     for old_version in follows:
         old_versions.append(old_version)
         _notify_itemversion_has_new_version(old_version, new_version, registry,
-                                            creator)
+                                            creator, autoupdated)
         _notify_referencing_resources_about_new_version(old_version,
                                                         new_version,
                                                         root_versions,
@@ -69,13 +71,13 @@ def notify_new_itemversion_created(context, registry, options):
                                                         is_batchmode)
     if follows == []:
         _notify_itemversion_has_new_version(None, new_version, registry,
-                                            creator)
+                                            creator, autoupdated)
 
 
 def _notify_itemversion_has_new_version(old_version, new_version, registry,
-                                        creator):
+                                        creator, autoupdated):
     event = ItemVersionNewVersionAdded(old_version, new_version, registry,
-                                       creator)
+                                       creator, autoupdated)
     registry.notify(event)
 
 

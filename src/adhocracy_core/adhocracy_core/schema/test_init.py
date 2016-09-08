@@ -456,6 +456,34 @@ class TestResource:
         assert inst.schema_type == ResourceObjectType
 
 
+class TestDeferredSelectWidget:
+
+    def call_fut(self, *args):
+        from . import deferred_select_widget
+        return deferred_select_widget(*args)
+
+    def test_empty_widget_if_no_choices_getter(self, node):
+        from deform.widget import Select2Widget
+        kw = {'context': object(), 'request': object()}
+        widget = self.call_fut(node, kw)
+        assert isinstance(widget, Select2Widget)
+        assert widget.multiple == False
+        assert widget.values == []
+
+    def test_filled_widget_if_choices_getter(self, node, mocker):
+        kw = {'context': object(), 'request': object()}
+        node.choices_getter = mocker.Mock(return_value=[('key', 'value')])
+        widget = self.call_fut(node, kw)
+        assert widget.values == [('key', 'value')]
+        node.choices_getter.assert_called_with(kw['context'], kw['request'])
+
+    def test_multi_select_widget_if_multiple(self, node):
+        kw = {'context': object(), 'request': object()}
+        node.multiple = True
+        widget = self.call_fut(node, kw)
+        assert widget.multiple
+
+
 class ReferenceUnitTest(unittest.TestCase):
 
     def make_one(self, **kwargs):
@@ -471,11 +499,13 @@ class ReferenceUnitTest(unittest.TestCase):
 
     def test_create(self):
         from adhocracy_core.interfaces import SheetReference
-        from adhocracy_core.schema import validate_reftype
+        from . import validate_reftype
+        from . import deferred_select_widget
         inst = self.make_one()
         assert inst.backref is False
         assert inst.reftype == SheetReference
         assert inst.validator.validators == (validate_reftype,)
+        assert inst.widget == deferred_select_widget
 
     def test_with_backref(self):
         inst = self.make_one(backref=True)
@@ -582,9 +612,12 @@ class TestUniqueReferences:
         return UniqueReferences(**kwargs)
 
     def test_create(self):
-        from adhocracy_core.schema import References
+        from . import References
+        from . import deferred_select_widget
         inst = self.make_one()
         assert isinstance(inst, References)
+        assert inst.widget == deferred_select_widget
+        assert inst.multiple
 
     def test_valid_deserialize_with_colander_null(self, request_):
         inst = self.make_one().bind(request_=request_)
@@ -664,13 +697,19 @@ class PasswordUnitTest(unittest.TestCase):
         from adhocracy_core.schema import Password
         return Password()
 
-    def test_serialize_valid_emtpy(self):
+    def test_create(self):
+        from colander import String
         inst = self.make_one()
-        assert inst.deserialize() == colander.drop
+        assert inst.schema_type is String
+        assert isinstance(inst.default, colander.deferred)
 
     def test_deserialize_valid_emtpy(self):
         inst = self.make_one()
-        assert inst.serialize() == ''
+        assert inst.deserialize() == colander.drop
+
+    def test_serialize_valid_emtpy(self):
+        inst = self.make_one()
+        assert inst.serialize() == colander.null
 
     def test_deserialize_valid_with_newlines(self):
         inst = self.make_one()
@@ -680,6 +719,18 @@ class PasswordUnitTest(unittest.TestCase):
         inst = self.make_one()
         with raises(colander.Invalid):
             inst.deserialize(1)
+
+    def test_bind_and_serialize_empty(self):
+        from datetime import datetime
+        inst = self.make_one().bind()
+        result = inst.serialize()
+        assert len(result) == 20
+
+    def test_bind_and_setup_password_widget(self):
+        from deform.widget import PasswordWidget
+        inst = self.make_one().bind()
+        widget = inst.widget
+        assert isinstance(widget, PasswordWidget)
 
 
 class DateTimeUnitTest(unittest.TestCase):
@@ -1057,9 +1108,21 @@ class TestFileStoreType:
         from adhocracy_core.schema import FileStoreType
         return FileStoreType()
 
-    def test_serialize_raises_exception(self, inst):
-        with raises(colander.Invalid):
-            inst.serialize(None, colander.null)
+    def test_serialize_null(self, inst):
+        assert inst.serialize(None, None) is colander.null
+
+    def test_serialize_file_to_filedict(self, inst):
+        from deform.widget import filedict
+        from substanced.file import File
+        file = Mock(spec=File, mimetype='image/file', size=10)
+        result = inst.serialize(None, file)
+        assert isinstance(result, filedict)
+        assert result == {'fp': None,
+                          'filename': file.title,
+                          'size': file.size,
+                          'uid': str(hash(file)),
+                          'mimetype': file.mimetype,
+                          }
 
     def test_deserialize_null(self, inst):
         assert inst.deserialize(None, colander.null) is None
@@ -1076,6 +1139,24 @@ class TestFileStoreType:
         mock_fstat = Mock(spec=os.fstat, return_value=mock_fstat_result)
         monkeypatch.setattr(os, 'fstat', mock_fstat)
         value = Mock()
+        assert inst.deserialize(None, value) == mock_response
+        assert mock_response.size == mock_fstat_result.st_size
+
+    def test_deserialize_filedict(self, inst, monkeypatch):
+        from deform.widget import filedict
+        from adhocracy_core import schema
+        import os
+        mock_response = Mock()
+        mock_file_constructor = Mock(spec=schema.File,
+                                     return_value=mock_response)
+        monkeypatch.setattr(schema, 'File', mock_file_constructor)
+        mock_fstat_result = Mock()
+        mock_fstat_result.st_size = 777
+        mock_fstat = Mock(spec=os.fstat, return_value=mock_fstat_result)
+        monkeypatch.setattr(os, 'fstat', mock_fstat)
+        value = filedict([('filename', Mock()),
+                          ('fp', Mock()),
+                         ])
         assert inst.deserialize(None, value) == mock_response
         assert mock_response.size == mock_fstat_result.st_size
 
@@ -1114,6 +1195,41 @@ class TestFileStoreType:
         with raises(colander.Invalid) as err_info:
             inst.deserialize(None, value)
         assert 'too large' in err_info.value.msg
+
+
+class TestFileStore:
+
+    @fixture
+    def inst(self):
+        from . import FileStore
+        return FileStore()
+
+    @fixture
+    def request_(self, request_):
+        request_.registry.settings['substanced.uploads_tempdir'] = '.'
+        return request_
+
+    def test_create(self, inst):
+        from . import FileStoreType
+        inst = inst.bind()
+        assert isinstance(inst.typ, FileStoreType)
+        assert inst.widget is None
+
+    def test_create_add_upload_widget_if_request(self, inst, request_):
+        from deform.widget import FileUploadWidget
+        inst = inst.bind(request=request_)
+        assert isinstance(inst.widget, FileUploadWidget)
+
+    def test_deserialize_ignore_tmp_store_if_no_request(self, inst):
+        inst = inst.bind()
+        assert inst.deserialize(colander.null) is None
+
+    def test_deserialize_clear_tmp_store_if_request(self, inst, request_,
+                                               mocker):
+        inst = inst.bind(request=request_)
+        mock = mocker.patch('adhocracy_core.schema.FileUploadTempStore').return_value
+        inst.deserialize(colander.null) is None
+        assert mock.clear.called
 
 
 class TestACLPrincipalType:
@@ -1165,6 +1281,26 @@ class TestACEPrincipal:
     def test_create(self, inst):
         from . import ACEPrincipalType
         inst.schema_type = ACEPrincipalType
+
+    def test_widget(self, inst):
+        inst.schema_type.valid_principals = ['admin']
+        inst = inst.bind()
+
+        assert inst.widget.values == [('admin', 'admin')]
+
+
+class TestACEPrincipals:
+
+    @fixture
+    def inst(self):
+        from . import ACEPrincipals
+        return ACEPrincipals()
+
+    def test_create(self, inst):
+        from . import SequenceSchema
+        from . import ACEPrincipal
+        assert isinstance(inst, SequenceSchema)
+        assert isinstance(inst['principal'], ACEPrincipal)
 
 
 @fixture
@@ -1244,3 +1380,51 @@ class TestACM:
              'permissions': [['edit', '']]}) == \
             {'principals': ['system.Everyone'],
              'permissions': [['edit', None]]}
+
+
+class TestDeferredPermmissionCheckValidator:
+
+    def call_fut(self, *args):
+        from . import create_deferred_permission_validator
+        return create_deferred_permission_validator(*args)
+
+    @fixture
+    def kw(self, context, request_):
+        return {'context': context,
+                'request': request_}
+
+    def test_raise_if_user_not_authorized(self, config, node, kw):
+        config.testing_securitypolicy(userid='hank', permissive=False)
+        validator = self.call_fut('permission')
+        with raises(colander.Invalid):
+            validator(node, kw)(node, 'value')
+
+    def test_pass_if_user_authorized(self, config, node, kw):
+        config.testing_securitypolicy(userid='hank', permissive=True)
+        validator = self.call_fut('permission')
+        assert validator(node, kw)(node, 'value') is None
+
+    def test_pass_if_request_binding_is_missing(self, config, node, kw):
+        del kw['request']
+        config.testing_securitypolicy(userid='hank', permissive=False)
+        validator = self.call_fut('permission')
+        assert validator(node, kw)(node, 'value') is None
+
+
+class TestChoicesByInterface:
+
+    def call_fut(self, *args):
+        from . import get_choices_by_interface
+        return get_choices_by_interface(*args)
+
+    def test_create_choices(self, request_, mocker, mock_catalogs,
+                            search_result):
+        from zope.interface.interfaces import IInterface
+        context = testing.DummyResource(__name__='resource')
+        mocker.patch('adhocracy_core.schema.find_service',
+                     return_value=mock_catalogs)
+        mock_catalogs.search.return_value = search_result._replace(elements=
+                                                                   [context])
+        result = self.call_fut(IInterface, context, request_)
+        assert mock_catalogs.search.call_args[0][0].interfaces == IInterface
+        assert result == [('http://example.comresource/', 'resource')]

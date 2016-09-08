@@ -1,12 +1,36 @@
 .markdown-rendered {
     &, * {
         white-space: normal;
-        line-height: 1.3;
     }
 
     img {
         height: auto;
         max-width: 100%;
         margin-bottom: 5px;
+    }
+}
+
+.inline-editable-markdown {
+
+    .markdown-rendered {
+        display: inline-block;
+    }
+
+    .inline-editable-markdown-empty-placeholder {
+        color: $color-text-introvert;
+    }
+
+    .inline-editable-markdown-edit-button {
+        @include rem(margin-left, 5px);
+        visibility: hidden;
+    }
+
+    &:hover .inline-editable-markdown-edit-button {
+        visibility: visible;
+    }
+
+    .inline-editable-markdown-edit-button-container {
+        @include rem(margin-bottom, 10px);
+        padding: 0 10px;
     }
 }

@@ -44,6 +44,7 @@ class TestAPIView:
         config = call_venusian(venusian)
         assert config.settings ==\
                [{'decorator': [authentication.validate_user_headers,
+                               authentication.validate_anonymize_header,
                                schemas.validate_visibility,
                                caching.set_cache_header,
                                ],

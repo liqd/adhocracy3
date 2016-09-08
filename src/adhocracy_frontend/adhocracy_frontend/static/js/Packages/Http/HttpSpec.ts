@@ -90,7 +90,7 @@ export var register = () => {
             var adhConfigMock;
             var adhCacheMock;
             var adhCredentialsMock;
-            var adhHttp : AdhHttp.Service<any>;
+            var adhHttp : AdhHttp.Service;
 
             beforeEach(() => {
                 adhPreliminaryNames = new AdhPreliminaryNames.Service();

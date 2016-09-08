@@ -5,6 +5,7 @@ import * as AdhHttp from "../Http/Http";
 import * as AdhCredentials from "./Credentials";
 
 import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
+import * as SIAnonymizeDefault from "../../Resources_/adhocracy_core/sheets/principal/IAnonymizeDefault";
 import * as SIPasswordAuthentication from "../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication";
 import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
 import * as SIUserExtended from "../../Resources_/adhocracy_core/sheets/principal/IUserExtended";
@@ -21,11 +22,14 @@ export interface IRegisterResponse {}
 
 
 export class Service {
-    public data : IUserBasic;
+    public data : {
+        name : string;
+        anonymize : boolean;
+    };
     public ready : angular.IPromise<RIUser>;
 
     constructor(
-        private adhHttp : AdhHttp.Service<any>,
+        private adhHttp : AdhHttp.Service,
         private adhCredentials : AdhCredentials.Service,
         private $q : angular.IQService,
         private $rootScope : angular.IScope
@@ -49,12 +53,15 @@ export class Service {
         });
     }
 
-    private loadUser(userPath) {
+    public loadUser(userPath) {
         var _self : Service = this;
 
         return _self.adhHttp.get(userPath)
             .then((resource) => {
-                _self.data = resource.data[SIUserBasic.nick];
+                _self.data = {
+                    name: resource.data[SIUserBasic.nick].name,
+                    anonymize: resource.data[SIAnonymizeDefault.nick].anonymize,
+                };
             }, (reason) => {
                 // The user resource that was returned by the server could not be accessed.
                 // This may happen e.g. with a network disconnect

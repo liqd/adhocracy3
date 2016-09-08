@@ -1,8 +1,8 @@
 /*doc
 ---
-title: map
+title: Map
 name: map
-category: Widgets
+category: Components
 ---
 */
 
@@ -13,14 +13,14 @@ category: Widgets
 
     .map-button-clear,
     .map-button-reset {
-        @include inline-block;
-        @include rem(padding, 0 10px);
+        @include rem(padding, 0 $padding);
+        display: inline-block;
     }
 }
 
 /*doc
 ---
-title: map info
+title: Map Info
 name: map-info
 parent: map
 ---
@@ -41,7 +41,7 @@ time.
 */
 .map-info {
     @include rem(font-size, $font-size-small);
-    @include rem(padding, 5px);
+    @include rem(padding, 5px $padding);
     background: $color-text-normal;
     color: $color-text-inverted;
     width: 100%;
@@ -51,19 +51,24 @@ time.
     }
 
     &.ng-invalid {
-        background: $color-function-invalid;
+        background: $color-function-negative;
         font-weight: $font-weight-extrovert;
+
+        a {
+            color: inherit;
+            text-decoration: underline;
+        }
     }
 }
 
 /*doc
 ---
-title: persistant map info
-name: map-info-persistant
+title: Persistent Map Info
+name: map-info-persistent
 parent: map
 ---
 
-Persistant map info is used to show general information in the context of a
+Persistent map info is used to show general information in the context of a
 map.  It is different from `map-info` in that it should be show all the time
 rather than in response to user action.
 
@@ -75,13 +80,13 @@ rather than in response to user action.
 */
 .map-info-persistent {
     @include rem(font-size, $font-size-small);
-    @include rem(padding, 5px);
+    @include rem(padding, 5px $padding);
     background: $color-background-base-introvert;
 }
 
 .leaflet-marker-icon {
-    @include border-radius(50%);
-    @include box-shadow(0 0 1px 1px $color-text-inverted);
+    border-radius: 50%;
+    box-shadow: 0 0 1px 1px $color-text-inverted;
     background: $color-brand-two-normal;
     color: $color-text-inverted;
     text-align: center;
@@ -113,7 +118,7 @@ rather than in response to user action.
 
 .map-list-navigate {
     @include rem(font-size, $font-size-normal);
-    font-weight: bold;
+    font-weight: $font-weight-extrovert;
 
     &:hover, &:focus {
         text-decoration: none;
@@ -158,12 +163,12 @@ rather than in response to user action.
 }
 
 .map-list-item {
-    @include inline-block;
+    display: inline-block;
     vertical-align: middle;
     width: 100%;
 
     &.m-empty {
-        font-weight: bold;
+        font-weight: $font-weight-extrovert;
         text-align: center;
     }
 }

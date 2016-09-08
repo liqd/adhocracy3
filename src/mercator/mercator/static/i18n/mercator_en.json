@@ -4,7 +4,6 @@
     "TR__BLOG_EMPTY_TEXT": "No posts yet.",
     "TR__BLOG_NEW_ENTRY": "New Post",
     "TR__COLLEAGUE": "colleague",
-    "TR__DESCRIPTION": "Description",
     "TR__DISCLAIMER": "disclaimer",
     "TR__ERROR_ENOUGH_TOPICS": "Please pick up to 2 topics",
     "TR__ERROR_INVALID_MERCATOR_PROPOSAL_ORGANIZATION_DATE_OF_FORESEEN_REGISTRATION_2016": "Please enter a valid organization date of registration (yyyy-mm).",
@@ -198,6 +197,5 @@
     "TR__MORE_PARTNERS": "I have more than 3 partner organisations",
     "TR__PERSONAL_CONTACT": "Personal contact",
     "TR__PROPOSAL_ADD": "Add proposal",
-    "TR__PROPOSAL_EMPTY_TEXT": "No proposals yet.",
     "TR__TWITTER": "Twitter"
 }

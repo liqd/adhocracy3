@@ -34,16 +34,10 @@ export interface IParagraph {
     selectedState? : string;
 }
 
-export interface IBadge {
-    title : string;
-    description : string;
-    name : string;
-}
-
 export interface IScope extends angular.IScope {
     path? : string;
     hasMap? : boolean;
-    hasBadges?: boolean;
+    hasBadges? : boolean;
     options : AdhHttp.IOptions;
     errors? : AdhHttp.IBackendErrorItem[];
     data : {
@@ -57,10 +51,10 @@ export interface IScope extends angular.IScope {
 
         // optional features
         coordinates? : number[];
-        assignments?: IBadge[];
+        assignments? : AdhBadge.IBadgeAssignment[];
     };
     selectedState? : string;
-    resource: any;
+    resource : any;
 
     toggleCreateForm() : void;
     showCreateForm? : boolean;
@@ -99,8 +93,8 @@ export var highlightSelectedParagraph = (
 
 export var bindPath = (
     $q : angular.IQService,
-    adhHttp : AdhHttp.Service<any>,
-    adhGetBadges? : AdhBadge.IGetBadges,
+    adhHttp : AdhHttp.Service,
+    adhGetBadges? : AdhBadge.IGetBadgeAssignments,
     adhTopLevelState? : AdhTopLevelState.Service
 ) => (
     scope : IScope,
@@ -162,7 +156,7 @@ export var bindPath = (
 };
 
 export var postCreate = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhUploadImage
 ) => (
@@ -233,7 +227,7 @@ export var postCreate = (
 };
 
 export var postEdit = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhUploadImage
 ) => (
@@ -242,8 +236,13 @@ export var postEdit = (
     oldParagraphVersions : RIParagraphVersion[],
     hasMap : boolean = false
 ) : angular.IPromise<RIDocumentVersion> => {
-    // This function assumes that paragraphs can not be reordered or deleted
-    // and that new paragraphs are always appended to the end.
+    // This function assumes the following:
+    //
+    // -   paragraphs can not be reordered
+    // -   paragraphs can't really be deleted, only excluded from the
+    //     next version of the document (by marking them as deleted
+    //     here in the FE),
+    // -   new paragraphs are always appended to the end.
 
     var documentPath = AdhUtil.parentPath(oldVersion.path);
     var poolPath = AdhUtil.parentPath(documentPath);
@@ -343,8 +342,8 @@ export var postEdit = (
 export var detailDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhHttp : AdhHttp.Service,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -368,8 +367,8 @@ export var detailDirective = (
 export var listItemDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhHttp : AdhHttp.Service,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -399,8 +398,8 @@ export var listItemDirective = (
 export var mapListItemDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhHttp : AdhHttp.Service,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     var directive : angular.IDirective = listItemDirective($q, adhConfig, adhHttp, adhGetBadges, adhTopLevelState);
@@ -440,7 +439,7 @@ export var listingDirective = (
 export var createDirective = (
     $location : angular.ILocationService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhShowError,
@@ -456,7 +455,8 @@ export var createDirective = (
             path: "@",
             hasMap: "=?",
             hasImage: "=?",
-            polygon: "=?"
+            polygon: "=?",
+            cancelUrl: "=?"
         },
         link: (scope : IFormScope, element) => {
             scope.errors = [];
@@ -482,7 +482,11 @@ export var createDirective = (
                 scope.data.paragraphs[index].deleted = true;
             };
 
-            scope.paragraphCount = () => _.filter(scope.data.paragraphs, (p) => !p.deleted).length;
+            scope.paragraphCount = () => {
+                if (scope.data) {
+                    return _.filter(scope.data.paragraphs, (p) => !p.deleted).length;
+                }
+            };
 
             scope.cancel = () => {
                 var processUrl = adhTopLevelState.get("processUrl");
@@ -505,7 +509,7 @@ export var editDirective = (
     $location : angular.ILocationService,
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhShowError,
@@ -522,7 +526,8 @@ export var editDirective = (
             hasMap: "=?",
             hasBadges: "=?",
             hasImage: "=?",
-            polygon: "=?"
+            polygon: "=?",
+            cancelUrl: "=?"
         },
         link: (scope : IFormScope, element) => {
             scope.errors = [];
@@ -540,7 +545,11 @@ export var editDirective = (
                 scope.data.paragraphs[index].deleted = true;
             };
 
-            scope.paragraphCount = () => _.filter(scope.data.paragraphs, (p) => !p.deleted).length;
+            scope.paragraphCount = () => {
+                if (scope.data) {
+                    return _.filter(scope.data.paragraphs, (p) => !p.deleted).length;
+                }
+            };
 
             bindPath($q, adhHttp)(scope, undefined, scope.hasMap);
 
@@ -561,4 +570,3 @@ export var editDirective = (
         }
     };
 };
-

@@ -1,44 +1,34 @@
 //Brand colors
-$color-brand-one-normal: #b3b3b3;
-$color-brand-one-introvert: #e6e6e6;
-$color-brand-one-extrovert: #808080;
-$color-brand-two-normal: #29abe2;
-$color-brand-two-introvert: #7fcdee;
-$color-brand-two-extrovert: #1f80aa;
+$color-brand-one-normal: #c3302a;
+$color-brand-one-introvert: lighten($color-brand-one-normal, 10%);
+$color-brand-one-extrovert: darken($color-brand-one-normal, 10%);
+$color-brand-two-normal: #241b70;
+$color-brand-two-introvert: lighten($color-brand-two-normal, 10%);
+$color-brand-two-extrovert: darken($color-brand-two-normal, 10%);
 
 // Text colors
-$color-text-normal: #333;
-$color-text-introvert: #666;
-$color-text-highlight-normal: $color-brand-two-introvert;
+$color-text-highlight-normal: $color-brand-two-normal;
 $color-text-highlight-introvert: $color-brand-two-introvert;
 $color-text-highlight-extrovert: $color-brand-two-extrovert;
+$color-text-introvert: #666;
 
 // Function colors
-$color-function-valid: #73bf44;
-$color-function-invalid: #f00;
 $color-function-winner: #f79321;
+$color-function-negative: $color-brand-one-normal;
 
-$font-family-normal: "Roboto", sans-serif;
+$font-family-normal: "Lato", sans-serif;
 $font-family-serif: "Merriweather", serif;
 
-$font-size-smaller: 9px;
-$font-size-small: 10px;
-$font-size-normal: 12px;
-$font-size-plus: 14px;
-$font-size-large: 18px;
+$font-size-smaller: 12px;
+$font-size-small: 14px;
+$font-size-normal: 16px;
+$font-size-plus: 20px;
+$font-size-large: 24px;
+$font-size-huge: 36px;
 
 //Other
 $moving-column-single-width-max: $font-size-normal * 64;
 
-$color-button-text: $color-brand-one-extrovert;
-$color-button-text-hover: $color-brand-one-normal;
-$color-button-cta-text: $color-text-normal;
-$color-button-cta-base: $color-brand-one-introvert;
-$color-button-cta-hover-background: $color-brand-one-normal;
-$color-button-cta-active-background: $color-brand-one-extrovert;
-$color-button-cta-active-text: $color-text-inverted;
-
 $moving-column-menu-height: 30px / $font-size-normal * 1em;
-$s1-header-width: 80%;
 // REFACT consider pushing this into the standard variables
-$s1-header-height: 100px;
+$s1-header-height: 110px;

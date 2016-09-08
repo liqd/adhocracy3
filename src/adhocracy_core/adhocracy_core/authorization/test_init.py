@@ -171,6 +171,39 @@ def test_set_local_roles_notify_modified(context, config):
     assert event.registry == config.registry
 
 
+def test_add_local_roles_non_update_roles(context):
+    from . import add_local_roles
+    new_roles = {'principal': []}
+    with raises(AssertionError):
+        add_local_roles(context, new_roles)
+
+
+def test_add_local_roles_new_roles(context):
+    from . import add_local_roles
+    new_roles = {'principal': set()}
+    add_local_roles(context, new_roles)
+    assert context.__local_roles__ == new_roles
+
+
+def test_add_local_roles_non_differ_roles(context):
+    from . import add_local_roles
+    old_roles = {'principal': set()}
+    context.__local_roles__ = old_roles
+    new_roles = {'principal': set()}
+    add_local_roles(context, new_roles)
+    assert context.__local_roles__ is old_roles
+
+
+def test_add_local_roles_differ_roles(context):
+    from . import add_local_roles
+    old_roles = {'principal': {'old'}, 'principal2': set()}
+    context.__local_roles__ = old_roles
+    new_roles = {'principal': {'new'}}
+    add_local_roles(context, new_roles)
+    assert context.__local_roles__ == {'principal': {'old', 'new'},
+                                       'principal2': set()}
+
+
 def test_get_local_roles(context):
     from . import get_local_roles
     roles = {'principal': set()}
@@ -296,6 +329,42 @@ def test_create_fake_god_request(registry):
     from . import create_fake_god_request
     req = create_fake_god_request(registry)
     assert req.__cached_principals__ == ['role:god']
+
+
+class TestGetPrincipalsWithLocalRoles:
+
+    def call_fut(self,  *args):
+        from . import get_principals_with_local_roles
+        return get_principals_with_local_roles(*args)
+
+    def test_principals_with_no_local_roles(self, context):
+        principals = ['system.Everyone', 'system.Authenticated']
+        assert set(self.call_fut(context, principals)) == set(principals)
+
+    def test_principals_with_wrong_local_roles(self, context):
+        context.__local_roles__ = {'group:default_group': {'role:participant'}}
+        principals = ['system.Everyone', 'system.Authenticated']
+        assert set(self.call_fut(context, principals)) == set(principals)
+
+    def test_principals_with_local_roles(self, context):
+        context.__local_roles__ = {'group:default_group': {'role:participant'}}
+        principals = ['system.Everyone', 'system.Authenticated',
+                      'group:default_group']
+        principals_with_roles = list(principals)
+        principals_with_roles.append('role:participant')
+        result = self.call_fut(context, principals)
+        assert set(result) == set(principals_with_roles)
+
+    def test_principals_with_anonymized_creator(self, context, mocker):
+        mocker.patch('adhocracy_core.authorization.get_anonymized_creator',
+                     return_value='userid')
+        context.__local_roles__ = {}
+        principals = ['system.Everyone', 'system.Authenticated',
+                      'userid']
+        principals_with_roles = list(principals)
+        principals_with_roles.append('role:creator')
+        result = self.call_fut(context, principals)
+        assert set(result) == set(principals_with_roles)
 
 
 @mark.usefixtures('integration')

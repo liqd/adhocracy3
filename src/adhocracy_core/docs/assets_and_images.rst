@@ -142,13 +142,14 @@ Now we can upload a sample picture::
     ...                        upload_files=upload_files).json
 
 In response, the backend sends a JSON document with the resource type and
-path of the new resource (just as with other resource types)::
+path of the new resource (just as with other resource types). The resource
+name is generated randomly::
 
     >>> resp_data['content_type']
     'adhocracy_core.resources.image.IImage'
     >>> pic_path = resp_data['path']
     >>> pic_path
-    'http://localhost/process/assets/0000000/'
+    'http://localhost/process/assets/.../'
 
 If the frontend tries to upload an asset that is overly large (more than 16
 MB), the backend responds with an error. Stricter size limits may be
@@ -175,11 +176,11 @@ the asset::
     >>> resp_image_meta = resp_data['data']['adhocracy_core.sheets.image.IImageMetadata']
     >>> pprint(resp_image_meta)
     {'attached_to': [],
-     'detail': 'http://localhost/process/assets/0000000/0000000/',
+     'detail': 'http://localhost/process/assets/.../0000000/',
      'filename': 'python.jpg',
      'mime_type': 'image/jpeg',
      'size': '159041',
-     'thumbnail': 'http://localhost/process/assets/0000000/0000001/'}
+     'thumbnail': 'http://localhost/process/assets/.../0000001/'}
 
 The actual binary data is *not* part of that JSON document::
 
@@ -275,7 +276,7 @@ As usual, the response lists the resources affected by the transaction::
     >>> sorted(updated_resources)
     ['changed_descendants', 'created', 'modified', 'removed']
     >>> resp_data['updated_resources']['modified']
-    ['http://localhost/process/assets/0000000/']
+    ['http://localhost/process/assets/.../']
     >>> 'http://localhost/process/' in updated_resources['changed_descendants']
     True
 
@@ -310,7 +311,7 @@ The image reference sheet also allows to refer to an external image url.
 
     >>> resp = admin.get(prop_v1_path).json
     >>> resp['data']['adhocracy_core.sheets.image.IImageReference']['picture']
-    '.../process/assets/0000000/'
+    '.../process/assets/.../'
     >>> resp['data']['adhocracy_core.sheets.image.IImageReference']['external_picture_url']
     ''
 
@@ -331,4 +332,4 @@ the backend downloads and references the given image url. The old picture
 reference is replaced with the newly created image.
 
     >>> resp['data']['adhocracy_core.sheets.image.IImageReference']['picture']
-    '.../process/assets/0000001/'
+    '.../process/assets/.../'

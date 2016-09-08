@@ -1,6 +1,5 @@
 <div
-    class="section-jump"
-    id="section-jump-top"
+    id="jump-top"
     data-ng-class="{
         'has-rosette': data.winner.name === 'winning' || data.winner.name === 'community',
         'm-winner': data.winner.name === 'winning',
@@ -47,15 +46,30 @@
         </div>
     </div>
 
-    <div class="mercator-proposal-detail-view">
+    <div data-ng-if="showBlogTabs()" class="tabs">
+        <a
+            class="tab"
+            data-ng-class="{'is-active': proposalTab !== 'blog'}"
+            data-ng-href="{{ path | adhResourceUrl }}">{{ "TR__MERCATOR_PROPOSAL_TAB_IDEA" | translate }}</a>
+        <a
+            class="tab"
+            data-ng-class="{'is-active': proposalTab === 'blog'}"
+            data-ng-href="{{ path | adhResourceUrl:'blog' }}">{{ "TR__MERCATOR_PROPOSAL_TAB_JOURNEY" | translate }}</a>
+    </div>
+
+    <div data-ng-if="showBlogTabs() && proposalTab === 'blog'" class="blog">
+        <adh-blog data-ng-if="data.logbookPoolPath" data-path="{{ data.logbookPoolPath }}"></adh-blog>
+    </div>
+
+    <div class="mercator-proposal-detail-view" data-ng-if="!showBlogTabs() || proposalTab !== 'blog'">
         <adh-show-image
             data-css-class="mercator-proposal-detail-view-image"
             data-path="{{data.introduction.picture}}"
             data-image-metadata-nick="adhocracy_mercator.sheets.mercator.IIntroImageMetadata"
         ></adh-show-image>
 
-        <div class="section-jump-body">
-            <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="">
+        <div class="jump-navigation-wrapper m-narrow">
+            <nav class="jump-navigation m-unnumbered" data-adh-sticky="">
                 <ol>
                     <li data-ng-if="data.winner.name === 'winning' || data.winner.name === 'community'"><a
                         href="#jury-decision"
@@ -92,20 +106,17 @@
                 </ol>
             </nav>
 
-            <div class="section-jump-main chapter-wrapper" data-du-spy-context="">
-                <section data-ng-if="data.winner.name === 'winning' || data.winner.name === 'community'" class="chapter m-jury-decision" id="jury-decision">
-                    <section class="jury-decision-section">
-                        <h2 class="chapter-header">{{ "TR__MERCATOR_JURY_STATEMENT" | translate }}</h2>
-                        <p>{{ "TR__MERCATOR_PROPOSAL_FUNDING" | translate }}: {{ data.winner.funding }} &euro;</p>
-                        <p>{{ data.winner.description }}</p>
-                        <div class="jury-decision-section-icon">
-                            <i class="icon-star"></i>
-                        </div>
-                    </section>
+            <div class="jump-navigation-main" data-du-spy-context="">
+                <section data-ng-if="data.winner.name === 'winning' || data.winner.name === 'community'" class="jury-decision-section" id="jury-decision">
+                    <h2>{{ "TR__MERCATOR_JURY_STATEMENT" | translate }}</h2>
+                    <p>{{ data.winner.description }}</p>
+                    <div class="jury-decision-section-icon">
+                        <i class="icon-star"></i>
+                    </div>
                 </section>
-                <section class="chapter" id="mercator-proposal-brief">
+                <section id="mercator-proposal-brief">
                     <section class="action-section {{subResourceSelectedState('pitch')}}">
-                        <h2 class="chapter-header m-counted"
+                        <h2 class="m-counted"
                             data-du-scrollspy="mercator-proposal-brief"
                             data-offset="50">{{ "TR__MERCATOR_PROPOSAL_BRIEF" | translate }}</h2>
                         <p>{{ data.introduction.pitch }}</p>
@@ -117,12 +128,10 @@
                     <section class="non-action-section">
                         <div class="mercator-proposal-location">
                             <h3>{{ "TR__MERCATOR_PROPOSAL_LOCATION_LABEL" | translate }}:</h3>
-                            <ul class="inline-boxes">
-                                <li data-ng-if="data.location.location_is_online" class="inline-box-online">{{ "TR__ONLINE" | translate }}</li>
-                                <li data-ng-if="data.location.location_is_specific">{{ data.location.location_specific }}</li>
-                                <li data-ng-if="data.location.location_is_linked_to_ruhr">{{ "TR__MERCATOR_PROPOSAL_RUHR" | translate }}</li>
-                                <li data-ng-if="data.finance.other_sources">{{ data.finance.otherSources }}</li>
-                            </ul>
+                            <span class="badge" data-ng-if="data.location.location_is_online">{{ "TR__ONLINE" | translate }}</span>
+                            <span class="badge" data-ng-if="data.location.location_is_specific">{{ data.location.location_specific }}</span>
+                            <span class="badge" data-ng-if="data.location.location_is_linked_to_ruhr">{{ "TR__MERCATOR_PROPOSAL_RUHR" | translate }}</span>
+                            <span class="badge" data-ng-if="data.finance.other_sources">{{ data.finance.otherSources }}</span>
                         </div>
                     </section>
 
@@ -140,9 +149,9 @@
                     </section>
                 </section>
 
-                <section class="chapter" id="mercator-proposal-about-you">
+                <section id="mercator-proposal-about-you">
                     <section class="non-action-section">
-                        <h2 class="chapter-header m-counted"
+                        <h2 class="m-counted"
                             data-du-scrollspy="mercator-proposal-about-you"
                             data-offset="50">{{ "TR__MERCATOR_PROPOSAL_ABOUT_YOU" | translate }}</h2>
 
@@ -258,9 +267,9 @@
                     </section>
                 </section>
 
-                <section class="chapter" id="mercator-proposal-impact">
+                <section id="mercator-proposal-impact">
                     <section class="action-section {{subResourceSelectedState('challenge')}}">
-                        <h2 class="chapter-header m-counted"
+                        <h2 class="m-counted"
                             data-du-scrollspy="mercator-proposal-impact"
                             data-offset="50">{{ "TR__MERCATOR_PROPOSAL_IMPACT" | translate }}</h2>
                         <h3>{{ "TR__MERCATOR_PROPOSAL_IMPACT_CHALLENGE_LABEL" | translate }}</h3>
@@ -338,9 +347,9 @@
                     </section>
                 </section>
 
-                <section class="chapter" id="mercator-proposal-criteria">
+                <section id="mercator-proposal-criteria">
                     <section class="action-section {{subResourceSelectedState('connectioncohesion')}}">
-                        <h2 class="chapter-header m-counted"
+                        <h2 class="m-counted"
                             data-du-scrollspy="mercator-proposal-criteria"
                             data-offset="50">{{ "TR__MERCATOR_PROPOSAL_CRITERIA" | translate }}</h2>
                         <h3>{{ "TR__MERCATOR_PROPOSAL_STRENGTHEN_LABEL" | translate }}</h3>
@@ -367,9 +376,9 @@
                     </section>
                 </section>
 
-                <section class="chapter" id="mercator-proposal-community" data-ng-if="data.experience || data.heardFrom">
+                <section id="mercator-proposal-community" data-ng-if="data.experience || data.heardFrom">
                     <section class="action-section {{subResourceSelectedState('experience')}}">
-                        <h2 class="chapter-header m-counted"
+                        <h2 class="m-counted"
                             data-du-scrollspy="mercator-proposal-community"
                             data-offset="50">{{ "TR__MERCATOR_PROPOSAL_COMMUNITY" | translate }}</h2>
                         <div data-ng-if="data.experience">
@@ -380,7 +389,7 @@
                 </section>
 
                 <footer class="mercator-proposal-detail-footer">
-                    <a class="button-back-to-top" data-du-smooth-scroll="" href="#section-jump-top">
+                    <a class="button-back-to-top" data-du-smooth-scroll="" href="#jump-top">
                     <i class="icon-back-to-top"></i> {{ "TR__BACK_TO_TOP" | translate }}</a>
                     <adh-like data-refers-to="{{path}}" data-disabled="processState != 'participate'"></adh-like>
                 </footer>

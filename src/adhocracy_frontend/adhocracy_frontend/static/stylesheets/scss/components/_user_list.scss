@@ -1,8 +1,8 @@
 /*doc
 ---
-title: User list item
+title: User List Item
 name: user-list-item
-category: Widgets
+category: Components
 ---
 
 A user list item within a listing widget
@@ -32,7 +32,7 @@ A user list item within a listing widget
 */
 
 .user-list-item-link {
-    @include rem(padding, 20px 20px 20px 1rem);
+    @include rem(padding, $padding);
     background: $color-background-base-introvert;
     border-bottom: 2px solid $color-structure-normal;
     display: block;
@@ -58,7 +58,7 @@ A user list item within a listing widget
 
     .user-list-item-button {
         float: right;
-        line-height: $font-size-large/$font-size-normal;
+        line-height: $font-size-large / $font-size-normal;
     }
 
     &.m-me, &:hover, &:focus, &.is-selected {

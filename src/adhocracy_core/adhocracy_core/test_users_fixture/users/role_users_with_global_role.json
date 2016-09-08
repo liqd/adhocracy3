@@ -1,0 +1,38 @@
+[
+  { "name": "admin",
+    "email": "admin@example.com",
+    "initial-password": "password",
+    "roles": ["admin"],
+    "groups": ["global_role_users"]
+  },
+   { "name": "initiator",
+    "email": "initiator@example.com",
+    "initial-password": "password",
+    "roles": ["initiator"],
+    "groups": ["global_role_users"]
+  },
+  { "name": "moderator",
+    "email": "moderator@example.com",
+    "initial-password": "password",
+    "roles": ["moderator"],
+    "groups": ["global_role_users"]
+  },
+  { "name": "participant",
+    "email": "participant@example.com",
+    "initial-password": "password",
+    "roles": ["participant"],
+    "groups": ["global_role_users"]
+  },
+  { "name": "participant2",
+    "email": "participant2@example.com",
+    "initial-password": "password",
+    "roles": ["participant"],
+    "groups": ["global_role_users"]
+  },
+  { "name": "authenticated",
+    "email": "authenticated@example.com",
+    "initial-password": "password",
+    "roles": [],
+    "groups": ["global_role_users"]
+  }
+]

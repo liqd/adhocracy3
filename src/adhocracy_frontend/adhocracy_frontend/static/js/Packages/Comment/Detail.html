@@ -28,13 +28,12 @@
                         class="comment-header-link"
                         title="{{ 'TR__EDIT' | translate }}">
                         <i class="comment-header-icon icon-pencil"></i>
-
                     </a>
                     <a href=""
-                        data-ng-click="delete()"
+                        data-ng-click="hide()"
                         data-ng-if="versionOptions.hide"
                         class="comment-header-link"
-                        title="{{ 'TR__DELETE' | translate }}">
+                        title="{{ 'TR__HIDE' | translate }}">
                         <i class="comment-header-icon icon-x"></i>
                     </a>
                     <a href=""
@@ -51,14 +50,38 @@
             </div>
         </div>
 
+        <ul class="alerts">
+            <li data-ng-repeat="(id, alert) in modals.alerts" class="alerts-message m-{{alert.mode}}" data-ng-click="modals.removeAlert(id)">
+                {{ alert.message | translate }}
+            </li>
+        </ul>
+
+        <div class="modal" data-ng-if="modals.modal">
+            <adh-report-abuse
+                data-ng-if="modals.modal === 'abuse'"
+                data-modals="modals"
+                class="report-abuse"
+                data-url="{{data.path}}">
+            </adh-report-abuse>
+        </div>
+
         <form class="comment-children-edit-form" data-ng-switch-when="1" data-ng-submit="submit()">
             <div class="form-error" data-ng-repeat="error in errors">
                 <p>{{ error | translate }}</p>
             </div>
             <textarea class="comment-edit-form-text" data-msd-elastic="" data-ng-model="data.content"></textarea>
             <footer class="form-footer">
-                <input type="submit" class="button-cta form-footer-button-cta" value="{{ 'TR__SAVE' | translate }}" />
-                <a href="" class="button form-footer-button" data-ng-click="cancel()" data-ng-if="!hideCancel">{{ "TR__CANCEL" | translate }}</a>
+                <div class="form-footer-right">
+                    <adh-anonymize
+                        data-url="{{item.path}}"
+                        data-method="POST"
+                        data-local-default="data.createdAnonymously"
+                        data-model="data.anonymize"></adh-anonymize>
+                    <input type="submit" class="button-cta" value="{{ 'TR__SAVE' | translate }}" />
+                </div>
+                <div class="form-footer-left">
+                    <a href="" class="button" data-ng-click="cancel()" data-ng-if="!hideCancel">{{ "TR__CANCEL" | translate }}</a>
+                </div>
             </footer>
         </form>
         <div class="comment-content" data-ng-switch-default="">{{data.content}}</div>

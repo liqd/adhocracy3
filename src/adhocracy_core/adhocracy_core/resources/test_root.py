@@ -91,6 +91,28 @@ class TestRoot:
         assert group_users == ['0000000']
         assert group_roles == ['god']
 
+    def test_create_root_with_anonymous_system_user(self, registry, request_):
+        from substanced.interfaces import IUserLocator
+        from adhocracy_core.resources.principal import ISystemUser
+        from adhocracy_core.resources.root import IRootPool
+        inst = registry.content.create(IRootPool.__identifier__)
+        locator = registry.getMultiAdapter((inst, request_), IUserLocator)
+        anonymous_user = locator.get_user_by_login('anonymous')
+        assert ISystemUser.providedBy(anonymous_user)
+        assert anonymous_user.email == 'sysadmin@test.de'
+
+    def test_create_root_with_anonymous_system_user_with_custom_login(
+            self, registry, request_):
+        from substanced.interfaces import IUserLocator
+        from adhocracy_core.resources.root import IRootPool
+        registry.settings['adhocracy.anonymous_user'] = 'custom_anonymous'
+        registry.settings['adhocracy.anonymous_user_email'] = 'custom@test.de'
+        inst = registry.content.create(IRootPool.__identifier__)
+        locator = registry.getMultiAdapter((inst, request_), IUserLocator)
+        anonymous_user = locator.get_user_by_login('custom_anonymous')
+        assert anonymous_user.email == 'custom@test.de'
+
+
     def test_create_root_with_example_process(self, registry):
         from adhocracy_core.resources.process import IProcess
         from .root import IRootPool
@@ -98,16 +120,17 @@ class TestRoot:
         assert IProcess.providedBy(inst['adhocracy'])
 
     def test_includeme_registry_add_default_group(self, registry, request_):
+        from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
         from substanced.util import find_service
         from adhocracy_core.resources.root import IRootPool
         from adhocracy_core.sheets.principal import IGroup
         inst = registry.content.create(IRootPool.__identifier__)
         groups = find_service(inst, 'principals', 'groups')
-        group = groups['authenticated']
+        group = groups[DEFAULT_USER_GROUP_NAME]
         group_sheet = registry.content.get_sheet(group, IGroup)
         group_users = [x.__name__ for x in group_sheet.get()['users']]
         group_roles = group_sheet.get()['roles']
         assert group is not None
-        assert group_roles == ['participant']
+        assert group_roles == []
 
 

@@ -1,4 +1,4 @@
-.s1-proposal-list-item {
+.s1-list-item {
     @include clearfix;
     @include rem(padding, 21px 16px 17px 16px);
     @include rem(margin-bottom, 4px);
@@ -6,7 +6,7 @@
     display: block;
     text-decoration: none;
 
-    .s1-proposal-list-item-meta {
+    .s1-list-item-meta {
         float: right;
 
         .meta-list-item {
@@ -23,7 +23,7 @@
     }
 }
 
-.s1-proposal-list-item-type {
+.s1-list-item-type {
     color: $color-brand-one-normal;
 
     &.is-selected {
@@ -40,51 +40,19 @@
     font-size: $font-size-large;
 }
 
-.s1-proposal-list-item-creator a {
+.s1-list-item-creator a {
     text-decoration: none;
 }
 
-.s1-proposal-list-item-time {
+.s1-list-item-time {
     color: $color-text-introvert;
     display: block;
     padding-top: 2px;
 }
 
-.s1-proposal-detail {
-    @include rem(padding, 5px 0 0 12px);
-
-    .s1-proposal-title {
-        @include rem(margin-bottom, 8px);
-        border: 0;
-        padding-bottom: 0;
-    }
-}
-
 .s1-proposal-list .listing-elements {
     @include clearfix;
     background: $color-background-base-introvert;
-}
-
-.s1-author-details .user-meta {
-    @include rem(padding, 20px 0);
-    border: 1px solid $color-background-base-introvert;
-    border-width: 1px 0;
-    display: block;
-    text-decoration: none;
-    
-    &.user-profile-image {
-        // center vertically
-        @include rem(margin-top, 10px);
-        // undo border and padding from above so the icon is rendered completely
-        border: 0;
-        padding: 0;
-        float: left;
-    }
-}
-
-
-.s1-proposal-detail-text {
-    @include rem(padding-top, 28px);
 }
 
 .s1-proposal-form {

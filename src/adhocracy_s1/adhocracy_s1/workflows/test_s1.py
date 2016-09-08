@@ -4,32 +4,9 @@ from pytest import mark
 from unittest.mock import Mock
 from webtest import TestResponse
 
+from adhocracy_core.testing import add_resources
 from adhocracy_core.testing import do_transition_to
-
-
-class TestDoTransitionToPropose:
-
-    @fixture
-    def registry(self, registry_with_content, mock_sheet):
-        mock_sheet.get.return_value = {'state_data': []}
-        registry_with_content.content.get_sheet.return_value = mock_sheet
-        return registry_with_content
-
-    def call_fut(self, *args, **kwargs):
-        from .s1 import do_transition_to_propose
-        return do_transition_to_propose(*args, **kwargs)
-
-    def test_ignore_if_no_result_state_data(self, context, request_, registry,
-                                            mock_sheet):
-        self.call_fut(context, request_)
-        assert not mock_sheet.set.called
-
-    def test_remove_result_state_data_start_date(
-            self, context, request_, registry, mock_sheet):
-        mock_sheet.get.return_value = {'state_data': [{'name': 'result',
-                                                       'start_date': '2015'}]}
-        self.call_fut(context, request_)
-        mock_sheet.set.assert_called_with({'state_data': [{'name': 'result'}]})
+from adhocracy_core.testing import get_next_states
 
 
 class TestDoTransitionToVotable:
@@ -157,11 +134,77 @@ class TestChangeChildrenToSelectedRejected:
         #              request=request_)]
 
 
+class TestDoTransitionRejectedToProposed:
+
+    def call_fut(self, *args, **kwargs):
+        from .s1 import do_transition_to_proposed
+        return do_transition_to_proposed(*args, **kwargs)
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    def test_ingnore_if_no_rates_service(self, pool, request_):
+        assert self.call_fut(pool, request_) is None
+
+    def test_remove_rates_and_add_renominate_info(self, pool, service,
+                                                  request_, registry, mocker):
+        from adhocracy_core.sheets.tags import ITags
+        request_.registry = registry
+        add_renominate_info = (mocker.patch('adhocracy_s1.workflows.s1.'
+                                            '_add_renominate_info'))
+        pool['rates'] = service
+        pool['rates']['rates1'] = testing.DummyResource()
+        version = testing.DummyResource()
+        request_.registry.content.get_sheet_field = Mock(return_value=version)
+
+        self.call_fut(pool, request_)
+
+        request_.registry.content.get_sheet_field\
+            .assert_called_with(pool, ITags, 'LAST')
+        add_renominate_info.assert_called_with(version, request_)
+
+
+class TestAddRenominateDescription:
+
+    def call_fut(self, *args):
+        from .s1 import _add_renominate_info
+        return _add_renominate_info(*args)
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    def test_add_renominate_description(self, context, request_, registry,
+                                        mocker, mock_sheet):
+        user = testing.DummyResource()
+        registry.content.get_sheet_field = Mock(return_value='username')
+        index_rates = mocker.patch('adhocracy_s1.workflows.s1.index_rates',
+                                   autospec=True, return_value=10)
+        description_sheet = registry.content.get_sheet.return_value = mock_sheet
+        description_sheet.get.return_value = {'description': 'old_description'}
+        registry.content.get_sheet.return_value = description_sheet
+
+        self.call_fut(context, request_)
+
+        wanted = 'old_description' \
+                 '\n\n---' \
+                 '\n\nrenominated by: username' \
+                 '\nold rating: 10' \
+                 '\n'
+        index_rates.assert_called_with(context, 0)
+        description_sheet.set.assert_called_with({'description': wanted})
+
+
+
+
 @mark.usefixtures('integration')
 def test_s1_includeme_add_workflow(registry):
-    from adhocracy_core.workflows import AdhocracyACLWorkflow
+    from adhocracy_core.workflows import ACLLocalRolesWorkflow
     workflow = registry.content.workflows['s1']
-    assert isinstance(workflow, AdhocracyACLWorkflow)
+    assert isinstance(workflow, ACLLocalRolesWorkflow)
+    workflow = registry.content.workflows['s1_private']
+    assert isinstance(workflow, ACLLocalRolesWorkflow)
 
 
 @mark.usefixtures('integration')
@@ -189,6 +232,15 @@ def _post_proposal_item(app_user, path='') -> TestResponse:
 @mark.functional
 class TestS1Workflow:
 
+    def test_create_process(self, app_admin):
+        from os.path import dirname
+        import adhocracy_s1
+        test_process_file = dirname(adhocracy_s1.__file__) + \
+                            '/test_process_fixture/resources/processes.json'
+        add_resources(app_admin.app_router, test_process_file)
+        resp = app_admin.get('/s1')
+        assert resp.status_code == 200
+
     def test_propose_participant_can_create_proposals(self, app_participant):
         resp = _post_proposal_item(app_participant, path='/s1')
         assert 'proposal_0000000' in resp.json['path']
@@ -215,7 +267,7 @@ class TestS1Workflow:
         resp = do_transition_to(app_initiator, '/s1', 'select')
         assert resp.status_code == 200
 
-    def test_select_proposal_has_state_votable(self, app_participant):
+    def test_select_proposal_has_state_voteable(self, app_participant):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
         resp = app_participant.get('/s1/proposal_0000000')
         assert resp.json['data'][IWorkflowAssignment.__identifier__]['workflow_state'] == 'voteable'
@@ -230,7 +282,12 @@ class TestS1Workflow:
         assert IRate in app_participant2.get_postable_types(
             '/s1/proposal_0000000/rates')
 
-    def test_select_everybody_can_list_votable_proposals(self, app_participant):
+    def test_select_participant_cannot_change_proposal_state(
+        self, app_participant):
+        next_states = get_next_states(app_participant, '/s1/proposal_0000001')
+        assert next_states == []
+
+    def test_select_everybody_can_list_voteable_proposals(self, app_participant):
         from adhocracy_core.sheets.pool import IPool
         resp = app_participant.get('/s1', {'workflow_state': 'voteable'})
         assert resp.json['data'][IPool.__identifier__]['elements'] == \
@@ -257,6 +314,12 @@ class TestS1Workflow:
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
         resp = app_participant.get('/s1/proposal_0000001')
         assert resp.json['data'][IWorkflowAssignment.__identifier__]['workflow_state'] == 'rejected'
+
+    def test_result_participant_can_change_proposal_state_to_proposed(
+        self, app_participant):
+        """Aka creator can renominate propopsal."""
+        next_states = get_next_states(app_participant, '/s1/proposal_0000001')
+        assert next_states == ['proposed']
 
     def test_result_participant_cannot_comment_old_proposal(self, app_participant2):
         from adhocracy_core.resources.comment import IComment
@@ -299,13 +362,13 @@ class TestS1Workflow:
         resp = do_transition_to(app_initiator, '/s1', 'propose')
         assert resp.status_code == 200
 
-    def test_propose_again_old_decision_date_is_removed(self, app_participant):
+    def test_propose_again_with_old_decision_date(self, app_participant):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
         resp = app_participant.get('/s1')
         state_data = resp.json['data'][IWorkflowAssignment.__identifier__]['state_data']
         datas = [x for x in state_data if x['name'] == 'result']
         decision_date = datas[0]['start_date']
-        assert decision_date is None
+        assert decision_date.endswith('+00:00')
 
     def test_propose_participant_can_create_proposals_again(self, app_participant):
         resp = _post_proposal_item(app_participant, path='/s1')
@@ -335,9 +398,9 @@ class TestS1Workflow:
 
 @mark.usefixtures('integration')
 def test_s1_content_includeme_add_workflow(registry):
-    from adhocracy_core.workflows import AdhocracyACLWorkflow
+    from adhocracy_core.workflows import ACLLocalRolesWorkflow
     workflow = registry.content.workflows['s1_content']
-    assert isinstance(workflow, AdhocracyACLWorkflow)
+    assert isinstance(workflow, ACLLocalRolesWorkflow)
 
 
 @mark.usefixtures('integration')
@@ -349,5 +412,20 @@ def test_s1_content_initiate_and_transition_to_selected(registry, request_):
     assert workflow.state_of(process) == 'proposed'
     workflow.transition_to_state(process, request_, 'voteable')
     workflow.transition_to_state(process, request_, 'selected')
+    assert workflow.state_of(process) == 'selected'
+
+
+@mark.usefixtures('integration')
+def test_s1_content_transition_to_rejected_and_proposed_again(
+        registry, request_, mocker):
+    from adhocracy_s1.resources.s1 import IProcess
+    from adhocracy_s1.workflows import s1
+    process = testing.DummyResource(__provides__=IProcess)
+    workflow = registry.content.workflows['s1_content']
+    workflow.initialize(process)
+    workflow.transition_to_state(process, request_, 'voteable')
+    workflow.transition_to_state(process, request_, 'rejected')
+    workflow.transition_to_state(process, request_, 'proposed')
+    assert workflow.state_of(process) == 'proposed'
 
 

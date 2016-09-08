@@ -4,4 +4,3 @@
 def includeme(config):
     """Include resource types and subscribers."""
     config.include('.s1')
-    config.include('.root')

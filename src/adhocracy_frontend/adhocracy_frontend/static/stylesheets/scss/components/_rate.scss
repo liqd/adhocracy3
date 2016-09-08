@@ -2,7 +2,7 @@
 ---
 title: Like
 name: like
-category: Widgets
+category: Components
 ---
 
 A like-button with counter.
@@ -35,14 +35,15 @@ The button has the is-rate-button-active state.
     }
 }
 
-$line-height: (24/12);
+$line-height: (24 / 12);
 $arrow-width: 1rem;
 
 .like-button {
-    @include inline-block;
     @include rem(font-size, $font-size-small);
     @include rem(min-width, 100px);
     @include rem(padding, 0 10px);
+    display: inline-block;
+    vertical-align: middle;
     position: relative;
     margin-left: $arrow-width;
     text-transform: uppercase;
@@ -55,8 +56,8 @@ $arrow-width: 1rem;
 
     &:before {
         @include rem(border-right, $arrow-width solid $color-button-cta-base);
-        border-top: $line-height/2 * 1em solid $color-structure-transparent;
-        border-bottom: $line-height/2 * 1em solid $color-structure-transparent;
+        border-top: $line-height / 2 * 1em solid $color-structure-transparent;
+        border-bottom: $line-height / 2 * 1em solid $color-structure-transparent;
         content: "";
         position: absolute;
         left: -$arrow-width;
@@ -80,16 +81,15 @@ $arrow-width: 1rem;
 
     &:active,
     &.is-rate-button-active {
-        background: $color-function-valid;
+        background: $color-function-positive;
 
         &:before {
-            border-right-color: $color-function-valid;
+            border-right-color: $color-function-positive;
         }
 
         // :focus is sometimes set on click and then stays.
         // That's why it is skipped here.
         &:hover {
-            // scss-lint:disable NestingDepth
             background: $color-button-cta-base;
 
             .supporting .text-unsupport {
@@ -111,141 +111,99 @@ $arrow-width: 1rem;
 ---
 title: Rate
 name: rate
-category: Widgets
+category: Components
 ---
 
 Rate up or down with counter
 
-The button has the `is-rate-button-active` state.
-rate-difference has the `is-positive` state. Can be `is-negative`.
-
-The whole widget may be disabled, in which case itself and both buttons have
-the `is-disabled` state.
+The buttons may habe the `is-active` state.
+The whole widget may have the `is-disabled` state.
 
 ```html_example
 <div class="rate">
-    <span class="rate-difference is-positive">3</span>
-    <span class="rate-button-container">
-        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
-        <span class="rate-results">+6</span>
-    </span>
-    <span class="rate-button-container">
-        <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
-        <span class="rate-results">-3</span>
-    </span>
+    <a href="" class="rate-pro"><i class="icon-vote-up" title="Vote up"></i> 6</a>
+    <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i> 3</a>
+</div>
+
+<div class="rate">
+    <a href="" class="rate-pro is-active"><i class="icon-vote-up" title="Vote up"></i> 6</a>
+    <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i> 3</a>
+</div>
+
+<div class="rate">
+    <a href="" class="rate-pro"><i class="icon-vote-up" title="Vote up"></i> 6</a>
+    <a href="" class="rate-contra is-active"><i class="icon-vote-down" title="Vote down"></i> 3</a>
 </div>
 
 <div class="rate is-disabled">
-    <span class="rate-difference is-positive">3</span>
-    <span class="rate-button-container">
-        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
-        <span class="rate-results">+6</span>
-    </span>
-    <span class="rate-button-container">
-        <a href="" class="rate-contra is-disabled"><i class="icon-vote-down" title="Vote down"></i></a>
-        <span class="rate-results">-3</span>
-    </span>
+    <a href="" class="rate-pro is-active"><i class="icon-vote-up" title="Vote up"></i> 6</a>
+    <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i> 3</a>
 </div>
-
-<div class="rate m-show-results-persist">
-    <span class="rate-difference is-positive">3</span>
-    <span class="rate-button-container">
-        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
-        <span class="rate-results">+6</span>
-    </span>
-    <span class="rate-button-container">
-        <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
-        <span class="rate-results">-3</span>
-    </span>
-</div>
-
-<div class="rate m-show-results-hover">
-    <span class="rate-difference is-positive">3</span>
-    <span class="rate-button-container">
-        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
-        <span class="rate-results">+6</span>
-    </span>
-    <span class="rate-button-container">
-        <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
-        <span class="rate-results">-3</span>
-    </span>
-</div>
-Hover show results
-<div class="rate is-cast m-show-results-click">
-    <span class="rate-difference is-positive">3</span>
-    <span class="rate-button-container">
-        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
-        <span class="rate-results">+6</span>
-    </span>
-    <span class="rate-button-container">
-        <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
-        <span class="rate-results">-3</span>
-    </span>
-</div>
-Click show results
 ```
 */
 
 .rate {
-    a {
-        color: $color-text-highlight-introvert;
+    display: inline-block;
+    vertical-align: middle;
+
+    &.is-disabled {
+        &:after {
+            @extend .icon-voting:before;
+            cursor: not-allowed;
+            line-height: 1.35;
+            font-size: 150%;
+        }
+
+        .rate-pro, .rate-contra {
+            display: none;
+        }
+    }
+}
+
+.rate-pro,
+.rate-contra {
+    border: 2px solid;
+    padding: 0.3em 0.5em;
+    text-decoration: none;
+    color: $color-text-normal;
+
+    &:hover,
+    &:focus,
+    &.is-active {
+        color: $color-text-inverted;
         text-decoration: none;
 
-        &.is-disabled {
-            cursor: not-allowed;
+        i {
+            color: inherit;
         }
     }
+}
 
-    .rate-button-container {
-        @include inline-block;
-        position: relative;
+.rate-pro {
+    border-color: $color-function-positive;
+
+    i {
+        color: $color-function-positive;
     }
 
-    .rate-results {
-        @include rem(font-size, $font-size-small);
-        @include rem(padding-top, 3px);
-        display: block;
-        position: absolute;
-        text-align: center;
-        visibility: hidden;
-        width: 100%;
+    &:hover,
+    &:focus,
+    &.is-active {
+        background-color: $color-function-positive;
+    }
+}
+
+.rate-contra {
+    border-color: $color-function-negative;
+
+    i {
+        color: $color-function-negative;
     }
 
-    &.m-show-results-persist,
-    &:hover.m-show-results-hover,
-    &:focus.m-show-results-hover,
-    &.is-cast.m-show-results-click {
-        .rate-results {
-            visibility: visible;
-        }
-    }
-
-    .rate-pro {
-        &.is-rate-button-active,
-        &:hover:not(.is-disabled),
-        &:focus:not(.is-disabled),
-        &:active:not(.is-disabled) {
-            color: $color-function-valid;
-        }
-    }
-
-    .rate-contra {
-        &.is-rate-button-active,
-        &:hover:not(.is-disabled),
-        &:focus:not(.is-disabled),
-        &:active:not(.is-disabled) {
-            color: $color-function-invalid;
-        }
-    }
-
-    .rate-difference {
-        &.is-positive {
-            color: $color-function-valid;
-        }
-
-        &.is-negative {
-            color: $color-function-invalid;
-        }
+    &:hover,
+    &:focus,
+    &.is-active {
+        background-color: $color-function-negative;
     }
 }
 
@@ -308,7 +266,7 @@ is bigger and exposes more details.
     width: 50%;
 }
 
-.opion-button-container,
+.opinion-button-container,
 .opinion-bar-container {
     @include rem(margin-bottom, 5px);
 }
@@ -319,7 +277,7 @@ is bigger and exposes more details.
     color: $color-button-text;
     display: block;
     font-size: $font-size-large;
-    font-weight: bold;
+    font-weight: $font-weight-extrovert;
     margin-right: 2px;
     text-align: center;
     text-decoration: none;
@@ -369,7 +327,7 @@ is bigger and exposes more details.
         text-align: center;
         width: 100%;
 
-        @media only screen and (max-width : $breakpoint-small-device) {
+        @media only screen and (max-width: $breakpoint-small-device) {
             display: none;
         }
     }

@@ -16,25 +16,12 @@
     <adh-recompile-on-change data-ng-switch-when="body" data-value="{{proposalUrl}}">
         <adh-resource-actions
             data-resource-path="{{proposalUrl}}"
+            data-item-path="{{proposalUrl}}"
             data-edit="true"
             data-moderate="canModerate()"
             data-report="true"
             data-share="true"
-            data-delete="false"
             data-print="true"></adh-resource-actions>
-
         <adh-mercator-2016-proposal-detail data-ng-if="proposalUrl" data-path="{{proposalUrl}}"></adh-mercator-2016-proposal-detail>
     </adh-recompile-on-change>
-
-    <adh-report-abuse
-        class="report-abuse"
-        data-ng-switch-when="overlays"
-        data-ng-if="overlay === 'abuse'"
-        data-url="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}">
-    </adh-report-abuse>
-
-    <div data-ng-switch-when="overlays" data-ng-if="overlay === 'share'">
-        <adh-social-share data-uri="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}"></adh-social-share>
-        <a href="" class="button" data-ng-click="ctrl.hideOverlay('share')">{{ "TR__CANCEL" | translate }}</a>
-    </div>
 </div>

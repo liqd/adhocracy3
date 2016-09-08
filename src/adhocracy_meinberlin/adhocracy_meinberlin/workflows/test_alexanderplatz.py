@@ -67,6 +67,6 @@ class TestAlexanderplatzWorkflow:
 
 @mark.usefixtures('integration')
 def test_includeme_add_alexanderplatz_workflow(registry):
-    from adhocracy_core.workflows import AdhocracyACLWorkflow
+    from adhocracy_core.workflows import ACLLocalRolesWorkflow
     workflow = registry.content.workflows['alexanderplatz']
-    assert isinstance(workflow, AdhocracyACLWorkflow)
+    assert isinstance(workflow, ACLLocalRolesWorkflow)

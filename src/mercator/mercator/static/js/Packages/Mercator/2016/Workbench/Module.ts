@@ -36,8 +36,8 @@ export var register = (angular) => {
             adhConfig,
             adhMetaApi
         ) => {
-            var customHeader = adhConfig.pkg_path + Workbench.pkgLocation + "/CustomHeader.html";
-            adhResourceAreaProvider.customHeader(processType, customHeader);
+            var processHeaderSlot = adhConfig.pkg_path + Workbench.pkgLocation + "/ProcessHeaderSlot.html";
+            adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
             Workbench.registerRoutes(processType)(adhResourceAreaProvider, adhMetaApi);
         }])
         .config(["adhProcessProvider", (adhProcessProvider) => {
@@ -45,13 +45,13 @@ export var register = (angular) => {
         }])
         .directive("adhMercator2016Workbench", ["adhConfig", "adhTopLevelState", Workbench.workbenchDirective])
         .directive("adhMercator2016ProposalCreateColumn", [
-            "adhConfig", "adhResourceUrlFilter", "$location", Workbench.proposalCreateColumnDirective])
+            "adhConfig", "adhTopLevelState", "adhResourceUrlFilter", "$location", Workbench.proposalCreateColumnDirective])
         .directive("adhMercator2016ProposalDetailColumn", [
             "$window", "adhTopLevelState", "adhPermissions", "adhConfig", Workbench.proposalDetailColumnDirective])
         .directive("adhMercator2016ProposalModerateColumn", [
-            "adhConfig", "adhResourceUrlFilter", "$location", Workbench.proposalModerateColumnDirective])
+            "adhConfig", "adhTopLevelState", "adhResourceUrlFilter", "$location", Workbench.proposalModerateColumnDirective])
         .directive("adhMercator2016ProposalEditColumn", [
-            "adhConfig", "adhResourceUrlFilter", "$location", Workbench.proposalEditColumnDirective])
+            "adhConfig", "adhTopLevelState", "adhResourceUrlFilter", "$location", Workbench.proposalEditColumnDirective])
         .directive("adhMercator2016ProposalListingColumn",
             ["adhConfig", "adhHttp", "adhTopLevelState", Workbench.proposalListingColumnDirective])
         .directive("adhMercator2016AddProposalButton", [

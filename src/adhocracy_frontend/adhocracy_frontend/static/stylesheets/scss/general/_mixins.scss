@@ -60,3 +60,7 @@ $rem-px-only: false !default;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+@function font-url($path) {
+    @return url("../fonts/" + $path + "?" + cachebust());
+}

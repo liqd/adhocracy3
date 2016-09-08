@@ -2,7 +2,6 @@
 
 import * as AdhConfig from "../../Config/Config";
 import * as AdhHttp from "../../Http/Http";
-import * as AdhMovingColumns from "../../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../../Permissions/Permissions";
 import * as AdhProcess from "../../Process/Process";
 import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
@@ -15,9 +14,11 @@ import RIS1Process from "../../../Resources_/adhocracy_s1/resources/s1/IProcess"
 import RIProposal from "../../../Resources_/adhocracy_s1/resources/s1/IProposal";
 import RIProposalVersion from "../../../Resources_/adhocracy_s1/resources/s1/IProposalVersion";
 import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
+import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIWorkflowAssignment from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/S1/Workbench";
+export var pkgLocation = "/S1/Workbench";
 
 
 export var s1WorkbenchDirective = (
@@ -39,14 +40,14 @@ export var s1WorkbenchDirective = (
 
 export var s1CurrentColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/CurrentColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.contentType = RIProposalVersion.content_type;
 
             scope.$watch("processUrl", (processUrl : string) => {
@@ -66,27 +67,27 @@ export var s1CurrentColumnDirective = (
                 });
             });
 
-            scope.shared.sorts = [{
+            scope.sorts = [{
+                key: "item_creation_date",
+                name: "TR__CREATION_DATE",
+                index: "item_creation_date",
+                reverse: true
+            }, {
                 key: "rates",
                 name: "TR__RATES",
                 index: "rates",
+                reverse: true
+            }, {
+                key: "controversiality",
+                name: "TR__CONTROVERSIALITY",
+                index: "controversiality",
                 reverse: true
             }, {
                 key: "comments",
                 name: "TR__COMMENTS_TOTAL",
                 index: "comments",
                 reverse: true
-            }, {
-                key: "item_creation_date",
-                name: "TR__CREATION_DATE",
-                index: "item_creation_date",
-                reverse: true
             }];
-
-            scope.shared.sort = "rates";
-            scope.shared.setSort = (sort : string) => {
-                scope.shared.sort = sort;
-            };
         }
     };
 };
@@ -94,14 +95,14 @@ export var s1CurrentColumnDirective = (
 
 export var s1NextColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/NextColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.contentType = RIProposalVersion.content_type;
 
             scope.$watch("processUrl", (processUrl : string) => {
@@ -116,22 +117,27 @@ export var s1NextColumnDirective = (
                 });
             });
 
-            scope.shared.sorts = [{
+            scope.sorts = [{
+                key: "item_creation_date",
+                name: "TR__CREATION_DATE",
+                index: "item_creation_date",
+                reverse: true
+            }, {
                 key: "rates",
                 name: "TR__RATES",
                 index: "rates",
                 reverse: true
             }, {
-                key: "item_creation_date",
-                name: "TR__CREATION_DATE",
-                index: "item_creation_date",
+                key: "controversiality",
+                name: "TR__CONTROVERSIALITY",
+                index: "controversiality",
+                reverse: true
+            }, {
+                key: "comments",
+                name: "TR__COMMENTS_TOTAL",
+                index: "comments",
                 reverse: true
             }];
-
-            scope.shared.sort = "rates";
-            scope.shared.setSort = (sort : string) => {
-                scope.shared.sort = sort;
-            };
         }
     };
 };
@@ -139,14 +145,14 @@ export var s1NextColumnDirective = (
 
 export var s1ArchiveColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ArchiveColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.contentType = RIProposalVersion.content_type;
 
             scope.$watch("processUrl", (processUrl : string) => {
@@ -162,7 +168,7 @@ export var s1ArchiveColumnDirective = (
                 });
             });
 
-            scope.shared.facets = [{
+            scope.facets = [{
                 key: "workflow_state",
                 name: "TR__S1_FACET_STATE_HEADER",
                 items: [
@@ -171,22 +177,27 @@ export var s1ArchiveColumnDirective = (
                 ]
             }];
 
-            scope.shared.sorts = [{
+            scope.sorts = [{
+                key: "item_creation_date",
+                name: "TR__CREATION_DATE",
+                index: "item_creation_date",
+                reverse: true
+            }, {
                 key: "rates",
                 name: "TR__RATES",
                 index: "rates",
                 reverse: true
             }, {
-                key: "item_creation_date",
-                name: "TR__CREATION_DATE",
-                index: "item_creation_date",
+                key: "controversiality",
+                name: "TR__CONTROVERSIALITY",
+                index: "controversiality",
+                reverse: true
+            }, {
+                key: "comments",
+                name: "TR__COMMENTS_TOTAL",
+                index: "comments",
                 reverse: true
             }];
-
-            scope.shared.sort = "rates";
-            scope.shared.setSort = (sort : string) => {
-                scope.shared.sort = sort;
-            };
         }
     };
 };
@@ -194,41 +205,44 @@ export var s1ArchiveColumnDirective = (
 
 export var s1ProposalDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhPermissions : AdhPermissions.Service
+    adhPermissions : AdhPermissions.Service,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalDetailColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["meeting", "processUrl", "proposalUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("meeting", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
         }
     };
 };
 
 export var s1ProposalCreateColumnDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalCreateColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
         }
     };
 };
 
 export var s1ProposalEditColumnDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalEditColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
         }
     };
 };
@@ -236,6 +250,7 @@ export var s1ProposalEditColumnDirective = (
 export var s1LandingDirective = (
     $translate: any,
     adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -243,8 +258,27 @@ export var s1LandingDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Landing.html",
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.on("processUrl", (processUrl) => {
+                adhHttp.get(processUrl).then((process) => {
+                    scope.processTitle = process.data[SITitle.nick].title;
+                    scope.processShortDescription = process.data[SIDescription.nick].short_description;
+                    scope.processDescription = process.data[SIDescription.nick].description;
+                });
+            }));
             $translate("TR__S1_ABOUT_TEXT").then((translated) => {
                 scope.aboutText = translated;
+            });
+            $translate("TR__S1_INTRODUCTION_TEXT").then((translated) => {
+                scope.introText = translated;
+            });
+            $translate("TR__S1_PHASE_A_TEXT").then((translated) => {
+                scope.phaseAText = translated;
+            });
+            $translate("TR__S1_PHASE_B_TEXT").then((translated) => {
+                scope.phaseBText = translated;
+            });
+            $translate("TR__S1_PHASE_C_TEXT").then((translated) => {
+                scope.phaseCText = translated;
             });
         }
     };
@@ -252,11 +286,11 @@ export var s1LandingDirective = (
 
 
 /**
- *         | proposed | votable | selected | rejected
- * --------------------------------------------------
- * propose | current  | -       | archive  | archive
- * select  | next     | current | archive  | archive
- * result  | next     | -       | cur/arc  | cur/arc
+ *         | proposed | voteable | selected | rejected
+ * ---------------------------------------------------
+ * propose | current  | -        | archive  | archive
+ * select  | next     | current  | archive  | archive
+ * result  | next     | -        | cur/arc  | cur/arc
  */
 var getMeeting = (proposal : RIProposal, process : RIS1Process) => {
     var processState = process.data[SIWorkflowAssignment.nick].workflow_state;
@@ -264,8 +298,10 @@ var getMeeting = (proposal : RIProposal, process : RIS1Process) => {
 
     if (proposalState === "proposed") {
         return processState === "propose" ? "current" : "next";
-    } else if (proposalState === "votable") {
+    } else if (proposalState === "voteable") {
         return "current";
+    } else if (processState !== "result") {
+        return "archive";
     } else {
         var processDecisionDate = AdhUtil.deepPluck(
             AdhProcess.getStateData(process.data[SIWorkflowAssignment.nick], "result"), ["start_date"]);
@@ -296,7 +332,7 @@ export var registerRoutes = (
             movingColumns: "is-show-hide-hide"
         })
         .specific(RIS1Process, "create-proposal", processType, context,
-            ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+            ["adhHttp", (adhHttp : AdhHttp.Service) => {
                 return (resource : RIS1Process) => {
                     return adhHttp.options(resource.path).then((options) => {
                         if (options.POST) {
@@ -338,7 +374,7 @@ export var registerRoutes = (
             movingColumns: "is-show-show-hide"
         })
         .specificVersionable(RIProposal, RIProposalVersion, "edit", processType, context,
-            ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+            ["adhHttp", (adhHttp : AdhHttp.Service) => {
                 return (item : RIProposal, version : RIProposalVersion, isVersion : boolean, process : RIS1Process) => {
                     return adhHttp.options(item.path).then((options) => {
                         if (options.POST) {
@@ -371,7 +407,7 @@ export var registerRoutes = (
             movingColumns: "is-collapse-show-show"
         })
         .specificVersionable(RIComment, RICommentVersion, "", processType, context, ["adhHttp", "$q", (
-            adhHttp : AdhHttp.Service<any>,
+            adhHttp : AdhHttp.Service,
             $q : angular.IQService
         ) => {
             var getCommentableUrl = (resource) : angular.IPromise<any> => {

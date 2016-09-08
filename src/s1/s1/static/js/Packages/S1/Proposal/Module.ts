@@ -1,4 +1,5 @@
 import * as AdhAngularHelpersModule from "../../AngularHelpers/Module";
+import * as AdhAnonymizeModule from "../../Anonymize/Module";
 import * as AdhBadgeModule from "../../Badge/Module";
 import * as AdhHttpModule from "../../Http/Module";
 import * as AdhPermissionsModule from "../../Permissions/Module";
@@ -14,6 +15,7 @@ export var moduleName = "adhS1Proposal";
 export var register = (angular) => {
     angular.module(moduleName, [
         AdhAngularHelpersModule.moduleName,
+        AdhAnonymizeModule.moduleName,
         AdhBadgeModule.moduleName,
         AdhHttpModule.moduleName,
         AdhPermissionsModule.moduleName,
@@ -52,5 +54,6 @@ export var register = (angular) => {
         "$q",
         Proposal.editDirective
     ])
-    .directive("adhS1ProposalListing", ["adhConfig", "adhTopLevelState", Proposal.listingDirective]);
+    .directive("adhS1ProposalListing", ["adhConfig", "adhTopLevelState", Proposal.listingDirective])
+	.directive("adhS1RenominateProposal", ["adhConfig", "adhHttp", "$window", Proposal.renominateProposalDirective]);
 };

@@ -32,6 +32,7 @@ export var logBackendError : (response : angular.IHttpPromiseCallbackArg<IBacken
 export interface IHttpConfig {
     noCredentials? : boolean;
     noExport? : boolean;
+    anonymize? : boolean;
 }
 
 export interface IHttpOptionsConfig extends IHttpConfig {
@@ -93,11 +94,7 @@ export var nonResourcePaths : string[] = [
  * path: ..., data: ...}.  if you want to send other objects over the
  * wire (such as during user login), use $http.
  */
-
-// FIXME: This service should be able to handle any type, not just instances of
-// ``Resources.IResource``.  Methods like ``postNewVersion`` may need additional
-// constraints (e.g. by moving them to subclasses).
-export class Service<R extends ResourcesBase.IResource> {
+export class Service {
 
     constructor(
         private $http : angular.IHttpService,
@@ -132,6 +129,12 @@ export class Service<R extends ResourcesBase.IResource> {
                 "X-User-Token": undefined
             });
         }
+        if (config.anonymize) {
+            _.assign(headers, {
+				// the header is non-empty so it doesn't get deleted by browsers
+                "X-Anonymize": "X-Anonymize"
+            });
+        }
         return headers;
     }
 
@@ -144,7 +147,7 @@ export class Service<R extends ResourcesBase.IResource> {
             POST: !!raw.data.POST,
             HEAD: !!raw.data.HEAD,
             DELETE: !!raw.data.DELETE,
-            hide: Boolean(metadata && _.has(metadata, "hidden")),
+            hide: !!metadata,
             canPost: (contentType : string) => {
                 if (raw.data.POST) {
                     var postOptions = raw.data.POST.request_body;
@@ -210,7 +213,7 @@ export class Service<R extends ResourcesBase.IResource> {
         path : string,
         params?,
         config : IHttpGetConfig = {}
-    ) : angular.IPromise<R> {
+    ) : angular.IPromise<any> {
         var query = (typeof params === "undefined") ? "" : "?" + $.param(params);
 
         var originalElements = (params || {}).elements || "omit";
@@ -225,7 +228,7 @@ export class Service<R extends ResourcesBase.IResource> {
                 AdhError.logBackendError));
     }
 
-    public putRaw(path : string, obj : R, config : IHttpConfig = {}) : angular.IPromise<any> {
+    public putRaw(path : string, obj : any, config : IHttpConfig = {}) : angular.IPromise<any> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-put preliminary path: " + path;
         }
@@ -238,7 +241,7 @@ export class Service<R extends ResourcesBase.IResource> {
         }));
     }
 
-    public put(path : string, obj : R, config : IHttpPutConfig = {}) : angular.IPromise<R> {
+    public put(path : string, obj : any, config : IHttpPutConfig = {}) : angular.IPromise<any> {
         var _self = this;
 
         if (!config.noExport) {
@@ -254,16 +257,18 @@ export class Service<R extends ResourcesBase.IResource> {
                 AdhError.logBackendError);
     }
 
-    public hide(path : string, contentType : string, config : IHttpConfig = {}) : angular.IPromise<any> {
-        var obj = {
-            content_type: contentType,
-            data: {}
-        };
-        obj.data[SIMetadata.nick] = {
-            hidden: true
-        };
+    public hide(path : string, config : IHttpConfig = {}) : angular.IPromise<any> {
+        return this.get(path).then((resource) => {
+            var obj = {
+                content_type: resource.content_type,
+                data: {}
+            };
+            obj.data[SIMetadata.nick] = {
+                hidden: true
+            };
 
-        return this.put(path, <any>obj, _.extend({}, config, {keepMetadata: true}));
+            return this.put(path, <any>obj, _.extend({}, config, {keepMetadata: true}));
+        });
     }
 
     public delete(path : string, config : IHttpConfig = {}) : angular.IPromise<any> {
@@ -279,7 +284,7 @@ export class Service<R extends ResourcesBase.IResource> {
         }));
     }
 
-    public postRaw(path : string, obj : R, config : IHttpConfig = {}) : angular.IPromise<any> {
+    public postRaw(path : string, obj : any, config : IHttpConfig = {}) : angular.IPromise<any> {
         var _self = this;
 
         if (_self.adhPreliminaryNames.isPreliminary(path)) {
@@ -305,7 +310,7 @@ export class Service<R extends ResourcesBase.IResource> {
         });
     }
 
-    public post(path : string, obj : R, config : IHttpConfig = {}) : angular.IPromise<R> {
+    public post(path : string, obj : any, config : IHttpConfig = {}) : angular.IPromise<any> {
         var _self = this;
 
         if (!config.noExport) {
@@ -413,9 +418,10 @@ export class Service<R extends ResourcesBase.IResource> {
      */
     public postNewVersionNoFork(
         oldVersionPath : string,
-        obj : R,
-        rootVersions? : string[]
-    ) : angular.IPromise<{ value: R; parentChanged: boolean; }> {
+        obj : any,
+        rootVersions? : string[],
+        config? : IHttpOptionsConfig
+    ) : angular.IPromise<{ value: any; parentChanged: boolean; }> {
         var _self = this;
 
         var timeoutRounds : number = 5;
@@ -431,7 +437,7 @@ export class Service<R extends ResourcesBase.IResource> {
             nextOldVersionPath : string,
             parentChanged : boolean,
             roundsLeft : number
-        ) : angular.IPromise<{ value : R; parentChanged : boolean; }> => {
+        ) : angular.IPromise<{ value : any; parentChanged : boolean; }> => {
             if (roundsLeft === 0) {
                 throw "Tried to post new version of " + dagPath + " " + timeoutRounds.toString() + " times, giving up.";
             }
@@ -469,14 +475,14 @@ export class Service<R extends ResourcesBase.IResource> {
             };
 
             return _self
-                .post(dagPath, _obj)
+                .post(dagPath, _obj, config)
                 .then(handleSuccess, <any>handleConflict);
         };
 
         return retry(oldVersionPath, false, timeoutRounds);
     }
 
-    public postToPool(poolPath : string, obj : R) : angular.IPromise<R> {
+    public postToPool(poolPath : string, obj : any) : angular.IPromise<any> {
         return this.post(poolPath, obj);
     }
 
@@ -486,8 +492,8 @@ export class Service<R extends ResourcesBase.IResource> {
      * If you do not know if a reference is already resolved to the
      * corresponding resource you can use this function to be sure.
      */
-    public resolve(path : string) : angular.IPromise<R>;
-    public resolve(resource : R) : angular.IPromise<R>;
+    public resolve(path : string) : angular.IPromise<any>;
+    public resolve(resource : any) : angular.IPromise<any>;
     public resolve(pathOrResource) {
         if (typeof pathOrResource === "string") {
             return this.get(pathOrResource);

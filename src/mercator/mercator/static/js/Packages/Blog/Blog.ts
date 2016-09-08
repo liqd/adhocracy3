@@ -23,7 +23,7 @@ export interface IFormScope extends IScope, AdhDocument.IFormScope {
 
 export var bindPath = (
     $q : angular.IQService,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service
 ) => {
     var fn = AdhDocument.bindPath($q, adhHttp);
 
@@ -75,12 +75,13 @@ export var detailDirective = (
     $q : angular.IQService,
     $window : angular.IWindowService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhShowError,
     adhSubmitIfValid,
-    adhUploadImage
+    adhUploadImage,
+    $translate
 ) => {
     return {
         restrict: "E",
@@ -99,15 +100,17 @@ export var detailDirective = (
             adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.path), "itemOptions");
 
             scope.delete = () => {
-                if ($window.confirm("Do you really want to delete this?")) {
-                    var itemPath = AdhUtil.parentPath(scope.path);
-                    adhHttp.delete(itemPath)
-                        .then(() => {
-                            if (typeof scope.onChange !== "undefined") {
-                                scope.onChange();
-                            }
-                        });
-                }
+                return $translate("TR__ASK_TO_CONFIRM_HIDE_ACTION").then((question) => {
+                    if ($window.confirm(question)) {
+                        var itemPath = AdhUtil.parentPath(scope.path);
+                        adhHttp.delete(itemPath)
+                            .then(() => {
+                                if (typeof scope.onChange !== "undefined") {
+                                    scope.onChange();
+                                }
+                            });
+                    }
+                });
             };
 
             scope.edit = () => {
@@ -138,7 +141,7 @@ export var detailDirective = (
 
 export var createDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhShowError,
     adhSubmitIfValid,

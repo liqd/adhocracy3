@@ -4,6 +4,7 @@ from adhocracy_core.interfaces import ITag
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.pool import pool_meta
+import adhocracy_core.sheets.anonymize
 import adhocracy_core.sheets.name
 import adhocracy_core.sheets.tags
 import adhocracy_core.sheets.pool
@@ -25,7 +26,8 @@ def create_initial_content_for_item(context, registry, options):
                                             request=request,
                                             )
     tags_sheet.set({'FIRST': first_version,
-                    'LAST': first_version})
+                    'LAST': first_version},
+                   autoupdated=True)
 
 
 item_meta = pool_meta._replace(
@@ -35,6 +37,7 @@ item_meta = pool_meta._replace(
                   adhocracy_core.sheets.pool.IPool,
                   adhocracy_core.sheets.metadata.IMetadata,
                   adhocracy_core.sheets.workflow.IWorkflowAssignment,
+                  adhocracy_core.sheets.anonymize.IAllowAddAnonymized,
                   ),
     element_types=(IItemVersion,
                    ITag,

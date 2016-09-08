@@ -9,8 +9,8 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.itemversion import itemversion_meta
 from adhocracy_core.resources.item import item_meta
 from adhocracy_core.resources.service import service_meta
-
 from adhocracy_core.sheets.rate import IRate
+from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
 
 
 class IRateVersion(IItemVersion):
@@ -46,12 +46,16 @@ rates_meta = service_meta._replace(
     iresource=IRatesService,
     content_name='rates',
     element_types=(IRate,),
+    extended_sheets=(IAllowAddAnonymized,
+                     ),
 )
 
 
 def add_ratesservice(context: IPool, registry: Registry, options: dict):
     """Add `rates` service to context."""
-    registry.content.create(IRatesService.__identifier__, parent=context)
+    registry.content.create(IRatesService.__identifier__,
+                            autoupdated=True,
+                            parent=context)
 
 
 def includeme(config):

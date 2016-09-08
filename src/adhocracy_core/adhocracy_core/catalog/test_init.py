@@ -545,3 +545,14 @@ class TestCatalogsServiceAdhocracy:
                                             sort_by='name'))
         assert result.count == 2
 
+    def test_get_index_value(selfs, registry, inst, mocker):
+        context = Mock()
+        index = Mock()
+        oid = Mock()
+        get_oid = mocker.patch('adhocracy_core.catalog.get_oid',
+                               return_value=oid)
+        inst.get_index = Mock(return_value=index)
+        result = inst.get_index_value(context, 'value')
+        get_oid.assert_called_with(context)
+        index.document_repr.asser_called_with(oid)
+        assert result == index.document_repr()

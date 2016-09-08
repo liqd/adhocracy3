@@ -6,7 +6,7 @@
     }
 
     &:before {
-        @include inline-block;
+        display: inline-block;
         background: url("/static/images/logo.png") no-repeat center top;
         content: " ";
         height: 100px;

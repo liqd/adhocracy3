@@ -351,6 +351,7 @@ class TestMercatorProposal:
              adhocracy_core.sheets.comment.ICommentable,
              adhocracy_core.sheets.rate.ILikeable,
              adhocracy_core.sheets.image.IImageReference,
+             adhocracy_core.sheets.logbook.IHasLogbookPool,
              adhocracy_mercator.sheets.mercator2.IMercatorSubResources,
              adhocracy_mercator.sheets.mercator2.IUserInfo,
              adhocracy_mercator.sheets.mercator2.IOrganizationInfo,
@@ -389,7 +390,7 @@ class TestProcess:
         assert meta.iresource is IProcess
         assert IProcess.isOrExtends(adhocracy_core.resources.process.IProcess)
         assert meta.element_types == (IMercatorProposal,)
-        assert meta.workflow_name == 'mercator2'
+        assert meta.default_workflow == 'mercator2'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

@@ -21,6 +21,7 @@ from adhocracy_core.resources.subscriber import _get_default_group
 from adhocracy_core import sheets
 from adhocracy_core.scripts.ad_assign_badges import create_badge_assignment
 from adhocracy_core.sheets.name import IName
+from adhocracy_core.schema import _generate_password
 
 
 logger = logging.getLogger(__name__)
@@ -182,7 +183,7 @@ def _create_user(user_info: dict, users: IResource, registry: Registry,
         default = _get_default_group(users)
         groups = [default]
     roles_names = user_info.get('roles', [])
-    password = user_info.get('initial-password', _gen_password())
+    password = user_info.get('initial-password', _generate_password())
     appstruct = {sheets.principal.IUserBasic.__identifier__:
                  {'name': user_info['name']},
                  sheets.principal.IUserExtended.__identifier__:
@@ -201,12 +202,6 @@ def _create_user(user_info: dict, users: IResource, registry: Registry,
     if activate:
         user.activate()
     return user
-
-
-def _gen_password():
-    chars = string.ascii_letters + string.digits + '+_'
-    pwd_len = 20
-    return ''.join(chars[int(c) % len(chars)] for c in os.urandom(pwd_len))
 
 
 def _send_invitation_mail(user: IUser, user_info: dict, registry: Registry):

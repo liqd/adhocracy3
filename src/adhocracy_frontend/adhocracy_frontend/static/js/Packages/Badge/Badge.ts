@@ -6,9 +6,9 @@ import * as _ from "lodash";
 import * as AdhConfig from "../Config/Config";
 import * as AdhCredentials from "../User/Credentials";
 import * as AdhHttp from "../Http/Http";
+import * as AdhListing from "../Listing/Listing";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
-import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhUtil from "../Util/Util";
 
 import RIBadgeAssignment from "../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment";
@@ -17,11 +17,12 @@ import * as SIBadgeable from "../../Resources_/adhocracy_core/sheets/badge/IBadg
 import * as SIBadgeAssignment from "../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment";
 import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
 import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
+import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
 
 var pkgLocation = "/Badge";
 
-export interface IBadge {
+export interface IBadgeAssignment {
     title : string;
     description : string;
     name : string;
@@ -29,17 +30,106 @@ export interface IBadge {
     badgePath : string;
 }
 
-export interface IGetBadges {
-    (resource : SIBadgeable.HasSheet) : angular.IPromise<IBadge[]>;
+export interface IGetBadgeAssignments {
+    (resource : SIBadgeable.HasSheet) : angular.IPromise<IBadgeAssignment[]>;
 }
 
-export var getBadgesFactory = (
-    adhHttp : AdhHttp.Service<any>,
+export interface IBadge {
+    name : string;
+    title? : string;
+    path : string;
+    groups? : string[];
+}
+
+export interface IBadgeGroup {
+    name : string;
+    title : string;
+    path : string;
+}
+
+var extractBadge = (badge) : IBadge => {
+    return {
+        name: badge.data[SIName.nick].name,
+        title: badge.data[SITitle.nick].title,
+        path: badge.path,
+        groups: badge.data[SIBadge.nick].groups
+    };
+};
+
+var extractGroup = (group) : IBadgeGroup => {
+    return {
+        name: group.data[SIName.nick].name,
+        title: group.data[SITitle.nick].title,
+        path: group.path
+    };
+};
+
+var collectBadgesByGroup = (groupPaths, badges) => {
+    var badgesByGroup = {};
+    _.forEach(groupPaths, (groupPath) => {
+        badgesByGroup[groupPath] = [];
+        _.forOwn(badges, (badge) => {
+            if (_.includes(badge.groups, groupPath)) {
+                badgesByGroup[groupPath].push(badge);
+            }
+        });
+    });
+    return badgesByGroup;
+};
+
+var createBadgeFacets = (badgeGroups, badges) : AdhListing.IFacetItem[] => {
+    var groupPaths = _.map(badgeGroups, "path");
+    var badgesByGroup = collectBadgesByGroup(groupPaths, badges);
+    return _.map(badgeGroups, (group : any) => {
+        return {
+            key: "badge",
+            name: group.title,
+            items: _.map(badgesByGroup[group.path], (badge : any) => {
+                return {
+                    key: badge.name,
+                    name: badge.title
+                };
+            })
+        };
+    });
+};
+
+export var getBadgeFacets = (
+    adhHttp : AdhHttp.Service,
     $q : angular.IQService
-) : IGetBadges => (
+) => (
+    path : string
+) : angular.IPromise<AdhListing.IFacetItem[]> => {
+    var httpMap = (paths : string[], fn) : angular.IPromise<any[]> => {
+        return $q.all(_.map(paths, (path) => {
+            return adhHttp.get(path).then(fn);
+        }));
+    };
+
+    var params = {
+        elements: "content",
+        depth: 4,
+        content_type: SIBadge.nick
+    };
+
+    return adhHttp.get(path, params).then((response) => {
+        var badgePaths = <string[]>_.map(response.data[SIPool.nick].elements, "path");
+        return httpMap(badgePaths, extractBadge).then((badges) => {
+            var groupPaths = _.union.apply(_, _.map(badges, "groups"));
+            return httpMap(groupPaths, extractGroup).then((badgeGroups) => {
+                return createBadgeFacets(badgeGroups, badges);
+            });
+        });
+    });
+};
+
+export var getBadgesFactory = (
+    adhHttp : AdhHttp.Service,
+    $q : angular.IQService
+) : IGetBadgeAssignments => (
     resource : SIBadgeable.HasSheet,
     includeParent? : boolean
-) : angular.IPromise<IBadge[]> => {
+) : angular.IPromise<IBadgeAssignment[]> => {
     if (typeof includeParent === "undefined") {
         includeParent = !!resource.content_type.match(/Version$/);
     }
@@ -74,38 +164,22 @@ export var getBadgesFactory = (
     }
 };
 
-export var extractBadge = (badge) => {
-    return {
-        name: badge.data[SIName.nick].name,
-        title: badge.data[SITitle.nick].title,
-        path: badge.path,
-        groups: badge.data[SIBadge.nick].groups
-    };
-};
+export var getAssignableBadgePaths = (rawOptions) : string[] => {
+    var requestBodyOptions : {content_type : string}[] = AdhUtil.deepPluck(rawOptions, [
+        "data", "POST", "request_body"
+    ]);
 
-export var extractGroup = (group) => {
-    return {
-        name: group.data[SIName.nick].name,
-        title: group.data[SITitle.nick].title,
-        path: group.path
-    };
-};
+    var assignableBadgeOptions = _.find(
+        requestBodyOptions,
+        (body) => body.content_type === RIBadgeAssignment.content_type);
 
-export var collectBadgesByGroup = (groupPaths, badges) => {
-    var badgesByGroup = {};
-    _.forEach(groupPaths, (groupPath) => {
-        badgesByGroup[groupPath] = [];
-        _.forOwn(badges, (badge) => {
-            if (_.includes(badge.groups, groupPath)) {
-                badgesByGroup[groupPath].push(badge);
-            }
-        });
-    });
-    return badgesByGroup;
+    return AdhUtil.deepPluck(assignableBadgeOptions, [
+        "data", SIBadgeAssignment.nick, "badge"
+    ]);
 };
 
 var bindPath = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     $q : angular.IQService
 ) => (
@@ -121,17 +195,7 @@ var bindPath = (
             return $q.when();
         }
 
-        var requestBodyOptions : {content_type : string}[] = AdhUtil.deepPluck(rawOptions, [
-            "data", "POST", "request_body"
-        ]);
-
-        var assignableBadgeOptions = _.find(
-            requestBodyOptions,
-            (body) => body.content_type === RIBadgeAssignment.content_type);
-
-        var assignableBadgePaths : string[] = AdhUtil.deepPluck(assignableBadgeOptions, [
-            "data", SIBadgeAssignment.nick, "badge"
-        ]);
+        var assignableBadgePaths : string[] = getAssignableBadgePaths(rawOptions);
 
         return $q.all(_.map(assignableBadgePaths, (b) => adhHttp.get(b).then(extractBadge))).then((badges : any) => {
             scope.badges = _.keyBy(badges, "path");
@@ -150,9 +214,9 @@ var bindPath = (
 
 export var badgeAssignment = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhPermissions: AdhPermissions.Service,
-    adhPreliminaryNames: AdhPreliminaryNames.Service,
+    adhHttp : AdhHttp.Service,
+    adhPermissions : AdhPermissions.Service,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
     $q : angular.IQService,
     adhCredentials : AdhCredentials.Service,
     adhGetBadges
@@ -160,19 +224,19 @@ export var badgeAssignment = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Assignment.html",
-        require: "^adhMovingColumn",
         scope: {
+            modals: "=",
             path: "@",
             showDescription: "=?"
         },
-        link: (scope, element, attrs, column: AdhMovingColumns.MovingColumnController) => {
+        link: (scope) => {
             scope.badgeablePath = scope.path;
             scope.data = {};
 
             adhHttp.get(scope.path).then((proposal) => {
                 scope.poolPath = proposal.data[SIBadgeable.nick].post_pool;
 
-                return adhGetBadges(proposal).then((assignments : IBadge[]) => {
+                return adhGetBadges(proposal).then((assignments : IBadgeAssignment[]) => {
 
                     bindPath(adhHttp, adhPermissions, $q)(scope);
 
@@ -191,7 +255,7 @@ export var badgeAssignment = (
                             _.forOwn(scope.checkboxes, (checked, badgePath) => {
                                 var assignmentExisted = scope.assignments.hasOwnProperty(badgePath);
                                 if (checked && !assignmentExisted) {
-                                    var assignment = new RIBadgeAssignment({ preliminaryNames: adhPreliminaryNames });
+                                    var assignment = new RIBadgeAssignment({ preliminaryNames : adhPreliminaryNames });
                                     assignment.data[SIBadgeAssignment.nick] = {
                                         badge: badgePath,
                                         object: scope.badgeablePath,
@@ -205,8 +269,8 @@ export var badgeAssignment = (
 
                             return transaction.commit()
                                 .then((responses) => {
-                                    column.hideOverlay("badges");
-                                    column.alert("TR__BADGE_ASSIGNMENT_UPDATED", "success");
+                                    scope.modals.hideModal("badges");
+                                    scope.modals.alert("TR__BADGE_ASSIGNMENT_UPDATED", "success");
                                 }, (response) => {
                                     scope.serverError = response[0].description;
                                 });
@@ -214,7 +278,7 @@ export var badgeAssignment = (
                     };
 
                     scope.cancel = () => {
-                        column.hideOverlay("badges");
+                        scope.modals.hideModal("badges");
                     };
                 });
             });

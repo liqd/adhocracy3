@@ -19,32 +19,6 @@ var pkgLocation = "/Listing";
 //////////////////////////////////////////////////////////////////////
 // Listings
 
-export interface IListingContainerAdapter {
-    // A list of elements that should be displayed
-    elemRefs(any) : string[];
-
-    // Total number of elements
-    totalCount(any) : number;
-
-    // The pool a new element should be posted to.
-    poolPath(any) : string;
-}
-
-export class ListingPoolAdapter implements IListingContainerAdapter {
-    // NOTE: container *must* have been requested with `elements=paths`
-    public elemRefs(container : ResourcesBase.IResource) {
-        return container.data[SIPool.nick].elements;
-    }
-
-    public totalCount(container : ResourcesBase.IResource) {
-        return container.data[SIPool.nick].count;
-    }
-
-    public poolPath(container : ResourcesBase.IResource) {
-        return container.path;
-    }
-}
-
 export interface IFacetItem {
     key : string;
     name : string;
@@ -148,7 +122,7 @@ export class Listing<Container extends ResourcesBase.IResource> {
             controller: ["$filter", "$scope", "adhHttp", "adhPreliminaryNames", "adhPermissions", (
                 $filter: angular.IFilterService,
                 $scope: ListingScope<Container>,
-                adhHttp: AdhHttp.Service<Container>,
+                adhHttp: AdhHttp.Service,
                 adhPreliminaryNames : AdhPreliminaryNames.Service,
                 adhPermissions : AdhPermissions.Service
             ) : void => {

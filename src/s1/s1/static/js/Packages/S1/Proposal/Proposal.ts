@@ -10,6 +10,7 @@ import * as AdhRate from "../../Rate/Rate";
 import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
 import * as AdhUtil from "../../Util/Util";
 
+import RISystemUser from "../../../Resources_/adhocracy_core/resources/principal/ISystemUser";
 import RIProposal from "../../../Resources_/adhocracy_s1/resources/s1/IProposal";
 import RIProposalVersion from "../../../Resources_/adhocracy_s1/resources/s1/IProposalVersion";
 import * as SICommentable from "../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
@@ -31,12 +32,15 @@ export interface IScope extends angular.IScope {
         title : string;
         description : string;
         rateCount : number;
+        create? : boolean;
         creator : string;
         creationDate : string;
         commentCount : number;
         assignments : AdhBadge.IBadge[];
         workflowState : string;
         decisionDate : string;
+        anonymize? : boolean;
+        createdAnonymously? : boolean;
     };
 }
 
@@ -51,11 +55,12 @@ export interface IFormScope extends IScope {
 
 
 var bindPath = (
-    adhHttp : AdhHttp.Service<any>,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $q : angular.IQService
 ) => (
     scope : IScope,
@@ -92,6 +97,7 @@ var bindPath = (
                         title: titleSheet.title,
                         description: descriptionSheet.description,
                         rateCount: ratesPro - ratesContra,
+                        create: false,
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
                         commentCount: version.data[SICommentable.nick].comments_count,
@@ -99,6 +105,12 @@ var bindPath = (
                         workflowState: workflowAssignmentSheet.workflow_state,
                         decisionDate: AdhProcess.getStateData(workflowAssignmentSheet, workflowAssignmentSheet.workflow_state).start_date
                     };
+
+                    if (adhConfig.anonymize_enabled) {
+                        adhHttp.get(scope.data.creator).then((res) => {
+                            scope.data.createdAnonymously = res.content_type === RISystemUser.content_type;
+                        });
+                    }
                 });
             });
         }
@@ -119,7 +131,7 @@ var fill = (
 };
 
 var postCreate = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : IScope,
@@ -135,11 +147,13 @@ var postCreate = (
     });
     fill(scope, proposalVersion);
 
-    return adhHttp.deepPost([proposal, proposalVersion]);
+    return adhHttp.deepPost([proposal, proposalVersion], {
+        anonymize: scope.data.anonymize
+    });
 };
 
 var postEdit = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : IScope,
@@ -152,17 +166,19 @@ var postEdit = (
     });
     fill(scope, proposalVersion);
 
-    return adhHttp.deepPost([proposalVersion]);
+    return adhHttp.deepPost([proposalVersion], {
+        anonymize: scope.data.anonymize
+    });
 };
 
 
 export var detailDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $q : angular.IQService
 ) => {
     return {
@@ -172,18 +188,18 @@ export var detailDirective = (
             path: "@"
         },
         link: (scope : IScope) => {
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
+            bindPath(adhConfig, adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
         }
     };
 };
 
 export var listItemDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $q : angular.IQService
 ) => {
     return {
@@ -193,7 +209,7 @@ export var listItemDirective = (
             path: "@"
         },
         link: (scope : IScope) => {
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
+            bindPath(adhConfig, adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
             scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                 if (!proposalVersionUrl) {
                     scope.selectedState = "";
@@ -209,7 +225,7 @@ export var listItemDirective = (
 
 export var createDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhShowError,
@@ -227,6 +243,7 @@ export var createDirective = (
             scope.errors = [];
             scope.data = <any>{};
             scope.showError = adhShowError;
+            scope.data.create = true;
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.S1ProposalForm, () => {
@@ -249,7 +266,7 @@ export var createDirective = (
 
 export var editDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhRate : AdhRate.Service,
@@ -257,7 +274,7 @@ export var editDirective = (
     adhShowError,
     adhSubmitIfValid,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $location : angular.ILocationService,
     $q : angular.IQService
 ) => {
@@ -270,7 +287,7 @@ export var editDirective = (
         link: (scope : IFormScope, element) => {
             scope.errors = [];
             scope.showError = adhShowError;
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
+            bindPath(adhConfig, adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.S1ProposalForm, () => {
@@ -321,6 +338,46 @@ export var listingDirective = (
             if (scope.decisionDate) {
                 scope.params.decision_date = scope.decisionDate;
             }
+        }
+    };
+};
+
+
+export var renominateProposalDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service,
+    $window : angular.IWindowService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Renominate.html",
+        scope: {
+            proposalUrl: "=",
+        },
+        link: (scope) => {
+            scope.$watch("proposalUrl", (proposalUrl) => {
+                adhHttp.get(proposalUrl).then((proposal) => {
+                    var workflow = proposal.data[SIWorkflowAssignment.nick];
+                    scope.isRejected = "rejected" === workflow.workflow_state;
+                });
+            });
+            scope.renominate = () => {
+                if ( ! $window.confirm("Do you want to renominate this proposal? (Page will reload)")) {
+                    return;
+                }
+                adhHttp.get(scope.proposalUrl).then((proposal) => {
+                    var patch = {
+                        content_type: proposal.content_type,
+                        data: {}
+                    };
+                    patch.data[SIWorkflowAssignment.nick] = {
+                        workflow_state: "proposed"
+                    };
+                    return adhHttp.put(proposal.path, patch).then(() => {
+                        $window.parent.location.reload();
+                    });
+                });
+            };
         }
     };
 };

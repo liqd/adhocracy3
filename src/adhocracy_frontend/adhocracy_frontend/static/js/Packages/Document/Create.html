@@ -1,9 +1,13 @@
+<div class="resource-navigation">
+    <div class="resource-navigation-breadcrumbs">
+        <adh-go-to-came-from data-default="cancelUrl"></adh-go-to-came-from>
+    </div>
+</div>
 <form
     novalidate="novalidate"
     data-ng-submit="submit()"
     class="document-form"
     name="documentForm">
-<div class="section-jump" id="section-jump-top">
     <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
 
     <div class="section-jump-cover">
@@ -60,20 +64,20 @@
         </label>
     </div><!-- /.cover -->
 
-    <div class="section-jump-body">
-        <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="" data-ng-if="paragraphCount() > 1">
+    <div class="jump-navigation-wrapper m-narrow">
+        <nav class="jump-navigation m-unnumbered" data-adh-sticky="" data-ng-if="paragraphCount() > 1">
             <ol>
                 <li data-ng-repeat="paragraph in data.paragraphs | filter:{deleted: false}">
                     <a
-                        href="#section-jump-chapter-{{$index}}"
+                        href="#jump-{{$index}}"
                         data-du-smooth-scroll=""
                         data-du-scrollspy="">{{ $index + 1}}</a>
                 </li>
             </ol>
         </nav>
 
-        <div class="section-jump-main chapter-wrapper" data-du-spy-context="" data-ng-class="{'has-navigation': paragraphCount() > 1}">
-            <section class="action-section chapter" data-ng-repeat="paragraph in data.paragraphs" data-ng-if="!paragraph.deleted" id="section-jump-chapter-{{$index}}">
+        <div class="jump-navigation-main" data-du-spy-context="" data-ng-class="{'has-navigation': paragraphCount() > 1}">
+            <section class="action-section" data-ng-repeat="paragraph in data.paragraphs" data-ng-if="!paragraph.deleted" id="jump-{{$index}}">
                 <label>
                     <textarea
                         data-msd-elastic=""
@@ -90,19 +94,21 @@
                     </span>
                 </label>
             </section>
+
+            <a href="" class="button-cta-secondary m-add document-form-add-paragraph-button" data-ng-click="addParagraph()">{{ "TR__ADD_PARAGRAPH" | translate }}</a>
+
             <footer class="form-footer">
-                <a href="" class="button-cta-secondary m-add document-form-add-paragraph-button" data-ng-click="addParagraph()">{{ "TR__ADD_PARAGRAPH" | translate }}</a>
-
-                <input
-                    type="submit"
-                    name="submit"
-                    value="{{ 'TR__PUBLISH' | translate }}"
-                    class="button-cta form-footer-button-cta document-form-submit-button" />
-
-                <a data-ng-click="cancel()" class="button form-footer-button">{{ "TR__CANCEL" | translate }}</a>
+                <div class="form-footer-right">
+                    <input
+                        type="submit"
+                        name="submit"
+                        value="{{ 'TR__PUBLISH' | translate }}"
+                        class="button-cta document-form-submit-button" />
+                </div>
+                <div class="form-footer-left">
+                    <a data-ng-click="cancel()" class="button">{{ "TR__CANCEL" | translate }}</a>
+                </div>
             </footer>
-        </div><!-- /.section-jump-main -->
-    </div><!-- /.section-jump-body -->
-</div><!-- /.section-jump -->
-<!-- DATA SUBMIT -->
+        </div><!-- /.jump-navigation-main -->
+    </div><!-- /.jump-navigation-wrapper -->
 </form>

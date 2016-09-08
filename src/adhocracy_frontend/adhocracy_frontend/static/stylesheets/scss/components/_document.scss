@@ -1,8 +1,8 @@
 /*doc
 ---
-title: Document form
+title: Document Form
 name: document-form
-category: Widgets
+category: Components
 ---
 
 A form for creating documents. This contains a <a href="#section-jump">section jump</a> widget
@@ -15,24 +15,28 @@ A form for creating documents. This contains a <a href="#section-jump">section j
             <input type="text" placeholder="Add a title here." class="m-title">
         </label>
     </div>
-    <div class="section-jump-body">
-        <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered">
+    <div class="jump-navigation-wrapper m-narrow">
+        <nav class="jump-navigation m-unnumbered">
             <ol>
                 <li>
-                    <a href="#section-jump-chapter-0">1</a>
+                    <a href="#section-jump-0">1</a>
                 </li>
             </ol>
         </nav>
-        <div class="section-jump-main chapter-wrapper">
-            <section id="section-jump-chapter-0">
+        <div class="jump-navigation-main">
+            <section id="section-jump-0">
                 <label>
                     <textarea></textarea>
                 </label>
             </section>
+            <a href="" class="button-cta-secondary m-add document-form-add-paragraph-button">add paragraph</a>
             <footer class="form-footer">
-                <a href="" class="button-cta-secondary m-add document-form-add-paragraph-button">add paragraph</a>
-                <input type="submit" name="submit" value="Submit" class="button-cta form-footer-button-cta document-form-submit-button">
-                <a class="button form-footer-button">Cancel</a>
+                <div class="form-footer-right">
+                    <input type="submit" name="submit" value="Submit" class="button-cta form-footer-button-cta document-form-submit-button">
+                </div>
+                <div class="form-footer-left">
+                    <a class="button form-footer-button">Cancel</a>
+                </div>
             </footer>
         </div>
     </div>
@@ -43,10 +47,9 @@ A form for creating documents. This contains a <a href="#section-jump">section j
 */
 
 .document-form {
-    padding: 0;
-
     .document-form-add-paragraph-button {
-        @include rem(margin-bottom, 45px);
+        @include rem(margin-top, 113px);
+        @include rem(margin-right, $padding);
         float: right;
     }
 
@@ -55,7 +58,7 @@ A form for creating documents. This contains a <a href="#section-jump">section j
     }
 
     .form-footer {
-        @include rem(margin-top, 113px);
-        @include rem(padding, 0 1rem);
+        @include rem(margin-top, 45px);
+        @include rem(padding, 0 $padding);
     }
 }

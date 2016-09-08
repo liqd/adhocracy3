@@ -5,24 +5,24 @@
         'm-winner': data.winnerBadgeAssignment.name === 'winning',
         'm-community-award': data.winnerBadgeAssignment.name === 'community'
     }"
-    class="proposal-list-item {{ selectedState }}">
+    class="list-item m-contains-image {{ selectedState }}">
     <adh-show-image
-        data-css-class="proposal-list-item-image"
+        data-css-class="list-item-image"
         data-path="{{data.introduction.picture}}"
         data-format="thumbnail"
         data-image-metadata-nick="adhocracy_mercator.sheets.mercator.IIntroImageMetadata"
     ></adh-show-image>
-    <div class="proposal-list-item-body">
-        <p class="proposal-list-item-username">
+    <div class="list-item-body">
+        <p class="list-item-author">
+            {{ "TR__BY" | translate }}
             {{data.user_info.first_name}}<span data-ng-if="data.organization_info.name">,
                 {{data.organization_info.name}}
             </span>
+            {{ "TR__ON" | translate }}
+            <adh-time data-datetime="data.user_info.createtime" data-format="D/M/YYYY"></adh-time>
         </p>
-        <h3 class="proposal-list-item-title">{{ data.title.title }}</h3>
-        <ul class="meta-list proposal-list-item-meta-list">
-            <li class="meta-list-item meta-list-item-date">
-                <adh-time data-datetime="data.user_info.createtime" data-format="D/M/YYYY"></adh-time>
-            </li>
+        <h3 class="list-item-title">{{ data.title.title }}</h3>
+        <ul class="meta-list list-item-meta">
             <li class="meta-list-item meta-list-item-total-comments">
                 <i class="icon-speechbubbles"></i>
                 {{ data.commentCountTotal }} <span class="print-only" aria-hidden="true">{{ "TR__COMMENTS_TOTAL" | translate }}</span>
@@ -35,15 +35,11 @@
             <li data-ng-if="data.currentPhase && data.currentPhase != 'result'" class="meta-list-item meta-list-item-budget">
                 {{ data.finance.requested_funding | number }} &euro; <span class="print-only" aria-hidden="true">{{ "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING" | translate }}</span>
             </li>
-            <li data-ng-if="data.winnerBadgeAssignment.name === 'winning'" class="meta-list-item meta-list-item-badge">
-                <span class="badge m-winner">{{ "TR__MERCATOR_BADGE_WINNERS" | translate }}</span>
-            </li>
-            <li data-ng-if="data.winnerBadgeAssignment.name === 'community'" class="meta-list-item meta-list-item-badge">
-                <span class="badge m-community-award">{{ "TR__MERCATOR_BADGE_COMMUNITY_AWARD" | translate }}</span>
-            </li>
-            <li data-ng-if="data.winnerBadgeAssignment.name === 'shortlist'" class="meta-list-item meta-list-item-badge">
-                <span class="badge m-shortlist">{{ "TR__MERCATOR_BADGE_SHORTLIST" | translate }}</span>
-            </li>
         </ul>
+        <div class="list-item-badges">
+            <span data-ng-if="data.winnerBadgeAssignment.name === 'winning'" class="badge m-winner">{{ "TR__MERCATOR_BADGE_WINNERS" | translate }}</span>
+            <span data-ng-if="data.winnerBadgeAssignment.name === 'community'" class="badge m-community-award">{{ "TR__MERCATOR_BADGE_COMMUNITY_AWARD" | translate }}</span>
+            <span data-ng-if="data.winnerBadgeAssignment.name === 'shortlist'" class="badge m-shortlist">{{ "TR__MERCATOR_BADGE_SHORTLIST" | translate }}</span>
+        </div>
     </div>
 </a>

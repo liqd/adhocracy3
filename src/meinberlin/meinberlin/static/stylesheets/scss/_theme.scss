@@ -1,18 +1,12 @@
-@import "layout_theme";
+@import "general/layout_theme";
+@import "components/base_theme";
 @import "components/badges_theme";
-@import "components/bplan";
-@import "components/stadtforum";
 @import "components/button_theme";
 @import "components/comment_theme";
 @import "components/error_pages_theme";
-@import "components/forms_theme";
-@import "components/kiezkasse_context";
-@import "components/listing_theme";
 @import "components/login_theme";
-@import "components/meinberlin_proposal";
 @import "components/moving_columns_theme";
-@import "components/tabs_theme";
-@import "components/rate_theme";
 @import "components/standalone_wrapper_theme";
-@import "components/type_theme";
 @import "components/user_indicator_theme";
+
+@import "components/bplan";

@@ -345,10 +345,11 @@ class TestAddDefaultGroupToUserSubscriber:
 
     @fixture
     def principals(self, pool, service):
+        from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
         pool['principals'] = service
         pool['principals']['groups'] = service.clone()
         group = testing.DummyResource()
-        pool['principals']['groups']['authenticated'] = group
+        pool['principals']['groups'][DEFAULT_USER_GROUP_NAME] = group
         pool['principals']['users'] = service.clone()
         user = testing.DummyResource()
         pool['principals']['users']['000000'] = user
@@ -366,8 +367,9 @@ class TestAddDefaultGroupToUserSubscriber:
 
     def test_default_group_exists_and_no_group_set(
             self, registry, principals, event, mock_sheet, mock_user_locator):
+        from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
         from adhocracy_core.sheets.principal import IPermissions
-        default_group = principals['groups']['authenticated']
+        default_group = principals['groups'][DEFAULT_USER_GROUP_NAME]
         user = principals['users']['000000']
         event.object = user
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
@@ -379,8 +381,9 @@ class TestAddDefaultGroupToUserSubscriber:
 
     def test_default_group_exists_and_group_set(
             self, registry, principals, event, mock_sheet, mock_user_locator):
+        from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
         from adhocracy_core.sheets.principal import IPermissions
-        default_group = principals['groups']['authenticated']
+        default_group = principals['groups'][DEFAULT_USER_GROUP_NAME]
         other_group = testing.DummyResource()
         user = principals['users']['000000']
         event.object = user
@@ -393,8 +396,9 @@ class TestAddDefaultGroupToUserSubscriber:
 
     def test_default_group_not_exists(
             self, registry, principals, event, mock_sheet):
+        from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
         from adhocracy_core.sheets.principal import IPermissions
-        del principals['groups']['authenticated']
+        del principals['groups'][DEFAULT_USER_GROUP_NAME]
         user = principals['users']['000000']
         event.object = user
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
@@ -455,7 +459,7 @@ class TestSendPasswordResetMail:
                                                                    event.object)
 
 
-class TestSendAcitvationMail:
+class TestApplyUserActivationConfiguration:
 
     @fixture
     def registry(self, registry, mock_messenger):
@@ -475,27 +479,59 @@ class TestSendAcitvationMail:
         event.registry = registry
         return event
 
-    def call_fut(self, event):
-        from .subscriber import send_activation_mail_or_activate_user
-        return send_activation_mail_or_activate_user(event)
+    @fixture
+    def mock_sheet(self, registry, mock_sheet):
+        registry.content.get_sheet.return_value = mock_sheet
+        return mock_sheet
 
-    def test_add_activation_path_and_notify_user(self, event, mock_messenger):
+    def call_fut(self, event):
+        from .subscriber import apply_user_activation_configuration
+        return apply_user_activation_configuration(event)
+
+    def test_activate_directly(self, event, mock_messenger, mock_sheet):
+        mock_sheet.get.return_value = {'activation': 'direct'}
+        self.call_fut(event)
+        assert event.object.activate.called
+        assert mock_messenger.send_registration_mail.called is False
+        assert mock_messenger.send_invitation_mail.called is False
+
+    def test_send_registration_mail(self, event, mock_messenger, mock_sheet):
+        mock_sheet.get.return_value = {'activation': 'registration_mail'}
         self.call_fut(event)
         send_mail_call_args = mock_messenger.send_registration_mail.call_args[0]
         assert send_mail_call_args[0] == event.object
         assert send_mail_call_args[1].startswith('/activate/')
         assert event.object.activation_path.startswith('/activate/')
+        assert event.object.activate.called is False
+        assert mock_messenger.send_invitation_mail.called is False
 
-    def test_activate_user_if_skip_settings_is_set(self, event, mock_messenger):
-        event.registry.settings['adhocracy.skip_registration_mail'] = 'true'
-        self.call_fut(event)
-        assert event.object.activate.called
-        assert mock_messenger.send_registration_mail.called is False
-
-    def test_activation_if_messenger_is_none(self, registry, event, mock_messenger):
+    def test_registration_if_messenger_is_none(self, registry, event,
+                                               mock_messenger, mock_sheet):
+        mock_sheet.get.return_value = {'activation': 'registration_mail'}
         registry.messenger = None
         self.call_fut(event)
         assert mock_messenger.send_registration_mail.called is False
+        assert mock_messenger.send_invitation_mail.called is False
+
+    def test_send_invitation_mail(self, event, mock_messenger, mock_sheet,
+                                  registry):
+        mock_sheet.get.return_value = {'activation': 'invitation_mail'}
+        reset_mock = Mock()
+        registry.content.create.return_value = reset_mock
+        self.call_fut(event)
+        send_mail_call_args = mock_messenger.send_invitation_mail.call_args[0]
+        assert send_mail_call_args[0] == event.object
+        assert send_mail_call_args[1] == reset_mock
+        assert event.object.activate.called is False
+        assert mock_messenger.send_registration_mail.called is False
+
+    def test_invitation_if_messenger_is_none(self, registry, event,
+                                             mock_messenger, mock_sheet):
+        mock_sheet.get.return_value = {'activation': 'invitation_mail'}
+        registry.messenger = None
+        self.call_fut(event)
+        assert mock_messenger.send_registration_mail.called is False
+        assert mock_messenger.send_invitation_mail.called is False
 
 
 class TestUpdateDownload:
@@ -522,207 +558,6 @@ class TestUpdateImageDownload:
         mock = mocker.patch.object(subscriber, 'add_image_size_downloads')
         self.call_fut(event)
         assert mock.called_with(event.object, event.registry)
-
-
-@fixture
-def mock_commentable_sheet(event, registry, mock_sheet):
-    event.registry = registry
-    registry.content.get_sheet.return_value = mock_sheet
-    mock_sheet.get.return_value = {'comments_count': 1}
-    return mock_sheet
-
-
-class TestIncreaseCommentsCount:
-
-    def call_fut(self, *args):
-        from .subscriber import increase_comments_count
-        return increase_comments_count(*args)
-
-    @fixture
-    def mock_event(self):
-        return Mock()
-
-    @fixture
-    def mock_update(self, mocker):
-        from . import subscriber
-        return mocker.patch.object(subscriber, 'update_comments_count')
-
-    @fixture
-    def mock_parent_version_sheet(self, mock_sheet, registry):
-        registry.content.get_sheet.return_value = mock_sheet
-        return mock_sheet
-
-    def test_increase_when_first_version_created(self,
-                                                 registry,
-                                                 mock_event,
-                                                 mock_update,
-                                                 mock_parent_version_sheet):
-        mock_comment_version = Mock()
-        mock_event.reference.source = mock_comment_version
-        mock_event.registry = registry
-        mock_parent_version_sheet.get.return_value = {'FIRST': mock_comment_version}
-        self.call_fut(mock_event)
-        assert mock_update.called
-
-    def test_no_increase_when_not_first_version_created(self, mock_event, mock_update):
-        mock_comment_version = Mock()
-        mock_event.reference.source = mock_comment_version
-        self.call_fut(mock_event)
-        assert not mock_update.called
-
-
-class TestDecreaseCommentsCount:
-
-    def call_fut(self, *args):
-        from .subscriber import decrease_comments_count
-        return decrease_comments_count(*args)
-
-    @fixture
-    def mock_event(self):
-        return Mock()
-
-    @fixture
-    def mock_update(self, mocker):
-        from . import subscriber
-        return mocker.patch.object(subscriber, 'update_comments_count')
-
-    @fixture
-    def mock_parent_version_sheet(self, mock_sheet, registry):
-        registry.content.get_sheet.return_value = mock_sheet
-        return mock_sheet
-
-    def test_decrease_when_first_version_deleted(self,
-                                                registry,
-                                                mock_event,
-                                                mock_update,
-                                                mock_parent_version_sheet):
-        mock_comment_version = Mock()
-        mock_event.reference.source = mock_comment_version
-        mock_event.registry = registry
-        mock_parent_version_sheet.get.return_value = {'FIRST': mock_comment_version}
-        self.call_fut(mock_event)
-        assert mock_update.called
-
-    def test_no_decrease_when_not_first_version_deleted(self, mock_event, mock_update):
-        mock_comment_version = Mock()
-        mock_event.reference.source = mock_comment_version
-        self.call_fut(mock_event)
-        assert not mock_update.called
-
-
-class TestUpdateCommentsCount:
-
-    def call_fut(self, *args):
-        from .subscriber import update_comments_count
-        return update_comments_count(*args)
-
-    def _make_resource(self, parent, iresource, registry):
-        return registry.content.create(iresource.__identifier__,
-                                       parent=parent,
-                                       appstructs={},
-                                       send_event=False,
-                                       )
-
-    def _get_comments_count(self, resource, registry):
-        from adhocracy_core.sheets.comment import ICommentable
-        comments_count = registry.content.get_sheet_field(resource,
-                                                          ICommentable,
-                                                          'comments_count')
-        return comments_count
-
-    def test_call(self, registry, pool_with_catalogs):
-        from adhocracy_core.resources.comment import IComment
-        from adhocracy_core.resources.comment import ICommentVersion
-        from adhocracy_core.resources.comment import ICommentsService
-        from adhocracy_core.resources.paragraph import IParagraphVersion
-        from adhocracy_core.resources.document import IDocumentVersion
-        from adhocracy_core.resources.rate import IRateVersion
-        from adhocracy_core import sheets
-        pool = pool_with_catalogs
-        registry.content.create(ICommentsService.__identifier__,
-                                parent=pool_with_catalogs)
-        comments = pool['comments']
-        comment = self._make_resource(comments, IComment, registry)
-        comment1 = self._make_resource(comment, ICommentVersion, registry)
-        comment2 = self._make_resource(comment, ICommentVersion, registry)
-        comment3 = self._make_resource(comment, ICommentVersion, registry)
-        non_commentable = self._make_resource(pool, IRateVersion, registry)
-        sub_commentable = self._make_resource(pool, IParagraphVersion, registry)
-        main_commentable = self._make_resource(pool, IDocumentVersion, registry)
-
-        sheet = registry.content.get_sheet(main_commentable, sheets.document.IDocument)
-        sheet.set({'elements': [sub_commentable]}, send_reference_event=False)
-        sheet = registry.content.get_sheet(non_commentable, sheets.rate.IRate)
-        sheet.set({'object': [sub_commentable]}, send_reference_event=False)
-
-        sheet = registry.content.get_sheet(comment3, sheets.comment.IComment)
-        sheet.set({'refers_to': sub_commentable}, send_reference_event=False)
-        sheet = registry.content.get_sheet(comment2, sheets.comment.IComment)
-        sheet.set({'refers_to': comment3}, send_reference_event=False)
-        sheet = registry.content.get_sheet(comment1, sheets.comment.IComment)
-        sheet.set({'refers_to': comment2}, send_reference_event=False)
-
-        self.call_fut(comment1, 1, registry)
-        self.call_fut(comment2, 1, registry)
-        self.call_fut(comment3, 1, registry)
-
-        assert self._get_comments_count(comment1, registry) == 0
-        assert self._get_comments_count(comment2, registry) == 1
-        assert self._get_comments_count(comment3, registry) == 2
-        assert self._get_comments_count(sub_commentable, registry) == 3
-        assert self._get_comments_count(main_commentable, registry) == 0
-
-
-class TestUpdateCommentsCountAfterVisibilityChange:
-
-    @fixture
-    def mock_sheet(self, mock_sheet, registry):
-        registry.content.get_sheet.return_value = mock_sheet
-        return mock_sheet
-
-    @fixture
-    def mock_update(self, mocker):
-        from . import subscriber
-        return mocker.patch.object(subscriber, 'update_comments_count')
-
-    def call_fut(self, *args):
-        from .subscriber import update_comments_count_after_visibility_change
-        return update_comments_count_after_visibility_change(*args)
-
-    def test_ignore_if_visible(self, mocker, registry, event, mock_update, mock_sheet):
-        from adhocracy_core.interfaces import VisibilityChange
-        from . import subscriber
-        event.registry = registry
-        comment_v0 = testing.DummyResource()
-        mock_sheet.get.side_effect = [{'FIRST': [comment_v0]}, {'comments_count': 1}]
-        mock_visibility = mocker.patch.object(subscriber, 'get_visibility_change')
-        mock_visibility.return_value = VisibilityChange.visible
-        self.call_fut(event)
-        assert not mock_update.called
-
-    def test_decrease_count_if_consealed(self, mocker, registry, event,
-                                         mock_update, mock_sheet):
-        from adhocracy_core.interfaces import VisibilityChange
-        from . import subscriber
-        event.registry = registry
-        comment_v0 = testing.DummyResource()
-        mock_sheet.get.side_effect = [{'FIRST': [comment_v0]}, {'comments_count': 2}]
-        mock_visibility = mocker.patch.object(subscriber, 'get_visibility_change')
-        mock_visibility.return_value = VisibilityChange.concealed
-        self.call_fut(event)
-        assert mock_update.called_with(comment_v0, -3, event.registry)
-
-    def test_increase_count_if_revealed(self, mocker, registry, event,
-                                        mock_update, mock_sheet):
-        from adhocracy_core.interfaces import VisibilityChange
-        from . import subscriber
-        event.registry = registry
-        comment_v0 = testing.DummyResource()
-        mock_sheet.get.side_effect = [{'FIRST': [comment_v0]}, {'comments_count': 2}]
-        mock_visibility = mocker.patch.object(subscriber, 'get_visibility_change')
-        mock_visibility.return_value = VisibilityChange.revealed
-        self.call_fut(event)
-        assert mock_update.called_with(comment_v0, 3, event.registry)
 
 
 class TestDownloadPictureForVersion:
@@ -862,12 +697,9 @@ def test_register_subscriber(registry):
     assert subscriber.add_default_group_to_user.__name__ in handlers
     assert subscriber.update_modification_date_modified_by.__name__ in handlers
     assert subscriber.send_password_reset_mail.__name__ in handlers
-    assert subscriber.send_activation_mail_or_activate_user.__name__ in handlers
+    assert subscriber.apply_user_activation_configuration.__name__ in handlers
     assert subscriber.update_asset_download.__name__ in handlers
     assert subscriber.update_image_downloads.__name__ in handlers
-    assert subscriber.decrease_comments_count.__name__ in handlers
-    assert subscriber.increase_comments_count.__name__ in handlers
-    assert subscriber.update_comments_count_after_visibility_change.__name__ in handlers
     assert set_acms_for_app_root.__name__ in handlers
     assert subscriber.download_external_picture_for_created.__name__ in handlers
     assert subscriber.download_external_picture_for_version.__name__ in handlers

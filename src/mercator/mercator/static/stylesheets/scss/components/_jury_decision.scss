@@ -1,0 +1,38 @@
+/*doc
+---
+title: Jury Decision
+name: jury-decision
+category: Components
+---
+
+Highlighted section for proposal detail that contains the winning proposals jury decision text
+
+Example navigation
+
+FIXME: reuse `.badge-description`
+
+```html_example
+<section class="jury-decision-section">
+    <h2>Jury Decision</h2>
+    <p>Lorem ipsum Ex veniam anim proident fugiat culpa est mollit ea minim Excepteur ut Ut in adipisicing
+    officia commodo id magna ex culpa et veniam magna non dolor reprehenderit ea commodo sit.</p>
+    <div class="jury-decision-section-icon">
+        <i class="icon-star"></i>
+    </div>
+</section>
+```
+*/
+
+.jury-decision-section {
+    @extend .action-section;
+    background: $color-brand-one-normal;
+
+    .jury-decision-section-icon {
+        @extend .action-section-button;
+        color: $color-text-inverted;
+
+        &:hover, &:focus {
+            color: $color-text-inverted;
+        }
+    }
+}

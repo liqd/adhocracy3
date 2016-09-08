@@ -3,18 +3,20 @@
 from datetime import datetime
 from pytz import UTC
 from pyramid.request import Request
+from pyramid.registry import Registry
 from substanced.util import find_service
+from adhocracy_core.catalog.adhocracy import index_rates
 from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
-
-
-def do_transition_to_propose(context: IPool, request: Request, **kwargs):
-    """Do various tasks to complete transition to propose state."""
-    _remove_state_data(context, 'result', 'start_date', request)
+from adhocracy_core.resources.proposal import IProposal
+from adhocracy_core.resources.proposal import IProposalVersion
+from adhocracy_core.sheets.description import IDescription
+from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.sheets.tags import ITags
 
 
 def do_transition_to_voteable(context: IPool, request: Request, **kwargs):
@@ -67,20 +69,6 @@ def _store_state_data(context: IWorkflowAssignment, state_name: str,
     sheet.set({'state_data': state_data})
 
 
-def _remove_state_data(context: IWorkflowAssignment, state_name: str,
-                       key: str, request: Request):
-    sheet = request.registry.content.get_sheet(context, IWorkflowAssignment,
-                                               request=request)
-    state_data = sheet.get()['state_data']
-    datas = [x for x in state_data if x['name'] == state_name]
-    if datas == []:
-        return
-    data = datas[0]
-    if key in data:
-        del data[key]
-    sheet.set({'state_data': state_data})
-
-
 def _get_children_sort_by_rates(context) -> []:
     catalog = find_service(context, 'catalogs')
     if catalog is None:
@@ -117,7 +105,39 @@ def _do_transition(context, request: Request, from_state: str, to_state: str,
                                   start_date=start_date)
 
 
+def do_transition_to_proposed(context: IProposal,
+                              request: Request,
+                              **kwargs) -> None:
+    """Delete rates for `context` and add renominate info."""
+    rates = find_service(context, 'rates')
+    if rates is None:
+        return
+    last = request.registry.content.get_sheet_field(context, ITags, 'LAST')
+    _add_renominate_info(last, request)
+    _remove_children(rates, request.registry)
+
+
+def _add_renominate_info(version: IProposalVersion, request: Request) -> None:
+    registry = request.registry
+    editor = registry.content.get_sheet_field(request.user, IUserBasic, 'name')
+    rates = index_rates(version, 0)
+    description_sheet = registry.content.get_sheet(version, IDescription)
+    description = description_sheet.get()['description']
+    renominate_info = '\n\n---'\
+                      '\n\nrenominated by: {0}'\
+                      '\nold rating: {1}'\
+                      '\n'.format(editor, rates)
+    description_sheet.set({'description': description + renominate_info})
+
+
+def _remove_children(context: IPool, registry: Registry) -> None:
+    child_names = [x for x in context.keys()]
+    for child in child_names:
+        context.remove(child, registry=registry)
+
+
 def includeme(config):
     """Add workflow."""
     config.add_workflow('adhocracy_s1.workflows:s1.yaml', 's1')
     config.add_workflow('adhocracy_s1.workflows:s1_content.yaml', 's1_content')
+    config.add_workflow('adhocracy_s1.workflows:s1_private.yaml', 's1_private')

@@ -23,6 +23,8 @@ import * as leafletMarkerCluster from "leafletMarkerCluster";  if (leafletMarker
 import * as markdownit from "markdownit";
 
 import * as AdhAbuseModule from "./Packages/Abuse/Module";
+import * as AdhAngularHelpersModule from "./Packages/AngularHelpers/Module";
+import * as AdhAnonymizeModule from "./Packages/Anonymize/Module";
 import * as AdhBadgeModule from "./Packages/Badge/Module";
 import * as AdhCommentModule from "./Packages/Comment/Module";
 import * as AdhConfigModule from "./Packages/Config/Module";
@@ -36,15 +38,15 @@ import * as AdhImageModule from "./Packages/Image/Module";
 import * as AdhInjectModule from "./Packages/Inject/Module";
 import * as AdhListingModule from "./Packages/Listing/Module";
 import * as AdhLocaleModule from "./Packages/Locale/Module";
-import * as AdhMarkdownModule from "./Packages/Markdown/Module";
 import * as AdhMappingModule from "./Packages/Mapping/Module";
+import * as AdhMarkdownModule from "./Packages/Markdown/Module";
 import * as AdhMetaApiModule from "./Packages/MetaApi/Module";
 import * as AdhMovingColumnsModule from "./Packages/MovingColumns/Module";
 import * as AdhPermissionsModule from "./Packages/Permissions/Module";
 import * as AdhPreliminaryNamesModule from "./Packages/PreliminaryNames/Module";
 import * as AdhProcessModule from "./Packages/Process/Module";
 import * as AdhRateModule from "./Packages/Rate/Module";
-import * as AdhAngularHelpersModule from "./Packages/AngularHelpers/Module";
+import * as AdhResourceActionsModule from "./Packages/ResourceActions/Module";
 import * as AdhResourceAreaModule from "./Packages/ResourceArea/Module";
 import * as AdhResourceWidgetsModule from "./Packages/ResourceWidgets/Module";
 import * as AdhS1Module from "./Packages/S1/Module";
@@ -94,6 +96,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         AdhDoneModule.moduleName,
         AdhCrossWindowMessagingModule.moduleName,
         AdhEmbedModule.moduleName,
+        AdhResourceActionsModule.moduleName,
         AdhResourceAreaModule.moduleName,
         AdhStickyModule.moduleName,
         AdhTrackingModule.moduleName,
@@ -167,6 +170,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
 
     // register our modules
     AdhAbuseModule.register(angular);
+    AdhAnonymizeModule.register(angular);
     AdhBadgeModule.register(angular);
     AdhCommentModule.register(angular);
     AdhConfigModule.register(angular, config);
@@ -189,6 +193,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhProcessModule.register(angular);
     AdhRateModule.register(angular);
     AdhAngularHelpersModule.register(angular);
+    AdhResourceActionsModule.register(angular);
     AdhResourceAreaModule.register(angular);
     AdhResourceWidgetsModule.register(angular);
     AdhS1Module.register(angular);

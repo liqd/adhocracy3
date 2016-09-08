@@ -15,6 +15,7 @@ from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import SequenceSchema
 from adhocracy_core.schema import TupleSchema
+from adhocracy_core.schema import get_choices_by_interface
 
 
 class WebMercatorLongitude(MappingSchema):
@@ -157,10 +158,16 @@ class LocationReference(SheetToSheet):
     target_isheet = IMultiPolygon
 
 
+def get_location_choices(context, request) -> []:
+    """Return location resources choices."""
+    return get_choices_by_interface(IMultiPolygon, context, request)
+
+
 class LocationReferenceSchema(MappingSchema):
     """Data structure for the location reference sheet."""
 
-    location = Reference(reftype=LocationReference)
+    location = Reference(reftype=LocationReference,
+                         choices_getter=get_location_choices)
 
 
 location_reference_meta = sheet_meta._replace(

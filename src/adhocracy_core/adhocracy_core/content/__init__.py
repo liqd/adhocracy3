@@ -11,12 +11,16 @@ from substanced.content import add_service_type
 from substanced.workflow import IWorkflow
 from zope.interface.interfaces import IInterface
 
+from adhocracy_core.authentication import is_created_anonymized
 from adhocracy_core.exceptions import RuntimeConfigurationError
+from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.interfaces import SheetMetadata
 from adhocracy_core.interfaces import IResourceSheet
+from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
+from adhocracy_core.sheets.anonymize import ANONYMIZE_PERMISSION
 from adhocracy_core.utils import get_iresource
 
 
@@ -288,23 +292,46 @@ class ResourceContentRegistry(ContentRegistry):
         return isheet, field, node
 
     def get_workflow(self, context: object) -> IWorkflow:
-        """Get workflow of `context` or None.
-
-        :raises RuntimeConfigurationError: if workflow is not registered
-        """
-        iresource = get_iresource(context)
+        """Get workflow of `context` or None."""
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
         try:
-            name = self.resources_meta[iresource].workflow_name
-        except KeyError:  # ease testing
-            return None
-        if name == '':
-            return None
-        try:
+            name = self.get_sheet_field(context,
+                                        IWorkflowAssignment,
+                                        'workflow')
+        except RuntimeConfigurationError:
+            name = ''
+        if name:
             workflow = self.workflows[name]
-        except KeyError:
-            msg = 'Workflow name is not registered: {0}'.format(name)
-            raise RuntimeConfigurationError(msg)
+        else:
+            workflow = None
         return workflow
+
+    def can_add_anonymized(self, context: object, request: Request) -> bool:
+        """Check if children can be created/added anonymized to `context`."""
+        if IItem.providedBy(context):
+            # if item was anonymized you can also add versions anonymized
+            has_sheet = _is_anonymized_and_has_permission(context, request)
+        else:
+            has_sheet = IAllowAddAnonymized.providedBy(context)
+        has_permission = request.has_permission(ANONYMIZE_PERMISSION, context)
+        return has_sheet and has_permission
+
+    def can_edit_anonymized(self, context: object, request: Request) -> bool:
+        """Check if `context` may be edited anonymously."""
+        can_anonymize = _is_anonymized_and_has_permission(context, request)
+        return can_anonymize
+
+    def can_delete_anonymized(self, context: object, request: Request) -> bool:
+        """Check if `context` may be deleted anonymously."""
+        can_anonymize = _is_anonymized_and_has_permission(context, request)
+        return can_anonymize
+
+
+def _is_anonymized_and_has_permission(context: object,
+                                      request: Request) -> bool:
+    is_anonymized = is_created_anonymized(context)
+    has_permission = request.has_permission(ANONYMIZE_PERMISSION, context)
+    return is_anonymized and has_permission
 
 
 def includeme(config):  # pragma: no cover

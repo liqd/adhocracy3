@@ -24,6 +24,7 @@ from adhocracy_core.interfaces import SheetMetadata
 from adhocracy_core.interfaces import Reference
 from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.interfaces import search_query
+from adhocracy_core.schema import SchemaNode
 from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Reference as ReferenceSchema
@@ -54,16 +55,23 @@ class BaseResourceSheet:
         self.extra_js_url = ''  # used for html forms :mod:`adhocracy_core.sdi`
 
     def get_schema_with_bindings(self) -> colander.MappingSchema:
+        bindings = self._get_basic_bindings()
+        context = bindings.pop('context')
         schema = create_schema(self.meta.schema_class,
-                               self.context,
+                               context,
                                self.request,
-                               registry=self.registry,
-                               creating=self.creating
+                               **bindings
                                )
         schema.name = self.meta.isheet.__identifier__
         is_mandatory = self.creating and self.meta.create_mandatory
         schema.missing = required if is_mandatory else drop
         return schema
+
+    def _get_basic_bindings(self) -> dict:
+        return {'context': self.context,
+                'registry': self.registry,
+                'creating': self.creating,
+                }
 
     @reify
     def _fields(self) -> dict:
@@ -104,15 +112,16 @@ class BaseResourceSheet:
         query = self._get_references_query(params)
         appstruct.update(self._get_reference_appstruct(query))
         if add_back_references:
+            query = self._get_back_references_query(params)
             appstruct.update(self._get_back_reference_appstruct(query))
         return appstruct
 
     def _get_default_appstruct(self) -> dict:
         appstruct = {}
+        bindings = self._get_basic_bindings()
         for node in self.schema:
             if isinstance(node.default, deferred):
-                default = node.default(node, {'context': self.context,
-                                              'registry': self.registry})
+                default = node.default(node, bindings)
             else:
                 default = node.default
             appstruct[node.name] = default
@@ -123,12 +132,14 @@ class BaseResourceSheet:
 
     def _get_references_query(self, params: dict) -> SearchQuery:
         """Might be overridden in subclasses."""
-        default_params = {'only_visible': False,
-                          'resolve': True,
-                          'allows': (),
-                          'references': [],
-                          }
-        query = search_query._replace(**default_params)
+        query = search_query._replace(resolve=True)
+        if params:
+            query = query._replace(**params)
+            query = query._replace(allows=())  # no view permission check
+        return query
+
+    def _get_back_references_query(self, params: dict) -> SearchQuery:
+        query = search_query._replace(resolve=True)
         if params:
             query = query._replace(**params)
         return query
@@ -175,7 +186,9 @@ class BaseResourceSheet:
             omit=(),
             send_event=True,
             send_reference_event=True,
-            omit_readonly: bool=True) -> bool:
+            omit_readonly: bool=True,
+            autoupdated=False,
+            ) -> bool:
         """Store appstruct.
 
         Read :func:`adhocracy_core.interfaces.IResourceSheet.set`
@@ -195,7 +208,9 @@ class BaseResourceSheet:
                                           self.registry,
                                           appstruct_old,
                                           appstruct,
-                                          self.request)
+                                          self.request,
+                                          autoupdated,
+                                          )
             self.registry.notify(event)
         return bool(appstruct)
 
@@ -228,7 +243,7 @@ class BaseResourceSheet:
                                               registry,
                                               send_event=send_event)
 
-    def serialize(self, params: dict=None):
+    def serialize(self, params: dict=None, add_back_references: bool=True):
         """Get sheet appstruct data and serialize.
 
         Read :func:`adhocracy_core.interfaces.IResourceSheet.serialize`
@@ -242,7 +257,9 @@ class BaseResourceSheet:
             'adhocracy.filter_by_visible', True))
         if filter_visible:
             params['only_visible'] = True
-        appstruct = self.get(params=params, omit_defaults=True)
+        appstruct = self.get(params=params,
+                             add_back_references=add_back_references,
+                             omit_defaults=True)
         schema = self.get_schema_with_bindings()
         cstruct = schema.serialize(appstruct)
         return cstruct
@@ -358,6 +375,8 @@ def add_sheet_to_registry(metadata: SheetMetadata, registry: Registry):
 def _assert_schema_preserves_super_type_data_structure(schema: MappingSchema):
     super_defaults = []
     for super_schema in schema.__class__.__bases__:
+        if super_schema is SchemaNode:
+            continue
         for child in super_schema().children:
             super_defaults.append((child.name, child.default))
     class_defaults = []
@@ -388,3 +407,6 @@ def includeme(config):  # pragma: no cover
     config.include('.badge')
     config.include('.logbook')
     config.include('.embed')
+    config.include('.notification')
+    config.include('.localroles')
+    config.include('.anonymize')

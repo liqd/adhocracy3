@@ -10,7 +10,7 @@ class IPoll(proposal.IProposal):
 
 poll_meta = proposal.proposal_meta._replace(
     iresource=IPoll,
-    workflow_name='stadtforum_poll',
+    default_workflow='stadtforum_poll',
     autonaming_prefix='poll_',
 )
 
@@ -20,11 +20,12 @@ class IProcess(process.IProcess):
 
 
 process_meta = process.process_meta._replace(
+    content_name='StadtForumProcess',
     iresource=IProcess,
     element_types=(IPoll,
                    ),
     is_implicit_addable=True,
-    workflow_name = 'stadtforum',
+    default_workflow = 'stadtforum',
 )
 
 

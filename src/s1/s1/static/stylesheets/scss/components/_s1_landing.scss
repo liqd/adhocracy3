@@ -1,10 +1,17 @@
-$susy: (
-    gutters: 0.05
-);
-
 .s1-landing {
     @include container;
     background: $color-background-base-introvert;
+    min-width: rem($moving-column-single-width-min);
+    max-width: rem($moving-column-single-width-max);
+
+    // center and make scrollable
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    overflow: auto;
 }
 
 .s1-landing-row,
@@ -31,22 +38,13 @@ $susy: (
     font-weight: $font-weight-extrovert;
 }
 
-.s1-landing-section-footer {
-    @include rem(margin-top, 4px);
-    float: right;
-
-    .button {
-        font-weight: bold;
-    }
-}
-
 .s1-landing-section-left {
-    @include span(9 of 12 first);
+    @include grid-span(9, 0);
 }
 
 .s1-landing-section-right {
     @include rem(border-left, 4px solid $color-background-base-introvert);
-    @include span(3 of 12 last);
+    @include grid-span(3, 9);
 }
 
 .s1-landing-section-go {
@@ -60,8 +58,4 @@ $susy: (
     .button {
         font-weight: $font-weight-extrovert;
     }
-}
-
-.s1-landing-section-footer-more {
-    @extend .m-introvert;
 }

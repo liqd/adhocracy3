@@ -1,4 +1,5 @@
 """Frontend view and simple pyramid app configurations."""
+import json
 import pkg_resources
 
 from pyramid.renderers import render
@@ -41,6 +42,8 @@ def config_view(request):
         'adhocracy.thentos_captcha.enabled', 'false'))
     config['captcha_url'] = settings.get(
         'adhocracy.thentos_captcha.frontend_url', 'http://localhost:6542/')
+    config['anonymize_enabled'] = asbool(settings.get(
+        'adhocracy.anonymize.enabled', 'false'))
     config['locale'] = settings.get('adhocracy.frontend.locale', 'en')
     custom_keys = settings.get('adhocracy.custom', '').split()
     config['custom'] = {k: settings.get('adhocracy.custom.%s' % k)
@@ -61,6 +64,18 @@ def config_view(request):
         'adhocracy.frontend.piwik_track_user_id', 'false'))
     config['profile_images_enabled'] = asbool(settings.get(
         'adhocracy.frontend.profile_images_enabled', 'true'))
+    config['map_tile_url'] = settings.get(
+        'adhocracy.frontend.map_tile_url',
+        'http://{s}.tile.osm.org/{z}/{x}/{y}.png')
+    map_tile_options = settings.get('adhocracy.frontend.map_tile_options')
+    if map_tile_options is not None:
+        config['map_tile_options'] = json.loads(map_tile_options)
+    else:
+        url = 'https://www.openstreetmap.org/copyright'
+        config['map_tile_options'] = {
+            'maxZoom': 18,
+            'attribution': '© <a href="%s">OpenStreetMap</a>' % url,
+        }
     use_cachbust = asbool(settings.get('cachebust.enabled', 'false'))
     if not use_cachbust:  # ease testing
         return config
@@ -105,8 +120,7 @@ def root_view(request):
     """Return the embeddee HTML."""
     if not hasattr(request, 'cachebusted_url'):  # ease testing
         return Response()
-    debug = config_view(request)['debug']
-    css_path = 'stylesheets/a3.css' if debug else 'stylesheets/min/a3.css'
+    css_path = 'stylesheets/a3.css'
     query_params = cachebust_query_params(request)
     result = render(
         'adhocracy_frontend:build/root.html.mako',

@@ -36,11 +36,18 @@ class ConfigViewTest(unittest.TestCase):
              'profile_images_enabled': True,
              'captcha_enabled': False,
              'captcha_url': 'http://localhost:6542/',
+             'anonymize_enabled': False,
              'support_url': None,
              'terms_url': {
                 'de': None,
                 'en': None
-             }}
+             },
+             'map_tile_options': {
+                 'attribution': '© <a href="https://www.openstreetmap.org/' +
+                                'copyright">OpenStreetMap</a>',
+                 'maxZoom': 18},
+             'map_tile_url': 'http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+             }
 
     def test_ws_url_without_ws_url_settings_scheme_https(self):
         request = testing.DummyRequest(scheme='https')

@@ -11,6 +11,7 @@ pyramid.includes =
 zodbconn.uri = zeo://localhost:9999?cache_size=200MB&connection_cache_size=50000&storage=main&blob_dir=var/db/test/blobs&shared_blob_dir=True
 substanced.secret = seekri1
 substanced.autosync_catalogs = true
+substanced.uploads_tempdir = %(here)s/../var/uploads_tmp
 adhocracy.ws_url = ws://localhost:8081
 
 mail.queue_path = %(here)s/../var/mail
@@ -22,7 +23,6 @@ adhocracy.abuse_handler_mail = abuse_handler@unconfigured.domain
 # Template for the subjects of messages sent to users (Python format string,
 # usable variables: {site_name}, {sender_name}, {title})
 adhocracy.message_user_subject = [{site_name}] Message from {sender_name}: {title}
-adhocracy.skip_registration_mail = true
 
 # Canonical frontend base URL. If this is an embedding URL, it should end with
 # #!. This is used for the creation of activation links.

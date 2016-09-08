@@ -2,23 +2,25 @@ title: Example
 description: Example workflow used in tests
 initial_state: participate
 auto_transition: False
+add_local_role_participant_to_default_group: True
 states:
   participate:
     title: Participate
     description: This phase is to participate.
     acm:
-     principals:           [participant, moderator, creator, initiator]
+     principals:           [participant, moderator, creator, initiator,  admin]
      permissions:
-       - [create_proposal,   A,           ~,         ~,       ~]
-       - [create_document,   A,           ~,         ~,       ~]
-       - [create_comment,    A,           A,         ~,       ~]
-       - [create_rate,      A,           ~,         ~,        ~]
-       - [create_asset,      A,           ~,         ~,       ~]
-       - [create_badge_assignment,  ~,    A,         A,       ~]
-       - [edit_rate,         ~,           ~,         A,       ~]
-       - [create_relation,   A,           ~,         ~,       ~]
-       - [edit_relation,     ~,           ~,         A,       ~]
-       - [hide,              ~,           A,         ~,       ~]
+       - [create_proposal,   A,           ~,         ~,       ~,             A]
+       - [create_document,   A,           ~,         ~,       ~,             A]
+       - [create_comment,    A,           A,         ~,       ~,             A]
+       - [create_rate,       A,           ~,         ~,       ~,             A]
+       - [create_asset,      A,           ~,         ~,       ~,             A]
+       - [create_badge_assignment,  ~,    A,         A,       ~,             A]
+       - [edit_rate,         ~,           ~,         A,       ~,             A]
+       - [create_relation,   A,           ~,         ~,       ~,             A]
+       - [edit_relation,     ~,           ~,         A,       ~,             A]
+       - [hide,              ~,           A,         ~,       ~,             A]
+       - [manage_anonymized, A,           ~,         ~,       ~,             ~]
   frozen:
     title: Frozen
 transitions:

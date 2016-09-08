@@ -4,16 +4,6 @@
     }
 }
 
-.comment-create-form,
-.comment-children-edit-form {
-    .form-footer-button {
-        @include rem(font-size, $font-size-small);
-        @include rem(line-height, 24px);
-        padding: 0;
-        text-transform: capitalize;
-    }
-}
-
 .comment-header .comment-header-links {
     margin-right: 1px;
     padding: 0;
@@ -29,14 +19,7 @@
 }
 
 .comment {
-    @include rem(padding, 0 10px);
-}
-
-.comment-content,
-.comment-create-form-text,
-.comment-edit-form-text {
-    @include rem(font-size, $font-size-small);
-    line-height: $line-height-large;
+    @include rem(padding, 0 $padding);
 }
 
 .comment-children {

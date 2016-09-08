@@ -1,4 +1,5 @@
 import colander
+import unittest
 from pyramid import testing
 from pytest import raises
 from pytest import fixture
@@ -354,12 +355,18 @@ class TestPermissionsSchema:
         from adhocracy_core.sheets.principal import PermissionsSchema
         return PermissionsSchema()
 
+    def test_create(self):
+        from .principal import get_group_choices
+        inst = self.make_one()
+        assert inst
+        assert inst['groups'].choices_getter == get_group_choices
+
     def test_deserialize_empty(self):
         inst = self.make_one()
         assert inst.deserialize({}) == {'groups': []}
 
-    def test_serialize_empty(self, context):
-        inst = self.make_one().bind(context=context)
+    def test_serialize_empty(self, context, request_):
+        inst = self.make_one().bind(context=context, request=request_)
         assert inst.serialize({}) == {'groups': [],
                                       'roles': [],
                                       }
@@ -374,6 +381,33 @@ class TestPermissionsSchema:
             {'groups': [request_.application_url + '/group/'],
              'roles': ['view'],
              }
+
+
+class TestGetGroupChoices:
+
+    def call_fut(self, *args):
+        from .principal import get_group_choices
+        return get_group_choices(*args)
+
+    def test_return_empty_list_if_no_assets_service(self, pool):
+        assert self.call_fut(pool, None) == []
+
+    def test_return_empty_list_if_empty_assets_service(self, pool, service):
+        pool['principals'] = service
+        pool['principals']['groups'] = service.clone()
+        assert self.call_fut(pool, None) == []
+
+    def test_get_asset_choices_from_assets_service(self, pool, request_,
+                                                   service):
+        from .principal import IGroup
+        pool['principals'] = service
+        pool['principals']['groups'] = service.clone()
+        pool['principals']['groups']['group'] = \
+            testing.DummyResource(__provides__=IGroup)
+        pool['principals']['groups']['no_group'] = testing.DummyResource()
+        choices = self.call_fut(pool, request_)
+        assert choices == [('http://example.com/principals/groups/group/',
+                            'group')]
 
 
 class TestPermissionsSheet:
@@ -449,3 +483,87 @@ class TestGroupSheet:
     def test_includeme_register_sheet(self, meta, registry):
         context = testing.DummyResource(__provides__=meta.isheet)
         assert registry.content.get_sheet(context, meta.isheet)
+
+
+class TestActivationSetting():
+
+    @fixture
+    def inst(self):
+        from .principal import ActivationSetting
+        return ActivationSetting()
+
+    def test_create(self, inst):
+        from adhocracy_core.schema import SingleLine
+        inst = inst.bind()
+        assert isinstance(inst, SingleLine)
+        assert inst.widget.values == [('direct', 'direct'),
+                                      ('registration_mail', 'registration_mail'),
+                                      ('invitation_mail', 'invitation_mail'),
+                                      ]
+
+    def test_serialize(self, inst):
+        assert inst.serialize('direct') == 'direct'
+
+    def test_deserialize_valid(self, inst):
+        inst = inst.bind()
+        assert inst.deserialize('direct') == 'direct'
+        assert inst.deserialize('registration_mail') == 'registration_mail'
+        assert inst.deserialize('invitation_mail') == 'invitation_mail'
+
+    def test_deserialize_invalid(self, inst):
+        inst = inst.bind()
+        with raises(colander.Invalid):
+            inst.deserialize('invalid')
+
+
+class TestActivationConfigurationSheet:
+
+    @fixture
+    def meta(self):
+        from adhocracy_core.sheets.principal import activation_configuration_meta
+        return activation_configuration_meta
+
+    def test_create(self, meta, context):
+        from adhocracy_core.sheets.principal import IActivationConfiguration
+        from adhocracy_core.sheets.principal import ActivationConfigutationSchema
+        from adhocracy_core.sheets import AnnotationRessourceSheet
+        inst = meta.sheet_class(meta, context, None)
+        assert isinstance(inst, AnnotationRessourceSheet)
+        assert inst.meta.isheet == IActivationConfiguration
+        assert inst.meta.schema_class == ActivationConfigutationSchema
+        assert inst.meta.readable is True
+        assert inst.meta.editable is False
+        assert inst.meta.creatable is True
+        assert inst.meta.permission_create == 'activate_user'
+        assert inst.meta.permission_view == 'view_userextended'
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context, None)
+        assert inst.get() == {'activation': 'registration_mail'}
+
+
+class TestAnonymizeDefaultSheet:
+
+    @fixture
+    def meta(self):
+        from adhocracy_core.sheets.principal import anonymize_default_meta
+        return anonymize_default_meta
+
+    def test_create(self, meta, context):
+        from adhocracy_core.sheets.principal import IAnonymizeDefault
+        from adhocracy_core.sheets.principal import AnonymizeDefaultSchema
+        from adhocracy_core.sheets import AnnotationRessourceSheet
+        inst = meta.sheet_class(meta, context, None)
+        assert isinstance(inst, AnnotationRessourceSheet)
+        assert inst.meta.isheet == IAnonymizeDefault
+        assert inst.meta.schema_class == AnonymizeDefaultSchema
+        assert inst.meta.readable is True
+        assert inst.meta.editable is True
+        assert inst.meta.creatable is True
+        assert inst.meta.permission_create == 'create_user'
+        assert inst.meta.permission_edit == 'edit_userextended'
+        assert inst.meta.permission_view == 'view_userextended'
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context, None)
+        assert inst.get() == {'anonymize': False}

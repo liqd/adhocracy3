@@ -31,7 +31,7 @@ export interface IScope extends angular.IScope {
         rateCount : number;
         creationDate : string;
         commentCount : number;
-        assignments : AdhBadge.IBadge[];
+        assignments : AdhBadge.IBadgeAssignment[];
     };
     selectedState? : string;
     resource : any;
@@ -39,11 +39,11 @@ export interface IScope extends angular.IScope {
 }
 
 var bindPath = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $q : angular.IQService
 ) => (
     scope : IScope,
@@ -99,7 +99,7 @@ var fill = (
 };
 
 var postCreate = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : IScope,
@@ -121,11 +121,11 @@ var postCreate = (
 
 export var detailDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
     $q : angular.IQService
 ) => {
     return {
@@ -146,7 +146,7 @@ export var detailDirective = (
 
 export var createDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhShowError,

@@ -85,6 +85,7 @@ asset_meta = pool_meta._replace(
     use_autonaming=True,
     permission_create='create_asset',
     after_creation=(add_metadata,),
+    is_sdi_addable=True,
 )
 
 
@@ -108,8 +109,10 @@ deprecated('IPoolWithAssets', 'Backward compatible code, use process instead')
 
 def add_assets_service(context: IPool, registry: Registry, options: dict):
     """Add `assets` service to context."""
-    registry.content.create(IAssetsService.__identifier__, parent=context,
-                            registry=registry)
+    registry.content.create(IAssetsService.__identifier__,
+                            parent=context,
+                            registry=registry,
+                            autoupdated=True)
 
 
 pool_with_assets_meta = pool_meta._replace(

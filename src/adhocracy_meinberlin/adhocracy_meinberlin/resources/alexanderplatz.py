@@ -33,12 +33,13 @@ class IProcess(IDocumentProcess):
     """Alexanderplatz participation process."""
 
 process_meta = document_process_meta._replace(
+    content_name='AlexanderplatzProcess',
     iresource=IProcess,
     element_types=(IGeoProposal,
                    IGeoDocument),
     extended_sheets=(ILocationReference,
                      ),
-    workflow_name='standard',
+    default_workflow='standard',
 )
 
 

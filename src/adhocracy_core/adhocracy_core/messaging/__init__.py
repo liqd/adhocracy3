@@ -1,4 +1,5 @@
 """Send messages to Principals."""
+from copy import copy
 from collections.abc import Sequence
 from logging import getLogger
 from urllib.request import quote
@@ -12,7 +13,11 @@ from pyramid.traversal import resource_path
 from pyramid.request import Request
 from pyramid.threadlocal import get_current_request
 from pyramid.i18n import TranslationStringFactory
+from pyramid.i18n import get_localizer
 
+from adhocracy_core.auditing import generate_activity_description
+from adhocracy_core.interfaces import Activity
+from adhocracy_core.interfaces import ActivityType
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.sheets.principal import IUserBasic
@@ -75,7 +80,7 @@ class Messenger:
             raise ValueError('Email has neither body nor html')
         request = request or get_current_request()
         if request:  # ease testing
-            translate = request.localizer.translate
+            translate = get_localizer(request).translate
             subject = subject and translate(subject)
             body = body and translate(body)
             html = html and translate(html)
@@ -168,8 +173,8 @@ class Messenger:
                                                      'name')
 
     def _get_user_url(self, user: IResource) -> str:
-        sender_path = resource_path(user)
-        return '%s/r%s/' % (self.frontend_url, sender_path)
+        path = resource_path(user)
+        return '%s/r%s/' % (self.frontend_url, path)
 
     def send_registration_mail(self, user: IUser, activation_path: str,
                                request: Request=None):
@@ -259,6 +264,58 @@ class Messenger:
         reset_url = '{0}/password_reset/?path={1}'.format(self.frontend_url,
                                                           reset_path_quoted)
         return reset_url
+
+    def send_activity_mail(self,
+                           user: IUser,
+                           activity: Activity,
+                           request: Request,
+                           ):
+        """Send email describing an activity event.
+
+        The following variables are provided for translations strings:
+
+            - `site_name`
+            - `object_url`
+            - `target_url`
+            - `activity_name`
+            - `activity_description`
+            - `object_type_name`
+            - `target_type_name`
+        """
+        translate = get_localizer(request).translate
+        description = generate_activity_description(activity, request)
+        mapping = copy(description.mapping)
+        mapping.update({'site_name': self.site_name,
+                        'activity_name': translate(activity.name),
+                        'activity_description': translate(description),
+                        'object_url': self._get_resource_url(activity.object),
+                        'target_url': self._get_resource_url(activity.target),
+                        })
+        subject = _('mail_send_activity_subject',
+                    mapping=mapping,
+                    default='${site_name}: ${activity_name}')
+        if activity.type == ActivityType.remove:
+            body = _('mail_send_activity_remove_body_txt',
+                     mapping=mapping,
+                     default=u'${activity_description} Visit '
+                             '${target_type_name}: ${target_url} .'
+                     )
+        else:
+            body = _('mail_send_activity_add_update_body_txt',
+                     mapping=mapping,
+                     default=u'${activity_description} Visit '
+                             '${object_type_name}: ${object_url} .'
+                     )
+        user_mail = self._get_user_email(user)
+        self.send_mail(subject=subject,
+                       recipients=[user_mail],
+                       body=body,
+                       request=request,
+                       )
+
+    def _get_resource_url(self, resource: IResource) -> str:
+        path = resource_path(resource)
+        return '{0}/r{1}/'.format(self.frontend_url, path)
 
 
 def includeme(config):

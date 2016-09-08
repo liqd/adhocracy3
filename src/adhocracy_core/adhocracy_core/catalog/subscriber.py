@@ -3,6 +3,7 @@
 Read :mod:`substanced.catalog.subscribers` for default reindex subscribers.
 """
 
+from pyramid.traversal import get_current_registry
 from substanced.util import find_service
 
 from adhocracy_core.utils import get_visibility_change
@@ -10,11 +11,12 @@ from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.interfaces import ISheetBackReferenceModified
-from adhocracy_core.interfaces import IResourceCreatedAndAdded
+from adhocracy_core.interfaces import ISheetBackReferenceRemoved
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.rate import IRateable
+from adhocracy_core.sheets.comment import IComment
 from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.badge import IBadgeable
@@ -62,14 +64,8 @@ def reindex_user_activation_path(event):
 
 def reindex_badge(event):
     """Reindex badge index if a backreference is modified/created."""
-    # TODO we cannot listen to the backreference modified event of the
-    # IBadgeable sheet here, because this event is send before the
-    # IBadgeAssignment fields 'subject' and 'badge' are properly stored.
     catalogs = find_service(event.object, 'catalogs')
-    badgeable = event.registry.content.get_sheet_field(event.object,
-                                                       IBadgeAssignment,
-                                                       'object')
-    catalogs.reindex_index(badgeable, 'badge')
+    catalogs.reindex_index(event.object, 'badge')
 
 
 def reindex_visibility(event):
@@ -107,6 +103,25 @@ def reindex_workflow_state(event):
         catalogs.reindex_index(versionable, 'workflow_state')
 
 
+def reindex_comments(event):
+    """Reindex comments index if a backreference is modified/created."""
+    catalogs = find_service(event.object, 'catalogs')
+    commentables = _get_affected_commentables(event.object)
+    for commentable in commentables:
+        catalogs.reindex_index(commentable, 'comments')
+
+
+def _get_affected_commentables(commentable):
+    registry = get_current_registry(commentable)
+    commentables = [commentable]
+    while IComment.providedBy(commentable):
+        commentable = registry.content.get_sheet_field(commentable, IComment,
+                                                       'refers_to')
+        if commentable:
+            commentables.append(commentable)
+    return commentables
+
+
 def includeme(config):
     """Register index subscribers."""
     config.add_subscriber(reindex_tag,
@@ -125,11 +140,11 @@ def includeme(config):
                           ISheetBackReferenceModified,
                           event_isheet=ICommentable)
     config.add_subscriber(reindex_badge,
-                          IResourceSheetModified,
-                          event_isheet=IBadgeAssignment)
+                          ISheetBackReferenceModified,
+                          event_isheet=IBadgeable)
     config.add_subscriber(reindex_badge,
-                          IResourceCreatedAndAdded,
-                          object_iface=IBadgeAssignment)
+                          ISheetBackReferenceRemoved,
+                          event_isheet=IBadgeAssignment)
     config.add_subscriber(reindex_item_badge,
                           ISheetBackReferenceModified,
                           object_iface=IItem,
@@ -146,5 +161,8 @@ def includeme(config):
     config.add_subscriber(reindex_user_activation_path,
                           IResourceSheetModified,
                           event_isheet=IUserBasic)
+    config.add_subscriber(reindex_comments,
+                          ISheetBackReferenceModified,
+                          event_isheet=ICommentable)
     # add subscriber to updated allowed index
     config.scan('substanced.objectmap.subscribers')

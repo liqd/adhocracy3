@@ -9,12 +9,12 @@ from substanced.catalog import IndexFactory
 from substanced.util import find_service
 from adhocracy_core.catalog.index import ReferenceIndex
 from adhocracy_core.exceptions import RuntimeConfigurationError
-from adhocracy_core.utils import is_deleted
 from adhocracy_core.utils import is_hidden
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.resources.comment import ICommentVersion
 from adhocracy_core.sheets.comment import ICommentable
+from adhocracy_core.sheets.comment import IComment
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.sheets.rate import IRateable
@@ -42,7 +42,7 @@ class AdhocracyCatalogIndexes:
     """
 
     tag = catalog.Keyword()
-    private_visibility = catalog.Keyword()  # visible / deleted / hidden
+    private_visibility = catalog.Keyword()  # visible / hidden
     badge = catalog.Keyword()
     item_badge = catalog.Keyword()
     title = catalog.Field()
@@ -80,18 +80,12 @@ def index_item_creation_date(resource, default) -> str:
 def index_visibility(resource, default) -> [str]:
     """Return value for the private_visibility index.
 
-    The return value will be one of [visible], [deleted], [hidden], or
-    [deleted, hidden].
+    Te return value will be one of [visible], [hidden]
     """
-    # FIXME: be more dry, this almost the same like what
-    # utils.get_reason_if_blocked is doing
-    result = []
-    if is_deleted(resource):
-        result.append('deleted')
     if is_hidden(resource):
-        result.append('hidden')
-    if not result:
-        result.append('visible')
+        result = ['hidden']
+    else:
+        result = ['visible']
     return result
 
 
@@ -138,6 +132,7 @@ def index_controversiality(resource, default) -> int:
     query = search_query._replace(interfaces=IRate,
                                   frequency_of='rate',
                                   indexes={'tag': 'LAST'},
+                                  only_visible=True,
                                   references=[(None, IRate, 'object', resource)
                                               ],
                                   )
@@ -154,14 +149,26 @@ def index_comments(resource, default) -> int:
 
     Only the LAST version of each rate is counted.
     """
-    item = find_interface(resource, IItem)
     catalogs = find_service(resource, 'catalogs')
-    query = search_query._replace(root=item,
-                                  interfaces=ICommentVersion,
+    query = search_query._replace(interfaces=ICommentVersion,
                                   indexes={'tag': 'LAST'},
+                                  only_visible=True,
+                                  references=[(None, IComment, 'refers_to',
+                                               resource)
+                                              ],
                                   )
     result = catalogs.search(query)
-    return result.count
+    comment_count = result.count
+    if comment_count:
+        comment_count += _index_comment_replies(result.elements, default)
+    return comment_count
+
+
+def _index_comment_replies(comment_list, default) -> int:
+    comment_count = 0
+    for comment in comment_list:
+        comment_count += index_comments(comment, default)
+    return comment_count
 
 
 def index_tag(resource, default) -> [str]:
@@ -203,27 +210,25 @@ def index_item_badge(resource, default) -> [str]:
     return badge_names
 
 
-def index_workflow_state(resource, default) -> [str]:
+def index_workflow_state(resource, default) -> str:
     """Return value for the workflow_state index."""
     registry = get_current_registry(resource)
-    state = registry.content.get_sheet_field(resource,
-                                             IWorkflowAssignment,
-                                             'workflow_state')
+    try:
+        state = registry.content.get_sheet_field(resource,
+                                                 IWorkflowAssignment,
+                                                 'workflow_state')
+    except (RuntimeConfigurationError, KeyError):
+        return default
     return state
 
 
 def index_workflow_state_of_item(resource, default) -> [str]:
     """Find item and return it`s value for the workflow_state index."""
-    registry = get_current_registry(resource)
     item = find_interface(resource, IItem)
-    try:
-        state = registry.content.get_sheet_field(item,
-                                                 IWorkflowAssignment,
-                                                 'workflow_state')
-    except (RuntimeConfigurationError, AttributeError):
-        return default
+    if item:
+        return index_workflow_state(item, default)
     else:
-        return state
+        return default
 
 
 def index_user_name(resource, default) -> str:

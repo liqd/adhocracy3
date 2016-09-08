@@ -10,7 +10,7 @@
 }
 
 .meinberlin-bplan-proposal-form-inner {
-    @include rem(padding, 15px);
+    @include rem(padding, $padding);
     background: $color-background-base;
 }
 

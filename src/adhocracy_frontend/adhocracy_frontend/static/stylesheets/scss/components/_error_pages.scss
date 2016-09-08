@@ -1,8 +1,38 @@
-.error-page-404 {
-    text-align: center;
+/*doc
+---
+title: Error Page
+name: error-page
+category: Components
+---
 
-    .error-page-image {
-        margin: 0 auto;
-        max-width: 100%;
+Has modifieres for status codes, e.g. `m-404` or `m-500`.
+
+```html_example
+<div class="error-page m-404">
+    <img class="error-page-image" src="/static/images/sample.jpg" alt="" />
+    <h1 class="error-page-title">404 - Not Found</h1>
+</div>
+```
+
+```html_example
+<div class="error-page m-404">
+    <img class="error-page-image" src="/static/images/sample.jpg" alt="404 - Not Found" />
+</div>
+```
+
+```html_example
+<div class="error-page m-500">
+    <h1 class="error-page-title">500 - Internal Server Error</h1>
+</div>
+```
+*/
+.error-page {
+    &.m-404 {
+        text-align: center;
     }
+}
+
+.error-page-image {
+    margin: 0 auto;
+    max-width: 100%;
 }

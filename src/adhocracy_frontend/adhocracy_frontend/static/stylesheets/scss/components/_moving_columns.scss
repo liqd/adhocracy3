@@ -21,48 +21,27 @@ States:
 -   is-show-show-collapse
 
 ```html_example
-<div class="moving-columns" style="height: 10em; position: relative;">
-    <div class="moving-column moving-column-structure">
-        <div class="debug-placeholder moving-column-menu">
-            <a>action</a>
-        </div>
-        <div class="debug-placeholder moving-column-body">structure column
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-            this is scrolling
-        </div>
+<div class="moving-columns is-collapse-show-hide" style="height: 10em; position: relative;">
+    <div class="moving-column is-collapse" style="width: 2em; left: calc(25% - 1em)">
+        <div class="moving-column-menu">menu</div>
+        <div class="moving-column-body">body</div>
+        <div class="moving-column-collapsed">collapsed</div>
     </div>
-    <div class="moving-column moving-column-content">
-        <div class="debug-placeholder moving-column-menu">menu</div>
-        <div class="debug-placeholder moving-column-body">content column</div>
+    <div class="moving-column is-show" style="width: 50%; left: calc(25% + 1em)">
+        <div class="moving-column-menu">menu</div>
+        <div class="moving-column-body">
+            <p>Quis sed iusto minus. Distinctio veritatis quisquam quam dolores laborum voluptas. Ducimus voluptas occaecati quod labore eum eos quo neque. Ullam molestias eos recusandae et. Non alias tempora dolor repudiandae animi sunt est non. Saepe dolor qui neque est fuga rerum dolores sunt.</p>
+            <p>Delectus sed amet a autem quod in. Suscipit repellat ratione aperiam voluptates est unde qui. Atque aut dicta asperiores saepe deserunt quo. Laudantium aut beatae excepturi sed.</p>
+            <p>Harum omnis minus nobis possimus. Aut nihil eveniet doloremque ducimus. Illo quam et mollitia. Eaque libero et est facilis non perferendis. Quia et ipsum similique ipsa.</p>
+        </div>
+        <div class="moving-column-collapsed">collapsed</div>
     </div>
-    <div class="moving-column moving-column-content2">
-        <div class="debug-placeholder moving-column-menu">menu</div>
-        <div class="debug-placeholder moving-column-body">secondary-content-column</div>
+    <div class="moving-column is-hide" style="width: 0%; left: calc(75% + 1em)">
+        <div class="moving-column-menu">menu</div>
+        <div class="moving-column-body">body</div>
+        <div class="moving-column-collapsed">collapsed</div>
     </div>
 </div>
-<a onclick="$('.moving-columns').toggleClass('is-collapse-show-show')">click me</a>
 ```
 */
 
@@ -81,7 +60,7 @@ States:
 
 -   `is-show` (*default*)
 -   `is-hidden`
--   `is-collapsed`
+-   `is-collapse`
 
 Each moving column has a menu. The menu may contain some arbitrary control
 elements.  Many columns do also have control elements to close (hide) or
@@ -94,7 +73,7 @@ The menu should always have the same state as its columns.
 */
 .moving-column {
     // layout
-    @include transition(width 0.5s, left 0.5s);
+    transition: width 0.5s, left 0.5s;
     position: absolute;
     top: 0;
     bottom: 0;
@@ -137,9 +116,7 @@ The menu should always have the same state as its columns.
 
     @media print {
         position: static;
-        // scss-lint:disable ImportantRule
         width: auto !important;
-        // scss-lint:enable ImportantRule
         border: 0;
 
         &:not(.has-focus) {
@@ -148,25 +125,17 @@ The menu should always have the same state as its columns.
     }
 }
 
-.moving-column-body,
-.moving-column-overlay,
-.moving-column-alerts,
-.moving-column-mask {
+.moving-column-body {
+    @include rem(border-width, 0 $moving-column-border-width $moving-column-border-width);
+    @include rem(font-size, $font-size-normal);
+
     position: absolute;
     top: $moving-column-menu-height;
     left: 0;
     right: 0;
-    overflow-y: auto;
-}
-
-.moving-column-body,
-.moving-column-mask {
     bottom: 0;
-}
+    overflow-y: auto;
 
-.moving-column-body {
-    @include rem(border-width, 0 $moving-column-border-width $moving-column-border-width);
-    @include rem(font-size, $font-size-normal);
     border-color: $color-structure-normal;
     border-style: solid;
 
@@ -191,23 +160,17 @@ name: moving-column-menu
 parent: moving-columns
 ---
 
-States:
-
--   `is-show` (*default*)
--   `is-hidden`
--   `is-collapsed`
-
 **Warning**: This widget currently has a fixed height.
 
 ```html_example
 <div class="moving-column-menu">
-    <span class="debug-placeholder">icon</span>
-    <span class="debug-placeholder">button</span>
-    <span class="debug-placeholder">button</span>
-    <span class="debug-placeholder">button</span>
-    <span class="debug-placeholder">button</span>
-    <span class="debug-placeholder">icon</span>
-    <span class="debug-placeholder">icon</span>
+    <i class="icon-speechbubble-unfilled moving-column-icon"></i>
+    <div class="moving-column-menu-nav">
+        <a
+            class="moving-column-menu-nav-button"
+            href="#"
+            title="close"><i class="icon-x moving-column-menu-nav-icon"></i></a>
+    </div>
 </div>
 ```
 */
@@ -216,56 +179,8 @@ States:
     @include rem(font-size, $font-size-small);
     @include rem(height, $moving-column-menu-height);
     @include rem(line-height, $moving-column-menu-height);
-    @include rem(padding, 0 0 0 $padding-small);
+    @include rem(padding, 0 0 0 $padding);
     background: $color-structure-normal;
-
-    .moving-column-menu-sort-option,
-    .moving-column-menu-button {
-        text-decoration: none;
-
-        &:hover, &:focus {
-            color: $color-text-highlight-extrovert;
-        }
-
-        &:active, &.is-active {
-            color: $color-text-highlight-normal;
-         }
-    }
-
-    .moving-column-menu-sort-option,
-    .moving-column-menu-button,
-    .moving-column-menu-sort-label {
-        @include inline-block;
-        @include rem(font-size, $font-size-small);
-        @include rem(margin-right, 30px);
-        color: $color-text-highlight-introvert;
-        font-weight: $font-weight-introvert;
-        float: left;
-    }
-
-    .moving-column-menu-sort-label {
-        @include rem(margin-right, 1rem);
-        font-style: italic;
-    }
-
-    .moving-column-menu-sort-option {
-        margin: 0;
-
-        &:not(:last-child) {
-            @include rem(margin-right, 1rem);
-            position: relative;
-
-            &:after {
-                @include inline-block;
-                @include rem(right, -1rem);
-                @include rem(width, 1rem);
-                content: "|";
-                position: absolute;
-                text-align: center;
-                color: $color-text-highlight-introvert;
-            }
-        }
-    }
 
     @media print {
         display: none;
@@ -276,7 +191,7 @@ States:
     @include rem(margin-right, 30px);
     @include rem(font-size, 17px);
     float: left;
-    line-height: (24/17);
+    line-height: (24 / 17);
     vertical-align: middle;
 }
 
@@ -284,9 +199,9 @@ States:
     float: right;
 
     .moving-column-menu-nav-button {
-        @include inline-block;
         @include rem(min-width, 3.5rem);
         @include rem(padding, 0 0.5rem);
+        display: inline-block;
         font-weight: $font-weight-extrovert;
         text-align: center;
         vertical-align: baseline;
@@ -306,97 +221,6 @@ States:
             @include rem(font-size, $font-size-smaller);
             line-height: 24px / $font-size-smaller;
         }
-    }
-}
-
-.moving-column-mask {
-    @include opacity(0.5);
-    background-color: $color-background-mask;
-    z-index: 2;
-
-    @media print {
-        display: none;
-    }
-}
-
-/*doc
----
-title: Moving Column Alerts
-name: moving-column-alerts
-parent: moving-columns
----
-
-A list of alert messages to notify users in the moving column
-
-```html_example
-<ul class="moving-column-alerts static-example">
-    <li class="moving-column-alert m-error">Error</li>
-    <li class="moving-column-alert m-warning">Warning</li>
-    <li class="moving-column-alert m-info">Info</li>
-    <li class="moving-column-alert m-success">Success</li>
-</ul>
-```
-*/
-.moving-column-alerts {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    z-index: 3;
-
-    @media print {
-        display: none;
-    }
-}
-
-.moving-column-alert {
-    @include rem(padding, 1rem);
-    background: $color-structure-normal;
-    text-align: center;
-
-    &.m-error {
-        background: $color-function-invalid;
-    }
-
-    &.m-warning {
-        background: mix($color-function-invalid, $color-structure-normal);
-    }
-
-    &.m-success {
-        background: $color-function-valid;
-    }
-}
-
-.moving-column-overlay {
-    @include clearfix;
-    @include rem(padding, 1rem);
-    background: $color-structure-normal;
-    border-top: 1px solid $color-structure-introvert;
-    // .leaflet-top has 1000
-    z-index: 1000;
-    max-height: 80%;
-    overflow-y: auto;
-
-    textarea,
-    input[type="text"] {
-        background: $color-background-base;
-    }
-
-    &.ng-enter, &.ng-leave {
-        @include transition(opacity 0.5s);
-    }
-
-    &.ng-enter,
-    &.ng-leave.ng-leave-active {
-        @include opacity(0);
-    }
-
-    &.ng-leave,
-    &.ng-enter.ng-enter-active {
-        @include opacity(1);
-    }
-
-    @media print {
-        display: none;
     }
 }
 

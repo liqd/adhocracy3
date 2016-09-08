@@ -18,6 +18,7 @@ export var register = () => {
             var adhResourceAreaMock;
             var adhRateEventManagerMock;
             var adhRateService;
+            var adhUserMock;
 
             beforeEach((done) => {
                 adhPermissionsMock = jasmine.createSpyObj("adhPermissionsMock", ["bindScope"]);
@@ -42,6 +43,7 @@ export var register = () => {
                     adhPreliminaryNamesMock,
                     null,
                     adhResourceAreaMock,
+                    adhUserMock,
                     done);
 
                 directive.link(scopeMock);

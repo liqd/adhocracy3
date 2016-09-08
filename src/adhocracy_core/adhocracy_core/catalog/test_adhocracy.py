@@ -87,24 +87,10 @@ def test_index_visibility_visible(context):
     assert index_visibility(context, 'default') == ['visible']
 
 
-def test_index_visibility_deleted(context):
-    from .adhocracy import index_visibility
-    assert index_visibility(context, 'default') == ['visible']
-    context.deleted = True
-    assert index_visibility(context, 'default') == ['deleted']
-
-
 def test_index_visibility_hidden(context):
     from .adhocracy import index_visibility
     context.hidden = True
     assert index_visibility(context, 'default') == ['hidden']
-
-
-def test_index_visibility_both(context):
-    from .adhocracy import index_visibility
-    context.deleted = True
-    context.hidden = True
-    assert sorted(index_visibility(context, 'default')) == ['deleted', 'hidden']
 
 
 @mark.usefixtures('integration')
@@ -215,6 +201,7 @@ class TestIndexControversiality:
             query._replace(interfaces=IRate,
                            frequency_of='rate',
                            indexes={'tag': 'LAST'},
+                           only_visible=True,
                            references=[(None, IRate, 'object', context) ],
                            )
 
@@ -253,15 +240,47 @@ class TestIndexComments:
     def test_index_comments(self, item, mock_catalogs, query, search_result):
         from .adhocracy import index_comments
         from adhocracy_core.resources.comment import ICommentVersion
-        item['commentable'] = testing.DummyResource()
-        search_result = search_result._replace(count=5)
-        mock_catalogs.search.return_value = search_result
-        query = query._replace(root=item,
-                               interfaces=ICommentVersion,
+        from adhocracy_core.sheets.comment import IComment
+        comment = testing.DummyResource()
+        commentable = testing.DummyResource()
+        search_result = search_result._replace(count=1, elements=[comment])
+        search_result_replies = search_result._replace(count=0)
+        mock_catalogs.search.side_effect = [search_result,
+                                            search_result_replies]
+        query = query._replace(interfaces=ICommentVersion,
                                indexes={'tag': 'LAST'},
+                               only_visible=True,
+                               references=[(None, IComment, 'refers_to',
+                                            commentable)
+                                           ],
                                )
-        assert index_comments(item['commentable'], None) == 5
-        assert mock_catalogs.search.call_args[0][0] == query
+        assert index_comments(commentable, None) == 1
+        mock_catalogs.search.call_args_list[0][0][0] == query
+
+    def test_index_comments_with_replies(self, item, mock_catalogs, query,
+                                         search_result):
+        from .adhocracy import index_comments
+        from adhocracy_core.resources.comment import ICommentVersion
+        from adhocracy_core.sheets.comment import IComment
+        comment = testing.DummyResource()
+        reply = testing.DummyResource()
+        commentable = testing.DummyResource()
+        search_result = search_result._replace(count=1, elements=[comment])
+        search_result_replies = search_result._replace(count=1,
+                                                       elements=[reply])
+        search_result_no_replies= search_result._replace(count=0)
+        mock_catalogs.search.side_effect = [search_result,
+                                            search_result_replies,
+                                            search_result_no_replies]
+        query = query._replace(interfaces=ICommentVersion,
+                               indexes={'tag': 'LAST'},
+                               only_visible=True,
+                               references=[(None, IComment, 'refers_to',
+                                            comment)
+                                           ],
+                               )
+        assert index_comments(commentable, None) == 2
+        mock_catalogs.search.call_args_list[1][0][0] == query
 
 
 @mark.usefixtures('integration')
@@ -444,6 +463,12 @@ class TestIndexWorkflowState:
         from .adhocracy import index_workflow_state
         mock_sheet.get.return_value = {'workflow_state': 'STATE'}
         assert index_workflow_state(context, 'default') == 'STATE'
+
+    def test_return_default_if_without_workflow(self, context, mock_sheet, registry):
+        from adhocracy_core.exceptions import RuntimeConfigurationError
+        from .adhocracy import index_workflow_state
+        registry.content.get_sheet.side_effect = RuntimeConfigurationError
+        assert index_workflow_state(context, 'default') == 'default'
 
     @mark.usefixtures('integration')
     def test_register(self, registry):

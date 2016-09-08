@@ -60,7 +60,6 @@ def make_resource(parent, name, iresource):
         return resource
 
 
-
 class TestBuildUpdatedResourcesDict:
 
     @fixture
@@ -126,6 +125,9 @@ class TestResourceRESTView:
         content.get_sheets_read.return_value = [mock_sheet]
         content.get_resources_meta_addable.return_value = [resource_meta]
         content.get_sheets_create.return_value = [mock_sheet]
+        content.can_edit_anonymized.return_value = False
+        content.can_add_anonymized.return_value = False
+        content.can_delete_anonymized.return_value = False
         inst = self.make_one(context, request_)
 
         response = inst.options()
@@ -133,6 +135,7 @@ class TestResourceRESTView:
         wanted = \
         {'GET': {'request_body': {},
          'request_querystring': {},
+         'request_headers': {},
          'response_body': {'content_type': '',
                            'data': {ISheet.__identifier__: {}},
                            'path': ''}},
@@ -140,10 +143,13 @@ class TestResourceRESTView:
          'OPTIONS': {},
          'POST': {'request_body': [{'content_type': IResource.__identifier__,
                                     'data': {ISheet.__identifier__: {}}}],
-                  'response_body': {'content_type': '', 'path': ''}},
-         'DELETE': {},
+                  'response_body': {'content_type': '', 'path': ''},
+                  'request_headers': {},
+                  },
+         'DELETE': {'request_headers': {}},
          'PUT': {'request_body': {'content_type': '',
                                   'data': {ISheet.__identifier__: {}}},
+                 'request_headers': {},
                  'response_body': {'content_type': '', 'path': ''}}}
         assert wanted['GET'] == response['GET']
         assert wanted['POST'] == response['POST']
@@ -174,7 +180,7 @@ class TestResourceRESTView:
         response = inst.options()
         wanted = {'HEAD': {},
                   'OPTIONS': {},
-                  'DELETE': {}}
+                  'DELETE': {'request_headers': {}}}
         assert wanted == response
 
     def test_options_without_delete_permission(self, request_, context):
@@ -185,36 +191,28 @@ class TestResourceRESTView:
                   'OPTIONS': {}}
         assert wanted == response
 
-    def test_add_metadata_permissions_info_no_metadata(self, request_, context):
+    def test_options_with_allow_x_anonymize_header(
+            self, request_, context, resource_meta, mock_sheet):
+        content = request_.registry.content
+        content.get_sheets_edit.return_value = [mock_sheet]
+        content.get_resources_meta_addable.return_value = [resource_meta]
+        content.can_edit_anonymized.return_value = True
+        content.can_add_anonymized.return_value = True
+        content.can_delete_anonymized.return_value = True
         inst = self.make_one(context, request_)
-        d = {'DummySheet': {}}
-        inst._add_metadata_edit_permission_info(d)
-        assert d == {'DummySheet': {}}
 
-    def test_add_metadata_permissions_info_without_hide_permission(
-            self, request_, context):
-        from adhocracy_core.sheets.metadata import IMetadata
-        request_.has_permission = Mock(return_value=False)
-        inst = self.make_one(context, request_)
-        d = {IMetadata.__identifier__: {}}
-        inst._add_metadata_edit_permission_info(d)
-        assert d == {IMetadata.__identifier__: {'deleted': [True, False]}}
+        response = inst.options()
 
-    def test_add_metadata_permissions_info_with_hide_permission(
-            self, request_, context):
-        from adhocracy_core.sheets.metadata import IMetadata
-        request_.has_permission = Mock(return_value=True)
-        inst = self.make_one(context, request_)
-        d = {IMetadata.__identifier__: {}}
-        inst._add_metadata_edit_permission_info(d)
-        assert d == {IMetadata.__identifier__: {'deleted': [True, False],
-                                                'hidden': [True, False]}}
+        assert response['POST']['request_headers'] == {'X-Anonymize': []}
+        assert response['PUT']['request_headers'] == {'X-Anonymize': []}
+        assert response['DELETE']['request_headers'] == {'X-Anonymize': []}
 
     def test_add_workflow_permissions_info(
-            self, request_, context, mock_sheet, mock_workflow):
+            self, request_, registry, context, mock_sheet, mock_workflow):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
         mock_workflow.get_next_states.return_value = ['draft']
-        mock_sheet.get.return_value = {'workflow': mock_workflow}
+        mock_sheet.get.return_value = {'workflow': 'sample'}
+        registry.content.workflows['sample'] = mock_workflow
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IWorkflowAssignment)
         editable_sheets = [mock_sheet]
         inst = self.make_one(context, request_)
@@ -462,6 +460,7 @@ class TestUsersRESTView:
                 root_versions=[],
                 request=request_,
                 is_batchmode=False,
+                anonymized_creator=None,
         )
         assert wanted == response
 
@@ -532,7 +531,9 @@ class TestItemRESTView:
                 appstructs={},
                 root_versions=[],
                 request=request_,
-                is_batchmode=True)
+                is_batchmode=True,
+                anonymized_creator=None,
+                )
         assert wanted == response
 
     def test_post_item(self, request_, context, mock_tags_sheet):
@@ -695,7 +696,9 @@ class TestBadgeAssignmentsRESTView:
     def test_options_ignore_if_no_postable_resources(self, context, request_):
         inst = self.make_one(context, request_)
         response = inst.options()
-        assert response == {'HEAD': {}, 'OPTIONS': {}, 'DELETE': {}}
+        assert response == {'HEAD': {},
+                            'OPTIONS': {},
+                            'DELETE': {'request_headers': {}}}
 
     def test_options_ignore_if_no_postable_assignments_sheets(
             self, request_, context, resource_meta,  mock_sheet):
@@ -934,6 +937,7 @@ class TestMetaApiView:
         workflows_meta = inst.get()['workflows']
         assert workflows_meta == {'sample': {'initial_state': '',
                                              'auto_transition': 'false',
+                                             'add_local_role_participant_to_default_group': 'false',
                                              'defaults': '',
                                              'states': {},
                                              'transitions': {}}}

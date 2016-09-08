@@ -189,7 +189,7 @@ export interface IControllerScope extends IScope {
 /**
  * promise supporters count.
  */
-export var countSupporters = (adhHttp : AdhHttp.Service<any>, postPoolPath : string, objectPath : string) : angular.IPromise<number> => {
+export var countSupporters = (adhHttp : AdhHttp.Service, postPoolPath : string, objectPath : string) : angular.IPromise<number> => {
     var query : any = {
         content_type: RIRateVersion.content_type,
         depth: "2",
@@ -209,10 +209,10 @@ export var countSupporters = (adhHttp : AdhHttp.Service<any>, postPoolPath : str
 export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidgets.ResourceWidget<R, IScope> {
     constructor(
         public adhConfig : AdhConfig.IService,
-        adhHttp : AdhHttp.Service<any>,
+        adhHttp : AdhHttp.Service,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhTopLevelState : AdhTopLevelState.Service,
-        private adhGetBadges : AdhBadge.IGetBadges,
+        private adhGetBadges : AdhBadge.IGetBadgeAssignments,
         private adhUploadImage,
         private flowFactory,
         private moment : moment.MomentStatic,
@@ -269,7 +269,7 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
         var itemPath = AdhUtil.parentPath(path);
         // FIXME: translate
         if (this.$window.confirm("Do you really want to delete this?")) {
-            return this.adhHttp.hide(itemPath, RIMercatorProposal.content_type)
+            return this.adhHttp.hide(itemPath)
                 .then(() => {
                     this.$location.url("/r/mercator");
                 });
@@ -727,10 +727,10 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
 export class CreateWidget<R extends ResourcesBase.IResource> extends Widget<R> {
     constructor(
         adhConfig : AdhConfig.IService,
-        adhHttp : AdhHttp.Service<any>,
+        adhHttp : AdhHttp.Service,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         adhTopLevelState : AdhTopLevelState.Service,
-        adhGetBadges : AdhBadge.IGetBadges,
+        adhGetBadges : AdhBadge.IGetBadgeAssignments,
         adhUploadImage,
         private $timeout : angular.ITimeoutService,
         flowFactory,
@@ -789,10 +789,10 @@ export class CreateWidget<R extends ResourcesBase.IResource> extends Widget<R> {
 export class DetailWidget<R extends ResourcesBase.IResource> extends Widget<R> {
     constructor(
         adhConfig : AdhConfig.IService,
-        adhHttp : AdhHttp.Service<any>,
+        adhHttp : AdhHttp.Service,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         adhTopLevelState : AdhTopLevelState.Service,
-        adhGetBadges : AdhBadge.IGetBadges,
+        adhGetBadges : AdhBadge.IGetBadgeAssignments,
         adhUploadImage,
         flowFactory,
         moment : moment.MomentStatic,
@@ -854,9 +854,9 @@ export var userListing = (adhConfig : AdhConfig.IService) => {
 
 export var listItem = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges
+    adhGetBadges : AdhBadge.IGetBadgeAssignments
 ) => {
     return {
         restrict: "E",
@@ -1067,7 +1067,7 @@ export var registerRoutes = (
             space: "content",
             movingColumns: "is-collapse-show-hide"
         })
-        .specific(RIMercatorProposalVersion, "edit", processType, context, ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+        .specific(RIMercatorProposalVersion, "edit", processType, context, ["adhHttp", (adhHttp : AdhHttp.Service) => {
             return (resource : RIMercatorProposalVersion) => {
                 var poolPath = AdhUtil.parentPath(resource.path);
 

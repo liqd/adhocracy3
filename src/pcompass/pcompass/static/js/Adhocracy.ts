@@ -13,6 +13,7 @@ import * as angularCache from "angularCache";  if (angularCache) { ; };
 import * as angularTranslate from "angularTranslate";  if (angularTranslate) { ; };
 import * as angularTranslateLoader from "angularTranslateLoader";  if (angularTranslateLoader) { ; };
 import * as angularElastic from "angularElastic";  if (angularElastic) { ; };
+import * as angularFlow from "angularFlow";  if (angularFlow) { ; };
 
 import * as modernizr from "modernizr";
 import * as moment from "moment";
@@ -32,6 +33,7 @@ import * as AdhDoneModule from "./Packages/Done/Module";
 import * as AdhEmbedModule from "./Packages/Embed/Module";
 import * as AdhEventManagerModule from "./Packages/EventManager/Module";
 import * as AdhHttpModule from "./Packages/Http/Module";
+import * as AdhIdeaCollectionModule from "./Packages/IdeaCollection/Module";
 import * as AdhImageModule from "./Packages/Image/Module";
 import * as AdhInjectModule from "./Packages/Inject/Module";
 import * as AdhListingModule from "./Packages/Listing/Module";
@@ -45,6 +47,7 @@ import * as AdhPermissionsModule from "./Packages/Permissions/Module";
 import * as AdhPreliminaryNamesModule from "./Packages/PreliminaryNames/Module";
 import * as AdhProcessModule from "./Packages/Process/Module";
 import * as AdhRateModule from "./Packages/Rate/Module";
+import * as AdhResourceActionsModule from "./Packages/ResourceActions/Module";
 import * as AdhResourceAreaModule from "./Packages/ResourceArea/Module";
 import * as AdhResourceWidgetsModule from "./Packages/ResourceWidgets/Module";
 import * as AdhShareSocialModule from "./Packages/ShareSocial/Module";
@@ -86,10 +89,12 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "ngAnimate",
         "ngAria",
         "ngMessages",
+        "flow",
         AdhCommentModule.moduleName,
         AdhConfigModule.moduleName,
         AdhCrossWindowMessagingModule.moduleName,
         AdhEmbedModule.moduleName,
+        AdhIdeaCollectionModule.moduleName,
         AdhPcompassModule.moduleName,
         AdhProcessModule.moduleName,
         AdhResourceAreaModule.moduleName,
@@ -171,6 +176,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhEmbedModule.register(angular);
     AdhEventManagerModule.register(angular);
     AdhHttpModule.register(angular, config);
+    AdhIdeaCollectionModule.register(angular);
     AdhImageModule.register(angular);
     AdhInjectModule.register(angular);
     AdhListingModule.register(angular);
@@ -185,6 +191,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhProcessModule.register(angular);
     AdhProcessModule.register(angular);
     AdhRateModule.register(angular);
+    AdhResourceActionsModule.register(angular);
     AdhResourceAreaModule.register(angular);
     AdhResourceWidgetsModule.register(angular);
     AdhShareSocialModule.register(angular);

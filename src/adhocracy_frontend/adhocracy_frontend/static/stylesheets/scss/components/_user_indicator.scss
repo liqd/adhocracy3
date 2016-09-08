@@ -2,15 +2,32 @@
 ---
 title: User Indicator
 name: user-indicator
-category: Widgets
+category: Components
 ---
 
 This Widget can be used to display the state of the currently logged in user.
-It is usually used in the header bar.
+It is usually used in the header bar, and now also in the resource header.
+
+```html_example
+<div class="user-indicator">
+    <div class="user-indicator-primary">
+        <a class="user-indicator-login" href="#">login</a>
+        or
+        <a class="user-indicator-register" href="#">register</a>
+    </div>
+</div>
+<div class="user-indicator">
+    <img src="/static/images/sample.jpg" alt="" class="user-profile-image" />
+    <adh-user-profile-image data-path="{{credentials.userPath}}"></adh-user-profile-image>
+    <a href="#" class="user-indicator-name">John Doe</a
+    ><span class="user-indicator-name-logout-separator">,</span>
+    <a class="user-indicator-logout" href="#">logout</a>
+</div>
+```
 */
 
 .user-indicator {
-    @include inline-block;
+    display: inline-block;
     vertical-align: middle;
     white-space: nowrap;
     color: $color-text-introvert;

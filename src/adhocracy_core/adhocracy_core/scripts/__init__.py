@@ -196,7 +196,6 @@ def import_fixture(asset: str, root: IPool, registry: Registry,
             continue
         if import_type == 'groups':
             import_groups(root, registry, import_file)
-            # TODO don't use private functions
         elif import_type == 'users':
             import_users(root, registry, import_file)
         elif import_type == 'resources':

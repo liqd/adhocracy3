@@ -63,6 +63,8 @@ class WorkflowMeta(MappingSchema):
 
     initial_state = SingleLine(missing=drop)
     defaults = SingleLine(missing=drop)
+    add_local_role_participant_to_default_group = Boolean(missing=drop,
+                                                          default=False)
     auto_transition = Boolean(missing=drop)
     states = SchemaNode(MappingType(unknown='preserve'),
                         missing=drop)

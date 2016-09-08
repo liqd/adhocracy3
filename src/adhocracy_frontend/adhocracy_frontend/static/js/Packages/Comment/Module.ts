@@ -1,4 +1,6 @@
+import * as AdhAbuse from "../Abuse/Module";
 import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
+import * as AdhAnonymizeModule from "../Anonymize/Module";
 import * as AdhCredentialsModule from "../User/Module";
 import * as AdhDateTimeModule from "../DateTime/Module";
 import * as AdhDoneModule from "../Done/Module";
@@ -10,9 +12,9 @@ import * as AdhPermissionsModule from "../Permissions/Module";
 import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
 import * as AdhRateModule from "../Rate/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
-import * as AdhAbuse from "../Abuse/Module";
 
 import * as AdhComment from "./Comment";
+import * as AdhEmbed from "../Embed/Embed";
 
 
 export var moduleName = "adhComment";
@@ -20,7 +22,9 @@ export var moduleName = "adhComment";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhAbuse.moduleName,
             AdhAngularHelpersModule.moduleName,
+            AdhAnonymizeModule.moduleName,
             AdhCredentialsModule.moduleName,
             AdhDateTimeModule.moduleName,
             AdhDoneModule.moduleName,
@@ -31,9 +35,13 @@ export var register = (angular) => {
             AdhPermissionsModule.moduleName,
             AdhPreliminaryNamesModule.moduleName,
             AdhRateModule.moduleName,
-            AdhTopLevelStateModule.moduleName,
-            AdhAbuse.moduleName
+            AdhTopLevelStateModule.moduleName
         ])
+        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
+            adhEmbedProvider
+                .registerDirective("comment-listing")
+                .registerDirective("create-or-show-comment-listing");
+        }])
         .directive("adhCommentListing", [
             "adhConfig",
             "adhHttp",
@@ -52,7 +60,9 @@ export var register = (angular) => {
             "adhRecursionHelper",
             "$window",
             "$q",
+            "$timeout",
+            "$translate",
             AdhComment.commentDetailDirective])
         .directive("adhCommentCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", AdhComment.commentCreateDirective])
-        .directive("adhCommentColumn", ["adhConfig", AdhComment.commentColumnDirective]);
+        .directive("adhCommentColumn", ["adhConfig", "adhTopLevelState", AdhComment.commentColumnDirective]);
 };

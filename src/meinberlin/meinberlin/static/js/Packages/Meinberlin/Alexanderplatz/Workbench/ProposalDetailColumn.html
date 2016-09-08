@@ -3,11 +3,6 @@
         <div class="moving-column-tab">
             <i class="icon-document moving-column-icon"></i>
         </div>
-        <a
-            class="moving-column-menu-button"
-            data-ng-if="proposalItemOptions.POST"
-            data-ng-click="setCameFrom()"
-            data-ng-href="{{ proposalUrl | adhParentPath | adhResourceUrl:'edit' }}">{{ "TR__EDIT" | translate }}</a>
 
         <div class="moving-column-menu-nav">
             <a
@@ -26,9 +21,10 @@
     <adh-recompile-on-change
         data-ng-switch-when="body"
         data-value="{{proposalUrl}}">
-        <adh-meinberlin-proposal-detail
+        <adh-idea-collection-proposal-detail
             data-ng-if="proposalUrl"
-            data-path="{{proposalUrl}}">
-        </adh-meinberlin-proposal-detail>
+            data-path="{{proposalUrl}}"
+            data-process-properties="processProperties">
+        </adh-idea-collection-proposal-detail>
     </adh-recompile-on-change>
 </div>

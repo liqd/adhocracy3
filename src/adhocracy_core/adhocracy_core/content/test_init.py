@@ -70,6 +70,10 @@ class TestResourceContentRegistry:
         return policy
 
     @fixture
+    def mock_created_anonymized(self, mocker):
+        return mocker.patch('adhocracy_core.content.is_created_anonymized')
+
+    @fixture
     def context(self):
         return testing.DummyResource(__provides__=(IResource, ISheet))
 
@@ -362,34 +366,68 @@ class TestResourceContentRegistry:
         with raises(ValueError):
             inst.resolve_isheet_field_from_dotted_string(dotted)
 
-    def test_get_workflow_non_iresource(self, inst):
-        context = testing.DummyResource()
+    def test_get_workflow_return_none_if_no_workflow_sheet(self, context,
+                                                           inst):
+        from adhocracy_core.exceptions import RuntimeConfigurationError
+        inst.get_sheet_field = Mock(side_effect=RuntimeConfigurationError)
         assert inst.get_workflow(context) is None
 
-    def test_get_workflow_no_iresource_metadata(self, context, inst):
+    def test_get_workflow_return_if_no_workflow_set(self, inst, context):
+        inst.get_sheet_field = Mock(return_value='')
         assert inst.get_workflow(context) is None
 
-    def test_get_workflow_workflow_set(self, inst, context, mock_workflow,
-                                       resource_meta):
+    def test_get_workflow(self, inst, context, mock_workflow, resource_meta):
         inst.workflows['sample'] = mock_workflow
-        meta = resource_meta._replace(workflow_name='sample')
-        inst.resources_meta[IResource] = meta
+        inst.get_sheet_field = Mock(return_value='sample')
         assert inst.get_workflow(context) == mock_workflow
 
-    def test_get_workflow_workflow_not_set(self, inst, context, mock_workflow,
-                                       resource_meta):
-        inst.workflows['sample'] = mock_workflow
-        meta = resource_meta._replace(workflow_name='')
-        inst.resources_meta[IResource] = meta
-        assert inst.get_workflow(context) is None
+    def test_can_add_anonymized_false_if_parent_has_no_anonymize_sheet(
+            self, inst, context, request_):
+        assert inst.can_add_anonymized(context, request_) is False
 
-    def test_get_workflow_raise_if_wrong_workflow_name(self, inst, context,
-                                                       resource_meta):
-        meta = resource_meta._replace(workflow_name='WRONG')
-        inst.resources_meta[IResource] = meta
-        from adhocracy_core.exceptions import RuntimeConfigurationError
-        with raises(RuntimeConfigurationError):
-            inst.get_workflow(context)
+    def test_can_add_anonymized_false_if_anonymize_permission_is_missing(
+            self, config, inst, request_):
+        from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
+        context = testing.DummyResource(__provides__=IAllowAddAnonymized)
+        config.testing_securitypolicy(userid='hank', permissive=False)
+        assert inst.can_add_anonymized(context, request_) is False
+
+    def test_can_add_anonymized_true_if_anonymize_sheet_and_permission(
+            self, config, inst, request_):
+        from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
+        context = testing.DummyResource(__provides__=IAllowAddAnonymized)
+        config.testing_securitypolicy(userid='hank', permissive=True)
+        assert inst.can_add_anonymized(context, request_) is True
+
+    def test_can_add_anonymized_true_if_parent_item_anonymized_and_permission(
+            self, config, inst, request_, mock_created_anonymized):
+        from adhocracy_core.interfaces import IItem
+        context = testing.DummyResource(__provides__=IItem)
+        mock_created_anonymized.return_value = True
+        config.testing_securitypolicy(userid='hank', permissive=True)
+        assert inst.can_add_anonymized(context, request_) is True
+
+    def test_can_edit_anonymized_false_if_missing_permission(
+            self, config, inst, context, request_):
+        config.testing_securitypolicy(userid='hank', permissive=False)
+        assert inst.can_edit_anonymized(context, request_) is False
+
+    def test_can_edit_anonymized_true_if_is_anonymized_and_has_permission(
+            self, config, inst, context, request_, mock_created_anonymized):
+        config.testing_securitypolicy(userid='hank', permissive=True)
+        mock_created_anonymized.return_value = True
+        assert inst.can_edit_anonymized(context, request_) is True
+
+    def test_can_delete_anonymized_false_if_missing_permission(
+            self, config, inst, context, request_):
+        config.testing_securitypolicy(userid='hank', permissive=False)
+        assert inst.can_delete_anonymized(context, request_) is False
+
+    def test_can_delete_anonymized_true_if_is_anonymized_and_has_permission(
+            self, config, inst, context, request_, mock_created_anonymized):
+        config.testing_securitypolicy(userid='hank', permissive=True)
+        mock_created_anonymized.return_value = True
+        assert inst.can_delete_anonymized(context, request_) is True
 
 
 @fixture

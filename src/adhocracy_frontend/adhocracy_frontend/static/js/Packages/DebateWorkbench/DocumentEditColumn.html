@@ -1,8 +1,6 @@
 <div data-ng-switch="transclusionId">
     <div data-ng-switch-when="menu">
         <i class="icon-document moving-column-icon"></i>
-        <a class="moving-column-menu-button" data-ng-href="{{ documentUrl | adhParentPath | adhResourceUrl }}">{{ "TR__CANCEL" | translate }}</a>
-
         <div class="moving-column-menu-nav">
             <a class="moving-column-menu-nav-button" data-ng-href="{{ processUrl | adhResourceUrl }}" title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
         </div>
@@ -17,7 +15,8 @@
             data-value="{{documentUrl}}">
         <adh-document-edit
             data-ng-if="documentUrl"
-            data-path="{{documentUrl}}">
+            data-path="{{documentUrl}}"
+            data-cancel-url="documentUrl | adhParentPath | adhResourceUrl">
         </adh-document-edit>
     </adh-recompile-on-change>
 </div>

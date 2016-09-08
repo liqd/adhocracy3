@@ -1,5 +1,0 @@
-[
-  {"path": "/opin/idea_collection",
-   "roles": {"group:authenticated": ["role:participant"]}
-  }
-]

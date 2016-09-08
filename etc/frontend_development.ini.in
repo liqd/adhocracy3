@@ -77,6 +77,9 @@ adhocracy.canonical_url = http://localhost:6551/static/embed.html#!
 # e.g. account activation.
 adhocracy.redirect_url = ${adhocracy:redirect_url}
 
+# Whether to allow users to post resources anonymously
+adhocracy.anonymize.enabled = false
+
 # If the Adhocracy frontend is embedded in a website from a trusted domain,
 # Adhocracy may pass user authentication token to the embedding website.
 adhocracy.trusted_domains =
@@ -84,12 +87,11 @@ adhocracy.trusted_domains =
 #     http://localhost:9000
 #     http://localhost:9001
 
-adhocracy.custom = mercator_platform_path financial_plan_url_de financial_plan_url_en show_add_button allow_rate embed_only hide_header s1_process_url
+adhocracy.custom = mercator_platform_path financial_plan_url_de financial_plan_url_en show_add_button allow_rate embed_only hide_header
 adhocracy.custom.mercator_platform_path = /mercator/
 adhocracy.custom.show_add_button = true
 adhocracy.custom.allow_rate = true
 adhocracy.custom.embed_only = false
-adhocracy.custom.s1_process_url = http://localhost:6541/s1/
 
 # if set to true the hader is not shown
 #adhocracy.custom.hide_header = true

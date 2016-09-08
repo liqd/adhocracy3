@@ -1,0 +1,143 @@
+// This is important for iframe resizing
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+/**
+ * When adhocracy is embedded, we have some code that determines its height and
+ * resizes the iframe accordingly.  For this to work, the body must not have
+ * any margins.  Apart from setting `margin: 0` on body we also need to prevent
+ * margin collapsing.  This can be done by adding a small padding both at the
+ * top and the bottom.  The trade-off is that there is some additional padding
+ * which might look strange.
+ */
+body {
+    padding: 1px 0;
+}
+
+.l-content {
+    @include rem(top, 40px);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+
+    @media print {
+        position: static;
+        overflow: visible;
+    }
+}
+
+/*doc
+---
+title: Header
+name: l-header
+category: Layout
+---
+
+Most views in adhocracy have a header. But this header is very flexible and
+depends on a lot of factors:
+
+-   Areas that are typically accessed via links from emails (`activate`,
+    `password_reset`) do not have a header.
+-   Areas related to user management (`login`, `register`,
+    `create_password_reset`) have a simplified header.
+-   The header in the resource area may have additional, process related
+    functionality.
+-   Embed contexts may have different headers.
+-   All headers contain a user indicator.
+
+```html_example
+<div class="l-header">
+    <div class="l-header-left placeholder">left</div>
+    <div class="l-header-right placeholder">right</div>
+</div>
+```
+*/
+.main-header {
+    @include rem(line-height, 40px);
+    position: relative;
+
+    @media print {
+        display: none;
+    }
+}
+
+.l-header {
+    @include clearfix;
+    @include rem(max-width, $moving-column-single-width-max);
+    margin: 0 auto;
+    position: relative;
+}
+
+.l-header-left,
+.l-header-right {
+    position: relative;
+    z-index: 1;
+}
+
+.l-header-left {
+    float: left;
+}
+
+.l-header-right {
+    float: right;
+}
+
+.l-center {
+    @include rem(max-width, 30rem);
+    @include rem(margin, 5rem auto 10rem);
+    @include rem(padding, 0.5rem);
+}
+
+/*doc
+---
+title: Grid
+name: grid
+category: Layout
+---
+
+We use a regular 12-column grid with fixed gutters.
+
+```html_example
+<div class="row">
+    <div class="placeholder cols-2">Col 1</div>
+    <div class="placeholder cols-2">Col 2</div>
+</div>
+<div class="row">
+    <div class="placeholder cols-3">Col 1</div>
+    <div class="placeholder cols-3">Col 2</div>
+    <div class="placeholder cols-3">Col 3</div>
+</div>
+```
+*/
+@mixin container {
+    @include pie-clearfix;
+}
+
+.row {
+    @include container;
+}
+
+.cols-2 {
+    @include grid-same-width(2);
+}
+
+.cols-3 {
+    @include grid-same-width(3);
+}
+
+/*doc
+---
+title: Padding
+name: l-padding
+category: Layout
+---
+
+A generic layout class to add padding to the sides of an element.
+*/
+.l-padding {
+    padding: 0 $padding;
+}

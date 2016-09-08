@@ -1,7 +1,7 @@
 /* documentation is in variables_doc */
 
 // Text colors
-$color-text-normal: #444;
+$color-text-normal: #222;
 $color-text-introvert: lighten($color-text-normal, 15%);
 $color-text-extrovert: darken($color-text-normal, 10%);
 $color-text-highlight-normal: #026dca;
@@ -10,21 +10,20 @@ $color-text-highlight-extrovert: lighten($color-text-highlight-normal, 10%);
 $color-text-inverted: white;
 
 // Function colors
-$color-function-valid: #2eac66;
-$color-function-invalid: #e6332a;
-$color-function-neutral: #f6d02b;
+$color-function-positive: #00af5d;
+$color-function-negative: #c72e51;
+$color-function-neutral: #fdd216;
 
 // Background colors
 $color-background-base: white;
 $color-background-base-introvert: #f2f2f2;
-$color-background-mask: black;
 
 // Structure colors
 $color-structure-normal: #e6e6e6;
 $color-structure-introvert: #ccc;
 $color-structure-transparent: transparent;
 
-//Brand colors
+// Brand colors
 $color-brand-one-normal: #fcb813;
 $color-brand-one-introvert: darken($color-brand-one-normal, 10%);
 $color-brand-one-extrovert: lighten($color-brand-one-normal, 10%);
@@ -32,14 +31,12 @@ $color-brand-two-normal: #00aae5;
 $color-brand-two-introvert: darken($color-brand-two-normal, 10%);
 $color-brand-two-extrovert: lighten($color-brand-two-normal, 10%);
 
-$font-family-normal: "Lato", sans-serif;
-$font-weight-introvert: 400;
+$font-family-normal: sans-serif;
+$font-weight-introvert: 300;
 $font-weight-medium: 500;
-$font-weight-normal: normal;
-$font-weight-introvert: 400;
 $font-weight-extrovert: 900;
-$font-size-smaller: 10px;
-$font-size-small: 12px;
+$font-size-smaller: 11px;
+$font-size-small: 13px;
 $font-size-normal: 14px;
 $font-size-plus: 16px;
 $font-size-large: 21px;
@@ -50,21 +47,13 @@ $moving-column-menu-height: 24px;
 $moving-column-border-width: 5px;
 $annotation-width: 34%;
 
-//Padding
-$padding-small: 0.5rem;
-$padding-medium: 1rem;
+// Padding
+$padding: 0.8rem;
 
-//Other
-$section-jump-navigation-width: 2rem;
+// Other
 $moving-column-single-width-max: 55rem;
 $moving-column-single-width-min: 35rem;
-$badge-line-height: 1 + 4px / $font-size-smaller;
-$badge-height: $badge-line-height * $font-size-smaller;
+$badge-line-height: 2;
 
-//Line-height (leading)
-$line-height-normal: 1.15;
-$line-height-large: 1.2;
-$line-height-plus: 1.6;
-
-//Breakpoints
+// Breakpoints
 $breakpoint-small-device: 640px;

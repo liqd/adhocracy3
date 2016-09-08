@@ -3,9 +3,9 @@ import * as _ from "lodash";
 import * as AdhConfig from "../Config/Config";
 import * as AdhCredentials from "../User/Credentials";
 import * as AdhHttp from "../Http/Http";
-import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
+import * as AdhResourceActions from "../ResourceActions/ResourceActions";
 import * as AdhResourceUtil from "../Util/ResourceUtil";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
@@ -13,6 +13,7 @@ import * as AdhUtil from "../Util/Util";
 import RIComment from "../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RIExternalResource from "../../Resources_/adhocracy_core/resources/external_resource/IExternalResource";
+import RISystemUser from "../../Resources_/adhocracy_core/resources/principal/ISystemUser";
 import * as SICommentable from "../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIComment from "../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
@@ -25,7 +26,7 @@ var pkgLocation = "/Comment";
 export interface ICommentResourceScope extends angular.IScope {
     path : string;
     submit : () => any;
-    delete : () => angular.IPromise<void>;
+    hide : () => angular.IPromise<void>;
     refersTo : string;
     poolPath : string;
     hideCancel? : boolean;
@@ -42,6 +43,7 @@ export interface ICommentResourceScope extends angular.IScope {
     afterCreateComment() : angular.IPromise<void>;
     item : any;
     report? : () => void;
+    modals : AdhResourceActions.Modals;
     // update resource
     update() : angular.IPromise<void>;
     // update outer listing
@@ -49,6 +51,7 @@ export interface ICommentResourceScope extends angular.IScope {
     onCancel() : void;
     data : {
         content : string;
+        createdAnonymously : boolean;
         creator : string;
         creationDate : string;
         modificationDate : string;
@@ -58,12 +61,13 @@ export interface ICommentResourceScope extends angular.IScope {
         itemPath : string;
         replyPoolPath : string;
         edited : boolean;
+        anonymize? : boolean;
     };
 }
 
 
 export var update = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     $q : angular.IQService
 ) => (
     scope : ICommentResourceScope,
@@ -108,7 +112,7 @@ export var update = (
 };
 
 export var bindPath = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     $q : angular.IQService
 ) => (
     scope : ICommentResourceScope,
@@ -123,7 +127,7 @@ export var bindPath = (
 };
 
 export var postCreate = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : ICommentResourceScope,
@@ -146,11 +150,13 @@ export var postCreate = (
     });
     version.parent = item.path;
 
-    return adhHttp.deepPost([item, version]);
+    return adhHttp.deepPost([item, version], {
+        anonymize: scope.data.anonymize,
+    });
 };
 
 export var postEdit = (
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : ICommentResourceScope,
@@ -162,31 +168,34 @@ export var postEdit = (
             var resource = AdhResourceUtil.derive(oldVersion, {preliminaryNames: adhPreliminaryNames});
             resource.data[SIComment.nick].content = scope.data.content;
             resource.parent = oldItem.path;
-            return adhHttp.deepPost([resource]);
+            return adhHttp.deepPost([resource], {
+                anonymize: scope.data.anonymize,
+            });
         });
 };
 
 
 export var commentDetailDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhRecursionHelper,
     $window : Window,
-    $q : angular.IQService
+    $q : angular.IQService,
+    $timeout,
+    $translate
 ) => {
     var _update = update(adhHttp, $q);
     var _postEdit = postEdit(adhHttp, adhPreliminaryNames);
 
-    var link = (scope : ICommentResourceScope, element, attrs, column? : AdhMovingColumns.MovingColumnController) => {
-        if (column) {
-            scope.report = () => {
-                column.$scope.shared.abuseUrl = scope.data.path;
-                column.toggleOverlay("abuse");
-            };
-        }
+    var link = (scope : ICommentResourceScope) => {
+        scope.modals = new AdhResourceActions.Modals($timeout);
+
+        scope.report = () => {
+            scope.modals.toggleModal("abuse");
+        };
 
         scope.$on("$destroy", adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
             if (!commentVersionUrl) {
@@ -218,6 +227,11 @@ export var commentDetailDirective = (
 
         scope.edit = () => {
             scope.mode = 1;
+            if (adhConfig.anonymize_enabled) {
+                adhHttp.get(scope.data.creator).then((res) => {
+                    scope.data.createdAnonymously = res.content_type === RISystemUser.content_type;
+                });
+            }
         };
 
         scope.cancel = () => {
@@ -238,17 +252,18 @@ export var commentDetailDirective = (
             });
         };
 
-        scope.delete = () : angular.IPromise<void> => {
-            // FIXME: translate
-            if ($window.confirm("Do you really want to delete this?")) {
-                return adhHttp.hide(scope.data.itemPath, RIComment.content_type).then(() => {
-                    if (scope.onSubmit) {
-                        scope.onSubmit();
-                    }
-                });
-            } else {
-                return $q.when();
-            }
+        scope.hide = () : angular.IPromise<void> => {
+            return $translate("TR__ASK_TO_CONFIRM_HIDE_ACTION").then((question) => {
+                if ($window.confirm(question)) {
+                    return adhHttp.hide(scope.data.itemPath).then(() => {
+                        if (scope.onSubmit) {
+                            scope.onSubmit();
+                        }
+                    });
+                } else {
+                    return $q.when();
+                }
+            });
         };
 
         adhPermissions.bindScope(scope, () => scope.data && scope.data.replyPoolPath, "poolOptions");
@@ -261,7 +276,6 @@ export var commentDetailDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
-        require: "?^adhMovingColumn",
         scope: {
             path: "@",
             onSubmit: "=?"
@@ -274,7 +288,7 @@ export var commentDetailDirective = (
 
 export var commentCreateDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => {
     var _postCreate = postCreate(adhHttp, adhPreliminaryNames);
@@ -311,7 +325,7 @@ export var commentCreateDirective = (
 
 export var adhCommentListing = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     $location : angular.ILocationService
@@ -336,6 +350,11 @@ export var adhCommentListing = (
                 name: "TR__RATES",
                 index: "rates",
                 reverse: true
+            }, {
+                key: "controversiality",
+                name: "TR__CONTROVERSIALITY",
+                index: "controversiality",
+                reverse: true
             }];
             scope.params = {};
 
@@ -343,12 +362,15 @@ export var adhCommentListing = (
                 return adhHttp.get(scope.path).then((commentable) => {
                     scope.params[SIComment.nick + ":refers_to"] = scope.path;
                     scope.poolPath = commentable.data[SICommentable.nick].post_pool;
-                    scope.custom = {
-                        refersTo: scope.path,
-                        goToLogin: () => {
-                            return adhTopLevelState.setCameFromAndGo("/login");
-                        }
-                    };
+                    return adhHttp.options(scope.poolPath).then((poolOptions) => {
+                        scope.custom = {
+                            commentability: poolOptions.POST,
+                            refersTo: scope.path,
+                            goToLogin: () => {
+                                return adhTopLevelState.setCameFromAndGo("/login");
+                            }
+                        };
+                    });
                 });
             };
 
@@ -368,7 +390,7 @@ export var adhCommentListing = (
 export var adhCreateOrShowCommentListing = (
     adhConfig : AdhConfig.IService,
     adhDone,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhCredentials : AdhCredentials.Service
 ) => {
@@ -427,14 +449,15 @@ export var adhCreateOrShowCommentListing = (
 };
 
 export var commentColumnDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Column.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["commentCloseUrl", "commentableUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("commentCloseUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("commentableUrl", scope));
         }
     };
 };

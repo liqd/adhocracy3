@@ -1,0 +1,22 @@
+defaults: s1
+title: Private S1
+add_local_role_participant_to_default_group: False
+states:
+  propose:
+    title: Participate
+    acm:
+      principals:               [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [view,                 D,         A,           A,         A,       A,         A]
+  select:
+    title: Evaluate
+    acm:
+      principals:               [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [view,                 D,         A,           A,         A,       A,         A]
+  result:
+    title: Result
+    acm:
+      principals:               [everyone, participant, moderator, creator, initiator, admin]
+      permissions:
+        - [view,                 D,         A,           A,         A,       A,         A]

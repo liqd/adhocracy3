@@ -1,6 +1,7 @@
 """Configure rest api packages."""
 from pyramid.view import view_config
 from adhocracy_core.authentication import validate_user_headers
+from adhocracy_core.authentication import validate_anonymize_header
 from adhocracy_core.caching import set_cache_header
 from adhocracy_core.interfaces import API_ROUTE_NAME
 from adhocracy_core.rest.schemas import validate_request_data
@@ -16,6 +17,7 @@ class api_view(view_config):  # noqa
         renderer='json'
         route_name='adhocracy_api'
         decorator = [validate_user_headers,
+                     validate_anonymize_header,
                      validate_visibility,
                      set_cache_header]
 
@@ -34,7 +36,7 @@ class api_view(view_config):  # noqa
                   request_method=POST,
                   )
         def post_rest_view(context:IResource, request: IRequest) -> dict:
-            appsturct = request.validated
+            appstruct = request.validated
             ...
     """
 
@@ -60,6 +62,7 @@ class api_view(view_config):  # noqa
         settings = {'renderer': 'json',
                     'route_name': API_ROUTE_NAME,
                     'decorator': [validate_user_headers,
+                                  validate_anonymize_header,
                                   validate_visibility,
                                   set_cache_header,
                                   ]

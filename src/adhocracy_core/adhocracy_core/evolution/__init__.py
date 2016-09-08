@@ -43,6 +43,8 @@ from adhocracy_core.sheets.badge import IHasBadgesPool
 from adhocracy_core.sheets.badge import ICanBadge
 from adhocracy_core.sheets.description import IDescription
 from adhocracy_core.sheets.image import IImageReference
+from adhocracy_core.sheets.notification import IFollowable
+from adhocracy_core.sheets.notification import INotification
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.relation import ICanPolarize
@@ -271,6 +273,8 @@ def change_pools_autonaming_scheme(root, registry):  # pragma: no cover
     count = len(pools)
     for index, pool in enumerate(pools):
         logger.info('Migrating {0} of {1}: {2}'.format(index + 1, count, pool))
+        if not pool:
+            continue
         if hasattr(pool, '_autoname_last'):
             pool._autoname_lasts = PersistentMapping()
             for prefix in prefixes:
@@ -586,18 +590,7 @@ def add_image_reference_to_organisations(root, registry):  # pragma: no cover
 
 
 def set_comment_count(root, registry):  # pragma: no cover
-    """Set comment_count for all ICommentables."""
-    from adhocracy_core.resources.subscriber import update_comments_count
-    catalogs = find_service(root, 'catalogs')
-    query = search_query._replace(interfaces=ICommentVersion,
-                                  only_visible=True,
-                                  resolve=True)
-    comment_versions = catalogs.search(query).elements
-    count = len(comment_versions)
-    for index, comment in enumerate(comment_versions):
-        logger.info('Set comment_count for resource {0} of {1}'
-                    .format(index + 1, count))
-        update_comments_count(comment, 1, registry)
+    """Outdated."""
 
 
 def remove_duplicated_group_ids(root, registry):  # pragma: no cover
@@ -624,33 +617,7 @@ def add_image_reference_to_proposals(root, registry):  # pragma: no cover
 
 
 def reset_comment_count(root, registry):  # pragma: no cover
-    """Reset comment_count for all ICommentables - See #2194, #2188."""
-    from adhocracy_core.resources.comment import ICommentVersion
-    from adhocracy_core.sheets.comment import ICommentable
-    from adhocracy_core.resources.subscriber import update_comments_count
-    catalogs = find_service(root, 'catalogs')
-    query = search_query._replace(interfaces=ICommentable,
-                                  only_visible=True,
-                                  resolve=True)
-    commentables = catalogs.search(query).elements
-    count = len(commentables)
-    for index, comment in enumerate(commentables):
-        logger.info('Set comment_count to 0 for resource {0} of {1}'
-                    .format(index + 1, count))
-        commentable_sheet = registry.content.get_sheet(comment,
-                                                       ICommentable)
-        commentable_sheet.set({'comments_count': 0}, omit_readonly=False)
-
-    query = search_query._replace(interfaces=ICommentVersion,
-                                  only_visible=True,
-                                  resolve=True,
-                                  indexes={'tag': 'FIRST'})
-    comment_versions = catalogs.search(query).elements
-    count = len(comment_versions)
-    for index, comment in enumerate(comment_versions):
-        logger.info('Recalculate comment_count for resource {0} of {1}'
-                    .format(index + 1, count))
-        update_comments_count(comment, 1, registry)
+    """Outdated."""
 
 
 @log_migration
@@ -719,6 +686,271 @@ def add_description_sheet_to_user(root, registry):  # pragma: no cover
     migrate_new_sheet(root, IUser, IDescription)
 
 
+@log_migration
+def remove_token_storage(root, registry):  # pragma: no cover
+    """Remove storage for authentication tokens, not used anymore."""
+    if hasattr(root, '_tokenmanager_storage'):
+        delattr(root, '_tokenmanager_storage')
+
+
+@log_migration
+def set_default_workflow(root, registry):  # pragma: no cover
+    """Set default workflow if no workflow in IWorkflowAssignment sheet."""
+    from adhocracy_core.utils import get_iresource
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
+    catalogs = find_service(root, 'catalogs')
+    resources = _search_for_interfaces(catalogs, IWorkflowAssignment)
+    for resource in resources:
+        iresource = get_iresource(resource)
+        meta = registry.content.resources_meta[iresource]
+        default_workflow_name = meta.default_workflow
+        sheet = registry.content.get_sheet(resource, IWorkflowAssignment)
+        workflow_name = sheet.get()['workflow']
+        if not workflow_name and default_workflow_name:
+            logger.info('Set default workflow {0} for {1}'.format(
+                default_workflow_name, resource))
+            sheet._store_data({'workflow': meta.default_workflow},
+                              initialize_workflow=False)
+
+
+@log_migration
+def add_local_roles_for_workflow_state(root,
+                                       registry):  # pragma: no cover
+    """Add local role of the current workflow state for all processes."""
+    from adhocracy_core.authorization import add_local_roles
+    from adhocracy_core.resources.process import IProcess
+    catalogs = find_service(root, 'catalogs')
+    resources = _search_for_interfaces(catalogs, IProcess)
+    count = len(resources)
+    for index, resource in enumerate(resources):
+        workflow = registry.content.get_workflow(resource)
+        state_name = workflow.state_of(resource)
+        local_roles = workflow._states[state_name].local_roles
+        logger.info('Update workflow local roles for resource {0} - {1} of {2}'
+                    .format(resource, index + 1, count))
+        if local_roles:
+            add_local_roles(resource, local_roles, registry=registry)
+
+
+@log_migration
+def rename_default_group(root, registry):  # pragma: no cover
+    """Rename default user group."""
+    from adhocracy_core.authorization import add_local_roles
+    from adhocracy_core.authorization import get_local_roles
+    from adhocracy_core.authorization import set_local_roles
+    from adhocracy_core.resources.process import IProcess
+    from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
+    from adhocracy_core.sheets.principal import IPermissions
+    catalogs = find_service(root, 'catalogs')
+    resources = _search_for_interfaces(catalogs, IProcess)
+    old_default_group_name = 'authenticated'
+    old_default_group_principal = 'group:' + old_default_group_name
+    new_default_group_name = DEFAULT_USER_GROUP_NAME
+    new_default_group_principal = 'group:' + DEFAULT_USER_GROUP_NAME
+    groups = root['principals']['groups']
+    if old_default_group_name in groups:
+        for resource in resources:
+            local_roles = get_local_roles(resource)
+            if old_default_group_principal in local_roles:
+                logger.info('Rename default group in local roles'
+                            ' of {0}'.format(resource))
+                old_roles = local_roles.pop(old_default_group_principal)
+                set_local_roles(resource, local_roles)
+                add_local_roles({new_default_group_principal: old_roles})
+        users = [u for u in root['principals']['users'].values()
+                 if IPermissions.providedBy(u)]
+        old_default_group = groups[old_default_group_name]
+        users_with_default_group = []
+        for user in users:
+            user_groups = registry.content.get_sheet_field(user,
+                                                           IPermissions,
+                                                           'groups')
+            if old_default_group in user_groups:
+                users_with_default_group.append(user)
+        logger.info('Rename default group '
+                    'to {}'.format(new_default_group_name))
+        groups.rename(old_default_group_name, new_default_group_name)
+        new_default_group = groups[new_default_group_name]
+        for user in users_with_default_group:
+            logger.info('Update default group name of user {}'.format(user))
+            permission_sheet = registry.content.get_sheet(user, IPermissions)
+            permissions = permission_sheet.get()
+            user_groups = permissions['groups']
+            user_groups.append(new_default_group)
+            permissions['groups'] = user_groups
+            permission_sheet.set(permissions)
+
+
+def migrate_auditlogentries_to_activities(root, registry):  # pragma: no cover
+    """Replace AuditlogenEntries with Activities entries."""
+    from pytz import UTC
+    from adhocracy_core.interfaces import SerializedActivity
+    from adhocracy_core.interfaces import ActivityType
+    from adhocracy_core.interfaces import AuditlogEntry
+    from adhocracy_core.interfaces import AuditlogAction
+    from adhocracy_core.auditing import get_auditlog
+    auditlog = get_auditlog(root)
+    old_entries = [(key, value) for key, value in auditlog.items()]
+    auditlog.clear()
+    mapping = {AuditlogAction.concealed: ActivityType.remove,
+               AuditlogAction.invisible: ActivityType.remove,
+               AuditlogAction.revealed: ActivityType.update,
+               AuditlogAction.created: ActivityType.add,
+               AuditlogAction.modified: ActivityType.update,
+               (AuditlogAction.concealed,): ActivityType.remove,
+               (AuditlogAction.invisible,): ActivityType.remove,
+               (AuditlogAction.revealed,): ActivityType.update,
+               (AuditlogAction.created,): ActivityType.add,
+               (AuditlogAction.modified,): ActivityType.update,
+               }
+    for key, value in old_entries:
+        if not isinstance(value, AuditlogEntry):
+            break
+        new_value_kwargs = {'type': mapping.get(value.name),
+                            'object_path': value.resource_path,
+                            'subject_path': value.user_path or '',
+                            'sheet_data': value.sheet_data or [],
+                            }
+        new_key = key.replace(tzinfo=UTC)
+        auditlog[new_key] = SerializedActivity()._replace(**new_value_kwargs)
+
+
+@log_migration
+def add_notification_sheet_to_user(root, registry):  # pragma: no cover
+    """Add notification sheet to user."""
+    migrate_new_sheet(root, IUser, INotification)
+
+
+@log_migration
+def add_followable_sheet_to_process(root, registry):  # pragma: no cover
+    """Add followable sheet to process."""
+    migrate_new_sheet(root, IProcess, IFollowable)
+
+
+@log_migration
+def remove_comment_count_data(root, registry):  # pragma: no cover
+    """Remove comment_count data in ICommentable sheet."""
+    from adhocracy_core.sheets.comment import ICommentable
+    catalogs = find_service(root, 'catalogs')
+    commentables = _search_for_interfaces(catalogs, ICommentable)
+    for commentable in commentables:
+        sheet = registry.content.get_sheet(commentable, ICommentable)
+        sheet.delete_field_values(['comments_count'])
+
+
+@log_migration
+def reindex_comments(root, registry):  # pragma: no cover
+    """Update comments index."""
+    from adhocracy_core.sheets.comment import ICommentable
+    catalogs = find_service(root, 'catalogs')
+    resources = _search_for_interfaces(catalogs, ICommentable)
+    for resource in resources:
+        catalogs.reindex_index(resource, 'comments')
+
+
+@log_migration
+def add_localroles_sheet_to_pools(root, registry):  # pragma: no cover
+    """Add localroles sheet to user."""
+    from adhocracy_core.sheets.localroles import ILocalRoles
+    migrate_new_sheet(root, IPool, ILocalRoles)
+
+
+@log_migration
+def allow_image_download_view_for_everyone(root, registry):  # pragma: no cover
+    """Add acls to image downloads to allow view for everyone."""
+    from adhocracy_core.resources.image import IImageDownload
+    from adhocracy_core.resources.image import allow_view_eveyone
+    catalogs = find_service(root, 'catalogs')
+    image_downloads = _search_for_interfaces(catalogs, IImageDownload)
+    for image_download in image_downloads:
+        allow_view_eveyone(image_download, registry, {})
+
+
+@log_migration
+def add_followable_sheet_to_organisation(root, registry):  # pragma: no cover
+    """Add followable sheet to orgnisations."""
+    migrate_new_sheet(root, IOrganisation, IFollowable)
+
+
+@log_migration
+def remove_participant_role_from_default_group(root,
+                                               registry):  # pragma: no cover
+    """Remove global participant role from default group."""
+    from adhocracy_core.sheets.principal import IGroup
+    groups = find_service(root, 'principals', 'groups')
+    default_group = groups.get('default_group')
+    group_sheet = registry.content.get_sheet(default_group, IGroup)
+    appstruct = group_sheet.get()
+    roles = appstruct['roles']
+    if 'participant' in roles:
+        roles.remove('participant')
+        appstruct['roles'] = roles
+        group_sheet.set(appstruct)
+
+
+@log_migration
+def add_activation_config_sheet_to_user(root, registry):  # pragma: no cover
+    """Add acitvation configuration sheet to user."""
+    from adhocracy_core.sheets.principal import IActivationConfiguration
+    migrate_new_sheet(root, IUser, IActivationConfiguration)
+
+
+@log_migration
+def add_global_anonymous_user(root, registry):  # pragma: no cover
+    """Add  global anonymmous user."""
+    from pyramid.request import Request
+    from adhocracy_core.resources.root import _add_anonymous_user
+    from adhocracy_core.resources.principal import get_system_user_anonymous
+    request = Request.blank('/dummy')
+    request.registry = registry
+    request.context = root
+    anonymous_user = get_system_user_anonymous(request)
+    if not anonymous_user:
+        _add_anonymous_user(root, registry)
+
+
+@log_migration
+def add_allow_add_anonymized_sheet_to_process(root,
+                                              registry):  # pragma: no cover
+    """Add allow add anonymized sheet to process."""
+    from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
+    migrate_new_sheet(root, IProcess, IAllowAddAnonymized)
+
+
+@log_migration
+def add_allow_add_anonymized_sheet_to_comments(root,
+                                               registry):  # pragma: no cover
+    """Add allow add anonymized sheet to comments service."""
+    from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
+    from adhocracy_core.resources.comment import ICommentsService
+    migrate_new_sheet(root, ICommentsService, IAllowAddAnonymized)
+
+
+@log_migration
+def add_allow_add_anonymized_sheet_to_items(root,
+                                            registry):  # pragma: no cover
+    """Add allow add anonymized sheet to items."""
+    from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
+    from adhocracy_core.interfaces import IItem
+    migrate_new_sheet(root, IItem, IAllowAddAnonymized)
+
+
+@log_migration
+def add_anonymize_default_sheet_to_user(root, registry):  # pragma: no cover
+    """Add anonymize default sheet to user."""
+    from adhocracy_core.sheets.principal import IAnonymizeDefault
+    migrate_new_sheet(root, IUser, IAnonymizeDefault)
+
+
+@log_migration
+def add_allow_add_anonymized_sheet_to_rates(root,
+                                            registry):  # pragma: no cover
+    """Add allow add anonymized sheet to rates service."""
+    from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
+    from adhocracy_core.resources.rate import IRatesService
+    migrate_new_sheet(root, IRatesService, IAllowAddAnonymized)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -758,3 +990,23 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(update_workflow_state_acl_for_all_resources)
     config.add_evolution_step(add_controversiality_index)
     config.add_evolution_step(add_description_sheet_to_user)
+    config.add_evolution_step(set_default_workflow)
+    config.add_evolution_step(add_local_roles_for_workflow_state)
+    config.add_evolution_step(rename_default_group)
+    config.add_evolution_step(remove_token_storage)
+    config.add_evolution_step(migrate_auditlogentries_to_activities)
+    config.add_evolution_step(add_notification_sheet_to_user)
+    config.add_evolution_step(add_followable_sheet_to_process)
+    config.add_evolution_step(add_localroles_sheet_to_pools)
+    config.add_evolution_step(remove_comment_count_data)
+    config.add_evolution_step(reindex_comments)
+    config.add_evolution_step(allow_image_download_view_for_everyone)
+    config.add_evolution_step(add_followable_sheet_to_organisation)
+    config.add_evolution_step(remove_participant_role_from_default_group)
+    config.add_evolution_step(add_activation_config_sheet_to_user)
+    config.add_evolution_step(add_global_anonymous_user)
+    config.add_evolution_step(add_allow_add_anonymized_sheet_to_process)
+    config.add_evolution_step(add_allow_add_anonymized_sheet_to_comments)
+    config.add_evolution_step(add_allow_add_anonymized_sheet_to_items)
+    config.add_evolution_step(add_anonymize_default_sheet_to_user)
+    config.add_evolution_step(add_allow_add_anonymized_sheet_to_rates)

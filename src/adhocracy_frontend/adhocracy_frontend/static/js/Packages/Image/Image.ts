@@ -28,7 +28,7 @@ var pkgLocation = "/Image";
  * FIXME: This should be exptended to cover a broader range of use cases.
  */
 export var uploadImageFactory = (
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service
 ) => (
     poolPath : string,
     flow : Flow,
@@ -68,7 +68,7 @@ export var uploadImageFactory = (
 
 
 export var addImage = (
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service
 ) => (
     resourcePath : string,
     imagePath : string
@@ -94,7 +94,7 @@ export var addImage = (
 
 export var uploadImageDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhUploadImage,
     flowFactory,
@@ -107,7 +107,8 @@ export var uploadImageDirective = (
             poolPath: "@",
             path: "@",
             didCompleteUpload: "&?",
-            didCancelUpload: "&?"
+            didCancelUpload: "&?",
+            cancelUrl: "=?"
         },
         link: (scope) => {
             scope.$flow = flowFactory.create();
@@ -133,7 +134,7 @@ export var uploadImageDirective = (
 };
 
 export var showImageDirective = (
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service
 ) => {
     return {
         restrict: "E",
@@ -180,4 +181,14 @@ export var showImageDirective = (
             });
         }
     };
+};
+
+export var backgroundImageDirective = (
+    adhHttp : AdhHttp.Service
+) => {
+    var directive = showImageDirective(adhHttp);
+    directive.template = "<div class=\"image-background {{cssClass}}\" " +
+        "style=\"background-image: url({{ imageUrl }})\"><ng-transclude></ng-transclude></div>";
+    (<angular.IDirective>directive).transclude = true;
+    return directive;
 };

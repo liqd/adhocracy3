@@ -13,9 +13,9 @@ def integration(integration):
 
 @mark.usefixtures('integration')
 def test_includeme_add_standard_workflow(registry):
-    from . import AdhocracyACLWorkflow
+    from . import ACLLocalRolesWorkflow
     workflow = registry.content.workflows['standard']
-    assert isinstance(workflow, AdhocracyACLWorkflow)
+    assert isinstance(workflow, ACLLocalRolesWorkflow)
 
 @mark.usefixtures('integration')
 def test_initiate_and_transition_to_result(registry, context):
@@ -44,12 +44,6 @@ class TestStandardPublicWithPrivateProcessesConfig:
         return '/opin/idea_collection'
 
     @fixture(scope='class')
-    def app_settings(self, app_settings) -> dict:
-        """Return settings to start the test wsgi app."""
-        app_settings['adhocracy.skip_registration_mail'] = True
-        return app_settings
-
-    @fixture(scope='class')
     def app_router(self, app_settings):
         """Add a `debate_private` workflow to IProcess resources."""
         from adhocracy_core.testing import make_configurator
@@ -57,7 +51,7 @@ class TestStandardPublicWithPrivateProcessesConfig:
         from adhocracy_core.resources.process import process_meta
         import adhocracy_core
         configurator = make_configurator(app_settings, adhocracy_core)
-        standard_process_meta = process_meta._replace(workflow_name='standard')
+        standard_process_meta = process_meta._replace(default_workflow='standard')
         add_resource_type_to_registry(standard_process_meta, configurator)
         app_router = configurator.make_wsgi_app()
         return app_router
@@ -131,18 +125,18 @@ class TestStandardPublicWithPrivateProcessesConfig:
         resp = app_admin.get(process_url_public)
         assert resp.status_code == 200
 
-    def test_participate_authenticated_can_post_proposal(
-            self, process_url_public, app_authenticated):
+    def test_participate_participant_can_post_proposal(
+            self, process_url_public, app_participant):
         from adhocracy_core.resources.proposal import IProposal
-        resp = app_authenticated.post_resource(process_url_public, IProposal,
-                                               {})
+        resp = app_participant.post_resource(process_url_public, IProposal,
+                                             {})
         assert resp.status_code == 200
 
-    def test_participate_authenticated_can_post_badge_assignments(
-            self, process_url_public, app_authenticated):
+    def test_participate_participant_can_post_badge_assignments(
+            self, process_url_public, app_participant):
         from adhocracy_core.resources.badge import IBadgeAssignment
-        resp = app_authenticated.options(process_url_public +
-                                         '/proposal_0000000/badge_assignments')
+        resp = app_participant.options(process_url_public +
+                                       '/proposal_0000000/badge_assignments')
         assert resp.json['POST']['request_body'][0]['content_type'] == \
             IBadgeAssignment.__identifier__
 

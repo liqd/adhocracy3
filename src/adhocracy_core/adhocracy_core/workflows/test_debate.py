@@ -15,9 +15,9 @@ def integration(integration):
 
 @mark.usefixtures('integration')
 def test_includeme(registry):
-    from adhocracy_core.workflows import AdhocracyACLWorkflow
+    from adhocracy_core.workflows import ACLLocalRolesWorkflow
     workflow = registry.content.workflows['debate']
-    assert isinstance(workflow, AdhocracyACLWorkflow)
+    assert isinstance(workflow, ACLLocalRolesWorkflow)
 
 
 @mark.usefixtures('integration')
@@ -56,7 +56,7 @@ class TestDebateWorkflow:
         from adhocracy_core.resources.process import process_meta
         import adhocracy_core
         configurator = make_configurator(app_settings, adhocracy_core)
-        debate_process_meta = process_meta._replace(workflow_name='debate')
+        debate_process_meta = process_meta._replace(default_workflow='debate')
         add_resource_type_to_registry(debate_process_meta, configurator)
         app_router = configurator.make_wsgi_app()
         return app_router

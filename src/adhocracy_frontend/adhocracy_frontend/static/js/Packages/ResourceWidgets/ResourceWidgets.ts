@@ -51,7 +51,7 @@ export class ResourceWrapperController {
         private $q : angular.IQService,
         private $parse : angular.IParseService,
         adhEventManagerClass,
-        private adhHttp : AdhHttp.Service<any>
+        private adhHttp : AdhHttp.Service
     ) {
         this.eventManager = new adhEventManagerClass();
         this.resourcePromises = [];
@@ -219,7 +219,7 @@ export class ResourceWidget<R extends ResourcesBase.IResource, S extends IResour
     public templateUrl : string;
 
     constructor(
-        public adhHttp : AdhHttp.Service<any>,
+        public adhHttp : AdhHttp.Service,
         public adhPreliminaryNames : AdhPreliminaryNames.Service,
         public $q : angular.IQService
     ) {}

@@ -51,7 +51,6 @@ lingua==3.10
 logilab-common==0.63.2
 mccabe==0.3.1
 meld3==1.0.0
-mock==1.0.1
 mr.developer==1.31
 multipledispatch==0.4.8
 path.py==8.1.2
@@ -100,6 +99,7 @@ snowballstemmer==1.2.0
 sphinx-rtd-theme==0.1.9
 sphinxcontrib-blockdiag==1.5
 sphinxcontrib-actdiag==0.8.5
+sphinxcontrib-programoutput
 statsd==3.0.1
 testfixtures==4.1.2
 transaction==1.4.4

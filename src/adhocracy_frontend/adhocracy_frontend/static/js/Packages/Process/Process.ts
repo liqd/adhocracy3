@@ -1,4 +1,4 @@
-/// <reference path="../../../lib2/types/angular.d.ts"/>
+    /// <reference path="../../../lib2/types/angular.d.ts"/>
 
 import * as AdhConfig from "../Config/Config";
 import * as AdhHttp from "../Http/Http";
@@ -9,6 +9,7 @@ import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
 import * as SIWorkflow from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
+import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
 
 var pkgLocation = "/Process";
 
@@ -18,6 +19,21 @@ export interface IStateData {
     name : string;
     description : string;
     start_date : string;
+}
+
+export interface IProcessProperties {
+    hasCreatorParticipate? : boolean;
+    hasImage? : boolean;
+    hasLocation? : boolean;
+    hasLocationText? : boolean;
+    // if a process has a proposal budget, but no max budget, then set maxBudget = Infinity.
+    maxBudget? : number;
+    processClass?;
+    proposalClass;
+    // WARNING: proposalSheet is not a regular feature of adhocracy,
+    // but a hack of Buergerhaushalt and Kiezkasse.
+    proposalSheet?;
+    proposalVersionClass;
 }
 
 export var getStateData = (sheet : SIWorkflow.Sheet, name : string) : IStateData => {
@@ -36,10 +52,12 @@ export var getStateData = (sheet : SIWorkflow.Sheet, name : string) : IStateData
 
 export class Provider implements angular.IServiceProvider {
     public templates : {[processType : string]: string};
+    public processProperties : {[processType : string]: IProcessProperties};
     public $get;
 
     constructor () {
         this.templates = {};
+        this.processProperties = {};
 
         this.$get = ["$injector", ($injector) => {
             return new Service(this, $injector);
@@ -59,11 +77,18 @@ export class Service {
         }
         return this.provider.templates[processType];
     }
+
+    public getProcessProperties(processType : string) : IProcessProperties {
+        if (!this.provider.processProperties.hasOwnProperty(processType)) {
+            return;
+        }
+        return this.provider.processProperties[processType];
+    }
 }
 
 export var workflowSwitchDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     $window : angular.IWindowService
 ) => {
@@ -87,13 +112,15 @@ export var workflowSwitchDirective = (
             });
 
             scope.switchState = (newState) => {
+                if ( ! $window.confirm("Will switch to process state " + newState + ". (Page will reload)")) {
+                    return;
+                }
                 adhHttp.get(scope.path).then((process) => {
                     process.data[SIWorkflow.nick] = {
                         workflow_state: newState
                     };
                     process.data[SIName.nick] = undefined;
                     adhHttp.put(scope.path, process).then((response) => {
-                        $window.alert("Switched to process state " + newState + ". Page reloading...");
                         $window.parent.location.reload();
                     });
                 });
@@ -113,6 +140,7 @@ export var processViewDirective = (
         link: (scope, element) => {
             adhTopLevelState.on("processType", (processType) => {
                 if (processType) {
+                    scope.processProperties = adhProcess.getProcessProperties(processType);
                     var template = adhProcess.getTemplate(processType);
                     element.html(template);
                     $compile(element.contents())(scope);
@@ -145,3 +173,23 @@ export var listingDirective = (adhConfig : AdhConfig.IService) => {
         }
     };
 };
+
+export var currentProcessTitleDirective = (
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhHttp: AdhHttp.Service
+) => {
+    return {
+        restrict: "E",
+        scope: {},
+        template: "<a class=\"current-process-title\" data-ng-href=\"{{processUrl | adhResourceUrl}}\">{{processTitle}}</a>",
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.on("processUrl", (processUrl) => {
+                adhHttp.get(processUrl).then((process) => {
+                    scope.processTitle = process.data[SITitle.nick].title;
+                });
+            }));
+        }
+    };
+};
+

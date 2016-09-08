@@ -1,6 +1,6 @@
 /*doc
 ---
-title: input
+title: Input
 name: input
 category: Inputs
 ---
@@ -30,7 +30,7 @@ it is also dirty or the form has been submitted.
 
 /*doc
 ---
-title: textinput
+title: Textinput
 name: textinput
 parent: input
 ---
@@ -63,7 +63,7 @@ surfaces with background color `color-background-base`.
 
 /*doc
 ---
-title: Textareas
+title: Textarea
 name: textinput.textarea
 parent: textinput
 ---
@@ -79,7 +79,7 @@ enabled in modern browsers.
 
 /*doc
 ---
-title: Title modifier
+title: Title Modifier
 name: textinput.m-title
 parent: textinput
 ---
@@ -91,10 +91,10 @@ Textinput that represents a title.
 ```
 */
 
-.error-state {
-    border-color: $color-function-invalid;
-    color: $color-function-invalid;
-    outline: 1px solid $color-function-invalid;
+%error-state {
+    border-color: $color-function-negative;
+    color: $color-function-negative;
+    outline: 1px solid $color-function-negative;
 }
 
 input[type="text"],
@@ -106,25 +106,28 @@ input[type="time"],
 input[type="number"],
 select,
 textarea {
+    @include placeholder {
+        opacity: 1;
+        color: $color-text-introvert;
+    }
+
     @include rem(margin-bottom, 0.5rem);
-    @include rem(padding, 0.25rem 1rem);
+    @include rem(padding, 0.25rem $padding);
     display: block;
     width: 100%;
     border: 1px solid $color-structure-introvert;
     color: $color-text-normal;
     background-color: $color-background-base-introvert;
 
-    @include placeholder {
-        @include opacity(1);
-        color: $color-text-introvert;
-    }
-
     &.m-title {
         @include rem(font-size, $font-size-large);
     }
 
     &.ng-dirty.ng-invalid {
-        @extend .error-state;
+        @extend %error-state;
+        border-color: $color-function-negative;
+        color: $color-function-negative;
+        outline: 1px solid $color-function-negative;
     }
 
     &.ng-disabled,
@@ -133,7 +136,6 @@ textarea {
         outline: 1px solid $color-structure-normal;
     }
 }
-
 
 
 .ng-submitted {
@@ -149,7 +151,7 @@ textarea {
     select,
     textarea {
         &.ng-invalid {
-            @extend .error-state;
+            @extend %error-state;
         }
     }
 }
@@ -165,49 +167,45 @@ textarea {
 
 /*doc
 ---
-title: error text
-name: error-text
-parent: input
----
-
-When text is in error it shows in an invalid color state
-
-```html_example
-<span class="input-error">Please enter your first name</span>
-```
-*/
-
-/*doc
----
-title: label text
+title: Label Text
 name: label-text
 parent: input
 ---
 
 Class to add styling to a label when the label itself is used as a container.
+It may have the `is-disabled` state.
 
 ```html_example
 <label>
     <span class="label-text">A label</span>
     <input type="text" />
 </label>
+<label>
+    <span class="label-text is-disabled">A label</span>
+    <input type="text" disabled="disabled"/>
+</label>
 ```
 */
-
 .label-text {
-    @include inline-block;
     @include rem(padding-bottom, 0.5rem);
+    display: inline-block;
+
+    &.is-disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 }
 
 .input-error {
     @include rem(font-size, $font-size-small);
+    @include rem(padding-top, 10px);
     display: block;
-    color: $color-function-invalid;
+    color: $color-function-negative;
 }
 
 /*doc
 ---
-title: checkbox
+title: Checkbox
 name: checkbox
 parent: input
 ---
@@ -225,7 +223,7 @@ be checked, w.g. for accepting terms of service.
 
 /*doc
 ---
-title: radio button
+title: Radio Button
 name: radio
 parent: input
 ---
@@ -243,23 +241,6 @@ checked.
 <label>
     <input name="radio-example" type="radio" />
     The other option
-</label>
-```
-*/
-
-/*doc
----
-title: label
-name: label
-category: Inputs
----
-
-A label can be used to describe an input.
-
-```html_example
-<label>
-    <input type="text" />
-    description
 </label>
 ```
 */
@@ -327,7 +308,7 @@ This error concerns a single input.
 
 /*doc
 ---
-title: Form footer
+title: Form Footer
 name: form-footer
 category: Inputs
 ---
@@ -337,11 +318,18 @@ A generic form footer containing one CTA and a regular button
 ```html_example
 
 <footer class="form-footer">
-    <input
-        type="submit"
-        value="Submit"
-        class="button-cta form-footer-button-cta" />
-    <a href="" class="button form-footer-button">Cancel</a>
+    <div class="form-footer-right">
+        <label>
+            <input type="checkbox" /> post anonymously
+        </label>
+        <input
+            type="submit"
+            value="Submit"
+            class="button-cta" />
+    </div>
+    <div class="form-footer-left">
+        <a href="" class="button">Cancel</a>
+    </div>
 </footer>
 ```
 */
@@ -350,15 +338,12 @@ A generic form footer containing one CTA and a regular button
     @include clearfix;
     width: 100%;
 
-    .form-footer-button-cta {
-        float: right;
 
-        + [class^="button"] {
-            @include rem(margin-right, 10px);
-        }
+    .form-footer-left {
+        float: left;
     }
 
-    .form-footer-button {
-        float: left;
+    .form-footer-right {
+        float: right;
     }
 }
