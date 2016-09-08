@@ -1,3 +1,9 @@
+.dropdown-button {
+    font-size: $font-size-huge;
+    font-weight: $font-weight-extrovert;
+    text-decoration: none;
+}
+
 .s1-list-item {
     @include clearfix;
     @include rem(padding, 21px 16px 17px 16px);
