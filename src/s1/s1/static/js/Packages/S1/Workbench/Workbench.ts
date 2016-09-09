@@ -265,21 +265,6 @@ export var s1LandingDirective = (
                     scope.processDescription = process.data[SIDescription.nick].description;
                 });
             }));
-            $translate("TR__S1_ABOUT_TEXT").then((translated) => {
-                scope.aboutText = translated;
-            });
-            $translate("TR__S1_INTRODUCTION_TEXT").then((translated) => {
-                scope.introText = translated;
-            });
-            $translate("TR__S1_PHASE_A_TEXT").then((translated) => {
-                scope.phaseAText = translated;
-            });
-            $translate("TR__S1_PHASE_B_TEXT").then((translated) => {
-                scope.phaseBText = translated;
-            });
-            $translate("TR__S1_PHASE_C_TEXT").then((translated) => {
-                scope.phaseCText = translated;
-            });
         }
     };
 };
