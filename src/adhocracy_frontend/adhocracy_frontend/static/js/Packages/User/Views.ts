@@ -414,7 +414,6 @@ export var registerDirective = (
                 adhTopLevelState.goToCameFrom("/");
             };
 
-
             scope.errors = [];
             scope.supportEmail = adhConfig.support_email;
 
