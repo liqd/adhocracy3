@@ -103,7 +103,9 @@ export interface IScopeLogin extends angular.IScope {
 
 
 export interface IScopeRegister extends angular.IScope {
-    registerForm : angular.IFormController;
+    form : {
+        register? : angular.IFormController;
+    };
     input : {
         username : string;
         email : string;
@@ -408,9 +410,11 @@ export var registerDirective = (
                 captchaGuess: ""
             };
 
+            scope.form = {};
+
             scope.$watchGroup(["input.passwordRepeat", "input.password"], (values) => {
-                if (scope.registerForm) {
-                    (<any>scope.registerForm).password_repeat.$setValidity("repeat", values[0] === values[1]);
+                if (scope.form.register) {
+                    (<any>scope.form.register).password_repeat.$setValidity("repeat", values[0] === values[1]);
                 }
             });
 
