@@ -21,7 +21,7 @@
 
         <adh-user-profile-image-edit data-path="{{path}}"></adh-user-profile-image-edit>
 
-        <h1 class="resource-header-title">{{ userBasic.name }}</h1>
+        <h1 class="resource-header-title">{{ userBasic.name | adhTranslateUsername }}</h1>
 
         <div class="resource-header-description">
             <adh-inline-editable-markdown

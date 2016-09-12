@@ -151,6 +151,18 @@ var bindServerErrors = (
     }
 };
 
+export var translateUsernameFilter = (
+    translateFilter
+) => {
+    return (userName : string) => {
+        if (userName === "anonymous") {
+            return translateFilter("TR__ANONYMOUS");
+        } else {
+            return userName;
+        }
+    };
+};
+
 export var activateArea = (
     adhConfig : AdhConfig.IService,
     adhUser : AdhUser.Service,

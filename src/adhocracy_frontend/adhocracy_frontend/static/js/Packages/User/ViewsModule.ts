@@ -91,6 +91,7 @@ export var register = (angular) => {
                 .registerDirective("register")
                 .registerDirective("user-indicator");
         }])
+        .filter("adhTranslateUsername", ["translateFilter", AdhUserViews.translateUsernameFilter])
         .directive("adhListUsers", ["adhCredentials", "adhConfig", AdhUserViews.userListDirective])
         .directive("adhUserListItem", ["adhConfig", AdhUserViews.userListItemDirective])
         .directive("adhUserProfile", [
