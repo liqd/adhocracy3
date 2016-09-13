@@ -36,7 +36,6 @@
     "TR__DELETE": "löschen",
     "TR__DESCRIPTION": "Beschreibung",
     "TR__DOCUMENT_EMPTY_TEXT": "Noch keine Dokumente",
-    "TR__DO_YOU_WANT_TO_RENOMINATE": "Willst Du diesen Vorschlag erneut einbringen?",
     "TR__EDIT": "bearbeiten",
     "TR__EDITED": "bearbeitet",
     "TR__EDIT_PROFILE_IMAGE": "Profilbild bearbeiten",
@@ -193,8 +192,8 @@
     "TR__VIEW_PROFILE": "Profil anzeigen",
     "TR__VOTES": "Stimmen",
     "TR__WEBSITE": "Webseite",
-    "TR__WILL_SWITCH_TO_STATE": "Setzt den Prozess in Phase: ",
     "TR__WILL_RELOAD_PAGE": "Die Seite wird neu geladen.",
+    "TR__WILL_SWITCH_TO_STATE": "Setzt den Prozess in Phase: ",
     "TR__YES": "ja",
     "TR__YOU_VOTED": "Deine Abstimmung:"
 }

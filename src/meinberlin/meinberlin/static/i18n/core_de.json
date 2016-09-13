@@ -10,6 +10,7 @@
     "TR__ADD_TITLE": "{{ title }} hinzufügen",
     "TR__ANONYMIZE": "Anonym veröffentlichen",
     "TR__ANONYMIZE_DEFAULT": "Standardmäßig anonym veröffentlichen",
+    "TR__ANONYMOUS": "anonymer Nutzer",
     "TR__ASK_TO_CONFIRM_HIDE_ACTION": "Möchten Sie diese Resource wirklich entfernen?",
     "TR__BACK_TO_TOP": "nach oben",
     "TR__BADGE_ASSIGNMENT_UPDATED": "Etiketten wurden aktualisiert.",
@@ -34,7 +35,6 @@
     "TR__CREATION_DATE": "Datum",
     "TR__DELETE": "löschen",
     "TR__DESCRIPTION": "Beschreibung",
-    "TR__DO_YOU_WANT_TO_RENOMINATE": "Wollen Sie diesen Vorschlag erneut einbringen?",
     "TR__DOCUMENT_EMPTY_TEXT": "Noch keine Dokumente",
     "TR__EDIT": "bearbeiten",
     "TR__EDITED": "bearbeitet",
@@ -192,8 +192,8 @@
     "TR__VIEW_PROFILE": "Profil anzeigen",
     "TR__VOTES": "Stimmen",
     "TR__WEBSITE": "Webseite",
-    "TR__WILL_SWITCH_TO_STATE": "Setzt den Prozess in Phase: ",
     "TR__WILL_RELOAD_PAGE": "Die Seite wird neu geladen.",
+    "TR__WILL_SWITCH_TO_STATE": "Setzt den Prozess in Phase: ",
     "TR__YES": "ja",
     "TR__YOU_VOTED": "Ihre Abstimmung:"
 }

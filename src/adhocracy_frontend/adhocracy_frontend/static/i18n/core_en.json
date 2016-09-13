@@ -35,7 +35,6 @@
     "TR__CREATION_DATE": "date",
     "TR__DELETE": "delete",
     "TR__DESCRIPTION": "Description",
-    "TR__DO_YOU_WANT_TO_RENOMINATE": "Do you want to renominate this proposal?",
     "TR__DOCUMENT_EMPTY_TEXT": "No documents yet.",
     "TR__EDIT": "edit",
     "TR__EDITED": "edited",
@@ -193,8 +192,8 @@
     "TR__VIEW_PROFILE": "view profile",
     "TR__VOTES": "votes",
     "TR__WEBSITE": "website",
-    "TR__WILL_SWITCH_TO_STATE": "Process will switch to phase: ",
     "TR__WILL_RELOAD_PAGE": "The page will reload.",
+    "TR__WILL_SWITCH_TO_STATE": "Process will switch to phase: ",
     "TR__YES": "yes",
     "TR__YOU_VOTED": "You voted:"
 }
