@@ -103,7 +103,9 @@ export interface IScopeLogin extends angular.IScope {
 
 
 export interface IScopeRegister extends angular.IScope {
-    registerForm : angular.IFormController;
+    form : {
+        register? : angular.IFormController;
+    };
     input : {
         username : string;
         email : string;
@@ -408,12 +410,19 @@ export var registerDirective = (
                 captchaGuess: ""
             };
 
+            scope.form = {};
+
+            scope.$watchGroup(["input.passwordRepeat", "input.password"], (values) => {
+                if (scope.form.register) {
+                    (<any>scope.form.register).password_repeat.$setValidity("repeat", values[0] === values[1]);
+                }
+            });
+
             scope.enableCancel = ! _.includes(["login", "register"], adhEmbed.getContext());
 
             scope.cancel = scope.goBack = () => {
                 adhTopLevelState.goToCameFrom("/");
             };
-
 
             scope.errors = [];
             scope.supportEmail = adhConfig.support_email;
@@ -766,6 +775,11 @@ export var userEditDirective = (
                         };
                     });
                 }
+            });
+
+            scope.$watchGroup(["data.passwordRepeat", "data.password"], (values) => {
+                // empty may by "" or undefined, so it needs special handling
+                scope.userEditForm.password_repeat.$setValidity("repeat", (values[0] === values[1]) || (!values[0] && !values[1]));
             });
 
             scope.submit = () => {
