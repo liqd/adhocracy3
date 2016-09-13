@@ -1,5 +1,5 @@
 <div class="login">
-    <form novalidate="novalidate" class="login-form" name="registerForm" data-ng-if="!success && !loggedIn" data-ng-submit="register()">
+    <form novalidate="novalidate" class="login-form" name="form.register" data-ng-if="!success && !loggedIn" data-ng-submit="register()">
         <div class="form-error" data-ng-repeat="error in errors track by $index">
             <p>{{ error | translate }}</p>
         </div>
@@ -11,7 +11,7 @@
                 name="username"
                 data-ng-model="input.username"
                 required="required" />
-            <span class="input-error" data-ng-show="showError(registerForm, registerForm.username, 'required')">
+            <span class="input-error" data-ng-show="showError(form.register, form.register.username, 'required')">
                 {{ "TR__ERROR_REQUIRED_USERNAME" | translate }}
             </span>
         </label>
@@ -22,10 +22,10 @@
                 name="email"
                 data-ng-model="input.email"
                 required="required" />
-            <span class="input-error" data-ng-show="showError(registerForm, registerForm.email, 'required')">
+            <span class="input-error" data-ng-show="showError(form.register, form.register.email, 'required')">
                 {{ "TR__ERROR_REQUIRED_EMAIL" | translate }}
             </span>
-            <span class="input-error" data-ng-show="showError(registerForm, registerForm.email, 'email')">
+            <span class="input-error" data-ng-show="showError(form.register, form.register.email, 'email')">
                 {{ "TR__ERROR_FORMAT_EMAIL" | translate }}
             </span>
         </label>
@@ -38,10 +38,10 @@
                 required="required"
                 data-ng-minlength="6"
                 data-ng-maxlength="100" />
-            <span class="input-error" data-ng-show="showError(registerForm, registerForm.password, 'required')">
+            <span class="input-error" data-ng-show="showError(form.register, form.register.password, 'required')">
                 {{ "TR__ERROR_REQUIRED_PASSWORD" | translate }}
             </span>
-            <span class="input-error" data-ng-show="showError(registerForm, registerForm.password, 'minlength')">
+            <span class="input-error" data-ng-show="showError(form.register, form.register.password, 'minlength')">
                 {{ "TR__ERROR_TOO_SHORT_PASSWORD" | translate }}
             </span>
         </label>
@@ -51,9 +51,8 @@
                 type="password"
                 name="password_repeat"
                 data-ng-model="input.passwordRepeat"
-                required="required"
-                data-ng-class="{'ng-invalid': (input.password !== input.passwordRepeat) && registerForm.password_repeat.$dirty}"/>
-            <span class="input-error" data-ng-show="(input.password !== input.passwordRepeat) && registerForm.password_repeat.$dirty">
+                required="required" />
+            <span class="input-error" data-ng-show="showError(form.register, form.register.password_repeat, 'repeat')">
                 {{ "TR__ERROR_MATCH_PASSWORD" | translate }}
             </span>
         </label>
@@ -64,7 +63,7 @@
                     link: '&lt;a data-ng-href=&quot;\\{\\{ termsUrl \\}\\}&quot; target=&quot;_blank&quot;&gt;{{ content }}&lt;/a&gt;'
                 }"></span>
             </div>
-            <span class="input-error" data-ng-show="showError(registerForm, registerForm.registerCheck, 'required')">
+            <span class="input-error" data-ng-show="showError(form.register, form.register.registerCheck, 'required')">
                 {{ "TR__ERROR_REQUIRED_TERMS_AND_CONDITIONS" | translate }}
             </span>
         </label>
@@ -90,7 +89,7 @@
                 <span class="label-text">{{ "TR__ENTER_CAPTCHA" | translate }}</span>
                 <input type="text" name="thentos_captcha_guess" required="required"
                        data-ng-model="input.captchaGuess" />
-                <span class="input-error" data-ng-show="showError(registerForm, registerForm.thentos_captcha_guess, 'required')">
+                <span class="input-error" data-ng-show="showError(form.register, form.register.thentos_captcha_guess, 'required')">
                     {{ "TR__ERROR_REQUIRED_CAPTCHA" | translate }}
                 </span>
             </label>
@@ -100,7 +99,7 @@
             name="register"
             value="{{ 'TR__REGISTER' | translate }}"
             class="button-cta"
-            data-ng-disabled="registerForm.$invalid || input.password !== input.passwordRepeat" />
+            data-ng-disabled="form.register.$invalid" />
         <div class="login-info">
             <p data-adh-html-translate="TR__REGISTRATION_LOGIN_INSTEAD" data-translate-templates="{
                 link: '&lt;a href=&quot;/login&quot;&gt;{{ content }}&lt;/a&gt;'

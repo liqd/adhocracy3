@@ -346,6 +346,8 @@ export var listingDirective = (
 export var renominateProposalDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service,
+    $q : angular.IQService,
+    $translate,
     $window : angular.IWindowService
 ) => {
     return {
@@ -362,19 +364,21 @@ export var renominateProposalDirective = (
                 });
             });
             scope.renominate = () => {
-                if ( ! $window.confirm("Do you want to renominate this proposal? (Page will reload)")) {
-                    return;
-                }
-                adhHttp.get(scope.proposalUrl).then((proposal) => {
-                    var patch = {
-                        content_type: proposal.content_type,
-                        data: {}
-                    };
-                    patch.data[SIWorkflowAssignment.nick] = {
-                        workflow_state: "proposed"
-                    };
-                    return adhHttp.put(proposal.path, patch).then(() => {
-                        $window.parent.location.reload();
+                $q.all([$translate("TR__DO_YOU_WANT_TO_RENOMINATE"), $translate("TR__WILL_RELOAD_PAGE")]).then((translated) => {
+                    if (!$window.confirm(translated[0] + " " + translated[1])) {
+                        return;
+                    }
+                    adhHttp.get(scope.proposalUrl).then((proposal) => {
+                        var patch = {
+                            content_type: proposal.content_type,
+                            data: {}
+                        };
+                        patch.data[SIWorkflowAssignment.nick] = {
+                            workflow_state: "proposed"
+                        };
+                        return adhHttp.put(proposal.path, patch).then(() => {
+                            $window.parent.location.reload();
+                        });
                     });
                 });
             };

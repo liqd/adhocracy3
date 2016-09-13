@@ -1,11 +1,9 @@
 {
     "TR__ARCHIVE": "Archive",
     "TR__CREATE_PROPOSAL": "Add proposal",
-    "TR__I_UNDERSTAND": "I understand",
-    "TR__LATER": "Later",
+    "TR__DO_YOU_WANT_TO_RENOMINATE": "Do you want to renominate this proposal?",
     "TR__MEETING_A": "Upcoming meeting",
     "TR__MEETING_B": "Following meeting",
-    "TR__MORE": "More",
     "TR__NEW_PROPOSAL": "New proposal",
     "TR__PROPOSAL_EMPTY_TEXT": "There are no proposals for this meeting yet. Be the first to create one!",
     "TR__S1_DESCRIPTION_PLACEHOLDER": "Add description here",
@@ -18,10 +16,8 @@
     "TR__S1_GO_TO_PLATFORM": "To the platform",
     "TR__S1_RENOMINATE_PROPOSAL": "Renominate proposal",
     "TR__S1_TITLE_PLACEHOLDER": "Add title here",
-    "TR__S1_SWITCH_TO": "Switch to",
     "TR__S1_WORKFLOW_PROPOSE": "Create and rate proposals",
-    "TR__S1_WORKFLOW_SELECT": "Rate proposals",
     "TR__S1_WORKFLOW_RESULT": "Show winner",
-    "TR__SELECTED": "Winner",
-    "TR__SUPPORT": "Support"
+    "TR__S1_WORKFLOW_SELECT": "Rate proposals",
+    "TR__SELECTED": "Winner"
 }

@@ -248,7 +248,6 @@ export var s1ProposalEditColumnDirective = (
 };
 
 export var s1LandingDirective = (
-    $translate: any,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service

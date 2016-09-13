@@ -1,5 +1,4 @@
 {
-    "TR__ACTIVATE": "aktivieren",
     "TR__ACTIVATION_CLOSE_THIS_TAB_AND_PROCEED": "Danke für Deine Registrierung. Dein Account ist nun aktiviert. Du kannst diese Seite schließen und zurück gehen zu {{siteName}}.",
     "TR__ACTIVATION_ERROR_1": "Wir werden Dir innerhalb der nächsten 24 Stunden einen neuen Link zur Authentifizierung zusenden. Bitte überprüfe Deine E-Mails und schaue auch im Spam-Ordner nach.",
     "TR__ACTIVATION_ERROR_2": "Bitte entschuldige die Schwierigkeiten und aktiviere Deinen Account innerhalb der nächsten 6 Tage.",
@@ -11,6 +10,7 @@
     "TR__ADD_TITLE": "{{ title }} hinzufügen",
     "TR__ANONYMIZE": "Anonym veröffentlichen",
     "TR__ANONYMIZE_DEFAULT": "Standardmäßig anonym veröffentlichen",
+    "TR__ANONYMOUS": "anonymer Nutzer",
     "TR__ASK_TO_CONFIRM_HIDE_ACTION": "Möchtest Du diese Resource wirklich entfernen?",
     "TR__BACK_TO_TOP": "nach oben",
     "TR__BADGE_ASSIGNMENT_UPDATED": "Etiketten wurden aktualisiert.",
@@ -53,7 +53,8 @@
     "TR__ERROR_MATCH_PASSWORD": "Passwörter stimmen nicht überein",
     "TR__ERROR_MIN_NUMBER_0": "Bitte eine Zahl größer als 0 eingeben.",
     "TR__ERROR_MUST_BE_A_NUMBER": "Wert muss eine Nummer sein",
-    "TR__ERROR_REQUIRED_CAPTCHA": "Captcha Lösung erforderlich.",
+    "TR__ERROR_REQUIRED": "Bitte etwas ausfüllen",
+    "TR__ERROR_REQUIRED_CAPTCHA": "Captcha Lösung erforderlich",
     "TR__ERROR_REQUIRED_CHECKBOXES": "Bitte etwas auswählen",
     "TR__ERROR_REQUIRED_COUNTRY": "Bitte ein Land auswählen",
     "TR__ERROR_REQUIRED_DESCRIPTION": "Bitte eine Beschreibung eingeben",
@@ -191,6 +192,8 @@
     "TR__VIEW_PROFILE": "Profil anzeigen",
     "TR__VOTES": "Stimmen",
     "TR__WEBSITE": "Webseite",
+    "TR__WILL_RELOAD_PAGE": "Die Seite wird neu geladen.",
+    "TR__WILL_SWITCH_TO_STATE": "Setzt den Prozess in Phase: ",
     "TR__YES": "ja",
     "TR__YOU_VOTED": "Deine Abstimmung:"
 }

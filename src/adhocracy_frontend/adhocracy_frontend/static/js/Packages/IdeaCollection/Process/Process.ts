@@ -60,7 +60,8 @@ export var detailDirective = (
                         scope.data.title = resource.data[SITitle.nick].title;
                         scope.data.shortDescription = resource.data[SIDescription.nick].short_description;
 
-                        if (scope.processProperties.hasLocation) {
+                        scope.hasLocation = scope.processProperties.hasLocation && resource.data[SILocationReference.nick].location;
+                        if (scope.hasLocation) {
                             var locationUrl = resource.data[SILocationReference.nick].location;
                             adhHttp.get(locationUrl).then((location) => {
                                 var polygon = location.data[SIMultiPolygon.nick].coordinates[0][0];

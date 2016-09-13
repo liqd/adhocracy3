@@ -1,12 +1,9 @@
 {
-    "anonymous": "anonymer Nutzer",
     "TR__ARCHIVE": "Archiv",
     "TR__CREATE_PROPOSAL": "Vorschlag machen",
-    "TR__I_UNDERSTAND": "OK, hab's verstanden",
-    "TR__LATER": "Später",
+    "TR__DO_YOU_WANT_TO_RENOMINATE": "Willst Du diesen Vorschlag erneut einbringen?",
     "TR__MEETING_A": "Aktuelle Sitzung",
     "TR__MEETING_B": "Folgende Sitzung",
-    "TR__MORE": "Mehr",
     "TR__NEW_PROPOSAL": "Neuer Vorschlag",
     "TR__PROPOSAL_EMPTY_TEXT": "Es gibt noch keine Vorschläge für diese Sitzung. Mache den ersten Vorschlag!",
     "TR__S1_DESCRIPTION_PLACEHOLDER": "Beschreiben Sie Ihren Vorschlag.",
@@ -17,10 +14,10 @@
     "TR__S1_FACET_STATE_HEADER": "Zustand",
     "TR__S1_GO_HEADER": "Loslegen",
     "TR__S1_GO_TO_PLATFORM": "Zu den Vorschlägen",
+    "TR__S1_RENOMINATE_PROPOSAL": "Erneut vorschlagen",
     "TR__S1_TITLE_PLACEHOLDER": "Hier Titel einfügen",
     "TR__S1_WORKFLOW_PROPOSE": "Vorschläge anlegen und bewerten",
-    "TR__S1_WORKFLOW_SELECT": "Vorschläge bewerten",
     "TR__S1_WORKFLOW_RESULT": "Gewinner zeigen",
-    "TR__SELECTED": "Gewinner",
-    "TR__SUPPORT": "Unterstützen"
+    "TR__S1_WORKFLOW_SELECT": "Vorschläge bewerten",
+    "TR__SELECTED": "Gewinner"
 }

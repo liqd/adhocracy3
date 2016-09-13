@@ -54,9 +54,6 @@ export interface IScope extends angular.IScope {
     config? : AdhConfig.IService;
 }
 
-// FIXME: the following functions duplicate some of the adhResourceWidget functionality
-// They are an experiment on how adhResourceWidget can be improved.  This duplication
-// should be resolved at some point.
 var bindPath = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service,
@@ -73,10 +70,13 @@ var bindPath = (
         if (scope.processProperties.hasLocation) {
             var processUrl = adhTopLevelState.get("processUrl");
             return adhHttp.get(processUrl).then((process) => {
-                var locationUrl = process.data[SILocationReference.nick]["location"];
-                return adhHttp.get(locationUrl).then((location) => {
-                    return location.data[SIMultiPolygon.nick]["coordinates"][0][0];
-                });
+                var locationUrl = process.data[SILocationReference.nick].location;
+                if (locationUrl) {
+                    return adhHttp.get(locationUrl).then((location) => {
+                        return location.data[SIMultiPolygon.nick].coordinates[0][0];
+                    });
+                }
+                return $q.when();
             });
         } else {
             return $q.when();
@@ -108,7 +108,6 @@ var bindPath = (
                     var polygon = args[1];
                     var assignments = args[2];
 
-                    // FIXME: an adapter should take care of this
                     var ratesPro = rates["1"] || 0;
                     var ratesContra = rates["-1"] || 0;
 
@@ -360,11 +359,13 @@ export var createDirective = (
 
             if (scope.processProperties.hasLocation) {
                 adhHttp.get(scope.poolPath).then((pool) => {
-                    var locationUrl = pool.data[SILocationReference.nick]["location"];
-                    adhHttp.get(locationUrl).then((location) => {
-                        var polygon = location.data[SIMultiPolygon.nick]["coordinates"][0][0];
-                        scope.data.polygon = polygon;
-                    });
+                    var locationUrl = pool.data[SILocationReference.nick].location;
+                    if (locationUrl) {
+                        adhHttp.get(locationUrl).then((location) => {
+                            var polygon = location.data[SIMultiPolygon.nick].coordinates[0][0];
+                            scope.data.polygon = polygon;
+                        });
+                    }
                 });
             }
 
