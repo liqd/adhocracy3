@@ -75,10 +75,6 @@ export var register = () => {
                 });
 
                 it("sets view field if specified", (done) => {
-                    service.route("/platform/wlog/@blarg", {}).then((data) => {
-                        expect(data["view"]).toBe("blarg");
-                        done();
-                    });
                     service.route("/platform/wlog/@blarg/", {}).then((data) => {
                         expect(data["view"]).toBe("blarg");
                         done();
@@ -86,10 +82,6 @@ export var register = () => {
                 });
 
                 it("does not set view field if not specified", (done) => {
-                    service.route("/platform/blarg", {}).then((data) => {
-                        expect(data["view"]).toBeFalsy();
-                        done();
-                    });
                     service.route("/platform/blarg/", {}).then((data) => {
                         expect(data["view"]).toBeFalsy();
                         done();
