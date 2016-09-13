@@ -54,9 +54,6 @@ export interface IScope extends angular.IScope {
     config? : AdhConfig.IService;
 }
 
-// FIXME: the following functions duplicate some of the adhResourceWidget functionality
-// They are an experiment on how adhResourceWidget can be improved.  This duplication
-// should be resolved at some point.
 var bindPath = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service,
@@ -111,7 +108,6 @@ var bindPath = (
                     var polygon = args[1];
                     var assignments = args[2];
 
-                    // FIXME: an adapter should take care of this
                     var ratesPro = rates["1"] || 0;
                     var ratesContra = rates["-1"] || 0;
 
