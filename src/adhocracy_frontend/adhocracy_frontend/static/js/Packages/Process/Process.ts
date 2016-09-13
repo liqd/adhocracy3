@@ -79,9 +79,6 @@ export class Service {
     }
 
     public getProcessProperties(processType : string) : IProcessProperties {
-        if (!this.provider.processProperties.hasOwnProperty(processType)) {
-            return;
-        }
         return this.provider.processProperties[processType];
     }
 }
