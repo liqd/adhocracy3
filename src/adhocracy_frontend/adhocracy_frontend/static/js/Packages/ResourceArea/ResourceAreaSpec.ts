@@ -69,6 +69,7 @@ export var register = () => {
                     adhEmbedMock,
                     adhMetaApiMock,
                     adhResourceUrlFilterMock);
+
             });
 
             describe("route", () => {
@@ -99,6 +100,12 @@ export var register = () => {
                     service.route("/platform/wlog/@blarg", {}).then((data) => {
                         expect(data["resourceUrl"]).toBe("http://rest_url/platform/wlog/");
                     }).catch(fail).finally(done);
+                });
+
+                it("fails with 404 if the view is not available", (done) => {
+                    service.route("/platform/wlog/@blub", {}).then(fail).catch((err) => {
+                        expect(err).toBe(404);
+                    }).finally(done);
                 });
             });
 
