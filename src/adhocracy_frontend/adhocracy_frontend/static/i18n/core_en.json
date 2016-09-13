@@ -34,6 +34,7 @@
     "TR__CREATION_DATE": "date",
     "TR__DELETE": "delete",
     "TR__DESCRIPTION": "Description",
+    "TR__DO_YOU_WANT_TO_RENOMINATE": "Do you want to renominate this proposal?",
     "TR__DOCUMENT_EMPTY_TEXT": "No documents yet.",
     "TR__EDIT": "edit",
     "TR__EDITED": "edited",
