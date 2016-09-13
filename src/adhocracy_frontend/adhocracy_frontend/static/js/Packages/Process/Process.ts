@@ -90,6 +90,8 @@ export var workflowSwitchDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
+    $q : angular.IQService,
+    $translate,
     $window : angular.IWindowService
 ) => {
     return {
@@ -112,16 +114,18 @@ export var workflowSwitchDirective = (
             });
 
             scope.switchState = (newState) => {
-                if ( ! $window.confirm("Will switch to process state " + newState + ". (Page will reload)")) {
-                    return;
-                }
-                adhHttp.get(scope.path).then((process) => {
-                    process.data[SIWorkflow.nick] = {
-                        workflow_state: newState
-                    };
-                    process.data[SIName.nick] = undefined;
-                    adhHttp.put(scope.path, process).then((response) => {
-                        $window.parent.location.reload();
+                $q.all([$translate("TR__WILL_SWITCH_TO_STATE"), $translate("TR__WILL_RELOAD_PAGE")]).then((translated) => {
+                    if (!$window.confirm(translated[0] + newState + ". " + translated[1])) {
+                        return;
+                    }
+                    adhHttp.get(scope.path).then((process) => {
+                        process.data[SIWorkflow.nick] = {
+                            workflow_state: newState
+                        };
+                        process.data[SIName.nick] = undefined;
+                        adhHttp.put(scope.path, process).then((response) => {
+                            $window.parent.location.reload();
+                        });
                     });
                 });
             };
