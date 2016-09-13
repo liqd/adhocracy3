@@ -168,6 +168,9 @@ export var listItemDirective = (
                     scope.picture = process.data[SIImageReference.nick].picture;
                 }
                 scope.title = process.data[SITitle.nick].title;
+                var workflow = process.data[SIWorkflow.nick];
+                scope.participationStartDate = getStateData(workflow, "participate").start_date;
+                scope.participationEndDate = getStateData(workflow, "evaluate").start_date;
             });
         }
     };
