@@ -87,27 +87,22 @@ def _batch_post_full_sample_proposal(app_user) -> TestResponse:
 @mark.usefixtures('log')
 class TestMercatorWorkflow:
 
-    @mark.xfail(reason='state is currently set to participate when creating the mercator process')
     def test_draft_participant_cannot_create_proposal(self, app_participant):
         from adhocracy_mercator.resources.mercator import IMercatorProposal
         assert IMercatorProposal not in app_participant.get_postable_types('/')
 
-    @mark.xfail(reason='state is currently set to participate when creating the mercator process')
     def test_draft_participant_cannot_create_proposal_per_batch(self, app_anonymous):
         resp = _batch_post_full_sample_proposal(app_anonymous)
         assert resp.status_code == 403
 
-    @mark.xfail(reason='state is currently set to participate when creating the mercator process')
     def test_change_state_to_announce(self, app_initiator):
         resp = do_transition_to(app_initiator, '/', 'announce')
         assert resp.status_code == 200
 
-    @mark.xfail(reason='state is currently set to participate when creating the mercator process')
     def test_announce_participant_cannot_create_proposal(self, app_participant):
         from adhocracy_mercator.resources.mercator import IMercatorProposal
         assert IMercatorProposal not in app_participant.get_postable_types('/')
 
-    @mark.xfail(reason='state is currently set to participate when creating the mercator process')
     def test_change_state_to_participate(self, app_initiator):
         resp = do_transition_to(app_initiator, '/', 'participate')
         assert resp.status_code == 200
