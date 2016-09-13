@@ -77,29 +77,25 @@ export var register = () => {
                 it("sets view field if specified", (done) => {
                     service.route("/platform/wlog/@blarg/", {}).then((data) => {
                         expect(data["view"]).toBe("blarg");
-                        done();
-                    });
+                    }).catch(fail).finally(done);
                 });
 
                 it("does not set view field if not specified", (done) => {
                     service.route("/platform/blarg/", {}).then((data) => {
                         expect(data["view"]).toBeFalsy();
-                        done();
-                    });
+                    }).catch(fail).finally(done);
                 });
 
                 it("sets contentType", (done) => {
                     service.route("/platform/wlog/@blarg", {}).then((data) => {
                         expect(data["contentType"]).toBe("content_type");
-                        done();
-                    });
+                    }).catch(fail).finally(done);
                 });
 
                 it("sets resourceUrl", (done) => {
                     service.route("/platform/wlog/@blarg", {}).then((data) => {
                         expect(data["resourceUrl"]).toBe("http://rest_url/platform/wlog/");
-                        done();
-                    });
+                    }).catch(fail).finally(done);
                 });
             });
 
