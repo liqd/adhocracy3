@@ -64,8 +64,7 @@ class TestIdeaCollection:
     def test_participate_participant_can_create_badge(self,
                                                       process_url,
                                                       app_participant,
-                                                      app_admin):
-        from adhocracy_core.resources.badge import IBadgeAssignment
+                                                      ):
         url = process_url + '/proposal_0000000/badge_assignments'
         resp = app_participant.options(url)
         badge_assignment = 'adhocracy_core.sheets.badge.IBadgeAssignment'
