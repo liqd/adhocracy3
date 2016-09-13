@@ -48,6 +48,7 @@ sheets:
 For testing, we import the needed stuff and start the Adhocracy app::
 
     >>> from pprint import pprint
+    >>> log = getfixture('log')
     >>> admin = getfixture('app_admin_filestorage')
 
 And an http server to test image download:

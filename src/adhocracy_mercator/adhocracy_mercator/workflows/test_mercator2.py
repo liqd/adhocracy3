@@ -19,6 +19,7 @@ def _post_comment_item(app_user, path='') -> TestResponse:
 
 
 @mark.functional
+@mark.usefixtures('log')
 class TestMercator2:
 
     @fixture

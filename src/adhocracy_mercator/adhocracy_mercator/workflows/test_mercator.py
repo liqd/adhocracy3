@@ -84,6 +84,7 @@ def _batch_post_full_sample_proposal(app_user) -> TestResponse:
 
 
 @mark.functional
+@mark.usefixtures('log')
 class TestMercatorWorkflow:
 
     @mark.xfail(reason='state is currently set to participate when creating the mercator process')

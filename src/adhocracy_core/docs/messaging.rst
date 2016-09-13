@@ -13,11 +13,11 @@ Some imports to work with rest api calls::
 
 Start Adhocracy testapp ::
 
+    >>> log = getfixture('log')
     >>> anonymous = getfixture('app_anonymous')
     >>> participant = getfixture('app_participant')
     >>> moderator = getfixture('app_moderator')
     >>> admin = getfixture('app_admin')
-    >>> log = getfixture('log')
 
 Message to a User
 -----------------
