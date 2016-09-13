@@ -23,9 +23,15 @@ export function parentPath(path : string) : string {
     "use strict";
 
     var result;
+    var root = "";
 
     if (typeof path === "undefined") {
         return undefined;
+    }
+    if (path.substr(0, 4) === "http") {
+        var match = path.match("(https?://[^/]*)(/?.*)");
+        root = match[1];
+        path = match[2];
     }
     if (path[path.length - 1] === "/") {
         result = path.substring(0, path.lastIndexOf("/", path.length - 2) + 1);
@@ -37,7 +43,7 @@ export function parentPath(path : string) : string {
         result = "/";
     }
 
-    return result;
+    return root + result;
 };
 
 
