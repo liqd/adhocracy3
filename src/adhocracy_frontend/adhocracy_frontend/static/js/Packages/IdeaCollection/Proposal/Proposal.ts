@@ -73,10 +73,13 @@ var bindPath = (
         if (scope.processProperties.hasLocation) {
             var processUrl = adhTopLevelState.get("processUrl");
             return adhHttp.get(processUrl).then((process) => {
-                var locationUrl = process.data[SILocationReference.nick]["location"];
-                return adhHttp.get(locationUrl).then((location) => {
-                    return location.data[SIMultiPolygon.nick]["coordinates"][0][0];
-                });
+                var locationUrl = process.data[SILocationReference.nick].location;
+                if (locationUrl) {
+                    return adhHttp.get(locationUrl).then((location) => {
+                        return location.data[SIMultiPolygon.nick].coordinates[0][0];
+                    });
+                }
+                return $q.when();
             });
         } else {
             return $q.when();
@@ -360,11 +363,13 @@ export var createDirective = (
 
             if (scope.processProperties.hasLocation) {
                 adhHttp.get(scope.poolPath).then((pool) => {
-                    var locationUrl = pool.data[SILocationReference.nick]["location"];
-                    adhHttp.get(locationUrl).then((location) => {
-                        var polygon = location.data[SIMultiPolygon.nick]["coordinates"][0][0];
-                        scope.data.polygon = polygon;
-                    });
+                    var locationUrl = pool.data[SILocationReference.nick].location;
+                    if (locationUrl) {
+                        adhHttp.get(locationUrl).then((location) => {
+                            var polygon = location.data[SIMultiPolygon.nick].coordinates[0][0];
+                            scope.data.polygon = polygon;
+                        });
+                    }
                 });
             }
 
