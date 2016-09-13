@@ -38,7 +38,7 @@ export var register = (angular) => {
             adhProcessProvider.templates[RIS1Process.content_type] = "<adh-s1-workbench></adh-s1-workbench>";
         }])
         .directive("adhS1Workbench", ["adhConfig", "adhTopLevelState", Workbench.s1WorkbenchDirective])
-        .directive("adhS1Landing", ["$translate", "adhConfig", "adhHttp", "adhTopLevelState", Workbench.s1LandingDirective])
+        .directive("adhS1Landing", ["adhConfig", "adhHttp", "adhTopLevelState", Workbench.s1LandingDirective])
         .directive("adhS1CurrentColumn", ["adhConfig", "adhHttp", "adhTopLevelState", Workbench.s1CurrentColumnDirective])
         .directive("adhS1NextColumn", ["adhConfig", "adhHttp", "adhTopLevelState", Workbench.s1NextColumnDirective])
         .directive("adhS1ArchiveColumn", ["adhConfig", "adhHttp", "adhTopLevelState", Workbench.s1ArchiveColumnDirective])
