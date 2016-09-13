@@ -7,6 +7,7 @@
     <div class="list-item-body">
         <h3 class="list-item-title">{{title}}</h3>
         <ul class="list-item-meta meta-list">
+            <li class="meta-list-item" data-ng-if="processName">{{processName | translate}}</li><br/>
             <li class="meta-list-item" data-ng-if="participationStartDate && participationEndDate">{{ "TR__PARTICIPATION_DATES" | translate:{
                 startDate: participationStartDate,
                 endDate: participationEndDate}

@@ -160,7 +160,8 @@ export var processViewDirective = (
 
 export var listItemDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service
+    adhHttp : AdhHttp.Service,
+    adhProcess : Service
 ) => {
     return {
         restrict: "E",
@@ -174,6 +175,7 @@ export var listItemDirective = (
                     scope.picture = process.data[SIImageReference.nick].picture;
                 }
                 scope.title = process.data[SITitle.nick].title;
+                scope.processName = adhProcess.getName(process.content_type);
                 var workflow = process.data[SIWorkflow.nick];
                 scope.participationStartDate = getStateData(workflow, "participate").start_date;
                 scope.participationEndDate = getStateData(workflow, "evaluate").start_date;
