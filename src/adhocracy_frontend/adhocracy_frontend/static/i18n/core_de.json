@@ -191,6 +191,8 @@
     "TR__VIEW_PROFILE": "Profil anzeigen",
     "TR__VOTES": "Stimmen",
     "TR__WEBSITE": "Webseite",
+    "TR__WILL_SWITCH_TO_STATE": "Setzt den Prozess in Phase: ",
+    "TR__WILL_RELOAD_PAGE": "Die Seite wird neu geladen.",
     "TR__YES": "ja",
     "TR__YOU_VOTED": "Deine Abstimmung:"
 }

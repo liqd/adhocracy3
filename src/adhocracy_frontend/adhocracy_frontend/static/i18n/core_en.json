@@ -191,6 +191,8 @@
     "TR__VIEW_PROFILE": "view profile",
     "TR__VOTES": "votes",
     "TR__WEBSITE": "website",
+    "TR__WILL_SWITCH_TO_STATE": "Process will switch to phase: ",
+    "TR__WILL_RELOAD_PAGE": "The page will reload.",
     "TR__YES": "yes",
     "TR__YOU_VOTED": "You voted:"
 }
