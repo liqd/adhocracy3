@@ -22,7 +22,10 @@ export var register = () => {
 
             beforeEach(() => {
                 providerMock = {
-                    defaults: {},
+                    defaults: {
+                        "content_type@@@": {},
+                        "content_type@blarg@@": {},
+                    },
                     specifics: {},
                     templates: {},
                     processHeaderSlots: {},
