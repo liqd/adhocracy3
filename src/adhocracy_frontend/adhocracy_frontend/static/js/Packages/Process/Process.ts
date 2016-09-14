@@ -6,6 +6,7 @@ import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhUtil from "../Util/Util";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
+import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
 import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SILocationReference from "../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
 import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
@@ -185,6 +186,7 @@ export var listItemDirective = (
                 var workflow = process.data[SIWorkflow.nick];
                 scope.participationStartDate = getStateData(workflow, "participate").start_date;
                 scope.participationEndDate = getStateData(workflow, "evaluate").start_date;
+                scope.shortDesc = process.data[SIDescription.nick].short_description;
             });
         }
     };
