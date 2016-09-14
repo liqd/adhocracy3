@@ -22,6 +22,12 @@ export var register = () => {
             it("returns '/' for ''", () => {
                 expect(AdhUtil.parentPath("")).toBe("/");
             });
+            it("works with URLs", () => {
+                expect(AdhUtil.parentPath("http://example.com/foo/bar")).toBe("http://example.com/foo");
+                expect(AdhUtil.parentPath("https://example.com/foo/bar")).toBe("https://example.com/foo");
+                expect(AdhUtil.parentPath("http://example.com/foo/bar/")).toBe("http://example.com/foo/");
+                expect(AdhUtil.parentPath("http://example.com")).toBe("http://example.com/");
+            });
         });
 
         describe("normalizeName", () => {
