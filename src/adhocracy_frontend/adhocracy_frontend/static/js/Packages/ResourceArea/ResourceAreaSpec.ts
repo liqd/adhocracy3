@@ -22,7 +22,10 @@ export var register = () => {
 
             beforeEach(() => {
                 providerMock = {
-                    defaults: {},
+                    defaults: {
+                        "content_type@@@": {},
+                        "content_type@blarg@@": {},
+                    },
                     specifics: {},
                     templates: {},
                     processHeaderSlots: {},
@@ -66,6 +69,7 @@ export var register = () => {
                     adhEmbedMock,
                     adhMetaApiMock,
                     adhResourceUrlFilterMock);
+
             });
 
             describe("route", () => {
@@ -75,39 +79,33 @@ export var register = () => {
                 });
 
                 it("sets view field if specified", (done) => {
-                    service.route("/platform/wlog/@blarg", {}).then((data) => {
-                        expect(data["view"]).toBe("blarg");
-                        done();
-                    });
                     service.route("/platform/wlog/@blarg/", {}).then((data) => {
                         expect(data["view"]).toBe("blarg");
-                        done();
-                    });
+                    }).catch(fail).finally(done);
                 });
 
                 it("does not set view field if not specified", (done) => {
-                    service.route("/platform/blarg", {}).then((data) => {
-                        expect(data["view"]).toBeFalsy();
-                        done();
-                    });
                     service.route("/platform/blarg/", {}).then((data) => {
                         expect(data["view"]).toBeFalsy();
-                        done();
-                    });
+                    }).catch(fail).finally(done);
                 });
 
                 it("sets contentType", (done) => {
                     service.route("/platform/wlog/@blarg", {}).then((data) => {
                         expect(data["contentType"]).toBe("content_type");
-                        done();
-                    });
+                    }).catch(fail).finally(done);
                 });
 
                 it("sets resourceUrl", (done) => {
                     service.route("/platform/wlog/@blarg", {}).then((data) => {
                         expect(data["resourceUrl"]).toBe("http://rest_url/platform/wlog/");
-                        done();
-                    });
+                    }).catch(fail).finally(done);
+                });
+
+                it("fails with 404 if the view is not available", (done) => {
+                    service.route("/platform/wlog/@blub", {}).then(fail).catch((err) => {
+                        expect(err).toBe(404);
+                    }).finally(done);
                 });
             });
 
