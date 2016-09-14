@@ -48,8 +48,9 @@ $thumbnail-width: 105px;
     @include container;
     @include rem(padding, 1.25em $padding);
     display: block;
-    border-bottom: 2px solid $color-structure-normal;
     position: relative;
+    margin-bottom: 1em;
+    box-shadow: 0 0 1em $color-structure-introvert;
 
     // reset link styling
     &, &:hover, &:focus {
@@ -90,7 +91,7 @@ $thumbnail-width: 105px;
 
 .list-item-title {
     @include rem(font-size, $font-size-plus);
-    font-weight: $font-weight-medium;
+    font-weight: $font-weight-extrovert;
 }
 
 .list-item-author {
