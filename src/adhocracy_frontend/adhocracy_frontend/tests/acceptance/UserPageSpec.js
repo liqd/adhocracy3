@@ -15,7 +15,7 @@ describe("user page", function() {
     it("is possible to send a message", function(done) {
         shared.loginOtherParticipant();
 
-        var annotatorPage = new UserPages.UserPage().get("0000005");
+        var annotatorPage = new UserPages.UserPage().get("0000000");
 
         annotatorPage.sendMessage(subject, content);
 
@@ -34,7 +34,7 @@ describe("user page", function() {
             expect(mail.text).toContain(content);
             expect(mail.subject).toContain(subject);
             expect(mail.from[0].address).toContain("noreply");
-            expect(mail.to[0].address).toContain("participant");
+            expect(mail.to[0].address).toContain("sysadmin");
             done();
         });
     });
