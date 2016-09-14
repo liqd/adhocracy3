@@ -1,4 +1,4 @@
-    /// <reference path="../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../lib2/types/angular.d.ts"/>
 
 import * as AdhConfig from "../Config/Config";
 import * as AdhHttp from "../Http/Http";
@@ -6,10 +6,12 @@ import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhUtil from "../Util/Util";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
+import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
+import * as SILocationReference from "../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
 import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
+import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIWorkflow from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
-import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
 
 var pkgLocation = "/Process";
 
@@ -51,11 +53,13 @@ export var getStateData = (sheet : SIWorkflow.Sheet, name : string) : IStateData
 
 
 export class Provider implements angular.IServiceProvider {
+    public names : {[processType : string]: string};
     public templates : {[processType : string]: string};
     public processProperties : {[processType : string]: IProcessProperties};
     public $get;
 
     constructor () {
+        this.names = {};
         this.templates = {};
         this.processProperties = {};
 
@@ -71,6 +75,10 @@ export class Service {
         private $injector : angular.auto.IInjectorService
     ) {}
 
+    public getName(processType : string) : string {
+        return this.provider.names[processType];
+    }
+
     public getTemplate(processType : string) : string {
         if (!this.provider.templates.hasOwnProperty(processType)) {
             throw "No template for process type \"" + processType + "\" has been configured.";
@@ -79,9 +87,6 @@ export class Service {
     }
 
     public getProcessProperties(processType : string) : IProcessProperties {
-        if (!this.provider.processProperties.hasOwnProperty(processType)) {
-            return;
-        }
         return this.provider.processProperties[processType];
     }
 }
@@ -154,13 +159,34 @@ export var processViewDirective = (
     };
 };
 
-export var listItemDirective = () => {
+export var listItemDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service,
+    adhProcess : Service
+) => {
     return {
         restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
         scope: {
             path: "@"
         },
-        template: "<a data-ng-href=\"{{ path | adhResourceUrl }}\">{{path}}</a>"
+        link: (scope) => {
+            adhHttp.get(scope.path).then((process) => {
+                if (process.data[SIImageReference.nick] && process.data[SIImageReference.nick].picture) {
+                    scope.picture = process.data[SIImageReference.nick].picture;
+                }
+                scope.title = process.data[SITitle.nick].title;
+                scope.processName = adhProcess.getName(process.content_type);
+                if (process.data[SILocationReference.nick] && process.data[SILocationReference.nick].location) {
+                    adhHttp.get(process.data[SILocationReference.nick].location).then((loc) => {
+                        scope.locationText = loc.data[SITitle.nick].title;
+                    });
+                }
+                var workflow = process.data[SIWorkflow.nick];
+                scope.participationStartDate = getStateData(workflow, "participate").start_date;
+                scope.participationEndDate = getStateData(workflow, "evaluate").start_date;
+            });
+        }
     };
 };
 
