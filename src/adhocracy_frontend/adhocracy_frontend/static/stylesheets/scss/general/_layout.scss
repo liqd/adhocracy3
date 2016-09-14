@@ -65,6 +65,10 @@ depends on a lot of factors:
     }
 }
 
+.main-header-logo {
+    height: 40px;
+}
+
 .l-header {
     @include clearfix;
     @include rem(max-width, $moving-column-single-width-max);
