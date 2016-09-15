@@ -23,7 +23,7 @@ debug_requires = ['adhocracy_frontend[debug]',
                   'meinberlin_lib[debug]',
                   ]
 
-setup(name='meinberlin',
+setup(name='demo',
       version=version.get_git_version(),
       description='Adhocracy meta package for backend/frontend customization.',
       long_description=README + '\n\n' + CHANGES,
@@ -45,6 +45,6 @@ setup(name='meinberlin',
                       'debug': debug_requires},
       entry_points="""\
       [paste.app_factory]
-      main = meinberlin:main
+      main = demo:main
       """,
       )

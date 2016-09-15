@@ -1,0 +1,8 @@
+include RELEASE-VERSION version.py
+recursive-include meinberlin_lib/build *.js *.css *.woff *.eot *.ttf *.svg *.xml *.json *.jpg *.ico *.gif *.png *.html *.md *.mako *.pt
+global-exclude *Spec.js
+prune meinberlin_lib/build/styleguide
+prune meinberlin_lib/build/lib/DefinitelyTyped
+prune meinberlin_lib/build/lib/q
+prune meinberlin_lib/build/lib/jasmine
+prune meinberlin_lib/build/lib/blanket
