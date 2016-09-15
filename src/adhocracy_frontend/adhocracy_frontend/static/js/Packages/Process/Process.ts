@@ -192,7 +192,7 @@ export var listItemDirective = (
     };
 };
 
-export var listingDirective = (adhConfig : AdhConfig.IService) => {
+export var listingDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service) => {
     return {
         restrict: "E",
         scope: {},
@@ -202,6 +202,9 @@ export var listingDirective = (adhConfig : AdhConfig.IService) => {
             scope.params = {
                 depth: "all"
             };
+            adhHttp.get("/").then((root) => {
+                scope.overviewDesc = root.data[SIDescription.nick].description;
+            });
         }
     };
 };
