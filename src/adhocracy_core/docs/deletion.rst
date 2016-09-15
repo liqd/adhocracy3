@@ -138,6 +138,7 @@ Start adhocracy app and log in some users::
     >>> participant = getfixture('app_participant')
     >>> moderator = getfixture('app_moderator')
     >>> admin = getfixture('app_admin')
+    >>> rest_url = getfixture('rest_url')
 
 Lets create some content::
 
@@ -216,7 +217,7 @@ Inspecting the 'updated_resources' listing in the response, we see that
 pool2 was removed::
 
     >>> resp['updated_resources']['removed']
-    ['http://localhost/pool2/']
+    ['.../pool2/']
 
 Now we get an error message when trying to retrieve the pool2::
 
@@ -242,9 +243,9 @@ the child of the pool2 is now hidden too::
 Only the pool1 is still visible in the pool::
 
     >>> resp = anonymous.get('/', params={'elements': 'paths'}).json
-    >>> 'http://localhost/pool1/' in resp['data']['adhocracy_core.sheets.pool.IPool']['elements']
+    >>> rest_url + '/pool1/' in resp['data']['adhocracy_core.sheets.pool.IPool']['elements']
     True
-    >>> 'http://localhost/pool2/' in resp['data']['adhocracy_core.sheets.pool.IPool']['elements']
+    >>> rest_url + '/pool2/' in resp['data']['adhocracy_core.sheets.pool.IPool']['elements']
     False
 
 Sanity check: internally, the backend uses a *private_visibility* index to keep

@@ -4,7 +4,6 @@ from pytest import mark
 import colander
 
 
-
 @mark.usefixtures('log')
 class TestJSONHTTPException:
 

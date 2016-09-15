@@ -16,13 +16,6 @@ def integration(config):
     config.include('adhocracy_core.messaging')
 
 
-@fixture
-def request_(registry):
-    request = testing.DummyRequest()
-    request.registry = registry
-    return request
-
-
 @mark.usefixtures('integration')
 class TestSendMail:
 

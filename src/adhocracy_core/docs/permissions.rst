@@ -267,19 +267,19 @@ Cannot edit process structure::
 
 Can create groups::
 
-   >>> resp = admin.options('http://localhost/principals/groups').json
+   >>> resp = admin.options('/principals/groups').json
    >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
    ['adhocracy_core.resources.principal.IGroup']
 
 Can create users::
 
-   >>> resp = admin.options('http://localhost/principals/users').json
+   >>> resp = admin.options('/principals/users').json
    >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
    ['adhocracy_core.resources.principal.IUser']
 
 Can assign users to groups, and roles to users::
 
-   >>> god_user = 'http://localhost/principals/users/0000000'
+   >>> god_user = '/principals/users/0000000'
    >>> resp = admin.options(god_user).json
    >>> pprint(sorted([s for s in resp['PUT']['request_body']['data']]))
    [...'adhocracy_core.sheets.principal.IPasswordAuthentication',

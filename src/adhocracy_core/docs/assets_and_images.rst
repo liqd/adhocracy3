@@ -50,6 +50,7 @@ For testing, we import the needed stuff and start the Adhocracy app::
     >>> from pprint import pprint
     >>> log = getfixture('log')
     >>> admin = getfixture('app_admin_filestorage')
+    >>> rest_url = getfixture('rest_url')
 
 And an http server to test image download:
 
@@ -70,7 +71,7 @@ We need a pool with an asset pool::
     >>> resp_data = admin.post('/', data).json
     >>> proposal_pool_path = resp_data['path']
     >>> proposal_pool_path
-    'http://localhost/process/'
+    '.../process/'
 
 We can ask the pool for the location of the asset pool::
 
@@ -78,7 +79,7 @@ We can ask the pool for the location of the asset pool::
     >>> asset_pool_path = resp_data['data'][
     ...         'adhocracy_core.sheets.asset.IHasAssetPool']['asset_pool']
     >>> asset_pool_path
-    'http://localhost/process/assets/'
+    '.../process/assets/'
 
 
 Asset Subtypes, MIME Type Validators, resizing
@@ -150,7 +151,7 @@ name is generated randomly::
     'adhocracy_core.resources.image.IImage'
     >>> pic_path = resp_data['path']
     >>> pic_path
-    'http://localhost/process/assets/.../'
+    '.../process/assets/.../'
 
 If the frontend tries to upload an asset that is overly large (more than 16
 MB), the backend responds with an error. Stricter size limits may be
@@ -177,11 +178,11 @@ the asset::
     >>> resp_image_meta = resp_data['data']['adhocracy_core.sheets.image.IImageMetadata']
     >>> pprint(resp_image_meta)
     {'attached_to': [],
-     'detail': 'http://localhost/process/assets/.../0000000/',
+     'detail': '.../process/assets/.../0000000/',
      'filename': 'python.jpg',
      'mime_type': 'image/jpeg',
      'size': '159041',
-     'thumbnail': 'http://localhost/process/assets/.../0000001/'}
+     'thumbnail': '.../process/assets/.../0000001/'}
 
 The actual binary data is *not* part of that JSON document::
 
@@ -277,8 +278,8 @@ As usual, the response lists the resources affected by the transaction::
     >>> sorted(updated_resources)
     ['changed_descendants', 'created', 'modified', 'removed']
     >>> resp_data['updated_resources']['modified']
-    ['http://localhost/process/assets/.../']
-    >>> 'http://localhost/process/' in updated_resources['changed_descendants']
+    ['.../process/assets/.../']
+    >>> rest_url + '/process/' in updated_resources['changed_descendants']
     True
 
 If we download the image metadata again, we see that filename and size have

@@ -64,14 +64,15 @@ class TestIdeaCollection:
     def test_participate_participant_can_create_badge(self,
                                                       process_url,
                                                       app_participant,
+                                                      rest_url,
                                                       ):
         url = process_url + '/proposal_0000000/badge_assignments'
         resp = app_participant.options(url)
         badge_assignment = 'adhocracy_core.sheets.badge.IBadgeAssignment'
         post_request_body = resp.json['POST']['request_body']
         assert badge_assignment in post_request_body[0]['data']
-        badges = ['http://localhost/opin/idea_collection/badges/categories/culture/',
-                  'http://localhost/opin/idea_collection/badges/categories/nature/']
+        badges = [rest_url + '/opin/idea_collection/badges/categories/culture/',
+                  rest_url + '/opin/idea_collection/badges/categories/nature/']
         assert badges[0] in post_request_body[0]['data'][badge_assignment]['badge']
         assert badges[1] in post_request_body[0]['data'][badge_assignment]['badge']
         assert len(post_request_body[0]['data'][badge_assignment]['badge']) is 2
