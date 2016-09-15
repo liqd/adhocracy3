@@ -1,0 +1,7 @@
+demo/bplan:announce->participate
+demo/collaborative_text:announce->participate
+demo/idea_collection:announce->participate
+demo/stadtforum:announce->participate
+demo/buergerhaushalt:announce->participate
+demo/kiezkasse:announce->participate
+demo/alexanderplatz:announce->participate

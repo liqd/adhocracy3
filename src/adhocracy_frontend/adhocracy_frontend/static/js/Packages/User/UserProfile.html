@@ -3,7 +3,7 @@
     data-itemtype="http://schema.org/Person"
     data-ng-if="path">
 
-    <div class="resource-navigation" data-ng-if="messageOptions.POST">
+    <div class="resource-navigation" data-ng-if="messageOptions.POST || options.PUT">
         <adh-resource-dropdown
             data-resource-path="{{path}}"
             data-item-path="{{path}}"

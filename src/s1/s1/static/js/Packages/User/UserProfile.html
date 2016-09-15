@@ -3,11 +3,11 @@
     data-itemtype="http://schema.org/Person"
     data-ng-if="path">
 
-    <div class="resource-navigation" data-ng-if="messageOptions.POST">
+    <div class="resource-navigation" data-ng-if="messageOptions.POST || options.PUT">
         <adh-resource-dropdown
             data-resource-path="{{path}}"
             data-item-path="{{path}}"
-            data-ng-if="options.PUT"
+            data-messaging="messageOptions.POST"
             data-settings="options.PUT">
         </adh-resource-dropdown>
     </div>
@@ -21,7 +21,7 @@
 
         <adh-user-profile-image-edit data-path="{{path}}"></adh-user-profile-image-edit>
 
-        <h1 class="resource-header-title">{{ userBasic.name }}</h1>
+        <h1 class="resource-header-title">{{ userBasic.name | adhTranslateUsername }}</h1>
 
         <div class="resource-header-description">
             <adh-inline-editable-markdown

@@ -1,0 +1,18 @@
+[
+  { "name": "demo_participant",
+    "email": "demo_participant@example.com",
+    "initial-password": "password",
+    "groups": []
+  },
+  { "name": "demo_moderator",
+    "email": "demo_moderator@example.com",
+    "initial-password": "password",
+    "groups": ["demo_moderators"]
+  },
+  { "name": "demo_initiator",
+    "email": "demo_initiator@example.com",
+    "initial-password": "password",
+    "groups": ["demo_initiators"]
+  }
+
+]
