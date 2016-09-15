@@ -13,7 +13,10 @@ import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
 import * as AdhDocument from "./Document";
 import * as AdhEmbed from "../Embed/Embed";
+import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 
+
+import RIGeoDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion";
 
 export var moduleName = "adhDocument";
 
@@ -41,6 +44,9 @@ export var register = (angular) => {
                 .registerDirective("document-create")
                 .registerDirective("document-edit")
                 .registerDirective("document-list-item");
+        }])
+        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
+            adhResourceAreaProvider.names[RIGeoDocumentVersion.content_type] = "TR__DOCUMENTS";
         }])
         .directive("adhDocumentDetail", ["$q", "adhConfig", "adhHttp", "adhGetBadges", "adhTopLevelState", AdhDocument.detailDirective])
         .directive("adhDocumentCreate", [
