@@ -11,10 +11,10 @@ import * as AdhResourceAreaModule from "../ResourceArea/Module";
 import * as AdhStickyModule from "../Sticky/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
-import * as AdhDocument from "./Document";
 import * as AdhEmbed from "../Embed/Embed";
 import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 
+import * as AdhDocument from "./Document";
 
 import RIGeoDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion";
 
