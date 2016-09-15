@@ -1,6 +1,7 @@
 import unittest
 
 from pyramid import testing
+from adhocracy_core.interfaces import API_ROUTE_NAME
 from adhocracy_core.testing import rest_url
 import colander
 import pytest
@@ -8,6 +9,7 @@ import pytest
 
 def _setup_config_and_request(root):
     config = testing.setUp()
+    config.add_route(API_ROUTE_NAME, '/api*traverse')
     request = testing.DummyRequest()
     request.root = root
     request.registry = config.registry

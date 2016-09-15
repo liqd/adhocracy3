@@ -48,7 +48,7 @@ from adhocracy_core.scripts import import_fixture
 broken_header = {'X-User-Path': '/principals/users/0000001',
                  'X-User-Token': ''}
 
-batch_url = '/batch'
+batch_url = '/api/batch'
 
 
 class DummyPool(testing.DummyResource):
@@ -226,8 +226,8 @@ def request_(registry):
 
 @fixture
 def rest_url():
-    rest_url = 'http://localhost'
     """Return API URL."""
+    rest_url = 'http://localhost/api'
     return rest_url
 
 
@@ -420,8 +420,10 @@ def registry_with_content(registry, mock_content_registry):
 @fixture
 def config(request) -> Configurator:
     """Return dummy testing configuration."""
+    from adhocracy_core.interfaces import API_ROUTE_NAME
     config = testing.setUp()
     request.addfinalizer(testing.tearDown)
+    config.add_route(API_ROUTE_NAME, '/api*traverse')
     return config
 
 

@@ -475,7 +475,8 @@ class TestPOSTItemRequestSchema:
                           'root_versions': []}
 
     def test_deserialize_with_root_versions(self, inst, request_, version):
-        root_version_path = request_.resource_url(version)
+        from adhocracy_core.interfaces import API_ROUTE_NAME
+        root_version_path = request_.resource_url(version, route_name=API_ROUTE_NAME)
         result = inst.deserialize({'content_type': IResource.__identifier__,
                                    'data': {},
                                    'root_versions': [root_version_path]})

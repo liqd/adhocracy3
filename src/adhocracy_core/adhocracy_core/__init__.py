@@ -12,6 +12,7 @@ import transaction
 from adhocracy_core.authentication import TokenHeaderAuthenticationPolicy
 from adhocracy_core.authentication import MultiRouteAuthenticationPolicy
 from adhocracy_core.interfaces import SDI_ROUTE_NAME
+from adhocracy_core.interfaces import API_ROUTE_NAME
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.resources.principal import groups_and_roles_finder
 from adhocracy_core.auditing import set_auditlog
@@ -134,7 +135,7 @@ def _create_authentication_policy(settings, config: Configurator)\
                                                    algorithm='HS512',
                                                    callback=groupfinder,
                                                    timeout=timeout)
-    multi_policy.add_policy(None, token_policy)
+    multi_policy.add_policy(API_ROUTE_NAME, token_policy)
     session_factory = SignedCookieSessionFactory(secret,
                                                  httponly=True,
                                                  timeout=timeout)

@@ -624,17 +624,19 @@ class TestUniqueReferences:
         assert inst.deserialize(colander.null) == []
 
     def test_valid_deserialize_with_duplication(self, request_, context):
+        from adhocracy_core.interfaces import API_ROUTE_NAME
         inst = self.make_one().bind(request=request_, context=context)
         target = context['target']
-        target_url = request_.resource_url(target)
+        target_url = request_.resource_url(target, route_name=API_ROUTE_NAME)
         assert inst.deserialize([target_url, target_url]) == [target]
 
     def test_valid_deserialize_without_duplication(self, request_, context):
+        from adhocracy_core.interfaces import API_ROUTE_NAME
         inst = self.make_one().bind(request=request_, context=context)
         target = context['target']
         target1 = context['target1']
-        target_url = request_.resource_url(target)
-        target1_url = request_.resource_url(target1)
+        target_url = request_.resource_url(target, route_name=API_ROUTE_NAME)
+        target1_url = request_.resource_url(target1, route_name=API_ROUTE_NAME)
         assert inst.deserialize([target_url, target1_url]) == [target, target1]
 
 

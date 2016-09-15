@@ -22,7 +22,7 @@ Start Adhocracy testapp and login admin::
     >>> app_admin = getfixture('app_admin')
     >>> rest_url = getfixture('rest_url')
     >>> rest_url
-    'http://localhost'
+    'http://localhost/api'
 
 .. _api-resource-structure:
 

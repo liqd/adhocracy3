@@ -70,7 +70,7 @@ The organization for the B-Plan needs to exist beforehand in the a3
 platform.
 
     >>> from webtest import TestApp
-    >>> rest_url = 'http://localhost'
+    >>> rest_url = 'http://localhost/api'
     >>> app_router = getfixture('app_router')
     >>> testapp = TestApp(app_router)
     >>> resp = testapp.post_json(rest_url + '/login_username',
