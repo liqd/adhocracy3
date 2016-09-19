@@ -6,13 +6,13 @@ import * as AdhImageModule from "../Image/Module";
 import * as AdhInjectModule from "../Inject/Module";
 import * as AdhMappingModule from "../Mapping/Module";
 import * as AdhMarkdownModule from "../Markdown/Module";
+import * as AdhNamesModule from "../Names/Module";
 import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
-import * as AdhResourceAreaModule from "../ResourceArea/Module";
 import * as AdhStickyModule from "../Sticky/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
 import * as AdhEmbed from "../Embed/Embed";
-import * as AdhResourceArea from "../ResourceArea/ResourceArea";
+import * as AdhNames from "../Names/Names";
 
 import * as AdhDocument from "./Document";
 
@@ -33,8 +33,8 @@ export var register = (angular) => {
             AdhInjectModule.moduleName,
             AdhMappingModule.moduleName,
             AdhMarkdownModule.moduleName,
+            AdhNamesModule.moduleName,
             AdhPreliminaryNamesModule.moduleName,
-            AdhResourceAreaModule.moduleName,
             AdhStickyModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
@@ -45,8 +45,8 @@ export var register = (angular) => {
                 .registerDirective("document-edit")
                 .registerDirective("document-list-item");
         }])
-        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            adhResourceAreaProvider.names[RIGeoDocumentVersion.content_type] = "TR__DOCUMENTS";
+        .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
+            adhNamesProvider.names[RIGeoDocumentVersion.content_type] = "TR__RESOURCE_DOCUMENT";
         }])
         .directive("adhDocumentDetail", ["$q", "adhConfig", "adhHttp", "adhGetBadges", "adhTopLevelState", AdhDocument.detailDirective])
         .directive("adhDocumentCreate", [

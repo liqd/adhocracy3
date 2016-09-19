@@ -66,7 +66,9 @@ import * as AdhWebSocketModule from "./Packages/WebSocket/Module";
 
 import * as AdhConfig from "./Packages/Config/Config";
 import * as AdhDebateWorkbench from "./Packages/DebateWorkbench/DebateWorkbench";
+import * as AdhNames from "./Packages/Names/Names";
 import * as AdhProcess from "./Packages/Process/Process";
+import * as AdhResourceArea from "./Packages/ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "./Packages/TopLevelState/TopLevelState";
 
 import RICollaborativeTextProcess from "./Resources_/adhocracy_meinberlin/resources/collaborative_text/IProcess";
@@ -171,11 +173,15 @@ export var init = (config : AdhConfig.IService, metaApi) => {
 
     // register debate workbench
     app.config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-        adhProcessProvider.names[RICollaborativeTextProcess.content_type] = "TR__PROCESS_COLLABORATIVE_TEXT_EDITING";
         adhProcessProvider.templates[RICollaborativeTextProcess.content_type] =
             "<adh-debate-workbench></adh-debate-workbench>";
     }]);
-    app.config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RICollaborativeTextProcess)]);
+    app.config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
+        AdhDebateWorkbench.registerRoutes(RICollaborativeTextProcess);
+    }]);
+    app.config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
+        adhNamesProvider.names[RICollaborativeTextProcess.content_type] = "TR__RESOURCE_COLLABORATIVE_TEXT_EDITING";
+    }]);
 
     app.value("angular", angular);
 
