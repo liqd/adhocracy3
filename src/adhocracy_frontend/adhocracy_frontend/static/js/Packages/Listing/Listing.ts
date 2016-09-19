@@ -72,6 +72,7 @@ export interface ListingScope<Container> extends angular.IScope {
     disableItem : (facet : IFacet, item : IFacetItem) => void;
     setSort : (sort : string) => void;
     counter? : boolean;
+    counterValue? : number;
 }
 
 export interface IFacetsScope extends angular.IScope {
@@ -114,7 +115,8 @@ export class Listing<Container extends ResourcesBase.IResource> {
                 emptyText: "@",
                 // use this to pass custom data to the injected templates
                 custom: "=?",
-                counter: "=?"
+                counter: "=?",
+                counterValue: "@?"
             },
             transclude: true,
             link: (scope, element, attrs, controller, transclude) => {
