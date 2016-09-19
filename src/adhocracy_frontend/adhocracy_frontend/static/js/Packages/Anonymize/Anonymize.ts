@@ -46,8 +46,8 @@ export var anonymizeDirective = (
                     _getAnonymizeOptional(scope.url, scope.method)
                 ]).then((args) => {
                     scope.isOptional = args[1];
-                    scope.data.model = scope.isOptional ? adhUser.data.anonymize : false;
-                    scope.data.model = scope.localDefault || scope.data.model;
+                    var def = typeof scope.localDefault === "undefined" ? adhUser.data.anonymize : scope.localDefault;
+                    scope.data.model = scope.isOptional ? def : false;
                 });
 
                 scope.$watch("data.model", (model) => {
