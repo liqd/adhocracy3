@@ -29,6 +29,7 @@ multipolygon_meta = simple_meta._replace(
         adhocracy_core.sheets.name.IName,
         adhocracy_core.sheets.geo.IMultiPolygon,
     ),
+    is_sdi_addable=True,
 )
 
 
