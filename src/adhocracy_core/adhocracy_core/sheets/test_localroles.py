@@ -111,7 +111,8 @@ class TestLocalRolesSheet:
         inst = meta.sheet_class(meta, context, registry)
         inst.set({'local_roles': [{'principal': 'userid',
                                    'roles': ['role:admin']}]})
-        set_roles.assert_called_with(inst.context, {'userid': {'role:admin'}})
+        set_roles.assert_called_with(inst.context, {'userid': {'role:admin'}},
+                                     registry)
 
     @mark.usefixtures('integration')
     def test_includeme_register_sheet(self, meta, registry):

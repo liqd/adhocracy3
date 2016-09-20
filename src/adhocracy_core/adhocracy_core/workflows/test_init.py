@@ -30,14 +30,14 @@ class TestACLocalRolesState:
         set_acl = mocker.patch('adhocracy_core.workflows.set_acl')
         inst = self.make_one(acl=[])
         inst(context, request_, None, None)
-        set_acl.assert_called_with(context, [], registry=request_.registry)
+        set_acl.assert_called_with(context, [], request_.registry)
 
     def test_call_with_local_roles(self, context, mocker, request_):
         add_local_roles = mocker.patch('adhocracy_core.workflows.add_local_roles')
         inst = self.make_one(local_roles={})
         inst(context, request_, None, None)
         add_local_roles.assert_called_with(context, {},
-                                           registry=request_.registry)
+                                           request_.registry)
 
 
 class TestAdhocracyACLWorkflow:
