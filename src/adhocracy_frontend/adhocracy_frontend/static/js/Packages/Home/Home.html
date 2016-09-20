@@ -1,4 +1,8 @@
 <div class="l-page">
+    <header class="resource-header" data-ng-if="title">
+        <h1 class="resource-header-title">{{title}}</h1>
+        <a href="/register" class="resource-header-action button-cta">{{ "TR__REGISTER" | translate }}</a>
+    </header>
     <div class="listing-info-text" data-ng-if="description">
         <adh-parse-markdown data-parsetext="description"></adh-parse-markdown>
     </div>
