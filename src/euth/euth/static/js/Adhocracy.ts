@@ -9,7 +9,7 @@ import * as angular from "angular";
 import * as angularAnimate from "angularAnimate"; if (angularAnimate) { ; };
 import * as angularAria from "angularAria"; if (angularAria) { ; };
 import * as angularMessages from "angularMessages"; if (angularMessages) { ; };
-import * as angularCache from "angularCache"; if (angularCache) { ; };
+import * as angularCache from "angular-cache"; if (angularCache) { ; };
 import * as angularTranslate from "angularTranslate"; if (angularTranslate) { ; };
 import * as angularTranslateLoader from "angularTranslateLoader"; if (angularTranslateLoader) { ; };
 import * as angularElastic from "angularElastic"; if (angularElastic) { ; };
