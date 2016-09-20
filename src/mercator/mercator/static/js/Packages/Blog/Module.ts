@@ -11,7 +11,7 @@ import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 
 import * as Blog from "./Blog";
 
-import RIParagraphVersion from "../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion";
+import RIDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
 
 
 export var moduleName = "adhBlog";
@@ -34,7 +34,7 @@ export var register = (angular) => {
                 .registerDirective("blog");
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            adhResourceAreaProvider.names[RIParagraphVersion.content_type] = "TR__PARAGRAPHS";
+            adhResourceAreaProvider.names[RIDocumentVersion.content_type] = "TR__DOCUMENTS";
         }])
         .directive("adhBlogPost", [
             "$q",
