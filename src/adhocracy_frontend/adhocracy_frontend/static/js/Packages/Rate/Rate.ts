@@ -249,15 +249,17 @@ export var directiveFactory = (template : string, sheetName : string) => (
                 if (typeof myRateResource !== "undefined") {
                     return $q.when(myRateResource);
                 } else {
-                    return adhHttp.withTransaction((transaction) => {
-                        var item = transaction.post(postPoolPath, new RIRate({preliminaryNames: adhPreliminaryNames}));
-                        var version = transaction.get(item.first_version_path);
+                    return getAnonymizeInfo(postPoolPath, "POST").then((anonymizeInfo) => {
+                        return adhHttp.withTransaction((transaction) => {
+                            var item = transaction.post(postPoolPath, new RIRate({preliminaryNames: adhPreliminaryNames}));
+                            var version = transaction.get(item.first_version_path);
 
-                        return transaction.commit()
-                            .then((responses) => {
-                                storeMyRateResource(<RIRateVersion>responses[version.index]);
-                                return myRateResource;
-                            });
+                            return transaction.commit({ anonymize : anonymizeInfo.defaultValue })
+                                .then((responses) => {
+                                    storeMyRateResource(<RIRateVersion>responses[version.index]);
+                                    return myRateResource;
+                                });
+                        });
                     });
                 }
             };
