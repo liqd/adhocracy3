@@ -240,10 +240,11 @@ def get_acl(resource) -> []:
     return _get_acl(resource, default=[])
 
 
-def get_acl_all(resource) -> []:
+def get_acl_lineage(resource) -> []:
     """Return :term:`ACL` of the `resource` inclusive inherited acl."""
     acl_all = []
-    for location in lineage(resource):
+    parent = getattr(resource, '__parent__', None)
+    for location in lineage(parent):
         acl = _get_acl(location, default=[])
         for ace in acl:
             acl_all.append(ace)
@@ -273,7 +274,7 @@ def _set_acl_with_local_roles(resource, acl: [], registry: Registry) -> []:
     The creator local role is ignored, it must not be inherited
     """
     roles_all = get_local_roles_all(resource)
-    acl_all = acl + get_acl_all(resource)
+    acl_all = acl + get_acl_lineage(resource)
     acl_roles = set()
     for principal, local_roles in roles_all.items():
         for ace_action, ace_principal, ace_permission in acl_all:

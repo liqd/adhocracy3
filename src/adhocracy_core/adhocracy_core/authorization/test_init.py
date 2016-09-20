@@ -342,8 +342,8 @@ def test_create_fake_god_request(registry):
 class TestSetACLWithLocalRoles:
 
     @fixture
-    def acl_all(self, mocker):
-        return mocker.patch('adhocracy_core.authorization.get_acl_all',
+    def acl_lineage(self, mocker):
+        return mocker.patch('adhocracy_core.authorization.get_acl_lineage',
                             magic_spec=True,
                             return_value=[])
 
@@ -362,24 +362,24 @@ class TestSetACLWithLocalRoles:
         from . import _set_acl_with_local_roles
         return _set_acl_with_local_roles(*args)
 
-    def test_set_acl(self, context, acl_all, roles_all, _set_acl, registry):
-        acl_all.return_value = []
+    def test_set_acl(self, context, acl_lineage, roles_all, _set_acl, registry):
+        acl_lineage.return_value = []
         roles_all.return_value = {}
         self.call_fut(context, [('Allow', 'role:admin', 'view')], registry)
         _set_acl.assert_called_with(context,
                                     [('Allow', 'role:admin', 'view')],
                                     registry=registry)
 
-    def test_set_empty_acl(self, context, acl_all, roles_all, _set_acl,
+    def test_set_empty_acl(self, context, acl_lineage, roles_all, _set_acl,
                            registry):
-        acl_all.return_value = []
+        acl_lineage.return_value = []
         roles_all.return_value = {}
         self.call_fut(context, [], registry)
         _set_acl.assert_called_with(context, [], registry=registry)
 
-    def test_add_role_to_local_acl(self, context, acl_all, roles_all,
+    def test_add_role_to_local_acl(self, context, acl_lineage, roles_all,
                                    _set_acl, registry):
-        acl_all.return_value = []
+        acl_lineage.return_value = []
         roles_all.return_value = {'admin': {'role:admin'}}
         self.call_fut(context, [('Allow', 'role:admin', 'view')], registry)
         _set_acl.assert_called_with(context,
@@ -387,33 +387,33 @@ class TestSetACLWithLocalRoles:
                                      ('Allow', 'role:admin', 'view')],
                                     registry=registry)
 
-    def test_add_role_to_inherited_acl(self, context, acl_all, roles_all,
+    def test_add_role_to_inherited_acl(self, context, acl_lineage, roles_all,
                                        _set_acl, registry):
-        acl_all.return_value = [('Allow', 'role:admin', 'view')]
+        acl_lineage.return_value = [('Allow', 'role:admin', 'view')]
         roles_all.return_value = {'admin': {'role:admin'}}
         self.call_fut(context, [], registry)
         _set_acl.assert_called_with(context,
                                     [('Allow', 'admin', 'view')],
                                     registry=registry)
 
-    def test_dont_add_role_if_not_matching(self, context, acl_all, roles_all,
+    def test_dont_add_role_if_not_matching(self, context, acl_lineage, roles_all,
                                            _set_acl, registry):
-        acl_all.return_value = [('Allow', 'role:admin', 'view')]
+        acl_lineage.return_value = [('Allow', 'role:admin', 'view')]
         roles_all.return_value = {'User': {'role:participant'}}
         self.call_fut(context, [], registry)
         _set_acl.assert_called_with(context, [], registry=registry)
 
-    def test_dont_add_role_if_creator(self, context, acl_all, roles_all,
+    def test_dont_add_role_if_creator(self, context, acl_lineage, roles_all,
                                       _set_acl, registry):
         from . import CREATOR_ROLEID
-        acl_all.return_value = [('Allow', CREATOR_ROLEID, 'view')]
+        acl_lineage.return_value = [('Allow', CREATOR_ROLEID, 'view')]
         roles_all.return_value = {'admin': {CREATOR_ROLEID}}
         self.call_fut(context, [], registry)
         _set_acl.assert_called_with(context, [], registry=registry)
 
-    def test_dont_add_role_if_ace_exists(self, context, acl_all, roles_all,
+    def test_dont_add_role_if_ace_exists(self, context, acl_lineage, roles_all,
                                           _set_acl, registry):
-        acl_all.return_value = [('Allow', 'role:admin', 'view'),
+        acl_lineage.return_value = [('Allow', 'role:admin', 'view'),
                                 ('Allow', 'admin', 'view')]
         roles_all.return_value = {'admin': {'role:admin'}}
         self.call_fut(context, [], registry) == []
@@ -431,14 +431,13 @@ def test_get_acl_return_acl(context):
     assert get_acl(context) == [('Allow', 'Admin', 'view')]
 
 
-def test_get_acl_all_return_inherited_acl(context):
-    from . import get_acl_all
+def test_get_acl_lineage_return_inherited_acl(context):
+    from . import get_acl_lineage
     grand_parent = testing.DummyResource(__acl__=[('Allow', 'Admin', 'view')])
     grand_parent['parent'] = testing.DummyResource()
     grand_parent['parent']['child'] = context
     context.__acl__ = [('Deny', 'Admin', 'view')]
-    assert get_acl_all(context) == [('Deny', 'Admin', 'view'),
-                                    ('Allow', 'Admin', 'view')]
+    assert get_acl_lineage(context) == [('Allow', 'Admin', 'view')]
 
 
 class TestSetAcl:
