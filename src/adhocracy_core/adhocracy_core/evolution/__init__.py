@@ -952,7 +952,7 @@ def add_allow_add_anonymized_sheet_to_rates(root,
 
 
 @log_migration
-def add_local_roles_to_acl(root, registry):
+def add_local_roles_to_acl(root, registry):  # pragma: no cover
     """Add ACE based on local roles to acl (process/organisation, proposal)."""
     from adhocracy_core.authorization import get_acl
     from adhocracy_core.authorization import _set_acl_with_local_roles
