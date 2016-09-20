@@ -54,9 +54,9 @@ def deferred_default_short_description(node: MappingSchema, kw: dict) -> str:
     """Return default s1  short description for `context` resource."""
     creating = kw['creating']
     context = kw['context']
-    if IProcess.providedBy(context):
-        return DEFAULT_S1_SHORT_DESCRIPTION
-    elif creating and creating.iresource == IProcess:
+    is_process = IProcess.providedBy(context)
+    is_creating_process = creating and creating.iresource == IProcess
+    if is_process or is_creating_process:
         return DEFAULT_S1_SHORT_DESCRIPTION
     else:
         return ''
@@ -67,9 +67,9 @@ def deferred_default_description(node: MappingSchema, kw: dict) -> str:
     """Return default s1 description for `context` resource."""
     creating = kw['creating']
     context = kw['context']
-    if IProcess.providedBy(context):
-        return DEFAULT_S1_DESCRIPTION
-    elif creating and creating.iresource == IProcess:
+    is_process = IProcess.providedBy(context)
+    is_creating_process = creating and creating.iresource == IProcess
+    if is_process or is_creating_process:
         return DEFAULT_S1_DESCRIPTION
     else:
         return ''
