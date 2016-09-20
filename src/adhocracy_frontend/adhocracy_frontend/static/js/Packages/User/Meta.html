@@ -3,5 +3,5 @@
 ><span data-ng-if="noLink" class="user-meta">{{name || userBasic.name | adhTranslateUsername }}</span
 ><a class="user-meta" data-ng-href="{{ path | adhResourceUrl }}" data-ng-if="!noLink">{{name || userBasic.name | translate }}</a>
 <span data-ng-repeat="assignment in assignments">
-	<span class="badge">{{ assignment.title }}</span>
+    <span class="badge">{{ assignment.title }}</span>
 </span>
