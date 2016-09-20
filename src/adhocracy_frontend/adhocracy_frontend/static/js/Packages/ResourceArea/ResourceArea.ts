@@ -438,3 +438,8 @@ export var directive = (adhResourceArea : Service, $compile : angular.ICompileSe
         }
     };
 };
+
+
+export var nameFilter = (adhResourceArea : Service) => (contentType : string) : string => {
+    return adhResourceArea.getName(contentType);
+};

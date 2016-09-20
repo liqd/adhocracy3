@@ -67,7 +67,6 @@ export var register = (angular) => {
             adhEmbedProvider.registerDirective("mercator-2016-proposal-detail");
             adhEmbedProvider.registerDirective("mercator-2016-proposal-listitem");
         }])
-        // FIXME: doesn't work
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider) => {
             adhResourceAreaProvider.names[RIMercatorProposal.content_type] = "TR__PROPOSALS";
         }])

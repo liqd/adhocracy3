@@ -45,7 +45,6 @@ export type IPredicate = string | {[key : string]: string}
 export interface ListingScope<Container> extends angular.IScope {
     path : string;
     contentType? : string;
-    contentName? : string;
     facets? : IFacet[];
     sort? : string;
     sorts? : ISortItem[];
@@ -134,8 +133,6 @@ export class Listing<Container extends ResourcesBase.IResource> {
                 adhPermissions.bindScope($scope, () => $scope.poolPath, "poolOptions");
 
                 $scope.createPath = adhPreliminaryNames.nextPreliminary();
-
-                $scope.contentName = adhResourceArea.getName($scope.contentType);
 
                 var getElements = (limit? : number, offset? : number) : angular.IPromise<Container> => {
                     var params = <any>{};
