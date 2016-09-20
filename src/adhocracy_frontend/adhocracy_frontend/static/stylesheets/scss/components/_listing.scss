@@ -16,6 +16,7 @@ a form for creating new elements. This form is then always visible.
     <form class="listing-create-form debug-placeholder">
         Create Form
     </form>
+    <div class="listing-counter">2 entries</div>
     <ol class="listing-elements">
         <li class="listing-element debug-placeholder">Element1</li>
         <li class="listing-element debug-placeholder">Element2</li>
@@ -30,10 +31,7 @@ a form for creating new elements. This form is then always visible.
 
 .listing-counter,
 .listing-info-text {
-    @include container;
     @include rem(padding, 1.25em $padding);
-    display: block;
-    position: relative;
     margin-bottom: 1em;
     background: $color-background-base-introvert;
 }
