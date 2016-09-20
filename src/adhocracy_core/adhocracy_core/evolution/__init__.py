@@ -16,7 +16,6 @@ from zope.interface.interfaces import IInterface
 
 from adhocracy_core.resources.principal import allow_create_asset_authenticated
 from adhocracy_core.catalog import ICatalogsService
-from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ISimple
@@ -50,9 +49,7 @@ from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.relation import ICanPolarize
 from adhocracy_core.sheets.relation import IPolarizable
 from adhocracy_core.sheets.title import ITitle
-from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
-from adhocracy_core.utils import has_annotation_sheet_data
 from adhocracy_core.workflows import update_workflow_state_acls
 
 logger = logging.getLogger(__name__)
@@ -451,42 +448,8 @@ def add_image_reference_to_users(root, registry):  # pragma: no cover
     migrate_new_sheet(root, IUser, IImageReference)
 
 
-@log_migration
 def remove_empty_first_versions(root, registry):  # pragma: no cover
-    """Remove empty first versions."""
-    catalogs = find_service(root, 'catalogs')
-    items = _search_for_interfaces(catalogs, IItem)
-    count = len(items)
-    for index, item in enumerate(items):
-        logger.info('Migrating resource {0} of {1}'.format(index + 1, count))
-        if 'VERSION_0000000' not in item:
-            continue
-        first_version = item['VERSION_0000000']
-        has_sheet_data = has_annotation_sheet_data(first_version)\
-            or hasattr(first_version, 'rate')
-        has_follower = _has_follower(first_version, registry)
-        if not has_sheet_data and has_follower:
-            logger.info('Delete empty version {0}.'.format(first_version))
-            del item['VERSION_0000000']
-
-
-def _is_version_without_data(version: IItemVersion)\
-        -> bool:  # pragma: no cover
-    for attribute in version.__dict__:
-        if attribute.startswith('_sheet_'):
-            return False
-        if attribute == 'rate':
-            return False
-    else:
-        return True
-
-
-def _has_follower(version: IItemVersion,
-                  registry: Registry) -> bool:  # pragma: no cover
-    followed_by = registry.content.get_sheet_field(version,
-                                                   IVersionable,
-                                                   'followed_by')
-    return followed_by != []
+    """Outdated."""
 
 
 @log_migration

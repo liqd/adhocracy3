@@ -180,13 +180,14 @@ def remove_workflow_state_data_end_date(root, registry):
         state_data = workflow_assignment.get()['state_data']
         if len(state_data) > 0:
             state_data_participate = state_data[0]
-            start_date = state_data_participate['start_date']
-            end_date = state_data_participate['end_date']
-            workflow_assignment.set(
-                {'state_data': [{'name': 'participate', 'description': '',
-                                 'start_date': start_date},
-                                {'name': 'closed', 'description': '',
-                                 'start_date': end_date}]})
+            if 'end_date' in state_data_participate:
+                start_date = state_data_participate['start_date']
+                end_date = state_data_participate['end_date']
+                workflow_assignment.set(
+                    {'state_data': [{'name': 'participate', 'description': '',
+                                     'start_date': start_date},
+                                    {'name': 'closed', 'description': '',
+                                     'start_date': end_date}]})
 
 
 @log_migration
