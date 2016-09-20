@@ -13,7 +13,7 @@ from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 from substanced.interfaces import IRoot
 
-from adhocracy_core.authorization import set_local_roles
+from adhocracy_core.authorization import add_local_roles
 from adhocracy_core.authentication import set_anonymized_creator
 from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.interfaces import IPool
@@ -266,7 +266,7 @@ class ResourceFactory:
                                 ):
         if creator and not anonymized_creator:
             userid = resource_path(creator)
-            set_local_roles(resource, {userid: {'role:creator'}}, registry)
+            add_local_roles(resource, {userid: {'role:creator'}}, registry)
         elif creator and anonymized_creator:
             userid = resource_path(anonymized_creator)
             set_anonymized_creator(resource, userid)
