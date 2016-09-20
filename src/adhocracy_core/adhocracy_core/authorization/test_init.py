@@ -188,6 +188,14 @@ def test_set_local_roles_update_acl(context, registry, set_acl_with_roles):
                                           [('principal', 'role:admin', 'view')],
                                           registry)
 
+def test_set_local_roles_removes_old_role_aces(context, registry,
+                                               set_acl_with_roles):
+    from . import set_local_roles
+    context.__acl__ = [('Allow', 'group:admin', 'view')]
+    new_roles = {}
+    set_local_roles(context, new_roles, registry)
+    set_acl_with_roles.assert_called_with(context, [], registry)
+
 
 def test_add_local_roles_non_update_roles(context, registry):
     from . import add_local_roles

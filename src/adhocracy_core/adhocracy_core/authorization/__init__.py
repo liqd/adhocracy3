@@ -90,6 +90,7 @@ def set_local_roles(resource, new_local_roles: dict, registry: Registry):
     _assert_values_have_set_type(new_local_roles)
     _set_local_roles(resource, new_local_roles, registry)
     acl = get_acl(resource)
+    acl = _remove_local_role_permissions_from_acl(acl)
     _set_acl_with_local_roles(resource, acl, registry)
 
 
@@ -256,6 +257,8 @@ def set_acl(resource, acl: list, registry: Registry):
 
     Every :term:`ACE` in the `acl` has to be a list of 3 strings.
     Permission given by :term:`local_role` are added to the existing acl.
+    Manually adding :term:`ACEs` containing group principals is not allowed,
+    as are used for local_role permissions.
     """
     _assert_list_of_list_of_strings(acl)
     _set_acl_with_local_roles(resource, acl, registry)
@@ -286,6 +289,16 @@ def _set_acl_with_local_roles(resource, acl: [], registry: Registry) -> []:
                     acl_roles.add(local_role_ace)
     acl = list(acl_roles) + acl
     _set_acl(resource, acl, registry=registry)
+
+
+def _remove_local_role_permissions_from_acl(acl: []) -> []:
+    """Remove :term:`local_role` permissions from the :term:`ACL`."""
+    acl_without_local_roles = []
+    for ace in acl:
+        _, ace_principal, _ = ace
+        if not 'group:' in ace_principal:
+            acl_without_local_roles.append(ace)
+    return acl_without_local_roles
 
 
 def includeme(config):
