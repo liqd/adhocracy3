@@ -32,6 +32,7 @@ import * as AdhDateTimeModule from "./Packages/DateTime/Module";
 import * as AdhDoneModule from "./Packages/Done/Module";
 import * as AdhEmbedModule from "./Packages/Embed/Module";
 import * as AdhEventManagerModule from "./Packages/EventManager/Module";
+import * as AdhHomeModule from "./Packages/Home/Module";
 import * as AdhHttpModule from "./Packages/Http/Module";
 import * as AdhImageModule from "./Packages/Image/Module";
 import * as AdhInjectModule from "./Packages/Inject/Module";
@@ -173,6 +174,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhDoneModule.register(angular);
     AdhEmbedModule.register(angular);
     AdhEventManagerModule.register(angular);
+    AdhHomeModule.register(angular);
     AdhHttpModule.register(angular, config);
     AdhImageModule.register(angular);
     AdhInjectModule.register(angular);
