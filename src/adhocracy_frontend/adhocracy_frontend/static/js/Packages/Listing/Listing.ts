@@ -73,7 +73,7 @@ export interface ListingScope<Container> extends angular.IScope {
     setSort : (sort : string) => void;
     counter? : boolean;
     counterValue? : number;
-    noCounterValue? : boolean;
+    getCounterValue : () => number;
 }
 
 export interface IFacetsScope extends angular.IScope {
@@ -137,7 +137,9 @@ export class Listing<Container extends ResourcesBase.IResource> {
 
                 $scope.createPath = adhPreliminaryNames.nextPreliminary();
 
-                $scope.noCounterValue = typeof ($scope.counterValue) === "undefined";
+                $scope.getCounterValue = () => {
+                    return typeof ($scope.counterValue) !== "undefined" ? $scope.counterValue : $scope.totalCount;
+                };
 
                 var getElements = (limit? : number, offset? : number) : angular.IPromise<Container> => {
                     var params = <any>{};

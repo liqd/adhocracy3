@@ -34,9 +34,7 @@
             </a>
         </div>
     </div>
-    <div class="listing-counter" data-ng-if="counter && counterValue > 0">{{counterValue}} {{contentType | adhResourceName | translate}}</div>
-    <div class="listing-counter" data-ng-if="counter && noCounterValue && totalCount == 1">{{totalCount}} {{contentType | adhResourceName | translate}}</div>
-    <div class="listing-counter" data-ng-if="counter && noCounterValue && totalCount > 1">{{totalCount}} {{contentType | adhResourceName:true | translate}}</div>
+    <div class="listing-counter" data-ng-if="counter && getCounterValue() > 0">{{getCounterValue()}} {{contentType | adhResourceName | translate}}</div>
     <ol class="listing-elements">
         <li class="listing-element" data-ng-repeat="element in elements">
             <adh-inject data-transclusion-id="element-id"></adh-inject>
