@@ -117,7 +117,7 @@ export class Listing<Container extends ResourcesBase.IResource> {
                 // use this to pass custom data to the injected templates
                 custom: "=?",
                 counter: "=?",
-                counterValue: "@?"
+                counterValue: "=?"
             },
             transclude: true,
             link: (scope, element, attrs, controller, transclude) => {
