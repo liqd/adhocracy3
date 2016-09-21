@@ -113,11 +113,17 @@ export var init = (config: AdhConfig.IService, metaApi) => {
 
     app.config(["adhTopLevelStateProvider", (adhTopLevelStateProvider: AdhTopLevelState.Provider) => {
         adhTopLevelStateProvider
-            .when("", ["$location", ($location): AdhTopLevelState.IAreaInput => {
-                if (config.redirect_url !== "/") {
-                    $location.replace();
-                    $location.path(config.redirect_url);
+            .when("", ["$location", "adhConfig", "adhEmbed", ($location, adhConfig, adhEmbed) : AdhTopLevelState.IAreaInput => {
+                var url;
+                if (adhEmbed.initialUrl) {
+                    url = adhEmbed.initialUrl;
+                } else if (adhConfig.redirect_url !== "/") {
+                    url = adhConfig.redirect_url;
+                } else {
+                    url = "/r/";
                 }
+                $location.replace();
+                $location.path(url);
                 return {
                     skip: true
                 };
