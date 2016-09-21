@@ -29,14 +29,10 @@ a form for creating new elements. This form is then always visible.
 ```
 */
 
-.listing-counter,
-.listing-info-text {
+.listing-counter {
     @include rem(padding, 1.25em $padding);
     margin-bottom: 1em;
     background: $color-background-base-introvert;
-}
-
-.listing-counter {
     text-transform: uppercase;
     font-weight: $font-weight-extrovert;
 }

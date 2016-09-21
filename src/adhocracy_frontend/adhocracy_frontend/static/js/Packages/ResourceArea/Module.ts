@@ -1,4 +1,5 @@
 import * as AdhEmbedModule from "../Embed/Module";
+import * as AdhHomeModule from "../Home/Module";
 import * as AdhHttpModule from "../Http/Module";
 import * as AdhProcessModule from "../Process/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
@@ -18,6 +19,7 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhEmbedModule.moduleName,
+            AdhHomeModule.moduleName,
             AdhHttpModule.moduleName,
             AdhProcessModule.moduleName,
             AdhTopLevelStateModule.moduleName

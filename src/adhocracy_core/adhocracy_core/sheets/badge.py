@@ -22,7 +22,6 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.name import IName
 from adhocracy_core.sheets.pool import IPool
-from adhocracy_core.authorization import get_principals_with_local_roles
 
 
 class IBadge(ISheet):
@@ -237,12 +236,9 @@ def get_assignable_badges(context: IBadgeable, request: Request) -> [IBadge]:
     if badges is None:
         return []
     catalogs = find_service(context, 'catalogs')
-    principals = request.effective_principals
-    principals_with_roles = get_principals_with_local_roles(context,
-                                                            principals)
     query = search_query._replace(root=badges,
                                   interfaces=IBadge,
-                                  allows=(principals_with_roles,
+                                  allows=(request.effective_principals,
                                           'assign_badge'),
                                   )
     result = catalogs.search(query)

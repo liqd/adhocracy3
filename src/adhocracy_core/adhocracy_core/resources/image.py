@@ -27,7 +27,7 @@ def allow_view_eveyone(context: IResource, registry: Registry,
                        options: dict):
     """Add view permission for everyone for `context`."""
     acl = [(Allow, Everyone, 'view')]
-    set_acl(context, acl, registry=registry)
+    set_acl(context, acl, registry)
 
 
 class IImageDownload(IAssetDownload):

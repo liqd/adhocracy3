@@ -970,7 +970,7 @@ class IRolesUserLocator(IUserLocator):  # pragma: no cover
 
 
 class IRoleACLAuthorizationPolicy(IAuthorizationPolicy):  # pragma: no cover
-    """A :term:`authorization policy` supporting rule based permissions."""
+    """A :term:`authorization policy` supporting creator term:`local role`."""
 
     group_prefix = Attribute('Prefix to generate the :term:`groupid`')
 
@@ -982,9 +982,8 @@ class IRoleACLAuthorizationPolicy(IAuthorizationPolicy):  # pragma: no cover
         """Check that one `principal` has the `permission` for `context`.
 
         This method extends the behavior of :func:`ACLAuthorizationPolicy`.
-        If a principal has the suffix 'group:' the :class:`IRolesUserLocator`
-        is called to retrieve the list of roles for this principal. These
-        roles extend the given `principals`.
+        If a principal is the creator of `context` the creator
+        :term:`local_role` is addded.
         """
 
 
