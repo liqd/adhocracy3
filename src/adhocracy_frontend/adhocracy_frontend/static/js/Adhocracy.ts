@@ -156,6 +156,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
 
     // register our modules
     AdhAbuseModule.register(angular);
+    AdhAngularHelpersModule.register(angular);
     AdhAnonymizeModule.register(angular);
     AdhBadgeModule.register(angular);
     AdhCommentModule.register(angular);
@@ -180,7 +181,6 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhPreliminaryNamesModule.register(angular);
     AdhProcessModule.register(angular);
     AdhRateModule.register(angular);
-    AdhAngularHelpersModule.register(angular);
     AdhResourceAreaModule.register(angular);
     AdhResourceWidgetsModule.register(angular);
     AdhShareSocialModule.register(angular);

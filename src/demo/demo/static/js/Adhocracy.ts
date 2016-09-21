@@ -190,13 +190,14 @@ export var init = (config : AdhConfig.IService, metaApi) => {
 
     // register our modules
     AdhAbuseModule.register(angular);
+    AdhAngularHelpersModule.register(angular);
     AdhAnonymizeModule.register(angular);
     AdhBadgeModule.register(angular);
     AdhCommentModule.register(angular);
     AdhConfigModule.register(angular, config);
     AdhCrossWindowMessagingModule.register(angular);
-    AdhDebateWorkbenchModule.register(angular);
     AdhDateTimeModule.register(angular);
+    AdhDebateWorkbenchModule.register(angular);
     AdhDocumentModule.register(angular);
     AdhDoneModule.register(angular);
     AdhEmbedModule.register(angular);
@@ -208,9 +209,9 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhInjectModule.register(angular);
     AdhListingModule.register(angular);
     AdhLocaleModule.register(angular);
-    AdhMeinberlinModule.register(angular);
     AdhMappingModule.register(angular);
     AdhMarkdownModule.register(angular);
+    AdhMeinberlinModule.register(angular);
     AdhMetaApiModule.register(angular, metaApi);
     AdhMovingColumnsModule.register(angular);
     AdhNamesModule.register(angular);
@@ -218,7 +219,6 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhPreliminaryNamesModule.register(angular);
     AdhProcessModule.register(angular);
     AdhRateModule.register(angular);
-    AdhAngularHelpersModule.register(angular);
     AdhResourceActionsModule.register(angular);
     AdhResourceAreaModule.register(angular);
     AdhResourceWidgetsModule.register(angular);

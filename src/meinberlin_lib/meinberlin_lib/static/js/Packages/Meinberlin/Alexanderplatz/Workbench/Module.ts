@@ -1,7 +1,7 @@
 import * as AdhDocumentModule from "../../../Document/Module";
 import * as AdhHttpModule from "../../../Http/Module";
-import * as AdhMappingModule from "../../../Mapping/Module";
 import * as AdhIdeaCollectionModule from "../../../IdeaCollection/Module";
+import * as AdhMappingModule from "../../../Mapping/Module";
 import * as AdhMovingColumnsModule from "../../../MovingColumns/Module";
 import * as AdhNamesModule from "../../../Names/Module";
 import * as AdhPermissionsModule from "../../../Permissions/Module";
@@ -9,13 +9,13 @@ import * as AdhProcessModule from "../../../Process/Module";
 import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
 import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 
+import * as AdhIdeaCollectionWorkbench from "../../../IdeaCollection/Workbench/Workbench";
 import * as AdhNames from "../../../Names/Names";
+import * as AdhProcess from "../../../Process/Process";
+
+import RIAlexanderplatzProcess from "../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess";
 import RIGeoProposal from "../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
 import RIGeoProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
-import RIAlexanderplatzProcess from "../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess";
-
-import * as AdhProcess from "../../../Process/Process";
-import * as AdhIdeaCollectionWorkbench from "../../../IdeaCollection/Workbench/Workbench";
 
 import * as Workbench from "./Workbench";
 
@@ -29,8 +29,8 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhDocumentModule.moduleName,
             AdhHttpModule.moduleName,
-            AdhMappingModule.moduleName,
             AdhIdeaCollectionModule.moduleName,
+            AdhMappingModule.moduleName,
             AdhMovingColumnsModule.moduleName,
             AdhNamesModule.moduleName,
             AdhPermissionsModule.moduleName,
