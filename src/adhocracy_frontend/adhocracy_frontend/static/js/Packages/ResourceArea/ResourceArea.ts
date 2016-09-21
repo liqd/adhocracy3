@@ -8,6 +8,7 @@ import * as AdhEmbed from "../Embed/Embed";
 import * as AdhHttpError from "../Http/Error";
 import * as AdhHttp from "../Http/Http";
 import * as AdhMetaApi from "../MetaApi/MetaApi";
+import * as AdhNames from "../Names/Names";
 import * as AdhResourceUtil from "../Util/ResourceUtil";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
@@ -440,6 +441,6 @@ export var directive = (adhResourceArea : Service, $compile : angular.ICompileSe
 };
 
 
-export var nameFilter = (adhResourceArea : Service) => (contentType : string) : string => {
-    return adhResourceArea.getName(contentType);
+export var nameFilter = (adhNames : AdhNames.Service) => (contentType : string, amount? : number) : string => {
+    return adhNames.getName(contentType, amount);
 };

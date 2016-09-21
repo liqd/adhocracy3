@@ -36,7 +36,7 @@ export var register = (angular) => {
         }])
         .provider("adhResourceArea", AdhResourceArea.Provider)
         .directive("adhResourceArea", ["adhResourceArea", "$compile", AdhResourceArea.directive])
-        .filter("adhResourceName", ["adhResourceArea", AdhResourceArea.nameFilter])
+        .filter("adhResourceName", ["adhNames", AdhResourceArea.nameFilter])
         .filter("adhParentPath", () => AdhUtil.parentPath)
         .filter("adhResourceUrl", ["adhConfig", AdhResourceArea.resourceUrl]);
 };
