@@ -34,14 +34,12 @@ export class Provider implements angular.IServiceProvider {
         type? : string;
     }};
     public processHeaderSlots : {[processType : string]: string};
-    public names : {[resourceType : string]: string};
 
     constructor() {
         var self = this;
         this.defaults = {};
         this.specifics = {};
         this.processHeaderSlots = {};
-        this.names = {};
         this.$get = [
             "$q",
             "$injector",
@@ -290,10 +288,6 @@ export class Service implements AdhTopLevelState.IAreaInput {
                 return false;
             }
         });
-    }
-
-    public getName(resourceType : string) : string {
-        return this.provider.names[resourceType];
     }
 
     public getTemplate() : angular.IPromise<string> {
