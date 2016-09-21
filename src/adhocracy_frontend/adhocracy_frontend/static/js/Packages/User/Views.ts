@@ -16,9 +16,9 @@ import * as AdhUtil from "../Util/Util";
 import * as AdhCredentials from "./Credentials";
 import * as AdhUser from "./User";
 
-import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
-import RIProposalVersion from "../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
-import RIRateVersion from "../../Resources_/adhocracy_core/resources/rate/IRateVersion";
+import RIComment from "../../Resources_/adhocracy_core/resources/comment/IComment";
+import RIProposal from "../../Resources_/adhocracy_core/resources/proposal/IProposal";
+import RIRate from "../../Resources_/adhocracy_core/resources/rate/IRate";
 import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
 import RISystemUser from "../../Resources_/adhocracy_core/resources/principal/ISystemUser";
 import * as SIAnonymizeDefault from "../../Resources_/adhocracy_core/sheets/principal/IAnonymizeDefault";
@@ -905,8 +905,7 @@ export var adhUserActivityOverviewDirective = (
 
                 var params = {
                     depth: "all",
-                    content_type: contentType.content_type,
-                    tag: "LAST"
+                    content_type: contentType.content_type
                 };
                 params[SIMetadata.nick + ":creator"] = scope.path;
 
@@ -914,9 +913,9 @@ export var adhUserActivityOverviewDirective = (
                     .then((pool) => { scope[scopeTarget] = pool.data[SIPool.nick].count; });
             };
 
-            requestCountInto(RICommentVersion, "commentCount", attrs.showComments);
-            requestCountInto(RIProposalVersion, "proposalCount", attrs.showProposals);
-            requestCountInto(RIRateVersion, "rateCount", attrs.showRatings);
+            requestCountInto(RIComment, "commentCount", attrs.showComments);
+            requestCountInto(RIProposal, "proposalCount", attrs.showProposals);
+            requestCountInto(RIRate, "rateCount", attrs.showRatings);
         }
     };
 };

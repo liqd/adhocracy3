@@ -1,5 +1,6 @@
 import * as _ from "lodash";
 
+import * as AdhAnonymize from "../Anonymize/Anonymize";
 import * as AdhConfig from "../Config/Config";
 import * as AdhCredentials from "../User/Credentials";
 import * as AdhEventManager from "../EventManager/EventManager";
@@ -149,6 +150,8 @@ export var directiveFactory = (template : string, sheetName : string) => (
 ) => {
     "use strict";
 
+    var getAnonymizeInfo = AdhAnonymize.getAnonymizeInfo(adhConfig, adhHttp, adhUser, $q);
+
     /**
      * Collect detailed information about poolPath specific to ratings for object.
      */
@@ -246,15 +249,17 @@ export var directiveFactory = (template : string, sheetName : string) => (
                 if (typeof myRateResource !== "undefined") {
                     return $q.when(myRateResource);
                 } else {
-                    return adhHttp.withTransaction((transaction) => {
-                        var item = transaction.post(postPoolPath, new RIRate({preliminaryNames: adhPreliminaryNames}));
-                        var version = transaction.get(item.first_version_path);
+                    return getAnonymizeInfo(postPoolPath, "POST").then((anonymizeInfo) => {
+                        return adhHttp.withTransaction((transaction) => {
+                            var item = transaction.post(postPoolPath, new RIRate({preliminaryNames: adhPreliminaryNames}));
+                            var version = transaction.get(item.first_version_path);
 
-                        return transaction.commit()
-                            .then((responses) => {
-                                storeMyRateResource(<RIRateVersion>responses[version.index]);
-                                return myRateResource;
-                            });
+                            return transaction.commit({ anonymize : anonymizeInfo.defaultValue })
+                                .then((responses) => {
+                                    storeMyRateResource(<RIRateVersion>responses[version.index]);
+                                    return myRateResource;
+                                });
+                        });
                     });
                 }
             };
@@ -317,11 +322,8 @@ export var directiveFactory = (template : string, sheetName : string) => (
                         newVersion.data[SIRate.nick].object = scope.refersTo;
                         newVersion.data[SIRate.nick].subject = adhCredentials.userPath;
 
-                        var promises = adhConfig.anonymize_enabled ? [adhUser.ready] : [];
-                        $q.all(promises).then(() => {
-                            var userDefault = adhConfig.anonymize_enabled ? adhUser.data.anonymize : false;
-
-                            return adhHttp.postNewVersionNoFork(version.path, newVersion, [], { anonymize: userDefault })
+                        return getAnonymizeInfo(AdhUtil.parentPath(version.path), "POST").then((anonymizeInfo) => {
+                            return adhHttp.postNewVersionNoFork(version.path, newVersion, [], { anonymize: anonymizeInfo.defaultValue })
                                 .then(() => {
                                     adhRateEventManager.trigger(scope.refersTo);
                                     scope.auditTrailVisible = false;
