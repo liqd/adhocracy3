@@ -48,6 +48,7 @@ import * as AdhMarkdownModule from "./Packages/Markdown/Module";
 import * as AdhMeinberlinModule from "./Packages/Meinberlin/Module";
 import * as AdhMetaApiModule from "./Packages/MetaApi/Module";
 import * as AdhMovingColumnsModule from "./Packages/MovingColumns/Module";
+import * as AdhNamesModule from "./Packages/Names/Module";
 import * as AdhPermissionsModule from "./Packages/Permissions/Module";
 import * as AdhPreliminaryNamesModule from "./Packages/PreliminaryNames/Module";
 import * as AdhProcessModule from "./Packages/Process/Module";
@@ -65,6 +66,7 @@ import * as AdhWebSocketModule from "./Packages/WebSocket/Module";
 
 import * as AdhConfig from "./Packages/Config/Config";
 import * as AdhDebateWorkbench from "./Packages/DebateWorkbench/DebateWorkbench";
+import * as AdhNames from "./Packages/Names/Names";
 import * as AdhProcess from "./Packages/Process/Process";
 import * as AdhTopLevelState from "./Packages/TopLevelState/TopLevelState";
 
@@ -107,6 +109,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         AdhEmbedModule.moduleName,
         AdhIdeaCollectionModule.moduleName,
         AdhMeinberlinModule.moduleName,
+        AdhNamesModule.moduleName,
         AdhResourceAreaModule.moduleName,
         AdhTrackingModule.moduleName,
         AdhUserViewsModule.moduleName
@@ -208,6 +211,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhMarkdownModule.register(angular);
     AdhMetaApiModule.register(angular, metaApi);
     AdhMovingColumnsModule.register(angular);
+    AdhNamesModule.register(angular);
     AdhPermissionsModule.register(angular);
     AdhPreliminaryNamesModule.register(angular);
     AdhProcessModule.register(angular);
