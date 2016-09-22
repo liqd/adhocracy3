@@ -1,6 +1,7 @@
 """Adhocracy core backend package."""
 import os
 import sys
+import version
 
 from setuptools import setup
 from setuptools import find_packages
@@ -66,16 +67,15 @@ debug_requires = [
     # http://www.vrplumber.com/programming/runsnakerun
 ]
 
-import version
 setup(name='adhocracy_core',
       version=version.get_git_version(),
       description='Adhocracy core backend package.',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
-          "Programming Language :: Python",
-          "Framework :: Pylons",
-          "Topic :: Internet :: WWW/HTTP",
-          "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+          'Programming Language :: Python',
+          'Framework :: Pylons',
+          'Topic :: Internet :: WWW/HTTP',
+          'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
       ],
       author='',
       author_email='',

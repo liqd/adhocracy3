@@ -39,8 +39,8 @@ proposal_meta = proposal.proposal_meta\
     ._replace(iresource=IProposal,
               element_types=(IProposalVersion,),
               item_type=IProposalVersion,
-              autonaming_prefix = 'proposal_',
-              default_workflow = 's1_content',
+              autonaming_prefix='proposal_',
+              default_workflow='s1_content',
               )\
     ._add(after_creation=(add_logbook_service,))
 

@@ -130,7 +130,7 @@ def change_bplan_officeworker_email_representation(root, registry):
 
 @log_migration
 def use_workflow_state_for_participation_time_range(root, registry):
-    """use workflow state data for participation start and end."""
+    """Use workflow state data for participation start and end."""
     from adhocracy_core.sheets.workflow import IWorkflowAssignment
     from adhocracy_meinberlin.resources.bplan import IProcess
     from adhocracy_meinberlin.sheets.bplan import IProcessSettings
