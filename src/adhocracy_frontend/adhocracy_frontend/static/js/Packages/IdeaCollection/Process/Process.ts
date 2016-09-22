@@ -85,7 +85,7 @@ export var detailDirective = (
             };
 
             var context = adhEmbed.getContext();
-            scope.hasResourceHeader = (context === "mein.bärlin.de");
+            scope.hasResourceHeader = (context === "");
         }
     };
 };
