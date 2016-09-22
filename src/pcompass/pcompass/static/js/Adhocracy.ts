@@ -24,6 +24,7 @@ import * as markdownit from "markdownit";
 
 import * as AdhAbuseModule from "./Packages/Abuse/Module";
 import * as AdhAngularHelpersModule from "./Packages/AngularHelpers/Module";
+import * as AdhAnonymizeModule from "./Packages/Anonymize/Module";
 import * as AdhBadgeModule from "./Packages/Badge/Module";
 import * as AdhCommentModule from "./Packages/Comment/Module";
 import * as AdhConfigModule from "./Packages/Config/Module";
@@ -111,11 +112,17 @@ export var init = (config : AdhConfig.IService, metaApi) => {
 
     app.config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
         adhTopLevelStateProvider
-            .when("", ["$location", ($location) : AdhTopLevelState.IAreaInput => {
-                if (config.redirect_url !== "/") {
-                    $location.replace();
-                    $location.path(config.redirect_url);
+            .when("", ["$location", "adhConfig", "adhEmbed", ($location, adhConfig, adhEmbed) : AdhTopLevelState.IAreaInput => {
+                var url;
+                if (adhEmbed.initialUrl) {
+                    url = adhEmbed.initialUrl;
+                } else if (adhConfig.redirect_url !== "/") {
+                    url = adhConfig.redirect_url;
+                } else {
+                    url = "/r/";
                 }
+                $location.replace();
+                $location.path(url);
                 return {
                     skip: true
                 };
@@ -168,6 +175,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     // register our modules
     AdhAbuseModule.register(angular);
     AdhAngularHelpersModule.register(angular);
+    AdhAnonymizeModule.register(angular);
     AdhBadgeModule.register(angular);
     AdhCommentModule.register(angular);
     AdhConfigModule.register(angular, config);

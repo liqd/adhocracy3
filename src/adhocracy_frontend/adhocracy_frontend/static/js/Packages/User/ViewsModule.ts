@@ -90,7 +90,7 @@ export var register = (angular) => {
                 .when("activate", ["adhConfig", "adhUser", "adhDone", "$rootScope", "$location", AdhUserViews.activateArea]);
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            AdhUserViews.registerRoutes();
+            AdhUserViews.registerRoutes(adhResourceAreaProvider);
         }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
             adhNamesProvider.names[RIUser.content_type] = "TR__RESOURCE_USER";

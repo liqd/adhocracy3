@@ -45,7 +45,6 @@ import * as AdhLocaleModule from "./Packages/Locale/Module";
 import * as AdhMappingModule from "./Packages/Mapping/Module";
 import * as AdhMarkdownModule from "./Packages/Markdown/Module";
 import * as AdhMetaApiModule from "./Packages/MetaApi/Module";
-import * as AdhNamesModule from "./Packages/Names/Module";
 import * as AdhMovingColumnsModule from "./Packages/MovingColumns/Module";
 import * as AdhPermissionsModule from "./Packages/Permissions/Module";
 import * as AdhPreliminaryNamesModule from "./Packages/PreliminaryNames/Module";
@@ -114,11 +113,17 @@ export var init = (config: AdhConfig.IService, metaApi) => {
 
     app.config(["adhTopLevelStateProvider", (adhTopLevelStateProvider: AdhTopLevelState.Provider) => {
         adhTopLevelStateProvider
-            .when("", ["$location", ($location): AdhTopLevelState.IAreaInput => {
-                if (config.redirect_url !== "/") {
-                    $location.replace();
-                    $location.path(config.redirect_url);
+            .when("", ["$location", "adhConfig", "adhEmbed", ($location, adhConfig, adhEmbed) : AdhTopLevelState.IAreaInput => {
+                var url;
+                if (adhEmbed.initialUrl) {
+                    url = adhEmbed.initialUrl;
+                } else if (adhConfig.redirect_url !== "/") {
+                    url = adhConfig.redirect_url;
+                } else {
+                    url = "/r/";
                 }
+                $location.replace();
+                $location.path(url);
                 return {
                     skip: true
                 };
@@ -172,6 +177,7 @@ export var init = (config: AdhConfig.IService, metaApi) => {
     // register our modules
     AdhAbuseModule.register(angular);
     AdhAngularHelpersModule.register(angular);
+    AdhAnonymizeModule.register(angular);
     AdhBadgeModule.register(angular);
     AdhCommentModule.register(angular);
     AdhConfigModule.register(angular, config);
