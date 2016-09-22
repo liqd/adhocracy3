@@ -88,7 +88,7 @@ export var register = (angular) => {
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider.names[RIUser.content_type] = "TR__USER";
-            AdhUserViews.registerRoutes();
+            AdhUserViews.registerRoutes()(adhResourceAreaProvider);
         }])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider
