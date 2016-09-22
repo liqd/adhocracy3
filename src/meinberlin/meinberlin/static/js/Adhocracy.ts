@@ -160,7 +160,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
                 prefix: "/static/i18n/countries_",
                 suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
             }, {
-                prefix: "/static/i18n/meinberlin_",
+                prefix: "/static/i18n/meinberlin_lib_",
                 suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
             }]
         });
