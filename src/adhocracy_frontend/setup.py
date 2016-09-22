@@ -48,6 +48,7 @@ setup(name='adhocracy_frontend',
       [pyramid.scaffold]
       adhocracy_frontend=adhocracy_frontend.scaffolds:AdhocracyExtensionTemplate
       [console_scripts]
-      deps2dot=adhocracy_frontend.scripts.deps2dot:main
+      ad_deps2dot=adhocracy_frontend.scripts.deps2dot:main
+      ad_merge_messages=adhocracy_frontend.scripts.merge_messages:main
       """,
       )
