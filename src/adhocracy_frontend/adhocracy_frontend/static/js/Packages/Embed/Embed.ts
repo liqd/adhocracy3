@@ -80,7 +80,7 @@ export class Provider implements angular.IServiceProvider {
 
 export class Service {
     private widget : string;
-    public initialUrl? : string;
+    public initialUrl : string = "";
 
     constructor(
         protected provider : Provider,
