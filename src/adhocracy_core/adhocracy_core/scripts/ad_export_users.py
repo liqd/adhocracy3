@@ -40,6 +40,7 @@ def export_users(root, registry, filename):  # pragma: no cover
 
 def _get_users(root: IResource, registry: Registry) -> [IUser]:
     request = Request.blank('/dummy')
+    request.registry = registry
     locator = registry.getMultiAdapter((root, request), IUserLocator)
     return locator.get_users()
 
