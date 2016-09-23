@@ -1,0 +1,44 @@
+<div data-ng-if="hasResourceHeader">
+    <div class="resource-navigation">
+        <adh-resource-dropdown
+            data-print="true">
+        </adh-resource-dropdown>
+    </div>
+    <adh-background-image
+        data-no-fallback="true"
+        data-path="{{data.picture}}">
+        <header class="resource-header" data-ng-class="{'m-image': data.picture}">
+
+            <h1 class="resource-header-title">{{ data.title }}</h1>
+
+            <ul class="resource-header-description">
+                <li>
+                    {{data.shortDescription}}
+                </li>
+            </ul>
+        </header>
+    </adh-background-image>
+    <div class="action-bar">
+        <adh-map-switch data-ng-if="hasLocation" data-model="data.isShowMap"></adh-map-switch>
+    </div>
+</div>
+<div class="action-bar" data-ng-if="!hasResourceHeader">
+    <adh-print-action data-class="action-bar-item"></adh-print-action>
+    <adh-map-switch data-ng-if="hasLocation" data-model="data.isShowMap"></adh-map-switch>
+</div>
+<div>
+    <adh-listing
+        data-content-type="{{contentType}}"
+        data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
+        data-facets="facets"
+        data-ng-show="!data.isShowMap"
+        data-no-create-form="true"
+        data-path="{{path}}"
+        data-sort="sort"
+        data-sorts="sorts"
+        data-counter="true">
+        <adh-meinberlin-stadtforum-proposal-list-item
+            data-path="{{element}}">
+        </adh-meinberlin-stadtforum-proposal-list-item>
+    </adh-listing>
+</div>
