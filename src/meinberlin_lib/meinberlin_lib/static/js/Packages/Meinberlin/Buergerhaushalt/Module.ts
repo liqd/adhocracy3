@@ -1,6 +1,6 @@
 import * as AdhEmbedModule from "../../Core/Embed/Module";
 import * as AdhProcessModule from "../../Core/Process/Module";
-import * as AdhResourceAreaModule from "../../ResourceArea/Module";
+import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
 
 import * as AdhIdeaCollectionModule from "../../Core/IdeaCollection/Module";
 
