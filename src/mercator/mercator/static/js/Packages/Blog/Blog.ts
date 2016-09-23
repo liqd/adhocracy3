@@ -1,9 +1,9 @@
-import * as AdhConfig from "../Config/Config";
-import * as AdhDocument from "../Document/Document";
-import * as AdhHttp from "../Http/Http";
-import * as AdhPermissions from "../Permissions/Permissions";
-import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
-import * as AdhUtil from "../Util/Util";
+import * as AdhConfig from "../Core/Config/Config";
+import * as AdhDocument from "../Core/Document/Document";
+import * as AdhHttp from "../Core/Http/Http";
+import * as AdhPermissions from "../Core/Permissions/Permissions";
+import * as AdhPreliminaryNames from "../Core/PreliminaryNames/PreliminaryNames";
+import * as AdhUtil from "../Core/Util/Util";
 
 import RIDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
 

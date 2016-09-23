@@ -1,6 +1,6 @@
-import * as AdhDebateWorkbenchModule from "../../DebateWorkbench/Module";
-import * as AdhDebateWorkbench from "../../DebateWorkbench/DebateWorkbench";
-import * as AdhProcess from "../../Process/Process";
+import * as AdhDebateWorkbenchModule from "../../Core/DebateWorkbench/Module";
+import * as AdhDebateWorkbench from "../../Core/DebateWorkbench/DebateWorkbench";
+import * as AdhProcess from "../../Core/Process/Process";
 import RIEuthCollaborativeTextProcess from "../../../Resources_/adhocracy_euth/resources/collaborative_text/IProcess";
 import RIEuthCollaborativeTextPrivateProcess from "../../../Resources_/adhocracy_euth/resources/collaborative_text/IPrivateProcess";
 

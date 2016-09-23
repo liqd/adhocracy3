@@ -1,13 +1,13 @@
 /// <reference path="../../../../../lib2/types/angular.d.ts"/>
 /// <reference path="../../../../../lib2/types/moment.d.ts"/>
 
-import * as AdhBadge from "../../../Badge/Badge";
-import * as AdhConfig from "../../../Config/Config";
-import * as AdhCredentials from "../../../User/Credentials";
-import * as AdhHttp from "../../../Http/Http";
-import * as AdhPermissions from "../../../Permissions/Permissions";
-import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
-import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
+import * as AdhBadge from "../../../Core/Badge/Badge";
+import * as AdhConfig from "../../../Core/Config/Config";
+import * as AdhCredentials from "../../../Core/User/Credentials";
+import * as AdhHttp from "../../../Core/Http/Http";
+import * as AdhPermissions from "../../../Core/Permissions/Permissions";
+import * as AdhPreliminaryNames from "../../../Core/PreliminaryNames/PreliminaryNames";
+import * as AdhTopLevelState from "../../../Core/TopLevelState/TopLevelState";
 
 import * as AdhMercator2015Proposal from "../../2015/Proposal/Proposal";
 
