@@ -1,5 +1,5 @@
-/// <reference path="../../../../lib2/types/lodash.d.ts"/>
-/// <reference path="../../../../lib2/types/moment.d.ts"/>
+/// <reference path="../../../../../lib2/types/lodash.d.ts"/>
+/// <reference path="../../../../../lib2/types/moment.d.ts"/>
 
 import * as AdhBadge from "../../Badge/Badge";
 import * as AdhConfig from "../../Config/Config";

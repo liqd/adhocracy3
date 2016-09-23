@@ -33,7 +33,7 @@
  * 10 in particular, but others may be affected.)
  */
 
-/// <reference path="../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../../lib2/types/angular.d.ts"/>
 
 import * as _ from "lodash";
 

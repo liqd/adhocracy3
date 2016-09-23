@@ -1,5 +1,5 @@
-/// <reference path="../../../lib2/types/angular.d.ts"/>
-/// <reference path="../../../lib2/types/leaflet.d.ts"/>
+/// <reference path="../../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../../lib2/types/leaflet.d.ts"/>
 
 /* tslint:disable:variable-name */
 

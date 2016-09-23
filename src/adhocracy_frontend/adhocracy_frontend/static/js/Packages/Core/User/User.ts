@@ -1,4 +1,4 @@
-/// <reference path="../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../../lib2/types/angular.d.ts"/>
 
 import * as AdhHttp from "../Http/Http";
 

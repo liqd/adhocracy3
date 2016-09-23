@@ -1,4 +1,4 @@
-/// <reference path="../../_all.d.ts"/>
+/// <reference path="../../../_all.d.ts"/>
 
 export var createDirective = (modernizr : ModernizrStatic) => {
     return {

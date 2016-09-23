@@ -1,4 +1,4 @@
-/// <reference path="../../../lib2/types/jasmine.d.ts"/>
+/// <reference path="../../../../lib2/types/jasmine.d.ts"/>
 
 import * as AdhEventManager from "./EventManager";
 

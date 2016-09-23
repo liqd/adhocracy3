@@ -17,7 +17,7 @@
  * change paths without a reload and in being more flexibel.
  */
 
-/// <reference path="../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../../lib2/types/angular.d.ts"/>
 
 import * as _ from "lodash";
 

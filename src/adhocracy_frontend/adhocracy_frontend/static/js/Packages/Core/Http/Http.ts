@@ -1,6 +1,6 @@
-/// <reference path="../../../lib2/types/jquery.d.ts"/>
-/// <reference path="../../../lib2/types/angular.d.ts"/>
-/// <reference path="../../../lib2/types/lodash.d.ts"/>
+/// <reference path="../../../../lib2/types/jquery.d.ts"/>
+/// <reference path="../../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../../lib2/types/lodash.d.ts"/>
 
 import * as _ from "lodash";
 

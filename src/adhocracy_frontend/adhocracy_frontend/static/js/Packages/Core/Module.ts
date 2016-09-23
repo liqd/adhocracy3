@@ -1,3 +1,5 @@
+import * as angular from "angular";
+
 import * as AdhAbuseModule from "./Abuse/Module";
 import * as AdhAngularHelpersModule from "./AngularHelpers/Module";
 import * as AdhAnonymizeModule from "./Anonymize/Module";
@@ -9,14 +11,12 @@ import * as AdhDoneModule from "./Done/Module";
 import * as AdhEmbedModule from "./Embed/Module";
 import * as AdhEventManagerModule from "./EventManager/Module";
 import * as AdhHomeModule from "./Home/Module";
-import * as AdhHttpModule from "./Http/Module";
 import * as AdhImageModule from "./Image/Module";
 import * as AdhInjectModule from "./Inject/Module";
 import * as AdhListingModule from "./Listing/Module";
 import * as AdhLocaleModule from "./Locale/Module";
 import * as AdhMappingModule from "./Mapping/Module";
 import * as AdhMarkdownModule from "./Markdown/Module";
-import * as AdhMetaApiModule from "./MetaApi/Module";
 import * as AdhMovingColumnsModule from "./MovingColumns/Module";
 import * as AdhPermissionsModule from "./Permissions/Module";
 import * as AdhPreliminaryNamesModule from "./PreliminaryNames/Module";
@@ -34,8 +34,7 @@ import * as AdhWebSocketModule from "./WebSocket/Module";
 
 export var moduleName = "adhCore";
 
-
-    // register our modules
+export var register = (angular) => {
     AdhAbuseModule.register(angular);
     AdhAnonymizeModule.register(angular);
     AdhBadgeModule.register(angular);
@@ -46,14 +45,12 @@ export var moduleName = "adhCore";
     AdhEmbedModule.register(angular);
     AdhEventManagerModule.register(angular);
     AdhHomeModule.register(angular);
-    AdhHttpModule.register(angular, config);
     AdhImageModule.register(angular);
     AdhInjectModule.register(angular);
     AdhListingModule.register(angular);
     AdhLocaleModule.register(angular);
     AdhMappingModule.register(angular);
     AdhMarkdownModule.register(angular);
-    AdhMetaApiModule.register(angular, metaApi);
     AdhMovingColumnsModule.register(angular);
     AdhPermissionsModule.register(angular);
     AdhPreliminaryNamesModule.register(angular);
@@ -69,3 +66,14 @@ export var moduleName = "adhCore";
     AdhUserModule.register(angular);
     AdhUserViewsModule.register(angular);
     AdhWebSocketModule.register(angular);
+
+    angular
+        .module(moduleName, [
+            AdhCommentModule.moduleName,
+            AdhCrossWindowMessagingModule.moduleName,
+            AdhEmbedModule.moduleName,
+            AdhResourceAreaModule.moduleName,
+            AdhTrackingModule.moduleName,
+            AdhUserViewsModule.moduleName
+        ]);
+};
