@@ -173,3 +173,34 @@ export var createDirective = (
         }
     };
 };
+
+export var listItemDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service,
+    adhPermissions : AdhPermissions.Service,
+    adhRate : AdhRate.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
+    $q : angular.IQService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope : IScope) => {
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
+                scope, undefined);
+            scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
+                if (!proposalVersionUrl) {
+                    scope.selectedState = "";
+                } else if (proposalVersionUrl === scope.path) {
+                    scope.selectedState = "is-selected";
+                } else {
+                    scope.selectedState = "is-not-selected";
+                }
+            }));
+        }
+    };
+};
