@@ -1,5 +1,3 @@
-import * as angular from "angular";
-
 import * as AdhAbuseModule from "./Abuse/Module";
 import * as AdhAngularHelpersModule from "./AngularHelpers/Module";
 import * as AdhAnonymizeModule from "./Anonymize/Module";
