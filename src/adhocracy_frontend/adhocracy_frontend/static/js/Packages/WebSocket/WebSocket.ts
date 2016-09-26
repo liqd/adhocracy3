@@ -161,7 +161,6 @@ export class Service {
             case "unknown_resource":
             case "malformed_message":
             case "invalid_json":
-            case "subscribe_not_supported":
             case "internal_error":
                 console.log(msg);
                 throw "WebSocket: onmessage: received error message.";
