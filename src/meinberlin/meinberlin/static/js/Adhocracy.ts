@@ -13,6 +13,8 @@ import * as angularCache from "angular-cache";  if (angularCache) { ; };
 import * as angularTranslate from "angularTranslate";  if (angularTranslate) { ; };
 import * as angularTranslateLoader from "angularTranslateLoader";  if (angularTranslateLoader) { ; };
 import * as angularElastic from "angularElastic";  if (angularElastic) { ; };
+import * as angularScroll from "angularScroll";  if (angularScroll) { ; };
+import * as angularFlow from "angularFlow";  if (angularFlow) { ; };
 
 import * as leaflet from "leaflet";
 import * as leafletMarkerCluster from "leafletMarkerCluster";  if (leafletMarkerCluster) { ; };
@@ -22,6 +24,8 @@ import * as moment from "moment";
 import * as webshim from "polyfiller";
 
 import * as AdhCoreModule from "./Packages/Core/Module";
+import * as AdhDebateWorkbenchModule from "./Packages/Core/DebateWorkbench/Module";
+import * as AdhIdeaCollectionModule from "./Packages/Core/IdeaCollection/Module";
 import * as AdhMeinberlinModule from "./Packages/Meinberlin/Module";
 
 import * as AdhConfig from "./Packages/Core/Config/Config";
@@ -60,8 +64,11 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "ngAnimate",
         "ngAria",
         "ngMessages",
+        "flow",
         AdhCoreModule.moduleName,
-        AdhMeinberlinModule.moduleName,
+        AdhDebateWorkbenchModule.moduleName,
+        AdhIdeaCollectionModule.moduleName,
+        AdhMeinberlinModule.moduleName
     ];
 
     if (config.cachebust) {
@@ -110,6 +117,9 @@ export var init = (config : AdhConfig.IService, metaApi) => {
                 suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
             }, {
                 prefix: "/static/i18n/countries_",
+                suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
+            }, {
+                prefix: "/static/i18n/meinberlin_lib_",
                 suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
             }]
         });

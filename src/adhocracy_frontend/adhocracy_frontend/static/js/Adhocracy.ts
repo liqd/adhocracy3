@@ -13,6 +13,8 @@ import * as angularCache from "angular-cache";  if (angularCache) { ; };
 import * as angularTranslate from "angularTranslate";  if (angularTranslate) { ; };
 import * as angularTranslateLoader from "angularTranslateLoader";  if (angularTranslateLoader) { ; };
 import * as angularElastic from "angularElastic";  if (angularElastic) { ; };
+import * as angularScroll from "angularScroll";  if (angularScroll) { ; };
+import * as angularFlow from "angularFlow";  if (angularFlow) { ; };
 
 import * as leaflet from "leaflet";
 import * as leafletMarkerCluster from "leafletMarkerCluster";  if (leafletMarkerCluster) { ; };
@@ -23,8 +25,8 @@ import * as webshim from "polyfiller";
 
 import * as AdhCoreModule from "./Packages/Core/Module";
 
-import * as AdhConfig from "./Packages/Config/Config";
-import * as AdhTopLevelState from "./Packages/TopLevelState/TopLevelState";
+import * as AdhConfig from "./Packages/Core/Config/Config";
+import * as AdhTopLevelState from "./Packages/Core/TopLevelState/TopLevelState";
 import * as AdhTemplates from "adhTemplates";  if (AdhTemplates) { ; };
 
 webshim.setOptions("basePath", "/static/lib/webshim/js-webshim/minified/shims/");
@@ -54,6 +56,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "ngAnimate",
         "ngAria",
         "ngMessages",
+        "flow",
         AdhCoreModule.moduleName
     ];
 
