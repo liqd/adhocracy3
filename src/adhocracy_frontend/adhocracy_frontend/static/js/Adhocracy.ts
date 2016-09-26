@@ -21,7 +21,6 @@ import * as modernizr from "modernizr";
 import * as moment from "moment";
 import * as webshim from "polyfiller";
 
-import * as AdhConfigModule from "./Packages/Config/Module";
 import * as AdhCoreModule from "./Packages/Core/Module";
 
 import * as AdhConfig from "./Packages/Config/Config";
@@ -55,7 +54,6 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "ngAnimate",
         "ngAria",
         "ngMessages",
-        AdhConfigModule.moduleName,
         AdhCoreModule.moduleName
     ];
 
@@ -125,8 +123,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     app.value("moment", moment);
 
     // register our modules
-    AdhConfigModule.register(angular, config);
-    AdhCoreModule.register(angular);
+    AdhCoreModule.register(angular, config, metaApi);
 
     // force-load some services
     var injector = angular.bootstrap(document.body, ["a3"], {strictDi: true});

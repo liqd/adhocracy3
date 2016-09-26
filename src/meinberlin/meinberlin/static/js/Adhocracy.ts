@@ -21,14 +21,11 @@ import * as modernizr from "modernizr";
 import * as moment from "moment";
 import * as webshim from "polyfiller";
 
-import * as AdhConfigModule from "./Packages/Core/Config/Module";
 import * as AdhCoreModule from "./Packages/Core/Module";
 import * as AdhMeinberlinModule from "./Packages/Meinberlin/Module";
-import * as AdhMetaApiModule from "./Packages/Core/MetaApi/Module";
 
 import * as AdhConfig from "./Packages/Core/Config/Config";
 import * as AdhDebateWorkbench from "./Packages/Core/DebateWorkbench/DebateWorkbench";
-import * as AdhHttpModule from "./Packages/Core/Http/Module";
 import * as AdhProcess from "./Packages/Core/Process/Process";
 import * as AdhTopLevelState from "./Packages/Core/TopLevelState/TopLevelState";
 
@@ -63,10 +60,8 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "ngAnimate",
         "ngAria",
         "ngMessages",
-        AdhConfigModule.moduleName,
         AdhCoreModule.moduleName,
         AdhMeinberlinModule.moduleName,
-        AdhMetaApiModule.moduleName
     ];
 
     if (config.cachebust) {
@@ -143,10 +138,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     app.value("moment", moment);
 
     // register our modules
-    AdhConfigModule.register(angular, config);
-    AdhCoreModule.register(angular);
-    AdhHttpModule.register(angular, config);
-    AdhMetaApiModule.register(angular, metaApi);
+    AdhCoreModule.register(angular, config, metaApi);
     AdhMeinberlinModule.register(angular);
 
     // force-load some services
