@@ -20,6 +20,7 @@ import * as modernizr from "modernizr";
 import * as moment from "moment";
 import * as webshim from "polyfiller";
 
+import * as AdhBlogModule from "./Packages/Blog/Module";
 import * as AdhCoreModule from "./Packages/Core/Module";
 import * as AdhMercatorModule from "./Packages/Mercator/Module";
 
@@ -129,6 +130,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     app.value("moment", moment);
 
     // register our modules
+    AdhBlogModule.register(angular);
     AdhCoreModule.register(angular, config, metaApi);
     AdhMercatorModule.register(angular);
 

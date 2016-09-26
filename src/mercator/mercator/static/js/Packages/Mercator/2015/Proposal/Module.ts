@@ -1,6 +1,5 @@
 import * as AdhAngularHelpersModule from "../../../Core/AngularHelpers/Module";
 import * as AdhBadgeModule from "../../../Core/Badge/Module";
-import * as AdhBlogModule from "../../../Core/Blog/Module";
 import * as AdhHttpModule from "../../../Core/Http/Module";
 import * as AdhImageModule from "../../../Core/Image/Module";
 import * as AdhInjectModule from "../../../Core/Inject/Module";
@@ -12,6 +11,8 @@ import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
 import * as AdhResourceWidgetsModule from "../../../Core/ResourceWidgets/Module";
 import * as AdhStickyModule from "../../../Core/Sticky/Module";
 import * as AdhTopLevelStateModule from "../../../Core/TopLevelState/Module";
+
+import * as AdhBlogModule from "../../../Blog/Module";
 
 import * as AdhUtil from "../../../Core/Util/Util";
 
