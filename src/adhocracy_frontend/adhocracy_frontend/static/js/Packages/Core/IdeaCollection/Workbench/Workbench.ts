@@ -117,6 +117,7 @@ export var detailColumnDirective = (
 
 export var addProposalButtonDirective = (
     adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
@@ -126,6 +127,10 @@ export var addProposalButtonDirective = (
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
+            adhHttp.get(scope.processUrl).then((process) => {
+                var workflow = process.data[SIWorkflow.nick].workflow;
+                scope.workflowAllowsCreateProposal = (workflow !== "debate" && workflow !== "debate_private");
+            });
 
             scope.setCameFrom = () => {
                 adhTopLevelState.setCameFrom();

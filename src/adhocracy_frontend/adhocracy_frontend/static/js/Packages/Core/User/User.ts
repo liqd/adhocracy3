@@ -70,7 +70,7 @@ export class Service {
                 // closed. In that case there is no reason to delete
                 // the token. We need to be able to discern the two
                 // cases.
-                // _self.adhCredentials.deleteToken();
+                _self.adhCredentials.deleteToken();
                 throw "failed to fetch user resource";
             });
     }

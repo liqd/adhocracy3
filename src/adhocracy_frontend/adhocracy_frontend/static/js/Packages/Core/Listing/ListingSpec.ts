@@ -89,8 +89,8 @@ export var register = () => {
                             $watch: jasmine.createSpy("$watch")
                         };
 
-                        var controller = directive.controller[5];
-                        controller(filterMock, scope, adhHttpMock, adhPreliminaryNamesMock, adhPermissionsMock);
+                        var controller = directive.controller[6];
+                        controller(filterMock, scope, adhHttpMock, adhPreliminaryNamesMock, adhPermissionsMock, null);
                     });
 
                     it("watches scope.path", () => {

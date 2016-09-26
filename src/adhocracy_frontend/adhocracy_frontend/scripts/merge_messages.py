@@ -52,7 +52,7 @@ def filter_core_keys(keys):
     return keys
 
 
-def main():
+def main():  # noqa
     package_name = sys.argv[1]
     file_prefix = sys.argv[2]
     keys = [l.rstrip() for l in sys.stdin]

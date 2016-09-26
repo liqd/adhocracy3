@@ -24,7 +24,7 @@ process_meta = process.process_meta._replace(
         ILocationReference,
         IImageReference,
     ),
-    default_workflow = 'standard',
+    default_workflow='standard',
 )
 
 
