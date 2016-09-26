@@ -147,6 +147,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhCoreModule.register(angular);
     AdhHttpModule.register(angular, config);
     AdhMetaApiModule.register(angular, metaApi);
+    AdhMeinberlinModule.register(angular);
 
     // force-load some services
     var injector = angular.bootstrap(document.body, ["a3"], {strictDi: true});
