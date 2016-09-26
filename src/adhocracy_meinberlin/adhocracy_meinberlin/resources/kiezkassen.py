@@ -43,7 +43,7 @@ process_meta = process.process_meta._replace(
         ILocationReference,
         IImageReference,
     ),
-    default_workflow = 'kiezkassen',
+    default_workflow='kiezkassen',
 )
 
 
