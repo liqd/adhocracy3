@@ -14,7 +14,7 @@ import * as SIMultiPolygon from "../../../../Resources_/adhocracy_core/sheets/ge
 import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/IdeaCollection/Process";
+var pkgLocation = "/Core/IdeaCollection/Process";
 
 
 export var detailDirective = (

@@ -26,7 +26,7 @@ import * as AdhCredentials from "../User/Credentials";
 import * as AdhEventManager from "../EventManager/EventManager";
 import * as AdhTracking from "../Tracking/Tracking";
 
-var pkgLocation = "/TopLevelState";
+var pkgLocation = "/Core/TopLevelState";
 
 
 export interface IAreaInput {

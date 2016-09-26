@@ -9,7 +9,7 @@ import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
 import * as SIBadgeable from "../../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
 
-var pkgLocation = "/ResourceActions";
+var pkgLocation = "/Core/ResourceActions";
 
 
 export class Modals {

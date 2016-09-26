@@ -3,7 +3,7 @@ import * as _ from "lodash";
 import * as AdhConfig from "../Config/Config";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
-export var pkgLocation = "/MovingColumns";
+export var pkgLocation = "/Core/MovingColumns";
 
 
 /**

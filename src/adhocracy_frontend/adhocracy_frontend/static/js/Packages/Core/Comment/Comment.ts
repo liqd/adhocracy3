@@ -20,7 +20,7 @@ import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
-var pkgLocation = "/Comment";
+var pkgLocation = "/Core/Comment";
 
 
 export interface ICommentResourceScope extends angular.IScope {

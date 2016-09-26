@@ -10,7 +10,7 @@ import * as SIImageMetadata from "../../../Resources_/adhocracy_core/sheets/imag
 import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
-var pkgLocation = "/Image";
+var pkgLocation = "/Core/Image";
 
 /**
  * upload image file.  this function can potentially

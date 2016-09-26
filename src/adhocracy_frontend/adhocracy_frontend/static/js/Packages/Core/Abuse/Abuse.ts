@@ -1,7 +1,7 @@
 import * as AdhConfig from "../Config/Config";
 import * as AdhHttp from "../Http/Http";
 
-var pkgLocation = "/Abuse";
+var pkgLocation = "/Core/Abuse";
 
 
 export var reportAbuseDirective = (adhHttp : AdhHttp.Service, adhConfig : AdhConfig.IService) => {

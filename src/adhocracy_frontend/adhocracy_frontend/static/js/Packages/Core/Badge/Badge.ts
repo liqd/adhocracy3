@@ -20,7 +20,7 @@ import * as SIName from "../../../Resources_/adhocracy_core/sheets/name/IName";
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
 
-var pkgLocation = "/Badge";
+var pkgLocation = "/Core/Badge";
 
 export interface IBadgeAssignment {
     title : string;

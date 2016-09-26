@@ -1,7 +1,7 @@
 /// <reference path="../../../../lib2/types/angular.d.ts"/>
 
 import * as AdhConfig from "../Config/Config";
-var pkgLocation = "/Markdown";
+var pkgLocation = "/Core/Markdown";
 
 
 export var parseMarkdown = (adhConfig : AdhConfig.IService, markdownit) => {

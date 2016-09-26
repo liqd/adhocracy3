@@ -17,7 +17,7 @@ import * as SITags from "../../../Resources_/adhocracy_core/sheets/tags/ITags";
 import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 import * as SIWorkflowAssignment from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/ResourceArea";
+var pkgLocation = "/Core/ResourceArea";
 
 
 export interface Dict {

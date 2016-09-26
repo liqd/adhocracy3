@@ -30,7 +30,7 @@ import * as SIPasswordAuthentication from "../../../Resources_/adhocracy_core/sh
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIUserBasic from "../../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
 
-var pkgLocation = "/User";
+var pkgLocation = "/Core/User";
 
 
 /**

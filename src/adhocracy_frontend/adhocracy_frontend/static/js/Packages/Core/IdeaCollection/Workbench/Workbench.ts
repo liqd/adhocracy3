@@ -11,7 +11,7 @@ import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/co
 import * as SIComment from "../../../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-export var pkgLocation = "/IdeaCollection/Workbench";
+export var pkgLocation = "/Core/IdeaCollection/Workbench";
 
 
 export var workbenchDirective = (

@@ -4,7 +4,7 @@ import * as AdhHttp from "../Http/Http";
 import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
 import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
 
-var pkgLocation = "/Home";
+var pkgLocation = "/Core/Home";
 
 
 export var homeDirective = (

@@ -16,7 +16,7 @@ import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";  if
 
 import * as AdhMappingUtils from "./MappingUtils";
 
-var pkgLocation = "/Mapping";
+var pkgLocation = "/Core/Mapping";
 
 
 var refreshAfterColumnExpandHack = (

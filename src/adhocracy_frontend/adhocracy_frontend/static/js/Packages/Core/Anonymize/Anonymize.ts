@@ -2,7 +2,7 @@ import * as AdhConfig from "../Config/Config";
 import * as AdhHttp from "../Http/Http";
 import * as AdhUser from "../User/User";
 
-var pkgLocation = "/Anonymize";
+var pkgLocation = "/Core/Anonymize";
 
 
 export interface IAnonymizeInfo {

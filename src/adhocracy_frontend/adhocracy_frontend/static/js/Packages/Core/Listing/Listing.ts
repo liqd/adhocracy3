@@ -15,7 +15,7 @@ import * as ResourcesBase from "../../ResourcesBase";
 
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 
-var pkgLocation = "/Listing";
+var pkgLocation = "/Core/Listing";
 
 //////////////////////////////////////////////////////////////////////
 // Listings

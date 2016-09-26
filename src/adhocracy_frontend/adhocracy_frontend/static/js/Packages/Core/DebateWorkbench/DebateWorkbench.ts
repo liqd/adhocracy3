@@ -18,7 +18,7 @@ import RIParagraphVersion from "../../../Resources_/adhocracy_core/resources/par
 import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SIParagraph from "../../../Resources_/adhocracy_core/sheets/document/IParagraph";
 
-var pkgLocation = "/DebateWorkbench";
+var pkgLocation = "/Core/DebateWorkbench";
 
 
 export var debateWorkbenchDirective = (

@@ -23,7 +23,7 @@ import * as SIRate from "../../../Resources_/adhocracy_core/sheets/rate/IRate";
 import * as SIUserBasic from "../../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
 import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/Rate";
+var pkgLocation = "/Core/Rate";
 
 
 /**

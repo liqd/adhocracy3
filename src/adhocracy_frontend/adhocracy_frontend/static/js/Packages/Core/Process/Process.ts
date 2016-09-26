@@ -14,7 +14,7 @@ import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle
 import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 import RIProcess from "../../../Resources_/adhocracy_core/resources/process/IProcess";
 
-var pkgLocation = "/Process";
+var pkgLocation = "/Core/Process";
 
 
 // mirrors adhocracy_core.sheets.workflow.StateData
