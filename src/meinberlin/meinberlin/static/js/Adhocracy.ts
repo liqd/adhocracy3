@@ -14,12 +14,12 @@ import * as angularTranslate from "angularTranslate";  if (angularTranslate) { ;
 import * as angularTranslateLoader from "angularTranslateLoader";  if (angularTranslateLoader) { ; };
 import * as angularElastic from "angularElastic";  if (angularElastic) { ; };
 
-import * as modernizr from "modernizr";
-import * as moment from "moment";
-import * as webshim from "polyfiller";
 import * as leaflet from "leaflet";
 import * as leafletMarkerCluster from "leafletMarkerCluster";  if (leafletMarkerCluster) { ; };
 import * as markdownit from "markdownit";
+import * as modernizr from "modernizr";
+import * as moment from "moment";
+import * as webshim from "polyfiller";
 
 import * as AdhConfigModule from "./Packages/Core/Config/Module";
 import * as AdhCoreModule from "./Packages/Core/Module";
@@ -109,7 +109,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         $locationProvider.html5Mode(true);
     }]);
     app.config(["$translateProvider", ($translateProvider) => {
-         $translateProvider.useStaticFilesLoader({
+        $translateProvider.useStaticFilesLoader({
             files: [{
                 prefix: "/static/i18n/core_",
                 suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
@@ -137,10 +137,10 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     app.config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RICollaborativeTextProcess)]);
 
     app.value("angular", angular);
-    app.value("modernizr", modernizr);
-    app.value("moment", moment);
     app.value("leaflet", leaflet);
     app.value("markdownit", markdownit);
+    app.value("modernizr", modernizr);
+    app.value("moment", moment);
 
     // register our modules
     AdhConfigModule.register(angular, config);

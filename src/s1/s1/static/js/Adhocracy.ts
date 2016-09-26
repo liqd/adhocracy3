@@ -15,12 +15,12 @@ import * as angularTranslateLoader from "angularTranslateLoader";  if (angularTr
 import * as angularElastic from "angularElastic";  if (angularElastic) { ; };
 import * as angularFlow from "angularFlow";  if (angularFlow) { ; };
 
-import * as modernizr from "modernizr";
-import * as moment from "moment";
-import * as webshim from "polyfiller";
 import * as leaflet from "leaflet";
 import * as leafletMarkerCluster from "leafletMarkerCluster";  if (leafletMarkerCluster) { ; };
 import * as markdownit from "markdownit";
+import * as modernizr from "modernizr";
+import * as moment from "moment";
+import * as webshim from "polyfiller";
 
 import * as AdhAbuseModule from "./Packages/Abuse/Module";
 import * as AdhAngularHelpersModule from "./Packages/AngularHelpers/Module";
@@ -146,7 +146,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         $locationProvider.html5Mode(true);
     }]);
     app.config(["$translateProvider", ($translateProvider) => {
-         $translateProvider.useStaticFilesLoader({
+        $translateProvider.useStaticFilesLoader({
             files: [{
                 prefix: "/static/i18n/core_",
                 suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
@@ -169,11 +169,11 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     }]);
 
     app.value("angular", angular);
-    app.value("modernizr", modernizr);
-    app.value("moment", moment);
+    app.value("angularFlow", angularFlow);
     app.value("leaflet", leaflet);
     app.value("markdownit", markdownit);
-    app.value("angularFlow", angularFlow);
+    app.value("modernizr", modernizr);
+    app.value("moment", moment);
 
     // register our modules
     AdhAbuseModule.register(angular);

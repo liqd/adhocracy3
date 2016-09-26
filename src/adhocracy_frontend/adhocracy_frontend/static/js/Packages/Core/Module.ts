@@ -38,6 +38,7 @@ export var moduleName = "adhCore";
 
 export var register = (angular) => {
     AdhAbuseModule.register(angular);
+    AdhAngularHelpersModule.register(angular);
     AdhAnonymizeModule.register(angular);
     AdhBadgeModule.register(angular);
     AdhCommentModule.register(angular);
@@ -61,7 +62,6 @@ export var register = (angular) => {
     AdhPreliminaryNamesModule.register(angular);
     AdhProcessModule.register(angular);
     AdhRateModule.register(angular);
-    AdhAngularHelpersModule.register(angular);
     AdhResourceActionsModule.register(angular);
     AdhResourceAreaModule.register(angular);
     AdhResourceWidgetsModule.register(angular);

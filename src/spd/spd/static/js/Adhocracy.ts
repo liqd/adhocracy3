@@ -16,11 +16,11 @@ import * as angularElastic from "angularElastic";  if (angularElastic) { ; };
 import * as angularScroll from "angularScroll";  if (angularScroll) { ; };
 import * as angularFlow from "angularFlow";  if (angularFlow) { ; };
 
+import * as leaflet from "leaflet";
+import * as leafletMarkerCluster from "leafletMarkerCluster";  if (leafletMarkerCluster) { ; };
 import * as markdownit from "markdownit";
 import * as modernizr from "modernizr";
 import * as moment from "moment";
-import * as leaflet from "leaflet";
-import * as leafletMarkerCluster from "leafletMarkerCluster";  if (leafletMarkerCluster) { ; };
 import * as webshim from "polyfiller";
 
 import * as AdhAbuseModule from "./Packages/Abuse/Module";
@@ -151,7 +151,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         $locationProvider.html5Mode(true);
     }]);
     app.config(["$translateProvider", ($translateProvider) => {
-         $translateProvider.useStaticFilesLoader({
+        $translateProvider.useStaticFilesLoader({
             files: [{
                 prefix: "/static/i18n/core_",
                 suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
@@ -177,11 +177,11 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     }]);
     app.config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RIDigitalLebenProcess)]);
 
-    app.value("markdownit", markdownit);
     app.value("angular", angular);
+    app.value("leaflet", leaflet);
+    app.value("markdownit", markdownit);
     app.value("modernizr", modernizr);
     app.value("moment", moment);
-    app.value("leaflet", leaflet);
 
     // register our modules
     AdhAbuseModule.register(angular);

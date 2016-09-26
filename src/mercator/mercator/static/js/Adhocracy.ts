@@ -59,6 +59,7 @@ import * as AdhWebSocketModule from "./Packages/WebSocket/Module";
 
 import * as AdhConfig from "./Packages/Config/Config";
 import * as AdhTopLevelState from "./Packages/TopLevelState/TopLevelState";
+
 import * as AdhTemplates from "adhTemplates";  if (AdhTemplates) { ; };
 
 webshim.setOptions("basePath", "/static/lib/webshim/js-webshim/minified/shims/");
@@ -141,7 +142,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         $locationProvider.html5Mode(true);
     }]);
     app.config(["$translateProvider", ($translateProvider) => {
-         $translateProvider.useStaticFilesLoader({
+        $translateProvider.useStaticFilesLoader({
             files: [{
                 prefix: "/static/i18n/core_",
                 suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"

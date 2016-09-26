@@ -6,21 +6,21 @@
 
 import * as angular from "angular";
 
-import * as angularAnimate from "angularAnimate"; if (angularAnimate) { ; };
-import * as angularAria from "angularAria"; if (angularAria) { ; };
-import * as angularMessages from "angularMessages"; if (angularMessages) { ; };
-import * as angularCache from "angular-cache"; if (angularCache) { ; };
-import * as angularTranslate from "angularTranslate"; if (angularTranslate) { ; };
-import * as angularTranslateLoader from "angularTranslateLoader"; if (angularTranslateLoader) { ; };
-import * as angularElastic from "angularElastic"; if (angularElastic) { ; };
-import * as angularScroll from "angularScroll"; if (angularScroll) { ; };
-import * as angularFlow from "angularFlow"; if (angularFlow) { ; };
+import * as angularAnimate from "angularAnimate";  if (angularAnimate) { ; };
+import * as angularAria from "angularAria";  if (angularAria) { ; };
+import * as angularMessages from "angularMessages";  if (angularMessages) { ; };
+import * as angularCache from "angular-cache";  if (angularCache) { ; };
+import * as angularTranslate from "angularTranslate";  if (angularTranslate) { ; };
+import * as angularTranslateLoader from "angularTranslateLoader";  if (angularTranslateLoader) { ; };
+import * as angularElastic from "angularElastic";  if (angularElastic) { ; };
+import * as angularScroll from "angularScroll";  if (angularScroll) { ; };
+import * as angularFlow from "angularFlow";  if (angularFlow) { ; };
 
+import * as leaflet from "leaflet";
+import * as leafletMarkerCluster from "leafletMarkerCluster";  if (leafletMarkerCluster) { ; };
 import * as markdownit from "markdownit";
 import * as modernizr from "modernizr";
 import * as moment from "moment";
-import * as leaflet from "leaflet";
-import * as leafletMarkerCluster from "leafletMarkerCluster";  if (leafletMarkerCluster) { ; };
 import * as webshim from "polyfiller";
 
 import * as AdhAbuseModule from "./Packages/Abuse/Module";
@@ -68,18 +68,18 @@ import * as AdhTopLevelState from "./Packages/TopLevelState/TopLevelState";
 import * as AdhTemplates from "adhTemplates"; if (AdhTemplates) { ; };
 
 webshim.setOptions("basePath", "/static/lib/webshim/js-webshim/minified/shims/");
-webshim.setOptions("forms-ext", { "replaceUI": true });
-webshim.setOptions({ "waitReady": false });
+webshim.setOptions("forms-ext", {"replaceUI": true});
+webshim.setOptions({"waitReady": false});
 webshim.polyfill("forms forms-ext");
 
-var loadComplete = (): void => {
+var loadComplete = () : void => {
     var w = (<any>window);
     w.adhocracy = w.adhocracy || {};
     w.adhocracy.loadState = "complete";
 };
 
 
-export var init = (config: AdhConfig.IService, metaApi) => {
+export var init = (config : AdhConfig.IService, metaApi) => {
     "use strict";
 
     // detect wheter we are running in iframe
@@ -112,7 +112,7 @@ export var init = (config: AdhConfig.IService, metaApi) => {
 
     var app = angular.module("a3", appDependencies);
 
-    app.config(["adhTopLevelStateProvider", (adhTopLevelStateProvider: AdhTopLevelState.Provider) => {
+    app.config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
         adhTopLevelStateProvider
             .when("", ["$location", "adhConfig", "adhEmbed", ($location, adhConfig, adhEmbed) : AdhTopLevelState.IAreaInput => {
                 var url;
@@ -129,7 +129,7 @@ export var init = (config: AdhConfig.IService, metaApi) => {
                     skip: true
                 };
             }])
-            .otherwise((): AdhTopLevelState.IAreaInput => {
+            .otherwise(() : AdhTopLevelState.IAreaInput => {
                 return {
                     template: "<adh-header></adh-header><div class=\"l-content\"><h1>404 - Not Found</h1></div>"
                 };
@@ -151,12 +151,12 @@ export var init = (config: AdhConfig.IService, metaApi) => {
                 prefix: "/static/i18n/core_",
                 suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
             }, {
-                    prefix: "/static/i18n/countries_",
-                    suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
-                }, {
-                    prefix: "/static/i18n/euth_",
-                    suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
-                }]
+                prefix: "/static/i18n/countries_",
+                suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
+            }, {
+                prefix: "/static/i18n/euth_",
+                suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
+            }]
         });
         $translateProvider.useSanitizeValueStrategy("escape");
         $translateProvider.preferredLanguage(config.locale);
@@ -169,11 +169,10 @@ export var init = (config: AdhConfig.IService, metaApi) => {
     }]);
 
     app.value("angular", angular);
-
+    app.value("leaflet", leaflet);
     app.value("markdownit", markdownit);
     app.value("modernizr", modernizr);
     app.value("moment", moment);
-    app.value("leaflet", leaflet);
 
     // register our modules
     AdhAbuseModule.register(angular);
@@ -216,7 +215,7 @@ export var init = (config: AdhConfig.IService, metaApi) => {
     AdhWebSocketModule.register(angular);
 
     // force-load some services
-    var injector = angular.bootstrap(document.body, ["a3"], { strictDi: true });
+    var injector = angular.bootstrap(document.body, ["a3"], {strictDi: true});
     injector.get("adhCrossWindowMessaging");
 
     loadComplete();
