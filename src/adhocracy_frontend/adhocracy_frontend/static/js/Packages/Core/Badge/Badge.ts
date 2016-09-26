@@ -11,14 +11,14 @@ import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as AdhUtil from "../Util/Util";
 
-import RIBadgeAssignment from "../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment";
-import * as SIBadge from "../../Resources_/adhocracy_core/sheets/badge/IBadge";
-import * as SIBadgeable from "../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
-import * as SIBadgeAssignment from "../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment";
-import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
-import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
-import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
-import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
+import RIBadgeAssignment from "../../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment";
+import * as SIBadge from "../../../Resources_/adhocracy_core/sheets/badge/IBadge";
+import * as SIBadgeable from "../../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
+import * as SIBadgeAssignment from "../../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment";
+import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIName from "../../../Resources_/adhocracy_core/sheets/name/IName";
+import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
+import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
 
 var pkgLocation = "/Badge";
 

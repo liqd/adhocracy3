@@ -11,17 +11,17 @@ import * as AdhRate from "../../Rate/Rate";
 import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
 import * as AdhUtil from "../../Util/Util";
 
-import RISystemUser from "../../../Resources_/adhocracy_core/resources/principal/ISystemUser";
-import * as SICommentable from "../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
-import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
-import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
-import * as SILocationReference from "../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
-import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
-import * as SIMultiPolygon from "../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
-import * as SIPoint from "../../../Resources_/adhocracy_core/sheets/geo/IPoint";
-import * as SIRateable from "../../../Resources_/adhocracy_core/sheets/rate/IRateable";
-import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
-import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import RISystemUser from "../../../../Resources_/adhocracy_core/resources/principal/ISystemUser";
+import * as SICommentable from "../../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
+import * as SIDescription from "../../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIImageReference from "../../../../Resources_/adhocracy_core/sheets/image/IImageReference";
+import * as SILocationReference from "../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
+import * as SIMetadata from "../../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SIMultiPolygon from "../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
+import * as SIPoint from "../../../../Resources_/adhocracy_core/sheets/geo/IPoint";
+import * as SIRateable from "../../../../Resources_/adhocracy_core/sheets/rate/IRateable";
+import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
+import * as SIVersionable from "../../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
 var pkgLocation = "/IdeaCollection/Proposal";
 

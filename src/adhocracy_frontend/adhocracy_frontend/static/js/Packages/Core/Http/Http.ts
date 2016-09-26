@@ -13,9 +13,9 @@ import * as AdhUtil from "../Util/Util";
 
 import * as ResourcesBase from "../../ResourcesBase";
 
-import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
-import * as SITags from "../../Resources_/adhocracy_core/sheets/tags/ITags";
-import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SITags from "../../../Resources_/adhocracy_core/sheets/tags/ITags";
+import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
 import * as AdhCache from "./Cache";
 import * as AdhConvert from "./Convert";

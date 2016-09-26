@@ -10,15 +10,15 @@ import * as AdhResourceUtil from "../Util/ResourceUtil";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 
-import RIComment from "../../Resources_/adhocracy_core/resources/comment/IComment";
-import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
-import RIExternalResource from "../../Resources_/adhocracy_core/resources/external_resource/IExternalResource";
-import RISystemUser from "../../Resources_/adhocracy_core/resources/principal/ISystemUser";
-import * as SICommentable from "../../Resources_/adhocracy_core/sheets/comment/ICommentable";
-import * as SIComment from "../../Resources_/adhocracy_core/sheets/comment/IComment";
-import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
-import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
-import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
+import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIExternalResource from "../../../Resources_/adhocracy_core/resources/external_resource/IExternalResource";
+import RISystemUser from "../../../Resources_/adhocracy_core/resources/principal/ISystemUser";
+import * as SICommentable from "../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
+import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
+import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
+import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
 var pkgLocation = "/Comment";
 

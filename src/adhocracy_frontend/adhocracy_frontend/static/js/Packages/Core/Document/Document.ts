@@ -8,20 +8,20 @@ import * as AdhUtil from "../Util/Util";
 
 import * as ResourcesBase from "../ResourcesBase";
 
-import RIDocument from "../../Resources_/adhocracy_core/resources/document/IDocument";
-import RIDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
-import RIGeoDocument from "../../Resources_/adhocracy_core/resources/document/IGeoDocument";
-import RIGeoDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion";
-import RIParagraph from "../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
-import RIParagraphVersion from "../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion";
-import * as SICommentable from "../../Resources_/adhocracy_core/sheets/comment/ICommentable";
-import * as SIDocument from "../../Resources_/adhocracy_core/sheets/document/IDocument";
-import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
-import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
-import * as SIParagraph from "../../Resources_/adhocracy_core/sheets/document/IParagraph";
-import * as SIPoint from "../../Resources_/adhocracy_core/sheets/geo/IPoint";
-import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
-import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import RIDocument from "../../../Resources_/adhocracy_core/resources/document/IDocument";
+import RIDocumentVersion from "../../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
+import RIGeoDocument from "../../../Resources_/adhocracy_core/resources/document/IGeoDocument";
+import RIGeoDocumentVersion from "../../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion";
+import RIParagraph from "../../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
+import RIParagraphVersion from "../../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion";
+import * as SICommentable from "../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
+import * as SIDocument from "../../../Resources_/adhocracy_core/sheets/document/IDocument";
+import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
+import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SIParagraph from "../../../Resources_/adhocracy_core/sheets/document/IParagraph";
+import * as SIPoint from "../../../Resources_/adhocracy_core/sheets/geo/IPoint";
+import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
+import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
 var pkgLocation = "/Document";
 

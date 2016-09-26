@@ -11,8 +11,8 @@ import * as AdhWebSocketModule from "../WebSocket/Module";
 
 import * as AdhRate from "./Rate";
 
-import * as SILikeable from "../../Resources_/adhocracy_core/sheets/rate/ILikeable";
-import * as SIRateable from "../../Resources_/adhocracy_core/sheets/rate/IRateable";
+import * as SILikeable from "../../../Resources_/adhocracy_core/sheets/rate/ILikeable";
+import * as SIRateable from "../../../Resources_/adhocracy_core/sheets/rate/IRateable";
 
 
 export var moduleName = "adhRate";

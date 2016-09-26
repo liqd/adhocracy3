@@ -7,7 +7,7 @@ import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
-import * as SIBadgeable from "../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
+import * as SIBadgeable from "../../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
 
 var pkgLocation = "/ResourceActions";
 

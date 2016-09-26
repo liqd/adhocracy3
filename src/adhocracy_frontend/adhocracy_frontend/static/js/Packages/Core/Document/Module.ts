@@ -16,7 +16,7 @@ import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 
 import * as AdhDocument from "./Document";
 
-import RIGeoDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion";
+import RIGeoDocumentVersion from "../../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion";
 
 export var moduleName = "adhDocument";
 

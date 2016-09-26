@@ -7,8 +7,8 @@ import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 
 import * as ResourcesBase from "../../ResourcesBase";
 
-import RIParagraph from "../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
-import * as SITags from "../../Resources_/adhocracy_core/sheets/tags/ITags";
+import RIParagraph from "../../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
+import * as SITags from "../../../Resources_/adhocracy_core/sheets/tags/ITags";
 
 import * as Convert from "./Convert";
 import * as Error from "./Error";

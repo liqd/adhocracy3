@@ -12,10 +12,10 @@ import * as AdhResourceUtil from "../Util/ResourceUtil";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 
-import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
-import * as SITags from "../../Resources_/adhocracy_core/sheets/tags/ITags";
-import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
-import * as SIWorkflowAssignment from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
+import RIProcess from "../../../Resources_/adhocracy_core/resources/process/IProcess";
+import * as SITags from "../../../Resources_/adhocracy_core/sheets/tags/ITags";
+import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import * as SIWorkflowAssignment from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/ResourceArea";
 

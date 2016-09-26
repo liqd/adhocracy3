@@ -13,7 +13,7 @@ import * as AdhWebSocket from "../WebSocket/WebSocket";
 
 import * as ResourcesBase from "../../ResourcesBase";
 
-import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
+import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 
 var pkgLocation = "/Listing";
 

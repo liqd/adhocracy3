@@ -6,13 +6,13 @@ import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhUtil from "../Util/Util";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
-import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
-import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
-import * as SILocationReference from "../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
-import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
-import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
-import * as SIWorkflow from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
-import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
+import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
+import * as SILocationReference from "../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
+import * as SIName from "../../../Resources_/adhocracy_core/sheets/name/IName";
+import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
+import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
+import RIProcess from "../../../Resources_/adhocracy_core/resources/process/IProcess";
 
 var pkgLocation = "/Process";
 

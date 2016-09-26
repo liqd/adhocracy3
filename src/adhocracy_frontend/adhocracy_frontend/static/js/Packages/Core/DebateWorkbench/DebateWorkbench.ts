@@ -9,14 +9,14 @@ import * as AdhUtil from "../Util/Util";
 
 import * as ResourcesBase from "../../ResourcesBase";
 
-import RIComment from "../../Resources_/adhocracy_core/resources/comment/IComment";
-import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
-import RIDocument from "../../Resources_/adhocracy_core/resources/document/IDocument";
-import RIDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
-import RIParagraph from "../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
-import RIParagraphVersion from "../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion";
-import * as SIComment from "../../Resources_/adhocracy_core/sheets/comment/IComment";
-import * as SIParagraph from "../../Resources_/adhocracy_core/sheets/document/IParagraph";
+import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
+import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIDocument from "../../../Resources_/adhocracy_core/resources/document/IDocument";
+import RIDocumentVersion from "../../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
+import RIParagraph from "../../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
+import RIParagraphVersion from "../../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion";
+import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
+import * as SIParagraph from "../../../Resources_/adhocracy_core/sheets/document/IParagraph";
 
 var pkgLocation = "/DebateWorkbench";
 

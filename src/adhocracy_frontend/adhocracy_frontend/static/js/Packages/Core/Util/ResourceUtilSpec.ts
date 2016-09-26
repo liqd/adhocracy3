@@ -2,8 +2,8 @@
 
 import * as AdhResourceUtil from "./ResourceUtil";
 
-import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
-import RIPool from "../../Resources_/adhocracy_core/interfaces/IPool";
+import RIProcess from "../../../Resources_/adhocracy_core/resources/process/IProcess";
+import RIPool from "../../../Resources_/adhocracy_core/interfaces/IPool";
 
 export var register = () => {
     describe("ResourceUtil", () => {

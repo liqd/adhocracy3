@@ -4,7 +4,7 @@ import * as AdhMetaApi from "../MetaApi/MetaApi";
 
 import * as ResourcesBase from "../../ResourcesBase";
 
-import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
 import * as AdhUtil from "./Util";
 

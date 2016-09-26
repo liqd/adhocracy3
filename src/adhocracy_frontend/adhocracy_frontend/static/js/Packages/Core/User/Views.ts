@@ -16,19 +16,19 @@ import * as AdhUtil from "../Util/Util";
 import * as AdhCredentials from "./Credentials";
 import * as AdhUser from "./User";
 
-import RIComment from "../../Resources_/adhocracy_core/resources/comment/IComment";
-import RIProposal from "../../Resources_/adhocracy_core/resources/proposal/IProposal";
-import RIRate from "../../Resources_/adhocracy_core/resources/rate/IRate";
-import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
-import RISystemUser from "../../Resources_/adhocracy_core/resources/principal/ISystemUser";
-import * as SIAnonymizeDefault from "../../Resources_/adhocracy_core/sheets/principal/IAnonymizeDefault";
-import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
-import * as SIHasAssetPool from "../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
-import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
-import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
-import * as SIPasswordAuthentication from "../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication";
-import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
-import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
+import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
+import RIProposal from "../../../Resources_/adhocracy_core/resources/proposal/IProposal";
+import RIRate from "../../../Resources_/adhocracy_core/resources/rate/IRate";
+import RIUser from "../../../Resources_/adhocracy_core/resources/principal/IUser";
+import RISystemUser from "../../../Resources_/adhocracy_core/resources/principal/ISystemUser";
+import * as SIAnonymizeDefault from "../../../Resources_/adhocracy_core/sheets/principal/IAnonymizeDefault";
+import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIHasAssetPool from "../../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
+import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
+import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SIPasswordAuthentication from "../../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication";
+import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
+import * as SIUserBasic from "../../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
 
 var pkgLocation = "/User";
 

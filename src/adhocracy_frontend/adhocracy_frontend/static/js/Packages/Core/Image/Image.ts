@@ -4,11 +4,11 @@ import * as AdhConfig from "../Config/Config";
 import * as AdhHttp from "../Http/Http";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
-import RIImage from "../../Resources_/adhocracy_core/resources/image/IImage";
-import * as SIHasAssetPool from "../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
-import * as SIImageMetadata from "../../Resources_/adhocracy_core/sheets/image/IImageMetadata";
-import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
-import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import RIImage from "../../../Resources_/adhocracy_core/resources/image/IImage";
+import * as SIHasAssetPool from "../../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
+import * as SIImageMetadata from "../../../Resources_/adhocracy_core/sheets/image/IImageMetadata";
+import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
+import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
 var pkgLocation = "/Image";
 

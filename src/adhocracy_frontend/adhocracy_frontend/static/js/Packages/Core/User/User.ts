@@ -4,12 +4,12 @@ import * as AdhHttp from "../Http/Http";
 
 import * as AdhCredentials from "./Credentials";
 
-import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
-import * as SIAnonymizeDefault from "../../Resources_/adhocracy_core/sheets/principal/IAnonymizeDefault";
-import * as SIPasswordAuthentication from "../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication";
-import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
-import * as SIUserExtended from "../../Resources_/adhocracy_core/sheets/principal/IUserExtended";
-import * as SICaptcha from "../../Resources_/adhocracy_core/sheets/principal/ICaptcha";
+import RIUser from "../../../Resources_/adhocracy_core/resources/principal/IUser";
+import * as SIAnonymizeDefault from "../../../Resources_/adhocracy_core/sheets/principal/IAnonymizeDefault";
+import * as SIPasswordAuthentication from "../../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication";
+import * as SIUserBasic from "../../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
+import * as SIUserExtended from "../../../Resources_/adhocracy_core/sheets/principal/IUserExtended";
+import * as SICaptcha from "../../../Resources_/adhocracy_core/sheets/principal/ICaptcha";
 
 
 export interface IUserBasic {

@@ -23,7 +23,7 @@ import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
 import * as AdhUserViews from "./Views";
 
-import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
+import RIUser from "../../../Resources_/adhocracy_core/resources/principal/IUser";
 
 export var moduleName = "adhUserViews";
 

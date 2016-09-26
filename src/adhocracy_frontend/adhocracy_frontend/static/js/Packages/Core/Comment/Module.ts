@@ -16,7 +16,7 @@ import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 import * as AdhComment from "./Comment";
 import * as AdhEmbed from "../Embed/Embed";
 
-import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 
 export var moduleName = "adhComment";
 

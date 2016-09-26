@@ -14,14 +14,14 @@ import * as AdhUser from "../User/User";
 import * as AdhUtil from "../Util/Util";
 import * as AdhWebSocket from "../WebSocket/WebSocket";
 
-import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
-import RIRate from "../../Resources_/adhocracy_core/resources/rate/IRate";
-import RIRateVersion from "../../Resources_/adhocracy_core/resources/rate/IRateVersion";
-import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
-import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
-import * as SIRate from "../../Resources_/adhocracy_core/sheets/rate/IRate";
-import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
-import * as SIWorkflow from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
+import RIProcess from "../../../Resources_/adhocracy_core/resources/process/IProcess";
+import RIRate from "../../../Resources_/adhocracy_core/resources/rate/IRate";
+import RIRateVersion from "../../../Resources_/adhocracy_core/resources/rate/IRateVersion";
+import RIUser from "../../../Resources_/adhocracy_core/resources/principal/IUser";
+import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
+import * as SIRate from "../../../Resources_/adhocracy_core/sheets/rate/IRate";
+import * as SIUserBasic from "../../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
+import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/Rate";
 

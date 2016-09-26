@@ -6,10 +6,10 @@ import * as AdhPermissions from "../../Permissions/Permissions";
 import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
 
-import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
-import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
-import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
-import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
+import RIComment from "../../../../Resources_/adhocracy_core/resources/comment/IComment";
+import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import * as SIComment from "../../../../Resources_/adhocracy_core/sheets/comment/IComment";
+import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 export var pkgLocation = "/IdeaCollection/Workbench";
 

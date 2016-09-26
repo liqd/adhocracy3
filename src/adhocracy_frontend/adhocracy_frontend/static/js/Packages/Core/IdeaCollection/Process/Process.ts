@@ -8,11 +8,11 @@ import * as AdhHttp from "../../Http/Http";
 import * as AdhPermissions from "../../Permissions/Permissions";
 import * as AdhProcess from "../../Process/Process";
 
-import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
-import * as SILocationReference from "../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
-import * as SIMultiPolygon from "../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
-import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
-import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
+import * as SIDescription from "../../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SILocationReference from "../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
+import * as SIMultiPolygon from "../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
+import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
+import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/IdeaCollection/Process";
 
