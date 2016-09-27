@@ -1,0 +1,15 @@
+.header-link {
+    float: left;
+
+    a {
+        @include rem(padding, 5px);
+        text-transform: uppercase;
+        text-decoration: none;
+        font-weight: $font-weight-extrovert;
+    }
+
+    &:focus a {
+        color: $color-brand-one-introvert;
+        cursor: default;
+    }
+}
