@@ -1,19 +1,19 @@
-import * as AdhEmbedModule from "../../Embed/Module";
-import * as AdhIdeaCollectionModule from "../../IdeaCollection/Module";
-import * as AdhNamesModule from "../../Names/Module";
-import * as AdhProcessModule from "../../Process/Module";
-import * as AdhResourceAreaModule from "../../ResourceArea/Module";
+import * as AdhEmbedModule from "../../Core/Embed/Module";
+import * as AdhIdeaCollectionModule from "../../Core/IdeaCollection/Module";
+import * as AdhNamesModule from "../../Core/Names/Module";
+import * as AdhProcessModule from "../../Core/Process/Module";
+import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
 
-import * as AdhIdeaCollectionWorkbench from "../../IdeaCollection/Workbench/Workbench";
-import * as AdhNames from "../../Names/Names";
-import * as AdhProcess from "../../Process/Process";
-import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
+import * as AdhIdeaCollectionWorkbench from "../../Core/IdeaCollection/Workbench/Workbench";
+import * as AdhNames from "../../Core/Names/Names";
+import * as AdhProcess from "../../Core/Process/Process";
+import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
 
 import RIGeoProposal from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
 import RIGeoProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
 import RIIdeaCollectionProcess from "../../../Resources_/adhocracy_meinberlin/resources/idea_collection/IProcess";
 
-import * as AdhEmbed from "../../Embed/Embed";
+import * as AdhEmbed from "../../Core/Embed/Embed";
 
 
 export var moduleName = "adhMeinberlinIdeaCollection";

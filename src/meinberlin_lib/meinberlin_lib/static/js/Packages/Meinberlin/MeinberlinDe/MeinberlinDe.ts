@@ -1,7 +1,7 @@
 /// <reference path="../../../../lib2/types/angular.d.ts"/>
 
-import * as AdhConfig from "../../Config/Config";
-import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
+import * as AdhConfig from "../../Core/Config/Config";
+import * as AdhTopLevelState from "../../Core/TopLevelState/TopLevelState";
 
 
 var pkgLocation = "/Meinberlin/MeinberlinDe";

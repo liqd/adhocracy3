@@ -25,7 +25,7 @@ process_meta = process.process_meta._replace(
     element_types=(IPoll,
                    ),
     is_implicit_addable=True,
-    default_workflow = 'stadtforum',
+    default_workflow='stadtforum',
 )
 
 

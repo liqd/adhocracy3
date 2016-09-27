@@ -1,21 +1,22 @@
-import * as AdhAngularHelpersModule from "../../../AngularHelpers/Module";
-import * as AdhBadgeModule from "../../../Badge/Module";
-import * as AdhBlogModule from "../../../Blog/Module";
-import * as AdhHttpModule from "../../../Http/Module";
-import * as AdhImageModule from "../../../Image/Module";
-import * as AdhInjectModule from "../../../Inject/Module";
-import * as AdhLocaleModule from "../../../Locale/Module";
-import * as AdhMetaApiModule from "../../../MetaApi/Module";
-import * as AdhNamesModule from "../../../Names/Module";
-import * as AdhPermissionsModule from "../../../Permissions/Module";
-import * as AdhPreliminaryNamesModule from "../../../PreliminaryNames/Module";
-import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
-import * as AdhResourceWidgetsModule from "../../../ResourceWidgets/Module";
-import * as AdhStickyModule from "../../../Sticky/Module";
-import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
+import * as AdhAngularHelpersModule from "../../../Core/AngularHelpers/Module";
+import * as AdhBadgeModule from "../../../Core/Badge/Module";
+import * as AdhHttpModule from "../../../Core/Http/Module";
+import * as AdhImageModule from "../../../Core/Image/Module";
+import * as AdhInjectModule from "../../../Core/Inject/Module";
+import * as AdhLocaleModule from "../../../Core/Locale/Module";
+import * as AdhMetaApiModule from "../../../Core/MetaApi/Module";
+import * as AdhNamesModule from "../../../Core/Names/Module";
+import * as AdhPermissionsModule from "../../../Core/Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../../../Core/PreliminaryNames/Module";
+import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
+import * as AdhResourceWidgetsModule from "../../../Core/ResourceWidgets/Module";
+import * as AdhStickyModule from "../../../Core/Sticky/Module";
+import * as AdhTopLevelStateModule from "../../../Core/TopLevelState/Module";
 
-import * as AdhNames from "../../../Names/Names";
-import * as AdhUtil from "../../../Util/Util";
+import * as AdhBlogModule from "../../../Blog/Module";
+
+import * as AdhNames from "../../../Core/Names/Names";
+import * as AdhUtil from "../../../Core/Util/Util";
 
 import RIMercator2015Process from "../../../../Resources_/adhocracy_mercator/resources/mercator/IProcess";
 import RIProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";

@@ -9,7 +9,7 @@ import * as _fs from "node-fs";
 import * as _ from "lodash";
 import * as Base from "./ResourcesBase";
 import * as UtilR from "./mkResources/Util";
-import * as MetaApi from "./Packages/MetaApi/MetaApi";
+import * as MetaApi from "./Packages/Core/MetaApi/MetaApi";
 
 
 
@@ -241,7 +241,7 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
         header += "/* tslint:disable:variable-name */\n\n";
         header += "import * as Base from \"" + canonicalizePath(relativeRoot + "../ResourcesBase") + "\";\n";
         header += "import * as PreliminaryNames from \"" +
-            canonicalizePath(relativeRoot + "../Packages/PreliminaryNames/PreliminaryNames") + "\";\n\n";
+            canonicalizePath(relativeRoot + "../Packages/Core/PreliminaryNames/PreliminaryNames") + "\";\n\n";
 
         var footer = "";
         footer += "/* tslint:enable:variable-name */\n";

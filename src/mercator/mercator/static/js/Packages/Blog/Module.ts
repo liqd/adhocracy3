@@ -1,15 +1,15 @@
-import * as AdhEmbedModule from "../Embed/Module";
-import * as AdhHttpModule from "../Http/Module";
-import * as AdhImageModule from "../Image/Module";
-import * as AdhListingModule from "../Listing/Module";
-import * as AdhMarkdownModule from "../Markdown/Module";
-import * as AdhNamesModule from "../Names/Module";
-import * as AdhPermissionsModule from "../Permissions/Module";
-import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
+import * as AdhEmbedModule from "../Core/Embed/Module";
+import * as AdhHttpModule from "../Core/Http/Module";
+import * as AdhImageModule from "../Core/Image/Module";
+import * as AdhListingModule from "../Core/Listing/Module";
+import * as AdhMarkdownModule from "../Core/Markdown/Module";
+import * as AdhNamesModule from "../Core/Names/Module";
+import * as AdhPermissionsModule from "../Core/Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../Core/PreliminaryNames/Module";
 
-import * as AdhEmbed from "../Embed/Embed";
-import * as AdhNames from "../Names/Names";
-import * as AdhResourceArea from "../ResourceArea/ResourceArea";
+import * as AdhEmbed from "../Core/Embed/Embed";
+import * as AdhNames from "../Core/Names/Names";
+import * as AdhResourceArea from "../Core/ResourceArea/ResourceArea";
 
 import * as Blog from "./Blog";
 
@@ -26,7 +26,6 @@ export var register = (angular) => {
             AdhImageModule.moduleName,
             AdhListingModule.moduleName,
             AdhMarkdownModule.moduleName,
-            AdhNamesModule.moduleName,
             AdhPermissionsModule.moduleName,
             AdhPreliminaryNamesModule.moduleName
         ])

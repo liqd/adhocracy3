@@ -56,10 +56,9 @@ def _get_processes_with_auto_transition(root: IRoot,
     catalogs = find_service(root, 'catalogs')
     query = search_query._replace(interfaces=IProcess)
     processes = catalogs.search(query).elements
-    check_auto_transition_enabled = \
-        lambda r: _auto_transition_enabled(r, registry)
-    processes_with_auto_transition = filter(check_auto_transition_enabled,
-                                            processes)
+    processes_with_auto_transition = filter(
+        lambda r: _auto_transition_enabled(r, registry),
+        processes)
     return processes_with_auto_transition
 
 
