@@ -18,7 +18,7 @@ states:
         - [create_rate,          ~,         D,           ~,         D,       ~,         ~]
         - [edit_rate,            ~,         ~,           ~,         D,       ~,         ~]
         - [create_comment,       ~,         D,           D,         ~,       D,         ~]
-        - [do_transition,        ~,         ~,           ~,         A,       ~,         ~]
+        - [do_transition,        ~,         A,           ~,         ~,       ~,         ~]
 transitions:
   to_voteable:
     from_state: proposed

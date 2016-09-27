@@ -1,13 +1,13 @@
-import * as AdhAbuseModule from "../../../Abuse/Module";
-import * as AdhCommentModule from "../../../Comment/Module";
-import * as AdhHttpModule from "../../../Http/Module";
-import * as AdhListingModule from "../../../Listing/Module";
-import * as AdhMovingColumnsModule from "../../../MovingColumns/Module";
-import * as AdhPermissionsModule from "../../../Permissions/Module";
-import * as AdhResourceActionsModule from "../../../ResourceActions/Module";
-import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
-import * as AdhUserModule from "../../../User/Module";
+import * as AdhAbuseModule from "../../../Core/Abuse/Module";
+import * as AdhCommentModule from "../../../Core/Comment/Module";
+import * as AdhHttpModule from "../../../Core/Http/Module";
+import * as AdhListingModule from "../../../Core/Listing/Module";
+import * as AdhMovingColumnsModule from "../../../Core/MovingColumns/Module";
+import * as AdhPermissionsModule from "../../../Core/Permissions/Module";
+import * as AdhResourceActionsModule from "../../../Core/ResourceActions/Module";
+import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../../../Core/TopLevelState/Module";
+import * as AdhUserModule from "../../../Core/User/Module";
 
 import RIProcess from "../../../../Resources_/adhocracy_mercator/resources/mercator/IProcess";
 

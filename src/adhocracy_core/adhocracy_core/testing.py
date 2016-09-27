@@ -104,8 +104,7 @@ def register_sheet(context, mock_sheet, registry, isheet=None) -> Mock:
 def create_event_listener(config: Configurator, ievent: IInterface) -> list:
     """Register dummy event listener that adds events to the returned List."""
     events = []
-    listener = lambda event: events.append(event)
-    config.add_subscriber(listener, ievent)
+    config.add_subscriber(lambda event: events.append(event), ievent)
     return events
 
 
@@ -281,8 +280,7 @@ def node() -> MappingSchema:
 def changelog(changelog_meta) -> dict:
     """Return transaction_changelog dictionary."""
     from collections import defaultdict
-    metadata = lambda: changelog_meta
-    return defaultdict(metadata)
+    return defaultdict(lambda: changelog_meta)
 
 
 @fixture

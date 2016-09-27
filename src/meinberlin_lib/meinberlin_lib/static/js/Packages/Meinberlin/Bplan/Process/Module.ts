@@ -1,9 +1,9 @@
-import * as AdhHttpModule from "../../../Http/Module";
-import * as AdhPreliminaryNamesModule from "../../../PreliminaryNames/Module";
-import * as AdhEmbedModule from "../../../Embed/Module";
-import * as AdhAngularHelpers from "../../../AngularHelpers/Module";
+import * as AdhHttpModule from "../../../Core/Http/Module";
+import * as AdhPreliminaryNamesModule from "../../../Core/PreliminaryNames/Module";
+import * as AdhEmbedModule from "../../../Core/Embed/Module";
+import * as AdhAngularHelpers from "../../../Core/AngularHelpers/Module";
 
-import * as AdhEmbed from "../../../Embed/Embed";
+import * as AdhEmbed from "../../../Core/Embed/Embed";
 
 import * as Process from "./Process";
 

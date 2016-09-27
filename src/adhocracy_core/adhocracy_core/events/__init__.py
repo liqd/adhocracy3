@@ -269,7 +269,7 @@ class ActivitiesAddedToAuditLog:
 
 
 def includeme(config):
-    """register event subscriber predicates 'isheet' and 'interface'."""
+    """Register event subscriber predicates 'isheet' and 'interface'."""
     config.include('substanced.event')
     config.add_subscriber_predicate('event_isheet', _ISheetPredicate)
     config.add_subscriber_predicate('object_iface', _InterfacePredicate)
