@@ -1,12 +1,12 @@
-import * as AdhEmbedModule from "../Core/Embed/Module";
-import * as AdhPermissionsModule from "../Core/Permissions/Module";
-import * as AdhResourceAreaModule from "../Core/ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../Core/TopLevelState/Module";
-import * as AdhUserViewsModule from "../Core/User/ViewsModule";
+import * as AdhEmbedModule from "../../Core/Embed/Module";
+import * as AdhPermissionsModule from "../../Core/Permissions/Module";
+import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../../Core/TopLevelState/Module";
+import * as AdhUserViewsModule from "../../Core/User/ViewsModule";
 
-import * as AdhEmbed from "../Core/Embed/Embed";
-import * as AdhResourceArea from "../Core/ResourceArea/ResourceArea";
-import * as AdhUserViews from "../Core/User/Views";
+import * as AdhEmbed from "../../Core/Embed/Embed";
+import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
+import * as AdhUserViews from "../../Core/User/Views";
 
 import * as AdhS1WorkbenchModule from "../Workbench/Module";
 import * as AdhS1Workbench from "../Workbench/Workbench";

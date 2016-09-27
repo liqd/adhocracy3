@@ -1,12 +1,12 @@
-import * as AdhAngularHelpersModule from "../Core/AngularHelpers/Module";
-import * as AdhAnonymizeModule from "../Core/Anonymize/Module";
-import * as AdhBadgeModule from "../Core/Badge/Module";
-import * as AdhHttpModule from "../Core/Http/Module";
-import * as AdhPermissionsModule from "../Core/Permissions/Module";
-import * as AdhPreliminaryNamesModule from "../Core/PreliminaryNames/Module";
-import * as AdhRateModule from "../Core/Rate/Module";
-import * as AdhResourceAreaModule from "../Core/ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../Core/TopLevelState/Module";
+import * as AdhAngularHelpersModule from "../../Core/AngularHelpers/Module";
+import * as AdhAnonymizeModule from "../../Core/Anonymize/Module";
+import * as AdhBadgeModule from "../../Core/Badge/Module";
+import * as AdhHttpModule from "../../Core/Http/Module";
+import * as AdhPermissionsModule from "../../Core/Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../../Core/PreliminaryNames/Module";
+import * as AdhRateModule from "../../Core/Rate/Module";
+import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../../Core/TopLevelState/Module";
 
 import * as Proposal from "./Proposal";
 

@@ -1,14 +1,14 @@
 /// <reference path="../../../../lib2/types/angular.d.ts"/>
 
-import * as AdhBadge from "../Core/Badge/Badge";
-import * as AdhConfig from "../Core/Config/Config";
-import * as AdhHttp from "../Core/Http/Http";
-import * as AdhPermissions from "../Core/Permissions/Permissions";
-import * as AdhPreliminaryNames from "../Core/PreliminaryNames/PreliminaryNames";
-import * as AdhProcess from "../Core/Process/Process";
-import * as AdhRate from "../Core/Rate/Rate";
-import * as AdhTopLevelState from "../Core/TopLevelState/TopLevelState";
-import * as AdhUtil from "../Core/Util/Util";
+import * as AdhBadge from "../../Core/Badge/Badge";
+import * as AdhConfig from "../../Core/Config/Config";
+import * as AdhHttp from "../../Core/Http/Http";
+import * as AdhPermissions from "../../Core/Permissions/Permissions";
+import * as AdhPreliminaryNames from "../../Core/PreliminaryNames/PreliminaryNames";
+import * as AdhProcess from "../../Core/Process/Process";
+import * as AdhRate from "../../Core/Rate/Rate";
+import * as AdhTopLevelState from "../../Core/TopLevelState/TopLevelState";
+import * as AdhUtil from "../../Core/Util/Util";
 
 import RISystemUser from "../../../Resources_/adhocracy_core/resources/principal/ISystemUser";
 import RIProposal from "../../../Resources_/adhocracy_s1/resources/s1/IProposal";
