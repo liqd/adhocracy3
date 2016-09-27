@@ -1,4 +1,4 @@
-/// <reference path="../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../../lib2/types/angular.d.ts"/>
 
 import * as AdhConfig from "../Config/Config";
 import * as AdhEmbed from "../Embed/Embed";
@@ -9,7 +9,7 @@ import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 
-import * as ResourcesBase from "../../ResourcesBase";
+import * as ResourcesBase from "../../../ResourcesBase";
 
 import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
