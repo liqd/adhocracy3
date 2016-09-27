@@ -1,15 +1,15 @@
-import * as AdhConfigModule from "../../../Config/Module";
-import * as AdhEmbedModule from "../../../Embed/Module";
-import * as AdhHttpModule from "../../../Http/Module";
-import * as AdhPermissionsModule from "../../../Permissions/Module";
-import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
+import * as AdhConfigModule from "../../../Core/Config/Module";
+import * as AdhEmbedModule from "../../../Core/Embed/Module";
+import * as AdhHttpModule from "../../../Core/Http/Module";
+import * as AdhPermissionsModule from "../../../Core/Permissions/Module";
+import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
 
-import * as AdhProcess from "../../../Process/Process";
+import * as AdhProcess from "../../../Core/Process/Process";
 
 import * as Process from "./Process";
 
-import RIProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
-import RIStadtforumProcess from "../../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IProcess";
+import RIProposalVersion from "../../../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
+import RIStadtforumProcess from "../../../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IProcess";
 
 
 export var moduleName = "adhMeinberlinStadtforumProcess";
