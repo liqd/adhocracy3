@@ -1,12 +1,12 @@
 /// <reference path="../../../../../lib2/types/angular.d.ts"/>
 
-import * as AdhBadge from "../../../Badge/Badge";
-import * as AdhConfig from "../../../Config/Config";
-import * as AdhHttp from "../../../Http/Http";
-import * as AdhPermissions from "../../../Permissions/Permissions";
-import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
-import * as AdhRate from "../../../Rate/Rate";
-import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
+import * as AdhBadge from "../../../Core/Badge/Badge";
+import * as AdhConfig from "../../../Core/Config/Config";
+import * as AdhHttp from "../../../Core/Http/Http";
+import * as AdhPermissions from "../../../Core/Permissions/Permissions";
+import * as AdhPreliminaryNames from "../../../Core/PreliminaryNames/PreliminaryNames";
+import * as AdhRate from "../../../Core/Rate/Rate";
+import * as AdhTopLevelState from "../../../Core/TopLevelState/TopLevelState";
 
 import * as SICommentable from "../../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIDescription from "../../../../Resources_/adhocracy_core/sheets/description/IDescription";

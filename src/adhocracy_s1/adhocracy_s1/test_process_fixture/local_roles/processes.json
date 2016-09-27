@@ -1,5 +1,5 @@
 [
     {"path": "/s1_private",
-     "roles": {"s1_private_participants": ["role:participant"]}
+     "roles": {"group:s1_private_participants": ["role:participant"]}
     }
 ]

@@ -25,8 +25,7 @@ def clear_changelog_callback(request):
 
 def create_changelog() -> dict:
     """Return dict that maps resource path to :class:`ChangelogMetadata`."""
-    metadata = lambda: changelog_meta
-    return defaultdict(metadata)
+    return defaultdict(lambda: changelog_meta)
 
 
 def clear_modification_date_callback(request):

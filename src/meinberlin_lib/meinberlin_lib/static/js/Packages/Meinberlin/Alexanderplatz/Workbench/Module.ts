@@ -1,19 +1,19 @@
-import * as AdhDocumentModule from "../../../Document/Module";
-import * as AdhHttpModule from "../../../Http/Module";
-import * as AdhMappingModule from "../../../Mapping/Module";
-import * as AdhIdeaCollectionModule from "../../../IdeaCollection/Module";
-import * as AdhMovingColumnsModule from "../../../MovingColumns/Module";
-import * as AdhPermissionsModule from "../../../Permissions/Module";
-import * as AdhProcessModule from "../../../Process/Module";
-import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
+import * as AdhDocumentModule from "../../../Core/Document/Module";
+import * as AdhHttpModule from "../../../Core/Http/Module";
+import * as AdhMappingModule from "../../../Core/Mapping/Module";
+import * as AdhIdeaCollectionModule from "../../../Core/IdeaCollection/Module";
+import * as AdhMovingColumnsModule from "../../../Core/MovingColumns/Module";
+import * as AdhPermissionsModule from "../../../Core/Permissions/Module";
+import * as AdhProcessModule from "../../../Core/Process/Module";
+import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../../../Core/TopLevelState/Module";
 
 import RIGeoProposal from "../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
 import RIGeoProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
 import RIAlexanderplatzProcess from "../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess";
 
-import * as AdhProcess from "../../../Process/Process";
-import * as AdhIdeaCollectionWorkbench from "../../../IdeaCollection/Workbench/Workbench";
+import * as AdhProcess from "../../../Core/Process/Process";
+import * as AdhIdeaCollectionWorkbench from "../../../Core/IdeaCollection/Workbench/Workbench";
 
 import * as Workbench from "./Workbench";
 

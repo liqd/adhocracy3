@@ -1,14 +1,14 @@
-import * as AdhEmbedModule from "../../Embed/Module";
-import * as AdhProcessModule from "../../Process/Module";
-import * as AdhResourceAreaModule from "../../ResourceArea/Module";
+import * as AdhEmbedModule from "../../Core/Embed/Module";
+import * as AdhProcessModule from "../../Core/Process/Module";
+import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
 
-import * as AdhIdeaCollectionModule from "../../IdeaCollection/Module";
+import * as AdhIdeaCollectionModule from "../../Core/IdeaCollection/Module";
 
-import * as AdhEmbed from "../../Embed/Embed";
-import * as AdhProcess from "../../Process/Process";
-import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
+import * as AdhEmbed from "../../Core/Embed/Embed";
+import * as AdhProcess from "../../Core/Process/Process";
+import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
 
-import * as AdhIdeaCollectionWorkbench from "../../IdeaCollection/Workbench/Workbench";
+import * as AdhIdeaCollectionWorkbench from "../../Core/IdeaCollection/Workbench/Workbench";
 
 import RIBuergerhaushaltProcess from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
 import RIBuergerhaushaltProposal from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal";
