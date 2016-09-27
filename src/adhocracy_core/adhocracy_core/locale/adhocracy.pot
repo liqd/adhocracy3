@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-07-11 15:59+0200\n"
+"POT-Creation-Date: 2016-09-27 18:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,43 +15,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: \n"
 "Generated-By: Lingua 3.10\n"
-
-#. Default: ${subject_name} added a ${object_type_name} to ${target_title}.
-#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:247
-msgid "activity_name_add"
-msgstr ""
-
-#. Default: ${subject_name} added the ${object_type_name} "${object_title}" to
-#. ${target_type_name} "${target_title}".
-#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:285
-msgid "activity_description_add"
-msgstr ""
-
-#. Default: ${subject_name} updated ${object_type_name}
-#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:252
-msgid "activity_name_update"
-msgstr ""
-
-#. Default: ${subject_name} updated ${object_type_name} "${object_title}".
-#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:291
-msgid "activity_description_update"
-msgstr ""
-
-#. Default: ${subject_name} removed a ${object_type_name} from ${target_title}.
-#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:256
-msgid "activity_name_remove"
-msgstr ""
-
-#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:261
-#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:302
-msgid "activity_missing"
-msgstr ""
-
-#. Default: ${subject_name} removed the ${object_type_name} "${object_title}"
-#. from ${target_type_name} "${target_title}".
-#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:296
-msgid "activity_description_remove"
-msgstr ""
 
 #. Default: ${site_name} Abuse Complaint
 #: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:119
@@ -94,6 +57,16 @@ msgstr ""
 msgid "mail_send_activity_subject"
 msgstr ""
 
+#. Default: ${site_name}: Password changed / Passwort wurde geändert
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:327
+msgid "mail_password_change_subject"
+msgstr ""
+
+#. Default: Your password has been changed.
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:331
+msgid "mail_password_change_body_txt"
+msgstr ""
+
 #. Default: Invitation to join ${site_name}
 #: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:241
 msgid "mail_invitation_subject"
@@ -114,36 +87,20 @@ msgstr ""
 msgid "mail_send_activity_add_update_body_txt"
 msgstr ""
 
-#: ././src/adhocracy_core/adhocracy_core/resources/document.py:47
-msgid "Document"
+#: ././src/adhocracy_core/adhocracy_core/sdi/views/catalogs.py:27
+msgid "Catalogs"
 msgstr ""
 
-#: ././src/adhocracy_core/adhocracy_core/resources/process.py:22
-msgid "Process"
-msgstr ""
-
-#: ././src/adhocracy_core/adhocracy_core/resources/comment.py:43
-msgid "Comment"
-msgstr ""
-
-#: ././src/adhocracy_core/adhocracy_core/resources/proposal.py:47
-msgid "Proposal"
-msgstr ""
-
-#: ././src/adhocracy_core/adhocracy_core/sdi/views/sheets.py:40
+#: ././src/adhocracy_core/adhocracy_core/sdi/views/sheets.py:39
 msgid "save"
 msgstr ""
 
-#: ././src/adhocracy_core/adhocracy_core/sdi/views/sheets.py:32
+#: ././src/adhocracy_core/adhocracy_core/sdi/views/sheets.py:31
 msgid "Sheets"
 msgstr ""
 
 #: ././src/adhocracy_core/adhocracy_core/sdi/views/sheets.py:84
 msgid "add"
-msgstr ""
-
-#: ././src/adhocracy_core/adhocracy_core/sdi/views/catalogs.py:27
-msgid "Catalogs"
 msgstr ""
 
 #: ././src/adhocracy_core/adhocracy_core/sdi/views/templates/rename.pt:11
@@ -164,4 +121,57 @@ msgstr ""
 
 #: ././src/adhocracy_core/adhocracy_core/sdi/views/templates/rename.pt:49
 msgid "Cancel"
+msgstr ""
+
+#: ././src/adhocracy_core/adhocracy_core/resources/proposal.py:47
+msgid "Proposal"
+msgstr ""
+
+#: ././src/adhocracy_core/adhocracy_core/resources/process.py:23
+msgid "Process"
+msgstr ""
+
+#: ././src/adhocracy_core/adhocracy_core/resources/comment.py:44
+msgid "Comment"
+msgstr ""
+
+#: ././src/adhocracy_core/adhocracy_core/resources/document.py:47
+msgid "Document"
+msgstr ""
+
+#. Default: ${subject_name} added a ${object_type_name} to ${target_title}.
+#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:254
+msgid "activity_name_add"
+msgstr ""
+
+#. Default: ${subject_name} added the ${object_type_name} "${object_title}" to
+#. ${target_type_name} "${target_title}".
+#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:292
+msgid "activity_description_add"
+msgstr ""
+
+#. Default: ${subject_name} updated ${object_type_name}
+#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:259
+msgid "activity_name_update"
+msgstr ""
+
+#. Default: ${subject_name} updated ${object_type_name} "${object_title}".
+#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:298
+msgid "activity_description_update"
+msgstr ""
+
+#. Default: ${subject_name} removed a ${object_type_name} from ${target_title}.
+#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:263
+msgid "activity_name_remove"
+msgstr ""
+
+#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:268
+#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:309
+msgid "activity_missing"
+msgstr ""
+
+#. Default: ${subject_name} removed the ${object_type_name} "${object_title}"
+#. from ${target_type_name} "${target_title}".
+#: ././src/adhocracy_core/adhocracy_core/auditing/__init__.py:303
+msgid "activity_description_remove"
 msgstr ""
