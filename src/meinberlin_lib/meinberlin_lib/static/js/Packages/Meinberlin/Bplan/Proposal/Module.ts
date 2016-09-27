@@ -1,10 +1,10 @@
-import * as AdhAngularHelpersModule from "../../../AngularHelpers/Module";
-import * as AdhEmbedModule from "../../../Embed/Module";
-import * as AdhHttpModule from "../../../Http/Module";
-import * as AdhPreliminaryNamesModule from "../../../PreliminaryNames/Module";
-import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
+import * as AdhAngularHelpersModule from "../../../Core/AngularHelpers/Module";
+import * as AdhEmbedModule from "../../../Core/Embed/Module";
+import * as AdhHttpModule from "../../../Core/Http/Module";
+import * as AdhPreliminaryNamesModule from "../../../Core/PreliminaryNames/Module";
+import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
 
-import * as AdhEmbed from "../../../Embed/Embed";
+import * as AdhEmbed from "../../../Core/Embed/Embed";
 
 import * as Proposal from "./Proposal";
 

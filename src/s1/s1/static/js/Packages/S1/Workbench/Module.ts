@@ -1,11 +1,11 @@
-import * as AdhCommentModule from "../../Comment/Module";
-import * as AdhHttpModule from "../../Http/Module";
-import * as AdhMarkdownModule from "../../Markdown/Module";
-import * as AdhProcessModule from "../../Process/Module";
-import * as AdhResourceAreaModule from "../../ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
+import * as AdhCommentModule from "../../Core/Comment/Module";
+import * as AdhHttpModule from "../../Core/Http/Module";
+import * as AdhMarkdownModule from "../../Core/Markdown/Module";
+import * as AdhProcessModule from "../../Core/Process/Module";
+import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../../Core/TopLevelState/Module";
 
-import * as AdhProcess from "../../Process/Process";
+import * as AdhProcess from "../../Core/Process/Process";
 
 import RIS1Process from "../../../Resources_/adhocracy_s1/resources/s1/IProcess";
 

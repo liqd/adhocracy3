@@ -1,17 +1,17 @@
-import * as AdhEmbedModule from "../../Embed/Module";
-import * as AdhResourceAreaModule from "../../ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
+import * as AdhEmbedModule from "../../Core/Embed/Module";
+import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../../Core/TopLevelState/Module";
 
-import * as AdhDebateWorkbenchModule from "../../DebateWorkbench/Module";
+import * as AdhDebateWorkbenchModule from "../../Core/DebateWorkbench/Module";
 import * as AdhMeinberlinAlexanderplatzWorkbenchModule from "../Alexanderplatz/Workbench/Module";
-import * as AdhIdeaCollectionModule from "../../IdeaCollection/Module";
+import * as AdhIdeaCollectionModule from "../../Core/IdeaCollection/Module";
 
-import * as AdhEmbed from "../../Embed/Embed";
-import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
+import * as AdhEmbed from "../../Core/Embed/Embed";
+import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
 
-import * as AdhDebateWorkbench from "../../DebateWorkbench/DebateWorkbench";
+import * as AdhDebateWorkbench from "../../Core/DebateWorkbench/DebateWorkbench";
 import * as AdhMeinberlinAlexanderplatzWorkbench from "../Alexanderplatz/Workbench/Workbench";
-import * as AdhIdeaCollectionWorkbench from "../../IdeaCollection/Workbench/Workbench";
+import * as AdhIdeaCollectionWorkbench from "../../Core/IdeaCollection/Workbench/Workbench";
 
 import RIAlexanderplatzProcess from "../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess";
 import RIBuergerhaushaltProcess from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
