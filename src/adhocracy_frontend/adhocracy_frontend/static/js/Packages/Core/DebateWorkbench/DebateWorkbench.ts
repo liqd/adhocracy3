@@ -110,6 +110,8 @@ export var processDetailColumnDirective = (
                 }
             });
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
+            var context = adhEmbed.getContext();
+            scope.hasResourceHeader = (context === "");
         }
     };
 };
