@@ -1,6 +1,6 @@
 import * as Names from "./Names";
 
-import RIProposal from "../../Resources_/adhocracy_core/resources/proposal/IProposal";
+import RIProposal from "../../../Resources_/adhocracy_core/resources/proposal/IProposal";
 
 export var moduleName = "adhNames";
 
