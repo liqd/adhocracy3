@@ -11,7 +11,7 @@ export class Provider implements angular.IServiceProvider {
 export class Service {
     constructor(private provider : Provider) {}
 
-    public getName(resourceType : string, amount? : number) : string {
+    public getName(resourceType : string, amount : number = 1) : string {
         var ret : string;
         if (typeof this.provider.names[resourceType] !== "undefined") {
             ret = this.provider.names[resourceType];
