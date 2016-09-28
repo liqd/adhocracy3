@@ -2,6 +2,7 @@ from json import dumps
 from json import loads
 import unittest
 
+from adhocracy_core.testing import rest_url
 from pyramid import testing
 from zope.interface import alsoProvides
 import pytest
@@ -61,15 +62,14 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         zodb_root['app_root'] = app_root
         app_root.__name__ = app_root.__parent__ = None
         self._child = app_root['child']
-        rest_url = 'http://localhost:6541'
         request = testing.DummyRequest()
         request.registry = object()
         request.root = app_root
-        request.application_url = rest_url
         self.request = request
+        self.rest_url = rest_url()
         QueueingClientCommunicator.zodb_database = DummyZODBDatabase(
             zodb_root=zodb_root)
-        QueueingClientCommunicator.rest_url = rest_url
+        QueueingClientCommunicator.rest_url = self.rest_url
         self._comm = QueueingClientCommunicator()
         self._peer = 'websocket peer'
         self._connect()
@@ -98,43 +98,43 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         assert len(self._comm.queue) == 0
 
     def test_onMessage_valid_subscribe(self):
-        msg = build_message({'action': 'subscribe', 'resource': self.request.application_url + '/child/'})
+        msg = build_message({'action': 'subscribe', 'resource': self.rest_url + '/child/'})
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {'status': 'ok',
                                        'action': 'subscribe',
-                                       'resource': self.request.application_url + '/child/'}
+                                       'resource': self.rest_url + '/child/'}
 
     def test_onMessage_valid_unsubscribe(self):
-        msg = build_message({'action': 'subscribe', 'resource': self.request.application_url + '/child/'})
+        msg = build_message({'action': 'subscribe', 'resource': self.rest_url + '/child/'})
         self._comm.onMessage(msg, False)
-        msg = build_message({'action': 'unsubscribe', 'resource': self.request.application_url + '/child/'})
+        msg = build_message({'action': 'unsubscribe', 'resource': self.rest_url + '/child/'})
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 2
         assert self._comm.queue[-1] == {'status': 'ok',
                                         'action': 'unsubscribe',
-                                        'resource': self.request.application_url + '/child/'}
+                                        'resource': self.rest_url + '/child/'}
 
     def test_onMessage_redundant_subscribe(self):
-        msg = build_message({'action': 'subscribe', 'resource': self.request.application_url + '/child/'})
+        msg = build_message({'action': 'subscribe', 'resource': self.rest_url + '/child/'})
         self._comm.onMessage(msg, False)
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 2
         assert self._comm.queue[-1] == {'status': 'redundant',
                                         'action': 'subscribe',
-                                        'resource': self.request.application_url + '/child/'}
+                                        'resource': self.rest_url + '/child/'}
 
     def test_onMessage_resubscribe_after_unsubscribe(self):
-        msg = build_message({'action': 'subscribe', 'resource': self.request.application_url + '/child/'})
+        msg = build_message({'action': 'subscribe', 'resource': self.rest_url + '/child/'})
         self._comm.onMessage(msg, False)
-        msg = build_message({'action': 'unsubscribe', 'resource': self.request.application_url + '/child/'})
+        msg = build_message({'action': 'unsubscribe', 'resource': self.rest_url + '/child/'})
         self._comm.onMessage(msg, False)
-        msg = build_message({'action': 'subscribe', 'resource': self.request.application_url + '/child/'})
+        msg = build_message({'action': 'subscribe', 'resource': self.rest_url + '/child/'})
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 3
         assert self._comm.queue[-1] == {'status': 'ok',
                                         'action': 'subscribe',
-                                        'resource': self.request.application_url + '/child/'}
+                                        'resource': self.rest_url + '/child/'}
 
     def test_onMessage_subscribe_item_version(self):
         # Subscribing ItemVersions used to be forbidden, but it's now allowed.
@@ -142,13 +142,13 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         alsoProvides(self._child, IItemVersion)
         msg = build_message(
             {'action': 'subscribe',
-             'resource': self.request.application_url + '/child/'})
+             'resource': self.rest_url + '/child/'})
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {
             'status': 'ok',
             'action': 'subscribe',
-            'resource': self.request.application_url + '/child/'}
+            'resource': self.rest_url + '/child/'}
 
     def test_onMessage_with_binary_message(self):
         self._comm.onMessage(b'DEADBEEF', True)
@@ -173,14 +173,14 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         assert 'not a mapping type' in last_message['details']
 
     def test_onMessage_with_wrong_field(self):
-        msg = build_message({'event': 'created', 'resource': self.request.application_url + '/child/'})
+        msg = build_message({'event': 'created', 'resource': self.rest_url + '/child/'})
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {'error': 'invalid_json',
                                        'details': 'action: Required'}
 
     def test_onMessage_with_invalid_action(self):
-        msg = build_message({'action': 'just do it!', 'resource': self.request.application_url + '/child/'})
+        msg = build_message({'action': 'just do it!', 'resource': self.rest_url + '/child/'})
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {'error': 'unknown_action',
@@ -211,7 +211,7 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
             'details': ': "1" is not a mapping type: Does not implement dict-like functionality.'}
 
     def test_onMessage_with_wrong_field_name(self):
-        msg = build_message({'action': 'subscribe', 'wrong_name': self.request.application_url + '/child/'})
+        msg = build_message({'action': 'subscribe', 'wrong_name': self.rest_url + '/child/'})
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {'error': 'invalid_json',
@@ -228,7 +228,7 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {
             'event': 'modified',
-            'resource': self.request.application_url + '/child/'}
+            'resource': self.rest_url + '/child/'}
 
     def test_send_child_notification(self):
         child = self._child
@@ -236,8 +236,8 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         self._comm.send_child_notification('new', child, child['grandchild'])
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {'event': 'new_child',
-                                       'resource': self.request.application_url + '/child/',
-                                       'child': self.request.application_url + '/child/grandchild/'}
+                                       'resource': self.rest_url + '/child/',
+                                       'child': self.rest_url + '/child/grandchild/'}
 
     def test_send_new_version_notification(self):
         child = self._child
@@ -245,8 +245,8 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         self._comm.send_new_version_notification(child, child['version_007'])
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {'event': 'new_version',
-                                       'resource': self.request.application_url + '/child/',
-                                       'version': self.request.application_url + '/child/version_007/'}
+                                       'resource': self.rest_url + '/child/',
+                                       'version': self.rest_url + '/child/version_007/'}
 
     def test_client_may_send_notifications_if_localhost(self):
         self._connect('tcp:localhost:1234')
@@ -274,19 +274,18 @@ class EventDispatchUnitTests(unittest.TestCase):
         app_root.__name__ = app_root.__parent__ = None
         self._child = app_root['child']
         self._grandchild = app_root['child']['grandchild']
-        rest_url = 'http://localhost:6541'
         request = testing.DummyRequest()
         request.registry = object()
         request.root = app_root
-        request.application_url = rest_url
         self.request = request
+        self.rest_url = rest_url()
         QueueingClientCommunicator.zodb_database = DummyZODBDatabase(
             zodb_root=zodb_root)
-        QueueingClientCommunicator.rest_url = rest_url
+        QueueingClientCommunicator.rest_url = self.rest_url
         self._subscriber = QueueingClientCommunicator()
         connection_request = DummyConnectionRequest('websocket peer')
         self._subscriber.onConnect(connection_request)
-        msg = build_message({'action': 'subscribe', 'resource': request.application_url + '/child/'})
+        msg = build_message({'action': 'subscribe', 'resource': self.rest_url + '/child/'})
         self._subscriber.onMessage(msg, False)
         self._dispatcher = QueueingClientCommunicator()
         connection_request = DummyConnectionRequest('tcp:localhost:1234')
@@ -302,8 +301,8 @@ class EventDispatchUnitTests(unittest.TestCase):
         self._dispatcher.onMessage(msg, False)
         assert len(self._dispatcher.queue) == 0
         assert self._subscriber.queue[-1] == {'event': 'new_child',
-                                              'resource': self.request.application_url + '/child/',
-                                              'child': self.request.application_url + '/child/grandchild/'}
+                                              'resource': self.rest_url + '/child/',
+                                              'child': self.rest_url + '/child/grandchild/'}
 
     def test_dispatch_created_notification_new_version(self):
         from adhocracy_core.interfaces import IItemVersion
@@ -313,15 +312,15 @@ class EventDispatchUnitTests(unittest.TestCase):
         self._dispatcher.onMessage(msg, False)
         assert len(self._dispatcher.queue) == 0
         assert self._subscriber.queue[-1] == {'event': 'new_version',
-                                              'resource': self.request.application_url + '/child/',
-                                              'version': self.request.application_url + '/child/grandchild/'}
+                                              'resource': self.rest_url + '/child/',
+                                              'version': self.rest_url + '/child/grandchild/'}
 
     def test_dispatch_modified_notification(self):
         msg = build_message({'event': 'modified', 'resource': '/child'})
         self._dispatcher.onMessage(msg, False)
         assert len(self._dispatcher.queue) == 0
         assert self._subscriber.queue[-1] == {'event': 'modified',
-                                              'resource': self.request.application_url + '/child/'}
+                                              'resource': self.rest_url + '/child/'}
 
     def test_dispatch_modified_child_notification(self):
         msg = build_message({'event': 'modified',
@@ -329,8 +328,8 @@ class EventDispatchUnitTests(unittest.TestCase):
         self._dispatcher.onMessage(msg, False)
         assert len(self._dispatcher.queue) == 0
         assert self._subscriber.queue[-1] == {'event': 'modified_child',
-                                              'resource': self.request.application_url + '/child/',
-                                              'child': self.request.application_url + '/child/grandchild/'}
+                                              'resource': self.rest_url + '/child/',
+                                              'child': self.rest_url + '/child/grandchild/'}
 
     def test_dispatch_removed_notification_removed_child(self):
         msg = build_message({'event': 'removed',
@@ -339,8 +338,8 @@ class EventDispatchUnitTests(unittest.TestCase):
         assert len(self._dispatcher.queue) == 0
         assert self._subscriber.queue[-1] == {
             'event': 'removed_child',
-            'resource': self.request.application_url + '/child/',
-            'child': self.request.application_url + '/child/grandchild/'}
+            'resource': self.rest_url + '/child/',
+            'child': self.rest_url + '/child/grandchild/'}
 
     def test_dispatch_removed_notification_removed_resource(self):
         msg = build_message({'event': 'removed',
@@ -349,7 +348,7 @@ class EventDispatchUnitTests(unittest.TestCase):
         assert len(self._dispatcher.queue) == 0
         assert self._subscriber.queue[-1] == {
             'event': 'removed',
-            'resource': self.request.application_url + '/child/'}
+            'resource': self.rest_url + '/child/'}
 
     def test_dispatch_changed_descendants_notification(self):
         msg = build_message({'event': 'changed_descendants',
@@ -358,7 +357,7 @@ class EventDispatchUnitTests(unittest.TestCase):
         assert len(self._dispatcher.queue) == 0
         assert self._subscriber.queue[-1] == {
             'event': 'changed_descendants',
-            'resource': self.request.application_url + '/child/'}
+            'resource': self.rest_url + '/child/'}
 
     def test_dispatch_invalid_event_notification(self):
         msg = build_message({'event': 'new_child',

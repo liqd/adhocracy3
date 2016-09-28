@@ -801,7 +801,7 @@ def _get_api_auth_data(headers: [tuple], request: IRequest, user: IResource)\
         -> dict:
     token_headers = dict([(x, y) for x, y in headers if x == UserTokenHeader])
     token = token_headers[UserTokenHeader]
-    user_url = request.resource_url(user)
+    user_url = request.resource_url(user, route_name=API_ROUTE_NAME)
     # TODO: use colander schema to create cstruct
     return {'status': 'success',
             'user_path': user_url,

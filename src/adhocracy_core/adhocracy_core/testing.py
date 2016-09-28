@@ -48,7 +48,7 @@ from adhocracy_core.scripts import import_fixture
 broken_header = {'X-User-Path': '/principals/users/0000001',
                  'X-User-Token': ''}
 
-batch_url = '/batch'
+batch_url = '/api/batch'
 
 
 class DummyPool(testing.DummyResource):
@@ -205,7 +205,7 @@ def log(request) -> LogCapture:
 
 
 @fixture
-def request_():
+def request_(registry):
     """Return dummy request with additional validation attributes.
 
     Additional Attributes:
@@ -217,7 +217,18 @@ def request_():
     request.anonymized_user = None
     request.scheme = 'http'
     request.matched_route = None
+    request.application_url = 'http://localhost'
+    request.host = 'localhost:80'
+    request.domain = 'localhost'
+    request.registry
     return request
+
+
+@fixture
+def rest_url():
+    """Return API URL."""
+    rest_url = 'http://localhost/api'
+    return rest_url
 
 
 @fixture
@@ -409,8 +420,10 @@ def registry_with_content(registry, mock_content_registry):
 @fixture
 def config(request) -> Configurator:
     """Return dummy testing configuration."""
+    from adhocracy_core.interfaces import API_ROUTE_NAME
     config = testing.setUp()
     request.addfinalizer(testing.tearDown)
+    config.add_route(API_ROUTE_NAME, '/api*traverse')
     return config
 
 
@@ -689,7 +702,6 @@ class AppUser:
 
     def __init__(self,
                  app_router: Router,
-                 rest_url: str='http://localhost/api',
                  base_path: str='/',
                  header: dict=None,
                  user_path: str='',
@@ -701,7 +713,7 @@ class AppUser:
         """The adhocracy wsgi application"""
         self.app = TestApp(app_router)
         """:class:`webtest.TestApp`to send requests to the backend server."""
-        self.rest_url = rest_url
+        self.rest_url = rest_url()
         """backend server url to generate request urls."""
         self.base_path = base_path
         """path prefix to generate request urls."""
@@ -786,7 +798,7 @@ class AppUser:
     def _build_url(self, path: str) -> str:
         if path.startswith('http'):
             return path
-        elif path.startswith('/'):
+        elif path.startswith('/') and (self.base_path == '\\'):
             return self.rest_url + path
         else:
             return self.rest_url + self.base_path + path
@@ -795,6 +807,16 @@ class AppUser:
         """Build and post batch request to the backend rest server."""
         resp = self.app.post_json(batch_url, subrequests, headers=self.header,
                                   expect_errors=True)
+        return resp
+
+    def head(self, path: str, extra_headers={}) -> TestResponse:
+        """Send head request to the backend rest server."""
+        url = self._build_url(path)
+        headers = copy(self.header)
+        headers.update(extra_headers)
+        resp = self.app.head(url,
+                             headers=headers,
+                             expect_errors=True)
         return resp
 
     def get(self, path: str, params={}, extra_headers={}) -> TestResponse:

@@ -7,7 +7,7 @@ import requests
 from random import choice
 from random import randint
 
-root_uri = 'http://localhost:9080'
+rest_url = 'http://localhost/api'
 verbose = False
 
 ALPHABET = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789'
@@ -26,7 +26,7 @@ def get_random_string(n=10, whitespace=False) -> str:
 
 
 def login():
-    uri = root_uri + "/login_username"
+    uri = rest_url + "/login_username"
     headers = {
         "Content-Type": "application/json;charset=UTF-8",
         "Accept": "application/json, text/plain, */*",
@@ -53,11 +53,11 @@ def login():
 
 
 create_proposal_batch = \
-    [{"method": "POST", "path": "http://localhost/mercator", "body": {
+    [{"method": "POST", "path": rest_url + "/mercator", "body": {
         "content_type": "adhocracy_mercator.resources.mercator.IMercatorProposal",
         "data": {},
         "first_version_path": "@pn2", "root_versions": [],
-        "parent": "http://localhost/mercator"}, "result_path": "@pn1",
+        "parent": rest_url + "/mercator"}, "result_path": "@pn1",
       "result_first_version_path": "@pn2"}, {"method": "POST", "path": "@pn1",
                                              "body": {
                                                  "content_type":
@@ -263,12 +263,11 @@ create_proposal_batch = \
 
 update_proposal_batch = \
     [{"method": "POST",
-      "path": "http://localhost/mercator/proposal_0000001/info_0000000/", "body": {
+      "path": rest_url + "/mercator/proposal_0000001/info_0000000/", "body": {
         "content_type": "adhocracy_mercator.resources.mercator"
                         ".IOrganizationInfoVersion",
         "data": {"adhocracy_core.sheets.versions.IVersionable": {"follows": [
-            "http://localhost/mercator/proposal_0000001/info_0000000"
-            "/VERSION_0000000/"]},
+            rest_url + "/mercator/proposal_0000001/info_0000000/VERSION_0000000/"]},
             "adhocracy_core.sheets.metadata.IMetadata": {"deleted": false,
                                                          "preliminaryNames":
                                                              {"state": 77}},
@@ -276,9 +275,9 @@ update_proposal_batch = \
                 "name": "organization name Updated", "country": "CL",
                 "status": "registered_nonprofit",
                 "website": "http://example.org"}}, "root_versions": [],
-        "parent": "http://localhost/mercator/proposal_0000001/info_0000000/"},
+        "parent": rest_url + "/mercator/proposal_0000001/info_0000000/"},
       "result_path": "@pn65", "result_first_version_path": "@pn77"},
-     {"method": "POST", "path": "http://localhost/mercator/proposal_0000001/", "body": {
+     {"method": "POST", "path": rest_url + "/mercator/proposal_0000001/", "body": {
          "content_type": "adhocracy_mercator.resources.mercator"
                          ".IMercatorProposalVersion",
          "data": {
@@ -286,11 +285,11 @@ update_proposal_batch = \
                                                           "preliminaryNames":
                                                               {"state": 78}},
              "adhocracy_core.sheets.versions.IVersionable": {"follows": [
-                 "http://localhost/mercator/proposal_0000001/VERSION_0000001/"]},
+                 rest_url + "/mercator/proposal_0000001/VERSION_0000001/"]},
              "adhocracy_mercator.sheets.mercator.IUserInfo": {
                  "personal_name": "pita Updated", "family_name": "pasta",
                  "country": "AR"}}, "root_versions": [],
-         "parent": "http://localhost/mercator/proposal_0000001/"}, "result_path": "@pn64",
+         "parent": rest_url + "/mercator/proposal_0000001/"}, "result_path": "@pn64",
       "result_first_version_path": "@pn78"}]
 
 
@@ -308,9 +307,9 @@ def _create_proposal():
         location_specific_1 = "location_is_specific"
 
     return   [{
-        "path": "" + root_uri + "/mercator/",
+        "path": "" + rest_url + "/mercator/",
         "body": {
-            "parent": "" + root_uri + "/mercator/",
+            "parent": "" + rest_url + "/mercator/",
             "data": {},
             "root_versions": [],
             "content_type": "adhocracy_mercator.resources.mercator.IMercatorProposal",
@@ -710,7 +709,7 @@ def _create_proposal():
                 "parent": "@pn31",
                 "data": {
                     "adhocracy_core.sheets.title.ITitle": {
-                        "title": name
+                        "title": "name"
                     },
                     "adhocracy_mercator.sheets.mercator.IHeardFrom": {
                         "heard_from_colleague": true,
@@ -751,7 +750,7 @@ def _create_proposal():
 def create_proposals(user_path="", user_token="", n=5, expect_error=False):
     proposals = []
 
-    uri = root_uri + "/batch"
+    uri = rest_url + "/batch"
     def headers(length):
         return {
             "Content-Type": "application/json;charset=UTF-8",

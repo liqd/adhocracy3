@@ -4,7 +4,6 @@ from pytest import mark
 import colander
 
 
-
 @mark.usefixtures('log')
 class TestJSONHTTPException:
 
@@ -157,14 +156,19 @@ class TestHandleError40X_exception:
         assert json_error is error
 
     def create_dummy_app(self, config, error=None):
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.interfaces import API_ROUTE_NAME
         def dummy_view(request):
             if error:
                 raise error
             else:
                 return "{}"
-        config.add_view(dummy_view, name='dummy_view')
-        config.add_route('dummy_view', '/')
+        config.add_view(dummy_view, name='dummy_view',
+                        route_name=API_ROUTE_NAME,
+                        context=IResource)
         from webtest import TestApp
+        root = testing.DummyResource(__provides__=IResource)
+        config.set_root_factory(lambda x: root)
         app = config.make_wsgi_app()
         return TestApp(app)
 
@@ -174,7 +178,7 @@ class TestHandleError40X_exception:
         app_dummy = self.create_dummy_app(
             integration,
             error=HTTPClientError(status_code=400, code=400))
-        resp = app_dummy.get('/dummy_view', status=400)
+        resp = app_dummy.get('/api/dummy_view', status=400)
         assert '400' in resp.json['errors'][0]['description']
 
     @mark.usefixtures('integration')
@@ -183,7 +187,7 @@ class TestHandleError40X_exception:
         app_dummy = self.create_dummy_app(
             integration,
             error=HTTPClientError(status_code=400, code=400))
-        resp = app_dummy.options('/dummy_view', status=400)
+        resp = app_dummy.options('/api/dummy_view', status=400)
         assert '400' in resp.json['errors'][0]['description']
 
 

@@ -1,8 +1,20 @@
 import unittest
 
 from pyramid import testing
+from adhocracy_core.interfaces import API_ROUTE_NAME
+from adhocracy_core.testing import rest_url
 import colander
 import pytest
+
+
+def _setup_config_and_request(root):
+    config = testing.setUp()
+    config.add_route(API_ROUTE_NAME, '/api*traverse')
+    request = testing.DummyRequest()
+    request.root = root
+    request.registry = config.registry
+    request.application_url = 'http://localhost'
+    return request
 
 
 class ClientRequestSchemaUnitTests(unittest.TestCase):
@@ -12,12 +24,14 @@ class ClientRequestSchemaUnitTests(unittest.TestCase):
     def setUp(self):
         child = testing.DummyResource()
         self.child = child
-        context = testing.DummyResource()
-        context['child'] = child
-        self.context = context
-        request = testing.DummyRequest()
-        request.root = context
-        self.request = request
+        root = testing.DummyResource()
+        root['child'] = child
+        self.context = root
+        self.request = _setup_config_and_request(root)
+        self.rest_url = rest_url()
+
+    def tearDown(self):
+        testing.tearDown()
 
     def _make_one(self):
         from adhocracy_core.websockets.schemas import ClientRequestSchema
@@ -27,30 +41,30 @@ class ClientRequestSchemaUnitTests(unittest.TestCase):
     def test_deserialize_subscribe(self):
         inst = self._make_one()
         result = inst.deserialize(
-            {'action': 'subscribe', 'resource': self.request.application_url + '/child/'})
+            {'action': 'subscribe', 'resource': self.rest_url + '/child/'})
         assert result == {'action': 'subscribe', 'resource': self.child}
 
     def test_deserialize_unsubscribe(self):
         inst = self._make_one()
         result = inst.deserialize(
-            {'action': 'unsubscribe', 'resource': self.request.application_url + '/child/'})
+            {'action': 'unsubscribe', 'resource': self.rest_url + '/child/'})
         assert result == {'action': 'unsubscribe', 'resource': self.child}
 
     def test_deserialize_invalid_action(self):
         inst = self._make_one()
         with pytest.raises(colander.Invalid):
-            inst.deserialize({'action': 'blah', 'resource': self.request.application_url + '/child'})
+            inst.deserialize({'action': 'blah', 'resource': self.rest_url + '/child'})
 
     def test_deserialize_invalid_resource(self):
         inst = self._make_one()
         with pytest.raises(colander.Invalid):
             inst.deserialize(
-                {'action': 'subscribe', 'resource': self.request.application_url + '/wrong_child'})
+                {'action': 'subscribe', 'resource': self.rest_url + '/wrong_child'})
 
     def test_deserialize_no_action(self):
         inst = self._make_one()
         with pytest.raises(colander.Invalid):
-            inst.deserialize({'resource': self.request.application_url + '/child'})
+            inst.deserialize({'resource': self.rest_url + '/child'})
 
     def test_deserialize_no_resource(self):
         inst = self._make_one()
@@ -65,12 +79,12 @@ class ClientRequestSchemaUnitTests(unittest.TestCase):
     def test_deserialize_wrong_field(self):
         inst = self._make_one()
         with pytest.raises(colander.Invalid):
-            inst.deserialize({'event': 'created', 'resource': self.request.application_url + '/child'})
+            inst.deserialize({'event': 'created', 'resource': self.rest_url + '/child'})
 
     def test_deserialize_wrong_inner_type(self):
         inst = self._make_one()
         with pytest.raises(colander.Invalid):
-            inst.deserialize({'action': 7, 'resource': self.request.application_url + '/child'})
+            inst.deserialize({'action': 7, 'resource': self.rest_url + '/child'})
 
     def test_deserialize_wrong_outer_type(self):
         inst = self._make_one()
@@ -85,11 +99,13 @@ class StatusConfirmationUnitTests(unittest.TestCase):
     def setUp(self):
         child = testing.DummyResource()
         self.child = child
-        context = testing.DummyResource()
-        context['child'] = child
-        request = testing.DummyRequest()
-        request.root = context
-        self.request = request
+        root = testing.DummyResource()
+        root['child'] = child
+        self.request = _setup_config_and_request(root)
+        self.rest_url = rest_url()
+
+    def tearDown(self):
+        testing.tearDown()
 
     def _make_one(self):
         from adhocracy_core.websockets.schemas import StatusConfirmation
@@ -102,7 +118,7 @@ class StatusConfirmationUnitTests(unittest.TestCase):
             {'status': 'ok', 'action': 'subscribe', 'resource': self.child})
         assert result == {'status': 'ok',
                           'action': 'subscribe',
-                          'resource': self.request.application_url + '/child/'}
+                          'resource': self.rest_url + '/child/'}
 
     def test_serialize_redundant(self):
         inst = self._make_one()
@@ -112,7 +128,7 @@ class StatusConfirmationUnitTests(unittest.TestCase):
              'resource': self.child})
         assert result == {'status': 'redundant',
                           'action': 'unsubscribe',
-                          'resource': self.request.application_url + '/child/'}
+                          'resource': self.rest_url + '/child/'}
 
     def test_serialize_default_status(self):
         inst = self._make_one()
@@ -120,7 +136,7 @@ class StatusConfirmationUnitTests(unittest.TestCase):
                                  'resource': self.child})
         assert result == {'status': 'ok',
                           'action': 'subscribe',
-                          'resource': self.request.application_url + '/child/'}
+                          'resource': self.rest_url + '/child/'}
 
 
 class ServerNotificationUnitTests(unittest.TestCase):
@@ -160,12 +176,14 @@ class NotificationUnitTests(unittest.TestCase):
     def setUp(self):
         parent = testing.DummyResource()
         self.parent = parent
-        context = testing.DummyResource()
-        context['parent'] = parent
-        self.context = context
-        request = testing.DummyRequest()
-        request.root = context
-        self.request = request
+        root = testing.DummyResource()
+        root['parent'] = parent
+        self.context = root
+        self.request = _setup_config_and_request(root)
+        self.rest_url = rest_url()
+
+    def tearDown(self):
+        testing.tearDown()
 
     def _bind(self, schema: colander.SchemaNode) -> colander.SchemaNode:
         return schema.bind(request=self.request, context=self.context)
@@ -175,14 +193,14 @@ class NotificationUnitTests(unittest.TestCase):
         schema = Notification()
         inst = self._bind(schema)
         result = inst.serialize({'event': 'modified', 'resource': self.parent})
-        assert result == {'event': 'modified', 'resource': self.request.application_url + '/parent/'}
+        assert result == {'event': 'modified', 'resource': self.rest_url + '/parent/'}
 
     def test_deserialize_notification(self):
         from adhocracy_core.websockets.schemas import Notification
         schema = Notification()
         inst = self._bind(schema)
         result = inst.deserialize(
-            {'event': 'created', 'resource': self.request.application_url + '/parent/'})
+            {'event': 'created', 'resource': self.rest_url + '/parent/'})
         assert result == {'event': 'created', 'resource': self.parent}
 
     def test_serialize_child_notification(self):
@@ -194,8 +212,8 @@ class NotificationUnitTests(unittest.TestCase):
                                  'resource': self.parent,
                                  'child': self.child})
         assert result == {'event': 'removed_child',
-                          'resource': self.request.application_url + '/parent/',
-                          'child': self.request.application_url + '/parent/child/'}
+                          'resource': self.rest_url + '/parent/',
+                          'child': self.rest_url + '/parent/child/'}
 
     def test_serialize_version_notification(self):
         from adhocracy_core.websockets.schemas import VersionNotification
@@ -206,5 +224,5 @@ class NotificationUnitTests(unittest.TestCase):
                                  'resource': self.parent,
                                  'version': self.version})
         assert result == {'event': 'removed_child',
-                          'resource': self.request.application_url + '/parent/',
-                          'version': self.request.application_url + '/parent/version/'}
+                          'resource': self.rest_url + '/parent/',
+                          'version': self.rest_url + '/parent/version/'}

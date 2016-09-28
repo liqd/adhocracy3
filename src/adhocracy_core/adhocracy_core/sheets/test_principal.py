@@ -371,14 +371,14 @@ class TestPermissionsSchema:
                                       'roles': [],
                                       }
 
-    def test_serialize_with_groups_and_roles(self, context, group, request_):
+    def test_serialize_with_groups_and_roles(self, context, group, request_, rest_url):
         context.roles = ['view']
         context.group_ids = ['/group']
         group.roles = ['admin']
         appstruct = {'groups': [group], 'roles': ['view']}
         inst = self.make_one().bind(context=context, request=request_)
         assert inst.serialize(appstruct) == \
-            {'groups': [request_.application_url + '/group/'],
+            {'groups': [rest_url + '/group/'],
              'roles': ['view'],
              }
 
@@ -398,7 +398,7 @@ class TestGetGroupChoices:
         assert self.call_fut(pool, None) == []
 
     def test_get_asset_choices_from_assets_service(self, pool, request_,
-                                                   service):
+                                                   service, rest_url):
         from .principal import IGroup
         pool['principals'] = service
         pool['principals']['groups'] = service.clone()
@@ -406,7 +406,7 @@ class TestGetGroupChoices:
             testing.DummyResource(__provides__=IGroup)
         pool['principals']['groups']['no_group'] = testing.DummyResource()
         choices = self.call_fut(pool, request_)
-        assert choices == [('http://example.com/principals/groups/group/',
+        assert choices == [(rest_url + '/principals/groups/group/',
                             'group')]
 
 

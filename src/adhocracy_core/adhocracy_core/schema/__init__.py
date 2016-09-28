@@ -527,11 +527,12 @@ class ResourceObjectType(SchemaType):
         else:
             context = node.bindings['context']
             request = node.bindings['request']
-            application_url_len = len(request.application_url)
-            if application_url_len > len(str(value)):
+            root_url = request.resource_url(request.root,
+                                            route_name=API_ROUTE_NAME)
+            root_url_len = len(root_url)
+            if root_url_len > len(str(value)):
                 raise KeyError
-            # Fixme: This does not work with :term:`virtual hosting`
-            path = value[application_url_len:]
+            path = value[root_url_len:]
             return find_resource(context, path)
 
 
@@ -1111,5 +1112,7 @@ def get_choices_by_interface(interface: IInterface,
     catalogs = find_service(context, 'catalogs')
     query = search_query._replace(interfaces=interface)
     resources = catalogs.search(query).elements
-    choices = [(request.resource_url(r), resource_path(r)) for r in resources]
+    choices = [(request.resource_url(r,
+                                     route_name=API_ROUTE_NAME),
+                resource_path(r)) for r in resources]
     return choices

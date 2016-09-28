@@ -22,6 +22,7 @@ Some imports to work with rest api calls::
 
 Start adhocracy app and log in some users::
 
+    >>> log = getfixture('log')
     >>> participant = getfixture('app_participant')
     >>> anonymization_userid = getfixture('global_anonymization_userid')
     >>> admin = getfixture('app_admin')

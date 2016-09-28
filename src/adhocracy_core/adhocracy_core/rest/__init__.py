@@ -15,7 +15,7 @@ class api_view(view_config):  # noqa
     the following defaults are set::
 
         renderer='json'
-        route_name='adhocracy_api'
+        route_name=API_ROUTE_NAME,
         decorator = [validate_user_headers,
                      validate_anonymize_header,
                      validate_visibility,
