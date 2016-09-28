@@ -25,8 +25,9 @@ import * as webshim from "polyfiller";
 
 import * as AdhCoreModule from "./Packages/Core/Module";
 
-import * as AdhConfig from "./Packages/Config/Config";
-import * as AdhTopLevelState from "./Packages/TopLevelState/TopLevelState";
+import * as AdhConfig from "./Packages/Core/Config/Config";
+import * as AdhTopLevelState from "./Packages/Core/TopLevelState/TopLevelState";
+
 import * as AdhTemplates from "adhTemplates";  if (AdhTemplates) { ; };
 
 webshim.setOptions("basePath", "/static/lib/webshim/js-webshim/minified/shims/");
