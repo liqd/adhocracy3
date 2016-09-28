@@ -9,6 +9,7 @@ import * as AdhHttpModule from "../Http/Module";
 import * as AdhLocaleModule from "../Locale/Module";
 import * as AdhMovingColumnsModule from "../MovingColumns/Module";
 import * as AdhPermissionsModule from "../Permissions/Module";
+import * as AdhResourceActionsModule from "../ResourceActions/Module";
 import * as AdhResourceAreaModule from "../ResourceArea/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
@@ -39,6 +40,7 @@ export var register = (angular) => {
             AdhPermissionsModule.moduleName,
             AdhHttpModule.moduleName,
             AdhTopLevelStateModule.moduleName,
+            AdhResourceActionsModule.moduleName,
             AdhResourceAreaModule.moduleName,
             AdhUserModule.moduleName,
             AdhImageModule.moduleName
