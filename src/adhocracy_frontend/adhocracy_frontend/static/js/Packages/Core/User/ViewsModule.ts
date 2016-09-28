@@ -20,7 +20,6 @@ import * as AdhImageModule from "../Image/Module";
 import * as AdhEmbed from "../Embed/Embed";
 import * as AdhHttp from "../Http/Http";
 import * as AdhNames from "../Names/Names";
-import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
 import * as AdhUserViews from "./Views";
@@ -89,9 +88,7 @@ export var register = (angular) => {
                 }])
                 .when("activate", ["adhConfig", "adhUser", "adhDone", "$rootScope", "$location", AdhUserViews.activateArea]);
         }])
-        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            AdhUserViews.registerRoutes()(adhResourceAreaProvider);
-        }])
+        .config(["adhResourceAreaProvider", AdhUserViews.registerRoutes()])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
             adhNamesProvider.names[RIUser.content_type] = "TR__RESOURCE_USER";
         }])
