@@ -6,7 +6,6 @@
 translateMe = [
     "TR__BACK_TO_TOP",
     "TR__BY",
-    "TR__COMMENTS",
     "TR__COMMENTS_TOTAL",
     "TR__CREATE_DOCUMENT",
     "TR__CREATION_DATE",
@@ -52,7 +51,6 @@ translateMe = [
     "TR__OTHER",
     "TR__PLEASE_SPECIFY",
     "TR__PRINT",
-    "TR__PROPOSALS",
     "TR__PUBLISH",
     "TR__RATES",
     "TR__SHARE",
