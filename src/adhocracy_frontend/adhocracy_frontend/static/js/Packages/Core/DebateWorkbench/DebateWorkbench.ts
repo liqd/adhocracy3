@@ -97,11 +97,12 @@ export var processDetailColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ProcessDetailColumn.html",
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
-            scope.$watch("path", (value : string) => {
+            scope.data = {};
+            scope.$watch("processUrl", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
                         var workflow = resource.data[SIWorkflow.nick];
-                        scope.picture = resource.data[SIImageReference.nick].picture;
+                        scope.data.picture = resource.data[SIImageReference.nick].picture;
                         scope.data.title = resource.data[SITitle.nick].title;
                         scope.data.participationStartDate = AdhProcess.getStateData(workflow, "participate").start_date;
                         scope.data.participationEndDate = AdhProcess.getStateData(workflow, "evaluate").start_date;
