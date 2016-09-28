@@ -6,7 +6,7 @@ import * as AdhConfig from "../Config/Config";
 import * as AdhMetaApi from "../MetaApi/MetaApi";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 
-import * as ResourcesBase from "../../ResourcesBase";
+import * as ResourcesBase from "../../../ResourcesBase";
 
 import * as AdhCache from "./Cache";
 import * as AdhConvert from "./Convert";

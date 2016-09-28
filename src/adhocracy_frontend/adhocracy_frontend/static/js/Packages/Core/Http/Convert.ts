@@ -5,7 +5,7 @@ import * as _ from "lodash";
 import * as AdhMetaApi from "../MetaApi/MetaApi";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 
-import * as ResourcesBase from "../../ResourcesBase";
+import * as ResourcesBase from "../../../ResourcesBase";
 import * as Resources_ from "../../../Resources_";
 
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";

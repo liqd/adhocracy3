@@ -5,7 +5,7 @@ import * as q from "q";
 import * as AdhHttp from "./Http";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 
-import * as ResourcesBase from "../../ResourcesBase";
+import * as ResourcesBase from "../../../ResourcesBase";
 
 import RIParagraph from "../../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
 import * as SITags from "../../../Resources_/adhocracy_core/sheets/tags/ITags";

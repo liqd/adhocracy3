@@ -20,7 +20,7 @@ import * as AdhEventManager from "../EventManager/EventManager";
 import * as AdhHttp from "../Http/Http";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 
-import * as ResourcesBase from "../../ResourcesBase";
+import * as ResourcesBase from "../../../ResourcesBase";
 
 
 export enum Mode {display, edit};

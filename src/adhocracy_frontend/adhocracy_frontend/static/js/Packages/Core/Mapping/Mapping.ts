@@ -3,7 +3,7 @@
 
 import * as _ from "lodash";
 
-import * as ResourcesBase from "../../ResourcesBase";
+import * as ResourcesBase from "../../../ResourcesBase";
 
 import * as AdhConfig from "../Config/Config";
 import * as AdhListing from "../Listing/Listing";
