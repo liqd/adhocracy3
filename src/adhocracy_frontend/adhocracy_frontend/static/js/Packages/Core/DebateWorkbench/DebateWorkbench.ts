@@ -102,7 +102,7 @@ export var processDetailColumnDirective = (
                 if (value) {
                     adhHttp.get(value).then((resource) => {
                         var workflow = resource.data[SIWorkflow.nick];
-                        scope.data.picture = resource.data[SIImageReference.nick].picture;
+                        scope.data.picture = (resource.data[SIImageReference.nick] || {}).picture;
                         scope.data.title = resource.data[SITitle.nick].title;
                         scope.data.participationStartDate = AdhProcess.getStateData(workflow, "participate").start_date;
                         scope.data.participationEndDate = AdhProcess.getStateData(workflow, "evaluate").start_date;
