@@ -1,6 +1,7 @@
 import * as AdhAbuseModule from "../Abuse/Module";
 import * as AdhCommentModule from "../Comment/Module";
 import * as AdhDocumentModule from "../Document/Module";
+import * as AdhEmbedModule from "../Embed/Module";
 import * as AdhHttpModule from "../Http/Module";
 import * as AdhMovingColumnsModule from "../MovingColumns/Module";
 import * as AdhPermissionsModule from "../Permissions/Module";
@@ -21,6 +22,7 @@ export var register = (angular) => {
             AdhAbuseModule.moduleName,
             AdhCommentModule.moduleName,
             AdhDocumentModule.moduleName,
+            AdhEmbedModule.moduleName,
             AdhHttpModule.moduleName,
             AdhMovingColumnsModule.moduleName,
             AdhPermissionsModule.moduleName,
