@@ -16,6 +16,7 @@ import * as AdhTopLevelStateModule from "../../../Core/TopLevelState/Module";
 import * as AdhBlogModule from "../../../Blog/Module";
 
 import * as AdhEmbed from "../../../Core/Embed/Embed";
+import * as AdhNames from "../../../Core/Names/Names";
 
 import RIMercatorProposal from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IMercatorProposal";
 
