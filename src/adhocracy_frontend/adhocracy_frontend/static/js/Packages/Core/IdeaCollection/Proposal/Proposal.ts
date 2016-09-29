@@ -329,6 +329,7 @@ export var mapListItemDirective = (
                     scope.selectedState = "is-not-selected";
                 }
             }));
+            scope.commentType = RICommentVersion.content_type;
         }
     };
 };
