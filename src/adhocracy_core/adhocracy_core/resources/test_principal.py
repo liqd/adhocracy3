@@ -120,7 +120,7 @@ class TestSdiUserColums:
         from .principal import sdi_user_columns
         return sdi_user_columns(*args, **kwargs)
 
-    def test_sdi_user_columns_none_user(self, context, request_):
+    def test_sdi_user_columns_none_user(self, request_):
         context = testing.DummyResource()
         result = self.call_fut(None, context, request_, [])
         assert result == [
@@ -128,9 +128,8 @@ class TestSdiUserColums:
             {'name': 'Email','value': ''},
         ]
 
-    def test_sdi_user_columns_user(self, context, request_):
+    def test_sdi_user_columns_user(self, request_):
         from .principal import IUser
-        from adhocracy_core.sheets.principal import IUserBasic
         context = testing.DummyResource(__provides__=IUser)
         mock_get_sheet_field = Mock()
         mock_get_sheet_field.side_effect = ['Admin', 'admin@example.com']
