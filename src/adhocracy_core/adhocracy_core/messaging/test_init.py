@@ -326,3 +326,31 @@ class TestActivityEmail:
         assert send_mail_args['body'] == 'mail_send_activity_remove_body_txt'
 
 
+class TestSendPasswordChangeMail:
+
+    @fixture
+    def registry(self, config):
+        config.include('pyramid_mailer.testing')
+        config.registry.settings['adhocracy.site_name'] = 'sitename'
+        config.registry.settings['adhocracy.frontend_url'] = 'http://front.end'
+        return config.registry
+
+    @fixture
+    def inst(self, registry):
+        from . import Messenger
+        return Messenger(registry)
+
+    def test_send_password_change_mail(self, inst, request_):
+        inst.send_mail = Mock()
+        user = testing.DummyResource(name='Anna', email='anna@example.org')
+        inst.send_password_change_mail(user, request=request_)
+        assert inst.send_mail.call_args[1]['recipients'] == ['anna@example.org']
+        assert inst.send_mail.call_args[1]['subject'] == \
+               'mail_password_change_subject'
+        assert inst.send_mail.call_args[1]['body'] == \
+               'mail_password_change_body_txt'
+        assert inst.send_mail.call_args[1]['body'].mapping == \
+               {'user_name': 'Anna',
+                'site_name': 'sitename',
+                'create_reset_url': 'http://front.end/create_password_reset/'}
+        assert inst.send_mail.call_args[1]['request'] == request_

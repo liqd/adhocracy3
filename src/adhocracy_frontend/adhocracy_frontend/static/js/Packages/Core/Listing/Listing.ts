@@ -11,7 +11,7 @@ import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 import * as AdhWebSocket from "../WebSocket/WebSocket";
 
-import * as ResourcesBase from "../../ResourcesBase";
+import * as ResourcesBase from "../../../ResourcesBase";
 
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 

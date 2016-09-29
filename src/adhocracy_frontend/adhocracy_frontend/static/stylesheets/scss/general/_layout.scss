@@ -17,7 +17,7 @@ body {
 }
 
 .l-content {
-    @include rem(top, 40px);
+    @include rem(top, $logo-height);
     position: absolute;
     bottom: 0;
     left: 0;
@@ -66,7 +66,7 @@ depends on a lot of factors:
 }
 
 .main-header-logo {
-    height: 40px;
+    height: $logo-height;
 }
 
 .l-header {

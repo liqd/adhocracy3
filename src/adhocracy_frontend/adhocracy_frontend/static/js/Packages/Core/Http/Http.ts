@@ -11,7 +11,7 @@ import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as AdhResourceUtil from "../Util/ResourceUtil";
 import * as AdhUtil from "../Util/Util";
 
-import * as ResourcesBase from "../../ResourcesBase";
+import * as ResourcesBase from "../../../ResourcesBase";
 
 import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 import * as SITags from "../../../Resources_/adhocracy_core/sheets/tags/ITags";

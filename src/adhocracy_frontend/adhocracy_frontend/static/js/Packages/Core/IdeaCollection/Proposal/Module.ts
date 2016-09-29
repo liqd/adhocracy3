@@ -11,7 +11,6 @@ import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
 
 import * as Proposal from "./Proposal";
 
-
 export var moduleName = "adhIdeaCollectionProposal";
 
 export var register = (angular) => {

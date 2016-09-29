@@ -2,7 +2,7 @@ import * as _ from "lodash";
 
 import * as AdhMetaApi from "../MetaApi/MetaApi";
 
-import * as ResourcesBase from "../../ResourcesBase";
+import * as ResourcesBase from "../../../ResourcesBase";
 
 import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 

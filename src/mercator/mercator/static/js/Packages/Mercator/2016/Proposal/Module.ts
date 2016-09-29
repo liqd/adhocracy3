@@ -5,6 +5,7 @@ import * as AdhHttpModule from "../../../Core/Http/Module";
 import * as AdhImageModule from "../../../Core/Image/Module";
 import * as AdhInjectModule from "../../../Core/Inject/Module";
 import * as AdhLocaleModule from "../../../Core/Locale/Module";
+import * as AdhNamesModule from "../../../Core/Names/Module";
 import * as AdhPermissionsModule from "../../../Core/Permissions/Module";
 import * as AdhPreliminaryNamesModule from "../../../Core/PreliminaryNames/Module";
 import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
@@ -15,6 +16,7 @@ import * as AdhTopLevelStateModule from "../../../Core/TopLevelState/Module";
 import * as AdhBlogModule from "../../../Blog/Module";
 
 import * as AdhEmbed from "../../../Core/Embed/Embed";
+import * as AdhNames from "../../../Core/Names/Names";
 
 import RIMercatorProposal from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IMercatorProposal";
 
@@ -36,6 +38,7 @@ export var register = (angular) => {
             AdhImageModule.moduleName,
             AdhInjectModule.moduleName,
             AdhLocaleModule.moduleName,
+            AdhNamesModule.moduleName,
             AdhPermissionsModule.moduleName,
             AdhPreliminaryNamesModule.moduleName,
             AdhResourceAreaModule.moduleName,
@@ -68,8 +71,8 @@ export var register = (angular) => {
             adhEmbedProvider.registerDirective("mercator-2016-proposal-detail");
             adhEmbedProvider.registerDirective("mercator-2016-proposal-listitem");
         }])
-        .config(["adhResourceAreaProvider", (adhResourceAreaProvider) => {
-            adhResourceAreaProvider.names[RIMercatorProposal.content_type] = "TR__PROPOSALS";
+        .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
+            adhNamesProvider.names[RIMercatorProposal.content_type] = "TR__RESOURCE_PROPOSAL";
         }])
         .directive("adhMercator2016ProposalCreate", [
             "$location",
