@@ -9,7 +9,7 @@ import * as AdhNamesModule from "../../../Core/Names/Module";
 import * as AdhPermissionsModule from "../../../Core/Permissions/Module";
 import * as AdhPreliminaryNamesModule from "../../../Core/PreliminaryNames/Module";
 import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
-import * as AdhResourceWidgetsModule from "../../../Core/ResourceWidgets/Module";
+import * as AdhResourceWidgetsModule from "../../../ResourceWidgets/Module";
 import * as AdhStickyModule from "../../../Core/Sticky/Module";
 import * as AdhTopLevelStateModule from "../../../Core/TopLevelState/Module";
 
