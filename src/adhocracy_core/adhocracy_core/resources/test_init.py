@@ -74,6 +74,15 @@ class TestAddResourceTypeToRegistry:
         config.add_sdi_add_view.assert_called_with(resource_meta.iresource,
                                                    'add_' + type_id)
 
+    def test_add_sdi_columns_if_is_sdi_column_mapper(self, config,
+                                                     resource_meta):
+        config.include('adhocracy_core.content')
+        type_id = IResource.__identifier__
+        add_columns = MagicMock()
+        resource_meta = resource_meta._replace(sdi_column_mapper=add_columns)
+        self.make_one(resource_meta, config)
+        assert config.registry.content.meta[type_id]['columns'] == add_columns
+
 
 class TestResourceFactory:
 
