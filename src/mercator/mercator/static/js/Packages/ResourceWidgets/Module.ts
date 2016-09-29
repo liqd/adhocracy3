@@ -1,6 +1,6 @@
-import * as AdhEventManagerModule from "../EventManager/Module";
-import * as AdhHttpModule from "../Http/Module";
-import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
+import * as AdhEventManagerModule from "../Core/EventManager/Module";
+import * as AdhHttpModule from "../Core/Http/Module";
+import * as AdhPreliminaryNamesModule from "../Core/PreliminaryNames/Module";
 
 import * as AdhResourceWidgets from "./ResourceWidgets";
 
