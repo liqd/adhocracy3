@@ -6,7 +6,7 @@ import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 
-import * as ResourcesBase from "../ResourcesBase";
+import * as ResourcesBase from "../../../ResourcesBase";
 
 import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RIDocument from "../../../Resources_/adhocracy_core/resources/document/IDocument";
