@@ -1,13 +1,15 @@
 import * as AdhDebateWorkbenchModule from "../../Core/DebateWorkbench/Module";
+
 import * as AdhDebateWorkbench from "../../Core/DebateWorkbench/DebateWorkbench";
 import * as AdhProcess from "../../Core/Process/Process";
+
 import RIEuthCollaborativeTextProcess from "../../../Resources_/adhocracy_euth/resources/collaborative_text/IProcess";
 import RIEuthCollaborativeTextPrivateProcess from "../../../Resources_/adhocracy_euth/resources/collaborative_text/IPrivateProcess";
 
 export var moduleName = "adhEuthCollaberativeTextediting";
 
-export var register = (angular) => {
 
+export var register = (angular) => {
     AdhDebateWorkbenchModule.register(angular);
 
     angular
