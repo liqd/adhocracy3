@@ -9,13 +9,13 @@ import * as AdhPermissions from "../../../Core/Permissions/Permissions";
 import * as AdhResourceArea from "../../../Core/ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../../../Core/TopLevelState/TopLevelState";
 
-import RIPoll from "../../../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IPoll";
-import RIProposalVersion from "../../../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
-import RIStadtforumProcess from "../../../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IProcess";
+import RIPoll from "../../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IPoll";
+import RIProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
+import RIStadtforumProcess from "../../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IProcess";
 
-import * as SIDescription from "../../../../../Resources_/adhocracy_core/sheets/description/IDescription";
-import * as SITitle from "../../../../../Resources_/adhocracy_core/sheets/title/ITitle";
-import * as SIWorkflow from "../../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
+import * as SIDescription from "../../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
+import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/Meinberlin/Stadtforum/Process";
 

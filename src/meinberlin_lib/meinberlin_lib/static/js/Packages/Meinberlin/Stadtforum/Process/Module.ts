@@ -8,8 +8,8 @@ import * as AdhProcess from "../../../Core/Process/Process";
 
 import * as Process from "./Process";
 
-import RIProposalVersion from "../../../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
-import RIStadtforumProcess from "../../../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IProcess";
+import RIProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
+import RIStadtforumProcess from "../../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IProcess";
 
 
 export var moduleName = "adhMeinberlinStadtforumProcess";
