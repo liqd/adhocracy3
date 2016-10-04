@@ -1,0 +1,35 @@
+<!-- FIXME: may contain links in adh-user-meta -->
+<a class="list-item {{selectedState}}" data-ng-class="{ 'm-contains-image': processProperties.hasImage }" href="{{path | adhParentPath | adhResourceUrl }}">
+    <adh-show-image
+        data-css-class="list-item-image"
+        data-ng-if="processProperties.hasImage"
+        data-path="{{data.picture}}"
+        data-format="thumbnail"
+    ></adh-show-image>
+    <div class="list-item-body">
+        <div class="list-item-author">
+            {{ "TR__ON" | translate }}
+            <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
+        </div>
+        <h3 class="list-item-title">{{data.title}}</h3>
+        <ul class="meta-list list-item-meta">
+            <li class="meta-list-item"><i class="meta-list-meta-item-icon icon-speechbubble-unfilled"></i
+            > {{ data.commentCount }} {{ commentType | adhResourceName:data.commentCount | translate }}</li>
+            <li class="meta-list-item"><i class="meta-list-meta-item-icon icon-voting"></i
+            > {{ data.rateCount | signum }} {{ "TR__RATES" | translate }}</li>
+            <li class="meta-list-item"
+            data-ng-if="processProperties.hasLocationText"><i class="meta-list-meta-item-icon icon-pin-detail"></i
+            > {{data.locationText}}</li>
+        </ul>
+        <div class="list-item-badges">
+            <span
+                data-ng-repeat="assignment in data.assignments"
+                class="badge list-item-badge"
+                data-ng-class="{
+                    'm-is-realized': assignment.name === 'going_to_be_realized',
+                    'm-is-not-realized': assignment.name === 'not_realizeable',
+                    'm-on-test': assignment.name === 'on_test'
+                }">{{ assignment.title | translate }}</span>
+        </div>
+    </div>
+</a>

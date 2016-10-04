@@ -41,5 +41,7 @@ export var register = (angular) => {
             "adhResourceUrlFilter",
             "$location",
             Proposal.createDirective
-        ]);
+        ])
+        .directive("adhMeinberlinStadtforumProposalListItem", [
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.listItemDirective]);
 };
