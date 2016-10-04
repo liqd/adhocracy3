@@ -14,6 +14,7 @@ import * as SIMetadata from "../../../../Resources_/adhocracy_core/sheets/metada
 import * as SIRateable from "../../../../Resources_/adhocracy_core/sheets/rate/IRateable";
 import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIVersionable from "../../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RIPoll from "../../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IPoll";
 import RIProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
 
@@ -35,6 +36,7 @@ export interface IScope extends angular.IScope {
     };
     selectedState? : string;
     resource : any;
+    commentType? : string;
     goToLogin() : void;
 }
 
@@ -201,6 +203,7 @@ export var listItemDirective = (
                     scope.selectedState = "is-not-selected";
                 }
             }));
+            scope.commentType = RICommentVersion.content_type;
         }
     };
 };
