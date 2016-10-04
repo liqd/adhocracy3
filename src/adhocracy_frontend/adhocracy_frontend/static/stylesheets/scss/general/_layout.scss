@@ -57,7 +57,7 @@ depends on a lot of factors:
 ```
 */
 .main-header {
-    @include rem(line-height, 40px);
+    @include rem(line-height, $logo-height);
     position: relative;
 
     @media print {
@@ -67,6 +67,7 @@ depends on a lot of factors:
 
 .main-header-logo {
     height: $logo-height;
+    vertical-align: bottom;
 }
 
 .l-header {
