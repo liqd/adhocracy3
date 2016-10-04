@@ -17,7 +17,7 @@ body {
 }
 
 .l-content {
-    @include rem(top, 40px);
+    @include rem(top, $logo-height);
     position: absolute;
     bottom: 0;
     left: 0;
@@ -56,19 +56,6 @@ depends on a lot of factors:
 </div>
 ```
 */
-.main-header {
-    @include rem(line-height, 40px);
-    position: relative;
-
-    @media print {
-        display: none;
-    }
-}
-
-.main-header-logo {
-    height: 40px;
-}
-
 .l-header {
     @include clearfix;
     @include rem(max-width, $moving-column-single-width-max);

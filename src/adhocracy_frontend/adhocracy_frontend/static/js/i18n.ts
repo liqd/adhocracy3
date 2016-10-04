@@ -6,7 +6,6 @@
 translateMe = [
     "TR__BACK_TO_TOP",
     "TR__BY",
-    "TR__COMMENTS",
     "TR__COMMENTS_TOTAL",
     "TR__CREATE_DOCUMENT",
     "TR__CREATION_DATE",
@@ -30,6 +29,7 @@ translateMe = [
     "TR__ERROR_TOO_NARROW_IMAGE",
     "TR__ERROR_TYPE_IMAGE",
     "TR__FIRSTNAME",
+    "TR__HOME",
     "TR__IMAGE_CHANGE",
     "TR__IMAGE_CHOOSE",
     "TR__IMAGE_CURRENT",

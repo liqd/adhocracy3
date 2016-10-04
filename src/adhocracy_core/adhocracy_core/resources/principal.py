@@ -36,6 +36,8 @@ from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.resources.asset import add_assets_service
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.metadata import is_older_than
+from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.sheets.principal import IUserExtended
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.pool
@@ -145,7 +147,6 @@ class User(Pool):
         statsd_incr('users.activated', 1)
         sheet.set(appstruct)
 
-
 user_meta = pool_meta._replace(
     iresource=IUser,
     content_class=User,
@@ -169,7 +170,7 @@ user_meta = pool_meta._replace(
     element_types=(),  # we don't want the frontend to post resources here
     use_autonaming=True,
     permission_create='create_user',
-    is_sdi_addable=True
+    is_sdi_addable=True,
 )
 
 
@@ -202,6 +203,21 @@ def allow_create_asset_authenticated(context: IPool,
     set_acl(context, acl, registry)
 
 
+def sdi_user_columns(folder, subobject, request, default_columnspec):
+    """Mapping function to add info columns to the sdi user listing."""
+    content = request.registry.content
+    user_name = ''
+    mail = ''
+    if IUser.providedBy(subobject):
+        user_name = content.get_sheet_field(subobject, IUserBasic, 'name')
+        mail = content.get_sheet_field(subobject, IUserExtended, 'email')
+    additional_columns = [
+        {'name': 'User', 'value': user_name},
+        {'name': 'Email', 'value': mail},
+    ]
+    return default_columnspec + additional_columns
+
+
 class IUsersService(IServicePool):
     """Service Pool for Users."""
 
@@ -216,6 +232,7 @@ users_meta = service_meta._replace(
                     add_assets_service,
                     allow_create_asset_authenticated,
                     ),
+    sdi_column_mapper=sdi_user_columns,
 )
 
 

@@ -22,13 +22,13 @@ import * as AdhMappingModule from "./Mapping/Module";
 import * as AdhMarkdownModule from "./Markdown/Module";
 import * as AdhMetaApiModule from "./MetaApi/Module";
 import * as AdhMovingColumnsModule from "./MovingColumns/Module";
+import * as AdhNamesModule from "./Names/Module";
 import * as AdhPermissionsModule from "./Permissions/Module";
 import * as AdhPreliminaryNamesModule from "./PreliminaryNames/Module";
 import * as AdhProcessModule from "./Process/Module";
 import * as AdhRateModule from "./Rate/Module";
 import * as AdhResourceActionsModule from "./ResourceActions/Module";
 import * as AdhResourceAreaModule from "./ResourceArea/Module";
-import * as AdhResourceWidgetsModule from "./ResourceWidgets/Module";
 import * as AdhShareSocialModule from "./ShareSocial/Module";
 import * as AdhStickyModule from "./Sticky/Module";
 import * as AdhTopLevelStateModule from "./TopLevelState/Module";
@@ -64,13 +64,13 @@ export var register = (angular, config, metaApi) => {
     AdhMarkdownModule.register(angular);
     AdhMetaApiModule.register(angular, metaApi);
     AdhMovingColumnsModule.register(angular);
+    AdhNamesModule.register(angular);
     AdhPermissionsModule.register(angular);
     AdhPreliminaryNamesModule.register(angular);
     AdhProcessModule.register(angular);
     AdhRateModule.register(angular);
     AdhResourceActionsModule.register(angular);
     AdhResourceAreaModule.register(angular);
-    AdhResourceWidgetsModule.register(angular);
     AdhShareSocialModule.register(angular);
     AdhStickyModule.register(angular);
     AdhTopLevelStateModule.register(angular);
@@ -86,6 +86,7 @@ export var register = (angular, config, metaApi) => {
             AdhCrossWindowMessagingModule.moduleName,
             AdhEmbedModule.moduleName,
             AdhMetaApiModule.moduleName,
+            AdhNamesModule.moduleName,
             AdhResourceAreaModule.moduleName,
             AdhTrackingModule.moduleName,
             AdhUserViewsModule.moduleName

@@ -16,9 +16,9 @@
 
 import * as _ from "lodash";
 
-import * as AdhEventManager from "../EventManager/EventManager";
-import * as AdhHttp from "../Http/Http";
-import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
+import * as AdhEventManager from "../Core/EventManager/EventManager";
+import * as AdhHttp from "../Core/Http/Http";
+import * as AdhPreliminaryNames from "../Core/PreliminaryNames/PreliminaryNames";
 
 import * as ResourcesBase from "../../ResourcesBase";
 

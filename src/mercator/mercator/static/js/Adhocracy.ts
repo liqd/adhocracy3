@@ -21,6 +21,7 @@ import * as moment from "moment";
 import * as webshim from "polyfiller";
 
 import * as AdhBlogModule from "./Packages/Blog/Module";
+import * as AdhResourceWidgetsModule from "./Packages/ResourceWidgets/Module";
 import * as AdhCoreModule from "./Packages/Core/Module";
 import * as AdhMercatorModule from "./Packages/Mercator/Module";
 
@@ -131,6 +132,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
 
     // register our modules
     AdhBlogModule.register(angular);
+    AdhResourceWidgetsModule.register(angular);
     AdhCoreModule.register(angular, config, metaApi);
     AdhMercatorModule.register(angular);
 

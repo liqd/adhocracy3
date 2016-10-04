@@ -127,6 +127,9 @@ export class Service implements IService {
         var _self : Service = this;
 
         _self.registerMessageHandler("setup", _self.setup.bind(_self));
+        _self.registerMessageHandler("setToken", _self.setToken.bind(_self));
+        _self.registerMessageHandler("deleteToken", _self.deleteToken.bind(_self));
+
         _self.manageResize();
 
         for (var messageHandler of providedMessageHandlers) {
@@ -166,6 +169,16 @@ export class Service implements IService {
             "resize",
             {height: height}
         );
+    }
+
+    private setToken(data : IMessageData) : void {
+        if (data.token && data.userPath) {
+            this.adhCredentials.storeAndEnableToken(data.token, data.userPath);
+        }
+    }
+
+    private deleteToken(data : IMessageData) :  void {
+        this.adhCredentials.deleteToken();
     }
 
     private sendAuthMessages() {
