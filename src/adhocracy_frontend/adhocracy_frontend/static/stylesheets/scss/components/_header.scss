@@ -1,3 +1,27 @@
+/*doc
+---
+title: Main Header
+name: main-header
+category: Components
+---
+
+The Banner on the top of the page.
+
+```html_example
+<header class="l-header main-header">
+    <div class="l-header-left">
+        <a href="#"><img class="main-header-logo" src="/static/images/sample.jpg" alt="Acme Corp." /></a>
+        <nav class="main-header-nav">
+            <a class="main-header-link" href="#">Home</a>
+            <a class="main-header-link" href="#">Help</a>
+        </nav>
+    </div>
+    <div class="l-header-right">
+        <a href="#">Login</a>
+    </div>
+</header>
+```
+*/
 .main-header {
     @include rem(line-height, $logo-height);
     position: relative;
