@@ -56,20 +56,6 @@ depends on a lot of factors:
 </div>
 ```
 */
-.main-header {
-    @include rem(line-height, $logo-height);
-    position: relative;
-
-    @media print {
-        display: none;
-    }
-}
-
-.main-header-logo {
-    height: $logo-height;
-    vertical-align: bottom;
-}
-
 .l-header {
     @include clearfix;
     @include rem(max-width, $moving-column-single-width-max);

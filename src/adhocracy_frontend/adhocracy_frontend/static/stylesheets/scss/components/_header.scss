@@ -1,3 +1,17 @@
+.main-header {
+    @include rem(line-height, $logo-height);
+    position: relative;
+
+    @media print {
+        display: none;
+    }
+}
+
+.main-header-logo {
+    height: $logo-height;
+    vertical-align: bottom;
+}
+
 .header-link {
     float: left;
 
