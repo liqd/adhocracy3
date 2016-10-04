@@ -2,6 +2,7 @@ import * as AdhConfigModule from "../../../Core/Config/Module";
 import * as AdhEmbedModule from "../../../Core/Embed/Module";
 import * as AdhHttpModule from "../../../Core/Http/Module";
 import * as AdhPermissionsModule from "../../../Core/Permissions/Module";
+import * as AdhProcessModule from "../../../Core/Process/Module";
 import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
 
 import * as AdhProcess from "../../../Core/Process/Process";
@@ -23,6 +24,7 @@ export var register = (angular) => {
             AdhEmbedModule.moduleName,
             AdhHttpModule.moduleName,
             AdhPermissionsModule.moduleName,
+            AdhProcessModule.moduleName,
             AdhResourceAreaModule.moduleName
         ])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
