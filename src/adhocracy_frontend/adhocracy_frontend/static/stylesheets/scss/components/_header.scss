@@ -12,18 +12,13 @@
     vertical-align: bottom;
 }
 
-.header-link {
-    float: left;
+.main-header-nav {
+    display: inline;
+}
 
-    a {
-        @include rem(padding, 5px);
-        text-transform: uppercase;
-        text-decoration: none;
-        font-weight: $font-weight-extrovert;
-    }
-
-    &:focus a {
-        color: $color-brand-one-introvert;
-        cursor: default;
-    }
+.main-header-link {
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: $font-weight-extrovert;
+    margin: 0 0.5em;
 }
