@@ -1,10 +1,12 @@
 import * as AdhConfigModule from "../../../Core/Config/Module";
 import * as AdhEmbedModule from "../../../Core/Embed/Module";
 import * as AdhHttpModule from "../../../Core/Http/Module";
+import * as AdhNamesModule from "../../../Core/Names/Module";
 import * as AdhPermissionsModule from "../../../Core/Permissions/Module";
 import * as AdhProcessModule from "../../../Core/Process/Module";
 import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
 
+import * as AdhNames from "../../../Core/Names/Names";
 import * as AdhProcess from "../../../Core/Process/Process";
 
 import * as Process from "./Process";
@@ -23,17 +25,20 @@ export var register = (angular) => {
             AdhConfigModule.moduleName,
             AdhEmbedModule.moduleName,
             AdhHttpModule.moduleName,
+            AdhNamesModule.moduleName,
             AdhPermissionsModule.moduleName,
             AdhProcessModule.moduleName,
             AdhResourceAreaModule.moduleName
         ])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.names[processType] = "TR__PROCESS_STADTFORUM";
             adhProcessProvider.templates[processType] = "<adh-meinberlin-stadtforum-workbench></adh-meinberlin-stadtforum-workbench>";
+        }])
+        .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
+            adhNamesProvider.names[processType] = "TR__RESOURCE_STADTFORUM";
+            adhNamesProvider.names[RIProposalVersion.content_type] = "TR__RESOURCE_POLL";
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider, adhConfig) => {
             Process.registerRoutes(processType)(adhResourceAreaProvider);
-            adhResourceAreaProvider.names[RIProposalVersion.content_type] = "TR__POLLS";
         }])
         .directive("adhMeinberlinStadtforumWorkbench", [
             "adhTopLevelState", "adhConfig", "adhHttp", Process.workbenchDirective])
