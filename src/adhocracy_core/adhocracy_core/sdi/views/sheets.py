@@ -11,7 +11,6 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IResourceSheet
 from adhocracy_core.schema import MappingSchema
 from adhocracy_core.sdi.form import FormView
-from adhocracy_core.sheets.embed import IEmbed
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import create_schema
 
@@ -83,7 +82,7 @@ class AddResourceSheetsBase(FormView):
 
     buttons = (_('add'),)
     iresource = None
-    _disabled = (IMetadata, IEmbed)
+    _disabled = (IMetadata)
     """Sheets not working with this add view yet, use sheets tabs instead."""
 
     def __init__(self, context: IResource, request: IRequest):
