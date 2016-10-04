@@ -56,19 +56,6 @@ depends on a lot of factors:
 </div>
 ```
 */
-.main-header {
-    @include rem(line-height, 40px);
-    position: relative;
-
-    @media print {
-        display: none;
-    }
-}
-
-.main-header-logo {
-    height: $logo-height;
-}
-
 .l-header {
     @include clearfix;
     @include rem(max-width, $moving-column-single-width-max);

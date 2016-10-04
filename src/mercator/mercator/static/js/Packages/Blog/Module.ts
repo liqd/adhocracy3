@@ -9,7 +9,6 @@ import * as AdhPreliminaryNamesModule from "../Core/PreliminaryNames/Module";
 
 import * as AdhEmbed from "../Core/Embed/Embed";
 import * as AdhNames from "../Core/Names/Names";
-import * as AdhResourceArea from "../Core/ResourceArea/ResourceArea";
 
 import * as Blog from "./Blog";
 
@@ -26,6 +25,7 @@ export var register = (angular) => {
             AdhImageModule.moduleName,
             AdhListingModule.moduleName,
             AdhMarkdownModule.moduleName,
+            AdhNamesModule.moduleName,
             AdhPermissionsModule.moduleName,
             AdhPreliminaryNamesModule.moduleName
         ])
