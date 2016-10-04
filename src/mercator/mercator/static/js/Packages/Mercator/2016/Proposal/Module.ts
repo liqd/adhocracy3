@@ -1,5 +1,6 @@
 import * as AdhAngularHelpersModule from "../../../Core/AngularHelpers/Module";
 import * as AdhBadgeModule from "../../../Core/Badge/Module";
+import * as AdhBlogModule from "../../../Blog/Module";
 import * as AdhCredentialsModule from "../../../Core/User/Module";
 import * as AdhHttpModule from "../../../Core/Http/Module";
 import * as AdhImageModule from "../../../Core/Image/Module";
@@ -9,11 +10,9 @@ import * as AdhNamesModule from "../../../Core/Names/Module";
 import * as AdhPermissionsModule from "../../../Core/Permissions/Module";
 import * as AdhPreliminaryNamesModule from "../../../Core/PreliminaryNames/Module";
 import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
-import * as AdhResourceWidgetsModule from "../../../Core/ResourceWidgets/Module";
+import * as AdhResourceWidgetsModule from "../../../ResourceWidgets/Module";
 import * as AdhStickyModule from "../../../Core/Sticky/Module";
 import * as AdhTopLevelStateModule from "../../../Core/TopLevelState/Module";
-
-import * as AdhBlogModule from "../../../Blog/Module";
 
 import * as AdhEmbed from "../../../Core/Embed/Embed";
 import * as AdhNames from "../../../Core/Names/Names";
