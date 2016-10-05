@@ -20,6 +20,8 @@ class TestEmbedCodeConfigBplanAdapter:
                           'autoresize': 'false',
                           'locale': 'en',
                           'autourl': 'false',
+                          'initial_url': '',
                           'nocenter': 'true',
+                          'noheader': 'true',
                           'style': 'height: 650px',
                           }

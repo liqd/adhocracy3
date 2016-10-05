@@ -39,7 +39,9 @@ def embed_code_config_adapter(context: IResource,
             'autoresize': 'false',
             'locale': locale,
             'autourl': 'false',
+            'initial_url': '',
             'nocenter': 'true',
+            'noheader': 'false',
             'style': 'height: 650px',
             }
 

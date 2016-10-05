@@ -12,10 +12,8 @@ def embed_code_config_bplan_adapter(context: IResource,
     """Return config to render `adhocracy_core:templates/embed_code.html`."""
     mapping = embed_code_config_adapter(context, request)
     mapping.update({'widget': 'mein-berlin-bplaene-proposal-embed',
-                    'autoresize': 'false',
-                    'autourl': 'false',
-                    'nocenter': 'true',
                     'style': 'height: 650px',
+                    'noheader': 'true',
                     })
     return mapping
 
