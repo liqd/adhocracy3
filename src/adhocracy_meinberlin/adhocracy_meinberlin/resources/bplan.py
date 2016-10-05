@@ -44,7 +44,6 @@ process_meta = process.process_meta._replace(
     default_workflow='bplan',
     extended_sheets=(adhocracy_meinberlin.sheets.bplan.IProcessSettings,
                      adhocracy_meinberlin.sheets.bplan.IProcessPrivateSettings,
-                     adhocracy_core.sheets.embed.IEmbed,
                      adhocracy_core.sheets.image.IImageReference,
                      ),
 )

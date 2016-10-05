@@ -931,6 +931,13 @@ def add_local_roles_to_acl(root, registry):  # pragma: no cover
         _set_acl_with_local_roles(resource, acl, registry)
 
 
+@log_migration
+def add_embed_sheet_to_processes(root, registry):  # pragma: no cover
+    """Add embed to processes."""
+    from adhocracy_core.sheets.embed import IEmbed
+    migrate_new_sheet(root, IProcess, IEmbed)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -991,3 +998,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_anonymize_default_sheet_to_user)
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_rates)
     config.add_evolution_step(add_local_roles_to_acl)
+    config.add_evolution_step(add_embed_sheet_to_processes)
