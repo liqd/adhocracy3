@@ -13,21 +13,9 @@
       "codepoint": 8856,
       "source": "svg/ban-circle.svg"
     },
-    "budget": {
-      "codepoint": 128176,
-      "source": "svg/budget.svg"
-    },
     "calendar": {
       "codepoint": 128197,
       "source": "svg/calendar.svg"
-    },
-    "chevron-next": {
-      "codepoint": 9654,
-      "source": "svg/chevron-next.svg"
-    },
-    "chevron-prev": {
-      "codepoint": 9664,
-      "source": "svg/chevron-prev.svg"
     },
     "document": {
       "codepoint": 128462,
@@ -69,13 +57,9 @@
       "codepoint": 8617,
       "source": "svg/reply.svg"
     },
-    "search": {
-      "codepoint": 128269,
-      "source": "svg/search.svg"
-    },
-    "speechbubble-unfilled": {
+    "speechbubble": {
       "codepoint": 128489,
-      "source": "svg/speechbubble-unfilled.svg"
+      "source": "svg/speechbubble.svg"
     },
     "speechbubbles": {
       "codepoint": 128490,
