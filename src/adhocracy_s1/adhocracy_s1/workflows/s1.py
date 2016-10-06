@@ -124,8 +124,8 @@ def _add_renominate_info(version: IProposalVersion, request: Request) -> None:
     description_sheet = registry.content.get_sheet(version, IDescription)
     description = description_sheet.get()['description']
     renominate_info = '\n\n---'\
-                      '\n\nrenominated by: {0}'\
-                      '\nold rating: {1}'\
+                      '\n\nErneut vorgeschlagen von: {0}'\
+                      '\nBefürworter*innen davor: {1}'\
                       '\n'.format(editor, rates)
     description_sheet.set({'description': description + renominate_info})
 
