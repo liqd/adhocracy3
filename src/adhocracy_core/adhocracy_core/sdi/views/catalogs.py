@@ -39,7 +39,7 @@ class AdhocracyFolderServices(AdhocracyFolderContents):
         allowed = system_catalog['allowed']
         q = (path.eq(folder, depth=1, include_origin=False) &
              interfaces.any([ICatalogsService, ICatalog, IIndex]) &
-             allowed.allows(self.request, 'view')
+             allowed.allows(self.request, 'sdi.view')
              )
         return q
 
