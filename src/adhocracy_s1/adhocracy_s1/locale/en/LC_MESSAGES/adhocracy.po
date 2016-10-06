@@ -84,7 +84,7 @@ msgid "mail_send_activity_add_update_body_txt"
 msgstr ""
 "${activity_description}\n"
 "\n"
-"Hier geht es zum Beitrag: ${object_url}\n"
+"Hier geht es zum ${object_type_name}: ${object_url}\n"
 "\n"
 "Herzliche Grüße,"
 "\n"
@@ -133,14 +133,14 @@ msgstr "ein ${object_type_name} wurde geändert."
 #: src/adhocracy_core/adhocracy_core/auditing/__init__.py:292
 msgid "activity_description_add"
 msgstr ""
-"${subject_name} hat den ${object_type_name} \"${object_title}\" zu ${target_type_name} ${target_title} hinzugefügt."
+"${subject_name} hat den ${object_type_name} \"${object_title}\" zu ${target_type_name} \"${target_title}\" hinzugefügt."
 
 
 #. Default: ${subject_name} updated ${object_type_name} "${object_title}".
 #: src/adhocracy_core/adhocracy_core/auditing/__init__.py:298
 msgid "activity_description_update"
 msgstr ""
-"${subject_name} hat den ${object_type_name} \"${object_title}\" in ${target_type_name} ${target_title} geändert."
+"${subject_name} hat den ${object_type_name} \"${object_title}\" in ${target_type_name} \"${target_title}\" geändert."
 
 
 #. Default: ${subject_name} removed the ${object_type_name} "${object_title}"
@@ -148,4 +148,4 @@ msgstr ""
 #: src/adhocracy_core/adhocracy_core/auditing/__init__.py:303
 msgid "activity_description_remove"
 msgstr ""
-"${subject_name} hat den ${object_type_name} \"${object_title}\" in ${target_type_name} ${target_title} gelöscht."
+"${subject_name} hat den ${object_type_name} \"${object_title}\" in ${target_type_name} \"${target_title}\" gelöscht."
