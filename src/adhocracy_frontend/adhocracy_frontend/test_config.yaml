@@ -1,0 +1,7 @@
+setting: "test"
+setting_bool: True
+setting_str: "str"
+setting_int: 90
+setting_float: 0.9
+s:
+   float: 0.9

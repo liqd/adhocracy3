@@ -3,89 +3,37 @@ import unittest
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
+from pytest import raises
 
 
-class ConfigViewTest(unittest.TestCase):
+@fixture
+def config(request):
+    config = testing.setUp()
+    request.addfinalizer(testing.tearDown)
+    return config
+
+
+@fixture
+def integration(config):
+    config.include('adhocracy_frontend')
+    return config
+
+
+class TestConfigView:
 
     def call_fut(self, request):
         from adhocracy_frontend import config_view
         return config_view(request)
 
-    def test_with_empty_settings(self):
-        request = testing.DummyRequest(scheme='http')
-        request.registry.settings = None
-        assert self.call_fut(request) == \
-            {'ws_url': 'ws://example.com:6561',
-             'pkg_path': '/static/js/Packages',
-             'rest_url': 'http://localhost:6541',
-             'rest_platform_path': '/adhocracy/',
-             'trusted_domains': [],
-             'support_email': None,
-             'locale': 'en',
-             'site_name': 'Adhocracy',
-             'netiquette_url': '',
-             'canonical_url': 'http://localhost:6551',
-             'redirect_url': '/',
-             'custom': {},
-             'debug': False,
-             'piwik_enabled': False,
-             'piwik_host': None,
-             'piwik_site_id': None,
-             'piwik_track_user_id': False,
-             'piwik_use_cookies': False,
-             'profile_images_enabled': True,
-             'captcha_enabled': False,
-             'captcha_url': 'http://localhost:6542/',
-             'anonymize_enabled': False,
-             'support_url': None,
-             'terms_url': {
-                'de': None,
-                'en': None
-             },
-             'map_tile_options': {
-                 'attribution': '© <a href="https://www.openstreetmap.org/' +
-                                'copyright">OpenStreetMap</a>',
-                 'maxZoom': 18},
-             'map_tile_url': 'http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-             }
+    def test_raise_if_no_config(self, request_):
+        with raises(KeyError):
+            self.call_fut(request_)
 
-    def test_ws_url_without_ws_url_settings_scheme_https(self):
-        request = testing.DummyRequest(scheme='https')
-        request.registry.settings = None
-        assert self.call_fut(request)['ws_url'] == 'wss://example.com:6561'
-
-    def test_ws_url_with_ws_url_settings(self):
-        request = testing.DummyRequest(scheme='http')
-        request.registry.settings = {'adhocracy.frontend.ws_url': 'ws://l.x'}
-        assert self.call_fut(request)['ws_url'] == 'ws://l.x'
-
-    def test_redirect_url_with_redirect_url_settings(self):
-        request = testing.DummyRequest(scheme='http')
-        request.registry.settings = {'adhocracy.redirect_url': '/r/example/'}
-        assert self.call_fut(request)['redirect_url'] == '/r/example/'
-
-    def test_pkg_path_with_pkg_path_settings(self):
-        request = testing.DummyRequest(scheme='http')
-        request.registry.settings = {'adhocracy.frontend.pkg_path': '/t'}
-        assert self.call_fut(request)['pkg_path'] == '/t'
-
-    def test_root_path_with_platform_settings(self):
-        request = testing.DummyRequest(scheme='http')
-        request.registry.settings = {'adhocracy.rest_platform_path':
-                                     '/adhocracy2/'}
-        assert self.call_fut(request)['rest_platform_path'] == '/adhocracy2/'
-
-    def test_root_path_with_rest_url_settings(self):
-        request = testing.DummyRequest(scheme='http')
-        request.registry.settings = {'adhocracy.frontend.rest_url': 'x.org'}
-        assert self.call_fut(request)['rest_url'] == 'x.org'
-
-    def test_support_email_with_support_email_settings(self):
-        request = testing.DummyRequest(scheme='http')
-        request.registry.settings = {
-            'adhocracy.frontend.support_email': 'x.org'
-        }
-        assert self.call_fut(request)['support_email'] == 'x.org'
+    @mark.usefixtures('integration')
+    def test_add_frontend_settings(self, config, request_):
+        settings = request_.registry['config']
+        config_json = self.call_fut(request_)
+        assert settings.adhocracy.frontend.ws_url == config_json['ws_url']
 
 
 class RootViewTest(unittest.TestCase):
@@ -101,13 +49,8 @@ class RootViewTest(unittest.TestCase):
         assert resp.body_file
 
 
-class ViewsFunctionalTest(unittest.TestCase):
-
-    def setUp(self):
-        from adhocracy_frontend import main
-        from webtest import TestApp
-        app = main({})
-        self.testapp = TestApp(app)
+@mark.usefixtures('functional')
+class ViewsFunctionalTest:
 
     @mark.xfail(reason='asset build:/stylesheets/a3.css must exists')
     def test_static_view(self):
@@ -129,19 +72,44 @@ class ViewsFunctionalTest(unittest.TestCase):
         assert '200' in resp.status
 
 
-@fixture()
-def integration(config):
-    config.include('adhocracy_frontend')
-
-
 @mark.usefixtures('integration')
 class TestIntegrationIncludeme:
 
-    def test_includeme(self):
-        """Check that includeme runs without errors."""
-        assert True
+    def test_includeme(self, integration):
+        """Check that includeme runs without errors and config is loaded."""
+        assert integration.registry['config']
 
     def test_register_subscriber(self, registry):
         from . import add_cors_headers
         handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
         assert add_cors_headers.__name__ in handlers
+
+
+class TestConfig:
+
+    @fixture
+    def config(self, config):
+        config.registry.settings['yaml.location'] =\
+            'adhocracy_frontend:test_config.yaml, '
+        config.include('tzf.pyramid_yml')
+        return config
+
+    def test_config_file_set_default_values(self, config):
+        settings = config.registry['config']
+        assert settings.setting == 'test'
+
+    def test_additional_config_files_extend_defaul_values(self, config):
+        config.config_defaults(
+            'adhocracy_frontend:test_config_extended.yaml')
+        settings = config.registry['config']
+        assert settings.setting == 'test'
+        assert settings.setting_extended == 'extended'
+
+    @mark.parametrize("setting, typ", [('setting_str', str),
+                                       ('setting_bool', bool),
+                                       ('setting_int', int),
+                                       ('setting_float', float),
+                                       ])
+    def test_values_are_typed(self, setting, typ, config):
+        settings = config.registry['config']
+        assert isinstance(settings[setting], typ)

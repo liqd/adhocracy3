@@ -1,82 +1,30 @@
 """Frontend view and simple pyramid app configurations."""
-import json
 import pkg_resources
 
 from pyramid.renderers import render
 from pyramid.config import Configurator
 from pyramid.events import NewResponse
-from pyramid.request import Request
 from pyramid.response import FileResponse
 from pyramid.response import Response
-from pyramid.settings import asbool
-from pyramid.settings import aslist
 
 from adhocracy_core.rest.subscriber import add_cors_headers
 
 
 def config_view(request):
     """Return the frontend configuration."""
-    settings = request.registry.settings or {}
+    settings = request.registry['config']
     config = {}
-    if 'adhocracy.frontend.ws_url' in settings:
-        public_ws_url = settings.get('adhocracy.frontend.ws_url')
-    else:
-        public_ws_url = _build_ws_url(request)
-    config['ws_url'] = public_ws_url
-    config['rest_url'] = settings.get('adhocracy.frontend.rest_url',
-                                      'http://localhost:6541')
-    config['canonical_url'] = settings.get('adhocracy.canonical_url',
-                                           'http://localhost:6551')
-    config['redirect_url'] = settings.get('adhocracy.redirect_url', '/')
-    config['rest_platform_path'] = settings.get('adhocracy.rest_platform_path',
-                                                '/adhocracy/')
-    config['netiquette_url'] = settings.get(
-        'adhocracy.frontend.netiquette_url', '')
-    config['pkg_path'] = settings.get('adhocracy.frontend.pkg_path',
-                                      '/static/js/Packages')
-    config['trusted_domains'] = aslist(
-        settings.get('adhocracy.trusted_domains', []))
-    config['support_email'] = settings.get('adhocracy.frontend.support_email')
-    config['support_url'] = settings.get('adhocracy.frontend.support_url')
-    config['captcha_enabled'] = asbool(settings.get(
-        'adhocracy.thentos_captcha.enabled', 'false'))
-    config['captcha_url'] = settings.get(
-        'adhocracy.thentos_captcha.frontend_url', 'http://localhost:6542/')
-    config['anonymize_enabled'] = asbool(settings.get(
-        'adhocracy.anonymize.enabled', 'false'))
-    config['locale'] = settings.get('adhocracy.frontend.locale', 'en')
-    custom_keys = settings.get('adhocracy.custom', '').split()
-    config['custom'] = {k: settings.get('adhocracy.custom.%s' % k)
-                        for k in custom_keys}
-    config['site_name'] = settings.get('adhocracy.site_name',
-                                       'Adhocracy')
-    config['debug'] = asbool(settings.get('adhocracy.frontend.debug', 'false'))
-    config['terms_url'] = {}
-    config['terms_url']['en'] = settings.get('adhocracy.frontend.terms_url.en')
-    config['terms_url']['de'] = settings.get('adhocracy.frontend.terms_url.de')
-    config['piwik_enabled'] = asbool(settings.get(
-        'adhocracy.frontend.piwik_enabled', 'false'))
-    config['piwik_host'] = settings.get('adhocracy.frontend.piwik_host')
-    config['piwik_site_id'] = settings.get('adhocracy.frontend.piwik_site_id')
-    config['piwik_use_cookies'] = asbool(settings.get(
-        'adhocracy.frontend.piwik_use_cookies', 'false'))
-    config['piwik_track_user_id'] = asbool(settings.get(
-        'adhocracy.frontend.piwik_track_user_id', 'false'))
-    config['profile_images_enabled'] = asbool(settings.get(
-        'adhocracy.frontend.profile_images_enabled', 'true'))
-    config['map_tile_url'] = settings.get(
-        'adhocracy.frontend.map_tile_url',
-        'http://{s}.tile.osm.org/{z}/{x}/{y}.png')
-    map_tile_options = settings.get('adhocracy.frontend.map_tile_options')
-    if map_tile_options is not None:
-        config['map_tile_options'] = json.loads(map_tile_options)
-    else:
-        url = 'https://www.openstreetmap.org/copyright'
-        config['map_tile_options'] = {
-            'maxZoom': 18,
-            'attribution': '© <a href="%s">OpenStreetMap</a>' % url,
-        }
-    use_cachbust = asbool(settings.get('cachebust.enabled', 'false'))
+    config.update(settings.adhocracy.frontend)
+    config['canonical_url'] = settings.adhocracy.canonical_url
+    config['redirect_url'] = settings.adhocracy.redirect_url
+    config['rest_platform_path'] = settings.adhocracy.rest_platform_path
+    config['trusted_domains'] = settings.adhocracy.trusted_domains
+    config['captcha_enabled'] = settings.adhocracy.thentos_captcha.enabled
+    config['captcha_url'] = settings.adhocracy.thentos_captcha.frontend_url
+    config['anonymize_enabled'] = settings.adhocracy.anonymize.enabled
+    config['custom'] = settings.adhocracy.custom
+    config['site_name'] = settings.adhocracy.site_name
+    use_cachbust = settings.configurator.cachebust.enabled
     if not use_cachbust:  # ease testing
         return config
     config['cachebust'] = use_cachbust
@@ -144,13 +92,6 @@ def root_view(request):
     return response
 
 
-def _build_ws_url(request: Request) -> str:
-    ws_domain = request.domain
-    ws_port = 6561
-    ws_scheme = 'wss' if request.scheme == 'https' else 'ws'
-    return '{}://{}:{}'.format(ws_scheme, ws_domain, ws_port)
-
-
 def adhocracy_sdk_view(request):
     """Return AdhocracySDK.js."""
     path = pkg_resources.resource_filename('adhocracy_frontend',
@@ -160,10 +101,12 @@ def adhocracy_sdk_view(request):
 
 def includeme(config):
     """Add routing and static view to deliver the frontend application."""
-    config.include('pyramid_cachebust')
-    config.include('pyramid_mako')
-    settings = config.registry.settings
-    cachebust_enabled = asbool(settings.get('cachebust.enabled', 'false'))
+    config_files = config.registry.settings.get('yaml.location', '')
+    config.registry.settings['yaml.location'] = \
+        'adhocracy_frontend:defaults.yaml, ' + config_files
+    config.include('tzf.pyramid_yml')
+    settings = config.registry['config']
+    cachebust_enabled = settings.configurator.cachebust.enabled
     if cachebust_enabled:
         cache_max_age = 30 * 24 * 60 * 60  # 30 days
     else:
