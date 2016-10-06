@@ -11,7 +11,7 @@ class IProcess(process.IProcess):
 
 
 process_meta = process.process_meta._replace(
-    content_name='S1Process',
+    content_name='Agenda-S1-Process',
     iresource=IProcess,
     default_workflow='s1',
     is_implicit_addable=True,
