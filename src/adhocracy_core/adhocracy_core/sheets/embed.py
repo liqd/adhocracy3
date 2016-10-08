@@ -26,12 +26,12 @@ class IEmbedCodeConfig(Interface):
 def embed_code_config_adapter(context: IResource,
                               request: IRequest) -> {}:
     """Return mapping to render `adhocracy_core:templates/embed_code.html`."""
-    settings = request.registry.settings
-    frontend_url = settings.get('adhocracy.frontend_url',
-                                'http://localhost:6551')
+    settings = request.registry['config']
+    frontend_url = settings.adhocracy.frontend_url
     sdk_url = os.path.join(frontend_url, 'AdhocracySDK.js')
     path = request.resource_url(context)
-    locale = settings.get('pyramid.default_locale_name', 'en')
+    # TODO use frontend.locale instead
+    locale = settings.configurator.pyramid.default_locale_name
     return {'sdk_url': sdk_url,
             'frontend_url': frontend_url,
             'path': path,

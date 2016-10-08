@@ -11,6 +11,7 @@ class TestEmbedCodeConfigBplanAdapter:
         from adhocracy_core.sheets.embed import IEmbedCodeConfig
         from adhocracy_meinberlin.resources.bplan import IProcess
         context = testing.DummyResource(__provides__=IProcess)
+        registry['config'].adhocracy.frontend_url = 'http://localhost:6551'
         result = registry.getMultiAdapter((context, request_),
                                           IEmbedCodeConfig)
         assert result == {'sdk_url': 'http://localhost:6551/AdhocracySDK.js',

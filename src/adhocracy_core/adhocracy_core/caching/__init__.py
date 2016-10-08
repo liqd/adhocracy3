@@ -43,8 +43,7 @@ def _set_cache_header(context: IResource, request: IRequest):
 
 
 def _get_cache_mode(registry) -> HTTPCacheMode:
-    mode_name = registry.settings.get('adhocracy_core.caching.http.mode',
-                                      HTTPCacheMode.no_cache.name)
+    mode_name = registry['config'].adhocracy_core.caching.http.mode
     mode = HTTPCacheMode[mode_name]
     return mode
 
@@ -273,7 +272,8 @@ class HTTPCacheStrategyStrongAdapter(HTTPCacheStrategyBaseAdapter):
 def purge_varnish_after_commit_hook(success: bool, registry: Registry,
                                     request: IRequest):
     """Send PURGE requests for all changed resources to Varnish."""
-    varnish_url = registry.settings.get('adhocracy.varnish_url')
+    settings = registry['config']
+    varnish_url = settings.adhocracy.varnish_url
     if not (success and varnish_url):
         return
     changelog_metadata = registry.changelog.values()

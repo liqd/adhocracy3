@@ -678,7 +678,7 @@ class TestGetUserOrAnonymous:
             self, request_, mock_user_locator, mock_is_anonymize):
         user = testing.DummyResource()
         mock_is_anonymize.return_value = True
-        request_.registry.settings['adhocracy.anonymous_user'] = 'anonymous_'
+        request_.registry['config'].adhocracy.anonymous_user = 'anonymous_'
         mock_user_locator.get_user_by_login.return_value = user
         assert self.call_fut(request_) == user
 

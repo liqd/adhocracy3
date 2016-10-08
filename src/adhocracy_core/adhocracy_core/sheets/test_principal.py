@@ -319,7 +319,7 @@ class TestCaptchaSheet:
 
     def test_includeme_set_create_mandatory_if_captcha_enabled(self, config,
                                                                meta):
-        config.registry.settings['adhocracy.thentos_captcha.enabled'] = 'true'
+        config.registry['config'].adhocracy.thentos_captcha.enabled = True
         config.include('adhocracy_core.content')
         config.include('adhocracy_core.sheets.principal')
         meta_included = config.registry.content.sheets_meta[meta.isheet]

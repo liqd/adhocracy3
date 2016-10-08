@@ -6,7 +6,6 @@ from urllib.request import quote
 
 from pyramid.registry import Registry
 from pyramid.renderers import render
-from pyramid.settings import asbool
 from pyramid_mailer.interfaces import IMailer
 from pyramid_mailer.message import Message
 from pyramid.traversal import resource_path
@@ -37,14 +36,12 @@ class Messenger:
         :param registry: used to retrieve and configure the mailer
         """
         self.registry = registry
-        settings = registry.settings
-        self.use_mail_queue = asbool(settings.get('adhocracy.use_mail_queue',
-                                                  False))
+        settings = registry['config']
+        self.use_mail_queue = settings.adhocracy.use_mail_queue
         logger.debug('Messenger will use mail queue: %s', self.use_mail_queue)
-        self.abuse_handler_mail = settings.get('adhocracy.abuse_handler_mail')
-        self.site_name = settings.get('adhocracy.site_name', 'Adhocracy')
-        self.frontend_url = settings.get('adhocracy.frontend_url',
-                                         'http://localhost:6551')
+        self.abuse_handler_mail = settings.adhocracy.abuse_handler_mail
+        self.site_name = settings.adhocracy.site_name
+        self.frontend_url = settings.adhocracy.frontend_url
         self.mailer = registry.getUtility(IMailer)
 
     def send_mail(self,
@@ -137,8 +134,8 @@ class Messenger:
                              request: Request=None,
                              ):
         """Send a message to a specific user."""
-        from_email = self.registry.settings.get('mail.noreply_sender',
-                                                'noreply@')
+        settings = self.registry['config'].configurator
+        from_email = settings.mail.noreply_sender
         recipient_email = self._get_user_email(recipient)
         sender_name = self._get_user_name(from_user)
         sender_url = self._get_user_url(from_user)

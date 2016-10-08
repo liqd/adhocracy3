@@ -75,8 +75,7 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
 
 
 def _add_default_group(context, registry):
-    if not registry.settings.get('adhocracy.add_default_group',
-                                 True):  # pragma: no cover
+    if not registry['config'].adhocracy.add_default_group:  # pragma: no cover
         return
     group_name = DEFAULT_USER_GROUP_NAME
     groups = find_service(context, 'principals', 'groups')
@@ -89,13 +88,11 @@ def _add_default_group(context, registry):
 
 
 def _add_initial_user_and_group(context, registry):
-
-    user_name = registry.settings.get('adhocracy.initial_login', 'god')
-    user_password = registry.settings.get('adhocracy.initial_password',
-                                          'password')
-    user_email = registry.settings.get('adhocracy.initial_email',
-                                       'sysadmin@test.de')
-    group_name = registry.settings.get('adhocracy.initial_group_name', 'gods')
+    settings = registry['config']
+    user_name = settings.adhocracy.initial_login
+    user_password = settings.adhocracy.initial_password
+    user_email = settings.adhocracy.initial_email
+    group_name = settings.adhocracy.initial_group_name
     group_roles = ['god']
     groups = find_service(context, 'principals', 'groups')
     appstructs = {adhocracy_core.sheets.principal.IGroup.__identifier__:
@@ -128,9 +125,9 @@ def _add_initial_user_and_group(context, registry):
 
 
 def _add_anonymous_user(context, registry):
-    user_name = registry.settings.get('adhocracy.anonymous_user', 'anonymous')
-    user_email = registry.settings.get('adhocracy.anonymous_user_email',
-                                       'sysadmin@test.de')
+    settings = registry['config']
+    user_name = settings.adhocracy.anonymous_user
+    user_email = settings.adhocracy.anonymous_user_email
     users = find_service(context, 'principals', 'users')
     appstruct = {adhocracy_core.sheets.principal.IUserBasic.__identifier__:
                  {'name': user_name},

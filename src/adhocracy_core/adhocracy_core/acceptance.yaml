@@ -1,0 +1,17 @@
+# test configuration for acceptance tests
+
+# configure 3rd party packages
+
+configurator:
+  zodbconn:
+    zodbconn.uri: 'zeo://localhost:9999?cache_size=200MB&connection_cache_size=50000&storage=main&blob_dir=var/db/test/blobs&shared_blob_dir=True'
+  substanced:
+    secret: 'secret'
+#    uploads_tempdir: '%(here)s/../var/uploads_tmp'
+
+# configure adhocracy
+
+adhocracy:
+  adhocracy.use_mail_queue: True
+  ws_url: 'ws://localhost:8081'
+  frontend_url: 'http://localhost:9090'

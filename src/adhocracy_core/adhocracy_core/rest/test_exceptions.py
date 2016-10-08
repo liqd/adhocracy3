@@ -53,7 +53,7 @@ class TestJSONHTTPException:
         assert 'None' in str(log)
 
     def test_log_abbreviated_request_body_if_gt_5000(self, request_, log):
-        request_.body = '{"data": "' + 'h' * 5110 + '"}'
+        request_.body = '{"data": "' + 'h' * 5210 + '"}'
         self.make_one([], request_)
         assert len(str(log)) < len(request_.body)
         assert '...' in str(log)
@@ -71,7 +71,7 @@ class TestJSONHTTPException:
 
     def test_log_abbreviated_formdata_body_if_gt_240(self, request_, log):
         request_.content_type = 'multipart/form-data'
-        request_.body = "h" * 240
+        request_.body = "h" * 280
         self.make_one([], request_)
         assert len(str(log)) < len(request_.body)
         assert 'h...' in str(log)

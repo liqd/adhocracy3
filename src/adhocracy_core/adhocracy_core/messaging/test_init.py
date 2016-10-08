@@ -16,13 +16,6 @@ def integration(config):
     config.include('adhocracy_core.messaging')
 
 
-@fixture
-def request_(registry):
-    request = testing.DummyRequest()
-    request.registry = registry
-    return request
-
-
 @mark.usefixtures('integration')
 class TestSendMail:
 
@@ -71,7 +64,7 @@ class TestSendMailToQueue:
     def test_send_mail_to_queue(self, config, registry, request_):
         config.include('pyramid_mailer.testing')
         config.include('adhocracy_core.content')
-        registry.settings['adhocracy.use_mail_queue'] = 'true'
+        registry['config'].adhocracy.use_mail_queue = True
         config.include('adhocracy_core.messaging')
         mailer = registry.messenger.mailer
         registry.messenger.send_mail(subject='Test mail',
@@ -133,7 +126,8 @@ class TestSendMessageToUser:
     def test_send_message_to_user(self, request_, registry):
         from adhocracy_core.sheets.principal import IUserExtended
         from adhocracy_core.sheets.principal import IUserBasic
-        registry.settings['mail.noreply_sender'] = 'noreply@example.org'
+        settings = registry['config'].configurator
+        settings.mail.noreply_sender = 'noreply@example.org'
         recipient = testing.DummyResource(__provides__=(IUserExtended,
                                                         IUserBasic),
                                           email='recipient@example.org')
@@ -159,6 +153,8 @@ class TestSendRegistrationMail:
     @fixture
     def registry(self, config):
         config.include('pyramid_mailer.testing')
+        settings = config.registry['config']
+        settings.adhocracy.use_mail_queue = False
         return config.registry
 
     @fixture
@@ -188,8 +184,8 @@ class TestSendPasswordResetMail:
     @fixture
     def registry(self, config):
         config.include('pyramid_mailer.testing')
-        config.registry.settings['adhocracy.site_name'] = 'sitename'
-        config.registry.settings['adhocracy.frontend_url'] = 'http://front.end'
+        config.registry['config'].adhocracy.site_name = 'sitename'
+        config.registry['config'].adhocracy.frontend_url = 'http://front.end'
         return config.registry
 
     @fixture
@@ -220,8 +216,8 @@ class TestSendInvitationMail:
     def registry(self, config):
         config.include('pyramid_mako')
         config.include('pyramid_mailer.testing')
-        config.registry.settings['adhocracy.site_name'] = 'sitename'
-        config.registry.settings['adhocracy.frontend_url'] = 'http://front.end'
+        config.registry['config'].adhocracy.site_name = 'sitename'
+        config.registry['config'].adhocracy.frontend_url = 'http://front.end'
         return config.registry
 
     @fixture
@@ -270,8 +266,8 @@ class TestActivityEmail:
     @fixture
     def registry(self, config):
         config.include('pyramid_mailer.testing')
-        config.registry.settings['adhocracy.site_name'] = 'sitename'
-        config.registry.settings['adhocracy.frontend_url'] = 'http://front.end'
+        config.registry['config'].adhocracy.site_name = 'sitename'
+        config.registry['config'].adhocracy.frontend_url = 'http://front.end'
         return config.registry
 
     @fixture
@@ -331,8 +327,8 @@ class TestSendPasswordChangeMail:
     @fixture
     def registry(self, config):
         config.include('pyramid_mailer.testing')
-        config.registry.settings['adhocracy.site_name'] = 'sitename'
-        config.registry.settings['adhocracy.frontend_url'] = 'http://front.end'
+        config.registry['config'].adhocracy.site_name = 'sitename'
+        config.registry['config'].adhocracy.frontend_url = 'http://front.end'
         return config.registry
 
     @fixture

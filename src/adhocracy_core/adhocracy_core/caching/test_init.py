@@ -29,14 +29,14 @@ def test_get_cache_mode_return_default_mode(registry):
 def test_get_cache_mode_return_mode_in_settings(registry):
     from adhocracy_core.interfaces import HTTPCacheMode
     from . import _get_cache_mode
-    registry.settings['adhocracy_core.caching.http.mode'] = \
+    registry['config'].adhocracy_core.caching.http.mode= \
         HTTPCacheMode.with_proxy_cache.name
     assert _get_cache_mode(registry) == HTTPCacheMode.with_proxy_cache
 
 
 def test_get_cache_mode_raise_if_wrong_mode_in_settings(registry):
     from . import _get_cache_mode
-    registry.settings['adhocracy_core.caching.http.mode'] = 'WRONG'
+    registry['config'].adhocracy_core.caching.http.mode= 'WRONG'
     with raises(KeyError):
         _get_cache_mode(registry)
 
@@ -375,7 +375,7 @@ class TestIntegrationCaching:
 
     def test_strategy_with_mode_without_proxy_cache_get(self, app_user, registry):
         from adhocracy_core.interfaces import HTTPCacheMode
-        registry.settings['adhocracy_core.caching.http.mode'] =\
+        registry['config'].adhocracy_core.caching.http.mode=\
              HTTPCacheMode.without_proxy_cache.name
         resp = app_user.get('/', status=200)
         assert resp.headers['Cache-control'] == 'max-age=0, must-revalidate'
@@ -383,7 +383,7 @@ class TestIntegrationCaching:
 
     def test_strategy_with_mode_proxy_cache_get(self, app_user, registry):
         from adhocracy_core.interfaces import HTTPCacheMode
-        registry.settings['adhocracy_core.caching.http.mode'] =\
+        registry['config'].adhocracy_core.caching.http.mode=\
              HTTPCacheMode.with_proxy_cache.name
         resp = app_user.get('/', status=200)
         assert resp.headers['Cache-control'] ==\
@@ -431,8 +431,8 @@ class TestPurgeVarnishAfterCommitHook:
 
     @fixture
     def registry_for_varnish(self, registry_with_changelog):
-        registry_with_changelog.settings[
-            'adhocracy.varnish_url'] = 'http://localhost'
+        registry_with_changelog['config'].adhocracy.varnish_url =\
+            'http://localhost'
         return registry_with_changelog
 
     @fixture
