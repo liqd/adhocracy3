@@ -41,7 +41,7 @@ class Messenger:
         logger.debug('Messenger will use mail queue: %s', self.use_mail_queue)
         self.abuse_handler_mail = settings.adhocracy.abuse_handler_mail
         self.site_name = settings.adhocracy.site_name
-        self.frontend_url = settings.adhocracy.frontend_url
+        self.frontend_url = settings.adhocracy.canonical_url
         self.mailer = registry.getUtility(IMailer)
 
     def send_mail(self,

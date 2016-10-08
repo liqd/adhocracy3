@@ -47,11 +47,11 @@ configurator:
 adhocracy:
   # Name of the entire site. Used in account registration information etc.
   site_name: 'Adhocracy'
-  # Canonical frontend base URL. If this is set, frontend links will always
-  # prefix links with this URL. If this is an embedding URL, it should end with
-  # #!.
-  canonical_url: ''
-  # TODO docu
+  # Canonical frontend base URL. For example the main webpage embedding the
+  # frontend. If this is set, frontend links will always prefix links with this
+  # URL. If this is an embedding URL, it should end with #!.
+  canonical_url: 'http://localhost:6551/static/embed.html#!'
+  # The base URL of the frontend javascript code and the SDK for embedding.
   frontend_url: 'http://localhost:6551'
   # The websocket url to notify about resource modifications
   ws_url: ''

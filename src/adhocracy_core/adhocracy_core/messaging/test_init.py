@@ -185,7 +185,7 @@ class TestSendPasswordResetMail:
     def registry(self, config):
         config.include('pyramid_mailer.testing')
         config.registry['config'].adhocracy.site_name = 'sitename'
-        config.registry['config'].adhocracy.frontend_url = 'http://front.end'
+        config.registry['config'].adhocracy.canonical_url = 'http://front.end'
         return config.registry
 
     @fixture
@@ -217,7 +217,7 @@ class TestSendInvitationMail:
         config.include('pyramid_mako')
         config.include('pyramid_mailer.testing')
         config.registry['config'].adhocracy.site_name = 'sitename'
-        config.registry['config'].adhocracy.frontend_url = 'http://front.end'
+        config.registry['config'].adhocracy.canonical_url = 'http://front.end'
         return config.registry
 
     @fixture
@@ -267,7 +267,7 @@ class TestActivityEmail:
     def registry(self, config):
         config.include('pyramid_mailer.testing')
         config.registry['config'].adhocracy.site_name = 'sitename'
-        config.registry['config'].adhocracy.frontend_url = 'http://front.end'
+        config.registry['config'].adhocracy.canonical_url = 'http://front.end'
         return config.registry
 
     @fixture
@@ -328,7 +328,7 @@ class TestSendPasswordChangeMail:
     def registry(self, config):
         config.include('pyramid_mailer.testing')
         config.registry['config'].adhocracy.site_name = 'sitename'
-        config.registry['config'].adhocracy.frontend_url = 'http://front.end'
+        config.registry['config'].adhocracy.canonical_url = 'http://front.end'
         return config.registry
 
     @fixture

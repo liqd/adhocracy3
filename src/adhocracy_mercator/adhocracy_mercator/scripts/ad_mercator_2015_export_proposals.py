@@ -295,5 +295,5 @@ def main():
 def _get_proposal_url(proposal: IMercatorProposalVersion,
                       registry: Registry) -> str:
     path = resource_path(proposal)
-    frontend_url = registry.settings.get('adhocracy.frontend_url')
+    frontend_url = registry.settings.get('adhocracy.canonical_url')
     return frontend_url + '/r' + path
