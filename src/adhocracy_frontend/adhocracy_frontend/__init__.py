@@ -21,7 +21,6 @@ def config_view(request):
     config['trusted_domains'] = settings.adhocracy.trusted_domains
     config['captcha_enabled'] = settings.adhocracy.thentos_captcha.enabled
     config['captcha_url'] = settings.adhocracy.thentos_captcha.frontend_url
-    config['anonymize_enabled'] = settings.adhocracy.anonymize.enabled
     config['custom'] = settings.adhocracy.custom
     config['site_name'] = settings.adhocracy.site_name
     use_cachbust = settings.configurator.cachebust.enabled

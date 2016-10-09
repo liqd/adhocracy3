@@ -30,9 +30,6 @@ adhocracy:
   # This is especially relevant for cases in which cameFrom is not set,
   # e.g. account activation.
   redirect_url: '/r/organisation/advocate-europe2/'
-  # Whether to allow users to post resources anonymously
-  anonymize:
-    enabled:  False
   # If the Adhocracy frontend is embedded in a website from a trusted domain,
   # Adhocracy may pass user authentication token to the embedding website.
   trusted_domains: []
@@ -40,6 +37,8 @@ adhocracy:
   # - http://localhost:9001
 
   frontend:
+    # Whether to allow users to post resources anonymously
+    anonymize_enabled: False
     # package path
     pkg_path: '/static/js/Packages'
     # Wether to display profile images in the frontend (disabling can improve performance for large installations)
