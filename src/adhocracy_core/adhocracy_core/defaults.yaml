@@ -69,7 +69,6 @@ adhocracy:
   # anonymous system user
   anonymous_user: 'anonymous'
   anonymous_user_email: 'sysadmin@test.de'
-  add_default_group: True  # TODO remove, not used
   # use file system queue to send mails
   use_mail_queue: False
   # Email address receiving abuse complaints

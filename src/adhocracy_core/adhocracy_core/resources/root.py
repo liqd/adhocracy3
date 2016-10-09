@@ -75,8 +75,6 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
 
 
 def _add_default_group(context, registry):
-    if not registry['config'].adhocracy.add_default_group:  # pragma: no cover
-        return
     group_name = DEFAULT_USER_GROUP_NAME
     groups = find_service(context, 'principals', 'groups')
     appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
