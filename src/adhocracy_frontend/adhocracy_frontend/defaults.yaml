@@ -88,12 +88,11 @@ adhocracy:
     hide_header: False
 
   # Only accept registration requests with valid captcha solutions
-  thentos_captcha:
-    # enable captcha support
-    enabled: False
-    # Where the frontend sends captcha traffic
-    backend_url: 'http://localhost:6542/'
-    # Where the backend sends captcha traffic (in development mode, this
-    # is the same as captcha backend; if nginx is dispatching inbound
-    # requests, this is just the frontend url)
-    frontend_url: 'http://localhost:6542/'
+  # enable captcha support
+  captcha_enabled: False
+  # Where the frontend sends captcha traffic
+  captcha_backend_url: 'http://localhost:6542/'
+  # Where the backend sends captcha traffic (in development mode, this
+  # is the same as captcha backend; if nginx is dispatching inbound
+  # requests, this is just the frontend url)
+  captcha_frontend_url: 'http://localhost:6542/'

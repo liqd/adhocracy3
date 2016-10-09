@@ -178,7 +178,7 @@ class CaptchaSchema(MappingSchema):
         """
         Validate the captcha.
 
-        If 'adhocracy.thentos_captcha.enabled' is true, we ask the
+        If 'adhocracy.captcha_enabled' is true, we ask the
         thentos-captcha service whether the given solution is correct.
         If captchas are not enabled, this validator will always pass.
         """
@@ -191,7 +191,7 @@ class CaptchaSchema(MappingSchema):
 
     def _captcha_is_correct(self, settings, value) -> bool:
         """Ask the captcha service whether the captcha was solved correctly."""
-        captcha_service = settings.adhocracy.thentos_captcha.backend_url
+        captcha_service = settings.adhocracy.captcha_backend_url
         resp = requests.post(urljoin(captcha_service, 'solve_captcha'),
                              json=value)
         return resp.json()['data']
@@ -395,7 +395,7 @@ def includeme(config):
     add_sheet_to_registry(userbasic_meta, config.registry)
     add_sheet_to_registry(userextended_meta, config.registry)
     settings = config.registry['config']
-    captcha_enabled = settings.adhocracy.thentos_captcha.enabled
+    captcha_enabled = settings.adhocracy.captcha_enabled
     if captcha_enabled:
         add_sheet_to_registry(captcha_meta._replace(creatable=True,
                                                     create_mandatory=True),

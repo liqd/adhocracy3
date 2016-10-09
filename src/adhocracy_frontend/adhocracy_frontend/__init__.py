@@ -19,8 +19,8 @@ def config_view(request):
     config['redirect_url'] = settings.adhocracy.redirect_url
     config['rest_platform_path'] = settings.adhocracy.rest_platform_path
     config['trusted_domains'] = settings.adhocracy.trusted_domains
-    config['captcha_enabled'] = settings.adhocracy.thentos_captcha.enabled
-    config['captcha_url'] = settings.adhocracy.thentos_captcha.frontend_url
+    config['captcha_enabled'] = settings.adhocracy.captcha_enabled
+    config['captcha_url'] = settings.adhocracy.captcha_frontend_url
     config['custom'] = settings.adhocracy.custom
     config['site_name'] = settings.adhocracy.site_name
     use_cachbust = settings.configurator.cachebust.enabled
