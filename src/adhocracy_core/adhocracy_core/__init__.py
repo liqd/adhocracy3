@@ -70,16 +70,16 @@ def _set_auditlog_if_missing(request):
 
 def add_after_commit_hooks(request):
     """Add after commit hooks."""
-    from adhocracy_core.caching import purge_varnish_after_commit_hook
+    from adhocracy_core.caching import purge_caching_proxy_after_commit_hook
     from adhocracy_core.websockets.client import \
         send_messages_after_commit_hook
     current_transaction = transaction.get()
     registry = request.registry
     # Order matters here
-    current_transaction.addAfterCommitHook(purge_varnish_after_commit_hook,
-                                           args=(registry, request))
-    current_transaction.addAfterCommitHook(send_messages_after_commit_hook,
-                                           args=(registry,))
+    current_transaction.addAfterCommitHook(
+        purge_caching_proxy_after_commit_hook, args=(registry, request))
+    current_transaction.addAfterCommitHook(
+        send_messages_after_commit_hook, args=(registry,))
 
 
 def add_request_callbacks(request):

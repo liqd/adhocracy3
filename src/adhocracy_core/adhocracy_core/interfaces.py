@@ -1031,7 +1031,7 @@ class HTTPCacheMode(Enum):
     """Make all cache strategies set headers that only work with a proxy cache
     between webserver and backend.
     The proxy cache has to accepts purge requests form the backend.
-    To make this work you have to set the `adhocracy_core.caching.http.pureurl`
+    To make this work you have to set the `adhocracy_core.caching_proxy`
     setting in you pyramid ini file.
     """
 

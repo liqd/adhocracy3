@@ -269,12 +269,12 @@ class HTTPCacheStrategyStrongAdapter(HTTPCacheStrategyBaseAdapter):
     etags = (etag_modified, etag_userid, etag_blocked)
 
 
-def purge_varnish_after_commit_hook(success: bool, registry: Registry,
-                                    request: IRequest):
+def purge_caching_proxy_after_commit_hook(success: bool, registry: Registry,
+                                          request: IRequest):
     """Send PURGE requests for all changed resources to Varnish."""
     settings = registry['config']
-    varnish_url = settings.adhocracy.varnish_url
-    if not (success and varnish_url):
+    proxy_url = settings.adhocracy.caching_proxy
+    if not (success and proxy_url):
         return
     changelog_metadata = registry.changelog.values()
     errcount = 0
@@ -283,7 +283,7 @@ def purge_varnish_after_commit_hook(success: bool, registry: Registry,
         if events == []:
             continue
         path = resource_path(meta.resource)
-        url = varnish_url + request.script_name + path
+        url = proxy_url + request.script_name + path
         for event in events:
             headers = {'X-Purge-Host': request.host}
             headers['X-Purge-Regex'] = '/?\??[^/]*'

@@ -74,8 +74,6 @@ adhocracy:
   use_mail_queue: False
   # Email address receiving abuse complaints
   abuse_handler_mail: 'abuse_handler@unconfigured.domain'
-  # URL of the Varnish cache
-  varnish_url: ''
   # performance workaround: disable filter references by view permission
   filter_by_view_permission: True
   # performance workaround: disable filter references by visible (not hidden)
@@ -93,5 +91,7 @@ adhocracy:
 
   # Mode to set http cache headers for resources, valid entries: no_cache, without_proxy_cache, with_proxy_cache
   caching_mode: 'no_cache'
+  # URL of the caching reverse proxy to send PURGE request to
+  caching_proxy: ''
 
 
