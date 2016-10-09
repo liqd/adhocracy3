@@ -1018,7 +1018,7 @@ class HTTPCacheMode(Enum):
     """Caching Mode for :class:`IHTTPCacheStrategy`.
 
     You can change the mode in you pyramid ini file with the
-    `adhocracy_core.caching.http.mode` setting.
+    `adhocracy.caching_mode` setting.
     """
 
     no_cache = 1

@@ -91,10 +91,7 @@ adhocracy:
     # requests, this is just the frontend url)
     frontend_url: 'http://localhost:6542/'
 
-adhocracy_core:
   # Mode to set http cache headers for resources, valid entries: no_cache, without_proxy_cache, with_proxy_cache
-  caching:
-    http:
-      mode: 'no_cache'
+  caching_mode: 'no_cache'
 
 

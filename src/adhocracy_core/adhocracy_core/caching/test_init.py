@@ -29,14 +29,14 @@ def test_get_cache_mode_return_default_mode(registry):
 def test_get_cache_mode_return_mode_in_settings(registry):
     from adhocracy_core.interfaces import HTTPCacheMode
     from . import _get_cache_mode
-    registry['config'].adhocracy_core.caching.http.mode= \
+    registry['config'].adhocracy.caching_mode= \
         HTTPCacheMode.with_proxy_cache.name
     assert _get_cache_mode(registry) == HTTPCacheMode.with_proxy_cache
 
 
 def test_get_cache_mode_raise_if_wrong_mode_in_settings(registry):
     from . import _get_cache_mode
-    registry['config'].adhocracy_core.caching.http.mode= 'WRONG'
+    registry['config'].adhocracy.caching_mode= 'WRONG'
     with raises(KeyError):
         _get_cache_mode(registry)
 
@@ -375,7 +375,7 @@ class TestIntegrationCaching:
 
     def test_strategy_with_mode_without_proxy_cache_get(self, app_user, registry):
         from adhocracy_core.interfaces import HTTPCacheMode
-        registry['config'].adhocracy_core.caching.http.mode=\
+        registry['config'].adhocracy.caching_mode=\
              HTTPCacheMode.without_proxy_cache.name
         resp = app_user.get('/', status=200)
         assert resp.headers['Cache-control'] == 'max-age=0, must-revalidate'
@@ -383,8 +383,8 @@ class TestIntegrationCaching:
 
     def test_strategy_with_mode_proxy_cache_get(self, app_user, registry):
         from adhocracy_core.interfaces import HTTPCacheMode
-        registry['config'].adhocracy_core.caching.http.mode=\
-             HTTPCacheMode.with_proxy_cache.name
+        registry['config'].adhocracy.caching_mode=\
+            HTTPCacheMode.with_proxy_cache.name
         resp = app_user.get('/', status=200)
         assert resp.headers['Cache-control'] ==\
                'max-age=0, proxy-revalidate, s-maxage=31104000'
