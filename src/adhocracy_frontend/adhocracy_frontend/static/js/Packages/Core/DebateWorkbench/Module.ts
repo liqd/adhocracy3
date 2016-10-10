@@ -43,6 +43,8 @@ export var register = (angular) => {
             "adhConfig", "adhTopLevelState", DebateWorkbench.documentEditColumnDirective])
         .directive("adhDebateProcessDetailColumn", [
             "adhConfig", "adhEmbed", "adhHttp", "adhPermissions", "adhTopLevelState", DebateWorkbench.processDetailColumnDirective])
+        .directive("adhDebateAddDocumentButton", [
+            "adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", DebateWorkbench.addDocumentButtonDirective])
         .directive("adhDebateProcessDetailAnnounceColumn", [
             "adhConfig",
             "adhEmbed",

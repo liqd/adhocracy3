@@ -25,7 +25,7 @@ import * as SIParagraph from "../../../Resources_/adhocracy_core/sheets/document
 import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/Core/DebateWorkbench";
+export var pkgLocation = "/Core/DebateWorkbench";
 
 
 export var debateWorkbenchDirective = (
@@ -113,6 +113,26 @@ export var processDetailColumnDirective = (
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
             var context = adhEmbed.getContext();
             scope.hasResourceHeader = (context === "");
+        }
+    };
+};
+
+export var addDocumentButtonDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service,
+    adhPermissions : AdhPermissions.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/AddDocumentButton.html",
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
+
+            scope.setCameFrom = () => {
+                adhTopLevelState.setCameFrom();
+            };
         }
     };
 };

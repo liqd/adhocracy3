@@ -142,7 +142,11 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         adhProcessProvider.templates[RICollaborativeTextProcess.content_type] =
             "<adh-debate-workbench></adh-debate-workbench>";
     }]);
-    app.config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RICollaborativeTextProcess)]);
+    app.config(["adhConfig", "adhResourceAreaProvider", (adhConfig, adhResourceAreaProvider) => {
+        var processHeaderSlot = adhConfig.pkg_path + AdhDebateWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
+        adhResourceAreaProvider.processHeaderSlots[RICollaborativeTextProcess.content_type] = processHeaderSlot;
+        AdhDebateWorkbench.registerRoutes(RICollaborativeTextProcess)(adhResourceAreaProvider);
+    }]);
 
     app.value("angular", angular);
     app.value("leaflet", leaflet);
