@@ -18,6 +18,6 @@ export class Service {
         } else {
             ret = "TR__RESOURCE";
         }
-        return amount != 1 ? ret + "_PLURAL" : ret;
+        return amount !== 1 ? ret + "_PLURAL" : ret;
     }
 }
