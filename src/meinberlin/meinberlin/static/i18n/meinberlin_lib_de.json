@@ -28,6 +28,8 @@
     "TR__RESOURCE_IDEA_COLLECTION_PLURAL": "Verfahren des Typs Ideensammlung",
     "TR__RESOURCE_KIEZKASSE": "Kiezkasse",
     "TR__RESOURCE_KIEZKASSE_PLURAL": "Kiezkassen-Verfahren",
+    "TR__RESOURCE_STADTFORUM": "Dialogverfahren",
+    "TR__RESOURCE_STADTFORUM_PLURAL": "Dialogverfahren",
     "TR__START_DATE": "Beginn",
     "TR__TITLE": "Titel"
 }
