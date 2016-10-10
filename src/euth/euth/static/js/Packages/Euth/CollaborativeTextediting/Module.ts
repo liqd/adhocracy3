@@ -25,8 +25,13 @@ export var register = (angular) => {
             adhProcessProvider.templates[RIEuthCollaborativeTextPrivateProcess.content_type] =
                 "<adh-debate-workbench></adh-debate-workbench>";
         }])
-        .config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RIEuthCollaborativeTextProcess)])
-        .config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RIEuthCollaborativeTextPrivateProcess)])
+        .config(["adhConfig", "adhResourceAreaProvider", (adhConfig, adhResourceAreaProvider) => {
+            var processHeaderSlot = adhConfig.pkg_path + AdhDebateWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
+            adhResourceAreaProvider.processHeaderSlots[RIEuthCollaborativeTextProcess.content_type] = processHeaderSlot;
+            AdhDebateWorkbench.registerRoutes(RIEuthCollaborativeTextProcess)(adhResourceAreaProvider);
+            adhResourceAreaProvider.processHeaderSlots[RIEuthCollaborativeTextPrivateProcess.content_type] = processHeaderSlot;
+            AdhDebateWorkbench.registerRoutes(RIEuthCollaborativeTextPrivateProcess)(adhResourceAreaProvider);
+        }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
             adhNamesProvider.names[RIEuthCollaborativeTextProcess.content_type] = "TR__RESOURCE_COLLABORATIVE_TEXT_EDITING";
             adhNamesProvider.names[RIEuthCollaborativeTextPrivateProcess.content_type] = "TR__RESOURCE_COLLABORATIVE_TEXT_EDITING";

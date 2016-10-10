@@ -485,7 +485,7 @@ def test_get_subject_name_return_user_name(context, registry):
     from adhocracy_core.sheets.principal import IUserBasic
     from . import _get_subject_name
     registry.content.get_sheet_field = Mock(return_value='user_name')
-    assert _get_subject_name(context, registry) == 'User_name'
+    assert _get_subject_name(context, registry) == 'user_name'
     registry.content.get_sheet_field.assert_called_with(context, IUserBasic,
                                                         'name')
 

@@ -11,7 +11,7 @@ import * as AdhPermissions from "../../../Core/Permissions/Permissions";
 import * as AdhPreliminaryNames from "../../../Core/PreliminaryNames/PreliminaryNames";
 import * as AdhResourceArea from "../../../Core/ResourceArea/ResourceArea";
 import * as AdhResourceUtil from "../../../Core/Util/ResourceUtil";
-import * as AdhResourceWidgets from "../../../Core/ResourceWidgets/ResourceWidgets";
+import * as AdhResourceWidgets from "../../../ResourceWidgets/ResourceWidgets";
 import * as AdhTopLevelState from "../../../Core/TopLevelState/TopLevelState";
 import * as AdhUtil from "../../../Core/Util/Util";
 

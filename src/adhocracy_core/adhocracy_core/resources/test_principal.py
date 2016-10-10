@@ -86,6 +86,7 @@ class TestUsers:
         assert meta.iresource is principal.IUsersService
         assert meta.permission_create == 'create_service'
         assert meta.content_name == 'users'
+        assert meta.sdi_column_mapper == principal.sdi_user_columns
         assert sheets.asset.IHasAssetPool in meta.extended_sheets
         assert badge.add_badge_assignments_service in meta.after_creation
         assert asset.add_assets_service in meta.after_creation
@@ -105,6 +106,39 @@ def test_create_asset_permission(context, registry, mocker):
     set_acl.assert_called_with(context,
                                [('Allow', 'system.Authenticated', 'create_asset')],
                                registry=registry)
+
+
+class TestSdiUserColums:
+
+    @fixture
+    def request_(self, context, registry_with_content):
+        request = testing.DummyRequest(context=context)
+        request.registry = registry_with_content
+        return request
+
+    def call_fut(self, *args, **kwargs):
+        from .principal import sdi_user_columns
+        return sdi_user_columns(*args, **kwargs)
+
+    def test_sdi_user_columns_none_user(self, request_):
+        context = testing.DummyResource()
+        result = self.call_fut(None, context, request_, [])
+        assert result == [
+            {'name': 'User','value': ''},
+            {'name': 'Email','value': ''},
+        ]
+
+    def test_sdi_user_columns_user(self, request_):
+        from .principal import IUser
+        context = testing.DummyResource(__provides__=IUser)
+        mock_get_sheet_field = Mock()
+        mock_get_sheet_field.side_effect = ['Admin', 'admin@example.com']
+        request_.registry.content.get_sheet_field = mock_get_sheet_field
+        result = self.call_fut(None, context, request_, [])
+        assert result == [
+            {'name': 'User','value': 'Admin'},
+            {'name': 'Email','value': 'admin@example.com'},
+        ]
 
 
 class TestUser:

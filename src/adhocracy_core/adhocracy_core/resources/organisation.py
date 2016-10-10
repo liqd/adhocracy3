@@ -10,6 +10,8 @@ from adhocracy_core.sheets.asset import IHasAssetPool
 from adhocracy_core.sheets.description import IDescription
 from adhocracy_core.sheets.image import IImageReference
 from adhocracy_core.sheets.notification import IFollowable
+from adhocracy_core.sheets.title import ITitle
+from adhocracy_core.utils import get_iresource
 
 
 class IOrganisation(IPool):
@@ -23,12 +25,31 @@ def enabled_ordering(pool: IPool, registry: Registry, **kwargs):
         pool.set_order(initial_order, reorderable=True)
 
 
+def sdi_organisation_columns(folder, subobject, request, default_columnspec):
+    """Mapping function to add info columns to the sdi organisation listing."""
+    content = request.registry.content
+    content_name = ''
+    title = ''
+    if subobject:
+        iresource = get_iresource(subobject)
+        metadata = content.resources_meta[iresource]
+        content_name = metadata.content_name
+        if IProcess.providedBy(subobject):
+            title = content.get_sheet_field(subobject, ITitle, 'title')
+    additional_columns = [
+        {'name': 'Type', 'value': content_name},
+        {'name': 'Title', 'value': title},
+    ]
+    return default_columnspec + additional_columns
+
+
 organisation_meta = pool_meta._replace(
     content_name='Organisation',
     iresource=IOrganisation,
     permission_create='create_organisation',
     is_implicit_addable=True,
     is_sdi_addable=True,
+    sdi_column_mapper=sdi_organisation_columns,
     element_types=(IProcess,
                    IOrganisation,
                    ),

@@ -29,7 +29,6 @@ import * as AdhProcessModule from "./Process/Module";
 import * as AdhRateModule from "./Rate/Module";
 import * as AdhResourceActionsModule from "./ResourceActions/Module";
 import * as AdhResourceAreaModule from "./ResourceArea/Module";
-import * as AdhResourceWidgetsModule from "./ResourceWidgets/Module";
 import * as AdhShareSocialModule from "./ShareSocial/Module";
 import * as AdhStickyModule from "./Sticky/Module";
 import * as AdhTopLevelStateModule from "./TopLevelState/Module";
@@ -72,7 +71,6 @@ export var register = (angular, config, metaApi) => {
     AdhRateModule.register(angular);
     AdhResourceActionsModule.register(angular);
     AdhResourceAreaModule.register(angular);
-    AdhResourceWidgetsModule.register(angular);
     AdhShareSocialModule.register(angular);
     AdhStickyModule.register(angular);
     AdhTopLevelStateModule.register(angular);

@@ -315,7 +315,6 @@ def _get_subject_name(user: IUserBasic, registry: Registry) -> str:
         name = 'Application'
     else:
         name = registry.content.get_sheet_field(user, IUserBasic, 'name')
-        name = name.capitalize()
     return name
 
 

@@ -241,7 +241,7 @@ export class Listing<Container extends ResourcesBase.IResource> {
                     return getElements($scope.currentLimit).then((container) => {
                         $scope.container = container;
                         $scope.poolPath = $scope.container.path;
-                        $scope.totalCount = $scope.container.data[SIPool.nick].count;
+                        $scope.totalCount = parseInt($scope.container.data[SIPool.nick].count, 10);
 
                         // avoid modifying the cached result
                         $scope.elements = _.clone($scope.container.data[SIPool.nick].elements);
