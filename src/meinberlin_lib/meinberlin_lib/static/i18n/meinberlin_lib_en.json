@@ -28,6 +28,8 @@
     "TR__RESOURCE_IDEA_COLLECTION_PLURAL": "Idea Collection Processes",
     "TR__RESOURCE_KIEZKASSE": "Neighborhood Budget",
     "TR__RESOURCE_KIEZKASSE_PLURAL": "Neighborhood Budget Processes",
+    "TR__RESOURCE_POLL": "poll",
+    "TR__RESOURCE_POLL_PLURAL": "polls",
     "TR__RESOURCE_STADTFORUM": "dialog project",
     "TR__RESOURCE_STADTFORUM_PLURAL": "dialog projects",
     "TR__START_DATE": "start date",
