@@ -20,6 +20,7 @@ class TestProposal:
         assert meta.autonaming_prefix == 'proposal_'
         assert meta.use_autonaming
         assert meta.is_implicit_addable
+        assert meta.is_sdi_addable
 
     @mark.usefixtures('integration')
     def test_create(self, meta, registry):
