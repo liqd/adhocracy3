@@ -28,6 +28,7 @@ import * as AdhDebateWorkbenchModule from "./Packages/Core/DebateWorkbench/Modul
 
 import * as AdhConfig from "./Packages/Core/Config/Config";
 import * as AdhDebateWorkbench from "./Packages/Core/DebateWorkbench/DebateWorkbench";
+import * as AdhNames from "./Packages/Core/Names/Names";
 import * as AdhProcess from "./Packages/Core/Process/Process";
 import * as AdhTopLevelState from "./Packages/Core/TopLevelState/TopLevelState";
 
@@ -136,6 +137,9 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         var processHeaderSlot = adhConfig.pkg_path + AdhDebateWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
         adhResourceAreaProvider.processHeaderSlots[RIDigitalLebenProcess.content_type] = processHeaderSlot;
         AdhDebateWorkbench.registerRoutes(RIDigitalLebenProcess)(adhResourceAreaProvider);
+    }]);
+    app.config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
+        adhNamesProvider.names[RIDigitalLebenProcess.content_type] = "TR__RESOURCE_COLLABORATIVE_TEXT_EDITING";
     }]);
 
     app.value("angular", angular);

@@ -55,6 +55,7 @@ translateMe = [
     "TR__PROPOSALS",
     "TR__PUBLISH",
     "TR__RATES",
+    "TR__RESOURCE_COLLABORATIVE_TEXT_EDITING",
     "TR__SHARE",
     "TR__SUPPORTERS",
     "TR__WEBSITE",

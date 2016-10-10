@@ -135,9 +135,6 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     }]);
 
     // register debate workbench
-    app.config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
-        adhNamesProvider.names[RICollaborativeTextProcess.content_type] = "TR__RESOURCE_COLLABORATIVE_TEXT_EDITING";
-    }]);
     app.config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
         adhProcessProvider.templates[RICollaborativeTextProcess.content_type] =
             "<adh-debate-workbench></adh-debate-workbench>";
@@ -146,6 +143,9 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         var processHeaderSlot = adhConfig.pkg_path + AdhDebateWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
         adhResourceAreaProvider.processHeaderSlots[RICollaborativeTextProcess.content_type] = processHeaderSlot;
         AdhDebateWorkbench.registerRoutes(RICollaborativeTextProcess)(adhResourceAreaProvider);
+    }]);
+    app.config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
+        adhNamesProvider.names[RICollaborativeTextProcess.content_type] = "TR__RESOURCE_COLLABORATIVE_TEXT_EDITING";
     }]);
 
     app.value("angular", angular);
