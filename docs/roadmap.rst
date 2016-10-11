@@ -5,17 +5,6 @@ Roadmap
 End of September 2016
 ---------------------
 
-Goal
-++++
-
-Polish the meinberlin project.
-
-KPIs
-++++
-
--   project managers can create all currently available process types on
-    meinberlin
-
 Features
 ++++++++
 
@@ -45,14 +34,11 @@ KPIs
 Features
 ++++++++
 
--   process overview can be filtered by region/city
 -   idea collection process with or without a map
 -   private and public processes
--   project managers can invite new users
+-   new users can be invited by liqd
 -   users can edit their own account information
--   project managers can generate embed snippets for a process
--   moderators of processes can download a data file (e.g. CSV) with
-    process contents
+-   embed snippets can be generated for a process
 -   concept for newsfeed / event-stream
 -   concept for notifications (users can follow processes and proposals
     in processes)
@@ -65,15 +51,13 @@ Goal
 ++++
 
 Adhocracy should be optimized to allow processes to be administered by
-initiators to take the workload off of our project managers and
-developers. It also should optimize platform features that allow users
+initiators. It also should optimize platform features that allow users
 and organizations to feel more at home.
 
 KPIs
 ++++
 
 -   we can offer an initial set up of a new process and organization
-    with little effort
 -   At least two persons feel comfortable configuring the adhocracy
     backend (#busfactor)
 -   we have a written strategy for onboarding of new developers
@@ -113,7 +97,7 @@ Goal
 
 -   Adhocracy provides an attractive environment that allows users to
     easily setup a simple participation process.
--   Project managers can easily setup more complex processes without
+-   More complex processes can be setup easily without
     help from developers.
 -   We have a dedicated concept for trainings in adhocracy and other
     activities related to online participation.
@@ -122,7 +106,6 @@ KPIs
 ++++
 
 -   we can offer an initial set up of a new process and organization
-    with tiny effort
 -   Over 80% of all identified adhocracy development debt has been
     tackled (#debt)
 -   at least two people are able to independently further develop
@@ -136,7 +119,7 @@ Features
 -   better discovery of processes (recommended processes, featured
     processes)
 -   search function for comments and contents
--   project managers can edit permissions in all processes
+-   permissions can be added in all processes
 -   more filtering options for processes (e.g. most activity)
 
 
