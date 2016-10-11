@@ -14,6 +14,7 @@ permissions:
   # create structure
   - [create_organisation,            ~,         ~,             ~,            ~,         ~,       ~,         A] # create organisation
   - [create_process,                 ~,         ~,             ~,            ~,         ~,       A,         A] # create process
+  - [create_page,                    ~,         ~,             ~,            ~,         ~,       A,         A] # create a static page
   # create process content
   - [create_asset,                   ~,         ~,             ~,            ~,         ~,       ~,         A] # create asset (image/file upload)
   - [create_external,                ~,         ~,             A,            ~,         ~,       ~,         A] # create external (store external URL)
