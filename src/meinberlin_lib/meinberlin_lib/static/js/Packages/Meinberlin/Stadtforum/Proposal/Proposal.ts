@@ -7,6 +7,7 @@ import * as AdhPermissions from "../../../Core/Permissions/Permissions";
 import * as AdhPreliminaryNames from "../../../Core/PreliminaryNames/PreliminaryNames";
 import * as AdhRate from "../../../Core/Rate/Rate";
 import * as AdhTopLevelState from "../../../Core/TopLevelState/TopLevelState";
+import * as AdhUtil from "../../../Core/Util/Util";
 
 import * as SICommentable from "../../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIDescription from "../../../../Resources_/adhocracy_core/sheets/description/IDescription";
@@ -169,7 +170,10 @@ export var createDirective = (
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.proposalForm, () => {
-                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.poolPath);
+                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.poolPath)
+                        .then((result) => {
+                            $location.url(adhResourceUrlFilter(AdhUtil.parentPath(result[1].path)));
+                        });
                 });
             };
         }
