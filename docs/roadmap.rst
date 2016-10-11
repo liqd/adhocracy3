@@ -57,7 +57,8 @@ and organizations to feel more at home.
 KPIs
 ++++
 
--   we've reduced the effort to set up new processes and organizations
+-   we can offer an initial set up of a new process and organization
+    with little effort
 -   At least two persons feel comfortable configuring the adhocracy
     backend (#busfactor)
 -   we have a written strategy for onboarding of new developers
@@ -106,6 +107,7 @@ KPIs
 ++++
 
 -   we can offer an initial set up of a new process and organization
+    with tiny effort
 -   Over 80% of all identified adhocracy development debt has been
     tackled (#debt)
 -   at least two people are able to independently further develop
