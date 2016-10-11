@@ -57,9 +57,10 @@ class BaseResourceSheet:
     def get_schema_with_bindings(self) -> colander.MappingSchema:
         bindings = self._get_basic_bindings()
         context = bindings.pop('context')
+        request = bindings.pop('request')
         schema = create_schema(self.meta.schema_class,
                                context,
-                               self.request,
+                               request,
                                **bindings
                                )
         schema.name = self.meta.isheet.__identifier__
@@ -70,6 +71,7 @@ class BaseResourceSheet:
     def _get_basic_bindings(self) -> dict:
         return {'context': self.context,
                 'registry': self.registry,
+                'request': self.request,
                 'creating': self.creating,
                 }
 

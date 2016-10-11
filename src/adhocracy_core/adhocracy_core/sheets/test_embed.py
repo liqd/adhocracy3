@@ -81,11 +81,12 @@ class TestEmbedSheet:
 
     def test_create(self, meta, context):
         from .embed import deferred_default_embed_code
+        from deform.widget import TextAreaWidget
         inst = meta.sheet_class(meta, context, None)
         assert inst
-        assert inst.schema['embed_code'].readonly
         assert inst.schema['embed_code'].default \
                == deferred_default_embed_code
+        assert isinstance(inst.schema['embed_code'].widget, TextAreaWidget)
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context, None)
