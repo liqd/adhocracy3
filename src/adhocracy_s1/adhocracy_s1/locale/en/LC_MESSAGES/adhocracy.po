@@ -1,0 +1,155 @@
+#
+# English translations for PACKAGE package
+# This file is distributed under the same license as the PACKAGE package.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE 1.0\n"
+"POT-Creation-Date: 2015-05-26 21:43+0200\n"
+"PO-Revision-Date: 2015-05-26 21:25+0200\n"
+"Last-Translator: Joscha <joka@jokasis.de>\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 3.10\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:210
+msgid "mail_sent_message_to_user_body_txt"
+msgstr ""
+"Die folgende Nachricht wurde Ihnen gesendet von ${sender_name}:\n"
+"\n"
+"${text}\n"
+"\n"
+"—\n"
+"Viele Grüße,\n"
+"Das ${site_name} Team\n"
+"\n"
+"Klicken Sie hier, um auf ${sender_name}’s Profil zu gelangen:\n"
+"${sender_url}"
+
+#: src/adhocracy_core/adhocracy_core/resources/subscriber.py:226
+msgid "mail_reset_password_body_txt"
+msgstr ""
+"Automatisch generierte E-Mail.\n"
+"\n"
+"\n"
+"Hallo ${user_name},\n"
+"\n"
+"nutzen Sie den folgenden Link um Ihr Passwort neu zu setzen.\n"
+"\n"
+"${reset_url}\n"
+"\n"
+"Das \"${site_name}\"-Team"
+
+#. Default: ${site_name}: Account Verification / Aktivierung Deines
+#. Nutzerkontos
+#: src/adhocracy_core/adhocracy_core/resources/principal.py:158
+msgid "mail_account_verification_subject"
+msgstr "Account Verification / Aktivierung Ihres Nutzerkontos."
+
+#: src/adhocracy_core/adhocracy_core/resources/principal.py:162
+msgid "mail_account_verification_body_txt"
+msgstr ""
+"Automatisch generierte E-Mail.\n"
+"\n"
+"\n"
+"Hallo ${user_name},\n"
+"\n"
+"vielen Dank für Ihre Registrierung auf ${site_name}.\n"
+"\n"
+"Diese E-Mail dient der Validierung Ihrer Identität. Bitte\n"
+"nutzen Sie den folgenden Link um Ihr Nutzerkonto zu aktivieren.\n"
+"\n"
+"${frontend_url}${activation_path}\n"
+"\n"
+"Wir wünschen Ihnen viel Spaß und Inspiration!\n"
+"\n"
+"Das \"${site_name}\"-Team"
+
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:298
+msgid "mail_send_activity_remove_body_txt"
+msgstr ""
+"Liebe*r ${user_name},\n"
+"\n"
+"${activity_description}\n"
+"\n"
+"Hier geht es zum Prozess: ${target_url}\n"
+"\n"
+"Herzliche Grüße,"
+"\n"
+"Das \"${site_name}\"-Team"
+
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:304
+msgid "mail_send_activity_add_update_body_txt"
+msgstr ""
+"Liebe*r ${user_name},\n"
+"\n"
+"${activity_description}\n"
+"\n"
+"Hier geht es zum ${object_type_name}: ${object_url}\n"
+"\n"
+"Herzliche Grüße,"
+"\n"
+"Das \"${site_name}\"-Team"
+
+
+#: src/adhocracy_core/adhocracy_core/resources/document.py:47
+msgid "Document"
+msgstr "Beitrag"
+
+
+#: src/adhocracy_core/adhocracy_core/resources/process.py:22
+msgid "Process"
+msgstr "Prozess"
+
+
+#: src/adhocracy_core/adhocracy_core/resources/comment.py:43
+msgid "Comment"
+msgstr "Kommentar"
+
+#: src/adhocracy_core/adhocracy_core/resources/proposal.py:47
+msgid "Proposal"
+msgstr "Beitrag"
+
+#: src/adhocracy_core/adhocracy_core/resources/idea collection.py:14
+msgid "IdeaCollectionProcess"
+msgstr "Prozess"
+
+#. Default: ${subject_name} added a ${object_type_name} to ${target_title}.
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:254
+msgid "activity_name_add"
+msgstr "ein ${object_type_name} wurde hinzugefügt."
+
+#. Default: ${subject_name} removed a ${object_type_name} from ${target_title}.
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:263
+msgid "activity_name_remove"
+msgstr "ein ${object_type_name} wurde gelöscht."
+
+#. Default: ${subject_name} updated ${object_type_name}
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:259
+msgid "activity_name_update"
+msgstr "ein ${object_type_name} wurde geändert."
+
+#. Default: ${subject_name} added the ${object_type_name} "${object_title}" to
+#. ${target_type_name} "${target_title}".
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:292
+msgid "activity_description_add"
+msgstr ""
+"${subject_name} hat den ${object_type_name} \"${object_title}\" zu ${target_type_name} \"${target_title}\" hinzugefügt."
+
+
+#. Default: ${subject_name} updated ${object_type_name} "${object_title}".
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:298
+msgid "activity_description_update"
+msgstr ""
+"${subject_name} hat den ${object_type_name} \"${object_title}\" in ${target_type_name} \"${target_title}\" geändert."
+
+
+#. Default: ${subject_name} removed the ${object_type_name} "${object_title}"
+#. from ${target_type_name} "${target_title}".
+#: src/adhocracy_core/adhocracy_core/auditing/__init__.py:303
+msgid "activity_description_remove"
+msgstr ""
+"${subject_name} hat den ${object_type_name} \"${object_title}\" in ${target_type_name} \"${target_title}\" gelöscht."

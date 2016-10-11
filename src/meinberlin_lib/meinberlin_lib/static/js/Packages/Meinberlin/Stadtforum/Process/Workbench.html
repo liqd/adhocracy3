@@ -1,0 +1,13 @@
+<div data-adh-moving-columns="" class="moving-columns">
+    <adh-moving-column>
+        <adh-meinberlin-stadtforum-detail-column></adh-meinberlin-stadtforum-detail-column>
+    </adh-moving-column>
+    <adh-moving-column>
+        <adh-meinberlin-stadtforum-proposal-create-column data-ng-if="view === 'create_proposal'"></adh-meinberlin-stadtforum-proposal-create-column>
+        <adh-meinberlin-stadtforum-proposal-edit-column data-ng-if="view === 'edit'"></adh-meinberlin-stadtforum-proposal-edit-column>
+        <adh-meinberlin-stadtforum-proposal-detail-column data-ng-if="view !== 'create_proposal' && view !== 'edit'"></adh-meinberlin-stadtforum-proposal-detail-column>
+    </adh-moving-column>
+    <adh-moving-column>
+        <adh-comment-column></adh-comment-column>
+    </adh-moving-column>
+</div>

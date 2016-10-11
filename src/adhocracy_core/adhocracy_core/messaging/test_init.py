@@ -291,6 +291,7 @@ class TestActivityEmail:
 
     def test_send_activity(self, inst, user, activity, request_, mocker):
         inst.send_mail = Mock()
+        inst._get_user_name = Mock(return_value='anna')
         inst._get_user_email = Mock(return_value='anna@example.org')
         translate_description = mocker.patch(
             'adhocracy_core.messaging.generate_activity_description',
@@ -298,6 +299,7 @@ class TestActivityEmail:
 
         inst.send_activity_mail(user, activity, request_)
 
+        inst._get_user_name.assert_called_with(user)
         inst._get_user_email.assert_called_with(user)
         send_mail_args = inst.send_mail.call_args[1]
         wanted_mapping = {'site_name': 'sitename',
@@ -306,6 +308,7 @@ class TestActivityEmail:
                           'activity_name': activity.name,
                           'activity_description':
                               translate_description.return_value.default,
+                          'user_name': 'anna'
                           }
         assert send_mail_args['recipients'] == ['anna@example.org']
         assert send_mail_args['subject'] == 'mail_send_activity_subject'
@@ -317,6 +320,7 @@ class TestActivityEmail:
     def test_send_activity_remove(self, inst, user, activity, request_, mocker):
         from adhocracy_core.interfaces import ActivityType
         inst.send_mail = Mock()
+        inst._get_user_name = Mock(return_value='anna')
         inst._get_user_email = Mock(return_value='anna@example.org')
         translate_description = mocker.patch(
             'adhocracy_core.messaging.generate_activity_description')

@@ -102,7 +102,7 @@ var bindPath = (
                         create: false,
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
-                        commentCount: version.data[SICommentable.nick].comments_count,
+                        commentCount: parseInt(version.data[SICommentable.nick].comments_count, 10),
                         assignments: badgeAssignments,
                         workflowState: workflowAssignmentSheet.workflow_state,
                         decisionDate: AdhProcess.getStateData(workflowAssignmentSheet, workflowAssignmentSheet.workflow_state).start_date

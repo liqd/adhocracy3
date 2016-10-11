@@ -14,6 +14,7 @@ import * as SIMetadata from "../../../../Resources_/adhocracy_core/sheets/metada
 import * as SIRateable from "../../../../Resources_/adhocracy_core/sheets/rate/IRateable";
 import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIVersionable from "../../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RIPoll from "../../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IPoll";
 import RIProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
 
@@ -35,6 +36,7 @@ export interface IScope extends angular.IScope {
     };
     selectedState? : string;
     resource : any;
+    commentType? : string;
     goToLogin() : void;
 }
 
@@ -76,7 +78,7 @@ var bindPath = (
                         rateCount: ratesPro - ratesContra,
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
-                        commentCount: resource.data[SICommentable.nick].comments_count,
+                        commentCount: parseInt(resource.data[SICommentable.nick].comments_count, 10),
                         assignments: assignments
                     };
                 });
@@ -170,6 +172,38 @@ export var createDirective = (
                     return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.poolPath);
                 });
             };
+        }
+    };
+};
+
+export var listItemDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service,
+    adhPermissions : AdhPermissions.Service,
+    adhRate : AdhRate.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
+    $q : angular.IQService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope : IScope) => {
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
+                scope, undefined);
+            scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
+                if (!proposalVersionUrl) {
+                    scope.selectedState = "";
+                } else if (proposalVersionUrl === scope.path) {
+                    scope.selectedState = "is-selected";
+                } else {
+                    scope.selectedState = "is-not-selected";
+                }
+            }));
+            scope.commentType = RICommentVersion.content_type;
         }
     };
 };

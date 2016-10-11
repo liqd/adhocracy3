@@ -290,6 +290,7 @@ class Messenger:
                         'activity_description': translate(description),
                         'object_url': self._get_resource_url(activity.object),
                         'target_url': self._get_resource_url(activity.target),
+                        'user_name': self._get_user_name(user),
                         })
         subject = _('mail_send_activity_subject',
                     mapping=mapping,
