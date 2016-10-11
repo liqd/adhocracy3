@@ -19,6 +19,7 @@ from adhocracy_core.resources.principal import ISystemUser
 from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.resources.process import IProcess
 from adhocracy_core.resources.geo import add_locations_service
+from adhocracy_core.resources.page import add_page_service
 from adhocracy_core.catalog import ICatalogsService
 import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.name
@@ -41,6 +42,7 @@ def create_initial_content_for_app_root(context: IPool, registry: Registry,
     _add_anonymous_user(context, registry)
     add_locations_service(context, registry, {})
     add_assets_service(context, registry, {})
+    add_page_service(context, registry, {})
 
 
 def _add_objectmap_to_app_root(root):

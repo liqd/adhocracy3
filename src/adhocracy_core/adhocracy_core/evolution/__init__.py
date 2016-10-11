@@ -931,6 +931,16 @@ def add_local_roles_to_acl(root, registry):  # pragma: no cover
         _set_acl_with_local_roles(resource, acl, registry)
 
 
+@log_migration
+def add_pages_service_to_root(root, registry):  # pragma: no cover
+    """Add pages service to root."""
+    from adhocracy_core.resources.page import add_page_service
+    pages = find_service(root, 'pages')
+    if pages is None:
+        logger.info('Add pages service to {0}'.format(root))
+        add_page_service(root, registry, {})
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -991,3 +1001,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_anonymize_default_sheet_to_user)
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_rates)
     config.add_evolution_step(add_local_roles_to_acl)
+    config.add_evolution_step(add_pages_service_to_root)
