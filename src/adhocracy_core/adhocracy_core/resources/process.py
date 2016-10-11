@@ -57,7 +57,6 @@ def process_embed_code_config_adapter(context: IResource,
     mapping.update({'widget': 'plain',
                     'autourl': 'true',
                     'initial_url': initial_url,
-                    'style': 'height: 650px',
                     })
     return mapping
 
