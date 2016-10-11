@@ -36,9 +36,9 @@ Features
 
 -   idea collection process with or without a map
 -   private and public processes
--   new users can be invited by liqd
+-   initiators can invite new users
 -   users can edit their own account information
--   embed snippets can be generated for a process
+-   initiators can generate embed snippets for processes
 -   concept for newsfeed / event-stream
 -   concept for notifications (users can follow processes and proposals
     in processes)
@@ -57,7 +57,7 @@ and organizations to feel more at home.
 KPIs
 ++++
 
--   we can offer an initial set up of a new process and organization
+-   we've reduced the effort to set up new processes and organizations
 -   At least two persons feel comfortable configuring the adhocracy
     backend (#busfactor)
 -   we have a written strategy for onboarding of new developers
@@ -119,7 +119,7 @@ Features
 -   better discovery of processes (recommended processes, featured
     processes)
 -   search function for comments and contents
--   permissions can be added in all processes
+-   initiators can edit permissions in all processes
 -   more filtering options for processes (e.g. most activity)
 
 
