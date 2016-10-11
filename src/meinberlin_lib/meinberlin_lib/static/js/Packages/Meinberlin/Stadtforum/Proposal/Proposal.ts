@@ -176,6 +176,11 @@ export var createDirective = (
                         });
                 });
             };
+
+            scope.cancel = () => {
+                var fallback = adhResourceUrlFilter(scope.poolPath);
+                adhTopLevelState.goToCameFrom(fallback);
+            };
         }
     };
 };
