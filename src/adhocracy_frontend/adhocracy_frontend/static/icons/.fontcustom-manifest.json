@@ -1,0 +1,95 @@
+{
+  "checksum": {
+    "previous": "",
+    "current": ""
+  },
+  "fonts": [],
+  "glyphs": {
+    "back-to-top": {
+      "codepoint": 9650,
+      "source": "svg/back-to-top.svg"
+    },
+    "ban-circle": {
+      "codepoint": 8856,
+      "source": "svg/ban-circle.svg"
+    },
+    "calendar": {
+      "codepoint": 128197,
+      "source": "svg/calendar.svg"
+    },
+    "document": {
+      "codepoint": 128462,
+      "source": "svg/document.svg"
+    },
+    "flag": {
+      "codepoint": 9873,
+      "source": "svg/flag.svg"
+    },
+    "list": {
+      "codepoint": 9776,
+      "source": "svg/list.svg"
+    },
+    "mail": {
+      "codepoint": 9993,
+      "source": "svg/mail.svg"
+    },
+    "map-filled": {
+      "codepoint": 128506,
+      "source": "svg/map-filled.svg"
+    },
+    "pencil": {
+      "codepoint": 9998,
+      "source": "svg/pencil.svg"
+    },
+    "picture-file": {
+      "codepoint": 128443,
+      "source": "svg/picture-file.svg"
+    },
+    "pig": {
+      "codepoint": 128022,
+      "source": "svg/pig.svg"
+    },
+    "print": {
+      "codepoint": 9113,
+      "source": "svg/print.svg"
+    },
+    "reply": {
+      "codepoint": 8617,
+      "source": "svg/reply.svg"
+    },
+    "speechbubble": {
+      "codepoint": 128489,
+      "source": "svg/speechbubble.svg"
+    },
+    "speechbubbles": {
+      "codepoint": 128490,
+      "source": "svg/speechbubbles.svg"
+    },
+    "three-dots": {
+      "codepoint": 8230,
+      "source": "svg/three-dots.svg"
+    },
+    "trash": {
+      "codepoint": 128465,
+      "source": "svg/trash.svg"
+    },
+    "volume": {
+      "codepoint": 128266,
+      "source": "svg/volume.svg"
+    },
+    "vote-down": {
+      "codepoint": 9661,
+      "source": "svg/vote-down.svg"
+    },
+    "vote-up": {
+      "codepoint": 9651,
+      "source": "svg/vote-up.svg"
+    },
+    "x": {
+      "codepoint": 10005,
+      "source": "svg/x.svg"
+    }
+  },
+  "options": {},
+  "templates": []
+}

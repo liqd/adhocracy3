@@ -318,3 +318,4 @@ def includeme(config):
     config.include('.service')
     config.include('.logbook')
     config.include('.relation')
+    config.include('.page')

@@ -55,7 +55,6 @@ etc/tslint.json
 lib64/
 src/rubygemsrecipe/
 src/substanced/
-*.fontcustom-manifest.json
 src/pyramid_cachebust/
 /package.json
 /node_modules
@@ -71,10 +70,10 @@ src/demo/demo/build/
 /tmp
 /wheelhouse
 /share
-.fontcustom-manifest.json
 RELEASE-VERSION
 *-requirements.txt
 /src/Mako/
 /styleguides
 src/deform
 src/deform_markdown
+adhocracy3-icons-preview.html
