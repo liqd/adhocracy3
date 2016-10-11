@@ -941,6 +941,13 @@ def add_pages_service_to_root(root, registry):  # pragma: no cover
         add_page_service(root, registry, {})
 
 
+@log_migration
+def add_embed_sheet_to_processes(root, registry):  # pragma: no cover
+    """Add embed to processes."""
+    from adhocracy_core.sheets.embed import IEmbed
+    migrate_new_sheet(root, IProcess, IEmbed)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -1002,3 +1009,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_rates)
     config.add_evolution_step(add_local_roles_to_acl)
     config.add_evolution_step(add_pages_service_to_root)
+    config.add_evolution_step(add_embed_sheet_to_processes)

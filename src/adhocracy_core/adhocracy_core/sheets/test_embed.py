@@ -19,7 +19,9 @@ class TestEmbedCodeConfigAdapter:
                           'autoresize': 'false',
                           'locale': 'en',
                           'autourl': 'false',
+                          'initial_url': '',
                           'nocenter': 'true',
+                          'noheader': 'false',
                           'style': 'height: 650px',
                           }
 

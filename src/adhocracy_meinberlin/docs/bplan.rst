@@ -198,7 +198,9 @@ required fields.
          data-autoresize="false"
          data-locale="en"
          data-autourl="false"
+         data-initial-url=""
          data-nocenter="true"
+         data-noheader="true"
          style="height: 650px">
     </div>
     <BLANKLINE>
