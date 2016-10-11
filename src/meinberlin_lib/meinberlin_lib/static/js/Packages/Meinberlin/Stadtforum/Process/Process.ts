@@ -163,7 +163,7 @@ export var registerRoutes = (
         })
         .default(RIStadtforumProcess, "create_proposal", processType, context, {
             space: "content",
-            movingColumns: "is-show-hide-hide"
+            movingColumns: "is-show-show-hide"
         })
         .specific(RIStadtforumProcess, "create_proposal", processType, context, [
             "adhHttp", (adhHttp : AdhHttp.Service) => (resource : RIStadtforumProcess) => {
