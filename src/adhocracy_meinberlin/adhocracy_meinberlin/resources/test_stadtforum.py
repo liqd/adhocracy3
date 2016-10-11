@@ -53,7 +53,9 @@ class TestEmbedCodeConfigAdapter:
                           'widget': 'meinberlin-stadtforum-proposal-detail',
                           'autoresize': 'false',
                           'locale': 'en',
+                          'initial_url': '',
                           'autourl': 'false',
                           'nocenter': 'true',
+                          'noheader': 'true',
                           'style': 'height: 650px',
                           }
