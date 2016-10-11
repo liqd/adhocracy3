@@ -604,7 +604,9 @@ export var metaDirective = (
                     .then((res) => {
                         $scope.userBasic = res.data[SIUserBasic.nick];
                         // provide no link if either noLink is true or there are no user profiles enabled or user is anonymous
-                        $scope.noLink = !!$scope.noLink || !adhResourceArea.has(RIUser.content_type) || (res.content_type === RISystemUser.content_type);
+                        var usersEnabled = adhResourceArea.has(RIUser.content_type);
+                        var userIsAnonymous = res.content_type === RISystemUser.content_type;
+                        $scope.noLink = !!$scope.noLink || !usersEnabled || userIsAnonymous;
                         adhGetBadges(res).then((assignments) => {
                             $scope.assignments = assignments;
                         });
