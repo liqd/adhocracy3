@@ -595,15 +595,16 @@ export var metaDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Meta.html",
         scope: {
             path: "@",
-            name: "@?"
+            name: "@?",
+            noLink: "@?"
         },
         controller: ["adhHttp", "$translate", "$scope", (adhHttp : AdhHttp.Service, $translate, $scope) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
                         $scope.userBasic = res.data[SIUserBasic.nick];
-                        // provide no link if either there are no user profiles enabled or user is anonymous
-                        $scope.noLink = !adhResourceArea.has(RIUser.content_type) || (res.content_type === RISystemUser.content_type);
+                        // provide no link if either noLink is true or there are no user profiles enabled or user is anonymous
+                        $scope.noLink = !!$scope.noLink || !adhResourceArea.has(RIUser.content_type) || (res.content_type === RISystemUser.content_type);
                         adhGetBadges(res).then((assignments) => {
                             $scope.assignments = assignments;
                         });
