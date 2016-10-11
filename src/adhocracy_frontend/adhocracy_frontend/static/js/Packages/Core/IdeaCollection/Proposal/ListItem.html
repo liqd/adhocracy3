@@ -9,7 +9,7 @@
     <div class="list-item-body">
         <div class="list-item-author">
             {{ "TR__BY" | translate }}
-            <adh-user-meta data-path="{{data.creator}}" data-ng-if="data.creator"></adh-user-meta>
+            <adh-user-meta data-ng-if="data.creator" data-path="{{data.creator}}" data-no-link="true"></adh-user-meta>
             {{ "TR__ON" | translate }}
             <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
         </div>
