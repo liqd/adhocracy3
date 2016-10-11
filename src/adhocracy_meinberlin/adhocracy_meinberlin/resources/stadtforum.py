@@ -45,7 +45,6 @@ def embed_code_config_poll_adapter(context: IResource,
                     'autoresize': 'false',
                     'autourl': 'false',
                     'nocenter': 'true',
-                    'style': 'height: 650px',
                     'path': version_path
                     })
     return mapping
