@@ -118,7 +118,7 @@ export var bindPath = (
                         return {
                             body: paragraphVersion.data[SIParagraph.nick].text,
                             deleted: false,
-                            commentCount: paragraphVersion.data[SICommentable.nick].comments_count,
+                            commentCount: parseInt(paragraphVersion.data[SICommentable.nick].comments_count, 10),
                             path: paragraphVersion.path
                         };
                     });

@@ -119,7 +119,7 @@ var bindPath = (
                         rateCount: ratesPro - ratesContra,
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
-                        commentCount: resource.data[SICommentable.nick].comments_count,
+                        commentCount: parseInt(resource.data[SICommentable.nick].comments_count, 10),
                         assignments: assignments
                     };
 
