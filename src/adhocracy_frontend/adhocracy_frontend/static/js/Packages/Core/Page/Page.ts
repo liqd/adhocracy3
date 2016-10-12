@@ -1,5 +1,6 @@
 import * as AdhConfig from "../Config/Config";
 import * as AdhHttp from "../Http/Http";
+import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
 import RIPage from "../../../Resources_/adhocracy_core/resources/page/IPage";
@@ -31,4 +32,12 @@ export var pageDirective = (
             });
         }
     };
+};
+
+export var registerRoutes = (
+    context : string = ""
+) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
+    adhResourceAreaProvider.default(RIPage, "", "", context, {
+        space: "page"
+    });
 };
