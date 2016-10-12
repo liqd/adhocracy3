@@ -1,0 +1,1 @@
+var pkgLocation = "/Core/Page";
