@@ -1,7 +1,9 @@
 <article>
-    <h1>{{ data.title }}</h1>
+    <div class="l-padding">
+        <h1>{{ data.title }}</h1>
 
-    <adh-opinion data-refers-to="{{path}}"></adh-opinion>
+        <adh-opinion data-refers-to="{{path}}"></adh-opinion>
+    </div>
 
     <adh-comment-listing data-path="{{path}}"></adh-comment-listing>
 </article>

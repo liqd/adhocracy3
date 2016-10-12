@@ -134,13 +134,13 @@ export var detailDirective = (
             }];
             scope.sort = "item_creation_date";
 
+            scope.contentType = RIProposalVersion.content_type;
+
             scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
                         scope.data.title = resource.data[SITitle.nick].title;
                         scope.data.shortDescription = resource.data[SIDescription.nick].short_description;
-
-                        scope.contentType = RIProposalVersion.content_type;
                     });
                 }
             });
@@ -163,7 +163,7 @@ export var registerRoutes = (
         })
         .default(RIStadtforumProcess, "create_proposal", processType, context, {
             space: "content",
-            movingColumns: "is-show-hide-hide"
+            movingColumns: "is-show-show-hide"
         })
         .specific(RIStadtforumProcess, "create_proposal", processType, context, [
             "adhHttp", (adhHttp : AdhHttp.Service) => (resource : RIStadtforumProcess) => {

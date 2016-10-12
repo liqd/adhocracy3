@@ -42,6 +42,21 @@ export var register = (angular) => {
             "$location",
             Proposal.createDirective
         ])
+        .directive("adhMeinberlinStadtforumProposalEdit", [
+            "adhConfig",
+            "adhHttp",
+            "adhPermissions",
+            "adhPreliminaryNames",
+            "adhRate",
+            "adhResourceUrlFilter",
+            "adhShowError",
+            "adhSubmitIfValid",
+            "adhTopLevelState",
+            "adhGetBadges",
+            "$location",
+            "$q",
+            Proposal.editDirective
+        ])
         .directive("adhMeinberlinStadtforumProposalListItem", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.listItemDirective]);
 };

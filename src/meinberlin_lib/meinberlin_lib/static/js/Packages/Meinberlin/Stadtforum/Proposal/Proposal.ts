@@ -7,6 +7,7 @@ import * as AdhPermissions from "../../../Core/Permissions/Permissions";
 import * as AdhPreliminaryNames from "../../../Core/PreliminaryNames/PreliminaryNames";
 import * as AdhRate from "../../../Core/Rate/Rate";
 import * as AdhTopLevelState from "../../../Core/TopLevelState/TopLevelState";
+import * as AdhUtil from "../../../Core/Util/Util";
 
 import * as SICommentable from "../../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIDescription from "../../../../Resources_/adhocracy_core/sheets/description/IDescription";
@@ -120,6 +121,23 @@ var postCreate = (
     return adhHttp.deepPost([proposal, proposalVersion]);
 };
 
+var postEdit = (
+    adhHttp : AdhHttp.Service,
+    adhPreliminaryNames : AdhPreliminaryNames.Service
+) => (
+    scope : IScope,
+    oldVersion : RIProposalVersion
+) => {
+    var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+    proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
+    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+        follows: [oldVersion.path]
+    });
+    fill(scope, proposalVersion);
+
+    return adhHttp.deepPost([proposalVersion]);
+};
+
 
 export var detailDirective = (
     adhConfig : AdhConfig.IService,
@@ -169,8 +187,59 @@ export var createDirective = (
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.proposalForm, () => {
-                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.poolPath);
+                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.poolPath)
+                        .then((result) => {
+                            $location.url(adhResourceUrlFilter(AdhUtil.parentPath(result[1].path)));
+                        });
                 });
+            };
+
+            scope.cancel = () => {
+                var fallback = adhResourceUrlFilter(scope.poolPath);
+                adhTopLevelState.goToCameFrom(fallback);
+            };
+        }
+    };
+};
+
+export var editDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service,
+    adhPermissions : AdhPermissions.Service,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhRate : AdhRate.Service,
+    adhResourceUrlFilter,
+    adhShowError,
+    adhSubmitIfValid,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhGetBadges : AdhBadge.IGetBadgeAssignments,
+    $location : angular.ILocationService,
+    $q : angular.IQService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope, element) => {
+            scope.errors = [];
+            scope.data = {};
+            scope.showError = adhShowError;
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
+
+            scope.submit = () => {
+                return adhSubmitIfValid(scope, element, scope.proposalForm, () => {
+                    return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.resource)
+                        .then((result) => {
+                            $location.url(adhResourceUrlFilter(AdhUtil.parentPath(result[0].path)));
+                        });
+                });
+            };
+
+            scope.cancel = () => {
+                var fallback = adhResourceUrlFilter(AdhUtil.parentPath(scope.path));
+                adhTopLevelState.goToCameFrom(fallback);
             };
         }
     };
