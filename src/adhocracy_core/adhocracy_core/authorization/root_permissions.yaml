@@ -23,6 +23,7 @@ permissions:
   - [create_comment,                 ~,         ~,             ~,            ~,         ~,       ~,         A] # create comment
   - [create_rate,                    ~,         ~,             ~,            ~,         ~,       ~,         ~] # create rate
   - [edit_rate,                      ~,         ~,             ~,            ~,         ~,       ~,         ~] # create rate version (edit for rates)
+  - [create_multipolygon,            ~,         ~,             ~,            ~,         ~,       ~,         A] # create geo multipolygon
   # badges
   - [create_badge,                   ~,         ~,             ~,            A,         ~,       A,         A] # create badge
   - [create_badge_assignment,        ~,         ~,             ~,            ~,         ~,       ~,         A] # create badge assingment
