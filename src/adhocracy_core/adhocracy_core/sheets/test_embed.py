@@ -65,6 +65,23 @@ class TestDeferredEmbedCode:
         result = self.call_fut(node, kw)
         assert 'data-path="http:localhost/1"' in result
 
+    def test_remove_noheader_from_embed_code_if_false(
+            self, mock_config_adapter, config, node, kw):
+        config.include('pyramid_mako')
+        mock_config_adapter.return_value = \
+            mock_config_adapter.return_value = {'noheader': 'false'}
+        result = self.call_fut(node, kw)
+        assert 'data-noheader' not in result
+
+
+    def test_remove_nocenter_from_embed_code_if_false(
+        self, mock_config_adapter, config, node, kw):
+        config.include('pyramid_mako')
+        mock_config_adapter.return_value = \
+            mock_config_adapter.return_value = {'nocenter': 'false'}
+        result = self.call_fut(node, kw)
+        assert 'data-nocenter' not in result
+
 
 class TestEmbedSheet:
 
