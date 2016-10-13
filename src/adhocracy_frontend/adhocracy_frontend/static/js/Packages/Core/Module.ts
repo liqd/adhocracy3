@@ -23,6 +23,7 @@ import * as AdhMarkdownModule from "./Markdown/Module";
 import * as AdhMetaApiModule from "./MetaApi/Module";
 import * as AdhMovingColumnsModule from "./MovingColumns/Module";
 import * as AdhNamesModule from "./Names/Module";
+import * as AdhPageModule from "./Page/Module";
 import * as AdhPermissionsModule from "./Permissions/Module";
 import * as AdhPreliminaryNamesModule from "./PreliminaryNames/Module";
 import * as AdhProcessModule from "./Process/Module";
@@ -65,6 +66,7 @@ export var register = (angular, config, metaApi) => {
     AdhMetaApiModule.register(angular, metaApi);
     AdhMovingColumnsModule.register(angular);
     AdhNamesModule.register(angular);
+    AdhPageModule.register(angular);
     AdhPermissionsModule.register(angular);
     AdhPreliminaryNamesModule.register(angular);
     AdhProcessModule.register(angular);
@@ -87,6 +89,7 @@ export var register = (angular, config, metaApi) => {
             AdhEmbedModule.moduleName,
             AdhMetaApiModule.moduleName,
             AdhNamesModule.moduleName,
+            AdhPageModule.moduleName,
             AdhResourceAreaModule.moduleName,
             AdhTrackingModule.moduleName,
             AdhUserViewsModule.moduleName
