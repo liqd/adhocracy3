@@ -128,10 +128,15 @@ export var register = () => {
             };
 
             beforeEach(() => {
+                var preliminaryNamesMock = <any>{
+                    nextPreliminary: () => "@0",
+                };
                 oldResource = new testResource({});
                 oldResource.path = "/old/path";
                 oldResource.data["test.sheet"] = new testSheet({});
-                resource = AdhResourceUtil.derive(oldResource, {});
+                resource = AdhResourceUtil.derive(oldResource, {
+                    preliminaryNames: preliminaryNamesMock,
+                });
             });
 
             it("sets the right content type", () => {
