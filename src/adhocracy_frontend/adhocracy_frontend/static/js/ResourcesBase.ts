@@ -34,7 +34,6 @@ export class Resource implements IResource {
     public parent : string;
     public first_version_path : string;
     public root_versions : string[];
-    public static sheets : string[];
 
     constructor(public content_type : string) {
         this.data = {};

@@ -137,7 +137,6 @@ var mkResourceClassName : (resource : string) => string;
 var mkModuleName : (module : string, metaApi : MetaApi.IMetaApi) => string;
 var mkImportStatement : (modulePath : string, relativeRoot : string, metaApi : MetaApi.IMetaApi) => string;
 var mkNick : (modulePath : string, metaApi : MetaApi.IMetaApi) => string;
-var mkSheets : (modulePath : string, metaApi : MetaApi.IMetaApi) => string;
 var mkFieldType : (field : MetaApi.ISheetField) => FieldType;
 var mkFlags : (field : MetaApi.ISheetField, comment? : boolean) => string;
 var isReadableField : (field : MetaApi.ISheetField) => boolean;
@@ -718,8 +717,7 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
     };
 
     resourceC += "class " + mkResourceClassName(mkNick(modulePath, metaApi)) + " extends Base.Resource {\n";
-    resourceC += "    public static content_type = \"" + modulePath + "\";\n";
-    resourceC += "    public static sheets = " + mkSheets(modulePath, metaApi) + ";\n\n";
+    resourceC += "    public static content_type = \"" + modulePath + "\";\n\n";
     resourceC += mkConstructor("    ") + "\n\n";
     resourceC += mkDataDeclaration("    ") + "\n\n";
     resourceC += mkGettersSetters("    ") + "\n";
@@ -770,11 +768,6 @@ mkNick = (modulePath : string, metaApi : MetaApi.IMetaApi) : string => {
     } else {
         throw "mkNick: " + modulePath;
     }
-};
-
-mkSheets = (modulePath : string, metaApi : MetaApi.IMetaApi) : string => {
-    var sheets : string[] = metaApi.resources[modulePath].sheets;
-    return JSON.stringify(sheets);
 };
 
 mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
