@@ -1,19 +1,22 @@
-import * as AdhAngularHelpersModule from "../../../AngularHelpers/Module";
-import * as AdhBadgeModule from "../../../Badge/Module";
-import * as AdhBlogModule from "../../../Blog/Module";
-import * as AdhHttpModule from "../../../Http/Module";
-import * as AdhImageModule from "../../../Image/Module";
-import * as AdhInjectModule from "../../../Inject/Module";
-import * as AdhLocaleModule from "../../../Locale/Module";
-import * as AdhMetaApiModule from "../../../MetaApi/Module";
-import * as AdhPermissionsModule from "../../../Permissions/Module";
-import * as AdhPreliminaryNamesModule from "../../../PreliminaryNames/Module";
-import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
+import * as AdhAngularHelpersModule from "../../../Core/AngularHelpers/Module";
+import * as AdhBadgeModule from "../../../Core/Badge/Module";
+import * as AdhHttpModule from "../../../Core/Http/Module";
+import * as AdhImageModule from "../../../Core/Image/Module";
+import * as AdhInjectModule from "../../../Core/Inject/Module";
+import * as AdhLocaleModule from "../../../Core/Locale/Module";
+import * as AdhMetaApiModule from "../../../Core/MetaApi/Module";
+import * as AdhNamesModule from "../../../Core/Names/Module";
+import * as AdhPermissionsModule from "../../../Core/Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../../../Core/PreliminaryNames/Module";
+import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
 import * as AdhResourceWidgetsModule from "../../../ResourceWidgets/Module";
-import * as AdhStickyModule from "../../../Sticky/Module";
-import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
+import * as AdhStickyModule from "../../../Core/Sticky/Module";
+import * as AdhTopLevelStateModule from "../../../Core/TopLevelState/Module";
 
-import * as AdhUtil from "../../../Util/Util";
+import * as AdhBlogModule from "../../../Blog/Module";
+
+import * as AdhNames from "../../../Core/Names/Names";
+import * as AdhUtil from "../../../Core/Util/Util";
 
 import RIMercator2015Process from "../../../../Resources_/adhocracy_mercator/resources/mercator/IProcess";
 import RIProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
@@ -36,6 +39,7 @@ export var register = (angular) => {
             AdhInjectModule.moduleName,
             AdhLocaleModule.moduleName,
             AdhMetaApiModule.moduleName,
+            AdhNamesModule.moduleName,
             AdhPermissionsModule.moduleName,
             AdhPreliminaryNamesModule.moduleName,
             AdhResourceAreaModule.moduleName,
@@ -51,7 +55,6 @@ export var register = (angular) => {
             var processType = RIMercator2015Process.content_type;
             var processHeaderSlot = adhConfig.pkg_path + Proposal.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
-            adhResourceAreaProvider.names[RIProposalVersion.content_type] = "TR__PROPOSALS";
             Proposal.registerRoutes(processType)(adhResourceAreaProvider, adhMetaApi);
         }])
         .config(["flowFactoryProvider", (flowFactoryProvider) => {
@@ -73,6 +76,9 @@ export var register = (angular) => {
                     "png"
                 ]  // correspond to exact mime types EG image/png
             };
+        }])
+        .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
+            adhNamesProvider.names[RIProposalVersion.content_type] = "TR__RESOURCE_PROPOSAL";
         }])
         // NOTE: we do not use a Widget based directive here for performance reasons
         .directive("adhMercator2015Proposal", ["adhConfig", "adhHttp", "adhTopLevelState", "adhGetBadges", Proposal.listItem])

@@ -150,8 +150,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
             index_query = indexes[0]
             for idx in indexes[1:]:
                 index_query &= idx
-            no_resolver = lambda x: x
-            elements = index_query.execute(resolver=no_resolver)
+            elements = index_query.execute(resolver=lambda x: x)
         else:
             elements = ResultSet(set(), 0, None)
         return elements

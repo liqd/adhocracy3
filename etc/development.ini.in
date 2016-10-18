@@ -59,8 +59,8 @@ adhocracy.site_name = Adhocracy Test Site
 
 # Canonical frontend base URL. If this is an embedding URL, it should end with
 # #!. This is used for the creation of activation links.
-adhocracy.frontend_url = http://localhost:6551/static/embed.html#!
-#adhocracy.frontend_url = http://localhost:6551
+#adhocracy.frontend_url = http://localhost:6551/static/embed.html#!
+adhocracy.frontend_url = http://localhost:6551
 
 # performance workaround: disable filter references by view permission
 #adhocracy.filter_by_view_permission = False

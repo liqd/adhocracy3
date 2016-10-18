@@ -1,12 +1,12 @@
 /// <reference path="../../../../lib2/types/angular.d.ts"/>
 
-import * as AdhConfig from "../../Config/Config";
-import * as AdhHttp from "../../Http/Http";
-import * as AdhPermissions from "../../Permissions/Permissions";
-import * as AdhProcess from "../../Process/Process";
-import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
-import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
-import * as AdhUtil from "../../Util/Util";
+import * as AdhConfig from "../../Core/Config/Config";
+import * as AdhHttp from "../../Core/Http/Http";
+import * as AdhPermissions from "../../Core/Permissions/Permissions";
+import * as AdhProcess from "../../Core/Process/Process";
+import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
+import * as AdhTopLevelState from "../../Core/TopLevelState/TopLevelState";
+import * as AdhUtil from "../../Core/Util/Util";
 
 import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";

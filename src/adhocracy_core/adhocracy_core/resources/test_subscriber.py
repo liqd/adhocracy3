@@ -459,6 +459,31 @@ class TestSendPasswordResetMail:
                                                                    event.object)
 
 
+class TestSendPasswordChangeMail:
+
+    @fixture
+    def registry(self, registry, mock_messenger):
+        registry.messenger = mock_messenger
+        return registry
+
+    @fixture
+    def event(self, context, registry):
+        event.object = context
+        event.registry = registry
+        return event
+
+    def call_fut(self, event):
+        from .subscriber import send_password_change_mail
+        return send_password_change_mail(event)
+
+    def test_call(self, event, mock_sheet, registry, mock_messenger):
+        user = testing.DummyResource()
+        mock_sheet.get.return_value = {'creator': user}
+        registry.content.get_sheet.return_value = mock_sheet
+        self.call_fut(event)
+        mock_messenger.send_password_change_mail.assert_called_with(user)
+
+
 class TestApplyUserActivationConfiguration:
 
     @fixture

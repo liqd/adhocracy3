@@ -11,7 +11,7 @@ class IProcess(process.IProcess):
 
 
 process_meta = process.process_meta._replace(
-    content_name='S1Process',
+    content_name='Agenda-S1-Prozess',
     iresource=IProcess,
     default_workflow='s1',
     is_implicit_addable=True,
@@ -39,8 +39,8 @@ proposal_meta = proposal.proposal_meta\
     ._replace(iresource=IProposal,
               element_types=(IProposalVersion,),
               item_type=IProposalVersion,
-              autonaming_prefix = 'proposal_',
-              default_workflow = 's1_content',
+              autonaming_prefix='proposal_',
+              default_workflow='s1_content',
               )\
     ._add(after_creation=(add_logbook_service,))
 

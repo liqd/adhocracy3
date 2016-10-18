@@ -47,6 +47,7 @@ from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.asset import IAssetData
 from adhocracy_core.sheets.image import IImageReference
 from adhocracy_core.sheets.principal import IActivationConfiguration
+from adhocracy_core.sheets.principal import IPasswordAuthentication
 
 logger = getLogger(__name__)
 
@@ -244,6 +245,14 @@ def send_password_reset_mail(event):
     event.registry.messenger.send_password_reset_mail(user, password_reset)
 
 
+def send_password_change_mail(event):
+    """Send mail notification when password has changed."""
+    user = event.registry.content.get_sheet_field(event.object,
+                                                  IMetadata,
+                                                  'creator')
+    event.registry.messenger.send_password_change_mail(user)
+
+
 def apply_user_activation_configuration(event):
     """Activate user or send activation or invite email."""
     user = event.object
@@ -398,6 +407,9 @@ def includeme(config):
     config.add_subscriber(send_password_reset_mail,
                           IResourceCreatedAndAdded,
                           object_iface=IPasswordReset)
+    config.add_subscriber(send_password_change_mail,
+                          IResourceSheetModified,
+                          event_isheet=IPasswordAuthentication)
     config.add_subscriber(update_asset_download,
                           IResourceSheetModified,
                           object_iface=IAsset,

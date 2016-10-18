@@ -57,9 +57,10 @@ class BaseResourceSheet:
     def get_schema_with_bindings(self) -> colander.MappingSchema:
         bindings = self._get_basic_bindings()
         context = bindings.pop('context')
+        request = bindings.pop('request')
         schema = create_schema(self.meta.schema_class,
                                context,
-                               self.request,
+                               request,
                                **bindings
                                )
         schema.name = self.meta.isheet.__identifier__
@@ -70,6 +71,7 @@ class BaseResourceSheet:
     def _get_basic_bindings(self) -> dict:
         return {'context': self.context,
                 'registry': self.registry,
+                'request': self.request,
                 'creating': self.creating,
                 }
 
@@ -147,9 +149,12 @@ class BaseResourceSheet:
     def _get_reference_appstruct(self, query: SearchQuery) -> iter:
         """Might be overridden in subclasses."""
         fields = self._fields['reference'].items()
-        get_ref = lambda node: Reference(self.context, self.meta.isheet,
-                                         node.name, None)
-        return self._yield_references(fields, query, get_ref)
+        return self._yield_references(
+            fields,
+            query,
+            lambda node: Reference(self.context, self.meta.isheet,
+                                   node.name, None)
+        )
 
     def _get_back_reference_appstruct(self, query: SearchQuery) -> iter:
         fields = self._fields['back_reference'].items()

@@ -1,0 +1,21 @@
+<a data-ng-href="{{ path | adhParentPath | adhResourceUrl }}"
+    data-ng-class="{'m-contains-images': data.picture}"
+    class="list-item {{ selectedState }}">
+    <adh-show-image
+        data-ng-if="data.picture"
+        data-path="{{data.picture}}"
+        data-css-class="list-item-image"
+        data-format="thumbnail"
+    ></adh-show-image>
+    <div class="list-item-body">
+        <h3 class="list-item-title">{{ data.title }}</h3>
+        <ul class="meta-list list-item-meta">
+            <li class="meta-list-item">
+                <i class="icon-speechbubble-unfilled"></i> {{ data.commentCountTotal }} {{ commentType | adhResourceName:data.commentCountTotal | translate }}
+            </li>
+        </ul>
+        <div class="list-item-badges">
+            <span data-ng-repeat="badge in data.assignments" class="badge m-info">{{ badge.title }}</span>
+        </div>
+    </div>
+</a>

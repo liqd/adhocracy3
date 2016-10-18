@@ -1,13 +1,13 @@
 /// <reference path="../../../../../lib2/types/angular.d.ts"/>
 
-import * as AdhConfig from "../../../Config/Config";
-import * as AdhHttp from "../../../Http/Http";
-import * as AdhMetaApi from "../../../MetaApi/MetaApi";
-import * as AdhMovingColumns from "../../../MovingColumns/MovingColumns";
-import * as AdhPermissions from "../../../Permissions/Permissions";
-import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
-import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
-import * as AdhUtil from "../../../Util/Util";
+import * as AdhConfig from "../../../Core/Config/Config";
+import * as AdhHttp from "../../../Core/Http/Http";
+import * as AdhMetaApi from "../../../Core/MetaApi/MetaApi";
+import * as AdhMovingColumns from "../../../Core/MovingColumns/MovingColumns";
+import * as AdhPermissions from "../../../Core/Permissions/Permissions";
+import * as AdhResourceArea from "../../../Core/ResourceArea/ResourceArea";
+import * as AdhTopLevelState from "../../../Core/TopLevelState/TopLevelState";
+import * as AdhUtil from "../../../Core/Util/Util";
 
 import * as AdhMercator2015Workbench from "../../2015/Workbench/Workbench";
 

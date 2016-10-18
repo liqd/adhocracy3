@@ -5,7 +5,9 @@
              autoresize='false',
              locale='en',
              autourl='false',
+             initial_url='',
              nocenter='true',
+             noheader='true',
              style='',
              "/>
 <script src="${sdk_url}"></script>
@@ -19,6 +21,12 @@
      data-autoresize="${autoresize}"
      data-locale="${locale}"
      data-autourl="${autourl}"
+     data-initial-url="${initial_url}"
+     %if nocenter!="false":
      data-nocenter="${nocenter}"
+     %endif
+     %if noheader!="false":
+     data-noheader="${noheader}"
+     %endif
      style="${style}">
 </div>

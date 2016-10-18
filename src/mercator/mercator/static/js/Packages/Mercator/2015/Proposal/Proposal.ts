@@ -3,17 +3,17 @@
 
 import * as _ from "lodash";
 
-import * as AdhBadge from "../../../Badge/Badge";
-import * as AdhConfig from "../../../Config/Config";
-import * as AdhHttp from "../../../Http/Http";
-import * as AdhMetaApi from "../../../MetaApi/MetaApi";
-import * as AdhPermissions from "../../../Permissions/Permissions";
-import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
-import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
-import * as AdhResourceUtil from "../../../Util/ResourceUtil";
+import * as AdhBadge from "../../../Core/Badge/Badge";
+import * as AdhConfig from "../../../Core/Config/Config";
+import * as AdhHttp from "../../../Core/Http/Http";
+import * as AdhMetaApi from "../../../Core/MetaApi/MetaApi";
+import * as AdhPermissions from "../../../Core/Permissions/Permissions";
+import * as AdhPreliminaryNames from "../../../Core/PreliminaryNames/PreliminaryNames";
+import * as AdhResourceArea from "../../../Core/ResourceArea/ResourceArea";
+import * as AdhResourceUtil from "../../../Core/Util/ResourceUtil";
 import * as AdhResourceWidgets from "../../../ResourceWidgets/ResourceWidgets";
-import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
-import * as AdhUtil from "../../../Util/Util";
+import * as AdhTopLevelState from "../../../Core/TopLevelState/TopLevelState";
+import * as AdhUtil from "../../../Core/Util/Util";
 
 import * as ResourcesBase from "../../../../ResourcesBase";
 

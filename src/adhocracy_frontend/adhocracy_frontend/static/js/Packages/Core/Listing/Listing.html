@@ -1,0 +1,56 @@
+<div class="listing">
+    <div class="listing-create-form" data-ng-if="!noCreateForm && poolOptions.POST">
+        <adh-inject data-transclusion-id="create-form-id"></adh-inject>
+    </div>
+    <div class="listing-create-button" data-ng-if="!noCreateForm && !poolOptions.POST && !poolOptions.loggedIn">
+        <adh-inject data-transclusion-id="create-button-id"></adh-inject>
+    </div>
+    <div class="action-bar" data-ng-if="facets.length > 0 || sorts.length > 1">
+        <a data-ng-if="facets.length > 0" class="action-bar-item" data-ng-class="{ 'm-selected': showFilter }" data-ng-click="toggleFilter();" href="">{{ "TR__FILTER_BY" | translate }}</a>
+        <span data-ng-repeat="facet in facets">
+            <a
+                href=""
+                title="{{ item.name | translate }}"
+                data-ng-repeat="item in facet.items"
+                data-ng-if="item.enabled"
+                data-ng-click="toggleItem(facet, item, $event)"
+                class="facet-item-{{item.key}} facet-toggle">
+                {{ item.name | translate }}
+                <span class="facet-cancel">x</span>
+            </a>
+        </span>
+        <a data-ng-if="sorts.length > 1" class="action-bar-item" data-ng-class="{ 'm-selected': showSort }" data-ng-click="toggleSort();" href="">{{ "TR__SORT_BY" | translate }}</a>
+    </div>
+    <div class="listing-results" data-ng-if="showFilter || showSort">
+        <adh-facets data-ng-if="showFilter" data-facets="facets" data-update="update" data-toggle-item="toggleItem" data-enable-item="enableItem" data-disable-item="disableItem"></adh-facets>
+        <div class="sorts" data-ng-if="showSort">
+            <h3 class="sort-header">{{ "TR__SORT_BY" | translate }}</h3>
+            <a
+                href=""
+                class="button-cta-secondary sort-item"
+                data-ng-repeat="sortItem in sorts"
+                data-ng-click="setSort(sortItem.key)"
+                data-ng-class="{'is-active': sortItem.key === sort }">{{ sortItem.name | uppercase | translate }}
+            </a>
+        </div>
+    </div>
+    <div class="listing-counter" data-ng-if="counter && getCounterValue() > 0">{{getCounterValue()}} {{contentType | adhResourceName:getCounterValue() | translate}}</div>
+    <ol class="listing-elements">
+        <li class="listing-element" data-ng-repeat="element in elements">
+            <adh-inject data-transclusion-id="element-id"></adh-inject>
+        </li>
+    </ol>
+    <a
+        href=""
+        class="load-more"
+        data-ng-if="currentLimit < totalCount"
+        data-ng-click="loadMore()">
+        <span class="load-more-numbers">
+            {{ "TR__SHOWING_LIMIT_TOTAL" | translate:{currentLimit: currentLimit, totalCount: totalCount} }}
+        </span>
+        <span class="load-more-text">{{ "TR__LOAD_MORE" | translate }}</span>
+    </a>
+    <div class="listing-empty-text" data-ng-if="elements.length === 0">
+        {{ emptyText }}
+    </div>
+</div>

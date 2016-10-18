@@ -291,6 +291,7 @@ class TestActivityEmail:
 
     def test_send_activity(self, inst, user, activity, request_, mocker):
         inst.send_mail = Mock()
+        inst._get_user_name = Mock(return_value='anna')
         inst._get_user_email = Mock(return_value='anna@example.org')
         translate_description = mocker.patch(
             'adhocracy_core.messaging.generate_activity_description',
@@ -298,6 +299,7 @@ class TestActivityEmail:
 
         inst.send_activity_mail(user, activity, request_)
 
+        inst._get_user_name.assert_called_with(user)
         inst._get_user_email.assert_called_with(user)
         send_mail_args = inst.send_mail.call_args[1]
         wanted_mapping = {'site_name': 'sitename',
@@ -306,6 +308,7 @@ class TestActivityEmail:
                           'activity_name': activity.name,
                           'activity_description':
                               translate_description.return_value.default,
+                          'user_name': 'anna'
                           }
         assert send_mail_args['recipients'] == ['anna@example.org']
         assert send_mail_args['subject'] == 'mail_send_activity_subject'
@@ -317,6 +320,7 @@ class TestActivityEmail:
     def test_send_activity_remove(self, inst, user, activity, request_, mocker):
         from adhocracy_core.interfaces import ActivityType
         inst.send_mail = Mock()
+        inst._get_user_name = Mock(return_value='anna')
         inst._get_user_email = Mock(return_value='anna@example.org')
         translate_description = mocker.patch(
             'adhocracy_core.messaging.generate_activity_description')
@@ -326,3 +330,31 @@ class TestActivityEmail:
         assert send_mail_args['body'] == 'mail_send_activity_remove_body_txt'
 
 
+class TestSendPasswordChangeMail:
+
+    @fixture
+    def registry(self, config):
+        config.include('pyramid_mailer.testing')
+        config.registry.settings['adhocracy.site_name'] = 'sitename'
+        config.registry.settings['adhocracy.frontend_url'] = 'http://front.end'
+        return config.registry
+
+    @fixture
+    def inst(self, registry):
+        from . import Messenger
+        return Messenger(registry)
+
+    def test_send_password_change_mail(self, inst, request_):
+        inst.send_mail = Mock()
+        user = testing.DummyResource(name='Anna', email='anna@example.org')
+        inst.send_password_change_mail(user, request=request_)
+        assert inst.send_mail.call_args[1]['recipients'] == ['anna@example.org']
+        assert inst.send_mail.call_args[1]['subject'] == \
+               'mail_password_change_subject'
+        assert inst.send_mail.call_args[1]['body'] == \
+               'mail_password_change_body_txt'
+        assert inst.send_mail.call_args[1]['body'].mapping == \
+               {'user_name': 'Anna',
+                'site_name': 'sitename',
+                'create_reset_url': 'http://front.end/create_password_reset/'}
+        assert inst.send_mail.call_args[1]['request'] == request_

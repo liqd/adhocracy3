@@ -130,7 +130,7 @@ def change_bplan_officeworker_email_representation(root, registry):
 
 @log_migration
 def use_workflow_state_for_participation_time_range(root, registry):
-    """use workflow state data for participation start and end."""
+    """Use workflow state data for participation start and end."""
     from adhocracy_core.sheets.workflow import IWorkflowAssignment
     from adhocracy_meinberlin.resources.bplan import IProcess
     from adhocracy_meinberlin.sheets.bplan import IProcessSettings
@@ -198,6 +198,14 @@ def update_workflow_state_acl_for_all_resources(root,
     update_workflow_state_acls(root, registry)
 
 
+@log_migration
+def add_embed_sheet_to_stadtforum_polls(root, registry):
+    """Add embed sheet to stadtforum polls."""
+    from adhocracy_core.sheets.embed import IEmbed
+    from adhocracy_meinberlin.resources.stadtforum import IPoll
+    migrate_new_sheet(root, IPoll, IEmbed)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(use_adhocracy_core_title_sheet)
@@ -210,3 +218,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_image_reference_to_blplan)
     config.add_evolution_step(remove_workflow_state_data_end_date)
     config.add_evolution_step(update_workflow_state_acl_for_all_resources)
+    config.add_evolution_step(add_embed_sheet_to_stadtforum_polls)

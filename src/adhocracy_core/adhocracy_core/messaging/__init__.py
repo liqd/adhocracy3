@@ -290,6 +290,7 @@ class Messenger:
                         'activity_description': translate(description),
                         'object_url': self._get_resource_url(activity.object),
                         'target_url': self._get_resource_url(activity.target),
+                        'user_name': self._get_user_name(user),
                         })
         subject = _('mail_send_activity_subject',
                     mapping=mapping,
@@ -316,6 +317,27 @@ class Messenger:
     def _get_resource_url(self, resource: IResource) -> str:
         path = resource_path(resource)
         return '{0}/r{1}/'.format(self.frontend_url, path)
+
+    def send_password_change_mail(self, user=IUser, request: Request=None):
+        """Send email with link to reset the user password."""
+        create_reset_url = '%s/create_password_reset/' % (self.frontend_url)
+        mapping = {'create_reset_url': create_reset_url,
+                   'user_name': user.name,
+                   'site_name': self.site_name,
+                   }
+        subject = _('mail_password_change_subject',
+                    mapping=mapping,
+                    default='${site_name}: Password changed / '
+                            'Passwort wurde geändert')
+        body = _('mail_password_change_body_txt',
+                 mapping=mapping,
+                 default='Your password has been changed.'
+                 )
+        self.send_mail(subject=subject,
+                       recipients=[user.email],
+                       body=body,
+                       request=request,
+                       )
 
 
 def includeme(config):

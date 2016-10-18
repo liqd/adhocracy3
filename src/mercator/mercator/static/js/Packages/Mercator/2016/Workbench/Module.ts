@@ -1,10 +1,10 @@
-import * as AdhHttpModule from "../../../Http/Module";
-import * as AdhMetaApiModule from "../../../MetaApi/Module";
-import * as AdhMovingColumnsModule from "../../../MovingColumns/Module";
-import * as AdhPermissionsModule from "../../../Permissions/Module";
-import * as AdhProcessModule from "../../../Process/Module";
-import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
+import * as AdhHttpModule from "../../../Core/Http/Module";
+import * as AdhMetaApiModule from "../../../Core/MetaApi/Module";
+import * as AdhMovingColumnsModule from "../../../Core/MovingColumns/Module";
+import * as AdhPermissionsModule from "../../../Core/Permissions/Module";
+import * as AdhProcessModule from "../../../Core/Process/Module";
+import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../../../Core/TopLevelState/Module";
 
 import RIMercator2016Process from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IProcess";
 

@@ -296,7 +296,7 @@ def _remove_local_role_permissions_from_acl(acl: []) -> []:
     acl_without_local_roles = []
     for ace in acl:
         _, ace_principal, _ = ace
-        if not 'group:' in ace_principal:
+        if 'group:' not in ace_principal:
             acl_without_local_roles.append(ace)
     return acl_without_local_roles
 

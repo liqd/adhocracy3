@@ -1,19 +1,21 @@
-import * as AdhDocumentModule from "../../../Document/Module";
-import * as AdhHttpModule from "../../../Http/Module";
-import * as AdhMappingModule from "../../../Mapping/Module";
-import * as AdhIdeaCollectionModule from "../../../IdeaCollection/Module";
-import * as AdhMovingColumnsModule from "../../../MovingColumns/Module";
-import * as AdhPermissionsModule from "../../../Permissions/Module";
-import * as AdhProcessModule from "../../../Process/Module";
-import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
+import * as AdhDocumentModule from "../../../Core/Document/Module";
+import * as AdhHttpModule from "../../../Core/Http/Module";
+import * as AdhMappingModule from "../../../Core/Mapping/Module";
+import * as AdhIdeaCollectionModule from "../../../Core/IdeaCollection/Module";
+import * as AdhMovingColumnsModule from "../../../Core/MovingColumns/Module";
+import * as AdhNamesModule from "../../../Core/Names/Module";
+import * as AdhPermissionsModule from "../../../Core/Permissions/Module";
+import * as AdhProcessModule from "../../../Core/Process/Module";
+import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../../../Core/TopLevelState/Module";
+
+import * as AdhIdeaCollectionWorkbench from "../../../Core/IdeaCollection/Workbench/Workbench";
+import * as AdhNames from "../../../Core/Names/Names";
+import * as AdhProcess from "../../../Core/Process/Process";
 
 import RIGeoProposal from "../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
 import RIGeoProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
 import RIAlexanderplatzProcess from "../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess";
-
-import * as AdhProcess from "../../../Process/Process";
-import * as AdhIdeaCollectionWorkbench from "../../../IdeaCollection/Workbench/Workbench";
 
 import * as Workbench from "./Workbench";
 
@@ -27,16 +29,16 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhDocumentModule.moduleName,
             AdhHttpModule.moduleName,
-            AdhMappingModule.moduleName,
             AdhIdeaCollectionModule.moduleName,
+            AdhMappingModule.moduleName,
             AdhMovingColumnsModule.moduleName,
+            AdhNamesModule.moduleName,
             AdhPermissionsModule.moduleName,
             AdhProcessModule.moduleName,
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.names[processType] = "TR__PROCESS_ALEXANDERPLATZ";
             adhProcessProvider.templates[processType] = "<adh-meinberlin-alexanderplatz-workbench " +
                 "data-process-properties=\"processProperties\"></adh-meinberlin-alexanderplatz-workbench>";
             adhProcessProvider.processProperties[processType] = {
@@ -46,11 +48,13 @@ export var register = (angular) => {
             };
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider, adhConfig) => {
-            var processType = RIAlexanderplatzProcess.content_type;
             var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
             Workbench.registerRoutes(processType)(adhResourceAreaProvider);
-            adhResourceAreaProvider.names[RIGeoProposalVersion.content_type] = "TR__PROPOSALS";
+        }])
+        .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
+            adhNamesProvider.names[RIAlexanderplatzProcess.content_type] = "TR__RESOURCE_ALEXANDERPLATZ";
+            adhNamesProvider.names[RIGeoProposalVersion.content_type] = "TR__RESOURCE_PROPOSAL";
         }])
         .directive("adhMeinberlinAlexanderplatzWorkbench", ["adhConfig", "adhTopLevelState", Workbench.workbenchDirective])
         .directive("adhMeinberlinAlexanderplatzProcessColumn", [

@@ -1,8 +1,11 @@
 """BPlan process resources."""
+from pyramid.interfaces import IRequest
+from adhocracy_core.interfaces import IResource
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import process
 from adhocracy_core.resources import proposal
-import adhocracy_core.sheets.embed
+from adhocracy_core.sheets.embed import embed_code_config_adapter
+from adhocracy_core.sheets.embed import IEmbedCodeConfig
 import adhocracy_meinberlin.sheets.bplan
 import adhocracy_core.sheets.image
 
@@ -27,7 +30,7 @@ proposal_meta = proposal.proposal_meta._replace(
     iresource=IProposal,
     element_types=(IProposalVersion,),
     item_type=IProposalVersion,
-    default_workflow = 'bplan_private',
+    default_workflow='bplan_private',
 )
 
 
@@ -41,13 +44,23 @@ process_meta = process.process_meta._replace(
     element_types=(IProposal,
                    ),
     is_implicit_addable=True,
-    default_workflow = 'bplan',
+    default_workflow='bplan',
     extended_sheets=(adhocracy_meinberlin.sheets.bplan.IProcessSettings,
                      adhocracy_meinberlin.sheets.bplan.IProcessPrivateSettings,
-                     adhocracy_core.sheets.embed.IEmbed,
                      adhocracy_core.sheets.image.IImageReference,
                      ),
 )
+
+
+def embed_code_config_bplan_adapter(context: IResource,
+                                    request: IRequest) -> {}:
+    """Return config to render `adhocracy_core:templates/embed_code.html`."""
+    mapping = embed_code_config_adapter(context, request)
+    mapping.update({'widget': 'mein-berlin-bplaene-proposal-embed',
+                    'style': 'height: 650px',
+                    'noheader': 'true',
+                    })
+    return mapping
 
 
 def includeme(config):
@@ -55,3 +68,6 @@ def includeme(config):
     add_resource_type_to_registry(proposal_meta, config)
     add_resource_type_to_registry(proposal_version_meta, config)
     add_resource_type_to_registry(process_meta, config)
+    config.registry.registerAdapter(embed_code_config_bplan_adapter,
+                                    (IProcess, IRequest),
+                                    IEmbedCodeConfig)

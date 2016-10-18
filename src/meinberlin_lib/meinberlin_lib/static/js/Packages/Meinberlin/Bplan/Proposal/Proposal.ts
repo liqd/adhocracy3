@@ -1,9 +1,9 @@
 /// <reference path="../../../../../lib2/types/angular.d.ts"/>
 
-import * as AdhConfig from "../../../Config/Config";
-import * as AdhHttp from "../../../Http/Http";
-import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
-import * as AdhProcess from "../../../Process/Process";
+import * as AdhConfig from "../../../Core/Config/Config";
+import * as AdhHttp from "../../../Core/Http/Http";
+import * as AdhPreliminaryNames from "../../../Core/PreliminaryNames/PreliminaryNames";
+import * as AdhProcess from "../../../Core/Process/Process";
 
 import RIProposal from "../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposal";
 import RIProposalVersion from "../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposalVersion";

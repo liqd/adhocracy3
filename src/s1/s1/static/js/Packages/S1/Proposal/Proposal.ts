@@ -1,15 +1,16 @@
 /// <reference path="../../../../lib2/types/angular.d.ts"/>
 
-import * as AdhBadge from "../../Badge/Badge";
-import * as AdhConfig from "../../Config/Config";
-import * as AdhHttp from "../../Http/Http";
-import * as AdhPermissions from "../../Permissions/Permissions";
-import * as AdhPreliminaryNames from "../../PreliminaryNames/PreliminaryNames";
-import * as AdhProcess from "../../Process/Process";
-import * as AdhRate from "../../Rate/Rate";
-import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
-import * as AdhUtil from "../../Util/Util";
+import * as AdhBadge from "../../Core/Badge/Badge";
+import * as AdhConfig from "../../Core/Config/Config";
+import * as AdhHttp from "../../Core/Http/Http";
+import * as AdhPermissions from "../../Core/Permissions/Permissions";
+import * as AdhPreliminaryNames from "../../Core/PreliminaryNames/PreliminaryNames";
+import * as AdhProcess from "../../Core/Process/Process";
+import * as AdhRate from "../../Core/Rate/Rate";
+import * as AdhTopLevelState from "../../Core/TopLevelState/TopLevelState";
+import * as AdhUtil from "../../Core/Util/Util";
 
+import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RISystemUser from "../../../Resources_/adhocracy_core/resources/principal/ISystemUser";
 import RIProposal from "../../../Resources_/adhocracy_s1/resources/s1/IProposal";
 import RIProposalVersion from "../../../Resources_/adhocracy_s1/resources/s1/IProposalVersion";
@@ -42,6 +43,7 @@ export interface IScope extends angular.IScope {
         anonymize? : boolean;
         createdAnonymously? : boolean;
     };
+    commentType? : string;
 }
 
 export interface IFormScope extends IScope {
@@ -100,7 +102,7 @@ var bindPath = (
                         create: false,
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
-                        commentCount: version.data[SICommentable.nick].comments_count,
+                        commentCount: parseInt(version.data[SICommentable.nick].comments_count, 10),
                         assignments: badgeAssignments,
                         workflowState: workflowAssignmentSheet.workflow_state,
                         decisionDate: AdhProcess.getStateData(workflowAssignmentSheet, workflowAssignmentSheet.workflow_state).start_date
@@ -189,6 +191,7 @@ export var detailDirective = (
         },
         link: (scope : IScope) => {
             bindPath(adhConfig, adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
+            scope.commentType = RICommentVersion.content_type;
         }
     };
 };

@@ -262,6 +262,7 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
                                    'autonaming_prefix',
                                    'use_autonaming_random',
                                    'is_sdi_addable',
+                                   'sdi_column_mapper',
                                    'element_types',
                                    'default_workflow',
                                    'alternative_workflows',
@@ -303,6 +304,9 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
     is_sdi_addable:
         Make this resource type automatically addable with the substanced
         admin interface (sdi).
+    sdi_column_mapper:
+        Mapping function to add columns with addition information to an sdi
+        folder view.
 
 
     IPool fields:

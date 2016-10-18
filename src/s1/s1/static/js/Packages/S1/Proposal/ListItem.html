@@ -9,6 +9,6 @@
 
     <h1 class="s1-proposal-title">{{ data.title }}</h1>
 
-    <span class="s1-list-item-creator"><adh-user-meta data-ng-if="data.creator" data-path="{{data.creator}}"></adh-user-meta></span>
+    <span class="s1-list-item-creator"><adh-user-meta data-ng-if="data.creator" data-path="{{data.creator}}" data-no-link="true"></adh-user-meta></span>
     <span class="s1-list-item-time"><adh-time data-datetime="data.creationDate" data-format="L"></adh-time></span>
 </a>

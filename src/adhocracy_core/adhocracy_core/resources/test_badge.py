@@ -20,6 +20,7 @@ class TestBadge:
                                         sheets.badge.IBadge,
                                         sheets.name.IName,)
         assert meta.permission_create == 'create_badge'
+        assert meta.is_sdi_addable == True
 
     @mark.usefixtures('integration')
     def test_create(self, context, registry, meta):
@@ -42,6 +43,7 @@ class TestBadgeGroup:
         assert meta.element_types == (resources.badge.IBadge,
                                       meta.iresource,
                                       )
+        assert meta.is_sdi_addable == True
 
     @mark.usefixtures('integration')
     def test_create(self, context, registry, meta):
@@ -68,6 +70,7 @@ class TestParticipantsAssignableBadgeGroup:
                                       meta.iresource,
                                       )
         assert meta.default_workflow == 'badge_assignment'
+        assert meta.is_implicit_addable == True
 
     @mark.usefixtures('integration')
     def test_create(self, context, registry, meta):

@@ -1,8 +1,8 @@
 /// <reference path="../../../../../lib2/types/angular.d.ts"/>
 
-import * as AdhConfig from "../../../Config/Config";
-import * as AdhHttp from "../../../Http/Http";
-import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
+import * as AdhConfig from "../../../Core/Config/Config";
+import * as AdhHttp from "../../../Core/Http/Http";
+import * as AdhPreliminaryNames from "../../../Core/PreliminaryNames/PreliminaryNames";
 
 import * as SIName from "../../../../Resources_/adhocracy_core/sheets/name/IName";
 import * as SIProcessPrivateSettings from "../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IProcessPrivateSettings";

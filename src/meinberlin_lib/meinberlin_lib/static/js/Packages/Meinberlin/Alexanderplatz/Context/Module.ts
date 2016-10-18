@@ -1,10 +1,10 @@
-import * as AdhEmbedModule from "../../../Embed/Module";
-import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
+import * as AdhEmbedModule from "../../../Core/Embed/Module";
+import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
 
 import * as AdhMeinberlinAlexanderplatzWorkbenchModule from "../Workbench/Module";
 
-import * as AdhEmbed from "../../../Embed/Embed";
-import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
+import * as AdhEmbed from "../../../Core/Embed/Embed";
+import * as AdhResourceArea from "../../../Core/ResourceArea/ResourceArea";
 
 import * as AdhMeinberlinAlexanderplatzWorkbench from "../Workbench/Workbench";
 

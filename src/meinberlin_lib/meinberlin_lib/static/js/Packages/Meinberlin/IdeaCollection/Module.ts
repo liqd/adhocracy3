@@ -1,17 +1,19 @@
-import * as AdhEmbedModule from "../../Embed/Module";
-import * as AdhIdeaCollectionModule from "../../IdeaCollection/Module";
-import * as AdhProcessModule from "../../Process/Module";
-import * as AdhResourceAreaModule from "../../ResourceArea/Module";
+import * as AdhEmbedModule from "../../Core/Embed/Module";
+import * as AdhIdeaCollectionModule from "../../Core/IdeaCollection/Module";
+import * as AdhNamesModule from "../../Core/Names/Module";
+import * as AdhProcessModule from "../../Core/Process/Module";
+import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
 
-import * as AdhIdeaCollectionWorkbench from "../../IdeaCollection/Workbench/Workbench";
-import * as AdhProcess from "../../Process/Process";
-import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
+import * as AdhIdeaCollectionWorkbench from "../../Core/IdeaCollection/Workbench/Workbench";
+import * as AdhNames from "../../Core/Names/Names";
+import * as AdhProcess from "../../Core/Process/Process";
+import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
 
 import RIGeoProposal from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
 import RIGeoProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
 import RIIdeaCollectionProcess from "../../../Resources_/adhocracy_meinberlin/resources/idea_collection/IProcess";
 
-import * as AdhEmbed from "../../Embed/Embed";
+import * as AdhEmbed from "../../Core/Embed/Embed";
 
 
 export var moduleName = "adhMeinberlinIdeaCollection";
@@ -23,6 +25,7 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhEmbedModule.moduleName,
             AdhIdeaCollectionModule.moduleName,
+            AdhNamesModule.moduleName,
             AdhProcessModule.moduleName,
             AdhResourceAreaModule.moduleName,
         ])
@@ -41,10 +44,8 @@ export var register = (angular) => {
 
             var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
-            adhResourceAreaProvider.names[RIGeoProposalVersion.content_type] = "TR__PROPOSALS";
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.names[processType] = "TR__PROCESS_IDEA_COLLECTION";
             adhProcessProvider.templates[processType] =
                 "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
                 "</adh-idea-collection-workbench>";
@@ -53,5 +54,9 @@ export var register = (angular) => {
                 proposalClass: RIGeoProposal,
                 proposalVersionClass: RIGeoProposalVersion
             };
+        }])
+        .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
+            adhNamesProvider.names[RIIdeaCollectionProcess.content_type] = "TR__RESOURCE_IDEA_COLLECTION";
+            adhNamesProvider.names[RIGeoProposalVersion.content_type] = "TR__RESOURCE_PROPOSAL";
         }]);
 };

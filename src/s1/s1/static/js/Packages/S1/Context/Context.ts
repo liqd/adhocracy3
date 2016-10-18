@@ -1,7 +1,7 @@
-import * as AdhConfig from "../../Config/Config";
-import * as AdhHttp from "../../Http/Http";
-import * as AdhPermissions from "../../Permissions/Permissions";
-import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
+import * as AdhConfig from "../../Core/Config/Config";
+import * as AdhHttp from "../../Core/Http/Http";
+import * as AdhPermissions from "../../Core/Permissions/Permissions";
+import * as AdhTopLevelState from "../../Core/TopLevelState/TopLevelState";
 
 import RIS1Process from "../../../Resources_/adhocracy_s1/resources/s1/IProcess";
 import * as SIWorkflowAssignment from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
