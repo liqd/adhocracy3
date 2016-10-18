@@ -53,7 +53,7 @@ var importField = (value, field : AdhMetaApi.ISheetField) => {
             parser = (point) => _.map(point, toFloat);
             break;
         case "adhocracy_core.sheets.geo.Polygon":
-            parser = (polygon) => _.map(polygon, (line) => _.map(line, toFloat));
+            parser = (polygon : any[][][]) => _.map(polygon, (line) => _.map(line, (point) => _.map(point, toFloat)));
             break;
     }
 
