@@ -14,7 +14,7 @@ class TestIndexUserText:
         from .system import index_user_text
         return index_user_text(*args)
 
-    def test_return_user_name(self, registry, context, mock_sheet):
+    def test_return_user_text(self, registry, context, mock_sheet):
         from copy import deepcopy
         context.__name__ = '0000006'
         user_basic_sheet = deepcopy(mock_sheet)

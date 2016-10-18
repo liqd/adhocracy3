@@ -213,10 +213,11 @@ def test_register_subscriber(registry):
     assert subscriber.reindex_tag.__name__ in handlers
     assert subscriber.reindex_visibility.__name__ in handlers
     assert subscriber.reindex_rates.__name__ in handlers
+    assert subscriber.reindex_controversiality.__name__ in handlers
     assert subscriber.reindex_badge.__name__ in handlers
     assert subscriber.reindex_item_badge.__name__ in handlers
     assert subscriber.reindex_workflow_state.__name__ in handlers
     assert subscriber.reindex_user_name.__name__ in handlers
     assert subscriber.reindex_user_email.__name__ in handlers
-    assert subscriber.reindex_controversiality.__name__ in handlers
+    assert subscriber.reindex_comments.__name__ in handlers
 
