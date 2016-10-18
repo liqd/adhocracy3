@@ -26,7 +26,13 @@ def main():
     regexlist = [
         ('Bitte erkläre, wieso du diesen Beitrag melden möchtest',
             'Bitte erklären Sie, wieso Sie diesen Beitrag melden möchten'),
+        ('enn Du doch einen neuen Link benötigst',
+            'enn Sie doch einen neuen Link benötigen'),
         ('benutze den', 'benutzen Sie den'),
+        ('gib dabei', 'geben Sie dabei'),
+        ('kontaktiere bitte', 'kontaktieren Sie bitte'),
+        ('ersuche bitte', 'ersuchen Sie bitte'),
+        ('Dich einzuloggen', 'sich einzuloggen'),
         ('schließe bitte das', 'schließen Sie bitte das'),
         ('Wenn Du einem Kommentar inhaltlich widersprechen möchtest',
             'Wenn Sie einem Kommentar inhaltlich widersprechen möchten'),
