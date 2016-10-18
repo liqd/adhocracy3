@@ -122,6 +122,12 @@ def _get_affected_commentables(commentable):
     return commentables
 
 
+def reindex_user_text(event):
+    """Reindex indexes `text`."""
+    catalogs = find_service(event.object, 'catalogs')
+    catalogs.reindex_index(event.object, 'text')
+
+
 def includeme(config):
     """Register index subscribers."""
     config.add_subscriber(reindex_tag,
@@ -164,5 +170,11 @@ def includeme(config):
     config.add_subscriber(reindex_comments,
                           ISheetBackReferenceModified,
                           event_isheet=ICommentable)
+    config.add_subscriber(reindex_user_text,
+                          IResourceSheetModified,
+                          event_isheet=IUserBasic)
+    config.add_subscriber(reindex_user_text,
+                          IResourceSheetModified,
+                          event_isheet=IUserExtended)
     # add subscriber to updated allowed index
     config.scan('substanced.objectmap.subscribers')

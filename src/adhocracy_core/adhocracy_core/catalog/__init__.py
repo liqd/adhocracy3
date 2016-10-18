@@ -322,5 +322,6 @@ def includeme(config):
     add_resource_type_to_registry(catalogs_service_meta, config)
     config.scan('substanced.catalog')
     config.scan('.index')
+    config.include('.system')
     config.include('.adhocracy')
     config.include('.subscriber')
