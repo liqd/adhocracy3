@@ -205,6 +205,10 @@ class TestReindexComments:
         catalog.reindex_index.assert_any_call(event.object, 'comments')
         catalog.reindex_index.assert_any_call(reference, 'comments')
 
+def test_reindex_user_text(event, catalog):
+    from .subscriber import reindex_user_text
+    reindex_user_text(event)
+    catalog.reindex_index.assert_called_with(event.object, 'text')
 
 @mark.usefixtures('integration')
 def test_register_subscriber(registry):
