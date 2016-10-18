@@ -14,7 +14,7 @@ import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as AdhCache from "./Cache";
 
 
-var sanityCheck = (obj : ResourcesBase.IResource) : void => {
+var sanityCheck = (obj : ResourcesBase.IResource, adhMetaApi : AdhMetaApi.Service) : void => {
     if (typeof obj !== "object") {
         throw ("unexpected type: " + (typeof obj).toString() + "\nin object:\n" + JSON.stringify(obj, null, 2));
     }
@@ -23,7 +23,7 @@ var sanityCheck = (obj : ResourcesBase.IResource) : void => {
         throw ("resource has no content_type field:\n" + JSON.stringify(obj, null, 2));
     }
 
-    if (!Resources_.resourceRegistry.hasOwnProperty(obj.content_type)) {
+    if (!adhMetaApi.resourceExists(obj.content_type)) {
         throw ("unknown content_type: " + obj.content_type + "\nin object:\n" + JSON.stringify(obj, null, 2));
     }
 };
@@ -43,7 +43,7 @@ export var importResource = <R extends ResourcesBase.IResource>(
     "use strict";
 
     var obj = response.data;
-    sanityCheck(obj);
+    sanityCheck(obj, metaApi);
 
     if (!obj.hasOwnProperty("path")) {
         throw ("resource has no path field: " + JSON.stringify(obj, null, 2));
@@ -68,7 +68,7 @@ export var importResource = <R extends ResourcesBase.IResource>(
     // iterate over all delivered sheets and construct instances
 
     _.forOwn(obj.data, (jsonSheet, sheetName) => {
-        if (!Resources_.sheetRegistry.hasOwnProperty(sheetName)) {
+        if (!metaApi.sheetExists(sheetName)) {
             throw ("unknown property sheet: " + sheetName + " " + JSON.stringify(obj, null, 2));
         }
 
@@ -203,7 +203,7 @@ export var exportResource = <R extends ResourcesBase.IResource>(
 ) : R => {
     "use strict";
 
-    sanityCheck(obj);
+    sanityCheck(obj, adhMetaApi);
     var newobj : R = _.cloneDeep(obj);
 
     // remove some fields from newobj.data[*] and empty sheets from
