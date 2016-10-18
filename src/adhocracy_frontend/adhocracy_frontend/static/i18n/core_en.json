@@ -1,8 +1,9 @@
 {
     "TR__ACTIVATION_CLOSE_THIS_TAB_AND_PROCEED": "Thank you for your registration. Your account has been activated. You can now close this tab and go back to {{siteName}}.",
-    "TR__ACTIVATION_ERROR_SUPPORT": "The link you have clicked on is invalid - probably because it has been used before. To request a new link, please contact our support team, explicitly stating the email address you registered with:",
+    "TR__ACTIVATION_ERROR_1": "If you do need a new link, please contact our support team, explicitly stating the email address you registered with:"
     "TR__ACTIVATION_ERROR_2": "We apologize for the inconvience. Please make sure you activate your account within the next 6 days.",
     "TR__ACTIVATION_ERROR_3": "Thanks!",
+    "TR__ACTIVATION_ERROR_SUPPORT": "The link you have clicked on is invalid - probably because it has been used before. Please try to log in.",
     "TR__ACTIVATION_ERROR_TITLE": "Oops, something went wrong.",
     "TR__ACTIVATION_SUCCESS_TITLE": "Your account has been activated!",
     "TR__ADD_DOCUMENT": "add document",
