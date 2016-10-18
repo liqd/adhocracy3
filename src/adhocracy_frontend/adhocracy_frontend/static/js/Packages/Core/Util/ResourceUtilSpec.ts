@@ -150,8 +150,12 @@ export var register = () => {
 
         describe("isInstanceOf", () => {
             var mockMetaApiData = {};
-            mockMetaApiData[RIProcess.content_type] = RIProcess;
-            mockMetaApiData[RIPool.content_type] = RIPool;
+            mockMetaApiData[RIProcess.content_type] = {
+                super_types: [RIPool.content_type]
+            };
+            mockMetaApiData[RIPool.content_type] = {
+                super_types: []
+            };
 
             var adhMetaApiMock = jasmine.createSpyObj("adhMetaApi", ["resource"]);
             adhMetaApiMock.resource.and.callFake((name) => mockMetaApiData[name]);
