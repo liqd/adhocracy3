@@ -5,7 +5,8 @@ import * as AdhHttp from "../Http/Http";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
 import RIImage from "../../../Resources_/adhocracy_core/resources/image/IImage";
-import * as SIHasAssetPool from "../../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
+import * as SIAssetData from "../../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
+import * as SIHasAssetPool from "../../../Resources_/adhocracy_core/sheets/asset/IAssetData";
 import * as SIImageMetadata from "../../../Resources_/adhocracy_core/sheets/image/IImageMetadata";
 import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
@@ -55,7 +56,7 @@ export var uploadImageFactory = (
 
     var formData = new FormData();
     formData.append("content_type", contentType);
-    formData.append("data:adhocracy_core.sheets.asset.IAssetData:data", bytes());
+    formData.append("data:" + SIAssetData.nick + ":data", bytes());
 
     return adhHttp.get(poolPath)
         .then((pool) => {

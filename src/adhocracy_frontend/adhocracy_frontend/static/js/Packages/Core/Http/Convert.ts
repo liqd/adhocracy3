@@ -8,6 +8,7 @@ import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as ResourcesBase from "../../../ResourcesBase";
 import * as Resources_ from "../../../Resources_";
 
+import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 
 import * as AdhCache from "./Cache";
@@ -223,7 +224,7 @@ export var exportResource = <R extends ResourcesBase.IResource>(
                     }
                     // workaround, as normal users can not set `hidden` field
                     // FIXME: use more appropriate place, e.g. expose in meta api
-                    if (!keepMetadata && sheetName === "adhocracy_core.sheets.metadata.IMetadata" && fieldName === "hidden") {
+                    if (!keepMetadata && sheetName === SIMetadata.nick && fieldName === "hidden") {
                         delete sheet[fieldName];
                     }
                 }

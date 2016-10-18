@@ -37,7 +37,7 @@ export var hasEqualContent = (resource1 : ResourcesBase.IResource, resource2 : R
     _.forOwn(resource1.data, (sheet, key) => {
         var sheet2 = resource2.data[key];
 
-        if (key !== "adhocracy_core.sheets.versions.IVersionable") {
+        if (key !== SIVersionable.nick) {
             _.forOwn(sheet, (value, field) => {
                 if (!_.isEqual(value, sheet2[field])) {
                     equal = false;
