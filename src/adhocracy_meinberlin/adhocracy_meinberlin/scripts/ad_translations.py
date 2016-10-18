@@ -51,7 +51,6 @@ def main():
         ('Gehe', 'Gehen Sie'),
         ('gehe auf', 'gehen Sie auf'),
         ('überprüfe', 'überprüfen Sie'),
-        ('kontaktiere', 'kontaktieren Sie'),
         ('schaue', 'schauen Sie'),
         ('Klicke', 'Klicken Sie'),
         ('gib dabei', 'geben Sie dabei'),

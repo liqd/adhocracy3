@@ -1,7 +1,7 @@
 {
     "TR__ACTIVATION_CLOSE_THIS_TAB_AND_PROCEED": "Danke für Ihre Registrierung. Ihr Account ist nun aktiviert. Sie können diese Seite schließen und zurück gehen zu {{siteName}}.",
-    "TR__ACTIVATION_ERROR_1": "Wenn Sie doch einen neuen Link benötigen, kontaktieren Sie bitte unser Support-Team und geben Sie dabei die E-Mail-Adresse an, mit der Sie sich registrierst haben:",
-    "TR__ACTIVATION_ERROR_2": "Bitte entschuldigen Sie die Schwierigkeiten und aktivieren Sie ihren Account innerhalb der nächsten 6 Tage.",
+    "TR__ACTIVATION_ERROR_1": "Wenn Sie doch einen neuen Link benötigen, kontaktieren Sie bitte unser Support-Team und geben Sie dabei die E-Mail-Adresse an, mit der Sie sich registriert haben:",
+    "TR__ACTIVATION_ERROR_2": "Bitte entschuldigen Sie die Schwierigkeiten und aktivieren Sie Ihren Account innerhalb der nächsten 6 Tage.",
     "TR__ACTIVATION_ERROR_3": "Danke!",
     "TR__ACTIVATION_ERROR_SUPPORT": "Dieser Link ist ungültig - wahrscheinlich, weil er schon einmal benutzt wurde. Versuchen Sie bitte einmal, sich einzuloggen.",
     "TR__ACTIVATION_ERROR_TITLE": "Hoppla, das ging schief!",
@@ -102,6 +102,7 @@
     "TR__IMAGE_CURRENT": "aktuelles Bild",
     "TR__IMAGE_SELECTED": "ausgewähltes Bild",
     "TR__IMAGE_UPLOAD": "Bild hochladen",
+    "TR__IMPRINT": "Impressum",
     "TR__I_ACCEPT_THE_TERMS_AND_CONDITIONS": "Ich akzeptiere die [[link:Nutzungsbedingungen]].",
     "TR__LASTNAME": "Nachname",
     "TR__LIST": "Liste",
