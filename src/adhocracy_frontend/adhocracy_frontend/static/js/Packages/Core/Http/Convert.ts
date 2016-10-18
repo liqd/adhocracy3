@@ -27,6 +27,48 @@ var sanityCheck = (obj : ResourcesBase.IResource, adhMetaApi : AdhMetaApi.Servic
     }
 };
 
+var importField = (value, field : AdhMetaApi.ISheetField) => {
+    var toBoolean = (v) => _.isString(v) ? (v === "true") : v;
+    var toInt = (v) => _.isString(v) ? parseInt(v, 10) : v;
+    var toFloat = (v) => _.isString(v) ? parseFloat(v) : v;
+
+    var parser = (v) => v;
+
+    // This code should be consistent with the types generated in mkResources
+    switch (field.valuetype) {
+        case "adhocracy_core.schema.Boolean":
+            parser = toBoolean;
+            break;
+        case "Integer":
+        case "adhocracy_core.schema.Integer":
+        case "adhocracy_core.schema.Rate":
+            parser = toInt;
+            break;
+        case "adhocracy_core.schema.CurrencyAmount":
+        case "adhocracy_core.sheets.geo.WebMercatorLongitude":
+        case "adhocracy_core.sheets.geo.WebMercatorLatitude":
+            parser = toFloat;
+            break;
+        case "adhocracy_core.sheets.geo.Point":
+            parser = (point) => _.map(point, toFloat);
+            break;
+        case "adhocracy_core.sheets.geo.Polygon":
+            parser = (polygon) => _.map(polygon, (line) => _.map(line, toFloat));
+            break;
+    }
+
+    if (field.containertype) {
+        var singleParser = parser;
+
+        if (field.containertype === "list") {
+            parser = (v) => _.map(v, singleParser);
+        } else {
+            throw new Error("Unknown containertype: " + field.containertype);
+        }
+    }
+
+    return parser(value);
+};
 
 /**
  * transform objects on the way in (all request methods)
@@ -74,7 +116,14 @@ export var importResource = (
             }
         }
 
-        // TODO: convert values
+        _.forOwn(jsonSheet, (value, fieldName : string) => {
+            // Some fields are not listed in the meta API
+            // See https://github.com/liqd/adhocracy3/issues/261
+            if (metaApi.fieldExists(sheetName, fieldName)) {
+                var field = metaApi.field(sheetName, fieldName);
+                jsonSheet[fieldName] = importField(value, field);
+            }
+        });
     });
 
     return obj;
