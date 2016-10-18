@@ -948,6 +948,15 @@ def add_embed_sheet_to_processes(root, registry):  # pragma: no cover
     migrate_new_sheet(root, IProcess, IEmbed)
 
 
+@log_migration
+def reindex_users_text(root, registry):  # pragma: no cover
+    """Reindex user system text index."""
+    catalogs = find_service(root, 'catalogs')
+    users = find_service(root, 'principals', 'users')
+    for user in users.values():
+        catalogs.reindex_index(user, 'text')
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -1010,3 +1019,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_local_roles_to_acl)
     config.add_evolution_step(add_pages_service_to_root)
     config.add_evolution_step(add_embed_sheet_to_processes)
+    config.add_evolution_step(reindex_users_text)
