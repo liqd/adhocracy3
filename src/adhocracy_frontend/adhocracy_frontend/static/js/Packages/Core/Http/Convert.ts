@@ -6,7 +6,6 @@ import * as AdhMetaApi from "../MetaApi/MetaApi";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 
 import * as ResourcesBase from "../../../ResourcesBase";
-import * as Resources_ from "../../../Resources_";
 
 import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
@@ -32,40 +31,22 @@ var sanityCheck = (obj : ResourcesBase.IResource, adhMetaApi : AdhMetaApi.Servic
 /**
  * transform objects on the way in (all request methods)
  */
-export var importResource = <R extends ResourcesBase.IResource>(
-    response : {data : R},
+export var importResource = (
+    response : {data : ResourcesBase.IResource},
     metaApi : AdhMetaApi.Service,
     preliminaryNames : AdhPreliminaryNames.Service,
     adhCache : AdhCache.Service,
     warmupPoolCache : boolean = false,
     originalElements : string = "omit"
-) : R => {
+) : ResourcesBase.IResource => {
     "use strict";
 
-    var obj = response.data;
+    var obj = _.cloneDeep(response.data);
     sanityCheck(obj, metaApi);
 
     if (!obj.hasOwnProperty("path")) {
         throw ("resource has no path field: " + JSON.stringify(obj, null, 2));
     }
-
-    // construct resource
-
-    var _rclass = Resources_.resourceRegistry[obj.content_type];
-    var _obj = new _rclass({
-        preliminaryNames: preliminaryNames,
-        path: obj.path
-    });
-
-    if (obj.hasOwnProperty("first_version_path")) {
-        _obj.first_version_path = obj.first_version_path;
-    }
-
-    if (obj.hasOwnProperty("root_versions")) {
-        _obj.root_versions = obj.root_versions;
-    }
-
-    // iterate over all delivered sheets and construct instances
 
     _.forOwn(obj.data, (jsonSheet, sheetName) => {
         if (!metaApi.sheetExists(sheetName)) {
@@ -75,7 +56,7 @@ export var importResource = <R extends ResourcesBase.IResource>(
         if (warmupPoolCache && (sheetName === SIPool.nick)) {
             var elementsPaths = [];
 
-            _.forEach(jsonSheet.elements, (rawSubresource : any) => {
+            _.forEach(jsonSheet.elements, (rawSubresource : ResourcesBase.IResource) => {
                 var pseudoResponse = {
                     data: rawSubresource
                 };
@@ -93,65 +74,10 @@ export var importResource = <R extends ResourcesBase.IResource>(
             }
         }
 
-        var _sclass = Resources_.sheetRegistry[sheetName];
-        _obj.data[sheetName] = _sclass.parse(jsonSheet);
-
-        // the above four lines compile because we leave
-        // typescript in the dark about the actual type of _class.
-        // har!
-        //
-        // NOTE: passing the json sheet to the constructor rather than
-        // iterating through it and assigning the values to the sheet
-        // manually is important.  the constructor has to parse some
-        // field types (e.g. Date).
+        // TODO: convert values
     });
 
-    // return
-
-    return _obj;
-
-
-    // FIXME: it would be nice if this function could throw an
-    // exception at run-time if the type of obj does not match
-    // R.  however, not only is R a compile-time entity,
-    // but it may very well be based on an interface that has no
-    // run-time entity anywhere.  two options:
-    //
-    // (1) http://stackoverflow.com/questions/24056019/is-there-a-way-to-check-instanceof-on-types-dynamically
-    //
-    // (2) typescript language feature request! :)
-    //
-    //
-    // the following function would be useful if the problem of
-    // turning abstract types into runtime objects could be solved.
-    // (for the time being, it has been removed from the Util module
-    // where it belongs.)
-    //
-    //
-    //   // in a way another function in the deep* family: check that _super
-    //   // has only attributes also available in _sub.  also check recursively
-    //   // (if _super has an object attribute, its counterpart in _sub must
-    //   // have the same attributes, and so on).
-    //
-    //   // FIXME: untested!
-    //   export function subtypeof(_sub, _super) {
-    //       if (typeof _sub !== typeof _super) {
-    //           return false;
-    //       }
-    //
-    //       if (typeof(_sub) === "object") {
-    //           if (_sub === null || _super === null) {
-    //               return true;
-    //           }
-    //
-    //           for (var x in _super) {
-    //               if (!(x in _sub)) { return false; }
-    //               if (!subtypeof(_sub[x], _super[x])) { return false; }
-    //           }
-    //       }
-    //
-    //       return true;
-    //   }
+    return obj;
 };
 
 
