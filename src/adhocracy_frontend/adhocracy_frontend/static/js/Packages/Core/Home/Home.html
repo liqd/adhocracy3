@@ -1,8 +1,11 @@
 <div class="l-page">
-    <header class="resource-header" data-ng-if="title">
-        <h1 class="resource-header-title">{{title}}</h1>
-        <a href="/register" class="resource-header-action button-cta">{{ "TR__REGISTER" | translate }}</a>
-    </header>
+    <adh-background-image
+        data-no-fallback="true"
+        data-path="{{picture}}">
+        <header class="resource-header" data-ng-class="{'m-image': picture}">
+            <h1 class="resource-header-title">{{ title }}</h1>
+        </header>
+    </adh-background-image>
     <adh-parse-markdown data-ng-if="description" data-parsetext="description"></adh-parse-markdown>
     <adh-process-listing></adh-process-listing>
 </div>
