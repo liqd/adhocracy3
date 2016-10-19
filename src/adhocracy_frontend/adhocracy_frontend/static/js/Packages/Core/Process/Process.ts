@@ -40,7 +40,7 @@ export interface IProcessProperties {
     proposalVersionClass;
 }
 
-export var getStateData = (sheet : SIWorkflow.Sheet, name : string) : IStateData => {
+export var getStateData = (sheet : SIWorkflow.ISheet, name : string) : IStateData => {
     for (var i = 0; i < sheet.state_data.length; i++) {
         if (sheet.state_data[i].name === name) {
             return sheet.state_data[i];

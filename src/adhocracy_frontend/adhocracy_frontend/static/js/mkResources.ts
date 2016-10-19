@@ -7,7 +7,6 @@ import * as http from "http";
 import * as fs from "fs";
 import * as _fs from "node-fs";
 import * as _ from "lodash";
-import * as Base from "./ResourcesBase";
 import * as UtilR from "./mkResources/Util";
 import * as MetaApi from "./Packages/Core/MetaApi/MetaApi";
 
@@ -258,177 +257,19 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
 
 renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IModuleDict, metaApi : MetaApi.IMetaApi) : void => {
     var sheetI : string = "";
-    var hasSheetI : string = "";
-
-    var sheetMetaApi : Base.ISheetMetaApi = {
-        readable: [],
-        editable: [],
-        creatable: [],
-        create_mandatory: [],
-        references: []
-    };
-
-    (() => {
-        for (var x in sheet.fields) {
-            if (sheet.fields.hasOwnProperty(x)) {
-                var field = sheet.fields[x];
-
-                if (field.readable) {
-                    sheetMetaApi.readable.push(field.name);
-                }
-                if (field.editable) {
-                    sheetMetaApi.editable.push(field.name);
-                }
-                if (field.creatable) {
-                    sheetMetaApi.creatable.push(field.name);
-                }
-                if (field.create_mandatory) {
-                    sheetMetaApi.create_mandatory.push(field.name);
-                }
-                if (field.valuetype === "adhocracy_core.schema.AbsolutePath") {
-                    sheetMetaApi.references.push(field.name);
-                }
-            }
-        }
-    })();
-
-    var mkConstructor = () => {
-        var args : string[] = [];
-        var lines : string[] = [];
-
-        if (sheet.fields.length > 0) {
-            args.push("args : {");
-            args.push(mkFieldSignaturesSheetCons(sheet.fields, "        ", ";\n") + ";");
-            args.push("    }");
-
-            for (var x in sheet.fields) {
-                if (sheet.fields.hasOwnProperty(x)) {
-                    var fieldName : string = sheet.fields[x].name;
-                    var codeLine : string = "this." + fieldName + " = args." + fieldName + ";";
-
-                    if (!isWriteableField(sheet.fields[x])) {
-                        codeLine = "if (args.hasOwnProperty(\"" + fieldName + "\")) { " + codeLine + "}";
-                    }
-
-                    lines.push("        " + codeLine);
-                }
-            }
-        }
-
-        var s = "";
-        s += "    constructor(" + args.join("\n") + ") {\n";
-        if (lines.length > 0) {
-            s += lines.join("\n") + "\n";
-        }
-
-        // FIXME: workaround for #261.  Remove if ticket is closed.
-        if (sheet.fields.length > 0) {
-            s += "\n";
-            s += "        // FIXME: workaround for #261.  Remove if ticket is closed.\n";
-            s += "        _.forOwn(args, (value, key) => {\n";
-            s += "            if (!_.includes(" + JSON.stringify(sheet.fields.map((fieldName) => fieldName.name)) + ", key)) {\n";
-            s += "                this[key] = value;\n";
-            s += "            }\n";
-            s += "        });\n";
-        }
-
-        s += "    }\n";
-        return s;
-    };
-
-    var mkParse = () => {
-        var args : string[] = [];
-        var lines : string[] = [];
-
-        if (sheet.fields.length > 0) {
-            args.push("args : {");
-            args.push(mkFieldSignaturesSheetParse(sheet.fields, "        ", ";\n") + ";");
-            args.push("    }");
-
-            lines.push("        var parsedArgs = {");
-            for (var x in sheet.fields) {
-                if (sheet.fields.hasOwnProperty(x)) {
-                    var codeLine : string;
-                    var fieldName : string = sheet.fields[x].name;
-                    var fieldParser : string = mkFieldType(sheet.fields[x]).parser;
-
-                    if (fieldParser) {
-                        codeLine = "(" + fieldParser + ")(args." + fieldName + ")";
-                    } else {
-                        codeLine = "args." + fieldName;
-                    }
-
-                    if (!isWriteableField(sheet.fields[x])) {
-                        codeLine = "args.hasOwnProperty(\"" + fieldName + "\") ? " + codeLine + " : undefined";
-                    }
-
-                    lines.push("            " + fieldName + ": " + codeLine + ",");
-                }
-            }
-            lines.push("        };");
-        }
-
-        var s = "";
-        s += "    static parse(" + args.join("\n") + ") {\n";
-        if (lines.length > 0) {
-            s += lines.join("\n") + "\n";
-        }
-
-        // FIXME: workaround for #261.  Remove if ticket is closed.
-        if (sheet.fields.length > 0) {
-            s += "\n";
-            s += "        // FIXME: workaround for #261.  Remove if ticket is closed.\n";
-            s += "        _.forOwn(args, (value, key) => {\n";
-            s += "            if (!_.includes(" + JSON.stringify(sheet.fields.map((fieldName) => fieldName.name)) + ", key)) {\n";
-            s += "                parsedArgs[key] = value;\n";
-            s += "            }\n";
-            s += "        });\n";
-        }
-
-        if (sheet.fields.length > 0) {
-            s += "        return new Sheet(parsedArgs);\n";
-        } else {
-            s += "        return new Sheet();\n";
-        }
-
-        s += "    }\n";
-        return s;
-    };
-
-    var showList = (elems : string[]) : string => {
-        if (elems.length === 0) {
-            return "[]";
-        } else {
-            return "[\"" + elems.join("\", \"") + "\"]";
-        }
-    };
-
-    sheetI += "import * as _ from \"lodash\";\n\n";
 
     sheetI += "export var nick : string = \"" + sheet.nick + "\";\n\n";
 
-    sheetI += "export class Sheet {\n";
+    sheetI += "export interface ISheet {\n";
 
-    sheetI += "    public static _meta : Base.ISheetMetaApi = {\n";
-    sheetI += "        readable: " + showList(sheetMetaApi.readable) + ",\n";
-    sheetI += "        editable: " + showList(sheetMetaApi.editable) + ",\n";
-    sheetI += "        creatable: " + showList(sheetMetaApi.creatable) + ",\n";
-    sheetI += "        create_mandatory: " + showList(sheetMetaApi.create_mandatory) + ",\n";
-    sheetI += "        references: " + showList(sheetMetaApi.references) + "\n";
-    sheetI += "    };\n\n";
-
-    sheetI += mkConstructor() + "\n";
-    sheetI += mkParse() + "\n";
-    sheetI += mkFieldSignatures(sheet.fields, "    public ", ";\n") + "\n";
+    sheetI += mkFieldSignatures(sheet.fields, "    ", ";\n") + "\n";
     sheetI += "}\n\n";
 
-    sheetI += "export interface HasSheet extends Base.IResource {\n";
-    sheetI += "    data : { \"" + modulePath + "\" : Sheet }\n";
-    sheetI += "    path : string;\n";
-    sheetI += "    content_type : string;\n";
+    sheetI += "export interface IHasSheet {\n";
+    sheetI += "    \"" + modulePath + "\" : ISheet;\n";
     sheetI += "}\n\n";
 
-    modules[modulePath] = sheetI + hasSheetI + mkSheetSetterGetter();
+    modules[modulePath] = sheetI + mkSheetSetterGetter();
 };
 
 mkFieldSignatures = (fields : MetaApi.ISheetField[], tab : string, separator : string) : string =>
@@ -511,7 +352,7 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
         for (var x in resource.sheets) {
             if (resource.sheets.hasOwnProperty(x)) {
                 var name = resource.sheets[x];
-                os.push("    \"" + name + "\" : " + mkModuleName(name, metaApi) + ".Sheet;");
+                os.push("    \"" + name + "\" : " + mkModuleName(name, metaApi) + ".ISheet;");
             }
         }
         os.push("};");

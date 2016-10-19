@@ -33,7 +33,7 @@ export interface IBadgeAssignment {
 }
 
 export interface IGetBadgeAssignments {
-    (resource : SIBadgeable.HasSheet) : angular.IPromise<IBadgeAssignment[]>;
+    (resource : ResourcesBase.IResource) : angular.IPromise<IBadgeAssignment[]>;
 }
 
 export interface IBadge {
@@ -129,7 +129,7 @@ export var getBadgesFactory = (
     adhHttp : AdhHttp.Service,
     $q : angular.IQService
 ) : IGetBadgeAssignments => (
-    resource : SIBadgeable.HasSheet,
+    resource : ResourcesBase.IResource,
     includeParent? : boolean
 ) : angular.IPromise<IBadgeAssignment[]> => {
     if (typeof includeParent === "undefined") {
