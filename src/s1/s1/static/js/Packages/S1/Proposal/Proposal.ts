@@ -126,10 +126,10 @@ var fill = (
     scope : IScope,
     proposalVersion
 ) : void => {
-    proposalVersion.data[SITitle.nick] = new SITitle.Sheet({
+    SITitle.set(proposalVersion, {
         title: scope.data.title
     });
-    proposalVersion.data[SIDescription.nick] = new SIDescription.Sheet({
+    SIDescription.set(proposalVersion, {
         description: scope.data.description
     });
 };
@@ -154,7 +154,7 @@ var postCreate = (
     };
 
     proposalVersion.parent = proposal.path;
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    SIVersionable.set(proposalVersion, {
         follows: [proposal.first_version_path]
     });
     fill(scope, proposalVersion);
@@ -177,7 +177,7 @@ var postEdit = (
         data: {},
     };
     proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    SIVersionable.set(proposalVersion, {
         follows: [oldVersion.path]
     });
     fill(scope, proposalVersion);
@@ -390,9 +390,9 @@ export var renominateProposalDirective = (
                             content_type: proposal.content_type,
                             data: {}
                         };
-                        patch.data[SIWorkflowAssignment.nick] = {
+                        SIWorkflowAssignment.set(patch, {
                             workflow_state: "proposed"
-                        };
+                        });
                         return adhHttp.put(proposal.path, patch).then(() => {
                             $window.parent.location.reload();
                         });

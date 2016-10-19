@@ -487,7 +487,7 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
 
         switch (resource.content_type) {
             case RIMercatorOrganizationInfoVersion.content_type:
-                resource.data[SIMercatorOrganizationInfo.nick] = new SIMercatorOrganizationInfo.Sheet({
+                SIMercatorOrganizationInfo.set(resource, {
                     status: data.organization_info.status_enum,
                     name: data.organization_info.name,
                     country: data.organization_info.country,
@@ -498,18 +498,18 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
                 });
                 break;
             case RIMercatorIntroductionVersion.content_type:
-                resource.data[SIMercatorIntroduction.nick] = new SIMercatorIntroduction.Sheet({
+                SIMercatorIntroduction.set(resource, {
                     teaser: data.introduction.teaser,
                     picture: data.introduction.picture
                 });
                 break;
             case RIMercatorDescriptionVersion.content_type:
-                resource.data[SIMercatorDescription.nick] = new SIMercatorDescription.Sheet({
+                SIMercatorDescription.set(resource, {
                     description: data.description.description
                 });
                 break;
             case RIMercatorLocationVersion.content_type:
-                resource.data[SIMercatorLocation.nick] = new SIMercatorLocation.Sheet({
+                SIMercatorLocation.set(resource, {
                     location_is_specific: data.location.location_is_specific,
                     location_specific_1: data.location.location_specific_1,
                     location_specific_2: data.location.location_specific_2,
@@ -519,32 +519,32 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
                 });
                 break;
             case RIMercatorStoryVersion.content_type:
-                resource.data[SIMercatorStory.nick] = new SIMercatorStory.Sheet({
+                SIMercatorStory.set(resource, {
                     story: data.story
                 });
                 break;
             case RIMercatorOutcomeVersion.content_type:
-                resource.data[SIMercatorOutcome.nick] = new SIMercatorOutcome.Sheet({
+                SIMercatorOutcome.set(resource, {
                     outcome: data.outcome
                 });
                 break;
             case RIMercatorStepsVersion.content_type:
-                resource.data[SIMercatorSteps.nick] = new SIMercatorSteps.Sheet({
+                SIMercatorSteps.set(resource, {
                     steps: data.steps
                 });
                 break;
             case RIMercatorValueVersion.content_type:
-                resource.data[SIMercatorValue.nick] = new SIMercatorValue.Sheet({
+                SIMercatorValue.set(resource, {
                     value: data.value
                 });
                 break;
             case RIMercatorPartnersVersion.content_type:
-                resource.data[SIMercatorPartners.nick] = new SIMercatorPartners.Sheet({
+                SIMercatorPartners.set(resource, {
                     partners: data.partners
                 });
                 break;
             case RIMercatorFinanceVersion.content_type:
-                resource.data[SIMercatorFinance.nick] = new SIMercatorFinance.Sheet({
+                SIMercatorFinance.set(resource, {
                     budget: data.finance.budget,
                     requested_funding: data.finance.requested_funding,
                     other_sources: data.finance.other_sources,
@@ -552,21 +552,21 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
                 });
                 break;
             case RIMercatorExperienceVersion.content_type:
-                resource.data[SIMercatorExperience.nick] = new SIMercatorExperience.Sheet({
+                SIMercatorExperience.set(resource, {
                     experience: data.experience
                 });
                 break;
             case RIMercatorProposalVersion.content_type:
-                resource.data[SIMercatorUserInfo.nick] = new SIMercatorUserInfo.Sheet({
+                SIMercatorUserInfo.set(resource, {
                     personal_name: data.user_info.first_name,
                     family_name: data.user_info.last_name,
                     country: data.user_info.country
                 });
-                resource.data[SITitle.nick] = new SITitle.Sheet({
+                SITitle.set(resource, {
                     title: data.title
                 });
                 if (typeof data.heard_from !== "undefined") {
-                    resource.data[SIMercatorHeardFrom.nick] = new SIMercatorHeardFrom.Sheet({
+                    SIMercatorHeardFrom.set(resource, {
                         heard_from_colleague: data.heard_from.colleague,
                         heard_from_website: data.heard_from.website,
                         heard_from_newsletter: data.heard_from.newsletter,
@@ -574,7 +574,7 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
                         heard_elsewhere: (data.heard_from.other ? data.heard_from.other_specify : "")
                     });
                 }
-                resource.data[SIMercatorSubResources.nick] = new SIMercatorSubResources.Sheet(<any>{});
+                SIMercatorSubResources.set(resource, <any>{});
                 break;
         }
 
@@ -622,7 +622,7 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
                 content_type: RIMercatorProposalVersion.content_type,
                 data: {},
             };
-            mercatorProposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+            SIVersionable.set(mercatorProposalVersion, {
                 follows: [mercatorProposal.first_version_path]
             });
 
@@ -652,7 +652,7 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
 
                 var version = new versionClass({preliminaryNames: this.adhPreliminaryNames});
                 version.parent = item.path;
-                version.data[SIVersionable.nick] = new SIVersionable.Sheet({
+                SIVersionable.set(version, {
                     follows: [item.first_version_path]
                 });
 

@@ -95,10 +95,10 @@ var fill = (
     scope : IScope,
     proposalVersion : ResourcesBase.IResource
 ) : void => {
-    proposalVersion.data[SITitle.nick] = new SITitle.Sheet({
+    SITitle.set(proposalVersion, {
         title: scope.data.title
     });
-    proposalVersion.data[SIDescription.nick] = new SIDescription.Sheet({
+    SIDescription.set(proposalVersion, {
         description: ""
     });
 };
@@ -123,7 +123,7 @@ var postCreate = (
     };
 
     proposalVersion.parent = proposal.path;
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    SIVersionable.set(proposalVersion, {
         follows: [proposal.first_version_path]
     });
     fill(scope, proposalVersion);
@@ -144,7 +144,7 @@ var postEdit = (
         data: {},
     };
     proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    SIVersionable.set(proposalVersion, {
         follows: [oldVersion.path]
     });
     fill(scope, proposalVersion);

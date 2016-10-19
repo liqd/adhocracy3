@@ -220,7 +220,7 @@ export var register = () => {
                         content_type: RIParagraph.content_type,
                         data: {},
                     };
-                    dag.data["adhocracy_core.sheets.tags.ITags"] = new SITags.Sheet({ LAST: returnPath1 });
+                    SITags.set(dag, { LAST: returnPath1 });
                     $httpMock.get.and.returnValue(q.when({ data: dag }));
 
                     adhHttp.getNewestVersionPathNoFork(path).then(
@@ -345,9 +345,10 @@ export var register = () => {
                         content_type: RIParagraph.content_type,
                         data: {},
                     };
-                    dag.data["adhocracy_core.sheets.tags.ITags"] = new SITags.Sheet({ FIRST: undefined,
-                                                                                      LAST: newHead
-                                                                                    });
+                    SITags.set(dag, {
+                        FIRST: undefined,
+                        LAST: newHead,
+                    });
 
 
                     var postResponses = [q.reject({ data: error }), q.when({ data: dag })].reverse();

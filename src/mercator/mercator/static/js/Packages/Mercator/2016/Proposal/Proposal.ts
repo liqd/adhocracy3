@@ -221,11 +221,11 @@ export interface IFormData extends IData {
 var fill = (data : IFormData, resource) => {
     switch (resource.content_type) {
         case RIMercatorProposal.content_type:
-            resource.data[SIUserInfo.nick] = new SIUserInfo.Sheet({
+            SIUserInfo.set(resource, {
                 first_name: data.userInfo.firstName,
                 last_name: data.userInfo.lastName
             });
-            resource.data[SIOrganizationInfo.nick] = new SIOrganizationInfo.Sheet({
+            SIOrganizationInfo.set(resource, {
                 name: data.organizationInfo.name,
                 city: data.organizationInfo.city,
                 country: data.organizationInfo.country,
@@ -235,7 +235,7 @@ var fill = (data : IFormData, resource) => {
                 status: data.organizationInfo.status,
                 status_other: data.organizationInfo.otherText
             });
-            resource.data[SITopic.nick] = new SITopic.Sheet({
+            SITopic.set(resource, {
                 topic: _.reduce(<any>data.topic, (result, include, topic) => {
                     if (include && (topic !== "otherText")) {
                         result.push(topic);
@@ -244,28 +244,28 @@ var fill = (data : IFormData, resource) => {
                 }, []),
                 topic_other: data.topic.otherText
             });
-            resource.data[SITitle.nick] = new SITitle.Sheet({
+            SITitle.set(resource, {
                 title: data.title
             });
-            resource.data[SILocation.nick] = new SILocation.Sheet({
+            SILocation.set(resource, {
                 location: data.location.location_specific,
                 is_online: !!data.location.location_is_online,
                 has_link_to_ruhr: !!data.location.location_is_linked_to_ruhr,
                 link_to_ruhr: data.location.location_is_linked_to_ruhr_text
             });
-            resource.data[SIStatus.nick] = new SIStatus.Sheet({
+            SIStatus.set(resource, {
                 status: data.status
             });
-            resource.data[SIFinancialPlanning.nick] = new SIFinancialPlanning.Sheet({
+            SIFinancialPlanning.set(resource, {
                 budget: data.finance.budget,
                 requested_funding: data.finance.requestedFunding,
                 major_expenses: data.finance.major
             });
-            resource.data[SIExtraFunding.nick] = new SIExtraFunding.Sheet({
+            SIExtraFunding.set(resource, {
                 other_sources: data.finance.otherSources,
                 secured: !!data.finance.secured
             });
-            resource.data[SICommunity.nick] = new SICommunity.Sheet({
+            SICommunity.set(resource, {
                 expected_feedback: data.experience,
                 heard_froms: _.reduce(<any>data.heardFrom, (result, include, item) => {
                     if (include && item !== "otherText" ) {
@@ -275,17 +275,17 @@ var fill = (data : IFormData, resource) => {
                 }, []),
                 heard_from_other: data.heardFrom.otherText
             });
-            resource.data[SIImageReference.nick] = new SIImageReference.Sheet({
+            SIImageReference.set(resource, {
                 picture: data.introduction.picture
             });
             break;
         case RIPitch.content_type:
-            resource.data[SIPitch.nick] = new SIPitch.Sheet({
+            SIPitch.set(resource, {
                 pitch: data.introduction.pitch
             });
             break;
         case RIPartners.content_type:
-            resource.data[SIPartners.nick] = new SIPartners.Sheet({
+            SIPartners.set(resource, {
                 has_partners: (<any>data.partners.hasPartners === "true" ? true : false),
                 partner1_name: data.partners.partner1.name,
                 partner1_website: data.partners.partner1.website,
@@ -300,52 +300,52 @@ var fill = (data : IFormData, resource) => {
             });
             break;
         case RIDuration.content_type:
-            resource.data[SIDuration.nick] = new SIDuration.Sheet({
+            SIDuration.set(resource, {
                 duration: data.duration
             });
             break;
         case RIChallenge.content_type:
-            resource.data[SIChallenge.nick] = new SIChallenge.Sheet({
+            SIChallenge.set(resource, {
                 challenge: data.impact.challenge
             });
             break;
         case RIGoal.content_type:
-            resource.data[SIGoal.nick] = new SIGoal.Sheet({
+            SIGoal.set(resource, {
                 goal: data.impact.goal
             });
             break;
         case RIPlan.content_type:
-            resource.data[SIPlan.nick] = new SIPlan.Sheet({
+            SIPlan.set(resource, {
                 plan: data.impact.plan
             });
             break;
         case RITarget.content_type:
-            resource.data[SITarget.nick] = new SITarget.Sheet({
+            SITarget.set(resource, {
                 target: data.impact.target
             });
             break;
         case RITeam.content_type:
-            resource.data[SITeam.nick] = new SITeam.Sheet({
+            SITeam.set(resource, {
                 team: data.impact.team
             });
             break;
         case RIExtraInfo.content_type:
-            resource.data[SIExtraInfo.nick] = new SIExtraInfo.Sheet({
+            SIExtraInfo.set(resource, {
                 extrainfo: data.impact.extraInfo
             });
             break;
         case RIConnectionCohesion.content_type:
-            resource.data[SIConnectionCohesion.nick] = new SIConnectionCohesion.Sheet({
+            SIConnectionCohesion.set(resource, {
                 connection_cohesion: data.criteria.strengthen
             });
             break;
         case RIDifference.content_type:
-            resource.data[SIDifference.nick] = new SIDifference.Sheet({
+            SIDifference.set(resource, {
                 difference: data.criteria.difference
             });
             break;
         case RIPracticalRelevance.content_type:
-            resource.data[SIPracticalRelevance.nick] = new SIPracticalRelevance.Sheet({
+            SIPracticalRelevance.set(resource, {
                 practicalrelevance: data.criteria.practical
             });
             break;
@@ -366,7 +366,7 @@ var create = (
         fill(data, proposal);
         var proposalRequest = transaction.post(scope.poolPath, proposal);
 
-        var subResourcesSheet = new SIMercatorSubResources.Sheet(<any>{});
+        var subResourcesSheet = <any>{};
         _.forEach({
             pitch: RIPitch,
             partners: RIPartners,
@@ -392,7 +392,7 @@ var create = (
             content_type: RIMercatorProposal.content_type,
             data: {},
         };
-        proposal2.data[SIMercatorSubResources.nick] = subResourcesSheet;
+        SIMercatorSubResources.set(proposal2, subResourcesSheet);
         transaction.put(proposalRequest.path, proposal2);
 
         return transaction.commit().then((responses) => {
@@ -462,7 +462,7 @@ var moderate = (
             content_type: oldProposal.content_type,
             data: {}
         };
-        clone.data[SIWinnerInfo.nick] = new SIWinnerInfo.Sheet({
+        SIWinnerInfo.set(clone, {
             funding: scope.data.winner.funding
         });
         var resourcePromise = adhHttp.put(scope.path, clone);

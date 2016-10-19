@@ -44,20 +44,20 @@ var postCreate = (
     };
     process.parent = poolPath;
 
-    process.data[SIName.nick] = new SIName.Sheet({
+    SIName.set(process, {
         name: scope.data.title
     });
-    process.data[SITitle.nick] = new SITitle.Sheet({
+    SITitle.set(process, {
         title: "Bebauungsplan " + scope.data.title
     });
-    process.data[SIProcessSettings.nick] = new SIProcessSettings.Sheet({
+    SIProcessSettings.set(process, {
         participation_kind: scope.data.kind,
         plan_number: scope.data.title
     });
-    process.data[SIProcessPrivateSettings.nick] = new SIProcessPrivateSettings.Sheet({
+    SIProcessPrivateSettings.set(process, {
         office_worker_email: scope.data.officeWorkerEmail
     });
-    process.data[SIWorkflowAssignment.nick] = new SIWorkflowAssignment.Sheet({
+    SIWorkflowAssignment.set(process, {
         state_data: [{
             start_date: scope.data.startDate,
             name: "participate",

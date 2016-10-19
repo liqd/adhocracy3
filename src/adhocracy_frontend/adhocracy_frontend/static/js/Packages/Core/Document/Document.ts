@@ -196,10 +196,10 @@ export var postCreate = (
                 data: {},
             };
             version.parent = item.path;
-            version.data[SIVersionable.nick] = new SIVersionable.Sheet({
+            SIVersionable.set(version, {
                 follows: [item.first_version_path]
             });
-            version.data[SIParagraph.nick] = new SIParagraph.Sheet({
+            SIParagraph.set(version, {
                 text: paragraph.body
             });
 
@@ -214,17 +214,17 @@ export var postCreate = (
         content_type: documentVersionClass.content_type,
         data: {},
     };
-    documentVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    SIVersionable.set(documentVersion, {
         follows: [doc.first_version_path]
     });
-    documentVersion.data[SIDocument.nick] = new SIDocument.Sheet({
+    SIDocument.set(documentVersion, {
         elements: <string[]>_.map(paragraphVersions, "path")
     });
-    documentVersion.data[SITitle.nick] = new SITitle.Sheet({
+    SITitle.set(documentVersion, {
         title: scope.data.title
     });
     if (hasMap && scope.data.coordinates && scope.data.coordinates[0] && scope.data.coordinates[1]) {
-        documentVersion.data[SIPoint.nick] = new SIPoint.Sheet({
+        SIPoint.set(documentVersion, {
             coordinates: scope.data.coordinates
         });
     }
@@ -236,7 +236,7 @@ export var postCreate = (
 
     if (scope.$flow && scope.$flow.support && scope.$flow.files.length > 0) {
         return adhUploadImage(poolPath, scope.$flow).then((imagePath : string) => {
-            documentVersion.data[SIImageReference.nick] = new SIImageReference.Sheet({
+            SIImageReference.set(documentVersion, {
                 picture: imagePath
             });
             return commit();
@@ -293,10 +293,10 @@ export var postEdit = (
                     content_type: RIParagraphVersion.content_type,
                     data: {},
                 };
-                paragraphVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+                SIVersionable.set(paragraphVersion, {
                     follows: [item.first_version_path]
                 });
-                paragraphVersion.data[SIParagraph.nick] = new SIParagraph.Sheet({
+                SIParagraph.set(paragraphVersion, {
                     text: paragraph.body
                 });
                 paragraphVersion.root_versions = [oldVersion.path];
@@ -316,10 +316,10 @@ export var postEdit = (
                         content_type: RIParagraphVersion.content_type,
                         data: {},
                     };
-                    paragraphVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+                    SIVersionable.set(paragraphVersion, {
                         follows: [oldParagraphVersion.path]
                     });
-                    paragraphVersion.data[SIParagraph.nick] = new SIParagraph.Sheet({
+                    SIParagraph.set(paragraphVersion, {
                         text: paragraph.body
                     });
 
@@ -338,24 +338,24 @@ export var postEdit = (
         content_type: documentVersionClass.content_type,
         data: {},
     };
-    documentVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    SIVersionable.set(documentVersion, {
         follows: [oldVersion.path]
     });
-    documentVersion.data[SIDocument.nick] = new SIDocument.Sheet({
+    SIDocument.set(documentVersion, {
         elements: paragraphRefs
     });
-    documentVersion.data[SITitle.nick] = new SITitle.Sheet({
+    SITitle.set(documentVersion, {
         title: scope.data.title
     });
     if (hasMap && scope.data.coordinates && scope.data.coordinates[0] && scope.data.coordinates[1]) {
-        documentVersion.data[SIPoint.nick] = new SIPoint.Sheet({
+        SIPoint.set(documentVersion, {
             coordinates: scope.data.coordinates
         });
     }
     // FIXME: workaround for a backend bug
     var oldImageReferenceSheet = oldVersion.data[SIImageReference.nick];
     if (oldImageReferenceSheet.picture) {
-        documentVersion.data[SIImageReference.nick] = oldImageReferenceSheet;
+        SIImageReference.set(documentVersion, oldImageReferenceSheet);
     }
 
     var commit = () => {
@@ -365,7 +365,7 @@ export var postEdit = (
 
     if (scope.$flow && scope.$flow.support && scope.$flow.files.length > 0) {
         return adhUploadImage(poolPath, scope.$flow).then((imagePath : string) => {
-            documentVersion.data[SIImageReference.nick] = new SIImageReference.Sheet({
+            SIImageReference.set(documentVersion, {
                 picture: imagePath
             });
             return commit();

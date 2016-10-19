@@ -167,25 +167,25 @@ var fill = (
     var proposalSheet = scope.processProperties.proposalSheet;
     if (proposalSheet && scope.processProperties.hasCreatorParticipate
         && scope.processProperties.hasLocationText && scope.processProperties.maxBudget) {
-        proposalVersion.data[proposalSheet.nick] = new proposalSheet.Sheet({
+        proposalSheet.set(proposalVersion, {
             budget: scope.data.budget,
             creator_participate: scope.data.creatorParticipate,
             location_text: scope.data.locationText
         });
     } else if (proposalSheet && scope.processProperties.hasLocationText && scope.processProperties.maxBudget) {
-        proposalVersion.data[proposalSheet.nick] = new proposalSheet.Sheet({
+        proposalSheet.set(proposalVersion, {
             budget: scope.data.budget,
             location_text: scope.data.locationText
         });
     }
-    proposalVersion.data[SITitle.nick] = new SITitle.Sheet({
+    SITitle.set(proposalVersion, {
         title: scope.data.title
     });
-    proposalVersion.data[SIDescription.nick] = new SIDescription.Sheet({
+    SIDescription.set(proposalVersion, {
         description: scope.data.detail
     });
     if (scope.data.lng && scope.data.lat) {
-        proposalVersion.data[SIPoint.nick] = new SIPoint.Sheet({
+        SIPoint.set(proposalVersion, {
             coordinates: [scope.data.lng, scope.data.lat]
         });
     }
@@ -215,7 +215,7 @@ var postCreate = (
         data: {},
     };
 
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    SIVersionable.set(proposalVersion, {
         follows: [proposal.first_version_path]
     });
     fill(scope, proposalVersion);
@@ -240,7 +240,7 @@ var postEdit = (
         content_type: proposalVersionClass.content_type,
         data: {},
     };
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    SIVersionable.set(proposalVersion, {
         follows: [oldVersion.path]
     });
     fill(scope, proposalVersion);

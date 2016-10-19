@@ -262,11 +262,11 @@ export var badgeAssignment = (
                                         content_type: RIBadgeAssignment.content_type,
                                         data: {},
                                     };
-                                    assignment.data[SIBadgeAssignment.nick] = {
+                                    SIBadgeAssignment.set(assignment, {
                                         badge: badgePath,
                                         object: scope.badgeablePath,
                                         subject: adhCredentials.userPath
-                                    };
+                                    });
                                     transaction.post(scope.poolPath, assignment);
                                 } else if (!checked && assignmentExisted) {
                                     transaction.delete(scope.assignments[badgePath].path);

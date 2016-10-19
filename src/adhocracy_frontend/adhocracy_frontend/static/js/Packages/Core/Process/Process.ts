@@ -120,10 +120,10 @@ export var workflowSwitchDirective = (
                         return;
                     }
                     adhHttp.get(scope.path).then((process) => {
-                        process.data[SIWorkflow.nick] = {
+                        SIWorkflow.set(process, {
                             workflow_state: newState
-                        };
-                        process.data[SIName.nick] = undefined;
+                        });
+                        SIName.set(process, undefined);
                         adhHttp.put(scope.path, process).then((response) => {
                             $window.parent.location.reload();
                         });

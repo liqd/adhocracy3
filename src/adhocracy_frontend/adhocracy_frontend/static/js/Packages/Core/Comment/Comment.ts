@@ -148,11 +148,11 @@ export var postCreate = (
         content_type: RICommentVersion.content_type,
         data: {},
     };
-    version.data[SIComment.nick] = new SIComment.Sheet({
+    SIComment.set(version, {
         content: scope.data.content,
         refers_to: scope.refersTo
     });
-    version.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    SIVersionable.set(version, {
         follows: [item.first_version_path]
     });
     version.parent = item.path;
@@ -440,7 +440,7 @@ export var adhCreateOrShowCommentListing = (
                                     content_type: RIExternalResource.content_type,
                                     data: {},
                                 };
-                                externalResource.data[SIName.nick] = new SIName.Sheet({
+                                SIName.set(externalResource, {
                                     name: scope.key,
                                 });
                                 return adhHttp.post(scope.poolPath, externalResource).then((obj) => {

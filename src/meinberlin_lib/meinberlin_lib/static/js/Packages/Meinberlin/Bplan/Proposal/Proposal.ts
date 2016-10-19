@@ -53,10 +53,10 @@ var postCreate = (
         data: {},
     };
     proposalVersion.parent = proposal.path;
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    SIVersionable.set(proposalVersion, {
         follows: [proposal.first_version_path]
     });
-    proposalVersion.data[SIProposal.nick] = new SIProposal.Sheet({
+    SIProposal.set(proposalVersion, {
         name: scope.data.name,
         street_number: scope.data.street,
         postal_code_city: scope.data.city,

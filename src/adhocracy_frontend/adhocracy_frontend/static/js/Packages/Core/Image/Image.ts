@@ -79,7 +79,7 @@ export var addImage = (
             data: {},
             content_type: resource.content_type
         };
-        patch.data[SIImageReference.nick] = new SIImageReference.Sheet({ picture: imagePath });
+        SIImageReference.set(patch, { picture: imagePath });
 
         // Versioned resources are on the way out, so they get the special treatment
         if (resource.data[SIVersionable.nick]) {

@@ -717,7 +717,7 @@ export var userProfileDirective = (
                         content_type: oldUser.content_type,
                         data: {}
                     };
-                    patch.data[SIDescription.nick] = new SIDescription.Sheet({
+                    SIDescription.set(patch, {
                         description: scope.data.description,
                         short_description: scope.data.shortDescription,
                     });
@@ -745,16 +745,16 @@ var postEdit = (
             data: {}
         };
         if (oldUser.data[SIUserBasic.nick].name !== data.name) {
-            patch.data[SIUserBasic.nick] = new SIUserBasic.Sheet({
+            SIUserBasic.set(patch, {
                 name: data.name,
             });
         }
         if (data.password) {
-            patch.data[SIPasswordAuthentication.nick] = new SIPasswordAuthentication.Sheet({
+            SIPasswordAuthentication.set(patch, {
                 password: data.password,
             });
         }
-        patch.data[SIAnonymizeDefault.nick] = new SIAnonymizeDefault.Sheet({
+        SIAnonymizeDefault.set(patch, {
             anonymize: data.anonymize,
         });
         return adhHttp.put(oldUser.path, patch);
