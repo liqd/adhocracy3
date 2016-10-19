@@ -38,6 +38,7 @@ from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.metadata import is_older_than
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.principal import IUserExtended
+from adhocracy_core.sheets.principal import IPasswordAuthentication
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.pool
@@ -146,6 +147,13 @@ class User(Pool):
         appstruct['hidden'] = not active
         statsd_incr('users.activated', 1)
         sheet.set(appstruct)
+
+    def is_password_valid(self, registry: Registry, password: str):
+        """Validate password against the IPasswordAuthentication sheet."""
+        sheet = registry.content.get_sheet(self, IPasswordAuthentication)
+        valid = sheet.check_plaintext_password(password)
+        return valid
+
 
 user_meta = pool_meta._replace(
     iresource=IUser,

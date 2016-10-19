@@ -536,8 +536,7 @@ def create_validate_login_password(request: Request,
         user = request.validated.get('user', None)
         if user is None:
             return
-        sheet = registry.content.get_sheet(user, IPasswordAuthentication)
-        valid = sheet.check_plaintext_password(password)
+        valid = user.is_password_valid(registry, password)
         if not valid:
             error = Invalid(node)
             error.add(Invalid(node['password'], msg=error_msg_wrong_login))
