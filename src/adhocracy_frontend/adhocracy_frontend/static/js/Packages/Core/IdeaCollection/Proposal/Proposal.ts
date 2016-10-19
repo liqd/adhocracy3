@@ -73,7 +73,7 @@ var bindPath = (
     var getPolygon = () => {
         if (scope.processProperties.hasLocation) {
             var processUrl = adhTopLevelState.get("processUrl");
-            return adhHttp.get(processUrl).then((process) => {
+            return adhHttp.get(processUrl).then((process) : angular.IPromise<void | number[][]> => {
                 var locationUrl = SILocationReference.get(process).location;
                 if (locationUrl) {
                     return adhHttp.get(locationUrl).then((location) => {
@@ -121,7 +121,7 @@ var bindPath = (
                         rateCount: ratesPro - ratesContra,
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
-                        commentCount: parseInt(SICommentable.get(resource).comments_count, 10),
+                        commentCount: SICommentable.get(resource).comments_count,
                         assignments: assignments
                     };
 

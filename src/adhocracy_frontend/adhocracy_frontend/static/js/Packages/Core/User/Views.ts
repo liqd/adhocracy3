@@ -915,7 +915,7 @@ export var adhUserActivityOverviewDirective = (
                 params[SIMetadata.nick + ":creator"] = scope.path;
 
                 adhHttp.get(adhConfig.rest_url, params)
-                    .then((pool) => { scope[scopeTarget] = parseInt(SIPool.get(pool).count, 10); });
+                    .then((pool) => { scope[scopeTarget] = parseInt((<any>SIPool.get(pool)).count, 10); });
             };
 
             requestCountInto(RIComment, "commentCount", attrs.showComments);

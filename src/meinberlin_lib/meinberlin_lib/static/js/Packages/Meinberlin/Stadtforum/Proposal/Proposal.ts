@@ -81,7 +81,7 @@ var bindPath = (
                         rateCount: ratesPro - ratesContra,
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
-                        commentCount: parseInt(SICommentable.get(resource).comments_count, 10),
+                        commentCount: SICommentable.get(resource).comments_count,
                         assignments: assignments
                     };
                 });

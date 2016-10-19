@@ -118,7 +118,7 @@ export var bindPath = (
                         return {
                             body: SIParagraph.get(paragraphVersion).text,
                             deleted: false,
-                            commentCount: parseInt(SICommentable.get(paragraphVersion).comments_count, 10),
+                            commentCount: SICommentable.get(paragraphVersion).comments_count,
                             path: paragraphVersion.path
                         };
                     });

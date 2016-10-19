@@ -275,7 +275,7 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
 mkFieldSignatures = (fields : MetaApi.ISheetField[], tab : string, separator : string) : string =>
     UtilR.mkThingList(
         fields,
-        (field) => field.name + " : " + mkFieldType(field).resultType,
+        (field) => field.name + (field.create_mandatory ? "" : "?") + " : " + mkFieldType(field).resultType,
         tab, separator
     );
 

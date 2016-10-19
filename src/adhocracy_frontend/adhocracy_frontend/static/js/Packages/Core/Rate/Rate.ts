@@ -127,7 +127,7 @@ export class Service {
         query[SIRate.nick + ":object"] = object;
 
         return this.adhHttp.get(poolPath, query).then((pool) => {
-            return SIPool.get(pool).aggregateby.rate;
+            return (<any>SIPool.get(pool)).aggregateby.rate;
         });
     }
 }
@@ -196,7 +196,7 @@ export var directiveFactory = (template : string, sheetName : string) => (
                     _.forOwn(ratePaths, (ratePath, ix) => {
                         auditTrail[ix] = {
                             subject: SIUserBasic.get(users[ix]).name,
-                            rate: parseInt(SIRate.get(rates[ix]).rate, 10)
+                            rate: SIRate.get(rates[ix]).rate
                         };
                     });
                     return auditTrail;
@@ -225,7 +225,7 @@ export var directiveFactory = (template : string, sheetName : string) => (
                 if (adhCredentials.loggedIn) {
                     return adhRate.fetchRate(postPoolPath, scope.refersTo, adhCredentials.userPath).then((resource) => {
                         storeMyRateResource(resource);
-                        scope.myRate = parseInt(SIRate.get(resource).rate, 10);
+                        scope.myRate = SIRate.get(resource).rate;
                         scope.hasCast = true;
                     }, () => undefined);
                 } else {
