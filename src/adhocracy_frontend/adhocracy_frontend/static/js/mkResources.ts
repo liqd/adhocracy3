@@ -85,8 +85,6 @@ import * as MetaApi from "./Packages/Core/MetaApi/MetaApi";
 
 interface IConfig {
     nickNames : boolean;
-    sheetGetters : boolean;
-    sheetSetters : boolean;
     httpOptions : {
         host : string;
         port : number;
@@ -96,8 +94,6 @@ interface IConfig {
 
 var config : IConfig = {
     nickNames : false,
-    sheetGetters : false,
-    sheetSetters : false,
     httpOptions : {
         host: "127.0.0.1",
         port: 6541,
@@ -126,8 +122,6 @@ var mkFieldSignaturesSheetCons : (fields : MetaApi.ISheetField[], tab : string, 
 var mkFieldSignaturesSheetParse : (fields : MetaApi.ISheetField[], tab : string, separator : string) => string;
 var mkFieldAssignments : (fields : MetaApi.ISheetField[], tab : string) => string;
 var enabledFields : (fields : MetaApi.ISheetField[], enableFlags? : string) => MetaApi.ISheetField[];
-var mkSheetSetter : (modulePath : string, fields : MetaApi.ISheetField[], _selfType : string) => string;
-var mkSheetGetter : (modulePath : string, _selfType : string) => string;
 
 var renderResource : (modulePath : string, resource : MetaApi.IResource, modules : MetaApi.IModuleDict, metaApi : MetaApi.IMetaApi) => void;
 
@@ -478,9 +472,6 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
     sheetI += "    content_type : string;\n";
     sheetI += "}\n\n";
 
-    hasSheetI += mkSheetSetter(sheet.nick, sheet.fields, "HasSheet");
-    hasSheetI += mkSheetGetter(sheet.nick, "HasSheet");
-
     modules[modulePath] = sheetI + hasSheetI;
 };
 
@@ -533,55 +524,6 @@ enabledFields = (fields : MetaApi.ISheetField[], enableFlags? : string) : MetaAp
             }
         });
         return enabledFields;
-    }
-};
-
-mkSheetSetter = (nick : string, fields : MetaApi.ISheetField[], _selfType : string) : string => {
-    if (config.sheetSetters) {
-        var ef = enabledFields(fields, "ECM");
-
-        if (!ef.length) {
-            return "";
-        } else {
-            var os = [];
-            os.push("export var _set = (");
-            os.push("    _self : " + _selfType + ",");
-            os.push(mkFieldSignatures(ef, "    ", ",\n"));
-            os.push(") : " + _selfType + " => {");
-            os.push("    _self.data[\"" + nick + "\"] = {");
-            // set writeable fields to corresponding setter argument
-            os.push(mkFieldAssignments(ef, "        ") + ",");
-            // set hidden fields to null (or we will get type errors)
-            (() => {
-                var disabledFields = [];
-                fields.map((field) => {
-                    if (ef.indexOf(field) === -1) {
-                        disabledFields.push(field);
-                    }
-                });
-                os.push(UtilR.mkThingList(disabledFields, (field) => field.name + ": null", "        ", ",\n"));
-            })();
-            os.push("    };");
-            os.push("    return _self;");
-            os.push("};\n");
-            return os.join("\n");
-        }
-    } else {
-        return "";
-    }
-};
-
-mkSheetGetter = (nick : string, _selfType : string) : string => {
-    if (config.sheetGetters) {
-        var os = [];
-        os.push("export var _get = (");
-        os.push("    _self : " + _selfType);
-        os.push(") : Sheet => {");
-        os.push("    return _self.data[\"" + nick + "\"];");
-        os.push("};\n");
-        return os.join("\n");
-    } else {
-        return "";
     }
 };
 
@@ -685,42 +627,10 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
         return os.map((s) => tab + s).join("\n");
     };
 
-    var mkGettersSetters = (tab : string) : string => {
-        var os : string[] = [];
-
-        for (var x in resource.sheets) {
-            if (resource.sheets.hasOwnProperty(x)) {
-                var name = resource.sheets[x];
-                if (config.sheetGetters) {
-                    os.push("public get" + mkSheetName(mkNick(name, metaApi)) + "() {");
-                    os.push("    return " + mkModuleName(name, metaApi) + "." + "_get(this);");
-                    os.push("}");
-                }
-
-                if (config.sheetSetters) {
-                    var ef = enabledFields(metaApi.sheets[name].fields, "ECM");
-                    if (ef.length) {
-                        os.push("public set" + mkSheetName(mkNick(name, metaApi)) + "(");
-                        os.push(mkFieldSignatures(ef, "    ", ",\n"));
-                        os.push(") {");
-                        os.push("    var _self = this;\n");
-                        os.push("    " + mkModuleName(name, metaApi) + "." + "_set(this,");
-                        os.push(UtilR.mkThingList(ef, (field) => field.name, "        ", ",\n    "));
-                        os.push("    );");
-                        os.push("    return _self;");
-                        os.push("}");
-                    }
-                }
-            }
-        }
-        return os.map((s) => tab + s).join("\n") + "";
-    };
-
     resourceC += "class " + mkResourceClassName(mkNick(modulePath, metaApi)) + " extends Base.Resource {\n";
     resourceC += "    public static content_type = \"" + modulePath + "\";\n\n";
     resourceC += mkConstructor("    ") + "\n\n";
-    resourceC += mkDataDeclaration("    ") + "\n\n";
-    resourceC += mkGettersSetters("    ") + "\n";
+    resourceC += mkDataDeclaration("    ") + "\n";
     resourceC += "}\n\n";
     resourceC += "export default " + mkResourceClassName(mkNick(modulePath, metaApi)) + ";\n\n";
 
