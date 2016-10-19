@@ -33,9 +33,6 @@
             data-ng-model="data.password"
             data-ng-minlength="6"
             data-ng-maxlength="100" />
-        <span class="input-error" data-ng-show="showError(userEditForm, userEditForm.password, 'required')">
-            {{ "TR__ERROR_REQUIRED_PASSWORD" | translate }}
-        </span>
         <span class="input-error" data-ng-show="showError(userEditForm, userEditForm.password, 'minlength')">
             {{ "TR__ERROR_TOO_SHORT_PASSWORD" | translate }}
         </span>
