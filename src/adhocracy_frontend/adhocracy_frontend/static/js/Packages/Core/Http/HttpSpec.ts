@@ -54,6 +54,7 @@ var mkAdhMetaApiMock = () => {
             }
         },
 
+        resourceExists: () => true,
         sheetExists: () => true,
         fieldExists: () => true,
 

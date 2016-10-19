@@ -6,14 +6,14 @@ import * as AdhMetaApi from "../MetaApi/MetaApi";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 
 import * as ResourcesBase from "../../../ResourcesBase";
-import * as Resources_ from "../../../Resources_";
 
+import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 
 import * as AdhCache from "./Cache";
 
 
-var sanityCheck = (obj : ResourcesBase.IResource) : void => {
+var sanityCheck = (obj : ResourcesBase.IResource, adhMetaApi : AdhMetaApi.Service) : void => {
     if (typeof obj !== "object") {
         throw ("unexpected type: " + (typeof obj).toString() + "\nin object:\n" + JSON.stringify(obj, null, 2));
     }
@@ -22,59 +22,83 @@ var sanityCheck = (obj : ResourcesBase.IResource) : void => {
         throw ("resource has no content_type field:\n" + JSON.stringify(obj, null, 2));
     }
 
-    if (!Resources_.resourceRegistry.hasOwnProperty(obj.content_type)) {
+    if (!adhMetaApi.resourceExists(obj.content_type)) {
         throw ("unknown content_type: " + obj.content_type + "\nin object:\n" + JSON.stringify(obj, null, 2));
     }
 };
 
+var importField = (value, field : AdhMetaApi.ISheetField) => {
+    var toBoolean = (v) => _.isString(v) ? (v === "true") : v;
+    var toInt = (v) => _.isString(v) ? parseInt(v, 10) : v;
+    var toFloat = (v) => _.isString(v) ? parseFloat(v) : v;
+
+    var parser = (v) => v;
+
+    // This code should be consistent with the types generated in mkResources
+    switch (field.valuetype) {
+        case "adhocracy_core.schema.Boolean":
+            parser = toBoolean;
+            break;
+        case "Integer":
+        case "adhocracy_core.schema.Integer":
+        case "adhocracy_core.schema.Rate":
+            parser = toInt;
+            break;
+        case "adhocracy_core.schema.CurrencyAmount":
+        case "adhocracy_core.sheets.geo.WebMercatorLongitude":
+        case "adhocracy_core.sheets.geo.WebMercatorLatitude":
+            parser = toFloat;
+            break;
+        case "adhocracy_core.sheets.geo.Point":
+            parser = (point) => _.map(point, toFloat);
+            break;
+        case "adhocracy_core.sheets.geo.Polygon":
+            parser = (polygon : any[][][]) => _.map(polygon, (line) => _.map(line, (point) => _.map(point, toFloat)));
+            break;
+    }
+
+    if (field.containertype) {
+        var singleParser = parser;
+
+        if (field.containertype === "list") {
+            parser = (v) => _.map(v, singleParser);
+        } else {
+            throw new Error("Unknown containertype: " + field.containertype);
+        }
+    }
+
+    return parser(value);
+};
 
 /**
  * transform objects on the way in (all request methods)
  */
-export var importResource = <R extends ResourcesBase.IResource>(
-    response : {data : R},
+export var importResource = (
+    response : {data : ResourcesBase.IResource},
     metaApi : AdhMetaApi.Service,
     preliminaryNames : AdhPreliminaryNames.Service,
     adhCache : AdhCache.Service,
     warmupPoolCache : boolean = false,
     originalElements : string = "omit"
-) : R => {
+) : ResourcesBase.IResource => {
     "use strict";
 
-    var obj = response.data;
-    sanityCheck(obj);
+    var obj = _.cloneDeep(response.data);
+    sanityCheck(obj, metaApi);
 
     if (!obj.hasOwnProperty("path")) {
         throw ("resource has no path field: " + JSON.stringify(obj, null, 2));
     }
 
-    // construct resource
-
-    var _rclass = Resources_.resourceRegistry[obj.content_type];
-    var _obj = new _rclass({
-        preliminaryNames: preliminaryNames,
-        path: obj.path
-    });
-
-    if (obj.hasOwnProperty("first_version_path")) {
-        _obj.first_version_path = obj.first_version_path;
-    }
-
-    if (obj.hasOwnProperty("root_versions")) {
-        _obj.root_versions = obj.root_versions;
-    }
-
-    // iterate over all delivered sheets and construct instances
-
     _.forOwn(obj.data, (jsonSheet, sheetName) => {
-        if (!Resources_.sheetRegistry.hasOwnProperty(sheetName)) {
+        if (!metaApi.sheetExists(sheetName)) {
             throw ("unknown property sheet: " + sheetName + " " + JSON.stringify(obj, null, 2));
         }
 
         if (warmupPoolCache && (sheetName === SIPool.nick)) {
             var elementsPaths = [];
 
-            _.forEach(jsonSheet.elements, (rawSubresource : any) => {
+            _.forEach(jsonSheet.elements, (rawSubresource : ResourcesBase.IResource) => {
                 var pseudoResponse = {
                     data: rawSubresource
                 };
@@ -92,65 +116,17 @@ export var importResource = <R extends ResourcesBase.IResource>(
             }
         }
 
-        var _sclass = Resources_.sheetRegistry[sheetName];
-        _obj.data[sheetName] = _sclass.parse(jsonSheet);
-
-        // the above four lines compile because we leave
-        // typescript in the dark about the actual type of _class.
-        // har!
-        //
-        // NOTE: passing the json sheet to the constructor rather than
-        // iterating through it and assigning the values to the sheet
-        // manually is important.  the constructor has to parse some
-        // field types (e.g. Date).
+        _.forOwn(jsonSheet, (value, fieldName : string) => {
+            // Some fields are not listed in the meta API
+            // See https://github.com/liqd/adhocracy3/issues/261
+            if (metaApi.fieldExists(sheetName, fieldName)) {
+                var field = metaApi.field(sheetName, fieldName);
+                jsonSheet[fieldName] = importField(value, field);
+            }
+        });
     });
 
-    // return
-
-    return _obj;
-
-
-    // FIXME: it would be nice if this function could throw an
-    // exception at run-time if the type of obj does not match
-    // R.  however, not only is R a compile-time entity,
-    // but it may very well be based on an interface that has no
-    // run-time entity anywhere.  two options:
-    //
-    // (1) http://stackoverflow.com/questions/24056019/is-there-a-way-to-check-instanceof-on-types-dynamically
-    //
-    // (2) typescript language feature request! :)
-    //
-    //
-    // the following function would be useful if the problem of
-    // turning abstract types into runtime objects could be solved.
-    // (for the time being, it has been removed from the Util module
-    // where it belongs.)
-    //
-    //
-    //   // in a way another function in the deep* family: check that _super
-    //   // has only attributes also available in _sub.  also check recursively
-    //   // (if _super has an object attribute, its counterpart in _sub must
-    //   // have the same attributes, and so on).
-    //
-    //   // FIXME: untested!
-    //   export function subtypeof(_sub, _super) {
-    //       if (typeof _sub !== typeof _super) {
-    //           return false;
-    //       }
-    //
-    //       if (typeof(_sub) === "object") {
-    //           if (_sub === null || _super === null) {
-    //               return true;
-    //           }
-    //
-    //           for (var x in _super) {
-    //               if (!(x in _sub)) { return false; }
-    //               if (!subtypeof(_sub[x], _super[x])) { return false; }
-    //           }
-    //       }
-    //
-    //       return true;
-    //   }
+    return obj;
 };
 
 
@@ -202,7 +178,7 @@ export var exportResource = <R extends ResourcesBase.IResource>(
 ) : R => {
     "use strict";
 
-    sanityCheck(obj);
+    sanityCheck(obj, adhMetaApi);
     var newobj : R = _.cloneDeep(obj);
 
     // remove some fields from newobj.data[*] and empty sheets from
@@ -223,7 +199,7 @@ export var exportResource = <R extends ResourcesBase.IResource>(
                     }
                     // workaround, as normal users can not set `hidden` field
                     // FIXME: use more appropriate place, e.g. expose in meta api
-                    if (!keepMetadata && sheetName === "adhocracy_core.sheets.metadata.IMetadata" && fieldName === "hidden") {
+                    if (!keepMetadata && sheetName === SIMetadata.nick && fieldName === "hidden") {
                         delete sheet[fieldName];
                     }
                 }

@@ -1,6 +1,7 @@
 import * as _ from "lodash";
 
 import * as AdhMetaApi from "../MetaApi/MetaApi";
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 
 import * as ResourcesBase from "../../../ResourcesBase";
 
@@ -12,18 +13,24 @@ import * as AdhUtil from "./Util";
 /**
  * Create a new version following an existing one.
  */
-export var derive = <R extends ResourcesBase.IResource>(oldVersion : R, settings) : R => {
-    var resource = new (<any>oldVersion).constructor(settings);
+export var derive = (
+    oldVersion : ResourcesBase.IResource,
+    settings : {preliminaryNames : AdhPreliminaryNames.Service}
+) : ResourcesBase.IResource => {
+    var resource : ResourcesBase.IResource = {
+        data: {},
+        path: settings.preliminaryNames.nextPreliminary(),
+        content_type: oldVersion.content_type,
+        first_version_path: settings.preliminaryNames.nextPreliminary(),
+    };
 
     _.forOwn(oldVersion.data, (sheet, key) => {
-        resource.data[key] = new sheet.constructor(settings);
-
-        _.forOwn(sheet, (value, field) => {
-            resource.data[key][field] = _.cloneDeep(value);
-        });
+        resource.data[key] = _.cloneDeep(sheet);
     });
 
-    resource.data[SIVersionable.nick] = new SIVersionable.Sheet({follows: [oldVersion.path]});
+    resource.data[SIVersionable.nick] = {
+        follows: [oldVersion.path]
+    };
 
     return resource;
 };
@@ -37,7 +44,7 @@ export var hasEqualContent = (resource1 : ResourcesBase.IResource, resource2 : R
     _.forOwn(resource1.data, (sheet, key) => {
         var sheet2 = resource2.data[key];
 
-        if (key !== "adhocracy_core.sheets.versions.IVersionable") {
+        if (key !== SIVersionable.nick) {
             _.forOwn(sheet, (value, field) => {
                 if (!_.isEqual(value, sheet2[field])) {
                     equal = false;

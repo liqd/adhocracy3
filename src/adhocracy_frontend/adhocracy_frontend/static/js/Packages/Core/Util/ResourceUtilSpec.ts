@@ -128,10 +128,15 @@ export var register = () => {
             };
 
             beforeEach(() => {
+                var preliminaryNamesMock = <any>{
+                    nextPreliminary: () => "@0",
+                };
                 oldResource = new testResource({});
                 oldResource.path = "/old/path";
                 oldResource.data["test.sheet"] = new testSheet({});
-                resource = AdhResourceUtil.derive(oldResource, {});
+                resource = AdhResourceUtil.derive(oldResource, {
+                    preliminaryNames: preliminaryNamesMock,
+                });
             });
 
             it("sets the right content type", () => {
@@ -150,8 +155,12 @@ export var register = () => {
 
         describe("isInstanceOf", () => {
             var mockMetaApiData = {};
-            mockMetaApiData[RIProcess.content_type] = RIProcess;
-            mockMetaApiData[RIPool.content_type] = RIPool;
+            mockMetaApiData[RIProcess.content_type] = {
+                super_types: [RIPool.content_type]
+            };
+            mockMetaApiData[RIPool.content_type] = {
+                super_types: []
+            };
 
             var adhMetaApiMock = jasmine.createSpyObj("adhMetaApi", ["resource"]);
             adhMetaApiMock.resource.and.callFake((name) => mockMetaApiData[name]);
