@@ -326,8 +326,8 @@ enabledFields = (fields : MetaApi.ISheetField[], enableFlags? : string) : MetaAp
 
 mkSheetSetterGetter = () => {
     // FIXME: we could add types
-    return "export var get = (resource) => resource.data[nick];\n" +
-        "export var set = (resource, sheet) : void => {\n" +
+    return "export var get = (resource) : ISheet => resource.data[nick];\n" +
+        "export var set = (resource, sheet : ISheet) : void => {\n" +
         "    resource.data[nick] = sheet;\n" +
         "};\n";
 };
