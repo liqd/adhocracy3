@@ -33,6 +33,7 @@ export interface IHttpConfig {
     noCredentials? : boolean;
     noExport? : boolean;
     anonymize? : boolean;
+    password? : string;
 }
 
 export interface IHttpOptionsConfig extends IHttpConfig {
@@ -133,6 +134,11 @@ export class Service {
             _.assign(headers, {
                 // the header is non-empty so it doesn't get deleted by browsers
                 "X-Anonymize": "X-Anonymize"
+            });
+        }
+        if (config.password) {
+            _.assign(headers, {
+                "X-User-Password": config.password
             });
         }
         return headers;
