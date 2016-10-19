@@ -254,51 +254,6 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
             }
         }
     })();
-
-    // generate root module Resources_.ts
-    (() => {
-        var rootModule = "";
-        var relativeRoot = "./Resources_/";
-        var imports : string[] = [];
-        (() => {
-            for (var modulePath in modules) {
-                if (modules.hasOwnProperty(modulePath)) {
-                    imports.push(mkImportStatement(modulePath, relativeRoot, metaApi));
-                }
-            }
-            imports.sort();
-            rootModule += imports.join("") + "\n";
-        })();
-
-        // resource registry.
-        (() => {
-            var dictEntries : string[] = [];
-            for (var modulePath in metaApi.resources) {
-                if (metaApi.resources.hasOwnProperty(modulePath)) {
-                    dictEntries.push("    \"" + modulePath + "\": " + mkModuleName(modulePath, metaApi));
-                }
-            }
-            dictEntries.sort();
-            rootModule += "export var resourceRegistry = {\n" + dictEntries.join(",\n") + "\n};\n\n";
-        })();
-
-        // sheet registry.
-        (() => {
-            var dictEntries : string[] = [];
-            for (var modulePath in metaApi.sheets) {
-                if (metaApi.sheets.hasOwnProperty(modulePath)) {
-                    dictEntries.push(
-                            "    \"" + modulePath + "\": "
-                            + mkModuleName(modulePath, metaApi) + ".Sheet");
-                }
-            }
-            dictEntries.sort();
-            rootModule += "export var sheetRegistry = {\n" + dictEntries.join(",\n") + "\n};\n";
-        })();
-
-        var absfp = outPath + "/Resources_.ts";
-        fs.writeFileSync(absfp, headerFooter(relativeRoot, rootModule));
-    })();
 };
 
 renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IModuleDict, metaApi : MetaApi.IMetaApi) : void => {
