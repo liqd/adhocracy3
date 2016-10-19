@@ -42,7 +42,7 @@ export var stateIndicatorDirective = (
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.on("processUrl", (processUrl) => {
                 adhHttp.get(processUrl).then((process : ResourcesBase.IResource) => {
-                    scope.workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
+                    scope.workflowState = SIWorkflowAssignment.get(process).workflow_state;
                 });
             }));
         }
@@ -68,7 +68,7 @@ export var meetingSelectorDirective = (
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("meeting", scope));
             adhHttp.get(scope.processUrl).then((process : ResourcesBase.IResource) => {
-                scope.workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
+                scope.workflowState = SIWorkflowAssignment.get(process).workflow_state;
             });
         }
     };

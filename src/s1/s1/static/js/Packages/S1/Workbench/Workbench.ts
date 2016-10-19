@@ -54,9 +54,9 @@ export var s1CurrentColumnDirective = (
 
             scope.$watch("processUrl", (processUrl : string) => {
                 adhHttp.get(processUrl).then((process : ResourcesBase.IResource) => {
-                    var workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
+                    var workflowState = SIWorkflowAssignment.get(process).workflow_state;
                     var decisionDate = AdhUtil.deepPluck(
-                        AdhProcess.getStateData(process.data[SIWorkflowAssignment.nick], "result"), ["start_date"]);
+                        AdhProcess.getStateData(SIWorkflowAssignment.get(process), "result"), ["start_date"]);
 
                     if (workflowState === "propose") {
                         scope.proposalState = "proposed";
@@ -109,7 +109,7 @@ export var s1NextColumnDirective = (
 
             scope.$watch("processUrl", (processUrl : string) => {
                 adhHttp.get(processUrl).then((process : ResourcesBase.IResource) => {
-                    scope.processState = process.data[SIWorkflowAssignment.nick].workflow_state;
+                    scope.processState = SIWorkflowAssignment.get(process).workflow_state;
 
                     if (scope.processState === "propose") {
                         scope.proposalState = "none";
@@ -161,10 +161,10 @@ export var s1ArchiveColumnDirective = (
                 adhHttp.get(processUrl).then((process : ResourcesBase.IResource) => {
                     scope.proposalState = "[\"any\", [\"selected\", \"rejected\"]]";
 
-                    var workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
+                    var workflowState = SIWorkflowAssignment.get(process).workflow_state;
                     if (workflowState === "result") {
                         var decisionDate = AdhUtil.deepPluck(
-                            AdhProcess.getStateData(process.data[SIWorkflowAssignment.nick], "result"), ["start_date"]);
+                            AdhProcess.getStateData(SIWorkflowAssignment.get(process), "result"), ["start_date"]);
                         scope.decisionDate = "[\"lt\",  \"" + decisionDate + "\"]";
                     }
                 });
@@ -261,9 +261,9 @@ export var s1LandingDirective = (
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.on("processUrl", (processUrl) => {
                 adhHttp.get(processUrl).then((process) => {
-                    scope.processTitle = process.data[SITitle.nick].title;
-                    scope.processShortDescription = process.data[SIDescription.nick].short_description;
-                    scope.processDescription = process.data[SIDescription.nick].description;
+                    scope.processTitle = SITitle.get(process).title;
+                    scope.processShortDescription = SIDescription.get(process).short_description;
+                    scope.processDescription = SIDescription.get(process).description;
                 });
             }));
         }
@@ -279,8 +279,8 @@ export var s1LandingDirective = (
  * result  | next     | -        | cur/arc  | cur/arc
  */
 var getMeeting = (proposal : ResourcesBase.IResource, process : ResourcesBase.IResource) => {
-    var processState = process.data[SIWorkflowAssignment.nick].workflow_state;
-    var proposalState = proposal.data[SIWorkflowAssignment.nick].workflow_state;
+    var processState = SIWorkflowAssignment.get(process).workflow_state;
+    var proposalState = SIWorkflowAssignment.get(proposal).workflow_state;
 
     if (proposalState === "proposed") {
         return processState === "propose" ? "current" : "next";
@@ -290,9 +290,9 @@ var getMeeting = (proposal : ResourcesBase.IResource, process : ResourcesBase.IR
         return "archive";
     } else {
         var processDecisionDate = AdhUtil.deepPluck(
-            AdhProcess.getStateData(process.data[SIWorkflowAssignment.nick], "result"), ["start_date"]);
+            AdhProcess.getStateData(SIWorkflowAssignment.get(process), "result"), ["start_date"]);
         var proposalDecisionDate = AdhUtil.deepPluck(
-            AdhProcess.getStateData(proposal.data[SIWorkflowAssignment.nick], proposalState), ["start_date"]);
+            AdhProcess.getStateData(SIWorkflowAssignment.get(proposal), proposalState), ["start_date"]);
 
         return (processDecisionDate === proposalDecisionDate) ? "current" : "archive";
     }
@@ -322,7 +322,7 @@ export var registerRoutes = (
                 return (resource : ResourcesBase.IResource) => {
                     return adhHttp.options(resource.path).then((options) => {
                         if (options.POST) {
-                            var processState = resource.data[SIWorkflowAssignment.nick].workflow_state;
+                            var processState = SIWorkflowAssignment.get(resource).workflow_state;
                             return {
                                 targetMeeting: processState === "propose" ? "current" : "next"
                             };
@@ -415,7 +415,7 @@ export var registerRoutes = (
                 if (resource.content_type !== RICommentVersion.content_type) {
                     return $q.when(resource);
                 } else {
-                    var url = resource.data[SIComment.nick].refers_to;
+                    var url = SIComment.get(resource).refers_to;
                     return adhHttp.get(url).then(getCommentableUrl);
                 }
             };

@@ -40,7 +40,7 @@ export var workbenchDirective = (
             scope.$watch("processUrl", (processUrl) => {
                 if (processUrl) {
                     adhHttp.get(processUrl).then((resource) => {
-                        scope.currentPhase = resource.data[SIWorkflow.nick].workflow_state;
+                        scope.currentPhase = SIWorkflow.get(resource).workflow_state;
                     });
                 }
             });
@@ -141,8 +141,8 @@ export var detailDirective = (
             scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
-                        scope.data.title = resource.data[SITitle.nick].title;
-                        scope.data.shortDescription = resource.data[SIDescription.nick].short_description;
+                        scope.data.title = SITitle.get(resource).title;
+                        scope.data.shortDescription = SIDescription.get(resource).short_description;
                     });
                 }
             });

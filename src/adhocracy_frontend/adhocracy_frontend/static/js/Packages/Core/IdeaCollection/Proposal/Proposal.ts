@@ -74,10 +74,10 @@ var bindPath = (
         if (scope.processProperties.hasLocation) {
             var processUrl = adhTopLevelState.get("processUrl");
             return adhHttp.get(processUrl).then((process) => {
-                var locationUrl = process.data[SILocationReference.nick].location;
+                var locationUrl = SILocationReference.get(process).location;
                 if (locationUrl) {
                     return adhHttp.get(locationUrl).then((location) => {
-                        return location.data[SIMultiPolygon.nick].coordinates[0][0];
+                        return SIMultiPolygon.get(location).coordinates[0][0];
                     });
                 }
                 return $q.when();
@@ -92,15 +92,15 @@ var bindPath = (
             adhHttp.get(value).then((resource) => {
                 scope.resource = resource;
 
-                var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
-                var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
-                var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
-                var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
-                var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
+                var titleSheet = SITitle.get(resource);
+                var descriptionSheet = SIDescription.get(resource);
+                var pointSheet = SIPoint.get(resource);
+                var metadataSheet = SIMetadata.get(resource);
+                var rateableSheet = SIRateable.get(resource);
 
                 var proposalSheetClass = scope.processProperties.proposalSheet;
                 if (proposalSheetClass) {
-                    var proposalSheet = resource.data[proposalSheetClass.nick];
+                    var proposalSheet = proposalSheetClass.get(resource);
                 }
 
                 $q.all([
@@ -121,7 +121,7 @@ var bindPath = (
                         rateCount: ratesPro - ratesContra,
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
-                        commentCount: parseInt(resource.data[SICommentable.nick].comments_count, 10),
+                        commentCount: parseInt(SICommentable.get(resource).comments_count, 10),
                         assignments: assignments
                     };
 
@@ -136,7 +136,7 @@ var bindPath = (
                         scope.data.polygon = polygon;
                     }
                     if (scope.processProperties.hasImage) {
-                        scope.data.picture = resource.data[SIImageReference.nick].picture;
+                        scope.data.picture = SIImageReference.get(resource).picture;
                     }
                     // WARNING: proposalSheet is not a regular feature of adhocracy,
                     // but a hack of Buergerhaushalt and Kiezkasse.
@@ -379,10 +379,10 @@ export var createDirective = (
 
             if (scope.processProperties.hasLocation) {
                 adhHttp.get(scope.poolPath).then((pool) => {
-                    var locationUrl = pool.data[SILocationReference.nick].location;
+                    var locationUrl = SILocationReference.get(pool).location;
                     if (locationUrl) {
                         adhHttp.get(locationUrl).then((location) => {
-                            var polygon = location.data[SIMultiPolygon.nick].coordinates[0][0];
+                            var polygon = SIMultiPolygon.get(location).coordinates[0][0];
                             scope.data.polygon = polygon;
                         });
                     }

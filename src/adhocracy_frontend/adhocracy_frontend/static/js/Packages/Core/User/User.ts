@@ -59,8 +59,8 @@ export class Service {
         return _self.adhHttp.get(userPath)
             .then((resource) => {
                 _self.data = {
-                    name: resource.data[SIUserBasic.nick].name,
-                    anonymize: resource.data[SIAnonymizeDefault.nick].anonymize,
+                    name: SIUserBasic.get(resource).name,
+                    anonymize: SIAnonymizeDefault.get(resource).anonymize,
                 };
             }, (reason) => {
                 // The user resource that was returned by the server could not be accessed.

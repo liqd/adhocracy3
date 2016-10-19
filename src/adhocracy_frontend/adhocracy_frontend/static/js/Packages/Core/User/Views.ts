@@ -604,7 +604,7 @@ export var metaDirective = (
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
-                        $scope.userBasic = res.data[SIUserBasic.nick];
+                        $scope.userBasic = SIUserBasic.get(res);
                         // provide no link if either noLink is true or there are no user profiles enabled or user is anonymous
                         var usersEnabled = adhResourceArea.has(RIUser.content_type);
                         var userIsAnonymous = res.content_type === RISystemUser.content_type;
@@ -655,7 +655,7 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
-                        $scope.userBasic = res.data[SIUserBasic.nick];
+                        $scope.userBasic = SIUserBasic.get(res);
                         adhGetBadges(res).then((assignments) => {
                             $scope.assignments = assignments;
                         });
@@ -699,10 +699,10 @@ export var userProfileDirective = (
             scope.$watch("path", (path) => {
                 if (path) {
                     adhHttp.get(path).then((user) => {
-                        scope.userBasic = user.data[SIUserBasic.nick];
+                        scope.userBasic = SIUserBasic.get(user);
                         scope.data = {
-                            description: user.data[SIDescription.nick].description,
-                            shortDescription: user.data[SIDescription.nick].short_description,
+                            description: SIDescription.get(user).description,
+                            shortDescription: SIDescription.get(user).short_description,
                         };
                         adhGetBadges(user).then((assignments) => {
                             scope.assignments = assignments;
@@ -744,7 +744,7 @@ var postEdit = (
             content_type: oldUser.content_type,
             data: {}
         };
-        if (oldUser.data[SIUserBasic.nick].name !== data.name) {
+        if (SIUserBasic.get(oldUser).name !== data.name) {
             SIUserBasic.set(patch, {
                 name: data.name,
             });
@@ -786,9 +786,9 @@ export var userEditDirective = (
                 if (path) {
                     adhHttp.get(path).then((user) => {
                         scope.data = {
-                            name: user.data[SIUserBasic.nick].name,
+                            name: SIUserBasic.get(user).name,
                             password: "",
-                            anonymize: user.data[SIAnonymizeDefault.nick].anonymize,
+                            anonymize: SIAnonymizeDefault.get(user).anonymize,
                         };
                     });
                 }
@@ -826,7 +826,7 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
         },
         link: (scope)  => {
             adhHttp.get(scope.recipientUrl).then((recipient : ResourcesBase.IResource) => {
-                scope.recipientName = recipient.data[SIUserBasic.nick].name;
+                scope.recipientName = SIUserBasic.get(recipient).name;
             });
 
             scope.messageSend = () => {
@@ -915,7 +915,7 @@ export var adhUserActivityOverviewDirective = (
                 params[SIMetadata.nick + ":creator"] = scope.path;
 
                 adhHttp.get(adhConfig.rest_url, params)
-                    .then((pool) => { scope[scopeTarget] = parseInt(pool.data[SIPool.nick].count, 10); });
+                    .then((pool) => { scope[scopeTarget] = parseInt(SIPool.get(pool).count, 10); });
             };
 
             requestCountInto(RIComment, "commentCount", attrs.showComments);
@@ -949,8 +949,8 @@ export var adhUserProfileImageDirective = (
                 if ( ! path) { return; }
 
                 adhHttp.get(scope.path).then((user) => {
-                    scope.assetPath = user.data[SIImageReference.nick].picture;
-                    scope.userName = user.data[SIUserBasic.nick].name;
+                    scope.assetPath = SIImageReference.get(user).picture;
+                    scope.userName = SIUserBasic.get(user).name;
                     if ( ! scope.assetPath) {
                         scope.didFailToLoadImage();
                     }
@@ -974,7 +974,7 @@ export var adhUserProfileImageEditDirective = (
         link: (scope) => {
             scope.config = adhConfig;
             adhHttp.get(AdhUtil.parentPath(scope.path)).then((userPool) => {
-                scope.assetPool = userPool.data[SIHasAssetPool.nick].asset_pool;
+                scope.assetPool = SIHasAssetPool.get(userPool).asset_pool;
             });
             scope.triggerUpload = () => {
                 scope.isUploading = true;

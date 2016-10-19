@@ -338,7 +338,7 @@ export class Service {
     public getNewestVersionPathNoFork(path : string, config : IHttpGetConfig = {}) : angular.IPromise<string> {
         return this.get(path, undefined, config)
             .then((item) => {
-                var head = item.data[SITags.nick].LAST;
+                var head = SITags.get(item).LAST;
                 return head;
             });
     }

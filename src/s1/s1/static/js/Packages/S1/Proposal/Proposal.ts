@@ -82,11 +82,11 @@ var bindPath = (
 
                 scope.resource = version;
 
-                var titleSheet : SITitle.Sheet = version.data[SITitle.nick];
-                var descriptionSheet : SIDescription.Sheet = version.data[SIDescription.nick];
-                var metadataSheet : SIMetadata.Sheet = version.data[SIMetadata.nick];
-                var rateableSheet : SIRateable.Sheet = version.data[SIRateable.nick];
-                var workflowAssignmentSheet : SIWorkflowAssignment.Sheet = item.data[SIWorkflowAssignment.nick];
+                var titleSheet = SITitle.get(version);
+                var descriptionSheet = SIDescription.get(version);
+                var metadataSheet = SIMetadata.get(version);
+                var rateableSheet = SIRateable.get(version);
+                var workflowAssignmentSheet = SIWorkflowAssignment.get(item);
 
                 $q.all([
                     adhGetBadges(version),
@@ -104,7 +104,7 @@ var bindPath = (
                         create: false,
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
-                        commentCount: parseInt(version.data[SICommentable.nick].comments_count, 10),
+                        commentCount: parseInt(SICommentable.get(version).comments_count, 10),
                         assignments: badgeAssignments,
                         workflowState: workflowAssignmentSheet.workflow_state,
                         decisionDate: AdhProcess.getStateData(workflowAssignmentSheet, workflowAssignmentSheet.workflow_state).start_date
@@ -376,7 +376,7 @@ export var renominateProposalDirective = (
         link: (scope) => {
             scope.$watch("proposalUrl", (proposalUrl) => {
                 adhHttp.get(proposalUrl).then((proposal) => {
-                    var workflow = proposal.data[SIWorkflowAssignment.nick];
+                    var workflow = SIWorkflowAssignment.get(proposal);
                     scope.isRejected = "rejected" === workflow.workflow_state;
                 });
             });

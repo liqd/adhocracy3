@@ -44,9 +44,9 @@ export var getProcessPolygon = (
     adhHttp : AdhHttp.Service
 ) => (processUrl : string) : angular.IPromise<any> => {
     return adhHttp.get(processUrl).then((resource) => {
-        var locationUrl = resource.data[SILocationReference.nick].location;
+        var locationUrl = SILocationReference.get(resource).location;
         return adhHttp.get(locationUrl).then((location) => {
-            return location.data[SIMultiPolygon.nick].coordinates[0][0];
+            return SIMultiPolygon.get(location).coordinates[0][0];
         });
     });
 };
@@ -252,7 +252,7 @@ export var registerRoutes = (
         })
         .specificVersionable(RIParagraph, RIParagraphVersion, "comments", processType, context, [
             () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
-                var documentUrl = _.last(_.sortBy(version.data[SIParagraph.nick].documents));
+                var documentUrl = _.last(_.sortBy(SIParagraph.get(version).documents));
                 return {
                     commentableUrl: version.path,
                     commentCloseUrl: documentUrl,

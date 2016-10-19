@@ -166,7 +166,7 @@ export var proposalListingColumnDirective = (
 
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
-                var currentPhase = resource.data[SIWorkflow.nick].workflow_state;
+                var currentPhase = SIWorkflow.get(resource).workflow_state;
 
                 scope.sort = "item_creation_date";
                 scope.setSort = (sort : string) => {
@@ -263,7 +263,7 @@ export var registerRoutes = (
                 if (resource.content_type !== RICommentVersion.content_type) {
                     return $q.when(resource);
                 } else {
-                    var url = resource.data[SIComment.nick].refers_to;
+                    var url = SIComment.get(resource).refers_to;
                     return adhHttp.get(url).then(getCommentableUrl);
                 }
             };
@@ -393,7 +393,7 @@ export var registerRoutes = (
                 (resource : ResourcesBase.IResource) => {
                     return {
                         proposalUrl: resource.path,
-                        commentableUrl: resource.data[SIMercatorSubResources.nick][section],
+                        commentableUrl: SIMercatorSubResources.get(resource)[section],
                         commentCloseUrl: resource.path
                     };
                 }

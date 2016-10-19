@@ -407,7 +407,7 @@ var edit = (
 ) => (scope) => {
     var data : IFormData = scope.data;
     return adhHttp.get(scope.path).then((oldProposal) => {
-        var subResourcesSheet : SIMercatorSubResources.Sheet = oldProposal.data[SIMercatorSubResources.nick];
+        var subResourcesSheet = SIMercatorSubResources.get(oldProposal);
 
         return adhHttp.withTransaction((transaction) => {
             var proposal : ResourcesBase.IResource = {
@@ -417,7 +417,7 @@ var edit = (
             };
             fill(data, proposal);
             // ICommunity can and should not be changed on edit
-            delete proposal.data[SICommunity.nick];
+            delete SICommunity.get(proposal);
             transaction.put(oldProposal.path, proposal);
 
             _.forEach({
@@ -467,14 +467,14 @@ var moderate = (
         });
         var resourcePromise = adhHttp.put(scope.path, clone);
 
-        var badgePoolPath = oldProposal.data[SIBadgeable.nick].post_pool;
-        var assignmentRequests = _.map(oldProposal.data[SIBadgeable.nick].assignments, (p : string) => adhHttp.get(p));
+        var badgePoolPath = SIBadgeable.get(oldProposal).post_pool;
+        var assignmentRequests = _.map(SIBadgeable.get(oldProposal).assignments, (p : string) => adhHttp.get(p));
         var badgePromise = $q.all(assignmentRequests).then((assignments) => {
             var communityAssignment = <any>_.find(assignments, (a : any) => {
-                return a.data[SIBadgeAssignment.nick].badge === badges.community;
+                return SIBadgeAssignment.get(a).badge === badges.community;
             });
             var winningAssignment = <any>_.find(assignments, (a : any) => {
-                return a.data[SIBadgeAssignment.nick].badge === badges.winning;
+                return SIBadgeAssignment.get(a).badge === badges.winning;
             });
             var badgeAssignment = communityAssignment || winningAssignment;
 
@@ -484,7 +484,7 @@ var moderate = (
                     content_type: RIBadgeAssignment.content_type,
                     data: {}
                 };
-                postdata.data[SIDescription.nick] = {
+                SIDescription.get(postdata) = {
                     description: scope.data.winner.description
                 };
                 return adhHttp.put(badgeAssignment.path, postdata);
@@ -493,10 +493,10 @@ var moderate = (
                     content_type: RIBadgeAssignment.content_type,
                     data: {}
                 };
-                postdata.data[SIDescription.nick] = {
+                SIDescription.get(postdata) = {
                     description: scope.data.winner.description
                 };
-                postdata.data[SIBadgeAssignment.nick] = {
+                SIBadgeAssignment.get(postdata) = {
                     badge: badges[scope.data.winner.name],
                     object: scope.path,
                     subject: adhCredentials.userPath
@@ -531,7 +531,7 @@ var get = (
             practicalrelevance : ResourcesBase.IResource
         } = <any>{};
 
-        return $q.all(_.map(proposal.data[SIMercatorSubResources.nick], (path, key) => {
+        return $q.all(_.map(SIMercatorSubResources.get(proposal), (path, key) => {
             return adhHttp.get(<string>path).then((subresource) => {
                 subs[key] = subresource;
             });
@@ -546,118 +546,118 @@ var get = (
             })
         ])).then((args : any[]) : IDetailData => {
             var commentCounts = {
-                proposal: proposal.data[SICommentable.nick].comments_count,
-                pitch: subs.pitch.data[SICommentable.nick].comments_count,
-                partners: subs.partners.data[SICommentable.nick].comments_count,
-                duration: subs.duration.data[SICommentable.nick].comments_count,
-                challenge: subs.challenge.data[SICommentable.nick].comments_count,
-                goal: subs.goal.data[SICommentable.nick].comments_count,
-                plan: subs.plan.data[SICommentable.nick].comments_count,
-                target: subs.target.data[SICommentable.nick].comments_count,
-                team: subs.team.data[SICommentable.nick].comments_count,
-                extrainfo: subs.extrainfo.data[SICommentable.nick].comments_count,
-                connectioncohesion: subs.connectioncohesion.data[SICommentable.nick].comments_count,
-                difference: subs.difference.data[SICommentable.nick].comments_count,
-                practicalrelevance: subs.practicalrelevance.data[SICommentable.nick].comments_count
+                proposal: SICommentable.get(proposal).comments_count,
+                pitch: SICommentable.get(subs.pitch).comments_count,
+                partners: SICommentable.get(subs.partners).comments_count,
+                duration: SICommentable.get(subs.duration).comments_count,
+                challenge: SICommentable.get(subs.challenge).comments_count,
+                goal: SICommentable.get(subs.goal).comments_count,
+                plan: SICommentable.get(subs.plan).comments_count,
+                target: SICommentable.get(subs.target).comments_count,
+                team: SICommentable.get(subs.team).comments_count,
+                extrainfo: SICommentable.get(subs.extrainfo).comments_count,
+                connectioncohesion: SICommentable.get(subs.connectioncohesion).comments_count,
+                difference: SICommentable.get(subs.difference).comments_count,
+                practicalrelevance: SICommentable.get(subs.practicalrelevance).comments_count
             };
 
             return {
                 supporterCount: args[0],
 
-                creationDate: proposal.data[SIMetaData.nick].item_creation_date,
-                creator: proposal.data[SIMetaData.nick].creator,
-                logbookPoolPath: proposal.data[SILogbook.nick].logbook_pool,
+                creationDate: SIMetaData.get(proposal).item_creation_date,
+                creator: SIMetaData.get(proposal).creator,
+                logbookPoolPath: SILogbook.get(proposal).logbook_pool,
 
                 userInfo: {
-                    firstName: proposal.data[SIMercatorUserInfo.nick].first_name,
-                    lastName: proposal.data[SIMercatorUserInfo.nick].last_name
+                    firstName: SIMercatorUserInfo.get(proposal).first_name,
+                    lastName: SIMercatorUserInfo.get(proposal).last_name
                 },
                 organizationInfo: {
-                    name: proposal.data[SIOrganizationInfo.nick].name,
-                    city: proposal.data[SIOrganizationInfo.nick].city,
-                    country: proposal.data[SIOrganizationInfo.nick].country,
-                    helpRequest: proposal.data[SIOrganizationInfo.nick].help_request,
-                    registrationDate: proposal.data[SIOrganizationInfo.nick].registration_date,
-                    website: proposal.data[SIOrganizationInfo.nick].website,
-                    status: proposal.data[SIOrganizationInfo.nick].status,
-                    otherText: proposal.data[SIOrganizationInfo.nick].status_other
+                    name: SIOrganizationInfo.get(proposal).name,
+                    city: SIOrganizationInfo.get(proposal).city,
+                    country: SIOrganizationInfo.get(proposal).country,
+                    helpRequest: SIOrganizationInfo.get(proposal).help_request,
+                    registrationDate: SIOrganizationInfo.get(proposal).registration_date,
+                    website: SIOrganizationInfo.get(proposal).website,
+                    status: SIOrganizationInfo.get(proposal).status,
+                    otherText: SIOrganizationInfo.get(proposal).status_other
                 },
                 topic: <any>_.reduce(<any>topics, (result, key : string) => {
-                    result[key] = _.indexOf(proposal.data[SITopic.nick].topic, key) !== -1;
+                    result[key] = _.indexOf(SITopic.get(proposal).topic, key) !== -1;
                     return result;
                 }, {
-                    otherText: proposal.data[SITopic.nick].topic_other
+                    otherText: SITopic.get(proposal).topic_other
                 }),
-                selectedTopics: _.map(proposal.data[SITopic.nick].topic, (topic : string) => {
+                selectedTopics: _.map(SITopic.get(proposal).topic, (topic : string) => {
                     if (topic === "other") {
-                        return proposal.data[SITopic.nick].topic_other;
+                        return SITopic.get(proposal).topic_other;
                     } else {
                         return topicTrString(topic);
                     }
                 }),
-                title: proposal.data[SITitle.nick].title,
+                title: SITitle.get(proposal).title,
                 location: {
-                    location_is_specific: !!proposal.data[SILocation.nick].location,
-                    location_specific: proposal.data[SILocation.nick].location,
-                    location_is_online: proposal.data[SILocation.nick].is_online,
-                    location_is_linked_to_ruhr: proposal.data[SILocation.nick].has_link_to_ruhr,
-                    location_is_linked_to_ruhr_text: proposal.data[SILocation.nick].link_to_ruhr
+                    location_is_specific: !!SILocation.get(proposal).location,
+                    location_specific: SILocation.get(proposal).location,
+                    location_is_online: SILocation.get(proposal).is_online,
+                    location_is_linked_to_ruhr: SILocation.get(proposal).has_link_to_ruhr,
+                    location_is_linked_to_ruhr_text: SILocation.get(proposal).link_to_ruhr
                 },
-                status: proposal.data[SIStatus.nick].status,
+                status: SIStatus.get(proposal).status,
                 finance: {
-                    budget: proposal.data[SIFinancialPlanning.nick].budget,
-                    requestedFunding: proposal.data[SIFinancialPlanning.nick].requested_funding,
-                    major: proposal.data[SIFinancialPlanning.nick].major_expenses,
-                    otherSources: (proposal.data[SIExtraFunding.nick] || {}).other_sources,
-                    secured: (proposal.data[SIExtraFunding.nick] || {}).secured
+                    budget: SIFinancialPlanning.get(proposal).budget,
+                    requestedFunding: SIFinancialPlanning.get(proposal).requested_funding,
+                    major: SIFinancialPlanning.get(proposal).major_expenses,
+                    otherSources: (SIExtraFunding.get(proposal) || {}).other_sources,
+                    secured: (SIExtraFunding.get(proposal) || {}).secured
                 },
-                experience: proposal.data[SICommunity.nick].expected_feedback,
-                heardFrom: _.reduce(proposal.data[SICommunity.nick].heard_froms, (result, item : string) => {
+                experience: SICommunity.get(proposal).expected_feedback,
+                heardFrom: _.reduce(SICommunity.get(proposal).heard_froms, (result, item : string) => {
                     result[item] = true;
                     return result;
                 }, {}),
                 winner: {
-                    funding: (proposal.data[SIWinnerInfo.nick] || {}).funding,
+                    funding: (SIWinnerInfo.get(proposal) || {}).funding,
                     description: (args[1] || {}).description,
                     name: (args[1] || {}).name
                 },
                 introduction: {
-                    pitch: subs.pitch.data[SIPitch.nick].pitch,
-                    picture: proposal.data[SIImageReference.nick].picture
+                    pitch: SIPitch.get(subs.pitch).pitch,
+                    picture: SIImageReference.get(proposal).picture
                 },
                 partners: {
-                    hasPartners: subs.partners.data[SIPartners.nick].has_partners,
+                    hasPartners: SIPartners.get(subs.partners).has_partners,
                     partner1: {
-                        name: subs.partners.data[SIPartners.nick].partner1_name,
-                        website: subs.partners.data[SIPartners.nick].partner1_website,
-                        country: subs.partners.data[SIPartners.nick].partner1_country
+                        name: SIPartners.get(subs.partners).partner1_name,
+                        website: SIPartners.get(subs.partners).partner1_website,
+                        country: SIPartners.get(subs.partners).partner1_country
                     },
                     partner2: {
-                        name: subs.partners.data[SIPartners.nick].partner2_name,
-                        website: subs.partners.data[SIPartners.nick].partner2_website,
-                        country: subs.partners.data[SIPartners.nick].partner2_country
+                        name: SIPartners.get(subs.partners).partner2_name,
+                        website: SIPartners.get(subs.partners).partner2_website,
+                        country: SIPartners.get(subs.partners).partner2_country
                     },
                     partner3: {
-                        name: subs.partners.data[SIPartners.nick].partner3_name,
-                        website: subs.partners.data[SIPartners.nick].partner3_website,
-                        country: subs.partners.data[SIPartners.nick].partner3_country
+                        name: SIPartners.get(subs.partners).partner3_name,
+                        website: SIPartners.get(subs.partners).partner3_website,
+                        country: SIPartners.get(subs.partners).partner3_country
                     },
-                    hasOther: !!subs.partners.data[SIPartners.nick].other_partners,
-                    otherText: subs.partners.data[SIPartners.nick].other_partners
+                    hasOther: !!SIPartners.get(subs.partners).other_partners,
+                    otherText: SIPartners.get(subs.partners).other_partners
                 },
-                duration: subs.duration.data[SIDuration.nick].duration,
+                duration: SIDuration.get(subs.duration).duration,
                 impact: {
-                    challenge: subs.challenge.data[SIChallenge.nick].challenge,
-                    goal: subs.goal.data[SIGoal.nick].goal,
-                    plan: subs.plan.data[SIPlan.nick].plan,
-                    target: subs.target.data[SITarget.nick].target,
-                    team: subs.team.data[SITeam.nick].team,
-                    extraInfo: subs.extrainfo.data[SIExtraInfo.nick].extrainfo
+                    challenge: SIChallenge.get(subs.challenge).challenge,
+                    goal: SIGoal.get(subs.goal).goal,
+                    plan: SIPlan.get(subs.plan).plan,
+                    target: SITarget.get(subs.target).target,
+                    team: SITeam.get(subs.team).team,
+                    extraInfo: SIExtraInfo.get(subs.extrainfo).extrainfo
                 },
                 criteria: {
-                    strengthen: subs.connectioncohesion.data[SIConnectionCohesion.nick].connection_cohesion,
-                    difference: subs.difference.data[SIDifference.nick].difference,
-                    practical: subs.practicalrelevance.data[SIPracticalRelevance.nick].practicalrelevance
+                    strengthen: SIConnectionCohesion.get(subs.connectioncohesion).connection_cohesion,
+                    difference: SIDifference.get(subs.difference).difference,
+                    practical: SIPracticalRelevance.get(subs.practicalrelevance).practicalrelevance
                 },
                 commentCounts: commentCounts,
                 commentCountTotal: _.sum(_.values(commentCounts))

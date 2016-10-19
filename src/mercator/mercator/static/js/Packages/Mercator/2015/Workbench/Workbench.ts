@@ -133,7 +133,7 @@ export var proposalListingColumnDirective = (
 
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
-                var currentPhase = resource.data[SIWorkflow.nick].workflow_state;
+                var currentPhase = SIWorkflow.get(resource).workflow_state;
 
                 if (typeof scope.facets === "undefined") {
                     scope.facets = [{
@@ -200,7 +200,7 @@ export var registerRoutes = (
                 if (resource.content_type !== RICommentVersion.content_type) {
                     return $q.when(resource);
                 } else {
-                    var url = resource.data[SIComment.nick].refers_to;
+                    var url = SIComment.get(resource).refers_to;
                     return adhHttp.get(url).then(getCommentableUrl);
                 }
             };

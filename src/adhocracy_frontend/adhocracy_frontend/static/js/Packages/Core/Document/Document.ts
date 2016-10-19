@@ -108,7 +108,7 @@ export var bindPath = (
     return scope.$watch(pathKey, (path : string) => {
         if (path) {
             adhHttp.get(path).then((documentVersion : ResourcesBase.IResource) => {
-                var paragraphPaths : string[] = documentVersion.data[SIDocument.nick].elements;
+                var paragraphPaths : string[] = SIDocument.get(documentVersion).elements;
                 var paragraphPromises = _.map(paragraphPaths, (path) => {
                     return adhHttp.get(path);
                 });
@@ -116,9 +116,9 @@ export var bindPath = (
                 return $q.all(paragraphPromises).then((paragraphVersions : ResourcesBase.IResource[]) => {
                     var paragraphs = _.map(paragraphVersions, (paragraphVersion) => {
                         return {
-                            body: paragraphVersion.data[SIParagraph.nick].text,
+                            body: SIParagraph.get(paragraphVersion).text,
                             deleted: false,
-                            commentCount: parseInt(paragraphVersion.data[SICommentable.nick].comments_count, 10),
+                            commentCount: parseInt(SICommentable.get(paragraphVersion).comments_count, 10),
                             path: paragraphVersion.path
                         };
                     });
@@ -127,18 +127,18 @@ export var bindPath = (
                     scope.paragraphVersions = paragraphVersions;
 
                     scope.data = {
-                        title: documentVersion.data[SITitle.nick].title,
+                        title: SITitle.get(documentVersion).title,
                         paragraphs: paragraphs,
                         // FIXME: DefinitelyTyped
                         commentCountTotal: (<any>_).sumBy(paragraphs, "commentCount"),
-                        modificationDate: documentVersion.data[SIMetadata.nick].modification_date,
-                        creationDate: documentVersion.data[SIMetadata.nick].creation_date,
-                        creator: documentVersion.data[SIMetadata.nick].creator,
-                        picture: documentVersion.data[SIImageReference.nick].picture
+                        modificationDate: SIMetadata.get(documentVersion).modification_date,
+                        creationDate: SIMetadata.get(documentVersion).creation_date,
+                        creator: SIMetadata.get(documentVersion).creator,
+                        picture: SIImageReference.get(documentVersion).picture
                     };
 
                     if (hasMap) {
-                        scope.data.coordinates = documentVersion.data[SIPoint.nick].coordinates;
+                        scope.data.coordinates = SIPoint.get(documentVersion).coordinates;
                     }
 
                     if (hasBadges) {
@@ -308,7 +308,7 @@ export var postEdit = (
             } else {
                 var oldParagraphVersion = oldParagraphVersions[index];
 
-                if (paragraph.body !== oldParagraphVersion.data[SIParagraph.nick].text) {
+                if (paragraph.body !== SIParagraph.get(oldParagraphVersion).text) {
                     paragraphVersion = {
                         path: adhPreliminaryNames.nextPreliminary(),
                         parent: AdhUtil.parentPath(oldParagraphVersion.path),
@@ -353,7 +353,7 @@ export var postEdit = (
         });
     }
     // FIXME: workaround for a backend bug
-    var oldImageReferenceSheet = oldVersion.data[SIImageReference.nick];
+    var oldImageReferenceSheet = SIImageReference.get(oldVersion);
     if (oldImageReferenceSheet.picture) {
         SIImageReference.set(documentVersion, oldImageReferenceSheet);
     }

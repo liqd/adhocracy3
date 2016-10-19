@@ -59,10 +59,10 @@ var bindPath = (
             adhHttp.get(value).then((resource) => {
                 scope.resource = resource;
 
-                var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
-                var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
-                var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
-                var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
+                var titleSheet = SITitle.get(resource);
+                var descriptionSheet = SIDescription.get(resource);
+                var metadataSheet = SIMetadata.get(resource);
+                var rateableSheet = SIRateable.get(resource);
 
                 $q.all([
                     adhRate.fetchAggregatedRates(rateableSheet.post_pool, resource.path),
@@ -81,7 +81,7 @@ var bindPath = (
                         rateCount: ratesPro - ratesContra,
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
-                        commentCount: parseInt(resource.data[SICommentable.nick].comments_count, 10),
+                        commentCount: parseInt(SICommentable.get(resource).comments_count, 10),
                         assignments: assignments
                     };
                 });

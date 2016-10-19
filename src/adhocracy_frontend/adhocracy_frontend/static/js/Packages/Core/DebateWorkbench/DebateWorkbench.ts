@@ -101,12 +101,12 @@ export var processDetailColumnDirective = (
             scope.$watch("processUrl", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
-                        var workflow = resource.data[SIWorkflow.nick];
-                        scope.data.picture = (resource.data[SIImageReference.nick] || {}).picture;
-                        scope.data.title = resource.data[SITitle.nick].title;
+                        var workflow = SIWorkflow.get(resource);
+                        scope.data.picture = (SIImageReference.get(resource) || {}).picture;
+                        scope.data.title = SITitle.get(resource).title;
                         scope.data.participationStartDate = AdhProcess.getStateData(workflow, "participate").start_date;
                         scope.data.participationEndDate = AdhProcess.getStateData(workflow, "evaluate").start_date;
-                        scope.data.shortDescription = resource.data[SIDescription.nick].short_description;
+                        scope.data.shortDescription = SIDescription.get(resource).short_description;
                     });
                 }
             });
@@ -205,7 +205,7 @@ export var registerRoutes = (
         })
         .specificVersionable(RIParagraph, RIParagraphVersion, "comments", processType.content_type, context, [
             () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
-                var documentUrl = _.last(_.sortBy(version.data[SIParagraph.nick].documents));
+                var documentUrl = _.last(_.sortBy(SIParagraph.get(version).documents));
                 return {
                     commentableUrl: version.path,
                     commentCloseUrl: documentUrl,
@@ -224,14 +224,14 @@ export var registerRoutes = (
                 if (resource.content_type !== RICommentVersion.content_type) {
                     return $q.when(resource);
                 } else {
-                    var url = resource.data[SIComment.nick].refers_to;
+                    var url = SIComment.get(resource).refers_to;
                     return adhHttp.get(url).then(getCommentableUrl);
                 }
             };
 
             return (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return getCommentableUrl(version).then((commentable) => {
-                    var documentUrl = _.last(_.sortBy(commentable.data[SIParagraph.nick].documents));
+                    var documentUrl = _.last(_.sortBy(SIParagraph.get(commentable).documents));
                     return {
                         commentableUrl: commentable.path,
                         commentCloseUrl: documentUrl,

@@ -27,8 +27,8 @@ export var pageDirective = (
             scope.$watch("path", (path : string) => {
                 if (path) {
                     adhHttp.get(path).then((page : ResourcesBase.IResource) => {
-                        scope.title = page.data[SITitle.nick].title;
-                        scope.description = page.data[SIDescription.nick].description;
+                        scope.title = SITitle.get(page).title;
+                        scope.description = SIDescription.get(page).description;
                     });
                 }
             });

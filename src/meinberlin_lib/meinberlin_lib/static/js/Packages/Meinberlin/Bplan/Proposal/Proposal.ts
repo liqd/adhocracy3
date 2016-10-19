@@ -130,7 +130,7 @@ export var embedDirective = (
             };
 
             adhHttp.get(scope.path).then((resource) => {
-                var sheet = resource.data[SIWorkflow.nick];
+                var sheet = SIWorkflow.get(resource);
                 scope.currentPhase = sheet.workflow_state;
                 scope.announceText = AdhProcess.getStateData(sheet, "announce").description;
                 scope.frozenText = AdhProcess.getStateData(sheet, "frozen").description;
