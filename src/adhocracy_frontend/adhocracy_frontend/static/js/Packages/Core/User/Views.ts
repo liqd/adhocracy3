@@ -735,6 +735,7 @@ var postEdit = (
         name : string;
         password? : string;
         anonymize? : boolean;
+        passwordOld? : string;
     }
 ) => {
     return adhHttp.get(path).then((oldUser) => {
@@ -755,7 +756,9 @@ var postEdit = (
         patch.data[SIAnonymizeDefault.nick] = new SIAnonymizeDefault.Sheet({
             anonymize: data.anonymize,
         });
-        return adhHttp.put(oldUser.path, patch);
+        return adhHttp.put(oldUser.path, patch, {
+            password: data.passwordOld
+        });
     });
 };
 

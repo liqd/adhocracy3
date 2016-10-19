@@ -47,6 +47,17 @@
             {{ "TR__ERROR_MATCH_PASSWORD" | translate }}
         </span>
     </label>
+    <label>
+        <span class="label-text">{{ "TR__PASSWORD_OLD" | translate }}</span>
+        <input
+            type="password"
+            name="password_old"
+            data-ng-required="data.password"
+            data-ng-model="data.passwordOld" />
+        <span class="input-error" data-ng-show="showError(userEditForm, userEditForm.password_old, 'required')">
+            {{ "TR__ERROR_REQUIRED_PASSWORD" | translate }}
+        </span>
+    </label>
     <label data-ng-if="config.anonymize_enabled">
         <input
             type="checkbox"
