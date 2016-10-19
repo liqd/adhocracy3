@@ -504,78 +504,6 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
     }
     resourceC += "\n";
 
-    var mkConstructor = (tab : string) => {
-        var os : string[] = [];
-
-        // we use reqArgs, optArgs, and lines to group semantically
-        // close constructor arguments and code lines.
-        //
-        // `{ [key : string] : string }` cannot be used with object
-        // attribute syntax, so we type the args dictionaries as
-        // `any`.
-        var reqArgs : any = {};
-        var optArgs : any = {};
-        var lines : string[] = [];
-
-        reqArgs.preliminaryNames = "PreliminaryNames.Service";
-
-        // resource path is either optional arg or (if n/a)
-        // preliminary name.
-        optArgs.path = "string";
-        lines.push("    if (args.hasOwnProperty(\"path\")) {");
-        lines.push("        _self.path = args.path;");
-        lines.push("    } else {");
-        lines.push("        _self.path = args.preliminaryNames.nextPreliminary();");
-        lines.push("    }");
-
-        // first_version_path is set to a preliminary name iff
-        // IVersions sheet is present.
-        if (resource.sheets.indexOf("adhocracy_core.sheets.versions.IVersions") !== -1) {
-            lines.push("    _self.first_version_path = args.preliminaryNames.nextPreliminary();");
-        } else {
-            lines.push("    _self.first_version_path = undefined;");
-        }
-
-        // root_versions is empty.
-        lines.push("    _self.root_versions = [];");
-
-        // if IName sheet is present, allow to set name in
-        // constructor (optional arg).
-        if (resource.sheets.indexOf("adhocracy_core.sheets.name.IName") !== -1) {
-            optArgs.name = "string";
-            lines.push("    if (args.hasOwnProperty(\"name\")) {");
-            lines.push("        _self.data[\"adhocracy_core.sheets.name.IName\"] =");
-            lines.push("            new " + mkModuleName("adhocracy_core.sheets.name.IName", metaApi) + ".Sheet" +
-                       "({ name : args.name })");
-            lines.push("    }");
-        }
-
-        // construct optargs
-        var args : string[] = [];
-        (() => {
-            var x;
-            for (x in reqArgs) {
-                if (reqArgs.hasOwnProperty(x)) {
-                    args.push(x + " : " + reqArgs[x]);
-                }
-            }
-            for (x in optArgs) {
-                if (optArgs.hasOwnProperty(x)) {
-                    args.push(x + "? : " + optArgs[x]);
-                }
-            }
-        })();
-
-        // construct constructor function code.
-        os.push("constructor(args : { " + args.join("; ") + " }) {");
-        os.push("    super(\"" + modulePath + "\");");
-        os.push("    var _self = this;");
-        lines.forEach((line) => os.push(line));
-        os.push("}");
-
-        return os.map((s) => tab + s).join("\n");
-    };
-
     var mkDataDeclaration = (tab : string) : string => {
         var os : string[] = [];
 
@@ -591,9 +519,10 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
         return os.map((s) => tab + s).join("\n");
     };
 
-    resourceC += "class " + mkResourceClassName(mkNick(modulePath, metaApi)) + " extends Base.Resource {\n";
+    resourceC += "class " + mkResourceClassName(mkNick(modulePath, metaApi)) + " implements Base.IResource {\n";
     resourceC += "    public static content_type = \"" + modulePath + "\";\n\n";
-    resourceC += mkConstructor("    ") + "\n\n";
+    resourceC += "    public path;\n";
+    resourceC += "    public content_type;\n\n";
     resourceC += mkDataDeclaration("    ") + "\n";
     resourceC += "}\n\n";
     resourceC += "export default " + mkResourceClassName(mkNick(modulePath, metaApi)) + ";\n\n";
