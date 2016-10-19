@@ -91,12 +91,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
                 return {
                     skip: true
                 };
-            }])
-            .otherwise(() : AdhTopLevelState.IAreaInput => {
-                return {
-                    template: "<adh-header></adh-header><div class=\"l-content\"><h1>404 - Not Found</h1></div>"
-                };
-            });
+            }]);
     }]);
     app.config(["$compileProvider", ($compileProvider) => {
         $compileProvider.debugInfoEnabled(config.debug);
