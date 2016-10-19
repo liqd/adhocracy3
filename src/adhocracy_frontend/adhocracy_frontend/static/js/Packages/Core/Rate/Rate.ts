@@ -14,10 +14,10 @@ import * as AdhUser from "../User/User";
 import * as AdhUtil from "../Util/Util";
 import * as AdhWebSocket from "../WebSocket/WebSocket";
 
-import RIProcess from "../../../Resources_/adhocracy_core/resources/process/IProcess";
+import * as ResourcesBase from "../../ResourcesBase";
+
 import RIRate from "../../../Resources_/adhocracy_core/resources/rate/IRate";
 import RIRateVersion from "../../../Resources_/adhocracy_core/resources/rate/IRateVersion";
-import RIUser from "../../../Resources_/adhocracy_core/resources/principal/IUser";
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIRate from "../../../Resources_/adhocracy_core/sheets/rate/IRate";
 import * as SIUserBasic from "../../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
@@ -73,7 +73,7 @@ export interface IRateScope extends angular.IScope {
 export var getWorkflowState = (
     adhResourceArea : AdhResourceArea.Service
 ) => (resourceUrl : string) : angular.IPromise<string> => {
-    return adhResourceArea.getProcess(resourceUrl, false).then((resource : RIProcess) => {
+    return adhResourceArea.getProcess(resourceUrl, false).then((resource : ResourcesBase.IResource) => {
         if (typeof resource !== "undefined") {
             var workflowSheet = resource.data[SIWorkflow.nick];
             if (typeof workflowSheet !== "undefined") {
@@ -166,8 +166,8 @@ export var directiveFactory = (template : string, sheetName : string) => (
         return adhHttp.get(poolPath, query)
             .then((poolRsp) => {
                 var ratePaths : string[] = poolRsp.data[SIPool.nick].elements;
-                var rates : RIRateVersion[] = [];
-                var users : RIUser[] = [];
+                var rates : ResourcesBase.IResource[] = [];
+                var users : ResourcesBase.IResource[] = [];
                 var auditTrail : { subject: string; rate: number }[] = [];
 
                 adhHttp.withTransaction((transaction) : angular.IPromise<void> => {
@@ -213,12 +213,12 @@ export var directiveFactory = (template : string, sheetName : string) => (
             disabled: "="
         },
         link: (scope : IRateScope) : void => {
-            var myRateResource : RIRateVersion;
+            var myRateResource : ResourcesBase.IResource;
             var webSocketOff : () => void;
             var postPoolPath : string;
             var rates : {[key : string]: number};
             var lock : boolean;
-            var storeMyRateResource : (resource : RIRateVersion) => void;
+            var storeMyRateResource : (resource : ResourcesBase.IResource) => void;
             var forceResult : boolean = false;
 
             var updateMyRate = () : angular.IPromise<void> => {
@@ -264,7 +264,7 @@ export var directiveFactory = (template : string, sheetName : string) => (
                 }
             };
 
-            storeMyRateResource = (resource : RIRateVersion) => {
+            storeMyRateResource = (resource : ResourcesBase.IResource) => {
                 myRateResource = resource;
 
                 if (typeof webSocketOff === "undefined") {

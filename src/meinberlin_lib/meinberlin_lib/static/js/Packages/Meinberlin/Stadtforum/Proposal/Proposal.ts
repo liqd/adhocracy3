@@ -9,6 +9,8 @@ import * as AdhRate from "../../../Core/Rate/Rate";
 import * as AdhTopLevelState from "../../../Core/TopLevelState/TopLevelState";
 import * as AdhUtil from "../../../Core/Util/Util";
 
+import * as ResourcesBase from "../../../../ResourcesBase";
+
 import * as SICommentable from "../../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIDescription from "../../../../Resources_/adhocracy_core/sheets/description/IDescription";
 import * as SIMetadata from "../../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
@@ -91,7 +93,7 @@ var bindPath = (
 
 var fill = (
     scope : IScope,
-    proposalVersion : RIProposalVersion
+    proposalVersion : ResourcesBase.IResource
 ) : void => {
     proposalVersion.data[SITitle.nick] = new SITitle.Sheet({
         title: scope.data.title
@@ -126,7 +128,7 @@ var postEdit = (
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : IScope,
-    oldVersion : RIProposalVersion
+    oldVersion : ResourcesBase.IResource
 ) => {
     var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
     proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);

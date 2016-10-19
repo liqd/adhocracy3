@@ -1058,7 +1058,7 @@ export var registerRoutes = (
             space: "content",
             movingColumns: "is-show-show-hide"
         })
-        .specific(RIMercatorProposalVersion, "", processType, context, () => (resource : RIMercatorProposalVersion) => {
+        .specific(RIMercatorProposalVersion, "", processType, context, () => (resource : ResourcesBase.IResource) => {
             return {
                 proposalUrl: resource.path
             };
@@ -1068,7 +1068,7 @@ export var registerRoutes = (
             movingColumns: "is-collapse-show-hide"
         })
         .specific(RIMercatorProposalVersion, "edit", processType, context, ["adhHttp", (adhHttp : AdhHttp.Service) => {
-            return (resource : RIMercatorProposalVersion) => {
+            return (resource : ResourcesBase.IResource) => {
                 var poolPath = AdhUtil.parentPath(resource.path);
 
                 return adhHttp.options(poolPath).then((options : AdhHttp.IOptions) => {
@@ -1087,7 +1087,7 @@ export var registerRoutes = (
             movingColumns: "is-show-show-hide",
             proposalTab: "blog"
         })
-        .specific(RIMercatorProposalVersion, "blog", processType, context, () => (resource : RIMercatorProposalVersion) => {
+        .specific(RIMercatorProposalVersion, "blog", processType, context, () => (resource : ResourcesBase.IResource) => {
             return {
                 proposalUrl: resource.path
             };
@@ -1096,7 +1096,7 @@ export var registerRoutes = (
             space: "content",
             movingColumns: "is-collapse-show-show"
         })
-        .specific(RIMercatorProposalVersion, "comments", processType, context, () => (resource : RIMercatorProposalVersion) => {
+        .specific(RIMercatorProposalVersion, "comments", processType, context, () => (resource : ResourcesBase.IResource) => {
             return {
                 proposalUrl: resource.path,
                 commentableUrl: resource.path,
@@ -1112,7 +1112,7 @@ export var registerRoutes = (
                 movingColumns: "is-collapse-show-show"
             })
             .specific(RIMercatorProposalVersion, "comments:" + section, processType, context, () =>
-                (resource : RIMercatorProposalVersion) => {
+                (resource : ResourcesBase.IResource) => {
                     return {
                         proposalUrl: resource.path,
                         commentableUrl: resource.data[SIMercatorSubResources.nick][section],

@@ -178,7 +178,7 @@ export var registerRoutes = (
             movingColumns: "is-show-show-hide"
         })
         .specificVersionable(RIDocument, RIDocumentVersion, "", processType.content_type, context, [
-            () => (item : RIDocument, version : RIDocumentVersion) => {
+            () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return {
                     documentUrl: version.path
                 };
@@ -188,7 +188,7 @@ export var registerRoutes = (
             movingColumns: "is-show-show-hide"
         })
         .specificVersionable(RIDocument, RIDocumentVersion, "edit", processType.content_type, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service) => (item : RIDocument, version : RIDocumentVersion) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -204,7 +204,7 @@ export var registerRoutes = (
             movingColumns: "is-collapse-show-show"
         })
         .specificVersionable(RIParagraph, RIParagraphVersion, "comments", processType.content_type, context, [
-            () => (item : RIParagraph, version : RIParagraphVersion) => {
+            () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 var documentUrl = _.last(_.sortBy(version.data[SIParagraph.nick].documents));
                 return {
                     commentableUrl: version.path,
@@ -229,7 +229,7 @@ export var registerRoutes = (
                 }
             };
 
-            return (item : RIComment, version : RICommentVersion) => {
+            return (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return getCommentableUrl(version).then((commentable) => {
                     var documentUrl = _.last(_.sortBy(commentable.data[SIParagraph.nick].documents));
                     return {

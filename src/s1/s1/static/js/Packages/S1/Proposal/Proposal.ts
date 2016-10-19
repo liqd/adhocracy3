@@ -10,6 +10,8 @@ import * as AdhRate from "../../Core/Rate/Rate";
 import * as AdhTopLevelState from "../../Core/TopLevelState/TopLevelState";
 import * as AdhUtil from "../../Core/Util/Util";
 
+import * as ResourcesBase from "../../ResourcesBase";
+
 import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RISystemUser from "../../../Resources_/adhocracy_core/resources/principal/ISystemUser";
 import RIProposal from "../../../Resources_/adhocracy_s1/resources/s1/IProposal";
@@ -27,7 +29,7 @@ var pkgLocation = "/S1/Proposal";
 
 export interface IScope extends angular.IScope {
     path : string;
-    resource : RIProposalVersion;
+    resource : ResourcesBase.IResource;
     selectedState? : string;
     data : {
         title : string;
@@ -75,8 +77,8 @@ var bindPath = (
                 adhHttp.get(AdhUtil.parentPath(value)),
                 adhHttp.get(value)
             ]).then((args : any) => {
-                var item : RIProposal = args[0];
-                var version : RIProposalVersion = args[1];
+                var item : ResourcesBase.IResource = args[0];
+                var version : ResourcesBase.IResource = args[1];
 
                 scope.resource = version;
 
@@ -159,7 +161,7 @@ var postEdit = (
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : IScope,
-    oldVersion : RIProposalVersion
+    oldVersion : ResourcesBase.IResource
 ) => {
     var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
     proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);

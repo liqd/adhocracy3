@@ -16,6 +16,8 @@ import * as AdhUtil from "../Util/Util";
 import * as AdhCredentials from "./Credentials";
 import * as AdhUser from "./User";
 
+import * as ResourcesBase from "../../ResourcesBase";
+
 import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RIProposal from "../../../Resources_/adhocracy_core/resources/proposal/IProposal";
 import RIRate from "../../../Resources_/adhocracy_core/resources/rate/IRate";
@@ -823,7 +825,7 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
             modals: "="
         },
         link: (scope)  => {
-            adhHttp.get(scope.recipientUrl).then((recipient : RIUser) => {
+            adhHttp.get(scope.recipientUrl).then((recipient : ResourcesBase.IResource) => {
                 scope.recipientName = recipient.data[SIUserBasic.nick].name;
             });
 
@@ -1028,7 +1030,7 @@ export var registerRoutes = (
             space: "user",
             movingColumns: "is-show-hide-hide"
         })
-        .specific(RIUser, "", "", context, () => (resource : RIUser) => {
+        .specific(RIUser, "", "", context, () => (resource : ResourcesBase.IResource) => {
             return {
                 userUrl: resource.path
             };
@@ -1037,7 +1039,7 @@ export var registerRoutes = (
             space: "user",
             movingColumns: "is-show-hide-hide"
         })
-        .specific(RIUser, "edit", "", context, ["adhHttp", (adhHttp : AdhHttp.Service) => (resource : RIUser) => {
+        .specific(RIUser, "edit", "", context, ["adhHttp", (adhHttp : AdhHttp.Service) => (resource : ResourcesBase.IResource) => {
             return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                 if (!options.PUT) {
                     throw 401;

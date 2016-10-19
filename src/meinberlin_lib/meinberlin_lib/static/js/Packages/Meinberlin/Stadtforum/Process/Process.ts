@@ -9,6 +9,8 @@ import * as AdhPermissions from "../../../Core/Permissions/Permissions";
 import * as AdhResourceArea from "../../../Core/ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../../../Core/TopLevelState/TopLevelState";
 
+import * as ResourcesBase from "../../../../ResourcesBase";
+
 import RIPoll from "../../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IPoll";
 import RIProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
 import RIStadtforumProcess from "../../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IProcess";
@@ -166,7 +168,7 @@ export var registerRoutes = (
             movingColumns: "is-show-show-hide"
         })
         .specific(RIStadtforumProcess, "create_proposal", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service) => (resource : RIStadtforumProcess) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (resource : ResourcesBase.IResource) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.canPost(RIPoll.content_type)) {
                         throw 401;
@@ -180,7 +182,7 @@ export var registerRoutes = (
             movingColumns: "is-show-show-hide"
         })
         .specificVersionable(RIPoll, RIProposalVersion, "", processType, context, [
-            () => (item : RIPoll, version : RIProposalVersion) => {
+            () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return {
                     proposalUrl: version.path
                 };
@@ -190,7 +192,7 @@ export var registerRoutes = (
             movingColumns: "is-show-show-hide"
         })
         .specificVersionable(RIPoll, RIProposalVersion, "edit", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service) => (item : RIPoll, version : RIProposalVersion) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -206,7 +208,7 @@ export var registerRoutes = (
             movingColumns: "is-collapse-show-show"
         })
         .specificVersionable(RIPoll, RIProposalVersion, "comments", processType, context, [
-            () => (item : RIPoll, version : RIProposalVersion) => {
+            () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return {
                     commentableUrl: version.path,
                     commentCloseUrl: version.path,

@@ -6,6 +6,8 @@ import * as AdhPermissions from "../../Permissions/Permissions";
 import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
 
+import * as ResourcesBase from "../../../ResourcesBase";
+
 import RIComment from "../../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import * as SIComment from "../../../../Resources_/adhocracy_core/sheets/comment/IComment";
@@ -252,7 +254,7 @@ export var registerRoutesFactory = (
                 }
             };
 
-            return (item : RIComment, version : RICommentVersion) => {
+            return (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return getCommentableUrl(version).then((commentable) => {
                     return {
                         commentableUrl: commentable.path,

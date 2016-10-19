@@ -3,7 +3,8 @@ import * as AdhHttp from "../../Core/Http/Http";
 import * as AdhPermissions from "../../Core/Permissions/Permissions";
 import * as AdhTopLevelState from "../../Core/TopLevelState/TopLevelState";
 
-import RIS1Process from "../../../Resources_/adhocracy_s1/resources/s1/IProcess";
+import * as ResourcesBase from "../../../ResourcesBase";
+
 import * as SIWorkflowAssignment from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 export var pkgLocation = "/S1/Context";
@@ -40,7 +41,7 @@ export var stateIndicatorDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/StateIndicator.html",
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.on("processUrl", (processUrl) => {
-                adhHttp.get(processUrl).then((process : RIS1Process) => {
+                adhHttp.get(processUrl).then((process : ResourcesBase.IResource) => {
                     scope.workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
                 });
             }));
@@ -66,7 +67,7 @@ export var meetingSelectorDirective = (
         },
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("meeting", scope));
-            adhHttp.get(scope.processUrl).then((process : RIS1Process) => {
+            adhHttp.get(scope.processUrl).then((process : ResourcesBase.IResource) => {
                 scope.workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
             });
         }

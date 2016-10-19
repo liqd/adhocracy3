@@ -3,6 +3,8 @@ import * as AdhHttp from "../Http/Http";
 import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
+import * as ResourcesBase from "../../ResourcesBase";
+
 import RIPage from "../../../Resources_/adhocracy_core/resources/page/IPage";
 import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
 import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
@@ -24,7 +26,7 @@ export var pageDirective = (
 
             scope.$watch("path", (path : string) => {
                 if (path) {
-                    adhHttp.get(path).then((page : RIPage) => {
+                    adhHttp.get(path).then((page : ResourcesBase.IResource) => {
                         scope.title = page.data[SITitle.nick].title;
                         scope.description = page.data[SIDescription.nick].description;
                     });

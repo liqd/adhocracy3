@@ -11,6 +11,8 @@ import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as AdhUtil from "../Util/Util";
 
+import * as ResourcesBase from "../../ResourcesBase";
+
 import RIBadgeAssignment from "../../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment";
 import * as SIBadge from "../../../Resources_/adhocracy_core/sheets/badge/IBadge";
 import * as SIBadgeable from "../../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
@@ -137,7 +139,7 @@ export var getBadgesFactory = (
     var assignmentPaths = resource.data[SIBadgeable.nick].assignments;
 
     var getBadge = (assignmentPath : string) => {
-        return adhHttp.get(assignmentPath).then((assignment : RIBadgeAssignment) => {
+        return adhHttp.get(assignmentPath).then((assignment : ResourcesBase.IResource) => {
             var badgePath = assignment.data[SIBadgeAssignment.nick].badge;
             return adhHttp.get(badgePath).then((badge) => {
                 return {

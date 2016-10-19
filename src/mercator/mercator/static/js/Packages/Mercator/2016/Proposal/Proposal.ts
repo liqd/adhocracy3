@@ -11,6 +11,8 @@ import * as AdhTopLevelState from "../../../Core/TopLevelState/TopLevelState";
 
 import * as AdhMercator2015Proposal from "../../2015/Proposal/Proposal";
 
+import * as ResourcesBase from "../../../../ResourcesBase";
+
 import * as SIBadgeable from "../../../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
 import * as SIBadgeAssignment from "../../../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment";
 import * as SIChallenge from "../../../../Resources_/adhocracy_mercator/sheets/mercator2/IChallenge";
@@ -503,18 +505,18 @@ var get = (
 ) => (path : string) : ng.IPromise<IDetailData> => {
     return adhHttp.get(path).then((proposal) => {
         var subs : {
-            pitch : RIPitch;
-            partners : RIPartners;
-            duration : RIDuration;
-            challenge : RIChallenge;
-            goal : RIGoal;
-            plan : RIPlan;
-            target : RITarget;
-            team : RITeam;
-            extrainfo : RIExtraInfo;
-            connectioncohesion : RIConnectionCohesion;
-            difference : RIDifference;
-            practicalrelevance : RIPracticalRelevance;
+            pitch : ResourcesBase.IResource
+            partners : ResourcesBase.IResource
+            duration : ResourcesBase.IResource
+            challenge : ResourcesBase.IResource
+            goal : ResourcesBase.IResource
+            plan : ResourcesBase.IResource
+            target : ResourcesBase.IResource
+            team : ResourcesBase.IResource
+            extrainfo : ResourcesBase.IResource
+            connectioncohesion : ResourcesBase.IResource
+            difference : ResourcesBase.IResource
+            practicalrelevance : ResourcesBase.IResource
         } = <any>{};
 
         return $q.all(_.map(proposal.data[SIMercatorSubResources.nick], (path, key) => {

@@ -60,8 +60,8 @@ export interface IScope extends angular.IScope {
     toggleCreateForm() : void;
     showCreateForm? : boolean;
 
-    documentVersion? : RIDocumentVersion;
-    paragraphVersions? : RIParagraphVersion[];
+    documentVersion? : ResourcesBase.IResource;
+    paragraphVersions? : ResourcesBase.IResource[];
 
     commentType? : string;
 }
@@ -107,13 +107,13 @@ export var bindPath = (
 ) : Function => {
     return scope.$watch(pathKey, (path : string) => {
         if (path) {
-            adhHttp.get(path).then((documentVersion : RIDocumentVersion) => {
+            adhHttp.get(path).then((documentVersion : ResourcesBase.IResource) => {
                 var paragraphPaths : string[] = documentVersion.data[SIDocument.nick].elements;
                 var paragraphPromises = _.map(paragraphPaths, (path) => {
                     return adhHttp.get(path);
                 });
 
-                return $q.all(paragraphPromises).then((paragraphVersions : RIParagraphVersion[]) => {
+                return $q.all(paragraphPromises).then((paragraphVersions : ResourcesBase.IResource[]) => {
                     var paragraphs = _.map(paragraphVersions, (paragraphVersion) => {
                         return {
                             body: paragraphVersion.data[SIParagraph.nick].text,
@@ -142,7 +142,7 @@ export var bindPath = (
                     }
 
                     if (hasBadges) {
-                        adhGetBadges(documentVersion).then((assignments) => {
+                        adhGetBadges(<RIDocumentVersion>documentVersion).then((assignments) => {
                             scope.data.assignments = assignments;
                         });
                     }
@@ -235,8 +235,8 @@ export var postEdit = (
     adhUploadImage
 ) => (
     scope : IFormScope,
-    oldVersion : RIDocumentVersion,
-    oldParagraphVersions : RIParagraphVersion[],
+    oldVersion : ResourcesBase.IResource,
+    oldParagraphVersions : ResourcesBase.IResource[],
     hasMap : boolean = false
 ) : angular.IPromise<RIDocumentVersion> => {
     // This function assumes the following:
@@ -252,11 +252,11 @@ export var postEdit = (
 
     const documentVersionClass = hasMap ? RIGeoDocumentVersion : RIDocumentVersion;
 
-    var paragraphItems : RIParagraph[] = [];
-    var paragraphVersions : RIParagraphVersion[] = [];
+    var paragraphItems : ResourcesBase.IResource[] = [];
+    var paragraphVersions : ResourcesBase.IResource[] = [];
     var paragraphRefs : string[] = [];
 
-    var paragraphVersion : RIParagraphVersion;
+    var paragraphVersion : ResourcesBase.IResource;
 
     _.forEach(scope.data.paragraphs, (paragraph : IParagraph, index : number) => {
         // currently, if a paragraph has been deleted, it doesn't get posted at all.
@@ -501,7 +501,7 @@ export var createDirective = (
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
                     return postCreate(adhHttp, adhPreliminaryNames, adhUploadImage)(scope, scope.path, scope.hasMap);
-                }).then((documentVersion : RIDocumentVersion) => {
+                }).then((documentVersion : ResourcesBase.IResource) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
                 });
@@ -567,7 +567,7 @@ export var editDirective = (
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
                     return postEdit(adhHttp, adhPreliminaryNames, adhUploadImage)(
                         scope, scope.documentVersion, scope.paragraphVersions, scope.hasMap);
-                }).then((documentVersion : RIDocumentVersion) => {
+                }).then((documentVersion : ResourcesBase.IResource) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
                 });
