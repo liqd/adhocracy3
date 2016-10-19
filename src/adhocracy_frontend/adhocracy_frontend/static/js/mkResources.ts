@@ -122,6 +122,7 @@ var mkFieldSignaturesSheetCons : (fields : MetaApi.ISheetField[], tab : string, 
 var mkFieldSignaturesSheetParse : (fields : MetaApi.ISheetField[], tab : string, separator : string) => string;
 var mkFieldAssignments : (fields : MetaApi.ISheetField[], tab : string) => string;
 var enabledFields : (fields : MetaApi.ISheetField[], enableFlags? : string) => MetaApi.ISheetField[];
+var mkSheetSetterGetter : () => string;
 
 var renderResource : (modulePath : string, resource : MetaApi.IResource, modules : MetaApi.IModuleDict, metaApi : MetaApi.IMetaApi) => void;
 
@@ -472,7 +473,7 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
     sheetI += "    content_type : string;\n";
     sheetI += "}\n\n";
 
-    modules[modulePath] = sheetI + hasSheetI;
+    modules[modulePath] = sheetI + hasSheetI + mkSheetSetterGetter();
 };
 
 mkFieldSignatures = (fields : MetaApi.ISheetField[], tab : string, separator : string) : string =>
@@ -525,6 +526,14 @@ enabledFields = (fields : MetaApi.ISheetField[], enableFlags? : string) : MetaAp
         });
         return enabledFields;
     }
+};
+
+mkSheetSetterGetter = () => {
+    // FIXME: we could add types
+    return "export var get = (resource) => resource.data[nick];\n" +
+        "export var set = (resource, sheet) : void => {\n" +
+        "    resource.data[nick] = sheet;\n" +
+        "};\n";
 };
 
 renderResource = (modulePath : string, resource : MetaApi.IResource, modules : MetaApi.IModuleDict, metaApi : MetaApi.IMetaApi) : void => {
