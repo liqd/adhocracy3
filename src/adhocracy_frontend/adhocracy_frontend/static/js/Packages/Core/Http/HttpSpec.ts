@@ -17,7 +17,11 @@ import * as Error from "./Error";
 var mkHttpMock = (adhPreliminaryNames : AdhPreliminaryNames.Service) => {
     var mock = jasmine.createSpy("$httpMock");
 
-    var response = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
+    var response : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RIParagraph.content_type,
+        data: {},
+    };
 
     (<any>mock).get = jasmine.createSpy("$httpMock.get").and.returnValue(q.when({ data: response }));
     (<any>mock).post = jasmine.createSpy("$httpMock.post").and.returnValue(q.when({ data: response }));
@@ -211,7 +215,11 @@ export var register = () => {
                     var path = "path/";
                     var returnPath1 = "path1/";
 
-                    var dag = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
+                    var dag : ResourcesBase.IResource = {
+                        path: adhPreliminaryNames.nextPreliminary(),
+                        content_type: RIParagraph.content_type,
+                        data: {},
+                    };
                     dag.data["adhocracy_core.sheets.tags.ITags"] = new SITags.Sheet({ LAST: returnPath1 });
                     $httpMock.get.and.returnValue(q.when({ data: dag }));
 
@@ -332,7 +340,11 @@ export var register = () => {
                     };
 
                     var newHead = "new_head";
-                    var dag = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
+                    var dag : ResourcesBase.IResource = {
+                        path: adhPreliminaryNames.nextPreliminary(),
+                        content_type: RIParagraph.content_type,
+                        data: {},
+                    };
                     dag.data["adhocracy_core.sheets.tags.ITags"] = new SITags.Sheet({ FIRST: undefined,
                                                                                       LAST: newHead
                                                                                     });

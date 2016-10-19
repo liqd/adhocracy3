@@ -10,6 +10,8 @@ import * as AdhResourceUtil from "../Util/ResourceUtil";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 
+import * as ResourcesBase from "../../ResourcesBase";
+
 import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RIExternalResource from "../../../Resources_/adhocracy_core/resources/external_resource/IExternalResource";
@@ -17,6 +19,7 @@ import RISystemUser from "../../../Resources_/adhocracy_core/resources/principal
 import * as SICommentable from "../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SIName from "../../../Resources_/adhocracy_core/sheets/name/IName";
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
@@ -133,14 +136,18 @@ export var postCreate = (
     scope : ICommentResourceScope,
     poolPath : string
 ) => {
-    var item = new RIComment({
-        preliminaryNames: adhPreliminaryNames
-    });
+    var item : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RIComment.content_type,
+        data: {},
+    };
     item.parent = poolPath;
 
-    var version = new RICommentVersion({
-        preliminaryNames: adhPreliminaryNames
-    });
+    var version : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RICommentVersion.content_type,
+        data: {},
+    };
     version.data[SIComment.nick] = new SIComment.Sheet({
         content: scope.data.content,
         refers_to: scope.refersTo
@@ -428,7 +435,14 @@ export var adhCreateOrShowCommentListing = (
                     } else {
                         var unwatch = scope.$watch(() => adhCredentials.loggedIn, (loggedIn) => {
                             if (loggedIn) {
-                                var externalResource = new RIExternalResource({preliminaryNames: adhPreliminaryNames, name: scope.key});
+                                var externalResource = {
+                                    path: adhPreliminaryNames.nextPreliminary(),
+                                    content_type: RIExternalResource.content_type,
+                                    data: {},
+                                };
+                                externalResource.data[SIName.nick] = new SIName.Sheet({
+                                    name: scope.key,
+                                });
                                 return adhHttp.post(scope.poolPath, externalResource).then((obj) => {
                                     if (obj.path !== commentablePath) {
                                         console.log("Created object has wrong path (internal error)");

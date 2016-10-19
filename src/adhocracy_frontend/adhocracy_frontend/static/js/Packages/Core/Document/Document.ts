@@ -170,18 +170,31 @@ export var postCreate = (
     const documentClass = hasMap ? RIGeoDocument : RIDocument;
     const documentVersionClass = hasMap ? RIGeoDocumentVersion : RIDocumentVersion;
 
-    var doc = new documentClass({preliminaryNames: adhPreliminaryNames});
-    doc.parent = poolPath;
+    var doc : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        first_version_path: adhPreliminaryNames.nextPreliminary(),
+        parent: poolPath,
+        content_type: documentClass.content_type,
+        data: {},
+    };
 
     var paragraphItems = [];
     var paragraphVersions = [];
 
     _.forEach(scope.data.paragraphs, (paragraph) => {
         if (!paragraph.deleted) {
-            var item = new RIParagraph({preliminaryNames: adhPreliminaryNames});
+            var item : ResourcesBase.IResource = {
+                path: adhPreliminaryNames.nextPreliminary(),
+                content_type: RIParagraph.content_type,
+                data: {},
+            };
             item.parent = doc.path;
 
-            var version = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
+            var version : ResourcesBase.IResource = {
+                path: adhPreliminaryNames.nextPreliminary(),
+                content_type: RIParagraphVersion.content_type,
+                data: {},
+            };
             version.parent = item.path;
             version.data[SIVersionable.nick] = new SIVersionable.Sheet({
                 follows: [item.first_version_path]
@@ -195,8 +208,12 @@ export var postCreate = (
         }
     });
 
-    var documentVersion = new documentVersionClass({preliminaryNames: adhPreliminaryNames});
-    documentVersion.parent = doc.path;
+    var documentVersion : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        parent: doc.path,
+        content_type: documentVersionClass.content_type,
+        data: {},
+    };
     documentVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
         follows: [doc.first_version_path]
     });
@@ -263,11 +280,19 @@ export var postEdit = (
         if (!paragraph.deleted) {
 
             if (index >= oldParagraphVersions.length) {
-                var item = new RIParagraph({preliminaryNames: adhPreliminaryNames});
-                item.parent = documentPath;
+                var item : ResourcesBase.IResource = {
+                    path: adhPreliminaryNames.nextPreliminary(),
+                    parent: documentPath,
+                    content_type: RIParagraph.content_type,
+                    data: {},
+                };
 
-                paragraphVersion = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
-                paragraphVersion.parent = item.path;
+                paragraphVersion = {
+                    path: adhPreliminaryNames.nextPreliminary(),
+                    parent: item.path,
+                    content_type: RIParagraphVersion.content_type,
+                    data: {},
+                };
                 paragraphVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
                     follows: [item.first_version_path]
                 });
@@ -284,15 +309,19 @@ export var postEdit = (
                 var oldParagraphVersion = oldParagraphVersions[index];
 
                 if (paragraph.body !== oldParagraphVersion.data[SIParagraph.nick].text) {
-                    paragraphVersion = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
-                    paragraphVersion.parent = AdhUtil.parentPath(oldParagraphVersion.path);
+                    paragraphVersion = {
+                        path: adhPreliminaryNames.nextPreliminary(),
+                        parent: AdhUtil.parentPath(oldParagraphVersion.path),
+                        root_versions: [oldVersion.path],
+                        content_type: RIParagraphVersion.content_type,
+                        data: {},
+                    };
                     paragraphVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
                         follows: [oldParagraphVersion.path]
                     });
                     paragraphVersion.data[SIParagraph.nick] = new SIParagraph.Sheet({
                         text: paragraph.body
                     });
-                    paragraphVersion.root_versions = [oldVersion.path];
 
                     paragraphVersions.push(paragraphVersion);
                     paragraphRefs.push(paragraphVersion.path);
@@ -303,8 +332,12 @@ export var postEdit = (
         }
     });
 
-    var documentVersion = new documentVersionClass({preliminaryNames: adhPreliminaryNames});
-    documentVersion.parent = documentPath;
+    var documentVersion = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        parent: documentPath,
+        content_type: documentVersionClass.content_type,
+        data: {},
+    };
     documentVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
         follows: [oldVersion.path]
     });

@@ -11,6 +11,8 @@ import * as AdhRate from "../../Rate/Rate";
 import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
 import * as AdhUtil from "../../Util/Util";
 
+import * as ResourcesBase from "../../../ResourcesBase";
+
 import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RISystemUser from "../../../../Resources_/adhocracy_core/resources/principal/ISystemUser";
 import * as SICommentable from "../../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
@@ -199,11 +201,20 @@ var postCreate = (
     var proposalClass = scope.processProperties.proposalClass;
     var proposalVersionClass = scope.processProperties.proposalVersionClass;
 
-    var proposal = new proposalClass({preliminaryNames: adhPreliminaryNames});
-    proposal.parent = poolPath;
-    var proposalVersion = new proposalVersionClass({preliminaryNames: adhPreliminaryNames});
+    var proposal : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        first_version_path: adhPreliminaryNames.nextPreliminary(),
+        parent: poolPath,
+        content_type: proposalClass.content_type,
+        data: {},
+    };
+    var proposalVersion : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        parent: proposal.path,
+        content_type: proposalVersionClass.content_type,
+        data: {},
+    };
 
-    proposalVersion.parent = proposal.path;
     proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
         follows: [proposal.first_version_path]
     });
@@ -223,8 +234,12 @@ var postEdit = (
 ) => {
     var proposalVersionClass = scope.processProperties.proposalVersionClass;
 
-    var proposalVersion = new proposalVersionClass({preliminaryNames: adhPreliminaryNames});
-    proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
+    var proposalVersion : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        parent: AdhUtil.parentPath(oldVersion.path),
+        content_type: proposalVersionClass.content_type,
+        data: {},
+    };
     proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
         follows: [oldVersion.path]
     });

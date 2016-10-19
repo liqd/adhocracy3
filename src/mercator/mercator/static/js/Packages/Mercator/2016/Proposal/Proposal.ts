@@ -358,7 +358,11 @@ var create = (
 ) => (scope) => {
     var data : IFormData = scope.data;
     return adhHttp.withTransaction((transaction) => {
-        var proposal = new RIMercatorProposal({preliminaryNames: adhPreliminaryNames});
+        var proposal : ResourcesBase.IResource = {
+            path: adhPreliminaryNames.nextPreliminary(),
+            content_type: RIMercatorProposal.content_type,
+            data: {},
+        };
         fill(data, proposal);
         var proposalRequest = transaction.post(scope.poolPath, proposal);
 
@@ -383,7 +387,11 @@ var create = (
             subResourcesSheet[subresourceKey] = request.path;
         });
 
-        var proposal2 = new RIMercatorProposal({preliminaryNames: adhPreliminaryNames});
+        var proposal2 : ResourcesBase.IResource = {
+            path: adhPreliminaryNames.nextPreliminary(),
+            content_type: RIMercatorProposal.content_type,
+            data: {},
+        };
         proposal2.data[SIMercatorSubResources.nick] = subResourcesSheet;
         transaction.put(proposalRequest.path, proposal2);
 
@@ -402,7 +410,11 @@ var edit = (
         var subResourcesSheet : SIMercatorSubResources.Sheet = oldProposal.data[SIMercatorSubResources.nick];
 
         return adhHttp.withTransaction((transaction) => {
-            var proposal = new RIMercatorProposal({preliminaryNames: adhPreliminaryNames});
+            var proposal : ResourcesBase.IResource = {
+                path: adhPreliminaryNames.nextPreliminary(),
+                content_type: RIMercatorProposal.content_type,
+                data: {},
+            };
             fill(data, proposal);
             // ICommunity can and should not be changed on edit
             delete proposal.data[SICommunity.nick];

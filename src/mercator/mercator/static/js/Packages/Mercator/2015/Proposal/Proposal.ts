@@ -608,11 +608,20 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
                 delete data.introduction.picture;
             }
 
-            var mercatorProposal = new RIMercatorProposal({preliminaryNames: this.adhPreliminaryNames});
+            var mercatorProposal = {
+                path: adhPreliminaryNames.nextPreliminary(),
+                first_version_path: adhPreliminaryNames.nextPreliminary(),
+                content_type: RIMercatorProposal.content_type,
+                data: {},
+            };
             mercatorProposal.parent = instance.scope.poolPath;
 
-            var mercatorProposalVersion = new RIMercatorProposalVersion({preliminaryNames: this.adhPreliminaryNames});
-            mercatorProposalVersion.parent = mercatorProposal.path;
+            var mercatorProposalVersion = {
+                path: adhPreliminaryNames.nextPreliminary(),
+                parent: mercatorProposal.path,
+                content_type: RIMercatorProposalVersion.content_type,
+                data: {},
+            };
             mercatorProposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
                 follows: [mercatorProposal.first_version_path]
             });

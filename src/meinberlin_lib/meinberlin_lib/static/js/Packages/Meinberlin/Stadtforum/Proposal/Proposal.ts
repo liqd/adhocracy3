@@ -110,9 +110,17 @@ var postCreate = (
     scope : IScope,
     poolPath : string
 ) => {
-    var proposal = new RIPoll({preliminaryNames: adhPreliminaryNames});
+    var proposal : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RIPoll.content_type,
+        data: {},
+    };
     proposal.parent = poolPath;
-    var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+    var proposalVersion : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RIProposalVersion.content_type,
+        data: {},
+    };
 
     proposalVersion.parent = proposal.path;
     proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
@@ -130,7 +138,11 @@ var postEdit = (
     scope : IScope,
     oldVersion : ResourcesBase.IResource
 ) => {
-    var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+    var proposalVersion : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RIProposalVersion.content_type,
+        data: {},
+    };
     proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
     proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
         follows: [oldVersion.path]

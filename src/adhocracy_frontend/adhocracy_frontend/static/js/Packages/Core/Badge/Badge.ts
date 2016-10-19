@@ -257,7 +257,11 @@ export var badgeAssignment = (
                             _.forOwn(scope.checkboxes, (checked, badgePath) => {
                                 var assignmentExisted = scope.assignments.hasOwnProperty(badgePath);
                                 if (checked && !assignmentExisted) {
-                                    var assignment = new RIBadgeAssignment({ preliminaryNames : adhPreliminaryNames });
+                                    var assignment : ResourcesBase.IResource = {
+                                        path: adhPreliminaryNames.nextPreliminary(),
+                                        content_type: RIBadgeAssignment.content_type,
+                                        data: {},
+                                    };
                                     assignment.data[SIBadgeAssignment.nick] = {
                                         badge: badgePath,
                                         object: scope.badgeablePath,

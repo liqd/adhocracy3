@@ -251,7 +251,12 @@ export var directiveFactory = (template : string, sheetName : string) => (
                 } else {
                     return getAnonymizeInfo(postPoolPath, "POST").then((anonymizeInfo) => {
                         return adhHttp.withTransaction((transaction) => {
-                            var item = transaction.post(postPoolPath, new RIRate({preliminaryNames: adhPreliminaryNames}));
+                            var item = transaction.post(postPoolPath, {
+                                path: adhPreliminaryNames.nextPreliminary(),
+                                first_version_path: adhPreliminaryNames.nextPreliminary(),
+                                content_type: RIRate.content_type,
+                                data: {},
+                            });
                             var version = transaction.get(item.first_version_path);
 
                             return transaction.commit({ anonymize : anonymizeInfo.defaultValue })
