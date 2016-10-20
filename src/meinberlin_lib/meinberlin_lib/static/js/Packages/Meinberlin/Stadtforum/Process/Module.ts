@@ -29,25 +29,5 @@ export var register = (angular) => {
             AdhPermissionsModule.moduleName,
             AdhProcessModule.moduleName,
             AdhResourceAreaModule.moduleName
-        ])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templates[processType] = "<adh-meinberlin-stadtforum-workbench></adh-meinberlin-stadtforum-workbench>";
-        }])
-        .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
-            adhNamesProvider.names[processType] = "TR__RESOURCE_STADTFORUM";
-            adhNamesProvider.names[RIProposalVersion.content_type] = "TR__RESOURCE_POLL";
-        }])
-        .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider, adhConfig) => {
-            Process.registerRoutes(processType)(adhResourceAreaProvider);
-        }])
-        .directive("adhMeinberlinStadtforumWorkbench", [
-            "adhTopLevelState", "adhConfig", "adhHttp", Process.workbenchDirective])
-        .directive("adhMeinberlinStadtforumProposalDetailColumn", [
-            "adhConfig", "adhTopLevelState", Process.proposalDetailColumnDirective])
-        .directive("adhMeinberlinStadtforumProposalCreateColumn", [
-            "adhConfig", "adhTopLevelState", Process.proposalCreateColumnDirective])
-        .directive("adhMeinberlinStadtforumProposalEditColumn", [
-            "adhConfig", "adhTopLevelState", Process.proposalEditColumnDirective])
-        .directive("adhMeinberlinStadtforumDetailColumn", ["adhConfig", "adhTopLevelState", Process.detailColumnDirective])
-        .directive("adhMeinberlinStadtforumDetail", ["adhConfig", "adhEmbed", "adhHttp", "adhPermissions", "$q", Process.detailDirective]);
+        ]);
 };
