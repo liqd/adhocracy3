@@ -5,6 +5,8 @@ import * as AdhNamesModule from "../../Core/Names/Module";
 import * as AdhProcessModule from "../../Core/Process/Module";
 import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
 
+import * as AdhEmbed from "../../Core/Embed/Embed";
+import * as AdhIdeaCollectionProposal from "../../Core/IdeaCollection/Proposal/Proposal";
 import * as AdhIdeaCollectionWorkbench from "../../Core/IdeaCollection/Workbench/Workbench";
 import * as AdhNames from "../../Core/Names/Names";
 import * as AdhPoll from "../../Core/IdeaCollection/Poll/Proposal";
@@ -32,6 +34,31 @@ export var register = (angular) => {
             AdhProcessModule.moduleName,
             AdhResourceAreaModule.moduleName
         ])
+        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
+            adhEmbedProvider
+                .registerDirective("meinberlin-stadtforum-proposal-detail")
+                .registerDirective("meinberlin-stadtforum-proposal-create");
+        }])
+        .directive("adhMeinberlinStadtforumProposalCreate", [
+            "adhConfig",
+            "adhHttp",
+            "adhPreliminaryNames",
+            "adhTopLevelState",
+            "adhShowError",
+            "adhSubmitIfValid",
+            "adhResourceUrlFilter",
+            "$location",
+            AdhIdeaCollectionProposal.createDirective
+        ])
+        .directive("adhMeinberlinStadtforumProposalDetail", [
+            "adhConfig",
+            "adhHttp",
+            "adhPermissions",
+            "adhRate",
+            "adhTopLevelState",
+            "adhGetBadges",
+            "$q",
+            AdhIdeaCollectionProposal.detailDirective])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
             var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
                 RIStadtforumProcess, RIPoll, RIProposalVersion);
