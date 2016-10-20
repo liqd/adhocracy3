@@ -34,6 +34,7 @@ export interface IProcessProperties {
     maxBudget? : number;
     processClass?;
     proposalClass;
+    proposalColumns?;
     // WARNING: proposalSheet is not a regular feature of adhocracy,
     // but a hack of Buergerhaushalt and Kiezkasse.
     proposalSheet?;
