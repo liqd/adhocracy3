@@ -1,5 +1,3 @@
-import * as AdhMeinberlinStadtforumProcessModule from "./Process/Module";
-import * as AdhMeinberlinStadtforumProposalModule from "./Proposal/Module";
 import * as AdhIdeaCollectionModule from "../../Core/IdeaCollection/Module";
 import * as AdhNamesModule from "../../Core/Names/Module";
 import * as AdhProcessModule from "../../Core/Process/Module";
@@ -20,15 +18,10 @@ import RIStadtforumProcess from "../../../Resources_/adhocracy_meinberlin/resour
 export var moduleName = "adhMeinberlinStadtforum";
 
 export var register = (angular) => {
-    AdhMeinberlinStadtforumProcessModule.register(angular);
-    AdhMeinberlinStadtforumProposalModule.register(angular);
     var processType = RIStadtforumProcess.content_type;
 
     angular
         .module(moduleName, [
-            AdhMeinberlinStadtforumProcessModule.moduleName,
-            AdhMeinberlinStadtforumProposalModule.moduleName,
-        ]);
             AdhIdeaCollectionModule.moduleName,
             AdhNamesModule.moduleName,
             AdhProcessModule.moduleName,
