@@ -18,6 +18,7 @@ from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.interfaces import SheetMetadata
+from adhocracy_core.interfaces import ISheetRequirePassword
 from adhocracy_core.interfaces import IResourceSheet
 from adhocracy_core.sheets.anonymize import IAllowAddAnonymized
 from adhocracy_core.sheets.anonymize import ANONYMIZE_PERMISSION
@@ -325,6 +326,14 @@ class ResourceContentRegistry(ContentRegistry):
         """Check if `context` may be deleted anonymously."""
         can_anonymize = _is_anonymized_and_has_permission(context, request)
         return can_anonymize
+
+    def is_password_required(self, context: object, request: Request) -> bool:
+        """Check if some sheets of `context` require a password for editing."""
+        sheets_edit = self.get_sheets_edit(context, request)
+        sheets_require_password = \
+            [s for s in sheets_edit
+             if s.meta.isheet.isOrExtends(ISheetRequirePassword)]
+        return bool(sheets_require_password)
 
 
 def _is_anonymized_and_has_permission(context: object,
