@@ -20,6 +20,7 @@ export var register = (angular) => {
             AdhRateModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
+        .directive("adhPollDetailColumn", ["adhConfig", "adhTopLevelState", Proposal.pollDetailColumnDirective])
         .directive("adhPollDetail", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.detailDirective]);
 };

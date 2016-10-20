@@ -12,6 +12,25 @@ import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
 export var pkgLocation = "/Core/IdeaCollection/Poll";
 
 
+export var pollDetailColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/PollDetailColumn.html",
+        scope: {
+            processProperties: "=",
+            transclusionId: "=",
+            view: "=?"
+        },
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("contentType", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));
+        }
+    };
+};
 
 export var detailDirective = (
     adhConfig : AdhConfig.IService,
