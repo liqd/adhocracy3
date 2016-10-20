@@ -207,6 +207,20 @@ class TestResourceRESTView:
         assert response['PUT']['request_headers'] == {'X-Anonymize': []}
         assert response['DELETE']['request_headers'] == {'X-Anonymize': []}
 
+    def test_options_with_allow_x_user_password_header(
+            self, request_, context, resource_meta, mock_sheet):
+        from adhocracy_core.interfaces import ISheetRequirePassword
+        content = request_.registry.content
+        mock_sheet.meta = \
+            mock_sheet.meta._replace(isheet=ISheetRequirePassword)
+        content.get_sheets_edit.return_value = [mock_sheet]
+        content.get_resources_meta_addable.return_value = [resource_meta]
+        inst = self.make_one(context, request_)
+        response = inst.options()
+        assert response['POST']['request_headers'] == {}
+        assert response['PUT']['request_headers'] == {'X-User-Password': []}
+        assert response['DELETE']['request_headers'] == {}
+
     def test_add_workflow_permissions_info(
             self, request_, registry, context, mock_sheet, mock_workflow):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
