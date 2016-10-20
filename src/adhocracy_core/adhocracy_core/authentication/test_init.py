@@ -273,6 +273,87 @@ class TestMultiRouteAuthenticationPolicy:
         assert inst.forget(request_) == [('1','1'), ('2', '2')]
 
 
+def test_is_header_password_true_if_password_header(request_):
+    from . import is_header_password
+    from . import UserPasswordHeader
+    request_.headers[UserPasswordHeader] = 'pwd'
+    assert is_header_password(request_) is True
+
+
+def test_is_header_password_false_if_no_password_header(request_):
+    from . import is_header_password
+    assert is_header_password(request_) is False
+
+
+def test_get_header_password_true_if_password_header(request_):
+    from . import get_header_password
+    from . import UserPasswordHeader
+    request_.headers[UserPasswordHeader] = 'pwd'
+    assert get_header_password(request_) is 'pwd'
+
+
+def test_get_header_password_false_if_no_password_header(request_):
+    from . import get_header_password
+    assert get_header_password(request_) is None
+
+
+class TestValidatePasswordHeader:
+
+    def call_fut(self, *args):
+        from . import validate_password_header
+        return validate_password_header(*args)
+
+    @fixture
+    def view(self):
+        return Mock()
+
+    @fixture
+    def mock_header_password(self, mocker):
+        return mocker.patch(
+            'adhocracy_core.authentication.is_header_password',
+            return_value=True)
+
+    @fixture
+    def mock_get_password(self, mocker):
+        return mocker.patch(
+            'adhocracy_core.authentication.get_header_password',
+            return_value='123456')
+
+    @fixture
+    def request_(self, request_, registry):
+        from adhocracy_core.resources.principal import  User
+        user = Mock(spec=User)
+        request_.user = user
+        request_.registry = registry
+        return request_
+
+    def test_ignore_if_no_password_header(self, context, request_, view):
+        self.call_fut(view)(context, request_)
+        view.assert_called_with(context, request_)
+
+    def test_invalid_password(self, context, request_, view,
+                                   mock_header_password,
+                                   mock_get_password):
+        request_.user.is_password_valid.return_value = False
+        with raises(HTTPBadRequest):
+            self.call_fut(view)(context, request_)
+
+    def test_password_not_required(self, context, request_, registry, view,
+                                   mock_header_password,
+                                   mock_get_password):
+        request_.user.is_password_valid.return_value = True
+        registry.content.is_password_required.return_value = False
+        with raises(HTTPBadRequest):
+            self.call_fut(view)(context, request_)
+
+    def test_valid_and_required(self, context, request_, registry, view,
+                                   mock_header_password,
+                                   mock_get_password):
+        request_.user.is_password_valid.return_value = True
+        registry.content.is_password_required.return_value = True
+        self.call_fut(view)(context, request_)
+        view.assert_called_with(context, request_)
+
 def test_is_marked_anonymize_true_if_anonymize_header(request_):
     from . import is_marked_anonymize
     from . import AnonymizeHeader
