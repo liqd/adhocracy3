@@ -302,6 +302,35 @@ class TestSimpleRESTView:
         data = {'content_type': 'X',
                 'data': {ISheet.__identifier__: {'x': 'y'}}}
         request_.validated = data
+        inst = self.make_one(context, request_)
+
+        response = inst.put()
+        assert mock_sheet.set.call_args[0][0] == {'x': 'y'}
+
+    def test_put_with_sheets_require_password_no_password(
+            self, request_, context, mock_sheet):
+        from adhocracy_core.interfaces import ISheetRequirePassword
+        mock_sheet.meta = \
+            mock_sheet.meta._replace(isheet=ISheetRequirePassword)
+        request_.registry.content.get_sheets_edit.return_value = [mock_sheet]
+        data = {'content_type': 'X',
+                'data': {ISheet.__identifier__: {'x': 'y'}}}
+        request_.validated = data
+
+        inst = self.make_one(context, request_)
+        response = inst.put()
+        assert not mock_sheet.set.called
+
+    def test_put_with_sheets_require_password(
+            self, request_, context, mock_sheet):
+        from adhocracy_core.interfaces import ISheetRequirePassword
+        mock_sheet.meta = \
+            mock_sheet.meta._replace(isheet=ISheetRequirePassword)
+        request_.registry.content.get_sheets_edit.return_value = [mock_sheet]
+        request_.password = '123456'
+        data = {'content_type': 'X',
+                'data': {ISheetRequirePassword.__identifier__: {'x': 'y'}}}
+        request_.validated = data
 
         inst = self.make_one(context, request_)
         response = inst.put()

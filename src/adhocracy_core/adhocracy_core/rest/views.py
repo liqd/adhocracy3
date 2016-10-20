@@ -18,6 +18,7 @@ from adhocracy_core.authentication import UserPasswordHeader
 from adhocracy_core.authentication import UserTokenHeader
 from adhocracy_core.authentication import AnonymizeHeader
 from adhocracy_core.authorization import is_password_required_to_edit_some
+from adhocracy_core.authorization import is_password_required_to_edit
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -240,6 +241,7 @@ class SimpleRESTView(ResourceRESTView):
         """Edit resource and get response data."""
         with statsd_timer('process.put', rate=.1, registry=self.registry):
             sheets = self.content.get_sheets_edit(self.context, self.request)
+            sheets = self._filter_require_password_header(sheets)
             appstructs = self.request.validated.get('data', {})
             for sheet in sheets:
                 name = sheet.meta.isheet.__identifier__
@@ -254,6 +256,13 @@ class SimpleRESTView(ResourceRESTView):
                                    self.request)
             cstruct = schema.serialize(appstruct)
         return cstruct
+
+    def _filter_require_password_header(self, sheets):
+        if hasattr(self.request, 'password') and self.request.password:
+            return sheets
+        sheets_without_password = [sheet for sheet in sheets
+                                   if not is_password_required_to_edit(sheet)]
+        return sheets_without_password
 
     @api_view(
         request_method='DELETE',
