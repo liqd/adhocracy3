@@ -249,6 +249,13 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
         """Delete values for every field name in `fields`."""
 
 
+class ISheetRequirePassword(ISheet):
+    """Sheet Interface indicating that a password if required for editing.
+
+    To edit such a Sheet the password needs to be send in the request.
+    """
+
+
 class ResourceMetadata(namedtuple('ResourceMetadata',
                                   ['content_name',
                                    'iresource',
