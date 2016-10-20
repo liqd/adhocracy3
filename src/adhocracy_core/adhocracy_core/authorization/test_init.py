@@ -474,4 +474,37 @@ def test_root_acm_extensions_adapter_register(registry, context):
     from . import IRootACMExtension
     root_acm_extension = registry.getAdapter(context, IRootACMExtension)
     assert root_acm_extension == {'principals': [],
+
                                   'permissions': []}
+
+
+class TestIsPasswordRequiredToEdit:
+
+    def call_fut(self, *args):
+        from . import is_password_required_to_edit
+        return is_password_required_to_edit(*args)
+
+    def test_false_if_no_marker_sheet(self, mock_sheet):
+        assert self.call_fut(mock_sheet) is False
+
+    def test_true_if_marker_sheet(self, mock_sheet):
+        from adhocracy_core.interfaces import ISheetRequirePassword
+        mock_sheet.meta = \
+            mock_sheet.meta._replace(isheet=ISheetRequirePassword)
+        assert self.call_fut(mock_sheet) is True
+
+
+class TestIsPasswordRequiredToEditSome:
+
+    def call_fut(self, *args):
+        from . import is_password_required_to_edit_some
+        return is_password_required_to_edit_some(*args)
+
+    def test_false_if_no_marker_sheets(self, mock_sheet):
+        assert self.call_fut([mock_sheet]) is False
+
+    def test_true_if_markers_sheet(self, mock_sheet):
+        from adhocracy_core.interfaces import ISheetRequirePassword
+        mock_sheet.meta = \
+            mock_sheet.meta._replace(isheet=ISheetRequirePassword)
+        assert self.call_fut([mock_sheet]) is True
