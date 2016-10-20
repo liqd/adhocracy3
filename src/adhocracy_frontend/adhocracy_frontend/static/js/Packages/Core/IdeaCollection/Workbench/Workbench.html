@@ -10,6 +10,6 @@
         <ng-include data-ng-if="processProperties.proposalColumns" src="processProperties.proposalColumns"></ng-include>
     </adh-moving-column>
     <adh-moving-column>
-        <adh-comment-column></adh-comment-column>
+        <adh-comment-column data-ng-if="!processProperties.proposalColumns"></adh-comment-column>
     </adh-moving-column>
 </div>
