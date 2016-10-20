@@ -7,6 +7,7 @@ import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
 
 import * as AdhIdeaCollectionWorkbench from "../../Core/IdeaCollection/Workbench/Workbench";
 import * as AdhNames from "../../Core/Names/Names";
+import * as AdhPoll from "../../Core/IdeaCollection/Poll/Proposal";
 import * as AdhProcess from "../../Core/Process/Process";
 import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
 
@@ -45,6 +46,7 @@ export var register = (angular) => {
                 "</adh-idea-collection-workbench>";
             adhProcessProvider.processProperties[processType] = {
                 proposalClass: RIPoll,
+                proposalColumns: adhConfig.pkg_path + AdhPoll.pkgLocation + "/ProposalColumns.html",
                 proposalVersionClass: RIProposalVersion
             };
         }])
