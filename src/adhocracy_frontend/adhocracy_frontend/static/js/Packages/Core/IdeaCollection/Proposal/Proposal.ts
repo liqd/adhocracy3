@@ -33,7 +33,7 @@ export interface IScope extends angular.IScope {
     errors? : AdhHttp.IBackendErrorItem[];
     data : {
         title : string;
-        detail : string;
+        detail? : string;
         rateCount : number;
         creator : string;
         creationDate : string;
@@ -56,7 +56,7 @@ export interface IScope extends angular.IScope {
     commentType? : string;
 }
 
-var bindPath = (
+export var bindPath = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
@@ -91,7 +91,6 @@ var bindPath = (
                 scope.resource = resource;
 
                 var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
-                var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
                 var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
                 var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
                 var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
@@ -115,13 +114,17 @@ var bindPath = (
 
                     scope.data = {
                         title: titleSheet.title,
-                        detail: descriptionSheet.description,
                         rateCount: ratesPro - ratesContra,
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
                         commentCount: parseInt(resource.data[SICommentable.nick].comments_count, 10),
                         assignments: assignments
                     };
+
+                    if (!scope.processProperties.proposalColumns) {
+                        var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
+                        scope.data.detail = descriptionSheet.description;
+                    }
 
                     if (adhConfig.anonymize_enabled) {
                         adhHttp.get(scope.data.creator).then((res) => {
@@ -179,9 +182,11 @@ var fill = (
     proposalVersion.data[SITitle.nick] = new SITitle.Sheet({
         title: scope.data.title
     });
-    proposalVersion.data[SIDescription.nick] = new SIDescription.Sheet({
-        description: scope.data.detail
-    });
+    if (!scope.processProperties.proposalColumns) {
+        proposalVersion.data[SIDescription.nick] = new SIDescription.Sheet({
+            description: scope.data.detail
+        });
+    }
     if (scope.data.lng && scope.data.lat) {
         proposalVersion.data[SIPoint.nick] = new SIPoint.Sheet({
             coordinates: [scope.data.lng, scope.data.lat]
@@ -373,6 +378,7 @@ export var createDirective = (
                     }
                 });
             }
+            scope.hasDetailText = !scope.processProperties.proposalColumns;
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.ideaCollectionProposalForm, () => {
