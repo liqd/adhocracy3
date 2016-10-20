@@ -7,10 +7,11 @@
     ></adh-show-image>
     <div class="list-item-body">
         <div class="list-item-author">
-            {{ "TR__BY" | translate }}
-            <adh-user-meta data-ng-if="data.creator" data-path="{{data.creator}}" data-no-link="true"></adh-user-meta>
-            {{ "TR__ON" | translate }}
-            <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
+            <div data-ng-if="processProperties.hasAuthorInListItem">{{ "TR__BY" | translate }}
+                <adh-user-meta data-ng-if="data.creator" data-path="{{data.creator}}" data-no-link="true"></adh-user-meta>
+                {{ "TR__ON" | translate }}
+                <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
+            </div>
         </div>
         <h3 class="list-item-title">{{data.title}}</h3>
         <ul class="meta-list list-item-meta">
