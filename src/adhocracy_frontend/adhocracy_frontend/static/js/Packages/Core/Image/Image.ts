@@ -60,7 +60,7 @@ export var uploadImageFactory = (
 
     return adhHttp.get(poolPath)
         .then((pool) => {
-            var postPath : string = pool.data[SIHasAssetPool.nick].asset_pool;
+            var postPath : string = SIHasAssetPool.get(pool).asset_pool;
             return adhHttp.postRaw(postPath, formData)
                 .then((rsp) => rsp.data.path)
                 .catch(<any>AdhHttp.logBackendError);
@@ -79,10 +79,10 @@ export var addImage = (
             data: {},
             content_type: resource.content_type
         };
-        patch.data[SIImageReference.nick] = new SIImageReference.Sheet({ picture: imagePath });
+        SIImageReference.set(patch, { picture: imagePath });
 
         // Versioned resources are on the way out, so they get the special treatment
-        if (resource.data[SIVersionable.nick]) {
+        if (SIVersionable.get(resource)) {
             var newVersion = _.clone(resource);
             _.merge(newVersion.data, patch.data);
             return adhHttp.postNewVersionNoFork(resourcePath, newVersion);

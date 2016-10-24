@@ -273,7 +273,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         return self.adhHttp.get(resourceUrl).then((version) => {
             if (version.data.hasOwnProperty(SIVersionable.nick)) {
                 return self.adhHttp.get(AdhUtil.parentPath(resourceUrl)).then((item) => {
-                    var lastUrl = item.data[SITags.nick].LAST;
+                    var lastUrl = SITags.get(item).LAST;
                     if (lastUrl === resourceUrl) {
                         return false;
                     } else {
@@ -331,7 +331,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
             var processType = process ? process.content_type : "";
             var processUrl = process ? process.path : "/";
-            var processState = process ? process.data[SIWorkflowAssignment.nick].workflow_state : "";
+            var processState = process ? SIWorkflowAssignment.get(process).workflow_state : "";
 
             if (hasRedirected) {
                 return;

@@ -59,8 +59,8 @@ export class Service {
         return _self.adhHttp.get(userPath)
             .then((resource) => {
                 _self.data = {
-                    name: resource.data[SIUserBasic.nick].name,
-                    anonymize: resource.data[SIAnonymizeDefault.nick].anonymize,
+                    name: SIUserBasic.get(resource).name,
+                    anonymize: SIAnonymizeDefault.get(resource).anonymize,
                 };
             }, (reason) => {
                 // The user resource that was returned by the server could not be accessed.
@@ -112,20 +112,20 @@ export class Service {
             "content_type": "adhocracy_core.resources.principal.IUser",
             "data": {}
         };
-        resource.data[SIUserBasic.nick] = {
+        SIUserBasic.set(resource, {
             "name": username
-        };
-        resource.data[SIUserExtended.nick] = {
+        });
+        SIUserExtended.set(resource, {
             "email": email
-        };
-        resource.data[SIPasswordAuthentication.nick] = {
+        });
+        SIPasswordAuthentication.set(resource, {
             "password": password
-        };
+        });
         if (captchaId && captchaGuess) {
-            resource.data[SICaptcha.nick] = {
+            SICaptcha.set(resource, {
                 "id": captchaId,
                 "solution": captchaGuess
-            };
+            });
         }
 
         return _self.adhHttp.post("/principals/users/", resource, {

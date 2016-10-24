@@ -11,6 +11,8 @@ import * as AdhRate from "../../Rate/Rate";
 import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
 import * as AdhUtil from "../../Util/Util";
 
+import * as ResourcesBase from "../../../ResourcesBase";
+
 import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RISystemUser from "../../../../Resources_/adhocracy_core/resources/principal/ISystemUser";
 import * as SICommentable from "../../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
@@ -71,11 +73,11 @@ var bindPath = (
     var getPolygon = () => {
         if (scope.processProperties.hasLocation) {
             var processUrl = adhTopLevelState.get("processUrl");
-            return adhHttp.get(processUrl).then((process) => {
-                var locationUrl = process.data[SILocationReference.nick].location;
+            return adhHttp.get(processUrl).then((process) : angular.IPromise<void | number[][]> => {
+                var locationUrl = SILocationReference.get(process).location;
                 if (locationUrl) {
                     return adhHttp.get(locationUrl).then((location) => {
-                        return location.data[SIMultiPolygon.nick].coordinates[0][0];
+                        return SIMultiPolygon.get(location).coordinates[0][0];
                     });
                 }
                 return $q.when();
@@ -90,15 +92,15 @@ var bindPath = (
             adhHttp.get(value).then((resource) => {
                 scope.resource = resource;
 
-                var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
-                var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
-                var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
-                var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
-                var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
+                var titleSheet = SITitle.get(resource);
+                var descriptionSheet = SIDescription.get(resource);
+                var pointSheet = SIPoint.get(resource);
+                var metadataSheet = SIMetadata.get(resource);
+                var rateableSheet = SIRateable.get(resource);
 
                 var proposalSheetClass = scope.processProperties.proposalSheet;
                 if (proposalSheetClass) {
-                    var proposalSheet = resource.data[proposalSheetClass.nick];
+                    var proposalSheet = proposalSheetClass.get(resource);
                 }
 
                 $q.all([
@@ -119,7 +121,7 @@ var bindPath = (
                         rateCount: ratesPro - ratesContra,
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
-                        commentCount: parseInt(resource.data[SICommentable.nick].comments_count, 10),
+                        commentCount: SICommentable.get(resource).comments_count,
                         assignments: assignments
                     };
 
@@ -134,7 +136,7 @@ var bindPath = (
                         scope.data.polygon = polygon;
                     }
                     if (scope.processProperties.hasImage) {
-                        scope.data.picture = resource.data[SIImageReference.nick].picture;
+                        scope.data.picture = SIImageReference.get(resource).picture;
                     }
                     // WARNING: proposalSheet is not a regular feature of adhocracy,
                     // but a hack of Buergerhaushalt and Kiezkasse.
@@ -165,25 +167,25 @@ var fill = (
     var proposalSheet = scope.processProperties.proposalSheet;
     if (proposalSheet && scope.processProperties.hasCreatorParticipate
         && scope.processProperties.hasLocationText && scope.processProperties.maxBudget) {
-        proposalVersion.data[proposalSheet.nick] = new proposalSheet.Sheet({
+        proposalSheet.set(proposalVersion, {
             budget: scope.data.budget,
             creator_participate: scope.data.creatorParticipate,
             location_text: scope.data.locationText
         });
     } else if (proposalSheet && scope.processProperties.hasLocationText && scope.processProperties.maxBudget) {
-        proposalVersion.data[proposalSheet.nick] = new proposalSheet.Sheet({
+        proposalSheet.set(proposalVersion, {
             budget: scope.data.budget,
             location_text: scope.data.locationText
         });
     }
-    proposalVersion.data[SITitle.nick] = new SITitle.Sheet({
+    SITitle.set(proposalVersion, {
         title: scope.data.title
     });
-    proposalVersion.data[SIDescription.nick] = new SIDescription.Sheet({
+    SIDescription.set(proposalVersion, {
         description: scope.data.detail
     });
     if (scope.data.lng && scope.data.lat) {
-        proposalVersion.data[SIPoint.nick] = new SIPoint.Sheet({
+        SIPoint.set(proposalVersion, {
             coordinates: [scope.data.lng, scope.data.lat]
         });
     }
@@ -199,12 +201,21 @@ var postCreate = (
     var proposalClass = scope.processProperties.proposalClass;
     var proposalVersionClass = scope.processProperties.proposalVersionClass;
 
-    var proposal = new proposalClass({preliminaryNames: adhPreliminaryNames});
-    proposal.parent = poolPath;
-    var proposalVersion = new proposalVersionClass({preliminaryNames: adhPreliminaryNames});
+    var proposal : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        first_version_path: adhPreliminaryNames.nextPreliminary(),
+        parent: poolPath,
+        content_type: proposalClass.content_type,
+        data: {},
+    };
+    var proposalVersion : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        parent: proposal.path,
+        content_type: proposalVersionClass.content_type,
+        data: {},
+    };
 
-    proposalVersion.parent = proposal.path;
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    SIVersionable.set(proposalVersion, {
         follows: [proposal.first_version_path]
     });
     fill(scope, proposalVersion);
@@ -223,9 +234,13 @@ var postEdit = (
 ) => {
     var proposalVersionClass = scope.processProperties.proposalVersionClass;
 
-    var proposalVersion = new proposalVersionClass({preliminaryNames: adhPreliminaryNames});
-    proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    var proposalVersion : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        parent: AdhUtil.parentPath(oldVersion.path),
+        content_type: proposalVersionClass.content_type,
+        data: {},
+    };
+    SIVersionable.set(proposalVersion, {
         follows: [oldVersion.path]
     });
     fill(scope, proposalVersion);
@@ -364,10 +379,10 @@ export var createDirective = (
 
             if (scope.processProperties.hasLocation) {
                 adhHttp.get(scope.poolPath).then((pool) => {
-                    var locationUrl = pool.data[SILocationReference.nick].location;
+                    var locationUrl = SILocationReference.get(pool).location;
                     if (locationUrl) {
                         adhHttp.get(locationUrl).then((location) => {
-                            var polygon = location.data[SIMultiPolygon.nick].coordinates[0][0];
+                            var polygon = SIMultiPolygon.get(location).coordinates[0][0];
                             scope.data.polygon = polygon;
                         });
                     }

@@ -11,6 +11,8 @@ import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 import * as AdhUtil from "../Util/Util";
 
+import * as ResourcesBase from "../../ResourcesBase";
+
 import RIBadgeAssignment from "../../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment";
 import * as SIBadge from "../../../Resources_/adhocracy_core/sheets/badge/IBadge";
 import * as SIBadgeable from "../../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
@@ -31,7 +33,7 @@ export interface IBadgeAssignment {
 }
 
 export interface IGetBadgeAssignments {
-    (resource : SIBadgeable.HasSheet) : angular.IPromise<IBadgeAssignment[]>;
+    (resource : ResourcesBase.IResource) : angular.IPromise<IBadgeAssignment[]>;
 }
 
 export interface IBadge {
@@ -49,17 +51,17 @@ export interface IBadgeGroup {
 
 var extractBadge = (badge) : IBadge => {
     return {
-        name: badge.data[SIName.nick].name,
-        title: badge.data[SITitle.nick].title,
+        name: SIName.get(badge).name,
+        title: SITitle.get(badge).title,
         path: badge.path,
-        groups: badge.data[SIBadge.nick].groups
+        groups: SIBadge.get(badge).groups
     };
 };
 
 var extractGroup = (group) : IBadgeGroup => {
     return {
-        name: group.data[SIName.nick].name,
-        title: group.data[SITitle.nick].title,
+        name: SIName.get(group).name,
+        title: SITitle.get(group).title,
         path: group.path
     };
 };
@@ -113,7 +115,7 @@ export var getBadgeFacets = (
     };
 
     return adhHttp.get(path, params).then((response) => {
-        var badgePaths = <string[]>_.map(response.data[SIPool.nick].elements, "path");
+        var badgePaths = <string[]>_.map(SIPool.get(response).elements, "path");
         return httpMap(badgePaths, extractBadge).then((badges) => {
             var groupPaths = _.union.apply(_, _.map(badges, "groups"));
             return httpMap(groupPaths, extractGroup).then((badgeGroups) => {
@@ -127,23 +129,23 @@ export var getBadgesFactory = (
     adhHttp : AdhHttp.Service,
     $q : angular.IQService
 ) : IGetBadgeAssignments => (
-    resource : SIBadgeable.HasSheet,
+    resource : ResourcesBase.IResource,
     includeParent? : boolean
 ) : angular.IPromise<IBadgeAssignment[]> => {
     if (typeof includeParent === "undefined") {
         includeParent = !!resource.content_type.match(/Version$/);
     }
 
-    var assignmentPaths = resource.data[SIBadgeable.nick].assignments;
+    var assignmentPaths = SIBadgeable.get(resource).assignments;
 
     var getBadge = (assignmentPath : string) => {
-        return adhHttp.get(assignmentPath).then((assignment : RIBadgeAssignment) => {
-            var badgePath = assignment.data[SIBadgeAssignment.nick].badge;
+        return adhHttp.get(assignmentPath).then((assignment : ResourcesBase.IResource) => {
+            var badgePath = SIBadgeAssignment.get(assignment).badge;
             return adhHttp.get(badgePath).then((badge) => {
                 return {
-                    title: badge.data[SITitle.nick].title,
-                    name: badge.data[SIName.nick].name,
-                    description: assignment.data[SIDescription.nick].description,
+                    title: SITitle.get(badge).title,
+                    name: SIName.get(badge).name,
+                    description: SIDescription.get(assignment).description,
                     path: assignmentPath,
                     badgePath: badgePath
                 };
@@ -155,7 +157,7 @@ export var getBadgesFactory = (
         var parentPath = AdhUtil.parentPath(resource.path);
 
         return adhHttp.get(parentPath).then((parentResource) => {
-            var parentAssignments = parentResource.data[SIBadgeable.nick].assignments;
+            var parentAssignments = SIBadgeable.get(parentResource).assignments;
             assignmentPaths = assignmentPaths.concat(parentAssignments);
             return $q.all(_.map(assignmentPaths, getBadge));
         });
@@ -234,14 +236,14 @@ export var badgeAssignment = (
             scope.data = {};
 
             adhHttp.get(scope.path).then((proposal) => {
-                scope.poolPath = proposal.data[SIBadgeable.nick].post_pool;
+                scope.poolPath = SIBadgeable.get(proposal).post_pool;
 
                 return adhGetBadges(proposal).then((assignments : IBadgeAssignment[]) => {
 
                     bindPath(adhHttp, adhPermissions, $q)(scope);
 
                     adhHttp.get(scope.badgeablePath).then((proposal) => {
-                        scope.poolPath = proposal.data[SIBadgeable.nick].post_pool;
+                        scope.poolPath = SIBadgeable.get(proposal).post_pool;
 
                         scope.assignments = _.keyBy(assignments, "badgePath");
                         // The following object only contains the current assignments. In order to render the badge
@@ -255,12 +257,16 @@ export var badgeAssignment = (
                             _.forOwn(scope.checkboxes, (checked, badgePath) => {
                                 var assignmentExisted = scope.assignments.hasOwnProperty(badgePath);
                                 if (checked && !assignmentExisted) {
-                                    var assignment = new RIBadgeAssignment({ preliminaryNames : adhPreliminaryNames });
-                                    assignment.data[SIBadgeAssignment.nick] = {
+                                    var assignment : ResourcesBase.IResource = {
+                                        path: adhPreliminaryNames.nextPreliminary(),
+                                        content_type: RIBadgeAssignment.content_type,
+                                        data: {},
+                                    };
+                                    SIBadgeAssignment.set(assignment, {
                                         badge: badgePath,
                                         object: scope.badgeablePath,
                                         subject: adhCredentials.userPath
-                                    };
+                                    });
                                     transaction.post(scope.poolPath, assignment);
                                 } else if (!checked && assignmentExisted) {
                                     transaction.delete(scope.assignments[badgePath].path);

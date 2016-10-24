@@ -18,9 +18,9 @@ export var homeDirective = (
         scope: {},
         link: (scope) => {
             adhHttp.get("/").then((root) => {
-                scope.picture = (root.data[SIImageReference.nick] || {}).picture;
-                scope.title = root.data[SITitle.nick].title;
-                scope.description = root.data[SIDescription.nick].description;
+                scope.picture = (SIImageReference.get(root) || {}).picture;
+                scope.title = SITitle.get(root).title;
+                scope.description = SIDescription.get(root).description;
             });
         }
     };

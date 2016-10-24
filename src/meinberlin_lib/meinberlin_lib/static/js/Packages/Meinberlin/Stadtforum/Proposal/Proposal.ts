@@ -9,6 +9,8 @@ import * as AdhRate from "../../../Core/Rate/Rate";
 import * as AdhTopLevelState from "../../../Core/TopLevelState/TopLevelState";
 import * as AdhUtil from "../../../Core/Util/Util";
 
+import * as ResourcesBase from "../../../../ResourcesBase";
+
 import * as SICommentable from "../../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIDescription from "../../../../Resources_/adhocracy_core/sheets/description/IDescription";
 import * as SIMetadata from "../../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
@@ -57,10 +59,10 @@ var bindPath = (
             adhHttp.get(value).then((resource) => {
                 scope.resource = resource;
 
-                var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
-                var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
-                var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
-                var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
+                var titleSheet = SITitle.get(resource);
+                var descriptionSheet = SIDescription.get(resource);
+                var metadataSheet = SIMetadata.get(resource);
+                var rateableSheet = SIRateable.get(resource);
 
                 $q.all([
                     adhRate.fetchAggregatedRates(rateableSheet.post_pool, resource.path),
@@ -79,7 +81,7 @@ var bindPath = (
                         rateCount: ratesPro - ratesContra,
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
-                        commentCount: parseInt(resource.data[SICommentable.nick].comments_count, 10),
+                        commentCount: SICommentable.get(resource).comments_count,
                         assignments: assignments
                     };
                 });
@@ -91,12 +93,12 @@ var bindPath = (
 
 var fill = (
     scope : IScope,
-    proposalVersion : RIProposalVersion
+    proposalVersion : ResourcesBase.IResource
 ) : void => {
-    proposalVersion.data[SITitle.nick] = new SITitle.Sheet({
+    SITitle.set(proposalVersion, {
         title: scope.data.title
     });
-    proposalVersion.data[SIDescription.nick] = new SIDescription.Sheet({
+    SIDescription.set(proposalVersion, {
         description: ""
     });
 };
@@ -108,12 +110,20 @@ var postCreate = (
     scope : IScope,
     poolPath : string
 ) => {
-    var proposal = new RIPoll({preliminaryNames: adhPreliminaryNames});
+    var proposal : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RIPoll.content_type,
+        data: {},
+    };
     proposal.parent = poolPath;
-    var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+    var proposalVersion : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RIProposalVersion.content_type,
+        data: {},
+    };
 
     proposalVersion.parent = proposal.path;
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    SIVersionable.set(proposalVersion, {
         follows: [proposal.first_version_path]
     });
     fill(scope, proposalVersion);
@@ -126,11 +136,15 @@ var postEdit = (
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : IScope,
-    oldVersion : RIProposalVersion
+    oldVersion : ResourcesBase.IResource
 ) => {
-    var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+    var proposalVersion : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RIProposalVersion.content_type,
+        data: {},
+    };
     proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    SIVersionable.set(proposalVersion, {
         follows: [oldVersion.path]
     });
     fill(scope, proposalVersion);

@@ -7,6 +7,8 @@ import * as AdhResourceArea from "../../../Core/ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../../../Core/TopLevelState/TopLevelState";
 import * as AdhUtil from "../../../Core/Util/Util";
 
+import * as ResourcesBase from "../../../../ResourcesBase";
+
 import RIAlexanderplatzProcess from "../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess";
 import RIGeoDocument from "../../../../Resources_/adhocracy_core/resources/document/IGeoDocument";
 import RIGeoDocumentVersion from "../../../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion";
@@ -42,9 +44,9 @@ export var getProcessPolygon = (
     adhHttp : AdhHttp.Service
 ) => (processUrl : string) : angular.IPromise<any> => {
     return adhHttp.get(processUrl).then((resource) => {
-        var locationUrl = resource.data[SILocationReference.nick].location;
+        var locationUrl = SILocationReference.get(resource).location;
         return adhHttp.get(locationUrl).then((location) => {
-            return location.data[SIMultiPolygon.nick].coordinates[0][0];
+            return SIMultiPolygon.get(location).coordinates[0][0];
         });
     });
 };
@@ -206,7 +208,7 @@ export var registerRoutes = (
             tab: "documents"
         })
         .specific(RIAlexanderplatzProcess, "create_document", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service) => (resource : RIAlexanderplatzProcess) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (resource : ResourcesBase.IResource) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.canPost(RIGeoDocument.content_type)) {
                         throw 401;
@@ -221,7 +223,7 @@ export var registerRoutes = (
             tab: "documents"
         })
         .specificVersionable(RIGeoDocument, RIGeoDocumentVersion, "", processType, context, [
-            () => (item : RIGeoDocument, version : RIGeoDocumentVersion) => {
+            () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return {
                     documentUrl: version.path
                 };
@@ -232,7 +234,7 @@ export var registerRoutes = (
             tab: "documents"
         })
         .specificVersionable(RIGeoDocument, RIGeoDocumentVersion, "edit", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service) => (item : RIGeoDocument, version : RIGeoDocumentVersion) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -249,8 +251,8 @@ export var registerRoutes = (
             tab: "documents"
         })
         .specificVersionable(RIParagraph, RIParagraphVersion, "comments", processType, context, [
-            () => (item : RIParagraph, version : RIParagraphVersion) => {
-                var documentUrl = _.last(_.sortBy(version.data[SIParagraph.nick].documents));
+            () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
+                var documentUrl = _.last(_.sortBy(SIParagraph.get(version).documents));
                 return {
                     commentableUrl: version.path,
                     commentCloseUrl: documentUrl,
@@ -270,7 +272,7 @@ export var registerRoutes = (
             tab: "proposals"
         })
         .specific(RIAlexanderplatzProcess, "create_proposal", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service) => (resource : RIAlexanderplatzProcess) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (resource : ResourcesBase.IResource) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.canPost(RIGeoProposal.content_type)) {
                         throw 401;
@@ -285,7 +287,7 @@ export var registerRoutes = (
             tab: "proposals"
         })
         .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "", processType, context, [
-            () => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
+            () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return {
                     proposalUrl: version.path
                 };
@@ -296,7 +298,7 @@ export var registerRoutes = (
             tab: "proposals"
         })
         .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "edit", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service) => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -313,7 +315,7 @@ export var registerRoutes = (
             tab: "proposals"
         })
         .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "comments", processType, context, [
-            () => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
+            () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return {
                     commentableUrl: version.path,
                     commentCloseUrl: version.path,

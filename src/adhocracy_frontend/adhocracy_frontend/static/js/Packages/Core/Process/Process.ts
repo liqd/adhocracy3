@@ -40,7 +40,7 @@ export interface IProcessProperties {
     proposalVersionClass;
 }
 
-export var getStateData = (sheet : SIWorkflow.Sheet, name : string) : IStateData => {
+export var getStateData = (sheet : SIWorkflow.ISheet, name : string) : IStateData => {
     for (var i = 0; i < sheet.state_data.length; i++) {
         if (sheet.state_data[i].name === name) {
             return sheet.state_data[i];
@@ -111,7 +111,7 @@ export var workflowSwitchDirective = (
             });
 
             adhHttp.get(scope.path).then((process) => {
-                scope.workflowState = process.data[SIWorkflow.nick].workflow_state;
+                scope.workflowState = SIWorkflow.get(process).workflow_state;
             });
 
             scope.switchState = (newState) => {
@@ -120,10 +120,10 @@ export var workflowSwitchDirective = (
                         return;
                     }
                     adhHttp.get(scope.path).then((process) => {
-                        process.data[SIWorkflow.nick] = {
+                        SIWorkflow.set(process, {
                             workflow_state: newState
-                        };
-                        process.data[SIName.nick] = undefined;
+                        });
+                        SIName.set(process, undefined);
                         adhHttp.put(scope.path, process).then((response) => {
                             $window.parent.location.reload();
                         });
@@ -168,20 +168,20 @@ export var listItemDirective = (
         },
         link: (scope) => {
             adhHttp.get(scope.path).then((process) => {
-                if (process.data[SIImageReference.nick] && process.data[SIImageReference.nick].picture) {
-                    scope.picture = process.data[SIImageReference.nick].picture;
+                if (SIImageReference.get(process) && SIImageReference.get(process).picture) {
+                    scope.picture = SIImageReference.get(process).picture;
                 }
-                scope.title = process.data[SITitle.nick].title;
+                scope.title = SITitle.get(process).title;
                 scope.processName = adhNames.getName(process.content_type, 1);
-                if (process.data[SILocationReference.nick] && process.data[SILocationReference.nick].location) {
-                    adhHttp.get(process.data[SILocationReference.nick].location).then((loc) => {
-                        scope.locationText = loc.data[SITitle.nick].title;
+                if (SILocationReference.get(process) && SILocationReference.get(process).location) {
+                    adhHttp.get(SILocationReference.get(process).location).then((loc) => {
+                        scope.locationText = SITitle.get(loc).title;
                     });
                 }
-                var workflow = process.data[SIWorkflow.nick];
+                var workflow = SIWorkflow.get(process);
                 scope.participationStartDate = getStateData(workflow, "participate").start_date;
                 scope.participationEndDate = getStateData(workflow, "evaluate").start_date;
-                scope.shortDesc = process.data[SIDescription.nick].short_description;
+                scope.shortDesc = SIDescription.get(process).short_description;
             });
         }
     };
@@ -213,7 +213,7 @@ export var currentProcessTitleDirective = (
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.on("processUrl", (processUrl) => {
                 adhHttp.get(processUrl).then((process) => {
-                    scope.processTitle = process.data[SITitle.nick].title;
+                    scope.processTitle = SITitle.get(process).title;
                 });
             }));
         }
