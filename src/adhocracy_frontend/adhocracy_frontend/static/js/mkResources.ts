@@ -115,7 +115,7 @@ interface FieldType {
 
 var compileAll : (metaApi : MetaApi.IMetaApi, outPath : string) => void;
 
-var renderSheet : (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IModuleDict, metaApi : MetaApi.IMetaApi) => void;
+var renderSheet : (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IModuleDict) => void;
 var mkFieldSignatures : (fields : MetaApi.ISheetField[], tab : string, separator : string) => string;
 var mkFieldSignaturesSheetCons : (fields : MetaApi.ISheetField[], tab : string, separator : string) => string;
 var mkFieldSignaturesSheetParse : (fields : MetaApi.ISheetField[], tab : string, separator : string) => string;
@@ -218,7 +218,7 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
 
     for (var sheetName in metaApi.sheets) {
         if (metaApi.sheets.hasOwnProperty(sheetName)) {
-            renderSheet(sheetName, metaApi.sheets[sheetName], modules, metaApi);
+            renderSheet(sheetName, metaApi.sheets[sheetName], modules);
         }
     }
 
@@ -255,7 +255,7 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
     })();
 };
 
-renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IModuleDict, metaApi : MetaApi.IMetaApi) : void => {
+renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IModuleDict) : void => {
     var sheetI : string = "";
 
     sheetI += "export var nick : string = \"" + sheet.nick + "\";\n\n";
