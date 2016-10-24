@@ -14,10 +14,10 @@ import * as AdhUser from "../User/User";
 import * as AdhUtil from "../Util/Util";
 import * as AdhWebSocket from "../WebSocket/WebSocket";
 
-import RIProcess from "../../../Resources_/adhocracy_core/resources/process/IProcess";
+import * as ResourcesBase from "../../ResourcesBase";
+
 import RIRate from "../../../Resources_/adhocracy_core/resources/rate/IRate";
 import RIRateVersion from "../../../Resources_/adhocracy_core/resources/rate/IRateVersion";
-import RIUser from "../../../Resources_/adhocracy_core/resources/principal/IUser";
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIRate from "../../../Resources_/adhocracy_core/sheets/rate/IRate";
 import * as SIUserBasic from "../../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
@@ -73,9 +73,9 @@ export interface IRateScope extends angular.IScope {
 export var getWorkflowState = (
     adhResourceArea : AdhResourceArea.Service
 ) => (resourceUrl : string) : angular.IPromise<string> => {
-    return adhResourceArea.getProcess(resourceUrl, false).then((resource : RIProcess) => {
+    return adhResourceArea.getProcess(resourceUrl, false).then((resource : ResourcesBase.IResource) => {
         if (typeof resource !== "undefined") {
-            var workflowSheet = resource.data[SIWorkflow.nick];
+            var workflowSheet = SIWorkflow.get(resource);
             if (typeof workflowSheet !== "undefined") {
                 return workflowSheet.workflow_state;
             }
@@ -106,8 +106,8 @@ export class Service {
         query[SIRate.nick + ":subject"] = subject;
         query[SIRate.nick + ":object"] = object;
         return this.adhHttp.get(poolPath, query).then((pool) => {
-            if (pool.data[SIPool.nick].elements.length > 0) {
-                return this.adhHttp.get(pool.data[SIPool.nick].elements[0]);
+            if (SIPool.get(pool).elements.length > 0) {
+                return this.adhHttp.get(SIPool.get(pool).elements[0]);
             } else {
                 return this.$q.reject("Not Found");
             }
@@ -127,7 +127,7 @@ export class Service {
         query[SIRate.nick + ":object"] = object;
 
         return this.adhHttp.get(poolPath, query).then((pool) => {
-            return pool.data[SIPool.nick].aggregateby.rate;
+            return (<any>SIPool.get(pool)).aggregateby.rate;
         });
     }
 }
@@ -165,9 +165,9 @@ export var directiveFactory = (template : string, sheetName : string) => (
 
         return adhHttp.get(poolPath, query)
             .then((poolRsp) => {
-                var ratePaths : string[] = poolRsp.data[SIPool.nick].elements;
-                var rates : RIRateVersion[] = [];
-                var users : RIUser[] = [];
+                var ratePaths : string[] = SIPool.get(poolRsp).elements;
+                var rates : ResourcesBase.IResource[] = [];
+                var users : ResourcesBase.IResource[] = [];
                 var auditTrail : { subject: string; rate: number }[] = [];
 
                 adhHttp.withTransaction((transaction) : angular.IPromise<void> => {
@@ -182,7 +182,7 @@ export var directiveFactory = (template : string, sheetName : string) => (
                 }).then(() => {
                     return adhHttp.withTransaction((transaction) : angular.IPromise<void> => {
                         var gets : AdhHttp.ITransactionResult[] = rates.map((rate) => {
-                            return transaction.get(rate.data[SIRate.nick].subject);
+                            return transaction.get(SIRate.get(rate).subject);
                         });
 
                         return transaction.commit()
@@ -195,8 +195,8 @@ export var directiveFactory = (template : string, sheetName : string) => (
                 }).then(() => {
                     _.forOwn(ratePaths, (ratePath, ix) => {
                         auditTrail[ix] = {
-                            subject: users[ix].data[SIUserBasic.nick].name,
-                            rate: parseInt(rates[ix].data[SIRate.nick].rate, 10)
+                            subject: SIUserBasic.get(users[ix]).name,
+                            rate: SIRate.get(rates[ix]).rate
                         };
                     });
                     return auditTrail;
@@ -213,19 +213,19 @@ export var directiveFactory = (template : string, sheetName : string) => (
             disabled: "="
         },
         link: (scope : IRateScope) : void => {
-            var myRateResource : RIRateVersion;
+            var myRateResource : ResourcesBase.IResource;
             var webSocketOff : () => void;
             var postPoolPath : string;
             var rates : {[key : string]: number};
             var lock : boolean;
-            var storeMyRateResource : (resource : RIRateVersion) => void;
+            var storeMyRateResource : (resource : ResourcesBase.IResource) => void;
             var forceResult : boolean = false;
 
             var updateMyRate = () : angular.IPromise<void> => {
                 if (adhCredentials.loggedIn) {
                     return adhRate.fetchRate(postPoolPath, scope.refersTo, adhCredentials.userPath).then((resource) => {
                         storeMyRateResource(resource);
-                        scope.myRate = parseInt(resource.data[SIRate.nick].rate, 10);
+                        scope.myRate = SIRate.get(resource).rate;
                         scope.hasCast = true;
                     }, () => undefined);
                 } else {
@@ -251,7 +251,12 @@ export var directiveFactory = (template : string, sheetName : string) => (
                 } else {
                     return getAnonymizeInfo(postPoolPath, "POST").then((anonymizeInfo) => {
                         return adhHttp.withTransaction((transaction) => {
-                            var item = transaction.post(postPoolPath, new RIRate({preliminaryNames: adhPreliminaryNames}));
+                            var item = transaction.post(postPoolPath, {
+                                path: adhPreliminaryNames.nextPreliminary(),
+                                first_version_path: adhPreliminaryNames.nextPreliminary(),
+                                content_type: RIRate.content_type,
+                                data: {},
+                            });
                             var version = transaction.get(item.first_version_path);
 
                             return transaction.commit({ anonymize : anonymizeInfo.defaultValue })
@@ -264,7 +269,7 @@ export var directiveFactory = (template : string, sheetName : string) => (
                 }
             };
 
-            storeMyRateResource = (resource : RIRateVersion) => {
+            storeMyRateResource = (resource : ResourcesBase.IResource) => {
                 myRateResource = resource;
 
                 if (typeof webSocketOff === "undefined") {
@@ -318,9 +323,9 @@ export var directiveFactory = (template : string, sheetName : string) => (
                             preliminaryNames: adhPreliminaryNames
                         });
 
-                        newVersion.data[SIRate.nick].rate = rate;
-                        newVersion.data[SIRate.nick].object = scope.refersTo;
-                        newVersion.data[SIRate.nick].subject = adhCredentials.userPath;
+                        SIRate.get(newVersion).rate = rate;
+                        SIRate.get(newVersion).object = scope.refersTo;
+                        SIRate.get(newVersion).subject = adhCredentials.userPath;
 
                         return getAnonymizeInfo(AdhUtil.parentPath(version.path), "POST").then((anonymizeInfo) => {
                             return adhHttp.postNewVersionNoFork(version.path, newVersion, [], { anonymize: anonymizeInfo.defaultValue })

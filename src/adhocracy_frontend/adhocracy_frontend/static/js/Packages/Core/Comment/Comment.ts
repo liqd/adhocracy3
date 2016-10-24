@@ -10,6 +10,8 @@ import * as AdhResourceUtil from "../Util/ResourceUtil";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 
+import * as ResourcesBase from "../../ResourcesBase";
+
 import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RIExternalResource from "../../../Resources_/adhocracy_core/resources/external_resource/IExternalResource";
@@ -17,6 +19,7 @@ import RISystemUser from "../../../Resources_/adhocracy_core/resources/principal
 import * as SICommentable from "../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
 import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SIName from "../../../Resources_/adhocracy_core/sheets/name/IName";
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
@@ -87,12 +90,12 @@ export var update = (
 
         scope.data.path = version.path;
         scope.data.itemPath = item.path;
-        scope.data.content = version.data[SIComment.nick].content;
-        scope.data.creator = item.data[SIMetadata.nick].creator;
-        scope.data.creationDate = version.data[SIMetadata.nick].item_creation_date;
-        scope.data.modificationDate = version.data[SIMetadata.nick].modification_date;
-        scope.data.commentCount = version.data[SICommentable.nick].comments_count;
-        scope.data.replyPoolPath = version.data[SICommentable.nick].post_pool;
+        scope.data.content = SIComment.get(version).content;
+        scope.data.creator = SIMetadata.get(item).creator;
+        scope.data.creationDate = SIMetadata.get(version).item_creation_date;
+        scope.data.modificationDate = SIMetadata.get(version).modification_date;
+        scope.data.commentCount = SICommentable.get(version).comments_count;
+        scope.data.replyPoolPath = SICommentable.get(version).post_pool;
         // NOTE: this is lexicographic comparison. Might break if the datetime
         // encoding changes.
         scope.data.edited = scope.data.modificationDate > scope.data.creationDate;
@@ -106,7 +109,7 @@ export var update = (
         };
         params[SIComment.nick + ":refers_to"] = version.path;
         return adhHttp.get(scope.data.replyPoolPath, params).then((pool) => {
-            scope.data.comments = pool.data[SIPool.nick].elements;
+            scope.data.comments = SIPool.get(pool).elements;
         });
     });
 };
@@ -133,19 +136,23 @@ export var postCreate = (
     scope : ICommentResourceScope,
     poolPath : string
 ) => {
-    var item = new RIComment({
-        preliminaryNames: adhPreliminaryNames
-    });
+    var item : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RIComment.content_type,
+        data: {},
+    };
     item.parent = poolPath;
 
-    var version = new RICommentVersion({
-        preliminaryNames: adhPreliminaryNames
-    });
-    version.data[SIComment.nick] = new SIComment.Sheet({
+    var version : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RICommentVersion.content_type,
+        data: {},
+    };
+    SIComment.set(version, {
         content: scope.data.content,
         refers_to: scope.refersTo
     });
-    version.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    SIVersionable.set(version, {
         follows: [item.first_version_path]
     });
     version.parent = item.path;
@@ -166,7 +173,7 @@ export var postEdit = (
         .then((path) => adhHttp.get(path))
         .then((oldVersion) => {
             var resource = AdhResourceUtil.derive(oldVersion, {preliminaryNames: adhPreliminaryNames});
-            resource.data[SIComment.nick].content = scope.data.content;
+            SIComment.get(resource).content = scope.data.content;
             resource.parent = oldItem.path;
             return adhHttp.deepPost([resource], {
                 anonymize: scope.data.anonymize,
@@ -362,14 +369,14 @@ export var adhCommentListing = (
             // what's good: the resource may be in the cache anyway + this is generic.
             adhHttp.get(scope.path).then((resource) => {
                 if (resource.content_type !== RICommentVersion.content_type) {
-                    scope.counterValue = resource.data[SICommentable.nick].comments_count;
+                    scope.counterValue = SICommentable.get(resource).comments_count;
                 }
             });
 
             var update = () => {
                 return adhHttp.get(scope.path).then((commentable) => {
                     scope.params[SIComment.nick + ":refers_to"] = scope.path;
-                    scope.poolPath = commentable.data[SICommentable.nick].post_pool;
+                    scope.poolPath = SICommentable.get(commentable).post_pool;
                     scope.custom = {
                         refersTo: scope.path,
                         goToLogin: () => {
@@ -423,12 +430,19 @@ export var adhCreateOrShowCommentListing = (
                 "content_type": RIExternalResource.content_type
             }).then(
                 (result) => {
-                    if (_.includes(result.data[SIPool.nick].elements, commentablePath)) {
+                    if (_.includes(SIPool.get(result).elements, commentablePath)) {
                         setScope(commentablePath);
                     } else {
                         var unwatch = scope.$watch(() => adhCredentials.loggedIn, (loggedIn) => {
                             if (loggedIn) {
-                                var externalResource = new RIExternalResource({preliminaryNames: adhPreliminaryNames, name: scope.key});
+                                var externalResource = {
+                                    path: adhPreliminaryNames.nextPreliminary(),
+                                    content_type: RIExternalResource.content_type,
+                                    data: {},
+                                };
+                                SIName.set(externalResource, {
+                                    name: scope.key,
+                                });
                                 return adhHttp.post(scope.poolPath, externalResource).then((obj) => {
                                     if (obj.path !== commentablePath) {
                                         console.log("Created object has wrong path (internal error)");

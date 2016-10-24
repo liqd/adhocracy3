@@ -192,7 +192,7 @@ export var assignBadgesActionDirective = (
             scope.$watch("resourcePath", (resourcePath) => {
                 if (resourcePath) {
                     adhHttp.get(resourcePath).then((badgeable) => {
-                        badgeAssignmentPoolPath = badgeable.data[SIBadgeable.nick].post_pool;
+                        badgeAssignmentPoolPath = SIBadgeable.get(badgeable).post_pool;
                     });
                 }
             });

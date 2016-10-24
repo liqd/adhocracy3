@@ -6,6 +6,8 @@ import * as AdhPermissions from "../../Permissions/Permissions";
 import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
 
+import * as ResourcesBase from "../../../ResourcesBase";
+
 import RIComment from "../../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import * as SIComment from "../../../../Resources_/adhocracy_core/sheets/comment/IComment";
@@ -32,7 +34,7 @@ export var workbenchDirective = (
             scope.$watch("processUrl", (processUrl) => {
                 if (processUrl) {
                     adhHttp.get(processUrl).then((resource) => {
-                        scope.currentPhase = resource.data[SIWorkflow.nick].workflow_state;
+                        scope.currentPhase = SIWorkflow.get(resource).workflow_state;
                     });
                 }
             });
@@ -128,7 +130,7 @@ export var addProposalButtonDirective = (
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
             adhHttp.get(scope.processUrl).then((process) => {
-                var workflow = process.data[SIWorkflow.nick].workflow;
+                var workflow = SIWorkflow.get(process).workflow;
                 scope.workflowAllowsCreateProposal = (workflow !== "debate" && workflow !== "debate_private");
             });
 
@@ -247,12 +249,12 @@ export var registerRoutesFactory = (
                 if (resource.content_type !== RICommentVersion.content_type) {
                     return $q.when(resource);
                 } else {
-                    var url = resource.data[SIComment.nick].refers_to;
+                    var url = SIComment.get(resource).refers_to;
                     return adhHttp.get(url).then(getCommentableUrl);
                 }
             };
 
-            return (item : RIComment, version : RICommentVersion) => {
+            return (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return getCommentableUrl(version).then((commentable) => {
                     return {
                         commentableUrl: commentable.path,
