@@ -336,7 +336,8 @@ export var listingDirective = (
             sorts: "=?",
             state: "@?",
             decisionDate: "@?",
-            creator: "@?"
+            creator: "@?",
+            counter: "=?"
         },
         link: (scope) => {
             scope.contentType = RIProposalVersion.content_type;
@@ -355,6 +356,7 @@ export var listingDirective = (
             if (scope.decisionDate) {
                 scope.params.decision_date = scope.decisionDate;
             }
+            scope.counter = typeof scope.counter === "undefined" ? true : scope.counter;
         }
     };
 };
