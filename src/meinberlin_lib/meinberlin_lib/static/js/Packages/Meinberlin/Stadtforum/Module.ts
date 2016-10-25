@@ -66,6 +66,7 @@ export var register = (angular) => {
                 "</adh-idea-collection-workbench>";
             adhProcessProvider.processProperties[processType] = {
                 hasAuthorInListItem: false,
+                hasCommentColumn: false,
                 proposalClass: RIPoll,
                 proposalColumns: adhConfig.pkg_path + AdhPoll.pkgLocation + "/ProposalColumns.html",
                 proposalVersionClass: RIProposalVersion
