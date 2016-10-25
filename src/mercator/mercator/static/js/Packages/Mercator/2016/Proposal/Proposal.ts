@@ -381,7 +381,11 @@ var create = (
             difference: RIDifference,
             practicalrelevance: RIPracticalRelevance
         }, (cls, subresourceKey : string) => {
-            var resource = new cls({preliminaryNames: adhPreliminaryNames});
+            var resource : ResourcesBase.IResource = {
+                path: adhPreliminaryNames.nextPreliminary(),
+                content_type: cls.content_type,
+                data: {},
+            };
             fill(data, resource);
             var request = transaction.post(proposalRequest.path, resource);
             subResourcesSheet[subresourceKey] = request.path;
@@ -434,7 +438,11 @@ var edit = (
                 difference: RIDifference,
                 practicalrelevance: RIPracticalRelevance
             }, (cls, subresourceKey : string) => {
-                var resource = new cls({preliminaryNames: adhPreliminaryNames});
+                var resource : ResourcesBase.IResource = {
+                    path: adhPreliminaryNames.nextPreliminary(),
+                    content_type: cls.content_type,
+                    data: {},
+                };
                 fill(data, resource);
                 transaction.put(subResourcesSheet[subresourceKey], resource);
             });
@@ -484,23 +492,23 @@ var moderate = (
                     content_type: RIBadgeAssignment.content_type,
                     data: {}
                 };
-                SIDescription.get(postdata) = {
+                SIDescription.set(postdata, {
                     description: scope.data.winner.description
-                };
+                });
                 return adhHttp.put(badgeAssignment.path, postdata);
             } else {
                 postdata = {
                     content_type: RIBadgeAssignment.content_type,
                     data: {}
                 };
-                SIDescription.get(postdata) = {
+                SIDescription.set(postdata, {
                     description: scope.data.winner.description
-                };
-                SIBadgeAssignment.get(postdata) = {
+                });
+                SIBadgeAssignment.set(postdata, {
                     badge: badges[scope.data.winner.name],
                     object: scope.path,
                     subject: adhCredentials.userPath
-                };
+                });
                 return adhHttp.post(badgePoolPath, postdata);
             }
         });
@@ -531,7 +539,7 @@ var get = (
             practicalrelevance : ResourcesBase.IResource
         } = <any>{};
 
-        return $q.all(_.map(SIMercatorSubResources.get(proposal), (path, key) => {
+        return $q.all(_.map(<any>SIMercatorSubResources.get(proposal), (path, key) => {
             return adhHttp.get(<string>path).then((subresource) => {
                 subs[key] = subresource;
             });
