@@ -62,6 +62,9 @@ export var register = (angular) => {
             var registerRoutes3 = AdhIdeaCollectionWorkbench.registerRoutesFactory(
                 RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion, true);
             registerRoutes3("mein.berlin.de")(adhResourceAreaProvider);
+            var registerRoutes4 = AdhIdeaCollectionWorkbench.registerRoutesFactory(
+                RIStadtforumProcess, RIPoll, RIProposalVersion);
+            registerRoutes4("mein.berlin.de")(adhResourceAreaProvider);
         }])
         .directive("adhMeinberlinDeHeader", ["adhConfig", "adhTopLevelState", AdhMeinberlinDe.headerDirective]);
 };
