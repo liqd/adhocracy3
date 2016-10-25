@@ -188,6 +188,7 @@ def test_set_local_roles_update_acl(context, registry, set_acl_with_roles):
                                           [('principal', 'role:admin', 'view')],
                                           registry)
 
+
 def test_set_local_roles_removes_old_role_aces(context, registry,
                                                set_acl_with_roles):
     from . import set_local_roles
@@ -299,7 +300,7 @@ class TestSetACMSForAppRoot:
     @fixture
     def root_acl(self, mocker):
         mock = mocker.patch('adhocracy_core.authorization._get_root_base_acl')
-        mock.return_value =[('Allow', 'role:admin', 'view')]
+        mock.return_value = [('Allow', 'role:admin', 'view')]
         return mock
 
     def test_set_god_permissions(self, mocker, root, event, root_acl):
@@ -475,6 +476,7 @@ def test_root_acm_extensions_adapter_register(registry, context):
     root_acm_extension = registry.getAdapter(context, IRootACMExtension)
     assert root_acm_extension == {'principals': [],
                                   'permissions': []}
+
 
 class TestIsPasswordRequiredToEdit:
 
