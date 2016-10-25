@@ -87,7 +87,7 @@ export interface IScopeData {
         first_name : string;
         last_name : string;
         country : string;
-        createtime : Date;
+        createtime : string;
         path : string;
         commentCount : number;
     };
@@ -323,7 +323,7 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
         data.user_info.country = SIMercatorUserInfo.get(mercatorProposalVersion).country;
         data.user_info.createtime = SIMetaData.get(mercatorProposalVersion).item_creation_date;
         data.user_info.path = SIMetaData.get(mercatorProposalVersion).creator;
-        data.title = SITitle.get(mercatorProposalVersion).title;
+        data.title = { title: SITitle.get(mercatorProposalVersion).title };
         data.logbookPoolPath = SILogbook.get(mercatorProposalVersion).logbook_pool;
 
         var heardFrom = SIMercatorHeardFrom.get(mercatorProposalVersion);
@@ -609,15 +609,15 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
             }
 
             var mercatorProposal = {
-                path: adhPreliminaryNames.nextPreliminary(),
-                first_version_path: adhPreliminaryNames.nextPreliminary(),
+                path: this.adhPreliminaryNames.nextPreliminary(),
+                first_version_path: this.adhPreliminaryNames.nextPreliminary(),
                 content_type: RIMercatorProposal.content_type,
                 data: {},
+                parent: instance.scope.poolPath,
             };
-            mercatorProposal.parent = instance.scope.poolPath;
 
             var mercatorProposalVersion = {
-                path: adhPreliminaryNames.nextPreliminary(),
+                path: this.adhPreliminaryNames.nextPreliminary(),
                 parent: mercatorProposal.path,
                 content_type: RIMercatorProposalVersion.content_type,
                 data: {},
@@ -695,7 +695,7 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
 
             this.cleanOrganizationInfo(data);
 
-            return AdhUtil.qFilter(_.map(SIMercatorSubResources.get(old), (path : string, key : string) => {
+            return AdhUtil.qFilter(_.map(<any>SIMercatorSubResources.get(old), (path : string, key : string) => {
                     var deferred = self.$q.defer();
                     self.adhHttp.get(path).then((oldSubresource) => {
                         var subresource = AdhResourceUtil.derive(oldSubresource, {preliminaryNames : self.adhPreliminaryNames});
