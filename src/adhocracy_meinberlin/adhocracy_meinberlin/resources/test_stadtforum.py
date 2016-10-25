@@ -11,8 +11,12 @@ class TestProcess:
 
     def test_meta(self, meta):
         from .stadtforum import IProcess
+        from adhocracy_core import sheets
         assert meta.iresource is IProcess
         assert meta.default_workflow == 'stadtforum'
+        assert meta.extended_sheets == (
+            sheets.image.IImageReference,
+        )
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):
