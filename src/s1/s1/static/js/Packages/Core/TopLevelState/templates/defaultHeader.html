@@ -1,10 +1,15 @@
-<header>
-    <a class="s1-header-logo-link" data-ng-href="/">
-        <abbr title="Participation as a Service">
-            <img class="s1-header-logo" alt="PAAS" src="/static/images/PAAS logo.png" />
-        </abbr>
-    </a>
-    <adh-current-process-title></adh-current-process-title>
-    <ng-include data-ng-if="areaHeaderSlot" src="areaHeaderSlot"></ng-include>
-    <adh-user-indicator data-separator="/"></adh-user-indicator>
+<header data-ng-hide="hideHeader" class="l-header main-header">
+    <div class="l-header-left">
+        <a class="main-header-logo" href="/">
+            <img alt="PAAS" src="/static/images/PAAS logo.png" />
+        </a>
+        <nav class="main-header-nav">
+            <adh-current-process-title></adh-current-process-title>
+        </nav>
+    </div>
+    <div class="l-header-right">
+        <adh-user-indicator data-separator="/"></adh-user-indicator>
+        <adh-help-link></adh-help-link>
+    </div>
 </header>
+<ng-include data-ng-if="areaHeaderSlot" src="areaHeaderSlot"></ng-include>
