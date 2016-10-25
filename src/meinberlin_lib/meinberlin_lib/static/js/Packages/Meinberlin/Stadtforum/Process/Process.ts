@@ -149,7 +149,7 @@ export var detailDirective = (
             adhPermissions.bindScope(scope, () => scope.path);
 
             var context = adhEmbed.getContext();
-            scope.hasResourceHeader = (context === "mein.bärlin.de");
+            scope.hasResourceHeader = (context === "");
         }
     };
 };
