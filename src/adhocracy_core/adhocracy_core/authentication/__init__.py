@@ -93,24 +93,26 @@ def validate_user_headers(view: callable):
     return wrapped_view
 
 
-def is_header_password(request: IRequest) -> bool:
+def has_password_header(request: IRequest) -> bool:
     """Check if request provided the password in the Password header."""
     return UserPasswordHeader in request.headers
 
 
 def get_header_password(request: IRequest) -> str:
     """Return the password in the Password header."""
-    if is_header_password(request):
-        return request.headers[UserPasswordHeader]
+    return request.headers.get(UserPasswordHeader, None)
 
 
 def validate_password_header(view: callable):
     """Decorator vor :term:`view` to check if the password header may be set.
 
-    :raise pyramid.httpexceptions.HTTPBadRequest: if password is invalid.
+    :raise pyramid.httpexceptions.HTTPBadRequest: if password is invalid or not
+    required. The case that a password is required by a sheet but not set
+    cannot be handled here, as we do not know which sheets are edited by the
+    request.
     """
     def wrapped_view(context, request):
-        password_is_set = is_header_password(request)
+        password_is_set = has_password_header(request)
         error = None
         if password_is_set:
             content = request.registry.content
@@ -121,8 +123,9 @@ def validate_password_header(view: callable):
                 error = error_entry('header',
                                     UserPasswordHeader,
                                     'Invalid password')
-            is_required = content.is_password_required(context, request)
-            if not is_required:
+            is_required_by_some_sheets = \
+                content.is_password_required(context, request)
+            if not is_required_by_some_sheets:
                 error = error_entry('header',
                                     UserPasswordHeader,
                                     'Password not required')

@@ -474,9 +474,7 @@ def test_root_acm_extensions_adapter_register(registry, context):
     from . import IRootACMExtension
     root_acm_extension = registry.getAdapter(context, IRootACMExtension)
     assert root_acm_extension == {'principals': [],
-
                                   'permissions': []}
-
 
 class TestIsPasswordRequiredToEdit:
 

@@ -273,16 +273,16 @@ class TestMultiRouteAuthenticationPolicy:
         assert inst.forget(request_) == [('1','1'), ('2', '2')]
 
 
-def test_is_header_password_true_if_password_header(request_):
-    from . import is_header_password
+def test_has_password_header_true_if_password_header(request_):
+    from . import has_password_header
     from . import UserPasswordHeader
     request_.headers[UserPasswordHeader] = 'pwd'
-    assert is_header_password(request_) is True
+    assert has_password_header(request_) is True
 
 
-def test_is_header_password_false_if_no_password_header(request_):
-    from . import is_header_password
-    assert is_header_password(request_) is False
+def test_has_password_header_false_if_no_password_header(request_):
+    from . import has_password_header
+    assert has_password_header(request_) is False
 
 
 def test_get_header_password_true_if_password_header(request_):
@@ -310,7 +310,7 @@ class TestValidatePasswordHeader:
     @fixture
     def mock_header_password(self, mocker):
         return mocker.patch(
-            'adhocracy_core.authentication.is_header_password',
+            'adhocracy_core.authentication.has_password_header',
             return_value=True)
 
     @fixture

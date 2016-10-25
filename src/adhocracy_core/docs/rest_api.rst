@@ -440,6 +440,11 @@ attribute in the json tree.)
 
 PUT responses have the same fields as POST responses.
 
+Note, when putting multiple sheets in a request some changes might be currently
+dropped when the request does not have sufficient permissions, e.g. cannot be
+edit by the user or requires an additional header.
+
+
 ERROR Handling
 ~~~~~~~~~~~~~~
 

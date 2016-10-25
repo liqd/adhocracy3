@@ -204,7 +204,6 @@ class TestUser:
         assert user.is_password_valid(registry, 'fodThyd2') == True
 
 
-
 class TestSystemUser:
 
     @fixture

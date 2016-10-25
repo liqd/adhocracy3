@@ -250,9 +250,10 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
 
 
 class ISheetRequirePassword(ISheet):
-    """Sheet Interface indicating that a password if required for editing.
+    """Sheet Interface indicating that a password is required for editing.
 
-    To edit such a Sheet the password needs to be send in the request.
+    To edit such a Sheet the password needs to be send in an additional request
+    header.
     """
 
 

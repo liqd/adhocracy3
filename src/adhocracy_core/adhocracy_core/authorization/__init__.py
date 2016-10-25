@@ -310,10 +310,7 @@ def is_password_required_to_edit(sheet: ISheet):
 
 def is_password_required_to_edit_some(sheets: [ISheet]):
     """Check if some of the sheets require a password for editing."""
-    for sheet in sheets:
-        if is_password_required_to_edit(sheet):
-            return True
-    return False
+    return any(is_password_required_to_edit(sheet) for sheet in sheets)
 
 
 def includeme(config):
