@@ -185,9 +185,9 @@ var fill = (
         title: scope.data.title
     });
     if (!scope.processProperties.proposalColumns) {
-	SIDescription.set(proposalVersion, {
-	    description: scope.data.detail
-	});
+        SIDescription.set(proposalVersion, {
+            description: scope.data.detail
+        });
     }
     if (scope.data.lng && scope.data.lat) {
         SIPoint.set(proposalVersion, {
