@@ -32,6 +32,7 @@ export interface IProcessProperties {
     hasLocationText? : boolean;
     hasAuthorInListItem? : boolean;
     hasDescription? : boolean;
+    hasCommentColumn : boolean;
     // if a process has a proposal budget, but no max budget, then set maxBudget = Infinity.
     maxBudget? : number;
     proposalClass;
