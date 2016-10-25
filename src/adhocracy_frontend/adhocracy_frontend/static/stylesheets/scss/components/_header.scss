@@ -10,7 +10,7 @@ The Banner on the top of the page.
 ```html_example
 <header class="l-header main-header">
     <div class="l-header-left">
-        <a href="#"><img class="main-header-logo" src="/static/images/sample.jpg" alt="Acme Corp." /></a>
+        <a class="main-header-logo" href="#"><img src="/static/images/sample.jpg" alt="Acme Corp." /></a>
         <nav class="main-header-nav">
             <a class="main-header-link" href="#">Home</a>
             <a class="main-header-link" href="#">Help</a>
@@ -32,8 +32,12 @@ The Banner on the top of the page.
 }
 
 .main-header-logo {
-    height: $logo-height;
-    vertical-align: bottom;
+    text-decoration: none;
+
+    img {
+        height: $logo-height;
+        vertical-align: bottom;
+    }
 }
 
 .main-header-nav {
