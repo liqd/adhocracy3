@@ -38,7 +38,7 @@ export var register = (angular) => {
                 adhResourceAreaProvider.processHeaderSlots[processType.content_type] = processHeaderSlot;
             });
         }])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
+        .config(["adhConfig", "adhProcessProvider", (adhConfig, adhProcessProvider : AdhProcess.Provider) => {
             _.forEach([RIEuthProcess, RIEuthPrivateProcess], (processType) => {
                 adhProcessProvider.templates[processType.content_type] =
                     "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
@@ -48,6 +48,7 @@ export var register = (angular) => {
                     hasDescription: true,
                     hasImage: true,
                     proposalClass: RIProposal,
+                    proposalDetailColumn: adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProposalDetailColumn.html",
                     proposalVersionClass: RIProposalVersion
                 };
             });

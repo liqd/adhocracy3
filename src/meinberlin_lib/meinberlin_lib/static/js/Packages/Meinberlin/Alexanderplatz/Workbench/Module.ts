@@ -38,7 +38,7 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
+        .config(["adhConfig", "adhProcessProvider", (adhConfig, adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[processType] = "<adh-meinberlin-alexanderplatz-workbench " +
                 "data-process-properties=\"processProperties\"></adh-meinberlin-alexanderplatz-workbench>";
             adhProcessProvider.processProperties[processType] = {
@@ -46,6 +46,7 @@ export var register = (angular) => {
                 hasDescription: true,
                 hasLocation: true,
                 proposalClass: RIGeoProposal,
+                proposalColumn: adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProposalColumn.html",
                 proposalVersionClass: RIGeoProposalVersion
             };
         }])
