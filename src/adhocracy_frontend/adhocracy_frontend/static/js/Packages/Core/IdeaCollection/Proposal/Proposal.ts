@@ -123,7 +123,7 @@ export var bindPath = (
                         assignments: assignments
                     };
 
-                    if (!scope.processProperties.hasDescription) {
+                    if (scope.processProperties.hasDescription) {
                         var descriptionSheet : SIDescription.ISheet = SIDescription.get(resource);
                         scope.data.detail = descriptionSheet.description;
                     }
@@ -184,7 +184,7 @@ var fill = (
     SITitle.set(proposalVersion, {
         title: scope.data.title
     });
-    if (!scope.processProperties.hasDescription) {
+    if (scope.processProperties.hasDescription) {
         SIDescription.set(proposalVersion, {
             description: scope.data.detail
         });
