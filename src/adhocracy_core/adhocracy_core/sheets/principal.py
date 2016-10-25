@@ -13,6 +13,7 @@ from deform.widget import SelectWidget
 import requests
 
 from adhocracy_core.interfaces import ISheet
+from adhocracy_core.interfaces import ISheetRequirePassword
 from substanced.interfaces import IUserLocator
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import BaseResourceSheet
@@ -266,7 +267,7 @@ permissions_meta = sheet_meta._replace(
 )
 
 
-class IPasswordAuthentication(ISheet):
+class IPasswordAuthentication(ISheet, ISheetRequirePassword):
     """Marker interface for the password sheet."""
 
 

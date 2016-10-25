@@ -18,6 +18,8 @@ from substanced.stats import statsd_timer
 import transaction
 
 from adhocracy_core.authentication import get_anonymized_creator
+from adhocracy_core.interfaces import ISheet
+from adhocracy_core.interfaces import ISheetRequirePassword
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IRoleACLAuthorizationPolicy
 from adhocracy_core.events import LocalRolesModified
@@ -299,6 +301,16 @@ def _remove_local_role_permissions_from_acl(acl: []) -> []:
         if 'group:' not in ace_principal:
             acl_without_local_roles.append(ace)
     return acl_without_local_roles
+
+
+def is_password_required_to_edit(sheet: ISheet):
+    """Check if the sheets requires a password for editing."""
+    return sheet.meta.isheet.isOrExtends(ISheetRequirePassword)
+
+
+def is_password_required_to_edit_some(sheets: [ISheet]):
+    """Check if some of the sheets require a password for editing."""
+    return any(is_password_required_to_edit(sheet) for sheet in sheets)
 
 
 def includeme(config):
