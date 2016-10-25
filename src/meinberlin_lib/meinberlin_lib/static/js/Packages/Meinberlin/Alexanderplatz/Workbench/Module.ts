@@ -42,6 +42,8 @@ export var register = (angular) => {
             adhProcessProvider.templates[processType] = "<adh-meinberlin-alexanderplatz-workbench " +
                 "data-process-properties=\"processProperties\"></adh-meinberlin-alexanderplatz-workbench>";
             adhProcessProvider.processProperties[processType] = {
+                hasCommentColumn: true,
+                hasDescription: true,
                 hasLocation: true,
                 proposalClass: RIGeoProposal,
                 proposalVersionClass: RIGeoProposalVersion

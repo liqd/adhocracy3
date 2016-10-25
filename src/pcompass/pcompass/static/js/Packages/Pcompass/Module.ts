@@ -37,6 +37,8 @@ export var register = (angular) => {
             adhProcessProvider.templates[RIPcompassProcess.content_type] =
                 "<adh-idea-collection-workbench data-process-properties=\"processProperties\"></adh-idea-collection-workbench>";
             adhProcessProvider.processProperties[RIPcompassProcess.content_type] = {
+                hasCommmentColumn: true,
+                hasDescription: true,
                 proposalClass: RIProposal,
                 proposalVersionClass: RIProposalVersion
             };
