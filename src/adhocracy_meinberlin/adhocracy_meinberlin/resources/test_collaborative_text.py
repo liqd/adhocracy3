@@ -15,11 +15,15 @@ class TestCollaborativeTextProcess:
 
     def test_meta(self, meta):
         import adhocracy_core.resources
+        from adhocracy_core import sheets
         from .collaborative_text import IProcess
         assert meta.iresource == IProcess
         assert meta.iresource.isOrExtends(
             adhocracy_core.resources.document_process.IDocumentProcess)
         assert meta.default_workflow == 'debate'
+        assert meta.extended_sheets == (
+            sheets.image.IImageReference,
+        )
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

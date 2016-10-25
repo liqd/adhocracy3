@@ -4,6 +4,8 @@ import * as AdhConfig from "../../../Core/Config/Config";
 import * as AdhHttp from "../../../Core/Http/Http";
 import * as AdhPreliminaryNames from "../../../Core/PreliminaryNames/PreliminaryNames";
 
+import * as ResourcesBase from "../../ResourcesBase";
+
 import * as SIName from "../../../../Resources_/adhocracy_core/sheets/name/IName";
 import * as SIProcessPrivateSettings from "../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IProcessPrivateSettings";
 import * as SIProcessSettings from "../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IProcessSettings";
@@ -35,23 +37,27 @@ var postCreate = (
     scope : IScope,
     poolPath : string
 ) => {
-    var process = new RIProcess({preliminaryNames: adhPreliminaryNames});
+    var process : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RIProcess.content_type,
+        data: {},
+    };
     process.parent = poolPath;
 
-    process.data[SIName.nick] = new SIName.Sheet({
+    SIName.set(process, {
         name: scope.data.title
     });
-    process.data[SITitle.nick] = new SITitle.Sheet({
+    SITitle.set(process, {
         title: "Bebauungsplan " + scope.data.title
     });
-    process.data[SIProcessSettings.nick] = new SIProcessSettings.Sheet({
+    SIProcessSettings.set(process, {
         participation_kind: scope.data.kind,
         plan_number: scope.data.title
     });
-    process.data[SIProcessPrivateSettings.nick] = new SIProcessPrivateSettings.Sheet({
+    SIProcessPrivateSettings.set(process, {
         office_worker_email: scope.data.officeWorkerEmail
     });
-    process.data[SIWorkflowAssignment.nick] = new SIWorkflowAssignment.Sheet({
+    SIWorkflowAssignment.set(process, {
         state_data: [{
             start_date: scope.data.startDate,
             name: "participate",

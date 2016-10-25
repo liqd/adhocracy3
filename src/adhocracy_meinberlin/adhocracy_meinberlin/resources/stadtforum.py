@@ -8,6 +8,7 @@ from adhocracy_core.resources import proposal
 from adhocracy_core.sheets.embed import IEmbed
 from adhocracy_core.sheets.embed import IEmbedCodeConfig
 from adhocracy_core.sheets.embed import embed_code_config_adapter
+from adhocracy_core.sheets.image import IImageReference
 
 
 class IPoll(proposal.IProposal):
@@ -33,6 +34,9 @@ process_meta = process.process_meta._replace(
                    ),
     is_implicit_addable=True,
     default_workflow='stadtforum',
+    extended_sheets=(
+        IImageReference,
+    ),
 )
 
 
