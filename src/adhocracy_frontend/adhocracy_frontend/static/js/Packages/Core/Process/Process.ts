@@ -26,20 +26,20 @@ export interface IStateData {
 }
 
 export interface IProcessProperties {
-    hasCreatorParticipate? : boolean;
-    hasImage? : boolean;
-    hasLocation? : boolean;
-    hasLocationText? : boolean;
-    hasAuthorInListItem? : boolean;
-    hasDescription? : boolean;
     hasCommentColumn : boolean;
+    hasCreatorParticipate? : boolean; // default: false
+    hasDescription : boolean;
+    hasImage? : boolean; // default: false
+    hasLocation? : boolean; // default: false
+    hasLocationText? : boolean; // default: false
+    hasAuthorInListItem? : boolean; // default: true
     // if a process has a proposal budget, but no max budget, then set maxBudget = Infinity.
-    maxBudget? : number;
+    maxBudget? : number; // default: undefined
     proposalClass;
-    proposalColumn?;
+    proposalColumn;
     // WARNING: proposalSheet is not a regular feature of adhocracy,
     // but a hack of Buergerhaushalt and Kiezkasse.
-    proposalSheet?;
+    proposalSheet?; // default: undefined
     proposalVersionClass;
 }
 
