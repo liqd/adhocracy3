@@ -34,7 +34,7 @@ export var register = (angular) => {
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
             var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
-                RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion);
+                RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion, true);
             registerRoutes()(adhResourceAreaProvider);
             registerRoutes("kiezkasse")(adhResourceAreaProvider);
 

@@ -36,7 +36,7 @@ export var register = (angular) => {
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
             var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
-                RIBuergerhaushaltProcess, RIBuergerhaushaltProposal, RIBuergerhaushaltProposalVersion);
+                RIBuergerhaushaltProcess, RIBuergerhaushaltProposal, RIBuergerhaushaltProposalVersion, true);
             registerRoutes()(adhResourceAreaProvider);
             registerRoutes("buergerhaushalt")(adhResourceAreaProvider);
 

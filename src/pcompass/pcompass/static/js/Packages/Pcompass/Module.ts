@@ -28,7 +28,7 @@ export var register = (angular) => {
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
             var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
-            var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(RIPcompassProcess, RIProposal, RIProposalVersion);
+            var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(RIPcompassProcess, RIProposal, RIProposalVersion, true);
             registerRoutes()(adhResourceAreaProvider);
             registerRoutes("pcompass")(adhResourceAreaProvider);
             adhResourceAreaProvider.processHeaderSlots[RIPcompassProcess.content_type] = processHeaderSlot;

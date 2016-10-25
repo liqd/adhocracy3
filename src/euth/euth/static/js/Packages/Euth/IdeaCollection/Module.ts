@@ -32,7 +32,7 @@ export var register = (angular) => {
 
             _.forEach([RIEuthProcess, RIEuthPrivateProcess], (processType) => {
                 var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
-                    processType, RIProposal, RIProposalVersion);
+                    processType, RIProposal, RIProposalVersion, true);
                 registerRoutes()(adhResourceAreaProvider);
                 registerRoutes("euth")(adhResourceAreaProvider);
                 adhResourceAreaProvider.processHeaderSlots[processType.content_type] = processHeaderSlot;

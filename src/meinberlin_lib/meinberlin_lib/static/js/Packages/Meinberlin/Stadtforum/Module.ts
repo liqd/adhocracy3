@@ -54,7 +54,7 @@ export var register = (angular) => {
             AdhIdeaCollectionProposal.detailDirective])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
             var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
-                RIStadtforumProcess, RIPoll, RIProposalVersion);
+                RIStadtforumProcess, RIPoll, RIProposalVersion, false);
             registerRoutes()(adhResourceAreaProvider);
 
             var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
