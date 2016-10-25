@@ -67,6 +67,7 @@ export var register = (angular) => {
             adhProcessProvider.processProperties[processType] = {
                 hasAuthorInListItem: false,
                 hasCommentColumn: false,
+                hasDescription: false,
                 proposalClass: RIPoll,
                 proposalColumns: adhConfig.pkg_path + AdhPoll.pkgLocation + "/ProposalColumns.html",
                 proposalVersionClass: RIProposalVersion

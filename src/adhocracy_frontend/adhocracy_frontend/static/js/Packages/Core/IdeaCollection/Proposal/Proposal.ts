@@ -123,7 +123,7 @@ export var bindPath = (
                         assignments: assignments
                     };
 
-                    if (!scope.processProperties.proposalColumns) {
+                    if (!scope.processProperties.hasDescription) {
                         var descriptionSheet : SIDescription.ISheet = SIDescription.get(resource);
                         scope.data.detail = descriptionSheet.description;
                     }
@@ -184,7 +184,7 @@ var fill = (
     SITitle.set(proposalVersion, {
         title: scope.data.title
     });
-    if (!scope.processProperties.proposalColumns) {
+    if (!scope.processProperties.hasDescription) {
         SIDescription.set(proposalVersion, {
             description: scope.data.detail
         });
@@ -396,7 +396,6 @@ export var createDirective = (
                     }
                 });
             }
-            scope.hasDetailText = !scope.processProperties.proposalColumns;
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.ideaCollectionProposalForm, () => {
