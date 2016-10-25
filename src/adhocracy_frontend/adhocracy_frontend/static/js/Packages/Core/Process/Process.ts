@@ -35,7 +35,7 @@ export interface IProcessProperties {
     // if a process has a proposal budget, but no max budget, then set maxBudget = Infinity.
     maxBudget? : number;
     proposalClass;
-    proposalColumns?;
+    proposalColumn?;
     // WARNING: proposalSheet is not a regular feature of adhocracy,
     // but a hack of Buergerhaushalt and Kiezkasse.
     proposalSheet?;

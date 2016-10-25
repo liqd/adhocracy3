@@ -69,7 +69,7 @@ export var register = (angular) => {
                 hasCommentColumn: false,
                 hasDescription: false,
                 proposalClass: RIPoll,
-                proposalColumns: adhConfig.pkg_path + AdhPoll.pkgLocation + "/ProposalColumns.html",
+                proposalColumn: adhConfig.pkg_path + AdhPoll.pkgLocation + "/ProposalColumn.html",
                 proposalVersionClass: RIProposalVersion
             };
         }])
