@@ -647,11 +647,20 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
                 var versionClass = <any>stuff[1];
                 var subresourceKey = <string>stuff[2];
 
-                var item = new itemClass({preliminaryNames: this.adhPreliminaryNames});
-                item.parent = mercatorProposal.path;
+                var item : ResourcesBase.IResource = {
+                    path: this.adhPreliminaryNames.nextPreliminary(),
+                    first_version_path: this.adhPreliminaryNames.nextPreliminary(),
+                    parent: mercatorProposal.path,
+                    content_type: itemClass.content_type,
+                    data: {},
+                };
 
-                var version = new versionClass({preliminaryNames: this.adhPreliminaryNames});
-                version.parent = item.path;
+                var version : ResourcesBase.IResource = {
+                    path: this.adhPreliminaryNames.nextPreliminary(),
+                    parent: item.path,
+                    content_type: versionClass.content_type,
+                    data: {},
+                };
                 SIVersionable.set(version, {
                     follows: [item.first_version_path]
                 });
@@ -662,7 +671,7 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
                 return [item, version];
             });
 
-            return this.$q.when(_.flattenDeep([mercatorProposal, mercatorProposalVersion, subresources]));
+            return this.$q.when(_.flattenDeep<ResourcesBase.IResource>([mercatorProposal, mercatorProposalVersion, subresources]));
         };
 
         if (instance.scope.$flow && instance.scope.$flow.support && instance.scope.$flow.files.length > 0) {
@@ -688,7 +697,7 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
                 delete data.introduction.picture;
             }
 
-            var mercatorProposalVersion = AdhResourceUtil.derive(old, {preliminaryNames : this.adhPreliminaryNames});
+            var mercatorProposalVersion = AdhResourceUtil.derive(old, {preliminaryNames : self.adhPreliminaryNames});
             mercatorProposalVersion.parent = AdhUtil.parentPath(old.path);
 
             this.fill(data, mercatorProposalVersion);

@@ -381,7 +381,11 @@ var create = (
             difference: RIDifference,
             practicalrelevance: RIPracticalRelevance
         }, (cls, subresourceKey : string) => {
-            var resource = new cls({preliminaryNames: adhPreliminaryNames});
+            var resource : ResourcesBase.IResource = {
+                path: adhPreliminaryNames.nextPreliminary(),
+                content_type: cls.content_type,
+                data: {},
+            };
             fill(data, resource);
             var request = transaction.post(proposalRequest.path, resource);
             subResourcesSheet[subresourceKey] = request.path;
@@ -434,7 +438,11 @@ var edit = (
                 difference: RIDifference,
                 practicalrelevance: RIPracticalRelevance
             }, (cls, subresourceKey : string) => {
-                var resource = new cls({preliminaryNames: adhPreliminaryNames});
+                var resource : ResourcesBase.IResource = {
+                    path: adhPreliminaryNames.nextPreliminary(),
+                    content_type: cls.content_type,
+                    data: {},
+                };
                 fill(data, resource);
                 transaction.put(subResourcesSheet[subresourceKey], resource);
             });
