@@ -16,6 +16,7 @@ import RIProposalVersion from "../../../../Resources_/adhocracy_core/resources/p
 import RIStadtforumProcess from "../../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IProcess";
 
 import * as SIDescription from "../../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIImageReference from "../../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
@@ -141,6 +142,7 @@ export var detailDirective = (
             scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
+                        scope.data.picture = (SIImageReference.get(resource) || {}).picture;
                         scope.data.title = SITitle.get(resource).title;
                         scope.data.shortDescription = SIDescription.get(resource).short_description;
                     });
