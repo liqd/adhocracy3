@@ -5,7 +5,7 @@ import * as AdhPreliminaryNamesModule from "../../PreliminaryNames/Module";
 import * as AdhRateModule from "../../Rate/Module";
 import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
 
-import * as Proposal from "./Proposal";
+import * as Poll from "./Poll";
 
 
 export var moduleName = "adhPoll";
@@ -20,7 +20,7 @@ export var register = (angular) => {
             AdhRateModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .directive("adhPollDetailColumn", ["adhConfig", "adhTopLevelState", Proposal.pollDetailColumnDirective])
+        .directive("adhPollDetailColumn", ["adhConfig", "adhTopLevelState", Poll.pollDetailColumnDirective])
         .directive("adhPollDetail", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.detailDirective]);
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Poll.detailDirective]);
 };

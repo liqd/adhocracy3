@@ -7,7 +7,7 @@ import * as AdhEmbed from "../../Core/Embed/Embed";
 import * as AdhIdeaCollectionProposal from "../../Core/IdeaCollection/Proposal/Proposal";
 import * as AdhIdeaCollectionWorkbench from "../../Core/IdeaCollection/Workbench/Workbench";
 import * as AdhNames from "../../Core/Names/Names";
-import * as AdhPoll from "../../Core/IdeaCollection/Poll/Proposal";
+import * as AdhPoll from "../../Core/IdeaCollection/Poll/Poll";
 import * as AdhProcess from "../../Core/Process/Process";
 import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
 
