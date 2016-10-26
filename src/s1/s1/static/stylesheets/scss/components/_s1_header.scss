@@ -10,6 +10,11 @@
     }
 }
 
+.s1-header {
+    @include rem(margin-bottom, 10px);
+    position: relative;
+}
+
 .s1-header-menu {
     white-space: nowrap;
     text-align: center;
