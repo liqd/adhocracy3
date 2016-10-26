@@ -1,9 +1,6 @@
 .current-process-title {
-    top: rem(0);
-    left: rem(170px);
-    position: absolute;
-    display: block;
-    line-height: rem(52px);
+    margin-left: 3em;
+    line-height: rem($logo-height);
 
     font-size: $font-size-large;
     text-decoration: none;
@@ -14,35 +11,8 @@
 }
 
 .s1-header {
-    margin-top: rem(50px);
-    margin-bottom: rem(10px);
-
+    @include rem(margin-bottom, 10px);
     position: relative;
-}
-
-.s1-header-logo-link {
-    @include rem(line-height, 30px);
-    @include rem(top, 10px);
-    @include rem(padding, 0 0.5rem);
-    display: inline-block;
-    color: $color-text-introvert;
-    position: absolute;
-    left: 0;
-    // IE 10 renders the image only logo with an underline otherwise
-    text-decoration: none;
-
-    &:hover, &:focus {
-        color: $color-text-normal;
-    }
-
-    abbr {
-        border: 0;
-    }
-}
-
-.s1-header-logo {
-    @include rem(height, 2rem);
-    vertical-align: bottom;
 }
 
 .s1-header-menu {

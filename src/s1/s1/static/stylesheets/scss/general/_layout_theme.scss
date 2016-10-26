@@ -1,3 +1,8 @@
 .l-center {
     background-color: $color-background-base;
 }
+
+.l-header {
+    max-width: none;
+    padding: 0 $padding;
+}
