@@ -307,9 +307,6 @@ export var listItemDirective = (
                     scope.selectedState = "is-not-selected";
                 }
             }));
-            if (typeof scope.processProperties.hasAuthorInListItem === "undefined") {
-                scope.processProperties.hasAuthorInListItem = true;
-            }
             scope.commentType = RICommentVersion.content_type;
         }
     };

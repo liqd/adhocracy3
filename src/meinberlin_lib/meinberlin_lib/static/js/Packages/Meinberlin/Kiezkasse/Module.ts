@@ -46,6 +46,7 @@ export var register = (angular) => {
                 "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
                 "</adh-idea-collection-workbench>";
             adhProcessProvider.setProperties(processType, {
+                hasAuthorInListItem: true,
                 hasCommentColumn: true,
                 hasCreatorParticipate: true,
                 hasDescription: true,
