@@ -85,8 +85,8 @@ export class Service {
         return this.provider.templates[processType];
     }
 
-    public getProcessProperties(processType : string) : IProcessProperties {
-        return this.provider.processProperties[processType];
+    public getProperties(processType : string) : IProcessProperties {
+        return this.provider.getProperties(processType);
     }
 }
 
@@ -148,7 +148,7 @@ export var processViewDirective = (
         link: (scope, element) => {
             adhTopLevelState.on("processType", (processType) => {
                 if (processType) {
-                    scope.processProperties = adhProcess.getProcessProperties(processType);
+                    scope.processProperties = adhProcess.getProperties(processType);
                     var template = adhProcess.getTemplate(processType);
                     element.html(template);
                     $compile(element.contents())(scope);
