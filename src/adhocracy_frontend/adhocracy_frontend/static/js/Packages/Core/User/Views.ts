@@ -735,6 +735,7 @@ var postEdit = (
     path : string,
     data : {
         name : string;
+        email? : string;
         password? : string;
         anonymize? : boolean;
         passwordOld? : string;
@@ -750,6 +751,13 @@ var postEdit = (
                 name: data.name,
             });
         }
+        // FIXME: backend is not yet implemented, so this will throw a
+        // type error on compilation.
+        // if (data.email) {
+        //     SIUserBasic.set(patch, {
+        //         email: data.email,
+        //     });
+        // }
         if (data.password) {
             SIPasswordAuthentication.set(patch, {
                 password: data.password,
@@ -790,6 +798,7 @@ export var userEditDirective = (
                     adhHttp.get(path).then((user) => {
                         scope.data = {
                             name: SIUserBasic.get(user).name,
+                            email: "",
                             password: "",
                             anonymize: SIAnonymizeDefault.get(user).anonymize,
                         };
