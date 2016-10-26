@@ -124,7 +124,7 @@ export var bindPath = (
                     };
 
                     if (scope.processProperties.hasDescription) {
-                        var descriptionSheet : SIDescription.ISheet = SIDescription.get(resource);
+                        var descriptionSheet = SIDescription.get(resource);
                         scope.data.detail = descriptionSheet.description;
                     }
 
