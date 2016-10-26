@@ -64,14 +64,14 @@ export var register = (angular) => {
             adhProcessProvider.templates[processType] =
                 "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
                 "</adh-idea-collection-workbench>";
-            adhProcessProvider.processProperties[processType] = {
+            adhProcessProvider.setProperties(processType, {
                 hasAuthorInListItem: false,
                 hasCommentColumn: false,
                 hasDescription: false,
                 proposalClass: RIPoll,
                 proposalColumn: adhConfig.pkg_path + AdhPoll.pkgLocation + "/ProposalColumn.html",
                 proposalVersionClass: RIProposalVersion
-            };
+            });
         }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
             adhNamesProvider.names[processType] = "TR__RESOURCE_STADTFORUM";

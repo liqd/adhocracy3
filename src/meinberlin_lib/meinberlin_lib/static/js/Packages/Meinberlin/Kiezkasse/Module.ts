@@ -45,7 +45,7 @@ export var register = (angular) => {
             adhProcessProvider.templates[processType] =
                 "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
                 "</adh-idea-collection-workbench>";
-            adhProcessProvider.processProperties[processType] = {
+            adhProcessProvider.setProperties(processType, {
                 hasCommentColumn: true,
                 hasCreatorParticipate: true,
                 hasDescription: true,
@@ -56,7 +56,7 @@ export var register = (angular) => {
                 proposalColumn: adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProposalColumn.html",
                 proposalSheet: SIKiezkasseProposal,
                 proposalVersionClass: RIKiezkasseProposalVersion
-            };
+            });
         }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
             adhNamesProvider.names[RIKiezkasseProcess.content_type] = "TR__RESOURCE_KIEZKASSE";
