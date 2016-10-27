@@ -6,7 +6,7 @@
         data-format="thumbnail"
     ></adh-show-image>
     <div class="list-item-body">
-        <div class="list-item-author">
+        <div class="list-item-author" data-ng-if="processProperties.hasAuthorInListItem">
             {{ "TR__BY" | translate }}
             <adh-user-meta data-ng-if="data.creator" data-path="{{data.creator}}" data-no-link="true"></adh-user-meta>
             {{ "TR__ON" | translate }}

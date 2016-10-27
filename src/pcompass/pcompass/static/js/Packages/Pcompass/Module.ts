@@ -28,16 +28,19 @@ export var register = (angular) => {
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
             var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
-            var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(RIPcompassProcess, RIProposal, RIProposalVersion);
+            var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(RIPcompassProcess, RIProposal, RIProposalVersion, true);
             registerRoutes()(adhResourceAreaProvider);
             registerRoutes("pcompass")(adhResourceAreaProvider);
             adhResourceAreaProvider.processHeaderSlots[RIPcompassProcess.content_type] = processHeaderSlot;
         }])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
+        .config(["adhConfig", "adhProcessProvider", (adhConfig, adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[RIPcompassProcess.content_type] =
                 "<adh-idea-collection-workbench data-process-properties=\"processProperties\"></adh-idea-collection-workbench>";
             adhProcessProvider.processProperties[RIPcompassProcess.content_type] = {
+                hasCommmentColumn: true,
+                hasDescription: true,
                 proposalClass: RIProposal,
+                proposalDetailColumn: adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProposalDetailColumn.html",
                 proposalVersionClass: RIProposalVersion
             };
         }]);

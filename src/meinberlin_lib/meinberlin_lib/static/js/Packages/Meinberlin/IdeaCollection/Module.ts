@@ -39,21 +39,25 @@ export var register = (angular) => {
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider: AdhResourceArea.Provider, adhConfig) => {
             var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
-                RIIdeaCollectionProcess, RIGeoProposal, RIGeoProposalVersion);
+                RIIdeaCollectionProcess, RIGeoProposal, RIGeoProposalVersion, true);
             registerRoutes()(adhResourceAreaProvider);
 
             var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
         }])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
+        .config(["adhConfig", "adhProcessProvider", (adhConfig, adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[processType] =
                 "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
                 "</adh-idea-collection-workbench>";
-            adhProcessProvider.processProperties[processType] = {
+            adhProcessProvider.setProperties(processType, {
+                hasAuthorInListItem: true,
+                hasCommentColumn: true,
+                hasDescription: true,
                 hasLocation: true,
                 proposalClass: RIGeoProposal,
+                proposalColumn: adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProposalColumn.html",
                 proposalVersionClass: RIGeoProposalVersion
-            };
+            });
         }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
             adhNamesProvider.names[RIIdeaCollectionProcess.content_type] = "TR__RESOURCE_IDEA_COLLECTION";

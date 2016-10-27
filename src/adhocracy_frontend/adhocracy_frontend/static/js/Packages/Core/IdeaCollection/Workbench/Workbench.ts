@@ -145,7 +145,8 @@ export var addProposalButtonDirective = (
 export var registerRoutesFactory = (
     ideaCollection,
     proposalType,
-    proposalVersionType
+    proposalVersionType,
+    hasCommentColumn = true
 ) => (
     context : string = ""
 ) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
@@ -224,44 +225,48 @@ export var registerRoutesFactory = (
                 return {
                     proposalUrl: version.path
                 };
-            }])
-        .defaultVersionable(proposalType, proposalVersionType, "comments", ideaCollection.content_type, context, {
-            space: "content",
-            movingColumns: "is-collapse-show-show"
-        })
-        .specificVersionable(proposalType, proposalVersionType, "comments", ideaCollection.content_type, context, [
-            () => (item, version) => {
-                return {
-                    commentableUrl: version.path,
-                    commentCloseUrl: version.path,
-                    proposalUrl: version.path
-                };
-            }])
-        .defaultVersionable(RIComment, RICommentVersion, "", ideaCollection.content_type, context, {
-            space: "content",
-            movingColumns: "is-collapse-show-show"
-        })
-        .specificVersionable(RIComment, RICommentVersion, "", ideaCollection.content_type, context, ["adhHttp", "$q", (
-            adhHttp : AdhHttp.Service,
-            $q : angular.IQService
-        ) => {
-            var getCommentableUrl = (resource) : angular.IPromise<any> => {
-                if (resource.content_type !== RICommentVersion.content_type) {
-                    return $q.when(resource);
-                } else {
-                    var url = SIComment.get(resource).refers_to;
-                    return adhHttp.get(url).then(getCommentableUrl);
-                }
-            };
+            }]);
 
-            return (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
-                return getCommentableUrl(version).then((commentable) => {
+    if (hasCommentColumn) {
+        adhResourceAreaProvider
+            .defaultVersionable(proposalType, proposalVersionType, "comments", ideaCollection.content_type, context, {
+                space: "content",
+                movingColumns: "is-collapse-show-show"
+            })
+            .specificVersionable(proposalType, proposalVersionType, "comments", ideaCollection.content_type, context, [
+                () => (item, version) => {
                     return {
-                        commentableUrl: commentable.path,
-                        commentCloseUrl: commentable.path,
-                        proposalUrl: commentable.path
+                        commentableUrl: version.path,
+                        commentCloseUrl: version.path,
+                        proposalUrl: version.path
                     };
-                });
-            };
-        }]);
+                }])
+            .defaultVersionable(RIComment, RICommentVersion, "", ideaCollection.content_type, context, {
+                space: "content",
+                movingColumns: "is-collapse-show-show"
+            })
+            .specificVersionable(RIComment, RICommentVersion, "", ideaCollection.content_type, context, ["adhHttp", "$q", (
+                adhHttp : AdhHttp.Service,
+                $q : angular.IQService
+            ) => {
+                var getCommentableUrl = (resource) : angular.IPromise<any> => {
+                    if (resource.content_type !== RICommentVersion.content_type) {
+                        return $q.when(resource);
+                    } else {
+                        var url = SIComment.get(resource).refers_to;
+                        return adhHttp.get(url).then(getCommentableUrl);
+                    }
+                };
+
+                return (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
+                    return getCommentableUrl(version).then((commentable) => {
+                        return {
+                            commentableUrl: commentable.path,
+                            commentCloseUrl: commentable.path,
+                            proposalUrl: commentable.path
+                        };
+                    });
+                };
+            }]);
+    }
 };

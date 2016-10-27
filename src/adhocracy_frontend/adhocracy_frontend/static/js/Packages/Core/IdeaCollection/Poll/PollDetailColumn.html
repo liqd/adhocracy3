@@ -18,10 +18,11 @@
     <div data-ng-switch-when="body">
         <adh-recompile-on-change
             data-value="{{proposalUrl}}">
-            <adh-meinberlin-stadtforum-proposal-detail
+            <adh-poll-detail
                 data-ng-if="proposalUrl"
-                data-path="{{proposalUrl}}">
-            </adh-meinberlin-stadtforum-proposal-detail>
+                data-path="{{proposalUrl}}"
+                data-process-properties="processProperties">
+            </adh-poll-detail>
         </adh-recompile-on-change>
     </div>
 </div>

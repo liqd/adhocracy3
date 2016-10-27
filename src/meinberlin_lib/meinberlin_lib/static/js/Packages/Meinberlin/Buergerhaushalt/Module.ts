@@ -36,25 +36,29 @@ export var register = (angular) => {
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
             var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
-                RIBuergerhaushaltProcess, RIBuergerhaushaltProposal, RIBuergerhaushaltProposalVersion);
+                RIBuergerhaushaltProcess, RIBuergerhaushaltProposal, RIBuergerhaushaltProposalVersion, true);
             registerRoutes()(adhResourceAreaProvider);
             registerRoutes("buergerhaushalt")(adhResourceAreaProvider);
 
             var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
         }])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
+        .config(["adhConfig", "adhProcessProvider", (adhConfig, adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[processType] =
                 "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
                 "</adh-idea-collection-workbench>";
-            adhProcessProvider.processProperties[processType] = {
+            adhProcessProvider.setProperties(processType, {
+                hasAuthorInListItem: true,
+                hasCommentColumn: true,
+                hasDescription: true,
                 hasLocation: true,
                 hasLocationText: true,
                 maxBudget: Infinity,
                 proposalClass: RIBuergerhaushaltProposal,
+                proposalColumn: adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProposalColumn.html",
                 proposalSheet: SIBuergerhaushaltProposal,
                 proposalVersionClass: RIBuergerhaushaltProposalVersion
-            };
+            });
         }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
             adhNamesProvider.names[RIBuergerhaushaltProcess.content_type] = "TR__RESOURCE_BUERGERHAUSHALT";

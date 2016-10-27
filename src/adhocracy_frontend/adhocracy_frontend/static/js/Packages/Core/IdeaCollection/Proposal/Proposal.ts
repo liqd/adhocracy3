@@ -35,7 +35,7 @@ export interface IScope extends angular.IScope {
     errors? : AdhHttp.IBackendErrorItem[];
     data : {
         title : string;
-        detail : string;
+        detail? : string;
         rateCount : number;
         creator : string;
         creationDate : string;
@@ -58,7 +58,7 @@ export interface IScope extends angular.IScope {
     commentType? : string;
 }
 
-var bindPath = (
+export var bindPath = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
@@ -93,7 +93,6 @@ var bindPath = (
                 scope.resource = resource;
 
                 var titleSheet = SITitle.get(resource);
-                var descriptionSheet = SIDescription.get(resource);
                 var pointSheet = SIPoint.get(resource);
                 var metadataSheet = SIMetadata.get(resource);
                 var rateableSheet = SIRateable.get(resource);
@@ -117,13 +116,17 @@ var bindPath = (
 
                     scope.data = {
                         title: titleSheet.title,
-                        detail: descriptionSheet.description,
                         rateCount: ratesPro - ratesContra,
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
                         commentCount: SICommentable.get(resource).comments_count,
                         assignments: assignments
                     };
+
+                    if (scope.processProperties.hasDescription) {
+                        var descriptionSheet = SIDescription.get(resource);
+                        scope.data.detail = descriptionSheet.description;
+                    }
 
                     if (adhConfig.anonymize_enabled) {
                         adhHttp.get(scope.data.creator).then((res) => {
@@ -181,9 +184,11 @@ var fill = (
     SITitle.set(proposalVersion, {
         title: scope.data.title
     });
-    SIDescription.set(proposalVersion, {
-        description: scope.data.detail
-    });
+    if (scope.processProperties.hasDescription) {
+        SIDescription.set(proposalVersion, {
+            description: scope.data.detail
+        });
+    }
     if (scope.data.lng && scope.data.lat) {
         SIPoint.set(proposalVersion, {
             coordinates: [scope.data.lng, scope.data.lat]

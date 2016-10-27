@@ -26,14 +26,17 @@ export interface IStateData {
 }
 
 export interface IProcessProperties {
+    hasCommentColumn? : boolean;
     hasCreatorParticipate? : boolean;
+    hasDescription? : boolean;
     hasImage? : boolean;
     hasLocation? : boolean;
     hasLocationText? : boolean;
+    hasAuthorInListItem? : boolean;
     // if a process has a proposal budget, but no max budget, then set maxBudget = Infinity.
     maxBudget? : number;
-    processClass?;
     proposalClass;
+    proposalColumn : string;
     // WARNING: proposalSheet is not a regular feature of adhocracy,
     // but a hack of Buergerhaushalt and Kiezkasse.
     proposalSheet?;
@@ -56,7 +59,7 @@ export var getStateData = (sheet : SIWorkflow.ISheet, name : string) : IStateDat
 
 export class Provider implements angular.IServiceProvider {
     public templates : {[processType : string]: string};
-    public processProperties : {[processType : string]: IProcessProperties};
+    protected processProperties : {[processType : string]: IProcessProperties};
     public $get;
 
     constructor () {
@@ -66,6 +69,14 @@ export class Provider implements angular.IServiceProvider {
         this.$get = ["$injector", ($injector) => {
             return new Service(this, $injector);
         }];
+    }
+
+    public setProperties(processType : string, properties : IProcessProperties) {
+        this.processProperties[processType] = properties;
+    }
+
+    public getProperties(processType : string) : IProcessProperties {
+        return this.processProperties[processType];
     }
 }
 
@@ -82,8 +93,8 @@ export class Service {
         return this.provider.templates[processType];
     }
 
-    public getProcessProperties(processType : string) : IProcessProperties {
-        return this.provider.processProperties[processType];
+    public getProperties(processType : string) : IProcessProperties {
+        return this.provider.getProperties(processType);
     }
 }
 
@@ -145,7 +156,7 @@ export var processViewDirective = (
         link: (scope, element) => {
             adhTopLevelState.on("processType", (processType) => {
                 if (processType) {
-                    scope.processProperties = adhProcess.getProcessProperties(processType);
+                    scope.processProperties = adhProcess.getProperties(processType);
                     var template = adhProcess.getTemplate(processType);
                     element.html(template);
                     $compile(element.contents())(scope);
