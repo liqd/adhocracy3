@@ -415,3 +415,4 @@ def includeme(config):  # pragma: no cover
     config.include('.notification')
     config.include('.localroles')
     config.include('.anonymize')
+    config.include('.activity')
