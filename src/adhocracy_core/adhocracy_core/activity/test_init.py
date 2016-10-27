@@ -212,6 +212,18 @@ class TestUpdateActicityCallback:
         added_activity = add_to.call_args[0][0][0]
         assert added_activity.published == now.return_value
 
+    def test_sends_generated_event(self, request_, add_to, changelog, context,
+                                   config):
+        from adhocracy_core.testing import create_event_listener
+        from adhocracy_core.interfaces import IActivitiesGenerated
+        changelog['/'] = changelog['']._replace(modified=True, resource=context)
+        added_listener = create_event_listener(config,
+                                               IActivitiesGenerated)
+        self.call_fut(request_, None)
+        event = added_listener[0]
+        added_activity = add_to.call_args[0][0][0]
+        assert event.activities == [added_activity]
+
 
 @fixture
 def get_title(mocker):

@@ -1,6 +1,4 @@
 """Create activity streams."""
-import transaction
-
 from pyramid.i18n import TranslationStringFactory
 from pyramid.i18n import TranslationString
 from pyramid.i18n import get_localizer
@@ -12,6 +10,7 @@ from pyramid.response import Response
 from substanced.util import find_service
 from logging import getLogger
 from adhocracy_core.auditing import add_to_auditlog
+from adhocracy_core.events import ActivitiesGenerated
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.title import ITitle
@@ -36,10 +35,9 @@ _ = TranslationStringFactory('adhocracy')
 
 
 def update_activity_callback(request: Request, response: Response) -> None:
-    """Add activities caused by current `request` to the auditlog.
+    """Generate activities caused by current `request` and add to the auditlog.
 
-    This is a response-callback that runs after a request has finished. To
-    store the audit entry it adds an additional transaction.
+    This is a response-callback that runs after a request has finished.
     """
     if isinstance(response, HTTPError):
         return
@@ -47,8 +45,9 @@ def update_activity_callback(request: Request, response: Response) -> None:
     if changes:
         activities = _create_activities(changes, request)
         activities = _add_name_to_activities(activities, request)
+        event = ActivitiesGenerated(activities, request)
+        request.registry.notify(event)
         add_to_auditlog(activities, request)
-        transaction.commit()
 
 
 def _filter_trival_changes(request: Request) -> []:

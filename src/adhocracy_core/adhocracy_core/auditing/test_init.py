@@ -140,14 +140,3 @@ class TestAddToAuditLog:
     def test_add(self, activity, mock_auditlog, request_):
         self.call_fut([activity], request_)
         mock_auditlog.add.assert_called_with(activity)
-
-    def test_add_sends_added_event(self, activity, config, mock_auditlog,
-                                   request_):
-        from adhocracy_core.testing import create_event_listener
-        from adhocracy_core.interfaces import IActivitiesAddedToAuditLog
-        added_listener = create_event_listener(config,
-                                               IActivitiesAddedToAuditLog)
-        self.call_fut([activity], request_)
-        event = added_listener[0]
-        assert event.object == mock_auditlog
-        assert event.activities == [activity]

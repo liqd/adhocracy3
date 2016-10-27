@@ -1,12 +1,12 @@
 """Log which user modifies resources in additional 'audit' database."""
 import substanced.util
+import transaction
 
 from pyramid.i18n import TranslationStringFactory
 from pyramid.traversal import resource_path
 from pyramid.request import Request
 from BTrees.OOBTree import OOBTree
 from logging import getLogger
-from adhocracy_core.events import ActivitiesAddedToAuditLog
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import SerializedActivity
 from adhocracy_core.interfaces import Activity
@@ -77,9 +77,8 @@ def add_to_auditlog(activities: [Activity],
     value is not specified in the config, auditing does not happen.
     """
     auditlog = get_auditlog(request.root)
-    event = ActivitiesAddedToAuditLog(auditlog, activities, request)
-    request.registry.notify(event)
     if auditlog is None:
         return
     for activity in activities:
         auditlog.add(activity)
+    transaction.commit()
