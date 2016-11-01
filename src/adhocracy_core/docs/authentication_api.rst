@@ -426,3 +426,22 @@ directly::
     {'status': 'success',
      'user_path': '.../principals/users/...',
      'user_token': '...'}
+
+
+Security Considerations
+-----------------------
+
+-   The password-reset mechanism allows attackers that have access to a
+    user's email address to take over an account.
+
+-   The password-edit mechanism allows attackers that have access to a
+    user's session and password to change the password. However, the
+    user receives an email informing them about the change and about
+    ways to recover their password (i.e. password-reset).
+
+-   In the future we may want to allow users to change their email
+    address. In this case attackers with access to a user's session and
+    password would be able to take over an account.
+
+-   Once an account has been compromised it is not possible to recover.
+    Legitimate users have no way to prove their legitimacy.
