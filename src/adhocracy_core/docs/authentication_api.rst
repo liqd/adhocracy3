@@ -368,6 +368,42 @@ Other users, even if logged in, cannot::
     False
 
 
+Editing Users
+-------------
+
+User can edit their own data::
+
+    >>> headers = {'X-User-Token': user_token_via_username}
+    >>> user = copy(anonymous)
+    >>> user.header = headers
+    >>> data = {'data': {'adhocracy_core.sheets.principal.IUserBasic': {'name': 'edited_name'}}}
+    >>> resp = user.put(user_path, data).json
+    >>> len(resp['updated_resources']['modified'])
+    1
+
+If they want to edit security-related information they need to pass
+their passwords in a custom header::
+
+    >>> headers = {'X-User-Token': user_token_via_username,
+    ...            'X-User-Password': 'EckVocUbs3'}
+    >>> user = copy(anonymous)
+    >>> user.header = headers
+    >>> data = {'data': {'adhocracy_core.sheets.principal.IPasswordAuthentication': {'password': 'edited_password'}}}
+    >>> resp = user.put(user_path, data).json
+    >>> len(resp['updated_resources']['modified'])
+    1
+
+If the header is missing the change is silently dropped::
+
+    >>> headers = {'X-User-Token': user_token_via_username}
+    >>> user = copy(anonymous)
+    >>> user.header = headers
+    >>> data = {'data': {'adhocracy_core.sheets.principal.IPasswordAuthentication': {'password': 'edited_password'}}}
+    >>> resp = user.put(user_path, data).json
+    >>> len(resp['updated_resources']['modified'])
+    0
+
+
 Password Reset
 --------------
 
