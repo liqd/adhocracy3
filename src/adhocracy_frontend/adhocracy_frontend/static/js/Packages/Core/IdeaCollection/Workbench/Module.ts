@@ -2,8 +2,6 @@ import * as AdhAbuseModule from "../../Abuse/Module";
 import * as AdhBadgeModule from "../../Badge/Module";
 import * as AdhCommentModule from "../../Comment/Module";
 import * as AdhHttpModule from "../../Http/Module";
-import * as AdhIdeaCollectionProcessModule from "../Process/Module";
-import * as AdhIdeaCollectionProposalModule from "../Proposal/Module";
 import * as AdhMovingColumnsModule from "../../MovingColumns/Module";
 import * as AdhPermissionsModule from "../../Permissions/Module";
 import * as AdhProcessModule from "../../Process/Module";
@@ -16,17 +14,12 @@ import * as Workbench from "./Workbench";
 export var moduleName = "adhIdeaCollectionWorkbench";
 
 export var register = (angular) => {
-    AdhIdeaCollectionProcessModule.register(angular);
-    AdhIdeaCollectionProposalModule.register(angular);
-
     angular
         .module(moduleName, [
             AdhAbuseModule.moduleName,
             AdhBadgeModule.moduleName,
             AdhCommentModule.moduleName,
             AdhHttpModule.moduleName,
-            AdhIdeaCollectionProcessModule.moduleName,
-            AdhIdeaCollectionProposalModule.moduleName,
             AdhMovingColumnsModule.moduleName,
             AdhPermissionsModule.moduleName,
             AdhProcessModule.moduleName,
