@@ -85,6 +85,7 @@ export var register = (angular, config, metaApi) => {
 
     angular
         .module(moduleName, [
+            AdhActivityModule.moduleName,
             AdhCommentModule.moduleName,
             AdhConfigModule.moduleName,
             AdhCrossWindowMessagingModule.moduleName,
