@@ -17,6 +17,10 @@ import * as AdhNames from "../../Core/Names/Names";
 import * as AdhProcess from "../../Core/Process/Process";
 import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
 
+import RIDigitalLebenProcess from "../../../Resources_/adhocracy_spd/resources/digital_leben/IProcess";
+import RIDocument from "../../../Resources_/adhocracy_core/resources/document/IDocument";
+import RIDocumentVersion from "../../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
+
 export var moduleName = "adhSpdCollaborativeText";
 
 export var register = (angular) => {
@@ -36,6 +40,30 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
+        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
+            adhEmbedProvider
+                .registerDirective("debate-workbench");
+        }])
+        .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider: AdhResourceArea.Provider, adhConfig) => {
+            var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
+                RIDigitalLebenProcess, RIDocument, RIDocumentVersion, false, true);
+            registerRoutes()(adhResourceAreaProvider);
+
+            var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/AddDocumentSlot.html";
+            adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
+        }])
+        .config(["adhConfig", "adhProcessProvider", (adhConfig, adhProcessProvider : AdhProcess.Provider) => {
+            adhProcessProvider.templates[processType] =
+                "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
+                "</adh-idea-collection-workbench>";
+            adhProcessProvider.setProperties(processType, {
+                proposalColumn: adhConfig.pkg_path + AdhDocument.pkgLocation + "/DetailSlot.html",
+                document: true,
+                hasCommentColumn: true,
+                proposalClass: RIDocument,
+                proposalVersionClass: RIDocumentVersion
+            });
+        }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
             adhNamesProvider.names[processType] = "TR__RESOURCE_COLLABORATIVE_TEXT_EDITING";
         }]);
