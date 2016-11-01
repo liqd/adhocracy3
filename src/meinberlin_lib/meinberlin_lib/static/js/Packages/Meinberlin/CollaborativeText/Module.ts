@@ -16,6 +16,10 @@ import * as AdhNames from "../../Core/Names/Names";
 import * as AdhProcess from "../../Core/Process/Process";
 import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
 
+import RIDocument from "../../../Resources_/adhocracy_core/resources/document/IDocument";
+import RIDocumentVersion from "../../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
+import RICollaborativeTextProcess from "../../../Resources_/adhocracy_meinberlin/resources/collaborative_text/IProcess";
+
 export var moduleName = "adhMeinberlinCollaborativeText";
 
 export var register = (angular) => {
@@ -34,6 +38,26 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
+        .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider: AdhResourceArea.Provider, adhConfig) => {
+            var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
+                RICollaborativeTextProcess, RIDocument, RIDocumentVersion, false, true);
+            registerRoutes()(adhResourceAreaProvider);
+
+            var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/AddDocumentSlot.html";
+            adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
+        }])
+        .config(["adhConfig", "adhProcessProvider", (adhConfig, adhProcessProvider : AdhProcess.Provider) => {
+            adhProcessProvider.templates[processType] =
+                "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
+                "</adh-idea-collection-workbench>";
+            adhProcessProvider.setProperties(processType, {
+                proposalColumn: adhConfig.pkg_path + AdhDocument.pkgLocation + "/DetailColumn.html",
+                document: true,
+                hasCommentColumn: true,
+                proposalClass: RIDocument,
+                proposalVersionClass: RIDocumentVersion
+            });
+        }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
             adhNamesProvider.names[processType] = "TR__RESOURCE_COLLABORATIVE_TEXT_EDITING";
         }]);
