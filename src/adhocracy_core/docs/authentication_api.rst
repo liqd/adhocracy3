@@ -366,3 +366,27 @@ Other users, even if logged in, cannot::
     False
     >>> 'adhocracy_core.sheets.principal.IPermissions' in resp['data']
     False
+
+
+Password Reset
+--------------
+
+If users forget their passwords, they can request a reset email::
+
+    >>> data = {'email': 'anna@example.org'}
+    >>> resp = anonymous.post('http://localhost/create_password_reset', data).json
+    >>> resp['status']
+    'success'
+
+The email contains a link that will allow them to enter a new password.
+Password reset also returns the credentials so that a user can login
+directly::
+
+    >>> newest_reset_path = getfixture('newest_reset_path')
+    >>> data = {'path': newest_reset_path(),
+    ...         'password': 'new_password'}
+    >>> resp = anonymous.post("http://localhost/password_reset", data).json
+    >>> pprint(resp)
+    {'status': 'success',
+     'user_path': '.../principals/users/...',
+     'user_token': '...'}
