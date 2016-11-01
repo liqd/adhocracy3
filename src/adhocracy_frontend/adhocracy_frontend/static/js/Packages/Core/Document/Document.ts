@@ -60,8 +60,8 @@ export interface IScope extends angular.IScope {
     toggleCreateForm() : void;
     showCreateForm? : boolean;
 
-    documentVersion? : RIDocumentVersion;
-    paragraphVersions? : RIParagraphVersion[];
+    documentVersion? : ResourcesBase.IResource;
+    paragraphVersions? : ResourcesBase.IResource[];
 
     commentType? : string;
 }
@@ -107,18 +107,18 @@ export var bindPath = (
 ) : Function => {
     return scope.$watch(pathKey, (path : string) => {
         if (path) {
-            adhHttp.get(path).then((documentVersion : RIDocumentVersion) => {
-                var paragraphPaths : string[] = documentVersion.data[SIDocument.nick].elements;
+            adhHttp.get(path).then((documentVersion : ResourcesBase.IResource) => {
+                var paragraphPaths : string[] = SIDocument.get(documentVersion).elements;
                 var paragraphPromises = _.map(paragraphPaths, (path) => {
                     return adhHttp.get(path);
                 });
 
-                return $q.all(paragraphPromises).then((paragraphVersions : RIParagraphVersion[]) => {
+                return $q.all(paragraphPromises).then((paragraphVersions : ResourcesBase.IResource[]) => {
                     var paragraphs = _.map(paragraphVersions, (paragraphVersion) => {
                         return {
-                            body: paragraphVersion.data[SIParagraph.nick].text,
+                            body: SIParagraph.get(paragraphVersion).text,
                             deleted: false,
-                            commentCount: parseInt(paragraphVersion.data[SICommentable.nick].comments_count, 10),
+                            commentCount: SICommentable.get(paragraphVersion).comments_count,
                             path: paragraphVersion.path
                         };
                     });
@@ -127,22 +127,22 @@ export var bindPath = (
                     scope.paragraphVersions = paragraphVersions;
 
                     scope.data = {
-                        title: documentVersion.data[SITitle.nick].title,
+                        title: SITitle.get(documentVersion).title,
                         paragraphs: paragraphs,
                         // FIXME: DefinitelyTyped
                         commentCountTotal: (<any>_).sumBy(paragraphs, "commentCount"),
-                        modificationDate: documentVersion.data[SIMetadata.nick].modification_date,
-                        creationDate: documentVersion.data[SIMetadata.nick].creation_date,
-                        creator: documentVersion.data[SIMetadata.nick].creator,
-                        picture: documentVersion.data[SIImageReference.nick].picture
+                        modificationDate: SIMetadata.get(documentVersion).modification_date,
+                        creationDate: SIMetadata.get(documentVersion).creation_date,
+                        creator: SIMetadata.get(documentVersion).creator,
+                        picture: SIImageReference.get(documentVersion).picture
                     };
 
                     if (hasMap) {
-                        scope.data.coordinates = documentVersion.data[SIPoint.nick].coordinates;
+                        scope.data.coordinates = SIPoint.get(documentVersion).coordinates;
                     }
 
                     if (hasBadges) {
-                        adhGetBadges(documentVersion).then((assignments) => {
+                        adhGetBadges(<RIDocumentVersion>documentVersion).then((assignments) => {
                             scope.data.assignments = assignments;
                         });
                     }
@@ -170,23 +170,36 @@ export var postCreate = (
     const documentClass = hasMap ? RIGeoDocument : RIDocument;
     const documentVersionClass = hasMap ? RIGeoDocumentVersion : RIDocumentVersion;
 
-    var doc = new documentClass({preliminaryNames: adhPreliminaryNames});
-    doc.parent = poolPath;
+    var doc : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        first_version_path: adhPreliminaryNames.nextPreliminary(),
+        parent: poolPath,
+        content_type: documentClass.content_type,
+        data: {},
+    };
 
     var paragraphItems = [];
     var paragraphVersions = [];
 
     _.forEach(scope.data.paragraphs, (paragraph) => {
         if (!paragraph.deleted) {
-            var item = new RIParagraph({preliminaryNames: adhPreliminaryNames});
+            var item : ResourcesBase.IResource = {
+                path: adhPreliminaryNames.nextPreliminary(),
+                content_type: RIParagraph.content_type,
+                data: {},
+            };
             item.parent = doc.path;
 
-            var version = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
+            var version : ResourcesBase.IResource = {
+                path: adhPreliminaryNames.nextPreliminary(),
+                content_type: RIParagraphVersion.content_type,
+                data: {},
+            };
             version.parent = item.path;
-            version.data[SIVersionable.nick] = new SIVersionable.Sheet({
+            SIVersionable.set(version, {
                 follows: [item.first_version_path]
             });
-            version.data[SIParagraph.nick] = new SIParagraph.Sheet({
+            SIParagraph.set(version, {
                 text: paragraph.body
             });
 
@@ -195,19 +208,23 @@ export var postCreate = (
         }
     });
 
-    var documentVersion = new documentVersionClass({preliminaryNames: adhPreliminaryNames});
-    documentVersion.parent = doc.path;
-    documentVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    var documentVersion : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        parent: doc.path,
+        content_type: documentVersionClass.content_type,
+        data: {},
+    };
+    SIVersionable.set(documentVersion, {
         follows: [doc.first_version_path]
     });
-    documentVersion.data[SIDocument.nick] = new SIDocument.Sheet({
+    SIDocument.set(documentVersion, {
         elements: <string[]>_.map(paragraphVersions, "path")
     });
-    documentVersion.data[SITitle.nick] = new SITitle.Sheet({
+    SITitle.set(documentVersion, {
         title: scope.data.title
     });
     if (hasMap && scope.data.coordinates && scope.data.coordinates[0] && scope.data.coordinates[1]) {
-        documentVersion.data[SIPoint.nick] = new SIPoint.Sheet({
+        SIPoint.set(documentVersion, {
             coordinates: scope.data.coordinates
         });
     }
@@ -219,7 +236,7 @@ export var postCreate = (
 
     if (scope.$flow && scope.$flow.support && scope.$flow.files.length > 0) {
         return adhUploadImage(poolPath, scope.$flow).then((imagePath : string) => {
-            documentVersion.data[SIImageReference.nick] = new SIImageReference.Sheet({
+            SIImageReference.set(documentVersion, {
                 picture: imagePath
             });
             return commit();
@@ -235,8 +252,8 @@ export var postEdit = (
     adhUploadImage
 ) => (
     scope : IFormScope,
-    oldVersion : RIDocumentVersion,
-    oldParagraphVersions : RIParagraphVersion[],
+    oldVersion : ResourcesBase.IResource,
+    oldParagraphVersions : ResourcesBase.IResource[],
     hasMap : boolean = false
 ) : angular.IPromise<RIDocumentVersion> => {
     // This function assumes the following:
@@ -252,26 +269,34 @@ export var postEdit = (
 
     const documentVersionClass = hasMap ? RIGeoDocumentVersion : RIDocumentVersion;
 
-    var paragraphItems : RIParagraph[] = [];
-    var paragraphVersions : RIParagraphVersion[] = [];
+    var paragraphItems : ResourcesBase.IResource[] = [];
+    var paragraphVersions : ResourcesBase.IResource[] = [];
     var paragraphRefs : string[] = [];
 
-    var paragraphVersion : RIParagraphVersion;
+    var paragraphVersion : ResourcesBase.IResource;
 
     _.forEach(scope.data.paragraphs, (paragraph : IParagraph, index : number) => {
         // currently, if a paragraph has been deleted, it doesn't get posted at all.
         if (!paragraph.deleted) {
 
             if (index >= oldParagraphVersions.length) {
-                var item = new RIParagraph({preliminaryNames: adhPreliminaryNames});
-                item.parent = documentPath;
+                var item : ResourcesBase.IResource = {
+                    path: adhPreliminaryNames.nextPreliminary(),
+                    parent: documentPath,
+                    content_type: RIParagraph.content_type,
+                    data: {},
+                };
 
-                paragraphVersion = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
-                paragraphVersion.parent = item.path;
-                paragraphVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+                paragraphVersion = {
+                    path: adhPreliminaryNames.nextPreliminary(),
+                    parent: item.path,
+                    content_type: RIParagraphVersion.content_type,
+                    data: {},
+                };
+                SIVersionable.set(paragraphVersion, {
                     follows: [item.first_version_path]
                 });
-                paragraphVersion.data[SIParagraph.nick] = new SIParagraph.Sheet({
+                SIParagraph.set(paragraphVersion, {
                     text: paragraph.body
                 });
                 paragraphVersion.root_versions = [oldVersion.path];
@@ -283,16 +308,20 @@ export var postEdit = (
             } else {
                 var oldParagraphVersion = oldParagraphVersions[index];
 
-                if (paragraph.body !== oldParagraphVersion.data[SIParagraph.nick].text) {
-                    paragraphVersion = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
-                    paragraphVersion.parent = AdhUtil.parentPath(oldParagraphVersion.path);
-                    paragraphVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+                if (paragraph.body !== SIParagraph.get(oldParagraphVersion).text) {
+                    paragraphVersion = {
+                        path: adhPreliminaryNames.nextPreliminary(),
+                        parent: AdhUtil.parentPath(oldParagraphVersion.path),
+                        root_versions: [oldVersion.path],
+                        content_type: RIParagraphVersion.content_type,
+                        data: {},
+                    };
+                    SIVersionable.set(paragraphVersion, {
                         follows: [oldParagraphVersion.path]
                     });
-                    paragraphVersion.data[SIParagraph.nick] = new SIParagraph.Sheet({
+                    SIParagraph.set(paragraphVersion, {
                         text: paragraph.body
                     });
-                    paragraphVersion.root_versions = [oldVersion.path];
 
                     paragraphVersions.push(paragraphVersion);
                     paragraphRefs.push(paragraphVersion.path);
@@ -303,26 +332,30 @@ export var postEdit = (
         }
     });
 
-    var documentVersion = new documentVersionClass({preliminaryNames: adhPreliminaryNames});
-    documentVersion.parent = documentPath;
-    documentVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    var documentVersion = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        parent: documentPath,
+        content_type: documentVersionClass.content_type,
+        data: {},
+    };
+    SIVersionable.set(documentVersion, {
         follows: [oldVersion.path]
     });
-    documentVersion.data[SIDocument.nick] = new SIDocument.Sheet({
+    SIDocument.set(documentVersion, {
         elements: paragraphRefs
     });
-    documentVersion.data[SITitle.nick] = new SITitle.Sheet({
+    SITitle.set(documentVersion, {
         title: scope.data.title
     });
     if (hasMap && scope.data.coordinates && scope.data.coordinates[0] && scope.data.coordinates[1]) {
-        documentVersion.data[SIPoint.nick] = new SIPoint.Sheet({
+        SIPoint.set(documentVersion, {
             coordinates: scope.data.coordinates
         });
     }
     // FIXME: workaround for a backend bug
-    var oldImageReferenceSheet = oldVersion.data[SIImageReference.nick];
+    var oldImageReferenceSheet = SIImageReference.get(oldVersion);
     if (oldImageReferenceSheet.picture) {
-        documentVersion.data[SIImageReference.nick] = oldImageReferenceSheet;
+        SIImageReference.set(documentVersion, oldImageReferenceSheet);
     }
 
     var commit = () => {
@@ -332,7 +365,7 @@ export var postEdit = (
 
     if (scope.$flow && scope.$flow.support && scope.$flow.files.length > 0) {
         return adhUploadImage(poolPath, scope.$flow).then((imagePath : string) => {
-            documentVersion.data[SIImageReference.nick] = new SIImageReference.Sheet({
+            SIImageReference.set(documentVersion, {
                 picture: imagePath
             });
             return commit();
@@ -501,7 +534,7 @@ export var createDirective = (
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
                     return postCreate(adhHttp, adhPreliminaryNames, adhUploadImage)(scope, scope.path, scope.hasMap);
-                }).then((documentVersion : RIDocumentVersion) => {
+                }).then((documentVersion : ResourcesBase.IResource) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
                 });
@@ -567,7 +600,7 @@ export var editDirective = (
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
                     return postEdit(adhHttp, adhPreliminaryNames, adhUploadImage)(
                         scope, scope.documentVersion, scope.paragraphVersions, scope.hasMap);
-                }).then((documentVersion : RIDocumentVersion) => {
+                }).then((documentVersion : ResourcesBase.IResource) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
                 });

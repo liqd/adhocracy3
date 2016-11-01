@@ -32,20 +32,23 @@ export var register = (angular) => {
 
             _.forEach([RIEuthProcess, RIEuthPrivateProcess], (processType) => {
                 var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
-                    processType, RIProposal, RIProposalVersion);
+                    processType, RIProposal, RIProposalVersion, true);
                 registerRoutes()(adhResourceAreaProvider);
                 registerRoutes("euth")(adhResourceAreaProvider);
                 adhResourceAreaProvider.processHeaderSlots[processType.content_type] = processHeaderSlot;
             });
         }])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
+        .config(["adhConfig", "adhProcessProvider", (adhConfig, adhProcessProvider : AdhProcess.Provider) => {
             _.forEach([RIEuthProcess, RIEuthPrivateProcess], (processType) => {
                 adhProcessProvider.templates[processType.content_type] =
                     "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
                     "</adh-idea-collection-workbench>";
                 adhProcessProvider.processProperties[processType.content_type] = {
+                    hasCommentColumn: true,
+                    hasDescription: true,
                     hasImage: true,
                     proposalClass: RIProposal,
+                    proposalDetailColumn: adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProposalDetailColumn.html",
                     proposalVersionClass: RIProposalVersion
                 };
             });

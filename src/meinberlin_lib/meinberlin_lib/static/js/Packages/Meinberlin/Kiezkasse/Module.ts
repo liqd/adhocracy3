@@ -34,26 +34,30 @@ export var register = (angular) => {
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
             var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
-                RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion);
+                RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion, true);
             registerRoutes()(adhResourceAreaProvider);
             registerRoutes("kiezkasse")(adhResourceAreaProvider);
 
             var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
         }])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
+        .config(["adhConfig", "adhProcessProvider", (adhConfig, adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[processType] =
                 "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
                 "</adh-idea-collection-workbench>";
-            adhProcessProvider.processProperties[processType] = {
+            adhProcessProvider.setProperties(processType, {
+                hasAuthorInListItem: true,
+                hasCommentColumn: true,
                 hasCreatorParticipate: true,
+                hasDescription: true,
                 hasLocation: true,
                 hasLocationText: true,
                 maxBudget: 50000,
                 proposalClass: RIKiezkasseProposal,
+                proposalColumn: adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProposalColumn.html",
                 proposalSheet: SIKiezkasseProposal,
                 proposalVersionClass: RIKiezkasseProposalVersion
-            };
+            });
         }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
             adhNamesProvider.names[RIKiezkasseProcess.content_type] = "TR__RESOURCE_KIEZKASSE";

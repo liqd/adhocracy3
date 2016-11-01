@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)  # pragma: no cover
 
 
 @log_migration
-def remove_spd_workflow_assignment_sheet(root):  # pragma: no cover
+def remove_spd_workflow_assignment_sheet(root, registry):  # pragma: no cover
     """Remove deprecated sheets.digital_leben.IWorkflowAssignment interface."""
     from adhocracy_core.interfaces import IResource
     from adhocracy_core.sheets.workflow import IWorkflowAssignment

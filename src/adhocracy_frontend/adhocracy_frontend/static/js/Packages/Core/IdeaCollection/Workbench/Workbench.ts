@@ -6,6 +6,8 @@ import * as AdhPermissions from "../../Permissions/Permissions";
 import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
 
+import * as ResourcesBase from "../../../ResourcesBase";
+
 import RIComment from "../../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import * as SIComment from "../../../../Resources_/adhocracy_core/sheets/comment/IComment";
@@ -32,7 +34,7 @@ export var workbenchDirective = (
             scope.$watch("processUrl", (processUrl) => {
                 if (processUrl) {
                     adhHttp.get(processUrl).then((resource) => {
-                        scope.currentPhase = resource.data[SIWorkflow.nick].workflow_state;
+                        scope.currentPhase = SIWorkflow.get(resource).workflow_state;
                     });
                 }
             });
@@ -128,8 +130,8 @@ export var addProposalButtonDirective = (
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
             adhHttp.get(scope.processUrl).then((process) => {
-                var workflow = process.data[SIWorkflow.nick].workflow;
-                scope.workflowAllowsCreateProposal = (workflow !== "debate" && workflow !== "debate_private");
+                var workflow = SIWorkflow.get(process).workflow;
+                scope.workflowAllowsCreateProposal = (workflow !== "debate" && workflow !== "debate_private" && workflow !== "stadtforum");
             });
 
             scope.setCameFrom = () => {
@@ -143,7 +145,8 @@ export var addProposalButtonDirective = (
 export var registerRoutesFactory = (
     ideaCollection,
     proposalType,
-    proposalVersionType
+    proposalVersionType,
+    hasCommentColumn = true
 ) => (
     context : string = ""
 ) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
@@ -222,44 +225,48 @@ export var registerRoutesFactory = (
                 return {
                     proposalUrl: version.path
                 };
-            }])
-        .defaultVersionable(proposalType, proposalVersionType, "comments", ideaCollection.content_type, context, {
-            space: "content",
-            movingColumns: "is-collapse-show-show"
-        })
-        .specificVersionable(proposalType, proposalVersionType, "comments", ideaCollection.content_type, context, [
-            () => (item, version) => {
-                return {
-                    commentableUrl: version.path,
-                    commentCloseUrl: version.path,
-                    proposalUrl: version.path
-                };
-            }])
-        .defaultVersionable(RIComment, RICommentVersion, "", ideaCollection.content_type, context, {
-            space: "content",
-            movingColumns: "is-collapse-show-show"
-        })
-        .specificVersionable(RIComment, RICommentVersion, "", ideaCollection.content_type, context, ["adhHttp", "$q", (
-            adhHttp : AdhHttp.Service,
-            $q : angular.IQService
-        ) => {
-            var getCommentableUrl = (resource) : angular.IPromise<any> => {
-                if (resource.content_type !== RICommentVersion.content_type) {
-                    return $q.when(resource);
-                } else {
-                    var url = resource.data[SIComment.nick].refers_to;
-                    return adhHttp.get(url).then(getCommentableUrl);
-                }
-            };
+            }]);
 
-            return (item : RIComment, version : RICommentVersion) => {
-                return getCommentableUrl(version).then((commentable) => {
+    if (hasCommentColumn) {
+        adhResourceAreaProvider
+            .defaultVersionable(proposalType, proposalVersionType, "comments", ideaCollection.content_type, context, {
+                space: "content",
+                movingColumns: "is-collapse-show-show"
+            })
+            .specificVersionable(proposalType, proposalVersionType, "comments", ideaCollection.content_type, context, [
+                () => (item, version) => {
                     return {
-                        commentableUrl: commentable.path,
-                        commentCloseUrl: commentable.path,
-                        proposalUrl: commentable.path
+                        commentableUrl: version.path,
+                        commentCloseUrl: version.path,
+                        proposalUrl: version.path
                     };
-                });
-            };
-        }]);
+                }])
+            .defaultVersionable(RIComment, RICommentVersion, "", ideaCollection.content_type, context, {
+                space: "content",
+                movingColumns: "is-collapse-show-show"
+            })
+            .specificVersionable(RIComment, RICommentVersion, "", ideaCollection.content_type, context, ["adhHttp", "$q", (
+                adhHttp : AdhHttp.Service,
+                $q : angular.IQService
+            ) => {
+                var getCommentableUrl = (resource) : angular.IPromise<any> => {
+                    if (resource.content_type !== RICommentVersion.content_type) {
+                        return $q.when(resource);
+                    } else {
+                        var url = SIComment.get(resource).refers_to;
+                        return adhHttp.get(url).then(getCommentableUrl);
+                    }
+                };
+
+                return (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
+                    return getCommentableUrl(version).then((commentable) => {
+                        return {
+                            commentableUrl: commentable.path,
+                            commentCloseUrl: commentable.path,
+                            proposalUrl: commentable.path
+                        };
+                    });
+                };
+            }]);
+    }
 };

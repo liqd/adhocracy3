@@ -8,6 +8,8 @@ import * as AdhResourceArea from "../../../Core/ResourceArea/ResourceArea";
 import * as AdhTopLevelState from "../../../Core/TopLevelState/TopLevelState";
 import * as AdhUtil from "../../../Core/Util/Util";
 
+import * as ResourcesBase from "../../../../ResourcesBase";
+
 import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RIMercatorProposalVersion from "../../../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion";
 import RIProcess from "../../../../Resources_/adhocracy_mercator/resources/mercator/IProcess";
@@ -131,7 +133,7 @@ export var proposalListingColumnDirective = (
 
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
-                var currentPhase = resource.data[SIWorkflow.nick].workflow_state;
+                var currentPhase = SIWorkflow.get(resource).workflow_state;
 
                 if (typeof scope.facets === "undefined") {
                     scope.facets = [{
@@ -190,7 +192,7 @@ export var registerRoutes = (
         .specific(RICommentVersion, "", processType, context, ["adhHttp", "$q", (
             adhHttp : AdhHttp.Service,
             $q : angular.IQService
-        ) => (resource : RICommentVersion) => {
+        ) => (resource : ResourcesBase.IResource) => {
             var specifics = {};
             specifics["commentUrl"] = resource.path;
 
@@ -198,7 +200,7 @@ export var registerRoutes = (
                 if (resource.content_type !== RICommentVersion.content_type) {
                     return $q.when(resource);
                 } else {
-                    var url = resource.data[SIComment.nick].refers_to;
+                    var url = SIComment.get(resource).refers_to;
                     return adhHttp.get(url).then(getCommentableUrl);
                 }
             };
@@ -232,7 +234,7 @@ export var registerRoutes = (
         })
         .specific(RIProcess, "create_proposal", processType, context, ["adhHttp",
             (adhHttp : AdhHttp.Service) => {
-                return (resource : RIProcess) => {
+                return (resource : ResourcesBase.IResource) => {
                     return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                         if (!options.POST) {
                             throw 401;

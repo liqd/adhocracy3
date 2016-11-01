@@ -28,9 +28,9 @@ export var derive = (
         resource.data[key] = _.cloneDeep(sheet);
     });
 
-    resource.data[SIVersionable.nick] = {
+    SIVersionable.set(resource, {
         follows: [oldVersion.path]
-    };
+    });
 
     return resource;
 };

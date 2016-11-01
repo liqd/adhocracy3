@@ -33,6 +33,7 @@ export interface IHttpConfig {
     noCredentials? : boolean;
     noExport? : boolean;
     anonymize? : boolean;
+    password? : string;
 }
 
 export interface IHttpOptionsConfig extends IHttpConfig {
@@ -133,6 +134,11 @@ export class Service {
             _.assign(headers, {
                 // the header is non-empty so it doesn't get deleted by browsers
                 "X-Anonymize": "X-Anonymize"
+            });
+        }
+        if (config.password) {
+            _.assign(headers, {
+                "X-User-Password": config.password
             });
         }
         return headers;
@@ -263,9 +269,9 @@ export class Service {
                 content_type: resource.content_type,
                 data: {}
             };
-            obj.data[SIMetadata.nick] = {
+            SIMetadata.set(obj, {
                 hidden: true
-            };
+            });
 
             return this.put(path, <any>obj, _.extend({}, config, {keepMetadata: true}));
         });
@@ -338,7 +344,7 @@ export class Service {
     public getNewestVersionPathNoFork(path : string, config : IHttpGetConfig = {}) : angular.IPromise<string> {
         return this.get(path, undefined, config)
             .then((item) => {
-                var head = item.data[SITags.nick].LAST;
+                var head = SITags.get(item).LAST;
                 return head;
             });
     }
@@ -442,9 +448,9 @@ export class Service {
                 throw "Tried to post new version of " + dagPath + " " + timeoutRounds.toString() + " times, giving up.";
             }
 
-            _obj.data[SIVersionable.nick] = {
+            SIVersionable.set(_obj, {
                 follows: [nextOldVersionPath]
-            };
+            });
 
             var handleSuccess = (resource) => {
                 return { value: resource, parentChanged: parentChanged };

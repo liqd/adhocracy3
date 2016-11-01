@@ -1,5 +1,5 @@
 import * as AdhDebateWorkbenchModule from "../../Core/DebateWorkbench/Module";
-import * as AdhNamesModule from "../../Core/Names/Modules";
+import * as AdhNamesModule from "../../Core/Names/Module";
 
 import * as AdhDebateWorkbench from "../../Core/DebateWorkbench/DebateWorkbench";
 import * as AdhNames from "../../Core/Names/Names";

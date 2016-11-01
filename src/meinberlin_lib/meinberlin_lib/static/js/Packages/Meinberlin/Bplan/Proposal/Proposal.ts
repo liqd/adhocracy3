@@ -5,6 +5,8 @@ import * as AdhHttp from "../../../Core/Http/Http";
 import * as AdhPreliminaryNames from "../../../Core/PreliminaryNames/PreliminaryNames";
 import * as AdhProcess from "../../../Core/Process/Process";
 
+import * as ResourcesBase from "../../ResourcesBase";
+
 import RIProposal from "../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposal";
 import RIProposalVersion from "../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposalVersion";
 import * as SIProposal from "../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IProposal";
@@ -38,15 +40,23 @@ var postCreate = (
     scope : IScope,
     poolPath : string
 ) : angular.IPromise<any> => {
-    var proposal = new RIProposal({preliminaryNames: adhPreliminaryNames});
+    var proposal : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RIProposal.content_type,
+        data: {},
+    };
     proposal.parent = poolPath;
 
-    var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+    var proposalVersion : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RIProposalVersion.content_type,
+        data: {},
+    };
     proposalVersion.parent = proposal.path;
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    SIVersionable.set(proposalVersion, {
         follows: [proposal.first_version_path]
     });
-    proposalVersion.data[SIProposal.nick] = new SIProposal.Sheet({
+    SIProposal.set(proposalVersion, {
         name: scope.data.name,
         street_number: scope.data.street,
         postal_code_city: scope.data.city,
@@ -120,7 +130,7 @@ export var embedDirective = (
             };
 
             adhHttp.get(scope.path).then((resource) => {
-                var sheet = resource.data[SIWorkflow.nick];
+                var sheet = SIWorkflow.get(resource);
                 scope.currentPhase = sheet.workflow_state;
                 scope.announceText = AdhProcess.getStateData(sheet, "announce").description;
                 scope.frozenText = AdhProcess.getStateData(sheet, "frozen").description;

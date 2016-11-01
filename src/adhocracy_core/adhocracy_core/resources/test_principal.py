@@ -200,6 +200,8 @@ class TestUser:
         assert user.tzname == 'UTC'
         assert user.roles == []
         assert user.timezone == timezone(user.tzname)
+        assert user.is_password_valid(registry, '123456') == False
+        assert user.is_password_valid(registry, 'fodThyd2') == True
 
 
 class TestSystemUser:

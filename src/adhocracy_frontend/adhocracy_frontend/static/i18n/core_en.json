@@ -147,6 +147,7 @@
     "TR__PARAGRAPH_PLACEHOLDER": "Add text here.",
     "TR__PARTICIPATION_DATES": "Participation is possible from {{ startDate | date }} until {{ endDate | date }}",
     "TR__PASSWORD": "password",
+    "TR__PASSWORD_OLD": "old password",
     "TR__PASSWORD_REPEAT": "password repeat",
     "TR__PASSWORD_RESET_CLOSE_THIS_TAB_AND_PROCEED": "Your password has been successfully set. You can now close this tab and go back to {{siteName}}.",
     "TR__PASSWORD_RESET_TITLE": "Set new password",

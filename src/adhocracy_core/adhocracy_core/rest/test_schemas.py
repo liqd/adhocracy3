@@ -1620,24 +1620,25 @@ class TestCreateValidateLoginPassword:
         assert validator(node, {'password': 'secret'}) is None
 
     def test_validate_password(self, node, request_, registry, mock_sheet):
-        user = testing.DummyResource()
+        from adhocracy_core.resources.principal import User
+        user = Mock(spec=User)
+        user.is_password_valid.return_value = True
         request_.validated['user'] = user
-        registry.content.get_sheet.return_value = mock_sheet
         validator = self.call_fut(request_, registry)
-        mock_sheet.check_plaintext_password.return_value = True
         assert validator(node, {'password': 'secret'}) is None
-        mock_sheet.check_plaintext_password.assert_called_with('secret')
+        user.is_password_valid.assert_called_with(registry, 'secret')
 
     def test_raise_if_wrong_password(self, node, request_, registry,
                                      mock_sheet):
-        user = testing.DummyResource()
+        from adhocracy_core.resources.principal import User
+        user = Mock(spec=User)
+        user.is_password_valid.return_value = False
         request_.validated['user'] = user
-        registry.content.get_sheet.return_value = mock_sheet
         validator = self.call_fut(request_, registry)
-        mock_sheet.check_plaintext_password.return_value = False
         node['password'] = node.clone()  # used to raise error
         with raises(colander.Invalid):
             validator(node, {'password': 'secret'})
+        user.is_password_valid.assert_called_with(registry, 'secret')
 
 
 class TestCreateValidateAccountActive:
