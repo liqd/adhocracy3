@@ -957,6 +957,16 @@ def reindex_users_text(root, registry):  # pragma: no cover
         catalogs.reindex_index(user, 'text')
 
 
+@log_migration
+def add_activity_service_to_root(root, registry):  # pragma: no cover
+    """Add activity service to root."""
+    from adhocracy_core.resources.activity import add_activiy_service
+    activity_stream = find_service(root, 'activity_stream')
+    if activity_stream is None:
+        logger.info('Add activity service to {0}'.format(root))
+        add_activiy_service(root, registry, {})
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -1020,3 +1030,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_pages_service_to_root)
     config.add_evolution_step(add_embed_sheet_to_processes)
     config.add_evolution_step(reindex_users_text)
+    config.add_evolution_step(add_activity_service_to_root)
