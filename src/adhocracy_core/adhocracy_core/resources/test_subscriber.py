@@ -712,6 +712,68 @@ class TestDownloadExternalPictureUrl:
         mock_sheet.set.assert_called_with({'picture': image}, send_event=False)
 
 
+class TestAddActivitiesToActivityStream:
+
+    @fixture
+    def event(self, event, registry, request_):
+        event.registry = registry
+        event.request = request_
+        return event
+
+    @fixture
+    def activity(self, activity):
+        from adhocracy_core.interfaces import ActivityType
+        from adhocracy_core.utils import now
+        return activity._replace(
+            subject=testing.DummyResource(),
+            type=ActivityType.add,
+            object=testing.DummyResource(),
+            target=testing.DummyResource(),
+            published=now()
+        )
+
+    @fixture
+    def mock_activity_stream(self, mocker):
+        activity_stream = testing.DummyResource()
+        mocker.patch('adhocracy_core.resources.subscriber.find_service',
+                     return_value=activity_stream)
+        return activity_stream
+
+    def call_fut(self, *args):
+        from .subscriber import add_activities_to_activity_stream
+        return add_activities_to_activity_stream(*args)
+
+    def test_ignore_if_no_activities(self, event, registry):
+        event.activities = []
+        self.call_fut(event)
+        assert not registry.content.create.called
+
+    def test_create_activities(self, event, registry, activity,
+                               mock_activity_stream, mocker):
+        from adhocracy_core.resources.activity import IActivity
+        import adhocracy_core.sheets.activity
+        event.activities = [activity]
+        mocker.patch('adhocracy_core.resources.subscriber' +
+                     '.generate_activity_description',
+                     return_value='description')
+        self.call_fut(event)
+        expected_appstructs = {
+            adhocracy_core.sheets.activity.IActivity.__identifier__: {
+                'subject': activity.subject,
+                'type': activity.type.value,
+                'object': activity.object,
+                'target': activity.target,
+                'name': 'description',
+                'published': activity.published,
+            }
+        }
+        registry.content.create.assert_called_with(
+            IActivity.__identifier__,
+            registry=registry,
+            parent=mock_activity_stream,
+            appstructs=expected_appstructs)
+
+
 @mark.usefixtures('integration')
 def test_register_subscriber(registry):
     from adhocracy_core.resources import subscriber
