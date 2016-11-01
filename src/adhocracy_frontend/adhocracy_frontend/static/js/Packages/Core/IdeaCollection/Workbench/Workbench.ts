@@ -131,7 +131,7 @@ export var addProposalButtonDirective = (
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
             adhHttp.get(scope.processUrl).then((process) => {
                 var workflow = SIWorkflow.get(process).workflow;
-                scope.workflowAllowsCreateProposal = (workflow !== "debate" && workflow !== "debate_private");
+                scope.workflowAllowsCreateProposal = (workflow !== "debate" && workflow !== "debate_private" && workflow !== "stadtforum");
             });
 
             scope.setCameFrom = () => {
