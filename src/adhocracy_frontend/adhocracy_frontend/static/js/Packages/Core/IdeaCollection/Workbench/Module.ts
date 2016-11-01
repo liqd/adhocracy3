@@ -36,6 +36,12 @@ export var register = (angular) => {
         ])
         .directive("adhIdeaCollectionWorkbench", [
             "adhTopLevelState", "adhConfig", "adhHttp", Workbench.workbenchDirective])
+        .directive("adhDocumentDetailColumn", [
+            "adhConfig", "adhPermissions", "adhTopLevelState", Workbench.documentDetailColumnDirective])
+        .directive("adhDocumentCreateColumn", [
+            "adhConfig", "adhTopLevelState", Workbench.documentCreateColumnDirective])
+        .directive("adhDocumentEditColumn", [
+            "adhConfig", "adhTopLevelState", Workbench.documentEditColumnDirective])
         .directive("adhIdeaCollectionProposalDetailColumn", [
             "adhConfig", "adhTopLevelState", Workbench.proposalDetailColumnDirective])
         .directive("adhIdeaCollectionProposalCreateColumn", [
@@ -45,6 +51,8 @@ export var register = (angular) => {
         .directive("adhIdeaCollectionProposalImageColumn", [
             "adhConfig", "adhTopLevelState", "adhResourceUrlFilter", "adhParentPathFilter", Workbench.proposalImageColumnDirective])
         .directive("adhIdeaCollectionDetailColumn", ["adhConfig", "adhTopLevelState", Workbench.detailColumnDirective])
+        .directive("adhIdeaCollectionAddDocumentButton", [
+            "adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", Workbench.addDocumentButtonDirective])
         .directive("adhIdeaCollectionAddProposalButton", [
             "adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", Workbench.addProposalButtonDirective]);
 };
