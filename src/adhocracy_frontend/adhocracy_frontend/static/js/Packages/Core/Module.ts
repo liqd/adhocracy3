@@ -1,4 +1,5 @@
 import * as AdhAbuseModule from "./Abuse/Module";
+import * as AdhActivityModule from "./Activity/Module";
 import * as AdhAngularHelpersModule from "./AngularHelpers/Module";
 import * as AdhAnonymizeModule from "./Anonymize/Module";
 import * as AdhBadgeModule from "./Badge/Module";
@@ -42,6 +43,7 @@ export var moduleName = "adhCore";
 
 export var register = (angular, config, metaApi) => {
     AdhAbuseModule.register(angular);
+    AdhActivityModule.register(angular);
     AdhAngularHelpersModule.register(angular);
     AdhAnonymizeModule.register(angular);
     AdhBadgeModule.register(angular);
