@@ -268,7 +268,7 @@ class TestUserExtendedSheet:
         assert inst.meta.schema_class == UserExtendedSchema
         assert inst.meta.permission_create == 'create_user'
         assert inst.meta.permission_view == 'view_userextended'
-        assert inst.meta.permission_edit == 'edit_userextended'
+        assert inst.meta.permission_edit == None
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context, None)
