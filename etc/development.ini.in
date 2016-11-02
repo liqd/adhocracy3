@@ -53,6 +53,8 @@ adhocracy.thentos_captcha.backend_url = http://localhost:6542/
 adhocracy.thentos_captcha.frontend_url = http://localhost:6542/
 # URL of the Varnish cache
 #adhocracy.varnish_url = http://127.0.0.1:8088
+# Enable activity stream generation
+adhocracy.activity_stream.enabled = True
 
 # Name of the entire site. Used in account registration information etc.
 adhocracy.site_name = Adhocracy Test Site

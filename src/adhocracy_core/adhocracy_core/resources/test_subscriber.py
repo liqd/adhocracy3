@@ -748,10 +748,23 @@ class TestAddActivitiesToActivityStream:
         self.call_fut(event)
         assert not registry.content.create.called
 
-    def test_create_activities(self, event, registry, activity,
-                               mock_activity_stream, mocker):
+
+    def test_ignore_per_default(self, event, registry, activity):
+        event.activities = [activity]
+        self.call_fut(event)
+        assert not registry.content.create.called
+
+    def test_ignore_if_disabled(self, event, registry, activity):
+        registry.settings['adhocracy.activity_stream.enabled'] = "False"
+        event.activities = [activity]
+        self.call_fut(event)
+        assert not registry.content.create.called
+
+    def test_create_activities_if_enabled(self, event, registry, activity,
+                                          mock_activity_stream, mocker):
         from adhocracy_core.resources.activity import IActivity
         import adhocracy_core.sheets.activity
+        registry.settings['adhocracy.activity_stream.enabled'] = "True"
         event.activities = [activity]
         mocker.patch('adhocracy_core.resources.subscriber' +
                      '.generate_activity_description',

@@ -9,6 +9,7 @@ import requests
 from pyramid.interfaces import IApplicationCreated
 from pyramid.registry import Registry
 from pyramid.request import Request
+from pyramid.settings import asbool
 from pyramid.traversal import find_interface
 from pyramid.i18n import get_localizer
 from pyramid.i18n import TranslationStringFactory
@@ -388,9 +389,13 @@ def _create_image(context: IResource,
 
 def add_activities_to_activity_stream(event: IActivitiesGenerated):
     """Add activity resources to activity_stream."""
-    activities = event.activities
     request = event.request
     registry = request.registry
+    activity_stream_enabled = asbool(registry.settings.get(
+        'adhocracy.activity_stream.enabled', False))
+    if not activity_stream_enabled:
+        return
+    activities = event.activities
     service = find_service(request.root, 'activity_stream')
     translate = get_localizer(request).translate
     for activity in activities:
