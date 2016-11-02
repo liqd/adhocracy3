@@ -48,6 +48,7 @@ export var register = (angular) => {
                 "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
                 "</adh-idea-collection-workbench>";
             adhProcessProvider.setProperties(processType, {
+                detailSlot: adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProposalColumn.html",
                 hasAuthorInListItem: true,
                 hasCommentColumn: true,
                 hasDescription: true,
@@ -55,7 +56,6 @@ export var register = (angular) => {
                 hasLocationText: true,
                 maxBudget: Infinity,
                 proposalClass: RIBuergerhaushaltProposal,
-                proposalColumn: adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProposalColumn.html",
                 proposalSheet: SIBuergerhaushaltProposal,
                 proposalVersionClass: RIBuergerhaushaltProposalVersion
             });
