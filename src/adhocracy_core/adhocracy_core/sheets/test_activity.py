@@ -1,6 +1,39 @@
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
+from pytest import raises
+
+
+@fixture
+def mock_now(monkeypatch):
+    from adhocracy_core.utils import now
+    date = now()
+    monkeypatch.setattr('adhocracy_core.schema.now', lambda: date)
+    return date
+
+
+class TestActivitySchema:
+
+    @fixture
+    def inst(self, mock_now):
+        from .activity import ActivitySchema
+        return ActivitySchema().bind()
+
+    def test_deserialize_empty(self, inst, mock_now):
+        assert inst.deserialize({}) == {'published': mock_now}
+
+    def test_deserialize_valid_activity_types(self, inst, mock_now):
+        assert inst.deserialize({'type':'Add'}) == \
+               {'published': mock_now, 'type': 'Add'}
+        assert inst.deserialize({'type':'Remove'}) == \
+               {'published': mock_now, 'type': 'Remove'}
+        assert inst.deserialize({'type':'Update'}) == \
+               {'published': mock_now, 'type': 'Update'}
+
+    def test_deserialize_invalid_activity_types(self, inst, mock_now):
+        from colander import Invalid
+        with raises(Invalid):
+            inst.deserialize({'type':'Invalid'})
 
 
 class TestActivitySheet:
@@ -9,13 +42,6 @@ class TestActivitySheet:
     def meta(self):
         from .activity import activity_meta
         return activity_meta
-
-    @fixture
-    def mock_now(self, monkeypatch):
-        from adhocracy_core.utils import now
-        date = now()
-        monkeypatch.setattr('adhocracy_core.schema.now', lambda: date)
-        return date
 
     def test_meta(self, meta):
         from adhocracy_core.sheets.activity import IActivity
