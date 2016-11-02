@@ -122,7 +122,10 @@ def add_badge_assignments_service(context: IPool, registry: Registry,
     """Add `badge_assignments` service to context."""
     creator = options.get('creator')
     registry.content.create(IBadgeAssignmentsService.__identifier__,
-                            parent=context, registry=registry, creator=creator)
+                            parent=context,
+                            registry=registry,
+                            creator=creator,
+                            autoupdated=True)
 
 
 def includeme(config):
