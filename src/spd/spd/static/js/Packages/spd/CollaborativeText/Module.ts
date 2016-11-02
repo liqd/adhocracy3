@@ -60,8 +60,8 @@ export var register = (angular) => {
                 proposalColumn: adhConfig.pkg_path + AdhDocument.pkgLocation + "/DetailSlot.html",
                 document: true,
                 hasCommentColumn: true,
-                proposalClass: RIDocument,
-                proposalVersionClass: RIDocumentVersion
+                itemClass: RIDocument,
+                versionClass: RIDocumentVersion
             });
         }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {

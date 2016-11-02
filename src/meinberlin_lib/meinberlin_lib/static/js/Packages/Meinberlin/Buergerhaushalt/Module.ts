@@ -55,10 +55,10 @@ export var register = (angular) => {
                 hasDescription: true,
                 hasLocation: true,
                 hasLocationText: true,
+                itemClass: RIBuergerhaushaltProposal,
                 maxBudget: Infinity,
-                proposalClass: RIBuergerhaushaltProposal,
                 proposalSheet: SIBuergerhaushaltProposal,
-                proposalVersionClass: RIBuergerhaushaltProposalVersion
+                versionClass: RIBuergerhaushaltProposalVersion
             });
         }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {

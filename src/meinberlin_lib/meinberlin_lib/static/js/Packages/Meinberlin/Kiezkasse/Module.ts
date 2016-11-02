@@ -56,10 +56,10 @@ export var register = (angular) => {
                 hasDescription: true,
                 hasLocation: true,
                 hasLocationText: true,
+                itemClass: RIKiezkasseProposal,
                 maxBudget: 50000,
-                proposalClass: RIKiezkasseProposal,
                 proposalSheet: SIKiezkasseProposal,
-                proposalVersionClass: RIKiezkasseProposalVersion
+                versionClass: RIKiezkasseProposalVersion
             });
         }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
