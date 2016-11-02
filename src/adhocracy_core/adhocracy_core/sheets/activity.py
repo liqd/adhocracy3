@@ -45,11 +45,8 @@ class ActivitySchema(MappingSchema):
     """Activity entry."""
 
     subject = Reference(reftype=SubjectReference)
-    type = SingleLine(validator=OneOf([ActivityType.add.value,
-                                       ActivityType.update.value,
-                                       ActivityType.remove.value,
-                                       ]),
-                      )
+    type = SingleLine(validator=OneOf(
+        [activity_type.value for activity_type in ActivityType]))
     object = Reference(reftype=ObjectReference)
     target = Reference(reftype=TargetReference)
     name = SingleLine()
