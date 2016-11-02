@@ -38,6 +38,12 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
+        // the (document-focused) IdeaCollection is also registered under the directive name
+        // "adhDebateWorkbench" such as not to break currently running embeds.
+        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
+            adhEmbedProvider
+                .registerDirective("debate-workbench");
+        }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider: AdhResourceArea.Provider, adhConfig) => {
             var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
                 RICollaborativeTextProcess, RIDocument, RIDocumentVersion, false, true);

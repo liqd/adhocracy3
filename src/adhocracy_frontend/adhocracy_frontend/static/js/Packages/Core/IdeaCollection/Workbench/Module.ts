@@ -27,6 +27,10 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
+        // the (document-focused) IdeaCollection is also registered under the directive name
+        // "adhDebateWorkbench" such as not to break currently running embeds.
+        .directive("adhDebateWorkbench", [
+            "adhTopLevelState", "adhConfig", "adhHttp", Workbench.workbenchDirective])
         .directive("adhIdeaCollectionWorkbench", [
             "adhTopLevelState", "adhConfig", "adhHttp", Workbench.workbenchDirective])
         .directive("adhDocumentDetailColumn", [
