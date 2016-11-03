@@ -25,6 +25,7 @@ import RIUser from "../../../Resources_/adhocracy_core/resources/principal/IUser
 import RISystemUser from "../../../Resources_/adhocracy_core/resources/principal/ISystemUser";
 import * as SIAnonymizeDefault from "../../../Resources_/adhocracy_core/sheets/principal/IAnonymizeDefault";
 import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIEmailNew from "../../../Resources_/adhocracy_core/sheets/principal/IEmailNew";
 import * as SIHasAssetPool from "../../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
 import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
@@ -751,13 +752,11 @@ var postEdit = (
                 name: data.name,
             });
         }
-        // FIXME: backend is not yet implemented, so this will throw a
-        // type error on compilation.
-        // if (data.email) {
-        //     SIUserBasic.set(patch, {
-        //         email: data.email,
-        //     });
-        // }
+        if (data.email) {
+            SIEmailNew.set(patch, {
+                email: data.email,
+            });
+        }
         if (data.password) {
             SIPasswordAuthentication.set(patch, {
                 password: data.password,
