@@ -165,6 +165,7 @@ user_meta = pool_meta._replace(
                   adhocracy_core.sheets.principal.IPermissions,
                   adhocracy_core.sheets.metadata.IMetadata,
                   adhocracy_core.sheets.pool.IPool,
+                  adhocracy_core.sheets.principal.IEmailNew,
                   ),
     extended_sheets=(adhocracy_core.sheets.principal.IPasswordAuthentication,
                      adhocracy_core.sheets.principal.IActivationConfiguration,

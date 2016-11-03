@@ -162,6 +162,7 @@ class TestUser:
                                      adhocracy_core.sheets.principal.IPermissions,
                                      adhocracy_core.sheets.metadata.IMetadata,
                                      adhocracy_core.sheets.pool.IPool,
+                                     adhocracy_core.sheets.principal.IEmailNew,
                                      )
         assert meta.extended_sheets == \
             (adhocracy_core.sheets.principal.IPasswordAuthentication,
