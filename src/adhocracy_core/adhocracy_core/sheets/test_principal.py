@@ -567,3 +567,27 @@ class TestAnonymizeDefaultSheet:
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'anonymize': False}
+
+class TestUserEmailNewSheet:
+
+    @fixture
+    def meta(self):
+        from adhocracy_core.sheets.principal import emailnew_meta
+        return emailnew_meta
+
+    def test_create(self, meta, context):
+        from adhocracy_core.sheets.principal import IEmailNew
+        from adhocracy_core.sheets.principal import EmailNewSchema
+        from adhocracy_core.sheets import AnnotationRessourceSheet
+        inst = meta.sheet_class(meta, context, None)
+        assert isinstance(inst, AnnotationRessourceSheet)
+        assert inst.meta.isheet == IEmailNew
+        assert inst.meta.schema_class == EmailNewSchema
+        assert inst.meta.permission_create == 'create_user'
+        assert inst.meta.permission_view == 'view_userextended'
+        assert inst.meta.permission_edit == 'edit_userextended'
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context, None)
+        assert inst.get() == {'email': ''}
+

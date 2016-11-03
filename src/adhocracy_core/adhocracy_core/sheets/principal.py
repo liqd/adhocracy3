@@ -127,6 +127,28 @@ userextended_meta = sheet_meta._replace(
 )
 
 
+class IEmailNew(ISheet):
+    """Marker interface for not yet activate new user email."""
+
+
+class EmailNewSchema(MappingSchema):
+    """New user mail sheet data structure.
+
+    `email`: email address
+    """
+
+    email = Email(validator=deferred_validate_user_email,)
+
+
+emailnew_meta = sheet_meta._replace(
+    isheet=IEmailNew,
+    schema_class=EmailNewSchema,
+    permission_create='create_user',
+    permission_view='view_userextended',
+    permission_edit='edit_userextended',
+)
+
+
 class IPermissions(ISheet):
     """Marker interface for the permissions sheet."""
 
@@ -410,3 +432,4 @@ def includeme(config):
     add_sheet_to_registry(permissions_meta, config.registry)
     add_sheet_to_registry(activation_configuration_meta, config.registry)
     add_sheet_to_registry(anonymize_default_meta, config.registry)
+    add_sheet_to_registry(emailnew_meta, config.registry)
