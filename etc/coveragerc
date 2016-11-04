@@ -31,7 +31,6 @@ source =
     src/adhocracy_sample
     src/adhocracy_meinberlin
     src/adhocracy_frontend
-    src/adhocracy_pcompass
 
 [report]
 # Regexes for lines to exclude from consideration
