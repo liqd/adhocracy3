@@ -24,11 +24,9 @@ omit =
     src/adhocracy_meinberlin/adhocracy_meinberlin/__init__.py
     src/adhocracy_meinberlin/adhocracy_meinberlin/scripts/*
     src/adhocracy_meinberlin/adhocracy_meinberlin/evolution/__init__.py
-    src/adhocracy_euth/adhocracy_euth/__init__.py
 
 source =
     src/adhocracy_core
-    src/adhocracy_euth
     src/adhocracy_mercator
     src/adhocracy_sample
     src/adhocracy_meinberlin
