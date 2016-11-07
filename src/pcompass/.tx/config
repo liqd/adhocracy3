@@ -1,8 +1,0 @@
-[main]
-host = https://www.transifex.com
-
-[adhocracy3.pcompass]
-file_filter = pcompass/static/i18n/pcompass_<lang>.json
-source_file = pcompass/static/i18n/pcompass_en.json
-source_lang = en
-type = KEYVALUEJSON
