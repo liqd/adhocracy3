@@ -4,6 +4,7 @@ import * as AdhNamesModule from "../../Core/Names/Module";
 import * as AdhProcessModule from "../../Core/Process/Module";
 import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
 
+import * as AdhIdeaCollectionProposal from "../../Core/IdeaCollection/Proposal/Proposal";
 import * as AdhIdeaCollectionWorkbench from "../../Core/IdeaCollection/Workbench/Workbench";
 import * as AdhNames from "../../Core/Names/Names";
 import * as AdhProcess from "../../Core/Process/Process";
@@ -50,12 +51,12 @@ export var register = (angular) => {
                 "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
                 "</adh-idea-collection-workbench>";
             adhProcessProvider.setProperties(processType, {
+                detailSlot: adhConfig.pkg_path + AdhIdeaCollectionProposal.pkgLocation + "/DetailSlot.html",
                 hasAuthorInListItem: true,
                 hasCommentColumn: true,
                 hasDescription: true,
                 hasLocation: true,
                 proposalClass: RIGeoProposal,
-                proposalColumn: adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProposalColumn.html",
                 proposalVersionClass: RIGeoProposalVersion
             });
         }])
