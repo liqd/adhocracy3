@@ -60,6 +60,7 @@ export var register = (angular) => {
                 detailSlot: adhConfig.pkg_path + AdhDocument.pkgLocation + "/DetailSlot.html",
                 document: true,
                 hasCommentColumn: true,
+                hasImage: true,
                 itemClass: RIDocument,
                 versionClass: RIDocumentVersion
             });

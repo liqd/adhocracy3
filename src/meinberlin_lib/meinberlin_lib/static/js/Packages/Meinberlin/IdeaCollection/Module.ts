@@ -45,8 +45,8 @@ export var register = (angular) => {
                 hasAuthorInListItem: true,
                 hasCommentColumn: true,
                 hasDescription: true,
+                hasImage: true,
                 hasLocation: true,
-                imageSlot: adhConfig.pkg_path + AdhIdeaCollectionProposal.pkgLocation + "/ImageSlot.html",
                 itemClass: RIGeoProposal,
                 versionClass: RIGeoProposalVersion
             });

@@ -36,7 +36,6 @@ export interface IProcessProperties {
     hasImage? : boolean;
     hasLocation? : boolean;
     hasLocationText? : boolean;
-    imageSlot? : string;
     itemClass;
     // if a process has a proposal budget, but no max budget, then set maxBudget = Infinity.
     maxBudget? : number;

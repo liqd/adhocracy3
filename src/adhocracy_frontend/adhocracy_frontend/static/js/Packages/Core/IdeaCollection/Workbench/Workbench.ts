@@ -133,7 +133,7 @@ export var proposalEditColumnDirective = (
     };
 };
 
-export var proposalImageColumnDirective = (
+export var imageColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhTopLevelState : AdhTopLevelState.Service,
     adhResourceUrl,
@@ -141,7 +141,7 @@ export var proposalImageColumnDirective = (
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalImageColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ImageColumn.html",
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("proposalUrl", scope));

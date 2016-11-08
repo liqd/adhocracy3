@@ -45,8 +45,8 @@ export var register = (angular) => {
             "adhConfig", "adhTopLevelState", Workbench.proposalCreateColumnDirective])
         .directive("adhIdeaCollectionProposalEditColumn", [
             "adhConfig", "adhTopLevelState", Workbench.proposalEditColumnDirective])
-        .directive("adhIdeaCollectionProposalImageColumn", [
-            "adhConfig", "adhTopLevelState", "adhResourceUrlFilter", "adhParentPathFilter", Workbench.proposalImageColumnDirective])
+        .directive("adhIdeaCollectionImageColumn", [
+            "adhConfig", "adhTopLevelState", "adhResourceUrlFilter", "adhParentPathFilter", Workbench.imageColumnDirective])
         .directive("adhIdeaCollectionDetailColumn", ["adhConfig", "adhTopLevelState", Workbench.detailColumnDirective])
         .directive("adhIdeaCollectionAddDocumentButton", [
             "adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", Workbench.addDocumentButtonDirective])
