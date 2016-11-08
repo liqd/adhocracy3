@@ -4,7 +4,7 @@ import * as AdhProcessModule from "../../Core/Process/Module";
 import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
 
 import * as AdhEmbed from "../../Core/Embed/Embed";
-import * as AdhIdeaCollectionProposal from "../../Core/IdeaCollection/Proposal/Proposal";
+import * as AdhIdeaCollectionPoll from "../../Core/IdeaCollection/Poll/Poll";
 import * as AdhIdeaCollectionWorkbench from "../../Core/IdeaCollection/Workbench/Workbench";
 import * as AdhNames from "../../Core/Names/Names";
 import * as AdhPoll from "../../Core/IdeaCollection/Poll/Poll";
@@ -29,29 +29,18 @@ export var register = (angular) => {
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider
-                .registerDirective("meinberlin-stadtforum-proposal-detail")
-                .registerDirective("meinberlin-stadtforum-proposal-create");
+                .registerDirective("meinberlin-stadtforum-proposal-detail");
         }])
-        .directive("adhMeinberlinStadtforumProposalCreate", [
-            "adhConfig",
-            "adhHttp",
-            "adhPreliminaryNames",
-            "adhTopLevelState",
-            "adhShowError",
-            "adhSubmitIfValid",
-            "adhResourceUrlFilter",
-            "$location",
-            AdhIdeaCollectionProposal.createDirective
-        ])
         .directive("adhMeinberlinStadtforumProposalDetail", [
             "adhConfig",
             "adhHttp",
             "adhPermissions",
+            "adhProcess",
             "adhRate",
             "adhTopLevelState",
             "adhGetBadges",
             "$q",
-            AdhIdeaCollectionProposal.detailDirective])
+            AdhIdeaCollectionPoll.detailDirective(processType)])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
             var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
                 RIStadtforumProcess, RIPoll, RIProposalVersion, false);
