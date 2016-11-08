@@ -51,11 +51,12 @@ export var register = (angular) => {
                 "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
                 "</adh-idea-collection-workbench>";
             adhProcessProvider.setProperties(processType, {
-                proposalColumn: adhConfig.pkg_path + AdhDocument.pkgLocation + "/DetailSlot.html",
-                document: true,
+                createSlot: adhConfig.pkg_path + AdhDocument.pkgLocation + "/CreateSlot.html",
+                detailSlot: adhConfig.pkg_path + AdhDocument.pkgLocation + "/DetailSlot.html",
+                editSlot: adhConfig.pkg_path + AdhDocument.pkgLocation + "/EditSlot.html",
                 hasCommentColumn: true,
-                proposalClass: RIDocument,
-                proposalVersionClass: RIDocumentVersion
+                itemClass: RIDocument,
+                versionClass: RIDocumentVersion
             });
         }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {

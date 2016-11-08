@@ -43,7 +43,9 @@ export var register = (angular) => {
             adhProcessProvider.templates[processType] = "<adh-meinberlin-alexanderplatz-workbench " +
                 "data-process-properties=\"processProperties\"></adh-meinberlin-alexanderplatz-workbench>";
             adhProcessProvider.setProperties(processType, {
+                createSlot: adhConfig.pkg_path + AdhIdeaCollectionProposal.pkgLocation + "/CreateSlot.html",
                 detailSlot: adhConfig.pkg_path + AdhIdeaCollectionProposal.pkgLocation + "/DetailSlot.html",
+                editSlot: adhConfig.pkg_path + AdhIdeaCollectionProposal.pkgLocation + "/EditSlot.html",
                 hasAuthorInListItem: true,
                 hasCommentColumn: true,
                 hasDescription: true,
