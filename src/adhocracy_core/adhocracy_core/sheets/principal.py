@@ -123,7 +123,7 @@ userextended_meta = sheet_meta._replace(
     sheet_class=AttributeResourceSheet,
     permission_create='create_user',
     permission_view='view_userextended',
-    permission_edit=None,
+    permission_edit='activate_user',
 )
 
 
