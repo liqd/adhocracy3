@@ -11,8 +11,6 @@ import * as ResourcesBase from "../../../ResourcesBase";
 
 import RIComment from "../../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
-import RIDocument from "../../../../Resources_/adhocracy_core/resources/document/IDocument";
-import RIDocumentVersion from "../../../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
 import RIParagraph from "../../../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
 import RIParagraphVersion from "../../../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion";
 import * as SIComment from "../../../../Resources_/adhocracy_core/sheets/comment/IComment";
@@ -211,12 +209,10 @@ export var addProposalButtonDirective = (
 };
 
 
-export var registerRoutesFactory = (
+export var registerCommonRoutesFactory = (
     ideaCollection,
     proposalType,
-    proposalVersionType,
-    hasCommentColumn = true,
-    document = false
+    proposalVersionType
 ) => (
     context : string = ""
 ) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
@@ -240,107 +236,57 @@ export var registerRoutesFactory = (
                     }
                 });
             }]);
+};
 
-    if (!document) {
-        adhResourceAreaProvider
-            .default(ideaCollection, "create_proposal", ideaCollection.content_type, context, {
-                space: "content",
-                movingColumns: "is-show-show-hide"
-            })
-            .specific(ideaCollection, "create_proposal", ideaCollection.content_type, context, [
-                "adhHttp", (adhHttp : AdhHttp.Service) => (resource) => {
-                    return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                        if (!options.POST) {
-                            throw 401;
-                        } else {
-                            return {};
-                        }
-                    });
-                }])
-            .defaultVersionable(proposalType, proposalVersionType, "edit", ideaCollection.content_type, context, {
-                space: "content",
-                movingColumns: "is-show-show-hide"
-            })
-            .specificVersionable(proposalType, proposalVersionType, "edit", ideaCollection.content_type, context, [
-                "adhHttp", (adhHttp : AdhHttp.Service) => (item, version) => {
-                    return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
-                        if (!options.POST) {
-                            throw 401;
-                        } else {
-                            return {
-                                proposalUrl: version.path
-                            };
-                        }
-                    });
-                }])
-        .defaultVersionable(proposalType, proposalVersionType, "image", ideaCollection.content_type, context, {
+export var registerDocumentRoutesFactory = (
+    ideaCollection,
+    itemClass,
+    versionClass
+) => (
+    context : string = ""
+) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
+
+    adhResourceAreaProvider
+        .default(ideaCollection, "create_document", ideaCollection.content_type, context, {
             space: "content",
             movingColumns: "is-show-show-hide"
         })
-        .specificVersionable(proposalType, proposalVersionType, "image", ideaCollection.content_type, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service) => (item, version) => {
+        .specific(ideaCollection, "create_document", ideaCollection.content_type, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service) => (resource) => {
+                return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                    if (!options.POST) {
+                        throw 401;
+                    } else {
+                        return {};
+                    }
+                });
+            }])
+        .defaultVersionable(itemClass, versionClass, "", ideaCollection.content_type, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide"
+        })
+        .specificVersionable(itemClass, versionClass, "", ideaCollection.content_type, context, [
+            () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
+                return {
+                    documentUrl: version.path
+                };
+            }])
+        .defaultVersionable(itemClass, versionClass, "edit", ideaCollection.content_type, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide"
+        })
+        .specificVersionable(itemClass, versionClass, "edit", ideaCollection.content_type, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service) => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
                     } else {
                         return {
-                            proposalUrl: version.path
+                            documentUrl: version.path
                         };
                     }
                 });
             }])
-        .defaultVersionable(proposalType, proposalVersionType, "", ideaCollection.content_type, context, {
-            space: "content",
-            movingColumns: "is-show-show-hide"
-        })
-        .specificVersionable(proposalType, proposalVersionType, "", ideaCollection.content_type, context, [
-            () => (item, version) => {
-                return {
-                    proposalUrl: version.path
-                };
-            }]);
-    } else {
-        adhResourceAreaProvider
-            .default(ideaCollection, "create_document", ideaCollection.content_type, context, {
-                space: "content",
-                movingColumns: "is-show-show-hide"
-            })
-            .specific(ideaCollection, "create_document", ideaCollection.content_type, context, [
-                "adhHttp", (adhHttp : AdhHttp.Service) => (resource) => {
-                    return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                        if (!options.POST) {
-                            throw 401;
-                        } else {
-                            return {};
-                        }
-                    });
-                }])
-            .defaultVersionable(RIDocument, RIDocumentVersion, "", ideaCollection.content_type, context, {
-                space: "content",
-                movingColumns: "is-show-show-hide"
-            })
-            .specificVersionable(RIDocument, RIDocumentVersion, "", ideaCollection.content_type, context, [
-                () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
-                    return {
-                        documentUrl: version.path
-                    };
-                }])
-            .defaultVersionable(RIDocument, RIDocumentVersion, "edit", ideaCollection.content_type, context, {
-                space: "content",
-                movingColumns: "is-show-show-hide"
-            })
-            .specificVersionable(RIDocument, RIDocumentVersion, "edit", ideaCollection.content_type, context, [
-                "adhHttp", (adhHttp : AdhHttp.Service) => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
-                    return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
-                        if (!options.POST) {
-                            throw 401;
-                        } else {
-                            return {
-                                documentUrl: version.path
-                            };
-                        }
-                    });
-                }])
         .defaultVersionable(RIParagraph, RIParagraphVersion, "comments", ideaCollection.content_type, context, {
             space: "content",
             movingColumns: "is-collapse-show-show"
@@ -382,15 +328,82 @@ export var registerRoutesFactory = (
                 });
             };
         }]);
-    }
+};
+
+export var registerProposalRoutesFactory = (
+    ideaCollection,
+    itemClass,
+    versionClass,
+    hasCommentColumn : boolean = true
+) => (
+    context : string = ""
+) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
+
+    adhResourceAreaProvider
+        .default(ideaCollection, "create_proposal", ideaCollection.content_type, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide"
+        })
+        .specific(ideaCollection, "create_proposal", ideaCollection.content_type, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service) => (resource) => {
+                return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                    if (!options.POST) {
+                        throw 401;
+                    } else {
+                        return {};
+                    }
+                });
+            }])
+        .defaultVersionable(itemClass, versionClass, "edit", ideaCollection.content_type, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide"
+        })
+        .specificVersionable(itemClass, versionClass, "edit", ideaCollection.content_type, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service) => (item, version) => {
+                return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
+                    if (!options.POST) {
+                        throw 401;
+                    } else {
+                        return {
+                            proposalUrl: version.path
+                        };
+                    }
+                });
+            }])
+    .defaultVersionable(itemClass, versionClass, "image", ideaCollection.content_type, context, {
+        space: "content",
+        movingColumns: "is-show-show-hide"
+    })
+    .specificVersionable(itemClass, versionClass, "image", ideaCollection.content_type, context, [
+        "adhHttp", (adhHttp : AdhHttp.Service) => (item, version) => {
+            return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
+                if (!options.POST) {
+                    throw 401;
+                } else {
+                    return {
+                        proposalUrl: version.path
+                    };
+                }
+            });
+        }])
+    .defaultVersionable(itemClass, versionClass, "", ideaCollection.content_type, context, {
+        space: "content",
+        movingColumns: "is-show-show-hide"
+    })
+    .specificVersionable(itemClass, versionClass, "", ideaCollection.content_type, context, [
+        () => (item, version) => {
+            return {
+                proposalUrl: version.path
+            };
+        }]);
 
     if (hasCommentColumn) {
         adhResourceAreaProvider
-            .defaultVersionable(proposalType, proposalVersionType, "comments", ideaCollection.content_type, context, {
+            .defaultVersionable(itemClass, versionClass, "comments", ideaCollection.content_type, context, {
                 space: "content",
                 movingColumns: "is-collapse-show-show"
             })
-            .specificVersionable(proposalType, proposalVersionType, "comments", ideaCollection.content_type, context, [
+            .specificVersionable(itemClass, versionClass, "comments", ideaCollection.content_type, context, [
                 () => (item, version) => {
                     return {
                         commentableUrl: version.path,

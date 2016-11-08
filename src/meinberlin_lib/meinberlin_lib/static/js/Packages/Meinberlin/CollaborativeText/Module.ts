@@ -45,8 +45,12 @@ export var register = (angular) => {
                 .registerDirective("debate-workbench");
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider: AdhResourceArea.Provider, adhConfig) => {
-            var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
-                RICollaborativeTextProcess, RIDocument, RIDocumentVersion, false, true);
+            var registerRoutes = (context? : string) => (provider) => {
+                AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
+                    RICollaborativeTextProcess, RIDocument, RIDocumentVersion)(context)(provider);
+                AdhIdeaCollectionWorkbench.registerDocumentRoutesFactory(
+                    RICollaborativeTextProcess, RIDocument, RIDocumentVersion)(context)(provider);
+            };
             registerRoutes()(adhResourceAreaProvider);
 
             var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/AddDocumentSlot.html";

@@ -34,8 +34,12 @@ export var register = (angular) => {
             adhEmbedProvider.registerContext("kiezkasse", ["kiezkassen"]);
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
-            var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
-                RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion, true);
+            var registerRoutes = (context? : string) => (provider) => {
+                AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
+                    RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion)(context)(provider);
+                AdhIdeaCollectionWorkbench.registerProposalRoutesFactory(
+                    RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion, true)(context)(provider);
+            };
             registerRoutes()(adhResourceAreaProvider);
             registerRoutes("kiezkasse")(adhResourceAreaProvider);
 
