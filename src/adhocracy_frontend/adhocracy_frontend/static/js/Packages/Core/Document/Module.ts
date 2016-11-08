@@ -1,6 +1,5 @@
 import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
 import * as AdhBadgeModule from "../Badge/Module";
-import * as AdhEmbedModule from "../Embed/Module";
 import * as AdhHttpModule from "../Http/Module";
 import * as AdhImageModule from "../Image/Module";
 import * as AdhInjectModule from "../Inject/Module";
@@ -11,7 +10,6 @@ import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
 import * as AdhStickyModule from "../Sticky/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
-import * as AdhEmbed from "../Embed/Embed";
 import * as AdhNames from "../Names/Names";
 
 import * as AdhDocument from "./Document";
@@ -27,7 +25,6 @@ export var register = (angular) => {
             "ngMessages",
             AdhAngularHelpersModule.moduleName,
             AdhBadgeModule.moduleName,
-            AdhEmbedModule.moduleName,
             AdhHttpModule.moduleName,
             AdhImageModule.moduleName,
             AdhInjectModule.moduleName,
@@ -38,13 +35,6 @@ export var register = (angular) => {
             AdhStickyModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider
-                .registerDirective("document-detail")
-                .registerDirective("document-create")
-                .registerDirective("document-edit")
-                .registerDirective("document-list-item");
-        }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
             adhNamesProvider.names[RIGeoDocumentVersion.content_type] = "TR__RESOURCE_DOCUMENT";
         }])

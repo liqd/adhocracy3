@@ -9,8 +9,6 @@ import * as AdhResourceActionsModule from "../ResourceActions/Module";
 import * as AdhResourceAreaModule from "../ResourceArea/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
-import * as AdhEmbed from "../Embed/Embed";
-
 import * as DebateWorkbench from "./DebateWorkbench";
 
 
@@ -30,10 +28,6 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider
-                .registerDirective("debate-workbench");
-        }])
         .directive("adhDebateWorkbench", ["adhConfig", "adhTopLevelState", DebateWorkbench.debateWorkbenchDirective])
         .directive("adhDocumentDetailColumn", [
             "adhConfig", "adhPermissions", "adhTopLevelState", DebateWorkbench.documentDetailColumnDirective])
