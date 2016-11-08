@@ -48,6 +48,7 @@ from adhocracy_core.sheets.asset import IAssetData
 from adhocracy_core.sheets.image import IImageReference
 from adhocracy_core.sheets.principal import IActivationConfiguration
 from adhocracy_core.sheets.principal import IPasswordAuthentication
+from adhocracy_core.sheets.principal import IEmailNew
 
 logger = getLogger(__name__)
 
@@ -298,6 +299,19 @@ def _send_invitation_mail(user, registry):
         messenger.send_invitation_mail(user, reset)
 
 
+def send_new_user_email_activation(event):
+    """Send new email address activation email."""
+    registry = event.registry
+    user = event.object
+    new_email = registry.content.get_sheet_field(user, IEmailNew, 'email')
+    if new_email:
+        activation_path = _generate_activation_path()
+        user.activation_path = activation_path
+        messenger = getattr(registry, 'messenger', None)
+        messenger.send_new_email_activation_mail(user,
+                                                 activation_path, new_email)
+
+
 def update_asset_download(event):
     """Update asset download."""
     add_metadata(event.object, event.registry)
@@ -401,6 +415,9 @@ def includeme(config):
     config.add_subscriber(apply_user_activation_configuration,
                           IResourceCreatedAndAdded,
                           object_iface=IUser)
+    config.add_subscriber(send_new_user_email_activation,
+                          IResourceSheetModified,
+                          event_isheet=IEmailNew)
     config.add_subscriber(update_modification_date_modified_by,
                           IResourceSheetModified,
                           object_iface=IMetadata)

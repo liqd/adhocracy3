@@ -1502,6 +1502,35 @@ class TestCreateValidateActivationPath:
         assert validator(node, 'activate') is None
         assert user.activate.called
 
+    def test_activate_new_email_raise_if_none_pending(self, node, request_,
+                                                      context, registry,
+                                   mock_user_locator, mocker):
+        mocker.patch('adhocracy_core.rest.schemas.is_older_than',
+                     return_value=False)
+        user = testing.DummyResource(active=True,
+                                     activate=mocker.Mock(),
+                                     has_new_email_pending=False,
+                                     activate_new_email=mocker.Mock(),
+                                     )
+        mock_user_locator.get_user_by_activation_path.return_value = user
+        validator = self.call_fut(context, request_, registry)
+        with raises(colander.Invalid):
+            validator(node, 'activate')
+
+    def test_activate_new_email(self, node, request_, context, registry,
+                                   mock_user_locator, mocker):
+        mocker.patch('adhocracy_core.rest.schemas.is_older_than',
+                     return_value=False)
+        user = testing.DummyResource(active=True,
+                                     activate=mocker.Mock(),
+                                     has_new_email_pending=True,
+                                     activate_new_email=mocker.Mock(),
+                                     )
+        mock_user_locator.get_user_by_activation_path.return_value = user
+        validator = self.call_fut(context, request_, registry)
+        validator(node, 'activate')
+        assert user.activate_new_email.called
+
 
 class TestPostLoginEmailRequestSchemma:
 
