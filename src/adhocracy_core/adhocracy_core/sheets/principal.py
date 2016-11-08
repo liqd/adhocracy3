@@ -127,7 +127,7 @@ userextended_meta = sheet_meta._replace(
 )
 
 
-class IEmailNew(ISheet):
+class IEmailNew(ISheet, ISheetRequirePassword):
     """Marker interface for not yet activate new user email."""
 
 
