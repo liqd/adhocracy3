@@ -26,7 +26,7 @@ import * as SIRateable from "../../../../Resources_/adhocracy_core/sheets/rate/I
 import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIVersionable from "../../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
-var pkgLocation = "/Core/IdeaCollection/Proposal";
+export var pkgLocation = "/Core/IdeaCollection/Proposal";
 
 
 export interface IScope extends angular.IScope {
