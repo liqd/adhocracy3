@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-11-03 13:54+0100\n"
+"POT-Creation-Date: 2016-11-08 17:07+0100\n"
 "PO-Revision-Date: 2015-05-26 21:25+0200\n"
 "Last-Translator: Joscha <joka@jokasis.de>\n"
 "Language-Team: English\n"
@@ -16,17 +16,17 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. Default: ${site_name} Abuse Complaint
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:120
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:119
 msgid "mail_abuse_complaint_subject"
 msgstr "mail_abuse_complaint_subject"
 
 #. Default: ${site_name} Message from ${sender_name}: ${title}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:151
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:150
 msgid "mail_sent_message_to_user_subject"
 msgstr "mail_sent_message_to_user_subject"
 
 #. Default: ${text}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:155
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:154
 msgid "mail_sent_message_to_user_body_txt"
 msgstr ""
 "(Deutsche Version weiter unten)\n"
@@ -55,12 +55,12 @@ msgstr ""
 
 #. Default: ${site_name}: Account Verification / Aktivierung Deines
 #. Nutzerkontos
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:188
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:187
 msgid "mail_account_verification_subject"
 msgstr "mail_account_verification_subject"
 
 #. Default: ${frontend_url}${activation_path}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:192
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:191
 msgid "mail_account_verification_body_txt"
 msgstr ""
 "Automatically generated Email. / Automatisch generierte E-Mail.\n"
@@ -98,12 +98,12 @@ msgstr ""
 "Dein \"${site_name}\"-Team"
 
 #. Default: ${site_name}: Reset Password / Passwort neu setzen
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:208
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:207
 msgid "mail_reset_password_subject"
 msgstr "mail_reset_password_subject"
 
 #. Default: ${reset_url}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:212
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:211
 msgid "mail_reset_password_body_txt"
 msgstr ""
 "Automatically generated Email. / Automatisch generierte E-Mail.\n"
@@ -130,17 +130,17 @@ msgstr ""
 "Dein \"${site_name}\"-Team"
 
 #. Default: ${site_name}: ${activity_name}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:297
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:295
 msgid "mail_send_activity_subject"
 msgstr "mail_send_activity_subject"
 
 #. Default: ${site_name}: Password changed / Passwort wurde geändert
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:330
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:328
 msgid "mail_password_change_subject"
 msgstr ""
 
 #. Default: Your password has been changed.
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:334
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:332
 msgid "mail_password_change_body_txt"
 msgstr ""
 "Automatically generated Email. / Automatisch generierte E-Mail.\n"
@@ -169,12 +169,12 @@ msgstr ""
 "Dein \"${site_name}\"-Team"
 
 #. Default: ${site_name}: Email Verification / Email Aktivierung
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:352
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:350
 msgid "mail_new_email_verification_subject"
 msgstr "mail_new_email_verification_subject"
 
 #. Default: ${frontend_url}${activation_path}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:356
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:354
 msgid "mail_new_email_verification_body_txt"
 msgstr ""
 "Automatically generated Email. / Automatisch generierte E-Mail.\n"
@@ -198,7 +198,7 @@ msgstr ""
 "Hallo ${user_name},\n"
 "\n"
 "Diese E-Mail dient der Validierung Deiner neuen Email-Adresse. Bitte\n"
-"nutze den folgenden Link um sie aktivieren.\n"
+"nutze den folgenden Link um sie zu aktivieren.\n"
 "\n"
 "${frontend_url}${activation_path}\n"
 "\n"
@@ -207,13 +207,13 @@ msgstr ""
 "Dein \"${site_name}\"-Team"
 
 #. Default: Invitation to join ${site_name}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:242
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:241
 #, fuzzy
 msgid "mail_invitation_subject"
 msgstr "mail_account_verification_subject"
 
 #. Default: Please click ${reset_url} to join and reset your password.
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:249
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:248
 #, fuzzy
 msgid "mail_invitation_body_txt"
 msgstr ""
@@ -252,7 +252,7 @@ msgstr ""
 "Dein \"${site_name}\"-Team"
 
 #. Default: ${activity_description} Visit ${target_type_name}: ${target_url} .
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:301
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:299
 #, fuzzy
 msgid "mail_send_activity_remove_body_txt"
 msgstr ""
@@ -265,7 +265,7 @@ msgstr ""
 "\n"
 
 #. Default: ${activity_description} Visit ${object_type_name}: ${object_url} .
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:307
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:305
 #, fuzzy
 msgid "mail_send_activity_add_update_body_txt"
 msgstr ""

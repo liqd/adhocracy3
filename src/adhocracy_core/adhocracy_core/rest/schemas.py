@@ -479,8 +479,6 @@ def create_validate_activation_path(context,
     return validate_activation_path
 
 
-
-
 @deferred
 def deferred_validate_activation_path(node: SchemaNode,
                                       kw: dict) -> All:

@@ -341,7 +341,7 @@ class Messenger:
 
     def send_new_email_activation_mail(self, user: IUser, activation_path: str,
                                        new_email: str, request: Request=None):
-        """Send a avtivation mail to validate the new email of a user."""
+        """Send a activation mail to validate the new email of a user."""
         mapping = {'activation_path': activation_path,
                    'frontend_url': self.frontend_url,
                    'user_name': user.name,
