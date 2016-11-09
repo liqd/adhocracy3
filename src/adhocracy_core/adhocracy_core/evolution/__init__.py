@@ -958,6 +958,13 @@ def reindex_users_text(root, registry):  # pragma: no cover
 
 
 @log_migration
+def add_email_new_sheet_to_user(root, registry):  # pragma: no cover
+    """Add email new sheet to user."""
+    from adhocracy_core.sheets.principal import IEmailNew
+    migrate_new_sheet(root, IUser, IEmailNew)
+
+
+@log_migration
 def add_activity_service_to_root(root, registry):  # pragma: no cover
     """Add activity service to root."""
     from adhocracy_core.resources.activity import add_activiy_service
@@ -1030,4 +1037,5 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_pages_service_to_root)
     config.add_evolution_step(add_embed_sheet_to_processes)
     config.add_evolution_step(reindex_users_text)
+    config.add_evolution_step(add_email_new_sheet_to_user)
     config.add_evolution_step(add_activity_service_to_root)

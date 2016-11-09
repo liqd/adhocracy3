@@ -339,6 +339,27 @@ class Messenger:
                        request=request,
                        )
 
+    def send_new_email_activation_mail(self, user: IUser, activation_path: str,
+                                       new_email: str, request: Request=None):
+        """Send a activation mail to validate the new email of a user."""
+        mapping = {'activation_path': activation_path,
+                   'frontend_url': self.frontend_url,
+                   'user_name': user.name,
+                   'site_name': self.site_name,
+                   }
+        subject = _('mail_new_email_verification_subject',
+                    mapping=mapping,
+                    default='${site_name}: Email Verification / '
+                            'Email Aktivierung')
+        body_txt = _('mail_new_email_verification_body_txt',
+                     mapping=mapping,
+                     default='${frontend_url}${activation_path}')
+        self.send_mail(subject=subject,
+                       recipients=[new_email],
+                       body=body_txt,
+                       request=request,
+                       )
+
 
 def includeme(config):
     """Add Messenger to registry."""
