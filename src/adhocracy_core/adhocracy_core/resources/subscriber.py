@@ -9,12 +9,15 @@ import requests
 from pyramid.interfaces import IApplicationCreated
 from pyramid.registry import Registry
 from pyramid.request import Request
+from pyramid.settings import asbool
 from pyramid.traversal import find_interface
+from pyramid.i18n import get_localizer
 from pyramid.i18n import TranslationStringFactory
 from substanced.util import find_service
 from substanced.file import File
 from substanced.file import USE_MAGIC
 
+from adhocracy_core.activity import generate_activity_description
 from adhocracy_core.authorization import set_acms_for_app_root
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
@@ -22,12 +25,14 @@ from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ISimple
 from adhocracy_core.interfaces import ISheet
+from adhocracy_core.interfaces import IActivitiesGenerated
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import ISheetReferenceNewVersion
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
+from adhocracy_core.resources.activity import IActivity
 from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IPasswordReset
@@ -49,6 +54,8 @@ from adhocracy_core.sheets.image import IImageReference
 from adhocracy_core.sheets.principal import IActivationConfiguration
 from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.sheets.principal import IEmailNew
+
+import adhocracy_core.sheets.activity
 
 logger = getLogger(__name__)
 
@@ -394,6 +401,36 @@ def _create_image(context: IResource,
     return image
 
 
+def add_activities_to_activity_stream(event: IActivitiesGenerated):
+    """Add activity resources to activity_stream."""
+    request = event.request
+    registry = request.registry
+    activity_stream_enabled = asbool(registry.settings.get(
+        'adhocracy.activity_stream.enabled', False))
+    if not activity_stream_enabled:
+        return
+    activities = event.activities
+    service = find_service(request.root, 'activity_stream')
+    translate = get_localizer(request).translate
+    for activity in activities:
+        description = generate_activity_description(activity, request)
+        description_full = translate(description)
+        appstructs = {
+            adhocracy_core.sheets.activity.IActivity.__identifier__: {
+                'subject': activity.subject,
+                'type': activity.type.value,
+                'object': activity.object,
+                'target': activity.target,
+                'name': description_full,
+                'published': activity.published,
+            }
+        }
+        registry.content.create(IActivity.__identifier__,
+                                appstructs=appstructs,
+                                parent=service,
+                                registry=registry)
+
+
 def includeme(config):
     """Register subscribers."""
     config.add_subscriber(set_acms_for_app_root, IApplicationCreated)
@@ -444,3 +481,5 @@ def includeme(config):
     config.add_subscriber(download_external_picture_for_edited,
                           IResourceSheetModified,
                           event_isheet=IImageReference)
+    config.add_subscriber(add_activities_to_activity_stream,
+                          IActivitiesGenerated)

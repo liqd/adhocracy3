@@ -11,7 +11,7 @@ from zope.interface import Interface
 from zope.interface.interfaces import IInterface
 
 from adhocracy_core.interfaces import Activity
-from adhocracy_core.interfaces import IActivitiesAddedToAuditLog
+from adhocracy_core.interfaces import IActivitiesGenerated
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import ISheetReferenceNewVersion
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
@@ -250,18 +250,16 @@ class _InterfacePredicate:
         return self.interface.providedBy(event.object)
 
 
-@implementer(IActivitiesAddedToAuditLog)
-class ActivitiesAddedToAuditLog:
+@implementer(IActivitiesGenerated)
+class ActivitiesGenerated:
 
-    __doc__ = IActivitiesAddedToAuditLog.__doc__
+    __doc__ = IActivitiesGenerated.__doc__
 
     def __init__(self,
-                 object,
                  activities: [Activity],
                  request: Request,
                  ):
-        self.object = object
-        """The audit log."""
+        self.object = None
         self.activities = activities
         """List of added activities."""
         self.request = request

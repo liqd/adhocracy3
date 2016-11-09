@@ -30,10 +30,10 @@ class TestSendActivityNotificationEmails:
 
     @fixture
     def event(self, request_, registry, context):
-        from adhocracy_core.events import ActivitiesAddedToAuditLog
+        from adhocracy_core.events import ActivitiesGenerated
         request_.registry = registry
         registry.root = context
-        return ActivitiesAddedToAuditLog(None, [], request_)
+        return ActivitiesGenerated([], request_)
 
     @fixture
     def mock_catalogs(self, mock_catalogs, mocker):

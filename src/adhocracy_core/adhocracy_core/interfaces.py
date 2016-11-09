@@ -570,10 +570,10 @@ class ILocalRolesModfied(IObjectEvent):
     registry = Attribute('The pyramid registry')
 
 
-class IActivitiesAddedToAuditLog(IObjectEvent):
-    """An event type send when :term:`activity` s are added to the auditlog."""
+class IActivitiesGenerated(IObjectEvent):
+    """An event type send when :term:`activity` s are created."""
 
-    object = Attribute('The audit log')
+    object = Attribute('Not used')
     activities = Attribute('The added activities')
     request = Attribute('The current pyramid request')
 
