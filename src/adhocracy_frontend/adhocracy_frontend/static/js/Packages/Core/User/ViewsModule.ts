@@ -117,11 +117,13 @@ export var register = (angular) => {
             AdhUserViews.userEditDirective])
         .directive("adhLogin", [
             "adhConfig",
+            "adhCrossWindowMessaging",
             "adhUser",
             "adhTopLevelState",
             "adhEmbed",
             "adhPermissions",
             "adhShowError",
+            "$window",
             AdhUserViews.loginDirective])
         .directive("adhPasswordReset", [
             "adhConfig", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", AdhUserViews.passwordResetDirective])

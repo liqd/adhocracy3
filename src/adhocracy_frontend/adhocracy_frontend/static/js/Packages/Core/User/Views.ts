@@ -5,6 +5,7 @@ import * as _ from "lodash";
 
 import * as AdhBadge from "../Badge/Badge";
 import * as AdhConfig from "../Config/Config";
+import * as AdhCrossWindowMessaging from "../CrossWindowMessaging/CrossWindowMessaging";
 import * as AdhHttp from "../Http/Http";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhResourceActions from "../ResourceActions/ResourceActions";
@@ -101,6 +102,7 @@ export interface IScopeLogin extends angular.IScope {
     enableCancel : boolean;
     cancel : () => void;
     logIn : () => angular.IPromise<void>;
+    logInWithServiceKonto : () => void;
     showError;
 }
 
@@ -208,11 +210,13 @@ export var activateArea = (
 
 export var loginDirective = (
     adhConfig : AdhConfig.IService,
+    adhCrossWindowMessaging : AdhCrossWindowMessaging.IService,
     adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhEmbed : AdhEmbed.Service,
     adhPermissions : AdhPermissions.Service,
-    adhShowError
+    adhShowError,
+    $window : angular.IWindowService
 ) => {
     return {
         restrict: "E",
@@ -245,6 +249,19 @@ export var loginDirective = (
                 bindServerErrors(scope, errors);
                 scope.credentials.password = "";
                 scope.loginForm.$setPristine();
+            };
+
+            scope.logInWithServiceKonto = () => {
+                var popup = $window.open(adhConfig.service_konto_login_url, "_blank", "width=460,height=225");
+
+                var cancel = adhCrossWindowMessaging.on("serviceKontoToken", (data) => {
+                    adhUser.logInWithServiceKonto(data.token).then(() => {
+                        adhTopLevelState.goToCameFrom("/", true);
+                    }, handleErrors);
+
+                    popup.close();
+                    cancel();
+                });
             };
 
             scope.logIn = () => {
