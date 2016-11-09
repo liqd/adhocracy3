@@ -211,8 +211,8 @@ export var addProposalButtonDirective = (
 
 export var registerCommonRoutesFactory = (
     ideaCollection,
-    proposalType,
-    proposalVersionType
+    itemType,
+    versionType
 ) => (
     context : string = ""
 ) => (
@@ -237,11 +237,11 @@ export var registerCommonRoutesFactory = (
                     }
                 });
             }])
-        .defaultVersionable(itemClass, versionClass, "", ideaCollection.content_type, context, {
+        .defaultVersionable(itemType, versionType, "", ideaCollection.content_type, context, {
             space: "content",
             movingColumns: "is-show-show-hide"
         })
-        .defaultVersionable(itemClass, versionClass, "edit", ideaCollection.content_type, context, {
+        .defaultVersionable(itemType, versionType, "edit", ideaCollection.content_type, context, {
             space: "content",
             movingColumns: "is-show-show-hide"
         });
@@ -249,8 +249,8 @@ export var registerCommonRoutesFactory = (
 
 export var registerDocumentRoutesFactory = (
     ideaCollection,
-    itemClass,
-    versionClass,
+    itemType,
+    versionType,
     hasCommentColumn : boolean = true
 ) => (
     context : string = ""
@@ -272,13 +272,13 @@ export var registerDocumentRoutesFactory = (
                     }
                 });
             }])
-        .specificVersionable(itemClass, versionClass, "", ideaCollection.content_type, context, [
+        .specificVersionable(itemType, versionType, "", ideaCollection.content_type, context, [
             () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return {
                     documentUrl: version.path
                 };
             }])
-        .specificVersionable(itemClass, versionClass, "edit", ideaCollection.content_type, context, [
+        .specificVersionable(itemType, versionType, "edit", ideaCollection.content_type, context, [
             "adhHttp", (adhHttp : AdhHttp.Service) => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
@@ -339,8 +339,8 @@ export var registerDocumentRoutesFactory = (
 
 export var registerProposalRoutesFactory = (
     ideaCollection,
-    itemClass,
-    versionClass,
+    itemType,
+    versionType,
     hasCommentColumn : boolean = true
 ) => (
     context : string = ""
@@ -362,13 +362,13 @@ export var registerProposalRoutesFactory = (
                     }
                 });
             }])
-        .specificVersionable(itemClass, versionClass, "", ideaCollection.content_type, context, [
+        .specificVersionable(itemType, versionType, "", ideaCollection.content_type, context, [
             () => (item, version) => {
                 return {
                     proposalUrl: version.path
                 };
             }])
-        .specificVersionable(itemClass, versionClass, "edit", ideaCollection.content_type, context, [
+        .specificVersionable(itemType, versionType, "edit", ideaCollection.content_type, context, [
             "adhHttp", (adhHttp : AdhHttp.Service) => (item, version) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
@@ -380,11 +380,11 @@ export var registerProposalRoutesFactory = (
                     }
                 });
             }])
-        .defaultVersionable(itemClass, versionClass, "image", ideaCollection.content_type, context, {
+        .defaultVersionable(itemType, versionType, "image", ideaCollection.content_type, context, {
             space: "content",
             movingColumns: "is-show-show-hide"
         })
-        .specificVersionable(itemClass, versionClass, "image", ideaCollection.content_type, context, [
+        .specificVersionable(itemType, versionType, "image", ideaCollection.content_type, context, [
             "adhHttp", (adhHttp : AdhHttp.Service) => (item, version) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
@@ -399,11 +399,11 @@ export var registerProposalRoutesFactory = (
 
     if (hasCommentColumn) {
         adhResourceAreaProvider
-            .defaultVersionable(itemClass, versionClass, "comments", ideaCollection.content_type, context, {
+            .defaultVersionable(itemType, versionType, "comments", ideaCollection.content_type, context, {
                 space: "content",
                 movingColumns: "is-collapse-show-show"
             })
-            .specificVersionable(itemClass, versionClass, "comments", ideaCollection.content_type, context, [
+            .specificVersionable(itemType, versionType, "comments", ideaCollection.content_type, context, [
                 () => (item, version) => {
                     return {
                         commentableUrl: version.path,
