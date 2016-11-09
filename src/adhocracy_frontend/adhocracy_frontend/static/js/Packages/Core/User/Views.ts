@@ -241,17 +241,19 @@ export var loginDirective = (
                  adhTopLevelState.goToCameFrom("/");
             };
 
+            var handleErrors = (errors) => {
+                bindServerErrors(scope, errors);
+                scope.credentials.password = "";
+                scope.loginForm.$setPristine();
+            };
+
             scope.logIn = () => {
                 return adhUser.logIn(
                     scope.credentials.nameOrEmail,
                     scope.credentials.password
                 ).then(() => {
                     adhTopLevelState.goToCameFrom("/", true);
-                }, (errors) => {
-                    bindServerErrors(scope, errors);
-                    scope.credentials.password = "";
-                    scope.loginForm.$setPristine();
-                });
+                }, handleErrors);
             };
         }
     };
