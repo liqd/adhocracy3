@@ -1,0 +1,23 @@
+<script>
+var parseSearchString = function(s) {
+    var q = {};
+    var items = s.substring(1).split('&');
+
+    for (var i = 0; i < items.length; i++) {
+        var parts = items[i].split('=');
+        var key = decodeURIComponent(parts[0]);
+        var value = parts.length >= 2 ? decodeURIComponent(parts[1]) : true;
+        q[key] = value;
+    }
+
+    return q;
+};
+
+window.opener.postMessage(JSON.stringify({
+    name: "value",
+    data: {
+        token: parseSearchString(location.search).token
+    }
+}), location.origin);
+
+</script>
