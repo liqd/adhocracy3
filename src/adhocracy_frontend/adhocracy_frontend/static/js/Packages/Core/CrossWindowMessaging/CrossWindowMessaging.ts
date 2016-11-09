@@ -66,7 +66,7 @@ export interface IPostMessageService {
 }
 
 export interface IService {
-    registerMessageHandler : (name : string, callback : (data : IMessageData) => void) => void;
+    on : (name : string, callback : (data : IMessageData) => void) => () => void;
     postResize : (height : number) => void;
     dummy? : boolean;
 }
@@ -102,7 +102,7 @@ export class Provider implements angular.IServiceProvider {
         }];
     }
 
-    public registerMessageHandler(name : string, callback) {
+    public on(name : string, callback) {
         this.callbacks.push({
             name: name,
             callback: callback
@@ -126,29 +126,32 @@ export class Service implements IService {
     ) {
         var _self : Service = this;
 
-        _self.registerMessageHandler("setup", _self.setup.bind(_self));
-        _self.registerMessageHandler("setToken", _self.setToken.bind(_self));
-        _self.registerMessageHandler("deleteToken", _self.deleteToken.bind(_self));
+        _self.on("setup", _self.setup.bind(_self));
+        _self.on("setToken", _self.setToken.bind(_self));
+        _self.on("deleteToken", _self.deleteToken.bind(_self));
 
         _self.manageResize();
 
         for (var messageHandler of providedMessageHandlers) {
-            _self.registerMessageHandler(messageHandler.name, messageHandler.callback);
+            _self.on(messageHandler.name, messageHandler.callback);
         }
 
         _self.postMessage("requestSetup", {});
     }
 
-    public registerMessageHandler(name, callback) {
+    public on(name, callback) : () => void {
         var _self : Service = this;
 
-        _self.$window.addEventListener("message", (event) => {
+        var wrapper = (event) => {
             var message = JSON.parse(event.data);
 
             if (((message.name === "setup") || (event.origin === _self.embedderOrigin)) && (message.name === name)) {
                 callback(message.data);
             }
-        });
+        };
+
+        _self.$window.addEventListener("message", wrapper);
+        return () => _self.$window.removeEventListener("message", wrapper);
     }
 
     private postMessage(name: string, data: IMessageData) : void {
@@ -266,8 +269,8 @@ export class Dummy implements IService {
         this.dummy = true;
     }
 
-    public registerMessageHandler(name, callback) {
-        return;
+    public on(name, callback) {
+        return () => null;
     }
 
     public postResize(height) {
