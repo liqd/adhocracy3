@@ -164,27 +164,10 @@ export var detailColumnDirective = (
     };
 };
 
-export var addDocumentButtonDirective = (
-    adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service,
-    adhPermissions : AdhPermissions.Service,
-    adhTopLevelState : AdhTopLevelState.Service
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/AddDocumentButton.html",
-        link: (scope) => {
-            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
-            adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
-
-            scope.setCameFrom = () => {
-                adhTopLevelState.setCameFrom();
-            };
-        }
-    };
-};
-
-export var addProposalButtonDirective = (
+var addResourceButtonFactory = (
+    targetView : string,
+    label : string
+) => (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service,
     adhPermissions : AdhPermissions.Service,
@@ -194,11 +177,14 @@ export var addProposalButtonDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/AddProposalButton.html",
         link: (scope) => {
+            scope.targetView = targetView;
+            scope.label = label;
+
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
             adhHttp.get(scope.processUrl).then((process) => {
                 var workflow = SIWorkflow.get(process).workflow;
-                scope.workflowAllowsCreateProposal = (workflow !== "debate" && workflow !== "debate_private" && workflow !== "stadtforum");
+                scope.workflowAllowsCreate = (workflow !== "debate" && workflow !== "debate_private" && workflow !== "stadtforum");
             });
 
             scope.setCameFrom = () => {
@@ -207,6 +193,9 @@ export var addProposalButtonDirective = (
         }
     };
 };
+
+export var addDocumentButtonDirective = addResourceButtonFactory("create_document", "TR__ADD_DOCUMENT");
+export var addProposalButtonDirective = addResourceButtonFactory("create_proposal", "TR__IDEA_COLLECTION_PARTICIPATE");
 
 
 export var registerCommonRoutesFactory = (
