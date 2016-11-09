@@ -64,6 +64,8 @@ def config_view(request):
         'adhocracy.frontend.piwik_track_user_id', 'false'))
     config['profile_images_enabled'] = asbool(settings.get(
         'adhocracy.frontend.profile_images_enabled', 'true'))
+    config['service_konto_login_url'] = settings.get(
+        'adhocracy.frontend.service_konto_login_url')
     config['map_tile_url'] = settings.get(
         'adhocracy.frontend.map_tile_url',
         'http://{s}.tile.osm.org/{z}/{x}/{y}.png')
