@@ -25,6 +25,7 @@ import RIUser from "../../../Resources_/adhocracy_core/resources/principal/IUser
 import RISystemUser from "../../../Resources_/adhocracy_core/resources/principal/ISystemUser";
 import * as SIAnonymizeDefault from "../../../Resources_/adhocracy_core/sheets/principal/IAnonymizeDefault";
 import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIEmailNew from "../../../Resources_/adhocracy_core/sheets/principal/IEmailNew";
 import * as SIHasAssetPool from "../../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
 import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
@@ -735,6 +736,7 @@ var postEdit = (
     path : string,
     data : {
         name : string;
+        email? : string;
         password? : string;
         anonymize? : boolean;
         passwordOld? : string;
@@ -748,6 +750,11 @@ var postEdit = (
         if (SIUserBasic.get(oldUser).name !== data.name) {
             SIUserBasic.set(patch, {
                 name: data.name,
+            });
+        }
+        if (data.email) {
+            SIEmailNew.set(patch, {
+                email: data.email,
             });
         }
         if (data.password) {
@@ -790,6 +797,7 @@ export var userEditDirective = (
                     adhHttp.get(path).then((user) => {
                         scope.data = {
                             name: SIUserBasic.get(user).name,
+                            email: "",
                             password: "",
                             anonymize: SIAnonymizeDefault.get(user).anonymize,
                         };

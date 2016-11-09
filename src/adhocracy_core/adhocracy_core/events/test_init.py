@@ -230,22 +230,20 @@ class IncludemeIntegrationTest(unittest.TestCase):
         assert self.config.get_predlist('object_iface')
 
 
-class TestIActivitiesAddedToAuditlog:
+class TestIActivitiesGenerated:
 
     def make_one(self, *args):
-        from adhocracy_core.events import ActivitiesAddedToAuditLog
-        return ActivitiesAddedToAuditLog(*args)
+        from adhocracy_core.events import ActivitiesGenerated
+        return ActivitiesGenerated(*args)
 
     def test_create(self):
-        from adhocracy_core.interfaces import IActivitiesAddedToAuditLog
+        from adhocracy_core.interfaces import IActivitiesGenerated
         from adhocracy_core.interfaces import Activity
-        auditlog = object()
         activities = [Activity()]
         request = object()
-        inst = self.make_one(auditlog, activities, request)
-        assert IActivitiesAddedToAuditLog.providedBy(inst)
-        assert verifyObject(IActivitiesAddedToAuditLog, inst)
-        assert inst.object == auditlog
+        inst = self.make_one(activities, request)
+        assert IActivitiesGenerated.providedBy(inst)
+        assert verifyObject(IActivitiesGenerated, inst)
         assert inst.activities == activities
         assert inst.request == request
 

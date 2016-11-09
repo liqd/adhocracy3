@@ -559,6 +559,43 @@ class TestApplyUserActivationConfiguration:
         assert mock_messenger.send_invitation_mail.called is False
 
 
+class TestSendNewUserEmailActivation:
+
+    @fixture
+    def registry(self, registry, mock_messenger):
+        registry.messenger = mock_messenger
+        return registry
+
+    @fixture
+    def user(self):
+        user = testing.DummyResource(name='user name',
+                                     email='test@test.de',
+                                     activate=Mock())
+        return user
+
+    @fixture
+    def event(self, user, registry):
+        event.object = user
+        event.registry = registry
+        return event
+
+    def call_fut(self, event):
+        from .subscriber import send_new_user_email_activation
+        return send_new_user_email_activation(event)
+
+    def test_send_new_email_activation_mail(self, event, registry,
+                                            mock_messenger):
+        registry.content.get_sheet_field = \
+            Mock(return_value='test@mail.org')
+        self.call_fut(event)
+        send_mail_call_args = \
+            mock_messenger.send_new_email_activation_mail.call_args[0]
+        assert send_mail_call_args[0] == event.object
+        assert send_mail_call_args[1].startswith('/activate/')
+        assert send_mail_call_args[2] == 'test@mail.org'
+        assert event.object.activation_path.startswith('/activate/')
+
+
 class TestUpdateDownload:
 
     def call_fut(self, event):
@@ -712,6 +749,81 @@ class TestDownloadExternalPictureUrl:
         mock_sheet.set.assert_called_with({'picture': image}, send_event=False)
 
 
+class TestAddActivitiesToActivityStream:
+
+    @fixture
+    def event(self, event, registry, request_):
+        event.registry = registry
+        event.request = request_
+        return event
+
+    @fixture
+    def activity(self, activity):
+        from adhocracy_core.interfaces import ActivityType
+        from adhocracy_core.utils import now
+        return activity._replace(
+            subject=testing.DummyResource(),
+            type=ActivityType.add,
+            object=testing.DummyResource(),
+            target=testing.DummyResource(),
+            published=now()
+        )
+
+    @fixture
+    def mock_activity_stream(self, mocker):
+        activity_stream = testing.DummyResource()
+        mocker.patch('adhocracy_core.resources.subscriber.find_service',
+                     return_value=activity_stream)
+        return activity_stream
+
+    def call_fut(self, *args):
+        from .subscriber import add_activities_to_activity_stream
+        return add_activities_to_activity_stream(*args)
+
+    def test_ignore_if_no_activities(self, event, registry):
+        event.activities = []
+        self.call_fut(event)
+        assert not registry.content.create.called
+
+
+    def test_ignore_per_default(self, event, registry, activity):
+        event.activities = [activity]
+        self.call_fut(event)
+        assert not registry.content.create.called
+
+    def test_ignore_if_disabled(self, event, registry, activity):
+        registry.settings['adhocracy.activity_stream.enabled'] = "False"
+        event.activities = [activity]
+        self.call_fut(event)
+        assert not registry.content.create.called
+
+    def test_create_activities_if_enabled(self, event, registry, activity,
+                                          mock_activity_stream, mocker):
+        from adhocracy_core.resources.activity import IActivity
+        import adhocracy_core.sheets.activity
+        registry.settings['adhocracy.activity_stream.enabled'] = "True"
+        event.activities = [activity]
+        mocker.patch('adhocracy_core.resources.subscriber' +
+                     '.generate_activity_description',
+                     return_value='description')
+        self.call_fut(event)
+        expected_appstructs = {
+            adhocracy_core.sheets.activity.IActivity.__identifier__: {
+                'subject': activity.subject,
+                'type': activity.type.value,
+                'object': activity.object,
+                'target': activity.target,
+                'name': 'description',
+                'published': activity.published,
+            }
+        }
+        registry.content.create.assert_called_with(
+            IActivity.__identifier__,
+            registry=registry,
+            parent=mock_activity_stream,
+            appstructs=expected_appstructs)
+
+
 @mark.usefixtures('integration')
 def test_register_subscriber(registry):
     from adhocracy_core.resources import subscriber
@@ -723,6 +835,7 @@ def test_register_subscriber(registry):
     assert subscriber.update_modification_date_modified_by.__name__ in handlers
     assert subscriber.send_password_reset_mail.__name__ in handlers
     assert subscriber.apply_user_activation_configuration.__name__ in handlers
+    assert subscriber.send_new_user_email_activation.__name__ in handlers
     assert subscriber.update_asset_download.__name__ in handlers
     assert subscriber.update_image_downloads.__name__ in handlers
     assert set_acms_for_app_root.__name__ in handlers

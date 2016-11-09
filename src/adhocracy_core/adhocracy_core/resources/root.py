@@ -10,6 +10,7 @@ from substanced.util import find_service
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
 from adhocracy_core.resources import add_resource_type_to_registry
+from adhocracy_core.resources.activity import add_activiy_service
 from adhocracy_core.resources.asset import add_assets_service
 from adhocracy_core.resources.organisation import IOrganisation
 from adhocracy_core.resources.organisation import organisation_meta
@@ -43,6 +44,7 @@ def create_initial_content_for_app_root(context: IPool, registry: Registry,
     add_locations_service(context, registry, {})
     add_assets_service(context, registry, {})
     add_page_service(context, registry, {})
+    add_activiy_service(context, registry, {})
 
 
 def _add_objectmap_to_app_root(root):
