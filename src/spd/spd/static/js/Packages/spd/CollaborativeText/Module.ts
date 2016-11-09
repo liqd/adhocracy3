@@ -1,14 +1,9 @@
-import * as AdhAbuseModule from "../../Core/Abuse/Module";
-import * as AdhCommentModule from "../../Core/Comment/Module";
 import * as AdhDocumentModule from "../../Core/Document/Module";
 import * as AdhEmbedModule from "../../Core/Embed/Module";
-import * as AdhHttpModule from "../../Core/Http/Module";
 import * as AdhIdeaCollectionModule from "../../Core/IdeaCollection/Module";
-import * as AdhMovingColumnsModule from "../../Core/MovingColumns/Module";
-import * as AdhPermissionsModule from "../../Core/Permissions/Module";
-import * as AdhResourceActionsModule from "../../Core/ResourceActions/Module";
+import * as AdhNamesModule from "../../Core/Names/Module";
+import * as AdhProcessModule from "../../Core/Process/Module";
 import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../../Core/TopLevelState/Module";
 
 import * as AdhDocument from "../../Core/Document/Document";
 import * as AdhEmbed from "../../Core/Embed/Embed";
@@ -28,17 +23,12 @@ export var register = (angular) => {
 
     angular
         .module(moduleName, [
-            AdhAbuseModule.moduleName,
-            AdhCommentModule.moduleName,
             AdhDocumentModule.moduleName,
             AdhEmbedModule.moduleName,
-            AdhHttpModule.moduleName,
             AdhIdeaCollectionModule.moduleName,
-            AdhMovingColumnsModule.moduleName,
-            AdhPermissionsModule.moduleName,
-            AdhResourceActionsModule.moduleName,
+            AdhNamesModule.moduleName,
+            AdhProcessModule.moduleName,
             AdhResourceAreaModule.moduleName,
-            AdhTopLevelStateModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider
@@ -58,8 +48,9 @@ export var register = (angular) => {
                 "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
                 "</adh-idea-collection-workbench>";
             adhProcessProvider.setProperties(processType, {
+                createSlot: adhConfig.pkg_path + AdhDocument.pkgLocation + "/CreateSlot.html",
                 detailSlot: adhConfig.pkg_path + AdhDocument.pkgLocation + "/DetailSlot.html",
-                document: true,
+                editSlot: adhConfig.pkg_path + AdhDocument.pkgLocation + "/EditSlot.html",
                 hasCommentColumn: true,
                 hasImage: true,
                 itemClass: RIDocument,
