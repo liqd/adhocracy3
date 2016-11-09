@@ -215,8 +215,9 @@ export var registerCommonRoutesFactory = (
     proposalVersionType
 ) => (
     context : string = ""
-) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-
+) => (
+    adhResourceAreaProvider : AdhResourceArea.Provider
+) => {
     adhResourceAreaProvider
         .default(ideaCollection, "", ideaCollection.content_type, context, {
             space: "content",
@@ -244,8 +245,9 @@ export var registerDocumentRoutesFactory = (
     versionClass
 ) => (
     context : string = ""
-) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-
+) => (
+    adhResourceAreaProvider : AdhResourceArea.Provider
+) => {
     adhResourceAreaProvider
         .default(ideaCollection, "create_document", ideaCollection.content_type, context, {
             space: "content",
@@ -337,8 +339,9 @@ export var registerProposalRoutesFactory = (
     hasCommentColumn : boolean = true
 ) => (
     context : string = ""
-) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-
+) => (
+    adhResourceAreaProvider : AdhResourceArea.Provider
+) => {
     adhResourceAreaProvider
         .default(ideaCollection, "create_proposal", ideaCollection.content_type, context, {
             space: "content",
@@ -370,32 +373,32 @@ export var registerProposalRoutesFactory = (
                     }
                 });
             }])
-    .defaultVersionable(itemClass, versionClass, "image", ideaCollection.content_type, context, {
-        space: "content",
-        movingColumns: "is-show-show-hide"
-    })
-    .specificVersionable(itemClass, versionClass, "image", ideaCollection.content_type, context, [
-        "adhHttp", (adhHttp : AdhHttp.Service) => (item, version) => {
-            return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
-                if (!options.POST) {
-                    throw 401;
-                } else {
-                    return {
-                        proposalUrl: version.path
-                    };
-                }
-            });
-        }])
-    .defaultVersionable(itemClass, versionClass, "", ideaCollection.content_type, context, {
-        space: "content",
-        movingColumns: "is-show-show-hide"
-    })
-    .specificVersionable(itemClass, versionClass, "", ideaCollection.content_type, context, [
-        () => (item, version) => {
-            return {
-                proposalUrl: version.path
-            };
-        }]);
+        .defaultVersionable(itemClass, versionClass, "image", ideaCollection.content_type, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide"
+        })
+        .specificVersionable(itemClass, versionClass, "image", ideaCollection.content_type, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service) => (item, version) => {
+                return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
+                    if (!options.POST) {
+                        throw 401;
+                    } else {
+                        return {
+                            proposalUrl: version.path
+                        };
+                    }
+                });
+            }])
+        .defaultVersionable(itemClass, versionClass, "", ideaCollection.content_type, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide"
+        })
+        .specificVersionable(itemClass, versionClass, "", ideaCollection.content_type, context, [
+            () => (item, version) => {
+                return {
+                    proposalUrl: version.path
+                };
+            }]);
 
     if (hasCommentColumn) {
         adhResourceAreaProvider
