@@ -236,7 +236,15 @@ export var registerCommonRoutesFactory = (
                         return {};
                     }
                 });
-            }]);
+            }])
+        .defaultVersionable(itemClass, versionClass, "", ideaCollection.content_type, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide"
+        })
+        .defaultVersionable(itemClass, versionClass, "edit", ideaCollection.content_type, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide"
+        });
 };
 
 export var registerDocumentRoutesFactory = (
@@ -263,20 +271,12 @@ export var registerDocumentRoutesFactory = (
                     }
                 });
             }])
-        .defaultVersionable(itemClass, versionClass, "", ideaCollection.content_type, context, {
-            space: "content",
-            movingColumns: "is-show-show-hide"
-        })
         .specificVersionable(itemClass, versionClass, "", ideaCollection.content_type, context, [
             () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return {
                     documentUrl: version.path
                 };
             }])
-        .defaultVersionable(itemClass, versionClass, "edit", ideaCollection.content_type, context, {
-            space: "content",
-            movingColumns: "is-show-show-hide"
-        })
         .specificVersionable(itemClass, versionClass, "edit", ideaCollection.content_type, context, [
             "adhHttp", (adhHttp : AdhHttp.Service) => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
@@ -357,10 +357,12 @@ export var registerProposalRoutesFactory = (
                     }
                 });
             }])
-        .defaultVersionable(itemClass, versionClass, "edit", ideaCollection.content_type, context, {
-            space: "content",
-            movingColumns: "is-show-show-hide"
-        })
+        .specificVersionable(itemClass, versionClass, "", ideaCollection.content_type, context, [
+            () => (item, version) => {
+                return {
+                    proposalUrl: version.path
+                };
+            }])
         .specificVersionable(itemClass, versionClass, "edit", ideaCollection.content_type, context, [
             "adhHttp", (adhHttp : AdhHttp.Service) => (item, version) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
@@ -388,16 +390,6 @@ export var registerProposalRoutesFactory = (
                         };
                     }
                 });
-            }])
-        .defaultVersionable(itemClass, versionClass, "", ideaCollection.content_type, context, {
-            space: "content",
-            movingColumns: "is-show-show-hide"
-        })
-        .specificVersionable(itemClass, versionClass, "", ideaCollection.content_type, context, [
-            () => (item, version) => {
-                return {
-                    proposalUrl: version.path
-                };
             }]);
 
     if (hasCommentColumn) {
