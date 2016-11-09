@@ -50,37 +50,25 @@ export var register = (angular) => {
             AdhMeinberlinAlexanderplatzWorkbench.registerRoutes(
                 RIAlexanderplatzProcess.content_type, "mein.berlin.de")(adhResourceAreaProvider);
 
-            var registerRoutes1 = AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
-                RIBuergerhaushaltProcess, RIBuergerhaushaltProposal, RIBuergerhaushaltProposalVersion);
-            registerRoutes1("mein.berlin.de")(adhResourceAreaProvider);
-            var registerRoutes2 = AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
-                RIIdeaCollectionProcess, RIGeoProposal, RIGeoProposalVersion);
-            registerRoutes2("mein.berlin.de")(adhResourceAreaProvider);
-            var registerRoutes3 = AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
-                RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion);
-            registerRoutes3("mein.berlin.de")(adhResourceAreaProvider);
-            var registerRoutes4 = AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
-                RIStadtforumProcess, RIPoll, RIProposalVersion);
-            registerRoutes4("mein.berlin.de")(adhResourceAreaProvider);
-            var registerRoutes5 = AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
-                RICollaborativeTextProcess, RIDocument, RIDocumentVersion);
-            registerRoutes5("mein.berlin.de")(adhResourceAreaProvider);
+            var registerCommonAndProposalRoutes = (processType, itemType, versionType, hasCommentColumn) => {
+                AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
+                    processType, itemType, versionType)("mein.berlin.de")(adhResourceAreaProvider);
+                AdhIdeaCollectionWorkbench.registerProposalRoutesFactory(
+                    processType, itemType, versionType, hasCommentColumn)("mein.berlin.de")(adhResourceAreaProvider);
+            };
 
-            var registerRoutes6 = AdhIdeaCollectionWorkbench.registerProposalRoutesFactory(
-                RIBuergerhaushaltProcess, RIBuergerhaushaltProposal, RIBuergerhaushaltProposalVersion, true);
-            registerRoutes6("mein.berlin.de")(adhResourceAreaProvider);
-            var registerRoutes7 = AdhIdeaCollectionWorkbench.registerProposalRoutesFactory(
-                RIIdeaCollectionProcess, RIGeoProposal, RIGeoProposalVersion, true);
-            registerRoutes7("mein.berlin.de")(adhResourceAreaProvider);
-            var registerRoutes8 = AdhIdeaCollectionWorkbench.registerProposalRoutesFactory(
-                RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion, true);
-            registerRoutes8("mein.berlin.de")(adhResourceAreaProvider);
-            var registerRoutes9 = AdhIdeaCollectionWorkbench.registerProposalRoutesFactory(
-                RIStadtforumProcess, RIPoll, RIProposalVersion, false);
-            registerRoutes9("mein.berlin.de")(adhResourceAreaProvider);
-            var registerRoutes10 = AdhIdeaCollectionWorkbench.registerDocumentRoutesFactory(
-                RICollaborativeTextProcess, RIDocument, RIDocumentVersion);
-            registerRoutes10("mein.berlin.de")(adhResourceAreaProvider);
+            var registerCommonAndDocumentRoutes = (processType, itemType, versionType) => {
+                AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
+                    processType, itemType, versionType)("mein.berlin.de")(adhResourceAreaProvider);
+                AdhIdeaCollectionWorkbench.registerDocumentRoutesFactory(
+                    processType, itemType, versionType)("mein.berlin.de")(adhResourceAreaProvider);
+            };
+
+            registerCommonAndProposalRoutes(RIBuergerhaushaltProcess, RIBuergerhaushaltProposal, RIBuergerhaushaltProposalVersion, true);
+            registerCommonAndProposalRoutes(RIIdeaCollectionProcess, RIGeoProposal, RIGeoProposalVersion, true);
+            registerCommonAndProposalRoutes(RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion, true);
+            registerCommonAndProposalRoutes(RIStadtforumProcess, RIPoll, RIProposalVersion, false);
+            registerCommonAndDocumentRoutes(RICollaborativeTextProcess, RIDocument, RIDocumentVersion);
         }])
         .directive("adhMeinberlinDeHeader", ["adhConfig", "adhTopLevelState", AdhMeinberlinDe.headerDirective]);
 };

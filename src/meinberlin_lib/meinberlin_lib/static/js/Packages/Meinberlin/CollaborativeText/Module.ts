@@ -36,13 +36,10 @@ export var register = (angular) => {
             AdhTopLevelStateModule.moduleName
         ])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider: AdhResourceArea.Provider, adhConfig) => {
-            var registerRoutes = (context? : string) => (provider) => {
-                AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
-                    RICollaborativeTextProcess, RIDocument, RIDocumentVersion)(context)(provider);
-                AdhIdeaCollectionWorkbench.registerDocumentRoutesFactory(
-                    RICollaborativeTextProcess, RIDocument, RIDocumentVersion)(context)(provider);
-            };
-            registerRoutes()(adhResourceAreaProvider);
+            AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
+                RICollaborativeTextProcess, RIDocument, RIDocumentVersion)()(adhResourceAreaProvider);
+            AdhIdeaCollectionWorkbench.registerDocumentRoutesFactory(
+                RICollaborativeTextProcess, RIDocument, RIDocumentVersion)()(adhResourceAreaProvider);
 
             var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/AddDocumentSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
