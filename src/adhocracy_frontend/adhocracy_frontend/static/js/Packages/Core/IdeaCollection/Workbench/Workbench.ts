@@ -250,7 +250,8 @@ export var registerCommonRoutesFactory = (
 export var registerDocumentRoutesFactory = (
     ideaCollection,
     itemClass,
-    versionClass
+    versionClass,
+    hasCommentColumn : boolean = true
 ) => (
     context : string = ""
 ) => (
@@ -288,48 +289,52 @@ export var registerDocumentRoutesFactory = (
                         };
                     }
                 });
-            }])
-        .defaultVersionable(RIParagraph, RIParagraphVersion, "comments", ideaCollection.content_type, context, {
-            space: "content",
-            movingColumns: "is-collapse-show-show"
-        })
-        .specificVersionable(RIParagraph, RIParagraphVersion, "comments", ideaCollection.content_type, context, [
-            () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
-                var documentUrl = _.last(_.sortBy(SIParagraph.get(version).documents));
-                return {
-                    commentableUrl: version.path,
-                    commentCloseUrl: documentUrl,
-                    documentUrl: documentUrl
-                };
-            }])
-        .defaultVersionable(RIComment, RICommentVersion, "", ideaCollection.content_type, context, {
-            space: "content",
-            movingColumns: "is-collapse-show-show"
-        })
-        .specificVersionable(RIComment, RICommentVersion, "", ideaCollection.content_type, context, ["adhHttp", "$q", (
-            adhHttp : AdhHttp.Service,
-            $q : angular.IQService
-        ) => {
-            var getCommentableUrl = (resource) : angular.IPromise<any> => {
-                if (resource.content_type !== RICommentVersion.content_type) {
-                    return $q.when(resource);
-                } else {
-                    var url = SIComment.get(resource).refers_to;
-                    return adhHttp.get(url).then(getCommentableUrl);
-                }
-            };
+            }]);
 
-            return (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
-                return getCommentableUrl(version).then((commentable) => {
-                    var documentUrl = _.last(_.sortBy(SIParagraph.get(commentable).documents));
+    if (hasCommentColumn) {
+        adhResourceAreaProvider
+            .defaultVersionable(RIParagraph, RIParagraphVersion, "comments", ideaCollection.content_type, context, {
+                space: "content",
+                movingColumns: "is-collapse-show-show"
+            })
+            .specificVersionable(RIParagraph, RIParagraphVersion, "comments", ideaCollection.content_type, context, [
+                () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
+                    var documentUrl = _.last(_.sortBy(SIParagraph.get(version).documents));
                     return {
-                        commentableUrl: commentable.path,
+                        commentableUrl: version.path,
                         commentCloseUrl: documentUrl,
                         documentUrl: documentUrl
                     };
-                });
-            };
-        }]);
+                }])
+            .defaultVersionable(RIComment, RICommentVersion, "", ideaCollection.content_type, context, {
+                space: "content",
+                movingColumns: "is-collapse-show-show"
+            })
+            .specificVersionable(RIComment, RICommentVersion, "", ideaCollection.content_type, context, ["adhHttp", "$q", (
+                adhHttp : AdhHttp.Service,
+                $q : angular.IQService
+            ) => {
+                var getCommentableUrl = (resource) : angular.IPromise<any> => {
+                    if (resource.content_type !== RICommentVersion.content_type) {
+                        return $q.when(resource);
+                    } else {
+                        var url = SIComment.get(resource).refers_to;
+                        return adhHttp.get(url).then(getCommentableUrl);
+                    }
+                };
+
+                return (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
+                    return getCommentableUrl(version).then((commentable) => {
+                        var documentUrl = _.last(_.sortBy(SIParagraph.get(commentable).documents));
+                        return {
+                            commentableUrl: commentable.path,
+                            commentCloseUrl: documentUrl,
+                            documentUrl: documentUrl
+                        };
+                    });
+                };
+            }]);
+    }
 };
 
 export var registerProposalRoutesFactory = (
