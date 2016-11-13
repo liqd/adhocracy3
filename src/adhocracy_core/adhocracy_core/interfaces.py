@@ -743,7 +743,7 @@ class Activity(namedtuple('Activity', ['subject',
         simple, humane readable description of the activity.
     sheet_data (list):
         List of sheet appstruct data when changing or deleting resources,
-        not part of the actvity stream ontology
+        not part of the activity stream ontology
     published (datetime.DateTime):
         the date/time the activity was published, required
     """
@@ -779,6 +779,8 @@ class ActivityType(Enum):
     add = 'Add'
     update = 'Update'
     remove = 'Remove'
+    transition = 'Transition'
+    """Transition to new workflow state."""
 
 
 class SerializedActivity(namedtuple('SerializedActivity', ['subject_path',

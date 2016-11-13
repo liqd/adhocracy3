@@ -26,6 +26,7 @@ from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.interfaces import ActivityType
 from adhocracy_core.interfaces import Activity
 from adhocracy_core.resources.comment import IComment
+from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import get_iresource
 
 logger = getLogger(__name__)
@@ -106,9 +107,20 @@ def _get_entry_name(change: ChangelogMetadata) -> str:
     elif change.visibility == VisibilityChange.concealed:
         return ActivityType.remove
     elif change.modified:
-        return ActivityType.update
+        if _is_workflow_state_change(change):
+            return ActivityType.transition
+        else:
+            return ActivityType.update
     else:  # pragma: no cover
         raise ValueError('Invalid change state', change)
+
+
+def _is_workflow_state_change(change: ChangelogMetadata) -> bool:
+    appstructs = change.modified_appstructs or dict()
+    assignment_change = [x for x in appstructs.keys()] == [IWorkflowAssignment]
+    state_change = appstructs.get(IWorkflowAssignment,
+                                  {}).get('workflow_state')
+    return assignment_change and state_change
 
 
 def _get_content_sheets(change: ChangelogMetadata, request: Request) -> []:
@@ -194,6 +206,11 @@ def generate_activity_name(activity: Activity,
                  mapping=mapping,
                  default=u'${subject_name} removed a ${object_type_name} from '
                          '${target_title}.')
+    elif activity.type == ActivityType.transition:
+        name = _('activity_name_transition',
+                 mapping=mapping,
+                 default=u'${subject_name} changed workflow state of '
+                         '${object_type_name}.')
     else:
         name = _('activity_missing', mapping=mapping)
     return name
@@ -235,6 +252,11 @@ def generate_activity_description(activity: Activity,
                  default=u'${subject_name} removed the ${object_type_name} '
                          '"${object_title}" from ${target_type_name} '
                          '"${target_title}".')
+    elif activity.type == ActivityType.transition:
+        name = _('activity_description_transition',
+                 mapping=mapping,
+                 default=u'${subject_name} changed workfow state of '
+                         '"${object_title}".')
     else:
         name = _('activity_missing', mapping=mapping)
     return name
