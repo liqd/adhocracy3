@@ -189,12 +189,16 @@ class TestUpdateActicityCallback:
 
     def test_add_sheet_data_if_modified(self, request_, add_to, changelog,
                                         context, mock_sheet, registry):
-        registry.content.get_sheets_edit.return_value = [mock_sheet]
-        changelog['/'] = changelog['']._replace(modified=True, resource=context)
+        registry.content.get_sheet.return_value = mock_sheet
+        appstructs = {mock_sheet.isheet: {}}
+        changelog['/'] = changelog['']._replace(modified=True,
+                                                modified_appstructs=appstructs,
+                                                resource=context)
         self.call_fut(request_, None)
         added_activity = add_to.call_args[0][0][0]
-        registry.content.get_sheets_edit.assert_called_with(context,
-                                                            request=request_)
+        registry.content.get_sheet.assert_called_with(context,
+                                                      mock_sheet.isheet,
+                                                      request=request_)
         assert added_activity.sheet_data == [{mock_sheet.meta.isheet:
                                               mock_sheet.serialize()}]
 

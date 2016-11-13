@@ -116,17 +116,20 @@ def _get_content_sheets(change: ChangelogMetadata, request: Request) -> []:
         resource = change.last_version
     else:
         resource = change.resource
+    content = request.registry.content
     if change.created:
-        sheets = request.registry.content.get_sheets_create(resource,
-                                                            request=request)
+        sheets = content.get_sheets_create(resource, request=request)
+    elif change.modified:
+        appstructs = change.modified_appstructs or dict()
+        sheets = [content.get_sheet(resource, s, request=request)
+                  for s in appstructs]
     else:
-        sheets = request.registry.content.get_sheets_edit(resource,
-                                                          request=request)
+        sheets = content.get_sheets_edit(resource, request=request)
     disabled = [IMetadata]
     return [s for s in sheets if s.meta.isheet not in disabled]
 
 
-def _get_sheet_data(sheets: [ISheet]) -> {}:
+def _get_sheet_data(sheets: [ISheet]) -> []:
     sheet_data = []
     for sheet in sheets:
             sheet_data.append({sheet.meta.isheet:
