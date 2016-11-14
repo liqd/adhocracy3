@@ -14,7 +14,7 @@ var parseSearchString = function(s) {
 };
 
 window.opener.postMessage(JSON.stringify({
-    name: "value",
+    name: "serviceKontoToken",
     data: {
         token: parseSearchString(location.search).token
     }

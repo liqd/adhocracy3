@@ -90,7 +90,7 @@ adhocracy.trusted_domains =
 # If you want to enable login via service konto, set this value to the URL
 # of the login form. The redirect url in the servicekonto settings needs to
 # point to ``/service_konto_finish``.
-# adhocracy.service_konto_login_url
+# adhocracy.frontend.service_konto_login_url
 
 adhocracy.custom = mercator_platform_path financial_plan_url_de financial_plan_url_en show_add_button allow_rate embed_only hide_header
 adhocracy.custom.mercator_platform_path = /mercator/
