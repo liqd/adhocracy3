@@ -51,13 +51,16 @@
             data-translate-templates="{
                 link: '&lt;a href=&quot;/register&quot;&gt;{{ content }}&lt;/a&gt;'
             }"></div>
-        <div class="login-info">
-            {{ "TR__LOGIN_SUPPORT" | translate}} <br />
-            <a data-ng-href="mailto:{{supportEmail}}?subject=Trouble%20with%20login">{{ supportEmail }}</a>
-        </div>
     </form>
 
-    <button type="button" data-ng-click="logInWithServiceKonto()">Service Konto</button>
+    <div class="login-block">
+        <button type="button" class="button-cta" data-ng-click="logInWithServiceKonto()">{{ "TR__LOGIN_SERVICE_KONTO" | translate }}</button>
+    </div>
+
+    <div class="login-info">
+        {{ "TR__LOGIN_SUPPORT" | translate}} <br />
+        <a data-ng-href="mailto:{{supportEmail}}?subject=Trouble%20with%20login">{{ supportEmail }}</a>
+    </div>
 
     <a data-ng-if="enableCancel" class="login-cancel" href="" ng-click="cancel()">{{ "TR__CANCEL" | translate}}</a>
 </div>
