@@ -3,11 +3,12 @@ from pyramid.interfaces import IRequest
 from pyramid.events import NewResponse
 from adhocracy_core.authentication import AnonymizeHeader
 from adhocracy_core.authentication import UserPasswordHeader
+from adhocracy_core.interfaces import API_ROUTE_NAME
 
 
 def set_response_headers(event: NewResponse):
-    """Add CORS headers to response for api requests."""
-    if _is_api_request(event.request):
+    """Add CORS headers to response for api requests and /."""
+    if _is_api_request(event.request) or _is_root_request(event.request):
         add_cors_headers(event)
     else:
         _set_frame_options_header(event)
@@ -32,9 +33,12 @@ def _set_frame_options_header(event: NewResponse):
 
 
 def _is_api_request(request: IRequest) -> bool:
-    # assuming api requests have no route
-    route_name = getattr(request.matched_route, 'name', None)
-    return route_name is None
+    route_name = getattr(request.matched_route, 'name', '')
+    return route_name == API_ROUTE_NAME
+
+
+def _is_root_request(request: IRequest) -> bool:
+    return request.path == '/'
 
 
 def includeme(config):
