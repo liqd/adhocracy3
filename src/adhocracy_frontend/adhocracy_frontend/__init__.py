@@ -66,6 +66,8 @@ def config_view(request):
         'adhocracy.frontend.profile_images_enabled', 'true'))
     config['service_konto_login_url'] = settings.get(
         'adhocracy.frontend.service_konto_login_url')
+    config['service_konto_help_url'] = settings.get(
+        'adhocracy.frontend.service_konto_help_url')
     config['map_tile_url'] = settings.get(
         'adhocracy.frontend.map_tile_url',
         'http://{s}.tile.osm.org/{z}/{x}/{y}.png')

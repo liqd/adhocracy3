@@ -55,6 +55,11 @@
 
     <div class="login-block" data-ng-if="serviceKontoEnabled">
         <button type="button" class="button-cta" data-ng-click="logInWithServiceKonto()">{{ "TR__LOGIN_SERVICE_KONTO" | translate }}</button>
+        <a
+            data-ng-if="serviceKontoHelpUrl"
+            href="{{serviceKontoHelpUrl}}"
+            title="{{ 'TR__HELP' | translate }}"
+            class="button-cta m-round">?</a>
     </div>
 
     <div class="login-info">

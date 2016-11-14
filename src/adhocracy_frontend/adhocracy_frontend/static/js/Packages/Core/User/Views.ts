@@ -104,6 +104,7 @@ export interface IScopeLogin extends angular.IScope {
     logInWithServiceKonto : () => void;
     showError;
     serviceKontoEnabled : boolean;
+    serviceKontoHelpUrl : string;
 }
 
 
@@ -225,6 +226,7 @@ export var loginDirective = (
             scope.errors = [];
             scope.supportEmail = adhConfig.support_email;
             scope.serviceKontoEnabled = !!adhConfig.service_konto_login_url;
+            scope.serviceKontoHelpUrl = adhConfig.service_konto_help_url;
             scope.showError = adhShowError;
 
             adhPermissions.bindScope(scope, "/principals/users");
