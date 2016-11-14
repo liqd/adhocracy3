@@ -31,11 +31,20 @@ def add_changelog_created(event):
         _add_changelog(event.registry, parent, key='autoupdated', value=True)
 
 
-def add_changelog_modified_and_descendants(event):
-    """Add modified message to the transaction_changelog."""
-    registry = getattr(event, 'registry', None)
-    if registry is None:   # TODO ACLModified events have no registry
-        registry = get_current_registry(event.object)
+def add_changelog_modified_sheet(event):
+    """Add modified message for IResourceSheetModified events to changelog."""
+    _add_changelog(event.registry, event.object, key='modified', value=True)
+    appstructs = {event.isheet: event.new_appstruct}
+    _add_changelog(event.registry, event.object,
+                   key='modified_appstructs',
+                   value=appstructs)
+    _add_changed_descendants_to_all_parents(event.registry, event.object)
+
+
+def add_changelog_modified_acl(event):
+    """Add modified message for ACLModified events to changelog."""
+    # TODO ACLModified events have no registry
+    registry = get_current_registry(event.object)
     _add_changelog(registry, event.object, key='modified', value=True)
     _add_changed_descendants_to_all_parents(registry, event.object)
 
@@ -98,7 +107,11 @@ def _add_changelog(registry: Registry, resource: IResource, key: str,
     path = resource_path(resource)
     metadata = changelog[path]
     old_value = getattr(metadata, key)
-    if old_value is not value:
+    if key == 'modified_appstructs':
+        updated_old_value = old_value or dict()
+        updated_old_value.update(value)
+        value = updated_old_value
+    if old_value != value:
         changelog[path] = metadata._replace(**{'resource': resource,
                                                key: value})
         return True
@@ -139,11 +152,11 @@ def includeme(config):
                           IResourceCreatedAndAdded)
     config.add_subscriber(add_changelog_autoupdated,
                           IResourceCreatedAndAdded)
-    config.add_subscriber(add_changelog_modified_and_descendants,
+    config.add_subscriber(add_changelog_modified_sheet,
                           IResourceSheetModified)
     config.add_subscriber(add_changelog_autoupdated,
                           IResourceSheetModified)
-    config.add_subscriber(add_changelog_modified_and_descendants,
+    config.add_subscriber(add_changelog_modified_acl,
                           ACLModified)
     config.add_subscriber(add_changelog_backrefs,
                           ISheetBackReferenceModified)

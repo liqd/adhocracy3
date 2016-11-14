@@ -129,6 +129,34 @@ class TestSendActivityNotificationEmails:
         self.call_fut(event)
         assert not mock_messenger.send_activity_mail.called
 
+    def test_ignore_if_transition(self, event, activity, mock_catalogs,
+                                  mock_messenger, search_result, followable):
+        from adhocracy_core.interfaces import ActivityType
+        activity = activity._replace(object=followable,
+                                     type=ActivityType.transition)
+        event.activities = [activity]
+        user = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
+        self.call_fut(event)
+        assert not mock_messenger.send_activity_mail.called
+
+    def test_ignore_if_workflow_assignment_update(
+            self, event, activity, mock_catalogs, mock_messenger,
+            search_result, followable):
+        from adhocracy_core.interfaces import ActivityType
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        sheet_data = [{IWorkflowAssignment: {}}]
+        activity = activity._replace(object=followable,
+                                     type=ActivityType.update,
+                                     sheet_data=sheet_data)
+        event.activities = [activity]
+        user = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
+        self.call_fut(event)
+        assert not mock_messenger.send_activity_mail.called
+
 
 @fixture
 def integration(config) -> Configurator:

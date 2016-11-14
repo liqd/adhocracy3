@@ -114,6 +114,19 @@ class TestUpdateActicityCallback:
         assert added_activity.type == ActivityType.update
         assert added_activity.object == context
 
+    def test_add_transition_activity_if_state_modified_and_state_changed(
+            self, request_, add_to, changelog, context, mock_sheet):
+        from adhocracy_core.interfaces import ActivityType
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        appstructs = {IWorkflowAssignment: {'workflow_state': 'draft'}}
+        changelog['/'] = changelog['']._replace(modified=True,
+                                                modified_appstructs=appstructs,
+                                                resource=context)
+        request_.registry.content.get_sheet.return_value = mock_sheet
+        self.call_fut(request_, None)
+        added_activity = add_to.call_args[0][0][0]
+        assert added_activity.type == ActivityType.transition
+
     def test_add_update_item_activity_if_version_created(
         self, request_, registry, add_to, changelog, item, version):
         from adhocracy_core.interfaces import ActivityType
@@ -189,12 +202,16 @@ class TestUpdateActicityCallback:
 
     def test_add_sheet_data_if_modified(self, request_, add_to, changelog,
                                         context, mock_sheet, registry):
-        registry.content.get_sheets_edit.return_value = [mock_sheet]
-        changelog['/'] = changelog['']._replace(modified=True, resource=context)
+        registry.content.get_sheet.return_value = mock_sheet
+        appstructs = {mock_sheet.isheet: {}}
+        changelog['/'] = changelog['']._replace(modified=True,
+                                                modified_appstructs=appstructs,
+                                                resource=context)
         self.call_fut(request_, None)
         added_activity = add_to.call_args[0][0][0]
-        registry.content.get_sheets_edit.assert_called_with(context,
-                                                            request=request_)
+        registry.content.get_sheet.assert_called_with(context,
+                                                      mock_sheet.isheet,
+                                                      request=request_)
         assert added_activity.sheet_data == [{mock_sheet.meta.isheet:
                                               mock_sheet.serialize()}]
 
@@ -295,6 +312,14 @@ class TestGenerateActivityName:
         assert name.default.format_map(name.mapping)
         assert name == 'activity_name_update'
 
+    def test_create_add_translation_if_transition_activity(self, activity,
+                                                           request_):
+        from adhocracy_core.interfaces import ActivityType
+        activity = activity._replace(type=ActivityType.transition)
+        name = self.call_fut(activity, request_)
+        assert name.default.format_map(name.mapping)
+        assert name == 'activity_name_transition'
+
 
 @mark.usefixtures('get_subject_name', 'get_resource_type', 'get_title')
 class TestGenerateActivityDescription:
@@ -344,6 +369,14 @@ class TestGenerateActivityDescription:
         name = self.call_fut(activity, request_)
         assert name.default.format_map(name.mapping)
         assert name == 'activity_description_update'
+
+    def test_create_add_translation_if_transition_activity(self, activity,
+                                                           request_):
+        from adhocracy_core.interfaces import ActivityType
+        activity = activity._replace(type=ActivityType.transition)
+        name = self.call_fut(activity, request_)
+        assert name.default.format_map(name.mapping)
+        assert name == 'activity_description_transition'
 
 
 def test_get_subject_name_return_user_name(context, registry):
