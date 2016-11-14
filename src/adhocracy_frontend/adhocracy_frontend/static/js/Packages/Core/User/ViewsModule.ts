@@ -117,7 +117,6 @@ export var register = (angular) => {
             AdhUserViews.userEditDirective])
         .directive("adhLogin", [
             "adhConfig",
-            "adhCrossWindowMessaging",
             "adhUser",
             "adhTopLevelState",
             "adhEmbed",

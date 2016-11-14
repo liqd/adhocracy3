@@ -34,7 +34,7 @@ export var register = () => {
                 adhTopLevelStateMock = jasmine.createSpyObj("adhTopLevelStateMock", ["goToCameFrom"]);
                 adhEmbedMock = jasmine.createSpyObj("adhEmbedMock", ["getContext"]);
                 directive = AdhUserViews.loginDirective(
-                    adhConfigMock, null, adhUserMock, adhTopLevelStateMock, adhEmbedMock, adhPermissionsMock, "adhShowError", null);
+                    adhConfigMock, adhUserMock, adhTopLevelStateMock, adhEmbedMock, adhPermissionsMock, "adhShowError", null);
             });
 
             describe("link", () => {

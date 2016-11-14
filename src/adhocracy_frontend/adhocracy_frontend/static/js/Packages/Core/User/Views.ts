@@ -5,7 +5,6 @@ import * as _ from "lodash";
 
 import * as AdhBadge from "../Badge/Badge";
 import * as AdhConfig from "../Config/Config";
-import * as AdhCrossWindowMessaging from "../CrossWindowMessaging/CrossWindowMessaging";
 import * as AdhHttp from "../Http/Http";
 import * as AdhPermissions from "../Permissions/Permissions";
 import * as AdhResourceActions from "../ResourceActions/ResourceActions";
@@ -210,7 +209,6 @@ export var activateArea = (
 
 export var loginDirective = (
     adhConfig : AdhConfig.IService,
-    adhCrossWindowMessaging : AdhCrossWindowMessaging.IService,
     adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhEmbed : AdhEmbed.Service,
@@ -254,15 +252,20 @@ export var loginDirective = (
             scope.logInWithServiceKonto = () => {
                 var popup;
 
-                var cancel = adhCrossWindowMessaging.on("serviceKontoToken", (data) => {
-                    adhUser.logInWithServiceKonto(data.token).then(() => {
-                        adhTopLevelState.goToCameFrom("/", true);
-                    }, handleErrors);
+                var handler = (event) => {
+                    var message = JSON.parse(event.data);
 
-                    popup.close();
-                    cancel();
-                });
+                    if (message.name === "serviceKontoToken" && event.origin === $window.location.origin) {
+                        adhUser.logInWithServiceKonto(message.data.token).then(() => {
+                            adhTopLevelState.goToCameFrom("/", true);
+                        }, handleErrors);
 
+                        popup.close();
+                        $window.removeEventListener("message", handler);
+                    }
+                };
+
+                $window.addEventListener("message", handler);
                 popup = $window.open(adhConfig.service_konto_login_url, "_blank", "width=460,height=225");
             };
 
