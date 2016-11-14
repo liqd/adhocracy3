@@ -1,5 +1,5 @@
 {
-    "TR__ACTIVATION_CLOSE_THIS_TAB_AND_PROCEED": "Schön, dass Sie sich beteiligen willst. Sie können diese Seite schließen und zurück gehen zu {{siteName}}.",
+    "TR__ACTIVATION_CLOSE_THIS_TAB_AND_PROCEED": "Schön, dass Sie sich beteiligen wollen. Sie können diese Seite schließen und zurück gehen zu {{siteName}}.",
     "TR__ACTIVATION_ERROR_1": "Wenn Sie doch einen neuen Link benötigen, kontaktieren Sie bitte unser Support-Team und geben Sie dabei die E-Mail-Adresse an, mit der Sie sich registriert haben:",
     "TR__ACTIVATION_ERROR_2": "Bitte entschuldigen Sie die Schwierigkeiten und aktivieren Sie Ihren Account innerhalb der nächsten 6 Tage.",
     "TR__ACTIVATION_ERROR_3": "Danke!",
@@ -108,6 +108,7 @@
     "TR__LIST": "Liste",
     "TR__LOAD_MORE": "mehr laden",
     "TR__LOGIN": "anmelden",
+    "TR__LOGIN_SERVICE_KONTO": "Login via Service-Konto Berlin",
     "TR__LOGIN_SUPPORT": "Sie haben Probleme mit der Anmeldung?",
     "TR__LOGOUT": "abmelden",
     "TR__MANAGE_BADGE_ASSIGNMENTS": "Etiketten",
