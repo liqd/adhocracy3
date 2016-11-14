@@ -53,7 +53,7 @@
             }"></div>
     </form>
 
-    <div class="login-block">
+    <div class="login-block" data-ng-if="serviceKontoEnabled">
         <button type="button" class="button-cta" data-ng-click="logInWithServiceKonto()">{{ "TR__LOGIN_SERVICE_KONTO" | translate }}</button>
     </div>
 
