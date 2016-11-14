@@ -1,12 +1,14 @@
 /// <reference path="../../../../lib2/types/angular.d.ts"/>
 
-import * as AdhConfig from "../../Config/Config";
-import * as AdhHttp from "../../Http/Http";
-import * as AdhPermissions from "../../Permissions/Permissions";
-import * as AdhProcess from "../../Process/Process";
-import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
-import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
-import * as AdhUtil from "../../Util/Util";
+import * as AdhConfig from "../../Core/Config/Config";
+import * as AdhHttp from "../../Core/Http/Http";
+import * as AdhPermissions from "../../Core/Permissions/Permissions";
+import * as AdhProcess from "../../Core/Process/Process";
+import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
+import * as AdhTopLevelState from "../../Core/TopLevelState/TopLevelState";
+import * as AdhUtil from "../../Core/Util/Util";
+
+import * as ResourcesBase from "../../ResourcesBase";
 
 import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
@@ -51,10 +53,10 @@ export var s1CurrentColumnDirective = (
             scope.contentType = RIProposalVersion.content_type;
 
             scope.$watch("processUrl", (processUrl : string) => {
-                adhHttp.get(processUrl).then((process : RIS1Process) => {
-                    var workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
+                adhHttp.get(processUrl).then((process : ResourcesBase.IResource) => {
+                    var workflowState = SIWorkflowAssignment.get(process).workflow_state;
                     var decisionDate = AdhUtil.deepPluck(
-                        AdhProcess.getStateData(process.data[SIWorkflowAssignment.nick], "result"), ["start_date"]);
+                        AdhProcess.getStateData(SIWorkflowAssignment.get(process), "result"), ["start_date"]);
 
                     if (workflowState === "propose") {
                         scope.proposalState = "proposed";
@@ -106,8 +108,8 @@ export var s1NextColumnDirective = (
             scope.contentType = RIProposalVersion.content_type;
 
             scope.$watch("processUrl", (processUrl : string) => {
-                adhHttp.get(processUrl).then((process : RIS1Process) => {
-                    scope.processState = process.data[SIWorkflowAssignment.nick].workflow_state;
+                adhHttp.get(processUrl).then((process : ResourcesBase.IResource) => {
+                    scope.processState = SIWorkflowAssignment.get(process).workflow_state;
 
                     if (scope.processState === "propose") {
                         scope.proposalState = "none";
@@ -156,13 +158,13 @@ export var s1ArchiveColumnDirective = (
             scope.contentType = RIProposalVersion.content_type;
 
             scope.$watch("processUrl", (processUrl : string) => {
-                adhHttp.get(processUrl).then((process : RIS1Process) => {
+                adhHttp.get(processUrl).then((process : ResourcesBase.IResource) => {
                     scope.proposalState = "[\"any\", [\"selected\", \"rejected\"]]";
 
-                    var workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
+                    var workflowState = SIWorkflowAssignment.get(process).workflow_state;
                     if (workflowState === "result") {
                         var decisionDate = AdhUtil.deepPluck(
-                            AdhProcess.getStateData(process.data[SIWorkflowAssignment.nick], "result"), ["start_date"]);
+                            AdhProcess.getStateData(SIWorkflowAssignment.get(process), "result"), ["start_date"]);
                         scope.decisionDate = "[\"lt\",  \"" + decisionDate + "\"]";
                     }
                 });
@@ -248,7 +250,6 @@ export var s1ProposalEditColumnDirective = (
 };
 
 export var s1LandingDirective = (
-    $translate: any,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service,
     adhTopLevelState : AdhTopLevelState.Service
@@ -260,26 +261,11 @@ export var s1LandingDirective = (
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.on("processUrl", (processUrl) => {
                 adhHttp.get(processUrl).then((process) => {
-                    scope.processTitle = process.data[SITitle.nick].title;
-                    scope.processShortDescription = process.data[SIDescription.nick].short_description;
-                    scope.processDescription = process.data[SIDescription.nick].description;
+                    scope.processTitle = SITitle.get(process).title;
+                    scope.processShortDescription = SIDescription.get(process).short_description;
+                    scope.processDescription = SIDescription.get(process).description;
                 });
             }));
-            $translate("TR__S1_ABOUT_TEXT").then((translated) => {
-                scope.aboutText = translated;
-            });
-            $translate("TR__S1_INTRODUCTION_TEXT").then((translated) => {
-                scope.introText = translated;
-            });
-            $translate("TR__S1_PHASE_A_TEXT").then((translated) => {
-                scope.phaseAText = translated;
-            });
-            $translate("TR__S1_PHASE_B_TEXT").then((translated) => {
-                scope.phaseBText = translated;
-            });
-            $translate("TR__S1_PHASE_C_TEXT").then((translated) => {
-                scope.phaseCText = translated;
-            });
         }
     };
 };
@@ -292,9 +278,9 @@ export var s1LandingDirective = (
  * select  | next     | current  | archive  | archive
  * result  | next     | -        | cur/arc  | cur/arc
  */
-var getMeeting = (proposal : RIProposal, process : RIS1Process) => {
-    var processState = process.data[SIWorkflowAssignment.nick].workflow_state;
-    var proposalState = proposal.data[SIWorkflowAssignment.nick].workflow_state;
+var getMeeting = (proposal : ResourcesBase.IResource, process : ResourcesBase.IResource) => {
+    var processState = SIWorkflowAssignment.get(process).workflow_state;
+    var proposalState = SIWorkflowAssignment.get(proposal).workflow_state;
 
     if (proposalState === "proposed") {
         return processState === "propose" ? "current" : "next";
@@ -304,9 +290,9 @@ var getMeeting = (proposal : RIProposal, process : RIS1Process) => {
         return "archive";
     } else {
         var processDecisionDate = AdhUtil.deepPluck(
-            AdhProcess.getStateData(process.data[SIWorkflowAssignment.nick], "result"), ["start_date"]);
+            AdhProcess.getStateData(SIWorkflowAssignment.get(process), "result"), ["start_date"]);
         var proposalDecisionDate = AdhUtil.deepPluck(
-            AdhProcess.getStateData(proposal.data[SIWorkflowAssignment.nick], proposalState), ["start_date"]);
+            AdhProcess.getStateData(SIWorkflowAssignment.get(proposal), proposalState), ["start_date"]);
 
         return (processDecisionDate === proposalDecisionDate) ? "current" : "archive";
     }
@@ -333,10 +319,10 @@ export var registerRoutes = (
         })
         .specific(RIS1Process, "create-proposal", processType, context,
             ["adhHttp", (adhHttp : AdhHttp.Service) => {
-                return (resource : RIS1Process) => {
+                return (resource : ResourcesBase.IResource) => {
                     return adhHttp.options(resource.path).then((options) => {
                         if (options.POST) {
-                            var processState = resource.data[SIWorkflowAssignment.nick].workflow_state;
+                            var processState = SIWorkflowAssignment.get(resource).workflow_state;
                             return {
                                 targetMeeting: processState === "propose" ? "current" : "next"
                             };
@@ -362,7 +348,12 @@ export var registerRoutes = (
             movingColumns: "is-show-show-hide"
         })
         .specificVersionable(RIProposal, RIProposalVersion, "", processType, context, () => {
-            return (item : RIProposal, version : RIProposalVersion, isVersion : boolean, process : RIS1Process) => {
+            return (
+                item : ResourcesBase.IResource,
+                version : ResourcesBase.IResource,
+                isVersion : boolean,
+                process : ResourcesBase.IResource
+            ) => {
                 return {
                     proposalUrl: version.path,
                     meeting: getMeeting(item, process)
@@ -375,7 +366,12 @@ export var registerRoutes = (
         })
         .specificVersionable(RIProposal, RIProposalVersion, "edit", processType, context,
             ["adhHttp", (adhHttp : AdhHttp.Service) => {
-                return (item : RIProposal, version : RIProposalVersion, isVersion : boolean, process : RIS1Process) => {
+                return (
+                    item : ResourcesBase.IResource,
+                    version : ResourcesBase.IResource,
+                    isVersion : boolean,
+                    process : ResourcesBase.IResource
+                ) => {
                     return adhHttp.options(item.path).then((options) => {
                         if (options.POST) {
                             return {
@@ -393,7 +389,12 @@ export var registerRoutes = (
             movingColumns: "is-collapse-show-show"
         })
         .specificVersionable(RIProposal, RIProposalVersion, "comments", processType, context, () => {
-            return (item : RIProposal, version : RIProposalVersion, isVersion : boolean, process : RIS1Process) => {
+            return (
+                item : ResourcesBase.IResource,
+                version : ResourcesBase.IResource,
+                isVersion : boolean,
+                process : ResourcesBase.IResource
+            ) => {
                 return {
                     proposalUrl: version.path,
                     commentableUrl: version.path,
@@ -414,12 +415,12 @@ export var registerRoutes = (
                 if (resource.content_type !== RICommentVersion.content_type) {
                     return $q.when(resource);
                 } else {
-                    var url = resource.data[SIComment.nick].refers_to;
+                    var url = SIComment.get(resource).refers_to;
                     return adhHttp.get(url).then(getCommentableUrl);
                 }
             };
 
-            return (item : RIComment, version : RICommentVersion) => {
+            return (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return getCommentableUrl(version).then((commentable) => {
                     return {
                         commentableUrl: commentable.path,

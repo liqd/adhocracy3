@@ -16,7 +16,6 @@ from zope.interface.interfaces import IInterface
 
 from adhocracy_core.resources.principal import allow_create_asset_authenticated
 from adhocracy_core.catalog import ICatalogsService
-from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ISimple
@@ -50,9 +49,7 @@ from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.relation import ICanPolarize
 from adhocracy_core.sheets.relation import IPolarizable
 from adhocracy_core.sheets.title import ITitle
-from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
-from adhocracy_core.utils import has_annotation_sheet_data
 from adhocracy_core.workflows import update_workflow_state_acls
 
 logger = logging.getLogger(__name__)
@@ -451,42 +448,8 @@ def add_image_reference_to_users(root, registry):  # pragma: no cover
     migrate_new_sheet(root, IUser, IImageReference)
 
 
-@log_migration
 def remove_empty_first_versions(root, registry):  # pragma: no cover
-    """Remove empty first versions."""
-    catalogs = find_service(root, 'catalogs')
-    items = _search_for_interfaces(catalogs, IItem)
-    count = len(items)
-    for index, item in enumerate(items):
-        logger.info('Migrating resource {0} of {1}'.format(index + 1, count))
-        if 'VERSION_0000000' not in item:
-            continue
-        first_version = item['VERSION_0000000']
-        has_sheet_data = has_annotation_sheet_data(first_version)\
-            or hasattr(first_version, 'rate')
-        has_follower = _has_follower(first_version, registry)
-        if not has_sheet_data and has_follower:
-            logger.info('Delete empty version {0}.'.format(first_version))
-            del item['VERSION_0000000']
-
-
-def _is_version_without_data(version: IItemVersion)\
-        -> bool:  # pragma: no cover
-    for attribute in version.__dict__:
-        if attribute.startswith('_sheet_'):
-            return False
-        if attribute == 'rate':
-            return False
-    else:
-        return True
-
-
-def _has_follower(version: IItemVersion,
-                  registry: Registry) -> bool:  # pragma: no cover
-    followed_by = registry.content.get_sheet_field(version,
-                                                   IVersionable,
-                                                   'followed_by')
-    return followed_by != []
+    """Outdated."""
 
 
 @log_migration
@@ -951,6 +914,66 @@ def add_allow_add_anonymized_sheet_to_rates(root,
     migrate_new_sheet(root, IRatesService, IAllowAddAnonymized)
 
 
+@log_migration
+def add_local_roles_to_acl(root, registry):  # pragma: no cover
+    """Add ACE based on local roles to acl (process/organisation, proposal)."""
+    from adhocracy_core.authorization import get_acl
+    from adhocracy_core.authorization import _set_acl_with_local_roles
+    catalogs = find_service(root, 'catalogs')
+    resources = _search_for_interfaces(catalogs, IProposal)
+    resources += _search_for_interfaces(catalogs, IProcess)
+    resources += _search_for_interfaces(catalogs, IOrganisation)
+    count = len(resources)
+    for index, resource in enumerate(resources):
+        logger.info('Add local roles to acl for resource {0} - {1} of {2}'
+                    .format(resource, index + 1, count))
+        acl = get_acl(resource)
+        _set_acl_with_local_roles(resource, acl, registry)
+
+
+@log_migration
+def add_pages_service_to_root(root, registry):  # pragma: no cover
+    """Add pages service to root."""
+    from adhocracy_core.resources.page import add_page_service
+    pages = find_service(root, 'pages')
+    if pages is None:
+        logger.info('Add pages service to {0}'.format(root))
+        add_page_service(root, registry, {})
+
+
+@log_migration
+def add_embed_sheet_to_processes(root, registry):  # pragma: no cover
+    """Add embed to processes."""
+    from adhocracy_core.sheets.embed import IEmbed
+    migrate_new_sheet(root, IProcess, IEmbed)
+
+
+@log_migration
+def reindex_users_text(root, registry):  # pragma: no cover
+    """Reindex user system text index."""
+    catalogs = find_service(root, 'catalogs')
+    users = find_service(root, 'principals', 'users')
+    for user in users.values():
+        catalogs.reindex_index(user, 'text')
+
+
+@log_migration
+def add_email_new_sheet_to_user(root, registry):  # pragma: no cover
+    """Add email new sheet to user."""
+    from adhocracy_core.sheets.principal import IEmailNew
+    migrate_new_sheet(root, IUser, IEmailNew)
+
+
+@log_migration
+def add_activity_service_to_root(root, registry):  # pragma: no cover
+    """Add activity service to root."""
+    from adhocracy_core.resources.activity import add_activiy_service
+    activity_stream = find_service(root, 'activity_stream')
+    if activity_stream is None:
+        logger.info('Add activity service to {0}'.format(root))
+        add_activiy_service(root, registry, {})
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -1010,3 +1033,9 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_items)
     config.add_evolution_step(add_anonymize_default_sheet_to_user)
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_rates)
+    config.add_evolution_step(add_local_roles_to_acl)
+    config.add_evolution_step(add_pages_service_to_root)
+    config.add_evolution_step(add_embed_sheet_to_processes)
+    config.add_evolution_step(reindex_users_text)
+    config.add_evolution_step(add_email_new_sheet_to_user)
+    config.add_evolution_step(add_activity_service_to_root)

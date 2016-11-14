@@ -250,6 +250,14 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
         """Delete values for every field name in `fields`."""
 
 
+class ISheetRequirePassword(ISheet):
+    """Sheet Interface indicating that a password is required for editing.
+
+    To edit such a Sheet the password needs to be send in an additional request
+    header.
+    """
+
+
 class ResourceMetadata(namedtuple('ResourceMetadata',
                                   ['content_name',
                                    'iresource',
@@ -263,6 +271,7 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
                                    'autonaming_prefix',
                                    'use_autonaming_random',
                                    'is_sdi_addable',
+                                   'sdi_column_mapper',
                                    'element_types',
                                    'default_workflow',
                                    'alternative_workflows',
@@ -304,6 +313,9 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
     is_sdi_addable:
         Make this resource type automatically addable with the substanced
         admin interface (sdi).
+    sdi_column_mapper:
+        Mapping function to add columns with addition information to an sdi
+        folder view.
 
 
     IPool fields:
@@ -559,10 +571,10 @@ class ILocalRolesModfied(IObjectEvent):
     registry = Attribute('The pyramid registry')
 
 
-class IActivitiesAddedToAuditLog(IObjectEvent):
-    """An event type send when :term:`activity` s are added to the auditlog."""
+class IActivitiesGenerated(IObjectEvent):
+    """An event type send when :term:`activity` s are created."""
 
-    object = Attribute('The audit log')
+    object = Attribute('Not used')
     activities = Attribute('The added activities')
     request = Attribute('The current pyramid request')
 
@@ -971,7 +983,7 @@ class IRolesUserLocator(IUserLocator):  # pragma: no cover
 
 
 class IRoleACLAuthorizationPolicy(IAuthorizationPolicy):  # pragma: no cover
-    """A :term:`authorization policy` supporting rule based permissions."""
+    """A :term:`authorization policy` supporting creator term:`local role`."""
 
     group_prefix = Attribute('Prefix to generate the :term:`groupid`')
 
@@ -983,9 +995,8 @@ class IRoleACLAuthorizationPolicy(IAuthorizationPolicy):  # pragma: no cover
         """Check that one `principal` has the `permission` for `context`.
 
         This method extends the behavior of :func:`ACLAuthorizationPolicy`.
-        If a principal has the suffix 'group:' the :class:`IRolesUserLocator`
-        is called to retrieve the list of roles for this principal. These
-        roles extend the given `principals`.
+        If a principal is the creator of `context` the creator
+        :term:`local_role` is addded.
         """
 
 

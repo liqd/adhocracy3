@@ -2,10 +2,16 @@
   {"path": "/",
     "creator": "admin",
     "content_type": "adhocracy_s1.resources.s1.IProcess",
-    "data": {"adhocracy_core.sheets.name.IName":
-    {"name": "s1"},
-      "adhocracy_core.sheets.workflow.IWorkflowAssignment":
-      {"workflow_state": "propose"}
+    "data": {
+      "adhocracy_core.sheets.name.IName": {
+        "name": "s1"
+      },
+      "adhocracy_core.sheets.title.ITitle": {
+        "title": "S1 Process"
+      },
+      "adhocracy_core.sheets.workflow.IWorkflowAssignment": {
+        "workflow_state": "propose"
+      }
     }
   },
   {
@@ -15,6 +21,9 @@
     "data": {
       "adhocracy_core.sheets.name.IName": {
         "name": "s1_private"
+      },
+      "adhocracy_core.sheets.title.ITitle": {
+        "title": "S1 Private Process"
       },
       "adhocracy_core.sheets.workflow.IWorkflowAssignment": {
         "workflow": "s1_private",

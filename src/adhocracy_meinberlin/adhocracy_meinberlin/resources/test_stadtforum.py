@@ -1,13 +1,6 @@
-from distutils import dir_util
-import os
-import transaction
-
+from pyramid import testing
 from pytest import fixture
 from pytest import mark
-from webtest import TestResponse
-
-from adhocracy_core.testing import add_resources
-from adhocracy_core.testing import do_transition_to
 
 class TestProcess:
 
@@ -18,8 +11,12 @@ class TestProcess:
 
     def test_meta(self, meta):
         from .stadtforum import IProcess
+        from adhocracy_core import sheets
         assert meta.iresource is IProcess
         assert meta.default_workflow == 'stadtforum'
+        assert meta.extended_sheets == (
+            sheets.image.IImageReference,
+        )
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):
@@ -34,10 +31,35 @@ class TestPoll:
         return poll_meta
 
     def test_meta(self, meta):
+        from adhocracy_core import sheets
         from .stadtforum import IPoll
         assert meta.iresource is IPoll
         assert meta.default_workflow == 'stadtforum_poll'
+        assert sheets.embed.IEmbed in meta.extended_sheets
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):
         assert registry.content.create(meta.iresource.__identifier__)
+
+
+class TestEmbedCodeConfigAdapter:
+
+    @mark.usefixtures('integration')
+    def test_get_config_for_stadtforum_poll(self, request_, registry, rest_url):
+        from adhocracy_core.sheets.embed import IEmbedCodeConfig
+        from adhocracy_meinberlin.resources.stadtforum import IPoll
+        context = testing.DummyResource(__provides__=IPoll)
+        result = registry.getMultiAdapter((context, request_),
+                                          IEmbedCodeConfig)
+        assert result == {'sdk_url': 'http://localhost:6551/AdhocracySDK.js',
+                          'frontend_url': 'http://localhost:6551',
+                          'path': rest_url + 'VERSION_0000000/',
+                          'widget': 'meinberlin-stadtforum-proposal-detail',
+                          'autoresize': 'false',
+                          'locale': 'en',
+                          'initial_url': '',
+                          'autourl': 'false',
+                          'nocenter': 'true',
+                          'noheader': 'true',
+                          'style': 'height: 650px',
+                          }

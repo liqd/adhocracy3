@@ -113,6 +113,44 @@ class TestSequenceSchema:
         assert inst.widget.readonly
         assert inst.widget.deserialize(inst, ['default']) == colander.null
 
+class TestSequenceOptionalJsonInSchema:
+
+    def make_one(self, **kwargs):
+        from . import SequenceOptionalJsonInSchema
+
+        class AdhocracySequenceExample(SequenceOptionalJsonInSchema):
+            child1 = colander.Schema(typ=colander.Int())
+        return AdhocracySequenceExample(**kwargs).bind()
+
+    def test_create(self):
+        from . import SequenceSchema
+        from . import SchemaNode
+        inst = self.make_one()
+        assert isinstance(inst, SequenceSchema)
+        assert isinstance(inst, SchemaNode)
+        assert inst.schema_type == colander.Sequence
+        assert inst.default == []
+
+    def test_sequence_wiget_is_set(self):
+        from deform.widget import TextInputWidget
+        inst = self.make_one()
+        assert isinstance(inst.widget,  TextInputWidget)
+
+    def test_desirialize_non_json(self):
+        inst = self.make_one()
+        result = inst.deserialize(['1', '2'])
+        assert result == [1, 2]
+
+    def test_desirialize_json(self):
+        inst = self.make_one()
+        result = inst.deserialize('[1, 2]')
+        assert result == [1, 2]
+
+    def test_desirialize_invalid_json(self):
+        inst = self.make_one()
+        with raises(colander.Invalid):
+            result = inst.deserialize('[')
+
 
 class TestInterface():
 

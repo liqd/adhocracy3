@@ -130,7 +130,7 @@ def change_bplan_officeworker_email_representation(root, registry):
 
 @log_migration
 def use_workflow_state_for_participation_time_range(root, registry):
-    """use workflow state data for participation start and end."""
+    """Use workflow state data for participation start and end."""
     from adhocracy_core.sheets.workflow import IWorkflowAssignment
     from adhocracy_meinberlin.resources.bplan import IProcess
     from adhocracy_meinberlin.sheets.bplan import IProcessSettings
@@ -180,13 +180,46 @@ def remove_workflow_state_data_end_date(root, registry):
         state_data = workflow_assignment.get()['state_data']
         if len(state_data) > 0:
             state_data_participate = state_data[0]
-            start_date = state_data_participate['start_date']
-            end_date = state_data_participate['end_date']
-            workflow_assignment.set(
-                {'state_data': [{'name': 'participate', 'description': '',
-                                 'start_date': start_date},
-                                {'name': 'closed', 'description': '',
-                                 'start_date': end_date}]})
+            if 'end_date' in state_data_participate:
+                start_date = state_data_participate['start_date']
+                end_date = state_data_participate['end_date']
+                workflow_assignment.set(
+                    {'state_data': [{'name': 'participate', 'description': '',
+                                     'start_date': start_date},
+                                    {'name': 'closed', 'description': '',
+                                     'start_date': end_date}]})
+
+
+@log_migration
+def update_workflow_state_acl_for_all_resources(root,
+                                                registry):  # pragma: no cover
+    """Update the local :term:`acl` with the current workflow state acl."""
+    from adhocracy_core.workflows import update_workflow_state_acls
+    update_workflow_state_acls(root, registry)
+
+
+@log_migration
+def add_embed_sheet_to_stadtforum_polls(root, registry):
+    """Add embed sheet to stadtforum polls."""
+    from adhocracy_core.sheets.embed import IEmbed
+    from adhocracy_meinberlin.resources.stadtforum import IPoll
+    migrate_new_sheet(root, IPoll, IEmbed)
+
+
+@log_migration
+def add_image_reference_to_stadtforum(root, registry):
+    """Add image reference sheet to stadtforum process."""
+    from adhocracy_meinberlin.resources.stadtforum import IProcess
+    from adhocracy_core.sheets.image import IImageReference
+    migrate_new_sheet(root, IProcess, IImageReference)
+
+
+@log_migration
+def add_image_reference_to_collaborative_text(root, registry):
+    """Add image reference sheet to collaborative_text process."""
+    from adhocracy_meinberlin.resources.collaborative_text import IProcess
+    from adhocracy_core.sheets.image import IImageReference
+    migrate_new_sheet(root, IProcess, IImageReference)
 
 
 def includeme(config):  # pragma: no cover
@@ -200,3 +233,7 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(use_workflow_state_for_participation_time_range)
     config.add_evolution_step(add_image_reference_to_blplan)
     config.add_evolution_step(remove_workflow_state_data_end_date)
+    config.add_evolution_step(update_workflow_state_acl_for_all_resources)
+    config.add_evolution_step(add_embed_sheet_to_stadtforum_polls)
+    config.add_evolution_step(add_image_reference_to_stadtforum)
+    config.add_evolution_step(add_image_reference_to_collaborative_text)

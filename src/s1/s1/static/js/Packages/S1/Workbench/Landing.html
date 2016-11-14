@@ -1,35 +1,19 @@
 <div class="s1-landing">
 
     <section class="s1-landing-section" data-ng-if="processTitle">
-        <h1 class="s1-landing-section-header">{{ processTitle }}</h1>
-        <adh-parse-markdown data-parsetext="processShortDescription"></adh-parse-markdown>
-        <adh-parse-markdown data-parsetext="processDescription"></adh-parse-markdown>
+        <div class="s1-landing-row">
+            <h1 class="s1-landing-section-header">{{ processTitle }}</h1>
+            <adh-parse-markdown data-parsetext="processShortDescription"></adh-parse-markdown>
+        </div>
+        <div class="s1-landing-row">
+            <section class="s1-landing-section s1-landing-section-left">
+                <adh-parse-markdown data-parsetext="processDescription"></adh-parse-markdown>
+            </section>
+            <section class="s1-landing-section s1-landing-section-go s1-landing-section-right">
+                <h1 class="s1-landing-section-header">{{ "TR__S1_GO_HEADER" | translate }}:</h1>
+                <a class="button-cta" data-ng-href="{{ processUrl | adhResourceUrl:'current' }}">{{ "TR__S1_GO_TO_PLATFORM" | translate }}</a>
+                <a class="button-cta" data-ng-href="{{ processUrl | adhResourceUrl:'create-proposal' }}">{{ "TR__CREATE_PROPOSAL" | translate }}</a>
+            </section>
+        </div>
     </section>
-
-    <section class="s1-landing-section">
-        <h1 class="s1-landing-section-header">{{ "TR__S1_INTRODUCTION_HEADER" | translate }}</h1>
-        <adh-parse-markdown data-parsetext="introText"></adh-parse-markdown>
-        <table><tr>
-            <td colspan="4"><h3>{{ "TR__S1_PHASE_A_HEADER" | translate }}</h3></td>
-            <td colspan="4"><h3>{{ "TR__S1_PHASE_B_HEADER" | translate }}</h3></td>
-            <td colspan="4"><h3>{{ "TR__S1_PHASE_C_HEADER" | translate }}</h3></td>
-        </tr>
-        <tr>
-            <td colspan="4"><adh-parse-markdown data-parsetext="phaseAText"></adh-parse-markdown></td>
-            <td colspan="4"><adh-parse-markdown data-parsetext="phaseBText"></adh-parse-markdown></td>
-            <td colspan="4"><adh-parse-markdown data-parsetext="phaseCText"></adh-parse-markdown></td>
-        </tr></table>
-    </section>
-
-    <div class="s1-landing-row">
-        <section class="s1-landing-section s1-landing-section-left">
-            <h1 class="s1-landing-section-header">{{ "TR__S1_ABOUT_HEADER" | translate }}</h1>
-            <adh-parse-markdown data-parsetext="aboutText"></adh-parse-markdown>
-        </section>
-        <section class="s1-landing-section s1-landing-section-go s1-landing-section-right">
-            <h1 class="s1-landing-section-header">{{ "TR__S1_GO_HEADER" | translate }}:</h1>
-            <a class="button-cta" data-ng-href="{{ processUrl | adhResourceUrl:'current' }}">{{ "TR__S1_GO_TO_PLATFORM" | translate }}</a>
-            <a class="button-cta" data-ng-href="{{ processUrl | adhResourceUrl:'create-proposal' }}">{{ "TR__CREATE_PROPOSAL" | translate }}</a>
-        </section>
-    </div>
 </div>

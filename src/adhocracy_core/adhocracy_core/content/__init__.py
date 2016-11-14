@@ -12,6 +12,7 @@ from substanced.workflow import IWorkflow
 from zope.interface.interfaces import IInterface
 
 from adhocracy_core.authentication import is_created_anonymized
+from adhocracy_core.authorization import is_password_required_to_edit_some
 from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import ISheet
@@ -310,11 +311,11 @@ class ResourceContentRegistry(ContentRegistry):
         """Check if children can be created/added anonymized to `context`."""
         if IItem.providedBy(context):
             # if item was anonymized you can also add versions anonymized
-            has_sheet = _is_anonymized_and_has_permission(context, request)
+            is_allowed = is_created_anonymized(context)
         else:
-            has_sheet = IAllowAddAnonymized.providedBy(context)
+            is_allowed = IAllowAddAnonymized.providedBy(context)
         has_permission = request.has_permission(ANONYMIZE_PERMISSION, context)
-        return has_sheet and has_permission
+        return is_allowed and has_permission
 
     def can_edit_anonymized(self, context: object, request: Request) -> bool:
         """Check if `context` may be edited anonymously."""
@@ -325,6 +326,11 @@ class ResourceContentRegistry(ContentRegistry):
         """Check if `context` may be deleted anonymously."""
         can_anonymize = _is_anonymized_and_has_permission(context, request)
         return can_anonymize
+
+    def is_password_required(self, context: object, request: Request) -> bool:
+        """Check if some sheets of `context` require a password for editing."""
+        sheets_edit = self.get_sheets_edit(context, request)
+        return is_password_required_to_edit_some(sheets_edit)
 
 
 def _is_anonymized_and_has_permission(context: object,

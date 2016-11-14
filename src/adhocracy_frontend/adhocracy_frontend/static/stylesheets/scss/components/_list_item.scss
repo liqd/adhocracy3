@@ -12,6 +12,10 @@ A generic list item. How a resource appears when in a list
     <div class="list-item-body">
         <div class="list-item-author">by user on 2016-04-15</div>
         <h3 class="list-item-title">Default</h3>
+        <div class="list-item-text">Ein Frontend-Entwickler geht lauten
+Schrittes zum A-Team. Alle sitzen zufrieden vor ihren Macs. Plötzlich raschelt
+es. Ein Fuchs kommt herein und dreht wie selbstverständlich eine Runde durchs
+Büro. Herzlichen Glückwunsch zum Namenstag, Hasan!</div>
         <ul class="list-item-meta meta-list">
             <li class="meta-list-item">
                 <i class="icon-speechbubbles"></i> 0 Comments
@@ -28,6 +32,10 @@ A generic list item. How a resource appears when in a list
     <div class="list-item-body">
         <div class="list-item-author">by user on 2016-04-15</div>
         <h3 class="list-item-title">Image</h3>
+        <div class="list-item-text">Ein Frontend-Entwickler geht lauten
+Schrittes zum A-Team. Alle sitzen zufrieden vor ihren Macs. Plötzlich raschelt
+es. Ein Fuchs kommt herein und dreht wie selbstverständlich eine Runde durchs
+Büro. Herzlichen Glückwunsch zum Namenstag, Hasan!</div>
         <ul class="list-item-meta meta-list">
             <li class="meta-list-item">
                 <i class="icon-speechbubbles"></i> 0 Comments
@@ -48,8 +56,9 @@ $thumbnail-width: 105px;
     @include container;
     @include rem(padding, 1.25em $padding);
     display: block;
-    border-bottom: 2px solid $color-structure-normal;
     position: relative;
+    margin-bottom: 1em;
+    box-shadow: 0 0 1em $color-structure-introvert;
 
     // reset link styling
     &, &:hover, &:focus {
@@ -90,7 +99,7 @@ $thumbnail-width: 105px;
 
 .list-item-title {
     @include rem(font-size, $font-size-plus);
-    font-weight: $font-weight-medium;
+    font-weight: $font-weight-extrovert;
 }
 
 .list-item-author {
@@ -105,4 +114,8 @@ $thumbnail-width: 105px;
 
 .list-item-badges {
     float: right;
+}
+
+.list-item-text {
+    margin-bottom: 1em;
 }

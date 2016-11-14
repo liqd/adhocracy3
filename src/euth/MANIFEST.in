@@ -1,8 +1,0 @@
-include RELEASE-VERSION version.py
-recursive-include euth/build *.js *.css *.woff *.eot *.ttf *.svg *.xml *.json *.jpg *.ico *.gif *.png *.html *.md *.mako *.pt
-global-exclude *Spec.js
-prune euth/build/styleguide
-prune euth/build/lib/DefinitelyTyped
-prune euth/build/lib/q
-prune euth/build/lib/jasmine
-prune euth/build/lib/blanket

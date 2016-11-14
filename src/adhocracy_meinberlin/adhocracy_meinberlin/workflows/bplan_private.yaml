@@ -7,5 +7,5 @@ states:
     acm:
       principals:       [everyone, participant, moderator, creator, initiator, admin]
       permissions:
-        - [view,         D,        D,           ~,         ~,       A,         A]
+        - [view,         D,        D,           D,         ~,       D,         D]
 transitions: {}

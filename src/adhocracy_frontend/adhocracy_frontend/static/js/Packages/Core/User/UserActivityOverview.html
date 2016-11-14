@@ -1,0 +1,7 @@
+<div class="user-activity-overview">
+  <div class="user-activity-overview-wrapper">
+    <div class="user-activity-overview-comments" data-ng-if="commentCount">{{ commentCount }} {{ commentType | adhResourceName:commentCount | translate}}</div>
+    <div class="user-activity-overview-proposals" data-ng-if="proposalCount">{{ proposalCount }} {{ proposalType | adhResourceName:proposalCount | translate }}</div>
+    <div class="user-activity-overview-ratings" data-ng-if="rateCount">{{ rateCount }} {{ rateType | adhResourceName:rateCount | translate}}</div>
+  </div>
+</div>

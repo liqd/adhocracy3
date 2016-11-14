@@ -11,6 +11,7 @@ from adhocracy_core.rest.exceptions import handle_error_500_exception
 from adhocracy_core.rest.exceptions import JSONHTTPClientError
 from adhocracy_core.rest.exceptions import get_json_body
 from adhocracy_core.authentication import AnonymizeHeader
+from adhocracy_core.authentication import UserPasswordHeader
 from pyramid.request import Request
 from pyramid.interfaces import IRequest
 from pyramid.view import view_defaults
@@ -186,6 +187,7 @@ class BatchView:
         self.copy_header_if_exists('X-User-Path', request)
         self.copy_header_if_exists('X-User-Token', request)
         self.copy_header_if_exists(AnonymizeHeader, request)
+        self.copy_header_if_exists(UserPasswordHeader, request)
 
         # properly setup subrequest in case script_name env is set,
         # see https://github.com/Pylons/pyramid/issues/1434

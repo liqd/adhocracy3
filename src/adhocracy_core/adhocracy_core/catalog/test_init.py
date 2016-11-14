@@ -517,7 +517,7 @@ class TestCatalogsServiceAdhocracy:
         from pyramid.authorization import Deny
         from adhocracy_core.authorization import set_acl
         child = self._make_resource(registry, parent=pool)
-        set_acl(pool, [(Deny, 'principal', 'view')], registry=registry)
+        set_acl(pool, [(Deny, 'principal', 'view')], registry)
         inst['system']['allowed'].reindex_resource(child)
         result = inst.search(query._replace(interfaces=IPool,
                                             allows=(['principal'], 'view')))
@@ -529,7 +529,7 @@ class TestCatalogsServiceAdhocracy:
         from pyramid.authorization import Allow
         from adhocracy_core.authorization import set_acl
         child = self._make_resource(registry, parent=pool)
-        set_acl(pool, [(Allow, 'principal', 'view')], registry=registry)
+        set_acl(pool, [(Allow, 'principal', 'view')], registry)
         inst['system']['allowed'].reindex_resource(child)
         result = inst.search(query._replace(interfaces=IPool,
                                             allows=(['principal'], 'view')))

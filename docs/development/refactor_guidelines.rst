@@ -51,6 +51,13 @@ Variable naming:
 * no misleading names
 * distinction between concepts (get, append, add,..)
 
+Additional guidelines:
+
+* **do not** translate names and terms from the problem domain; **do**
+  translate everything else
+* **do** use singular
+* **do** convert umlauts to ae, ue, …
+
 Variables:
 ++++++++++
 

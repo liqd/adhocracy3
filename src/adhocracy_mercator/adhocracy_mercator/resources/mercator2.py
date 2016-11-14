@@ -231,23 +231,23 @@ proposal_meta = proposal.proposal_meta._replace(
         add_ratesservice,
         add_badge_assignments_service,
         add_logbook_service,)
-)._add(extended_sheets=
-       (ITitle,
-        IDescription,
-        ICommentable,
-        ILikeable,
-        IImageReference,
-        IHasLogbookPool,
-        adhocracy_mercator.sheets.mercator2.IMercatorSubResources,
-        adhocracy_mercator.sheets.mercator2.IUserInfo,
-        adhocracy_mercator.sheets.mercator2.IOrganizationInfo,
-        adhocracy_mercator.sheets.mercator2.ITopic,
-        adhocracy_mercator.sheets.mercator2.ILocation,
-        adhocracy_mercator.sheets.mercator2.IStatus,
-        adhocracy_mercator.sheets.mercator2.IFinancialPlanning,
-        adhocracy_mercator.sheets.mercator2.IExtraFunding,
-        adhocracy_mercator.sheets.mercator2.ICommunity,
-        adhocracy_mercator.sheets.mercator2.IWinnerInfo))
+)._add(
+    extended_sheets=(ITitle,
+                     IDescription,
+                     ICommentable,
+                     ILikeable,
+                     IImageReference,
+                     IHasLogbookPool,
+                     adhocracy_mercator.sheets.mercator2.IMercatorSubResources,
+                     adhocracy_mercator.sheets.mercator2.IUserInfo,
+                     adhocracy_mercator.sheets.mercator2.IOrganizationInfo,
+                     adhocracy_mercator.sheets.mercator2.ITopic,
+                     adhocracy_mercator.sheets.mercator2.ILocation,
+                     adhocracy_mercator.sheets.mercator2.IStatus,
+                     adhocracy_mercator.sheets.mercator2.IFinancialPlanning,
+                     adhocracy_mercator.sheets.mercator2.IExtraFunding,
+                     adhocracy_mercator.sheets.mercator2.ICommunity,
+                     adhocracy_mercator.sheets.mercator2.IWinnerInfo))
 
 
 class IProcess(process.IProcess):

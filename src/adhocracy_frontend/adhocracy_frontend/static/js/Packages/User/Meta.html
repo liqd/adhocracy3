@@ -1,7 +1,0 @@
-<!-- as this is an inline directive, whitespace is relevant, including no newline at end of file
---><adh-user-profile-image data-css-class="user-meta" data-path="{{path}}"></adh-user-profile-image
-><span data-ng-if="noLink" class="user-meta">{{name || userBasic.name | translate }}</span
-><a class="user-meta" data-ng-href="{{ path | adhResourceUrl }}" data-ng-if="!noLink">{{name || userBasic.name | translate }}</a>
-<span data-ng-repeat="assignment in assignments">
-	<span class="badge">{{ assignment.title }}</span>
-</span>

@@ -1,0 +1,130 @@
+<div class="resource-navigation">
+    <div class="resource-navigation-breadcrumbs">
+        <adh-go-to-came-from data-default="cancelUrl"></adh-go-to-came-from>
+    </div>
+</div>
+<form
+    novalidate="novalidate"
+    data-ng-submit="submit()"
+    class="proposal-form"
+    name="ideaCollectionProposalForm">
+
+    <div class="proposal-form-upper">
+        <div class="form-error" data-ng-repeat="error in errors track by $index">
+            <p>{{ error | adhFormatError | translate }}</p>
+        </div>
+
+        <!-- BASIC INFORMATION -->
+
+        <!-- Title -->
+        <label>
+            <span class="label-text">{{ "TR__IDEA_COLLECTION_TITLE" | translate }}</span>
+            <input
+                type="text"
+                data-ng-model="data.title"
+                name="title"
+                minlength="3"
+                maxlength="100"
+                required="required" />
+            <span class="input-error" data-ng-show="showError(ideaCollectionProposalForm, ideaCollectionProposalForm.title, 'required')">
+                {{ "TR__IDEA_COLLECTION_ERROR_REQUIRED_TITLE" | translate }}
+            </span>
+        </label>
+
+        <!-- Detail Description -->
+        <label data-ng-if="processProperties.hasDescription">
+            <span class="label-text">{{ "TR__IDEA_COLLECTION_DETAIL" | translate }}</span>
+
+            <textarea
+                data-msd-elastic=""
+                data-ng-model="data.detail"
+                name="detail"
+                maxlength="500"
+                required="required"></textarea>
+
+            <span class="input-error" data-ng-show="showError(ideaCollectionProposalForm, ideaCollectionProposalForm.detail, 'required')">
+                {{ "TR__IDEA_COLLECTION_ERROR_REQUIRED_DETAIL" | translate }}
+            </span>
+        </label>
+
+        <!-- Requested Budget -->
+        <label data-ng-if="processProperties.maxBudget">
+            <span class="label-text">{{ "TR__IDEA_COLLECTION_BUDGET" | translate }}</span>
+            <input
+                type="number"
+                data-ng-model="data.budget"
+                name="budget"
+                min="0"
+                max="{{processProperties.maxBudget}}"
+                required="required" />
+            <span class="input-error" data-ng-show="showError(ideaCollectionProposalForm, ideaCollectionProposalForm.budget, 'required')">
+                {{ "TR__IDEA_COLLECTION_ERROR_REQUIRED_BUDGET" | translate }}
+            </span>
+            <span class="input-error" data-ng-show="showError(ideaCollectionProposalForm, ideaCollectionProposalForm.budget, 'number')">
+                {{ "TR__ERROR_MUST_BE_A_NUMBER" | translate }}
+            </span>
+        </label>
+
+        <!-- Engagement -->
+        <label data-ng-if="processProperties.hasCreatorParticipate">
+            <input
+                type="checkbox"
+                data-ng-model="data.creatorParticipate"
+                name="creatorParticipate"
+                />
+                {{ "TR__IDEA_COLLECTION_I_WANT_TO_BE_PART" | translate }}
+            <span class="input-error" data-ng-show="showError(ideaCollectionProposalForm, ideaCollectionProposalForm.creatorParticipate, 'required')">
+                {{ "TR__IDEA_COLLECTION_ERROR_REQUIRED_I_WANT_TO_BE_PART" | translate }}
+            </span>
+        </label>
+
+        <!-- LOCATION RELATED INFORMATION -->
+        <!-- Related Place -->
+        <label data-ng-if="processProperties.hasLocationText">
+            <span class="label-text">{{ "TR__IDEA_COLLECTION_LOCATION_TEXT" | translate }}</span>
+            <input
+                type="text"
+                data-ng-model="data.locationText"
+                name="locationText"
+                maxlength="100"
+                required="required" />
+            <span class="input-error" data-ng-show="showError(ideaCollectionProposalForm, ideaCollectionProposalForm.locationText, 'required')">
+                {{ "TR__IDEA_COLLECTION_ERROR_REQUIRED_LOCATION_TEXT" | translate }}
+            </span>
+        </label>
+    </div>
+
+    <!-- Map -->
+    <label data-ng-if="processProperties.hasLocation">
+        <adh-map-input data-ng-if="data.polygon" data-lng="data.lng" data-lat="data.lat" data-polygon="data.polygon" data-height="250"></adh-map-input>
+    </label>
+
+    <!-- DATA SUBMIT -->
+    <footer class="form-footer">
+        <div class="form-footer-right">
+            <adh-anonymize
+                data-ng-if="create"
+                data-url="{{poolPath}}"
+                data-method="POST"
+                data-model="data.anonymize"></adh-anonymize>
+            <adh-anonymize
+                data-ng-if="!create && resource.path"
+                data-url="{{resource.path | adhParentPath}}"
+                data-method="POST"
+                data-local-default="data.createdAnonymously"
+                data-model="data.anonymize"></adh-anonymize>
+
+            <input
+                type="submit"
+                name="submit"
+                value="{{ 'TR__PUBLISH' | translate }}"
+                class="button-cta" />
+        </div>
+        <div class="form-footer-left">
+            <a
+                href=""
+                data-ng-click="cancel()"
+                class="button">{{ "TR__CANCEL" | translate }}</a>
+        </div>
+    </footer>
+</form>

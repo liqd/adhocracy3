@@ -189,8 +189,8 @@ class TestAddRenominateDescription:
 
         wanted = 'old_description' \
                  '\n\n---' \
-                 '\n\nrenominated by: username' \
-                 '\nold rating: 10' \
+                 '\n\nErneut vorgeschlagen von: username' \
+                 '\nBefürworter*innen davor: 10' \
                  '\n'
         index_rates.assert_called_with(context, 0)
         description_sheet.set.assert_called_with({'description': wanted})

@@ -4,18 +4,19 @@ from pyramid.interfaces import IRequest
 from pyramid.registry import Registry
 from pyramid.renderers import render
 from pyramid.request import Request
+from pyramid.threadlocal import get_current_registry
 from pyrsistent import freeze
 from pyrsistent import PMap
 from substanced.workflow import Workflow
 from substanced.workflow import WorkflowError
 from substanced.util import find_service
-from substanced.util import set_acl
 from zope.deprecation import deprecated
 from zope.interface import implementer
 from zope.interface import Interface
 from adhocracy_core.authorization import acm_to_acl
 from adhocracy_core.authorization import create_fake_god_request
 from adhocracy_core.authorization import add_local_roles
+from adhocracy_core.authorization import set_acl
 from adhocracy_core.exceptions import ConfigurationError
 from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
 from adhocracy_core.interfaces import IAdhocracyWorkflow
@@ -45,12 +46,14 @@ class ACLLocalRolesState(dict):
 
     def __call__(self, context, request, transition, workflow):
         registry = getattr(request, 'registry', None)
+        if registry is None:
+            registry = get_current_registry(context)
         if self.acl is not None:
-            set_acl(context, self.acl, registry=registry)
+            set_acl(context, self.acl, registry)
         if self.local_roles is not None:
             add_local_roles(context,
                             self.local_roles,
-                            registry=registry)
+                            registry)
 
 
 @implementer(IAdhocracyWorkflow)

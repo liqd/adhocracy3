@@ -1,0 +1,13 @@
+<adh-user-list-item data-path="{{credentials.userPath}}" data-me="true" data-ng-if="credentials.loggedIn"></adh-user-list-item>
+
+<section class="user-list">
+    <adh-listing
+        data-path="/principals/users/"
+        data-no-create-form="true"
+        data-initial-limit="initialLimit"
+        data-content-type="{{contentType}}"
+        data-counter="true">
+        <adh-user-list-item
+            data-path="{{element}}"></adh-user-list-item>
+    </adh-listing>
+</section>

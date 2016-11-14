@@ -7,12 +7,15 @@ var shared = require("./shared");
 
 describe("user registration", function() {
     it("can register", function() {
+        var mailsBeforeMessaging = fs.readdirSync(browser.params.mail.queue_path + "/new");
         browser.get("/");
         UserPages.ensureLogout();
         UserPages.register("u1", "u1@example.com", "password1");
-        UserPages.logout();
-        UserPages.login("u1", "password1");
-        expect(UserPages.isLoggedIn()).toBe(true);
+        var flow = browser.controlFlow();
+        flow.execute(function() {
+            var mailsAfterMessaging = fs.readdirSync(browser.params.mail.queue_path + "/new");
+            expect(mailsAfterMessaging.length).toEqual(mailsBeforeMessaging.length + 1);
+        });
     });
 
     it("cannot register with wrong password repeat", function() {

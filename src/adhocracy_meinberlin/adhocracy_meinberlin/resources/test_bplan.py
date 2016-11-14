@@ -1,3 +1,4 @@
+from pyramid import testing
 from pytest import mark
 from pytest import fixture
 
@@ -54,7 +55,6 @@ class TestProcess:
 
     def test_meta(self, meta):
         from adhocracy_core.resources.process import IProcess
-        from adhocracy_core.sheets.embed import IEmbed
         from adhocracy_core.sheets.image import IImageReference
         from adhocracy_meinberlin import sheets
         from adhocracy_meinberlin import resources
@@ -64,7 +64,6 @@ class TestProcess:
         assert meta.permission_create == 'create_process'
         assert meta.extended_sheets == (sheets.bplan.IProcessSettings,
                                         sheets.bplan.IProcessPrivateSettings,
-                                        IEmbed,
                                         IImageReference,
                                         )
         assert meta.permission_create == 'create_process'
@@ -75,3 +74,24 @@ class TestProcess:
         assert registry.content.create(meta.iresource.__identifier__)
 
 
+class TestEmbedCodeConfigAdapter:
+
+    @mark.usefixtures('integration')
+    def test_get_config_for_bplan_process(self, request_, registry, rest_url):
+        from adhocracy_core.sheets.embed import IEmbedCodeConfig
+        from .bplan import IProcess
+        context = testing.DummyResource(__provides__=IProcess)
+        result = registry.getMultiAdapter((context, request_),
+                                          IEmbedCodeConfig)
+        assert result == {'sdk_url': 'http://localhost:6551/AdhocracySDK.js',
+                          'frontend_url': 'http://localhost:6551',
+                          'path': rest_url,
+                          'widget': 'mein-berlin-bplaene-proposal-embed',
+                          'autoresize': 'false',
+                          'locale': 'en',
+                          'autourl': 'false',
+                          'initial_url': '',
+                          'nocenter': 'true',
+                          'noheader': 'true',
+                          'style': 'height: 650px',
+                          }

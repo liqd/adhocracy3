@@ -10,24 +10,27 @@ CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
 requires = ['adhocracy_frontend',
             'adhocracy_meinberlin',
+            'meinberlin_lib',
             ]
 
 test_requires = ['adhocracy_frontend[test]',
                  'adhocracy_meinberlin[test]',
+                 'meinberlin_lib[test]',
                  ]
 
 debug_requires = ['adhocracy_frontend[debug]',
                   'adhocracy_meinberlin[debug]',
+                  'meinberlin_lib[debug]',
                   ]
 
 setup(name='meinberlin',
       version=version.get_git_version(),
       description='Adhocracy meta package for backend/frontend customization.',
       long_description=README + '\n\n' + CHANGES,
-      classifiers=["Programming Language :: Python",
-                   "Framework :: Pylons",
-                   "Topic :: Internet :: WWW/HTTP",
-                   "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+      classifiers=['Programming Language :: Python',
+                   'Framework :: Pylons',
+                   'Topic :: Internet :: WWW/HTTP',
+                   'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
                    ],
       author='',
       author_email='',

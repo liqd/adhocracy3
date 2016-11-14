@@ -1,9 +1,11 @@
-import * as AdhConfig from "../Config/Config";
-import * as AdhDocument from "../Document/Document";
-import * as AdhHttp from "../Http/Http";
-import * as AdhPermissions from "../Permissions/Permissions";
-import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
-import * as AdhUtil from "../Util/Util";
+import * as AdhConfig from "../Core/Config/Config";
+import * as AdhDocument from "../Core/Document/Document";
+import * as AdhHttp from "../Core/Http/Http";
+import * as AdhPermissions from "../Core/Permissions/Permissions";
+import * as AdhPreliminaryNames from "../Core/PreliminaryNames/PreliminaryNames";
+import * as AdhUtil from "../Core/Util/Util";
+
+import * as ResourcesBase from "../../ResourcesBase";
 
 import RIDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
 
@@ -127,7 +129,7 @@ export var detailDirective = (
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
                     return AdhDocument.postEdit(adhHttp, adhPreliminaryNames, adhUploadImage)(
                         scope, scope.documentVersion, scope.paragraphVersions);
-                }).then((documentVersion : RIDocumentVersion) => {
+                }).then((documentVersion : ResourcesBase.IResource) => {
                     if (typeof scope.onChange !== "undefined") {
                         scope.onChange();
                     }
@@ -214,7 +216,7 @@ export var createDirective = (
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
                     return AdhDocument.postCreate(adhHttp, adhPreliminaryNames, adhUploadImage)(scope, scope.path);
-                }).then((documentVersion : RIDocumentVersion) => {
+                }).then((documentVersion : ResourcesBase.IResource) => {
 
                     scope.cancel();
 

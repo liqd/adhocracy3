@@ -23,10 +23,10 @@ setup(name='adhocracy_frontend',
       version=version.get_git_version(),
       description='Adhocracy frontend package.',
       long_description=README + '\n\n' + CHANGES,
-      classifiers=["Programming Language :: Python",
-                   "Framework :: Pylons",
-                   "Topic :: Internet :: WWW/HTTP",
-                   "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+      classifiers=['Programming Language :: Python',
+                   'Framework :: Pylons',
+                   'Topic :: Internet :: WWW/HTTP',
+                   'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
                    ],
       author='',
       author_email='',
@@ -48,6 +48,7 @@ setup(name='adhocracy_frontend',
       [pyramid.scaffold]
       adhocracy_frontend=adhocracy_frontend.scaffolds:AdhocracyExtensionTemplate
       [console_scripts]
-      deps2dot=adhocracy_frontend.scripts.deps2dot:main
+      ad_deps2dot=adhocracy_frontend.scripts.deps2dot:main
+      ad_merge_messages=adhocracy_frontend.scripts.merge_messages:main
       """,
       )

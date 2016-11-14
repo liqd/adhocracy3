@@ -14,6 +14,9 @@ from adhocracy_core.interfaces import error_entry
 UserTokenHeader = 'X-User-Token'
 """The request header parameter to set the authentication token."""
 
+UserPasswordHeader = 'X-User-Password'
+"""The request header parameter to set the user password."""
+
 UserPathHeader = 'X-User-Path'
 """Deprecated: The optional request header to set the userid."""
 
@@ -84,6 +87,49 @@ def validate_user_headers(view: callable):
             error = error_entry('header',
                                 UserTokenHeader,
                                 'Invalid user token')
+            request.errors.append(error)
+            raise HTTPBadRequest()
+        return view(context, request)
+    return wrapped_view
+
+
+def has_password_header(request: IRequest) -> bool:
+    """Check if request provided the password in the Password header."""
+    return UserPasswordHeader in request.headers
+
+
+def get_header_password(request: IRequest) -> str:
+    """Return the password in the Password header."""
+    return request.headers.get(UserPasswordHeader, None)
+
+
+def validate_password_header(view: callable):
+    """Decorator vor :term:`view` to check if the password header may be set.
+
+    :raise pyramid.httpexceptions.HTTPBadRequest: if password is invalid or not
+    required. The case that a password is required by a sheet but not set
+    cannot be handled here, as we do not know which sheets are edited by the
+    request.
+    """
+    def wrapped_view(context, request):
+        password_is_set = has_password_header(request)
+        error = None
+        if password_is_set:
+            content = request.registry.content
+            user = request.user
+            password = get_header_password(request)
+            is_valid = user.is_password_valid(request.registry, password)
+            if not is_valid:
+                error = error_entry('header',
+                                    UserPasswordHeader,
+                                    'Invalid password')
+            is_required_by_some_sheets = \
+                content.is_password_required(context, request)
+            if not is_required_by_some_sheets:
+                error = error_entry('header',
+                                    UserPasswordHeader,
+                                    'Password not required')
+        if error:
             request.errors.append(error)
             raise HTTPBadRequest()
         return view(context, request)
@@ -197,7 +243,7 @@ def is_created_anonymized(context: object) -> bool:
 
 
 def includeme(config):  # pragma: no cover
-    """Add request properties `user` and `anonymized_user`."""
+    """Add request properties."""
     from adhocracy_core.resources.principal import get_user_or_anonymous
     from adhocracy_core.resources.principal import get_anonymized_user
     config.add_request_method(get_user_or_anonymous,
@@ -205,4 +251,7 @@ def includeme(config):  # pragma: no cover
                               reify=True)
     config.add_request_method(get_anonymized_user,
                               name='anonymized_user',
+                              reify=True)
+    config.add_request_method(get_header_password,
+                              name='password',
                               reify=True)

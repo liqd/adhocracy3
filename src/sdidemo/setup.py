@@ -1,3 +1,4 @@
+"""SDI demo package."""
 import os
 
 from setuptools import setup, find_packages
@@ -12,18 +13,18 @@ requires = [
     'waitress',
     'substanced',
     'pyramid_tm',
-    ]
+]
 
 setup(name='sdidemo',
       version='0.0',
       description='sdidemo',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
-        "Programming Language :: Python",
-        "Framework :: Pylons",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-        ],
+          'Programming Language :: Python',
+          'Framework :: Pylons',
+          'Topic :: Internet :: WWW/HTTP',
+          'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
+      ],
       author='',
       author_email='',
       url='',
@@ -33,12 +34,11 @@ setup(name='sdidemo',
       zip_safe=False,
       install_requires=requires,
       tests_require=requires,
-      test_suite="sdidemo",
-      entry_points = """\
+      test_suite='sdidemo',
+      entry_points="""\
       [paste.app_factory]
       main = sdidemo:main
       [console_scripts]
       qpwrapper = sdidemo.scripts.qpwrapper:main
       """,
       )
-

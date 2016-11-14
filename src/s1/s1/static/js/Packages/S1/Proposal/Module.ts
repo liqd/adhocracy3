@@ -1,14 +1,19 @@
-import * as AdhAngularHelpersModule from "../../AngularHelpers/Module";
-import * as AdhAnonymizeModule from "../../Anonymize/Module";
-import * as AdhBadgeModule from "../../Badge/Module";
-import * as AdhHttpModule from "../../Http/Module";
-import * as AdhPermissionsModule from "../../Permissions/Module";
-import * as AdhPreliminaryNamesModule from "../../PreliminaryNames/Module";
-import * as AdhRateModule from "../../Rate/Module";
-import * as AdhResourceAreaModule from "../../ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
+import * as AdhAngularHelpersModule from "../../Core/AngularHelpers/Module";
+import * as AdhAnonymizeModule from "../../Core/Anonymize/Module";
+import * as AdhBadgeModule from "../../Core/Badge/Module";
+import * as AdhHttpModule from "../../Core/Http/Module";
+import * as AdhNamesModule from "../../Core/Names/Module";
+import * as AdhPermissionsModule from "../../Core/Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../../Core/PreliminaryNames/Module";
+import * as AdhRateModule from "../../Core/Rate/Module";
+import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../../Core/TopLevelState/Module";
+
+import * as AdhNames from "../../Core/Names/Names";
 
 import * as Proposal from "./Proposal";
+
+import RIProposalVersion from "../../../Resources_/adhocracy_s1/resources/s1/IProposalVersion";
 
 export var moduleName = "adhS1Proposal";
 
@@ -18,12 +23,16 @@ export var register = (angular) => {
         AdhAnonymizeModule.moduleName,
         AdhBadgeModule.moduleName,
         AdhHttpModule.moduleName,
+        AdhNamesModule.moduleName,
         AdhPermissionsModule.moduleName,
         AdhPreliminaryNamesModule.moduleName,
         AdhRateModule.moduleName,
         AdhResourceAreaModule.moduleName,
         AdhTopLevelStateModule.moduleName
     ])
+    .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
+        adhNamesProvider.names[RIProposalVersion.content_type] = "TR__RESOURCE_PROPOSAL";
+    }])
     .directive("adhS1ProposalDetail", [
         "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.detailDirective])
     .directive("adhS1ProposalListItem", [
@@ -55,5 +64,5 @@ export var register = (angular) => {
         Proposal.editDirective
     ])
     .directive("adhS1ProposalListing", ["adhConfig", "adhTopLevelState", Proposal.listingDirective])
-	.directive("adhS1RenominateProposal", ["adhConfig", "adhHttp", "$window", Proposal.renominateProposalDirective]);
+    .directive("adhS1RenominateProposal", ["adhConfig", "adhHttp", "$q", "$translate", "$window", Proposal.renominateProposalDirective]);
 };

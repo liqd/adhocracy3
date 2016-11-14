@@ -4,6 +4,7 @@ from collections import OrderedDict
 from datetime import datetime
 import decimal
 import io
+import json
 import os
 import re
 import string
@@ -30,6 +31,7 @@ from deform.widget import SequenceWidget
 from deform.widget import Select2Widget
 from deform.widget import SelectWidget
 from deform.widget import PasswordWidget
+from deform.widget import TextInputWidget
 from deform_markdown import MarkdownTextAreaWidget
 from deform.widget import filedict
 from pyramid.path import DottedNameResolver
@@ -106,6 +108,22 @@ class SequenceSchema(colander.SequenceSchema, SchemaNode):
             widget.readonly = True
             widget.deserialize = lambda x, y: null
         return widget
+
+
+class SequenceOptionalJsonInSchema(SequenceSchema):
+    """Sequence type that allows a JSON string deserialization input."""
+
+    def deserialize(self, cstruct):
+        if isinstance(cstruct, str):
+            try:
+                cstruct = json.loads(cstruct)
+            except ValueError:
+                raise Invalid(self, 'Ivaild JSON.')
+        return super().deserialize(cstruct)
+
+    @deferred
+    def widget(self, kw: dict):
+        return TextInputWidget()
 
 
 class MappingSchema(colander.MappingSchema, SchemaNode):

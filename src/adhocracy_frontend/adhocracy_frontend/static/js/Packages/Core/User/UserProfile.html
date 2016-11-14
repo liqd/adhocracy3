@@ -1,0 +1,41 @@
+<section
+    data-itemscope=""
+    data-itemtype="http://schema.org/Person"
+    data-ng-if="path">
+
+    <div class="resource-navigation" data-ng-if="messageOptions.POST || options.PUT">
+        <adh-resource-dropdown
+            data-resource-path="{{path}}"
+            data-item-path="{{path}}"
+            data-messaging="messageOptions.POST"
+            data-settings="options.PUT">
+        </adh-resource-dropdown>
+    </div>
+    <header class="resource-header">
+        <div class="resource-header-meta">
+            <span
+                data-ng-repeat="assignment in assignments"
+                class="badge">{{ assignment.title | translate }}
+            </span>
+        </div>
+
+        <adh-user-profile-image-edit data-path="{{path}}"></adh-user-profile-image-edit>
+
+        <h1 class="resource-header-title">{{ userBasic.name }}</h1>
+
+        <div class="resource-header-description">
+            <adh-inline-editable-markdown
+                class="user-description-short"
+                data-parsetext="data.shortDescription"
+                data-title="{{ 'TR__SHORT_DESCRIPTION' | translate }}"
+                data-is-editable="options.PUT"
+                data-did-click-save="saveDescription()"
+                data-maxlength="200"
+            ></adh-inline-editable-markdown>
+        </div>
+    </header>
+
+    <div>
+        <adh-inject></adh-inject>
+    </div><!-- .user-profile-info-proposals -->
+</section>

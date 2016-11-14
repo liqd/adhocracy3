@@ -1,19 +1,23 @@
-import * as AdhAngularHelpersModule from "../../../AngularHelpers/Module";
-import * as AdhBadgeModule from "../../../Badge/Module";
+import * as AdhAngularHelpersModule from "../../../Core/AngularHelpers/Module";
+import * as AdhBadgeModule from "../../../Core/Badge/Module";
 import * as AdhBlogModule from "../../../Blog/Module";
-import * as AdhCredentialsModule from "../../../User/Module";
-import * as AdhHttpModule from "../../../Http/Module";
-import * as AdhImageModule from "../../../Image/Module";
-import * as AdhInjectModule from "../../../Inject/Module";
-import * as AdhLocaleModule from "../../../Locale/Module";
-import * as AdhPermissionsModule from "../../../Permissions/Module";
-import * as AdhPreliminaryNamesModule from "../../../PreliminaryNames/Module";
-import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
+import * as AdhCredentialsModule from "../../../Core/User/Module";
+import * as AdhHttpModule from "../../../Core/Http/Module";
+import * as AdhImageModule from "../../../Core/Image/Module";
+import * as AdhInjectModule from "../../../Core/Inject/Module";
+import * as AdhLocaleModule from "../../../Core/Locale/Module";
+import * as AdhNamesModule from "../../../Core/Names/Module";
+import * as AdhPermissionsModule from "../../../Core/Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../../../Core/PreliminaryNames/Module";
+import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
 import * as AdhResourceWidgetsModule from "../../../ResourceWidgets/Module";
-import * as AdhStickyModule from "../../../Sticky/Module";
-import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
+import * as AdhStickyModule from "../../../Core/Sticky/Module";
+import * as AdhTopLevelStateModule from "../../../Core/TopLevelState/Module";
 
-import * as AdhEmbed from "../../../Embed/Embed";
+import * as AdhEmbed from "../../../Core/Embed/Embed";
+import * as AdhNames from "../../../Core/Names/Names";
+
+import RIMercatorProposal from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IMercatorProposal";
 
 import * as Proposal from "./Proposal";
 
@@ -33,6 +37,7 @@ export var register = (angular) => {
             AdhImageModule.moduleName,
             AdhInjectModule.moduleName,
             AdhLocaleModule.moduleName,
+            AdhNamesModule.moduleName,
             AdhPermissionsModule.moduleName,
             AdhPreliminaryNamesModule.moduleName,
             AdhResourceAreaModule.moduleName,
@@ -64,6 +69,9 @@ export var register = (angular) => {
             adhEmbedProvider.registerDirective("mercator-2016-proposal-create");
             adhEmbedProvider.registerDirective("mercator-2016-proposal-detail");
             adhEmbedProvider.registerDirective("mercator-2016-proposal-listitem");
+        }])
+        .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
+            adhNamesProvider.names[RIMercatorProposal.content_type] = "TR__RESOURCE_PROPOSAL";
         }])
         .directive("adhMercator2016ProposalCreate", [
             "$location",

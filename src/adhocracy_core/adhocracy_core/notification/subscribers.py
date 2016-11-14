@@ -7,14 +7,14 @@ from substanced.util import find_service
 from adhocracy_core.interfaces import Activity
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.interfaces import Reference
-from adhocracy_core.interfaces import IActivitiesAddedToAuditLog
+from adhocracy_core.interfaces import IActivitiesGenerated
 from adhocracy_core.sheets.notification import INotification
 from adhocracy_core.sheets.notification import IFollowable
 from adhocracy_core.resources.comment import IComment
 from adhocracy_core.resources.process import IProcess
 
 
-def send_activity_notification_emails(event: IActivitiesAddedToAuditLog):
+def send_activity_notification_emails(event: IActivitiesGenerated):
     """Notify users about activities regarding resources they follow."""
     streams = _create_resource_streams(event.activities)
     subscriptions = _get_follow_subscriptions(streams, event.request)
@@ -61,4 +61,4 @@ def _send_emails(subscriptions: dict, streams: [tuple], request: IRequest):
 def includeme(config):
     """Register subscribers."""
     config.add_subscriber(send_activity_notification_emails,
-                          IActivitiesAddedToAuditLog)
+                          IActivitiesGenerated)

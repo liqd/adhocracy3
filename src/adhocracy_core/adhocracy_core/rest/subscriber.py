@@ -2,6 +2,7 @@
 from pyramid.interfaces import IRequest
 from pyramid.events import NewResponse
 from adhocracy_core.authentication import AnonymizeHeader
+from adhocracy_core.authentication import UserPasswordHeader
 
 
 def set_response_headers(event: NewResponse):
@@ -19,7 +20,8 @@ def add_cors_headers(event: NewResponse):
         'Access-Control-Allow-Origin': origin,
         'Access-Control-Allow-Headers': 'Origin, Content-Type, Accept, '
                                         'X-User-Path, X-User-Token, '
-                                        + AnonymizeHeader,
+                                        + AnonymizeHeader + ', '
+                                        + UserPasswordHeader,
         'Access-Control-Allow-Credentials': 'true',
         'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS',
     })

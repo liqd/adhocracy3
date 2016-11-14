@@ -1,0 +1,18 @@
+<a class="list-item" data-ng-class="{'m-contains-image': picture}" href="{{path | adhResourceUrl}}">
+    <adh-show-image
+        data-ng-if="picture"
+        data-css-class="list-item-image"
+        data-path="{{picture}}"
+    ></adh-show-image>
+    <div class="list-item-body">
+        <h3 class="list-item-title">{{title}}</h3>
+        <div class="list-item-author" data-ng-if="participationStartDate && participationEndDate">{{ "TR__PARTICIPATION_DATES" | translate:{
+                startDate: participationStartDate,
+                endDate: participationEndDate}
+            }}</div>
+        <div class="list-item-text">{{shortDesc | translate }}</div>
+        <ul class="list-item-meta meta-list">
+            <li class="meta-list-item" data-ng-if="processName">{{processName | translate}}</li>
+        </ul>
+    </div>
+</a>

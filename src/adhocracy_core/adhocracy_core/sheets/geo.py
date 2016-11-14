@@ -14,6 +14,7 @@ from adhocracy_core.schema import Reference
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import SequenceSchema
+from adhocracy_core.schema import SequenceOptionalJsonInSchema
 from adhocracy_core.schema import TupleSchema
 from adhocracy_core.schema import get_choices_by_interface
 
@@ -56,7 +57,7 @@ class Point(TupleSchema):
     y = WebMercatorLatitude()
 
 
-class LineString(SequenceSchema):
+class LineString(SequenceOptionalJsonInSchema):
     """List of geographical points on the earth."""
 
     missing = []

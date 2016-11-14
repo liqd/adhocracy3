@@ -1,0 +1,32 @@
+<adh-listing
+    data-path="{{poolPath}}"
+    data-content-type="{{contentType}}"
+    data-sorts="sorts"
+    data-params="params"
+    data-custom="custom"
+    data-empty-text="{{ 'TR__COMMENT_EMPTY_TEXT' | translate }}"
+    data-counter="true"
+    data-counter-value="counterValue"
+>
+    <div data-ng-switch="transclusionId">
+        <adh-comment-create
+            data-ng-switch-when="create-form-id"
+            data-refers-to="{{custom.refersTo}}"
+            data-pool-path="{{poolPath}}"
+            data-on-submit="onCreate"
+            data-hide-cancel="true">
+        </adh-comment-create>
+        <div data-ng-switch-when="create-button-id">
+            <a
+                href=""
+                data-ng-click="custom.goToLogin()"
+                class="button-cta">{{ "TR__CREATE_A_COMMENT" | translate }}
+            </a>
+        </div>
+        <adh-comment
+            data-ng-switch-when="element-id"
+            data-path="{{element}}"
+            data-on-submit="update">
+        </adh-comment>
+    </div>
+</adh-listing>

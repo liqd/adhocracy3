@@ -1,15 +1,18 @@
 /// <reference path="../../../../lib2/types/angular.d.ts"/>
 
-import * as AdhBadge from "../../Badge/Badge";
-import * as AdhConfig from "../../Config/Config";
-import * as AdhHttp from "../../Http/Http";
-import * as AdhPermissions from "../../Permissions/Permissions";
-import * as AdhPreliminaryNames from "../../PreliminaryNames/PreliminaryNames";
-import * as AdhProcess from "../../Process/Process";
-import * as AdhRate from "../../Rate/Rate";
-import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
-import * as AdhUtil from "../../Util/Util";
+import * as AdhBadge from "../../Core/Badge/Badge";
+import * as AdhConfig from "../../Core/Config/Config";
+import * as AdhHttp from "../../Core/Http/Http";
+import * as AdhPermissions from "../../Core/Permissions/Permissions";
+import * as AdhPreliminaryNames from "../../Core/PreliminaryNames/PreliminaryNames";
+import * as AdhProcess from "../../Core/Process/Process";
+import * as AdhRate from "../../Core/Rate/Rate";
+import * as AdhTopLevelState from "../../Core/TopLevelState/TopLevelState";
+import * as AdhUtil from "../../Core/Util/Util";
 
+import * as ResourcesBase from "../../ResourcesBase";
+
+import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RISystemUser from "../../../Resources_/adhocracy_core/resources/principal/ISystemUser";
 import RIProposal from "../../../Resources_/adhocracy_s1/resources/s1/IProposal";
 import RIProposalVersion from "../../../Resources_/adhocracy_s1/resources/s1/IProposalVersion";
@@ -26,7 +29,7 @@ var pkgLocation = "/S1/Proposal";
 
 export interface IScope extends angular.IScope {
     path : string;
-    resource : RIProposalVersion;
+    resource : ResourcesBase.IResource;
     selectedState? : string;
     data : {
         title : string;
@@ -42,6 +45,7 @@ export interface IScope extends angular.IScope {
         anonymize? : boolean;
         createdAnonymously? : boolean;
     };
+    commentType? : string;
 }
 
 export interface IFormScope extends IScope {
@@ -73,16 +77,16 @@ var bindPath = (
                 adhHttp.get(AdhUtil.parentPath(value)),
                 adhHttp.get(value)
             ]).then((args : any) => {
-                var item : RIProposal = args[0];
-                var version : RIProposalVersion = args[1];
+                var item : ResourcesBase.IResource = args[0];
+                var version : ResourcesBase.IResource = args[1];
 
                 scope.resource = version;
 
-                var titleSheet : SITitle.Sheet = version.data[SITitle.nick];
-                var descriptionSheet : SIDescription.Sheet = version.data[SIDescription.nick];
-                var metadataSheet : SIMetadata.Sheet = version.data[SIMetadata.nick];
-                var rateableSheet : SIRateable.Sheet = version.data[SIRateable.nick];
-                var workflowAssignmentSheet : SIWorkflowAssignment.Sheet = item.data[SIWorkflowAssignment.nick];
+                var titleSheet = SITitle.get(version);
+                var descriptionSheet = SIDescription.get(version);
+                var metadataSheet = SIMetadata.get(version);
+                var rateableSheet = SIRateable.get(version);
+                var workflowAssignmentSheet = SIWorkflowAssignment.get(item);
 
                 $q.all([
                     adhGetBadges(version),
@@ -100,7 +104,7 @@ var bindPath = (
                         create: false,
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
-                        commentCount: version.data[SICommentable.nick].comments_count,
+                        commentCount: SICommentable.get(version).comments_count,
                         assignments: badgeAssignments,
                         workflowState: workflowAssignmentSheet.workflow_state,
                         decisionDate: AdhProcess.getStateData(workflowAssignmentSheet, workflowAssignmentSheet.workflow_state).start_date
@@ -122,10 +126,10 @@ var fill = (
     scope : IScope,
     proposalVersion
 ) : void => {
-    proposalVersion.data[SITitle.nick] = new SITitle.Sheet({
+    SITitle.set(proposalVersion, {
         title: scope.data.title
     });
-    proposalVersion.data[SIDescription.nick] = new SIDescription.Sheet({
+    SIDescription.set(proposalVersion, {
         description: scope.data.description
     });
 };
@@ -137,12 +141,20 @@ var postCreate = (
     scope : IScope,
     poolPath : string
 ) => {
-    var proposal = new RIProposal({preliminaryNames: adhPreliminaryNames});
+    var proposal : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RIProposal.content_type,
+        data: {},
+    };
     proposal.parent = poolPath;
-    var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+    var proposalVersion : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RIProposalVersion.content_type,
+        data: {},
+    };
 
     proposalVersion.parent = proposal.path;
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    SIVersionable.set(proposalVersion, {
         follows: [proposal.first_version_path]
     });
     fill(scope, proposalVersion);
@@ -157,11 +169,15 @@ var postEdit = (
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : IScope,
-    oldVersion : RIProposalVersion
+    oldVersion : ResourcesBase.IResource
 ) => {
-    var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+    var proposalVersion : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RIProposalVersion.content_type,
+        data: {},
+    };
     proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+    SIVersionable.set(proposalVersion, {
         follows: [oldVersion.path]
     });
     fill(scope, proposalVersion);
@@ -189,6 +205,7 @@ export var detailDirective = (
         },
         link: (scope : IScope) => {
             bindPath(adhConfig, adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
+            scope.commentType = RICommentVersion.content_type;
         }
     };
 };
@@ -319,7 +336,8 @@ export var listingDirective = (
             sorts: "=?",
             state: "@?",
             decisionDate: "@?",
-            creator: "@?"
+            creator: "@?",
+            counter: "=?"
         },
         link: (scope) => {
             scope.contentType = RIProposalVersion.content_type;
@@ -338,6 +356,7 @@ export var listingDirective = (
             if (scope.decisionDate) {
                 scope.params.decision_date = scope.decisionDate;
             }
+            scope.counter = typeof scope.counter === "undefined" ? true : scope.counter;
         }
     };
 };
@@ -346,6 +365,8 @@ export var listingDirective = (
 export var renominateProposalDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service,
+    $q : angular.IQService,
+    $translate,
     $window : angular.IWindowService
 ) => {
     return {
@@ -357,24 +378,26 @@ export var renominateProposalDirective = (
         link: (scope) => {
             scope.$watch("proposalUrl", (proposalUrl) => {
                 adhHttp.get(proposalUrl).then((proposal) => {
-                    var workflow = proposal.data[SIWorkflowAssignment.nick];
+                    var workflow = SIWorkflowAssignment.get(proposal);
                     scope.isRejected = "rejected" === workflow.workflow_state;
                 });
             });
             scope.renominate = () => {
-                if ( ! $window.confirm("Do you want to renominate this proposal? (Page will reload)")) {
-                    return;
-                }
-                adhHttp.get(scope.proposalUrl).then((proposal) => {
-                    var patch = {
-                        content_type: proposal.content_type,
-                        data: {}
-                    };
-                    patch.data[SIWorkflowAssignment.nick] = {
-                        workflow_state: "proposed"
-                    };
-                    return adhHttp.put(proposal.path, patch).then(() => {
-                        $window.parent.location.reload();
+                $q.all([$translate("TR__DO_YOU_WANT_TO_RENOMINATE"), $translate("TR__WILL_RELOAD_PAGE")]).then((translated) => {
+                    if (!$window.confirm(translated[0] + " " + translated[1])) {
+                        return;
+                    }
+                    adhHttp.get(scope.proposalUrl).then((proposal) => {
+                        var patch = {
+                            content_type: proposal.content_type,
+                            data: {}
+                        };
+                        SIWorkflowAssignment.set(patch, {
+                            workflow_state: "proposed"
+                        });
+                        return adhHttp.put(proposal.path, patch).then(() => {
+                            $window.parent.location.reload();
+                        });
                     });
                 });
             };

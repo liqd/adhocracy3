@@ -45,6 +45,7 @@ class TestAPIView:
         assert config.settings ==\
                [{'decorator': [authentication.validate_user_headers,
                                authentication.validate_anonymize_header,
+                               authentication.validate_password_header,
                                schemas.validate_visibility,
                                caching.set_cache_header,
                                ],

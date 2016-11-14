@@ -432,6 +432,14 @@ attribute in the json tree.)
 
 PUT responses have the same fields as POST responses.
 
+.. note::
+
+   When putting multiple sheets in a request some changes might be
+   currently dropped when the request does not have sufficient
+   permissions, e.g. cannot be edit by the user or requires an
+   additional header.
+
+
 ERROR Handling
 ~~~~~~~~~~~~~~
 
@@ -1553,7 +1561,7 @@ custom filters:
   user resource url.
   Valid query comparable: 'eq'
   Supports sorting.
-    >>> resp_data = app_admin.get('/Documents', params={'creator': '/principals/users/0000002'}).json
+    >>> resp_data = app_admin.get('/Documents', params={'creator': '/principals/users/0000003'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['.../Documents/badges/',
      '.../Documents/document_0000000/']

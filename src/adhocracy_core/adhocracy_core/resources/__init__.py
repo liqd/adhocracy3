@@ -13,7 +13,7 @@ from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 from substanced.interfaces import IRoot
 
-from adhocracy_core.authorization import set_local_roles
+from adhocracy_core.authorization import add_local_roles
 from adhocracy_core.authentication import set_anonymized_creator
 from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.interfaces import IPool
@@ -41,6 +41,7 @@ resource_meta = ResourceMetadata(content_name='',
                                  autonaming_prefix='',
                                  use_autonaming_random=False,
                                  is_sdi_addable=False,
+                                 sdi_column_mapper=None,
                                  element_types=(),
                                  default_workflow='',
                                  alternative_workflows=tuple(),
@@ -75,6 +76,8 @@ def add_resource_type_to_registry(metadata: ResourceMetadata,
         meta['add_view'] = add_view_name
         if hasattr(config, 'add_sdi_add_view'):  # ease tests
             config.add_sdi_add_view(metadata.iresource, add_view_name)
+    if metadata.sdi_column_mapper:
+        meta['columns'] = metadata.sdi_column_mapper
     add_content_type(config, iresource.__identifier__,
                      ResourceFactory(metadata),
                      factory_type=iresource.__identifier__, **meta)
@@ -230,7 +233,8 @@ class ResourceFactory:
         from adhocracy_core.resources.principal import IUser  # prevent circles
         if IUser.providedBy(resource):  # TODO Why?
             creator = resource
-        self._set_local_role_creator(resource, creator, anonymized_creator)
+        self._set_local_role_creator(resource, creator, anonymized_creator,
+                                     registry)
 
         if IMetadata.providedBy(resource):
             metadata = self._get_metadata(resource, creator, registry)
@@ -260,10 +264,12 @@ class ResourceFactory:
     def _set_local_role_creator(self,
                                 resource: IResource,
                                 creator: IResource,
-                                anonymized_creator: IResource):
+                                anonymized_creator: IResource,
+                                registry: Registry
+                                ):
         if creator and not anonymized_creator:
             userid = resource_path(creator)
-            set_local_roles(resource, {userid: {'role:creator'}})
+            add_local_roles(resource, {userid: {'role:creator'}}, registry)
         elif creator and anonymized_creator:
             userid = resource_path(anonymized_creator)
             set_anonymized_creator(resource, userid)
@@ -312,3 +318,5 @@ def includeme(config):
     config.include('.service')
     config.include('.logbook')
     config.include('.relation')
+    config.include('.page')
+    config.include('.activity')

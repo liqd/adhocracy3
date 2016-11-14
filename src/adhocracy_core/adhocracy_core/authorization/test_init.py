@@ -14,6 +14,19 @@ def integration(config):
     return config
 
 
+@fixture
+def set_acl_with_roles(mocker):
+    return mocker.patch('adhocracy_core.authorization.'
+                        '_set_acl_with_local_roles',
+                        magic_spec=True)
+
+
+@fixture
+def set_acl(mocker):
+    return mocker.patch('adhocracy_core.authorization._set_acl',
+                        magic_spec=True)
+
+
 class TestRuleACLAuthorizationPolicy:
 
     @fixture
@@ -72,7 +85,8 @@ class TestRuleACLAuthorizationPolicy:
         assert inst.permits(context['child'], ['system.Authenticated',
                                                'Everybody'], 'view')
 
-    def test_permits_inherited_acl_multiple_principals_local_deny(self, inst, context):
+    def test_permits_inherited_acl_multiple_principals_local_deny(self, inst,
+                                                                  context):
         from pyramid.security import Allow
         from pyramid.security import Deny
         context.__acl__ = [(Allow, 'system.Authenticated', 'view')]
@@ -81,76 +95,70 @@ class TestRuleACLAuthorizationPolicy:
         assert not inst.permits(context['child'], ['system.Authenticated',
                                                    'Everybody'], 'view')
 
-    # Additional features to support group roles mapped to permissions
+    # Additional features to support permission given by local creator role
 
-    def test_permits_acl_with_local_roles(self, inst, context):
+    def test_permits_ignore_non_creator_local_roles(self, inst, context):
         from pyramid.security import Allow
-        context.__local_roles__ = {'system.Authenticated': {'role:admin'}}
         context.__acl__ = [(Allow, 'role:admin', 'view')]
-        assert inst.permits(context, ['system.Authenticated', 'Admin',
-                                      'group:Admin'],  'view')
+        context.__local_roles__ = {'User': {'role:admin'}}
+        assert not inst.permits(context, ['User'],  'view')
 
-    def test_permits_acl_with_wrong_local_roles(self, inst, context):
+    def test_permits_ignore_no_creator_local_roles_no_anonymized_creator(
+            self, inst, context, mocker):
+        from . import CREATOR_ROLEID
         from pyramid.security import Allow
-        context.__local_roles__ = {'WRONG_PRINCIPAL': {'role:admin'}}
-        context.__acl__ = [(Allow, 'role:admin', 'view')]
-        assert not inst.permits(context, ['system.Authenticated', 'Admin',
-                                          'group:Admin'],  'view')
+        context.__acl__ = [(Allow, CREATOR_ROLEID, 'view')]
+        context.__local_roles__ = {}
+        mocker.patch('adhocracy_core.authorization.get_anonymized_creator',
+                     return_value='')
+        assert not inst.permits(context, ['User'],  'view')
 
-    def test_permits_acl_with_inherited_local_roles(self, inst, context):
+    def test_permits_add_creator_local_role(self, inst, context):
         from pyramid.security import Allow
-        context.__acl__ = [(Allow, 'role:admin', 'view'),
-                           (Allow, 'role:contributor', 'add')]
-        context['child'] = testing.DummyResource(
-            __local_roles__={'system.Authenticated': {'role:admin'}})
-        context['child']['grandchild'] = testing.DummyResource(
-            __local_roles__={'system.Authenticated': {'role:contributor'}})
-        assert inst.permits(context['child']['grandchild'],
-                            ['system.Authenticated'], 'view')
-        assert inst.permits(context['child']['grandchild'],
-                            ['system.Authenticated'], 'add')
+        from . import CREATOR_ROLEID
+        context.__acl__ = [(Allow, CREATOR_ROLEID, 'view')]
+        context.__local_roles__ = {'User': {CREATOR_ROLEID}}
+        assert inst.permits(context, ['User'], 'view')
 
-    def test_permits_acl_with_inherited_creator_local_role(self, inst, context):
-        """We do not want to inherit the 'creator' local role."""
+    def test_permits_add_anonymized_creator_local_role(self, inst, context,
+                                                       mocker):
         from pyramid.security import Allow
-        context.__acl__ = [(Allow, 'role:creator', 'view')]
-        context['child'] = testing.DummyResource(
-            __local_roles__={'system.Authenticated': {'role:creator'}})
-        context['child']['grandchild'] = testing.DummyResource()
-
-        assert not inst.permits(context['child']['grandchild'],
-                                ['system.Authenticated'], 'view')
+        from . import CREATOR_ROLEID
+        mocker.patch('adhocracy_core.authorization.get_anonymized_creator',
+                     return_value='User')
+        context.__acl__ = [(Allow, CREATOR_ROLEID, 'view')]
+        assert inst.permits(context, ['User'], 'view')
 
 
-def test_set_local_roles_non_set_roles(context):
+def test_set_local_roles_non_set_roles(context, registry):
     from . import set_local_roles
     new_roles = {'principal': []}
     with raises(AssertionError):
-        set_local_roles(context, new_roles)
+        set_local_roles(context, new_roles, registry)
 
 
-def test_set_local_roles_new_roles(context):
+def test_set_local_roles_new_roles(context, registry):
     from . import set_local_roles
     new_roles = {'principal': set()}
-    set_local_roles(context, new_roles)
+    set_local_roles(context, new_roles, registry)
     assert context.__local_roles__ is new_roles
 
 
-def test_set_local_roles_non_differ_roles(context):
+def test_set_local_roles_non_differ_roles(context, registry):
     from . import set_local_roles
     old_roles = {'principal': set()}
     context.__local_roles__ = old_roles
     new_roles = {'principal': set()}
-    set_local_roles(context, new_roles)
+    set_local_roles(context, new_roles, registry)
     assert context.__local_roles__ is old_roles
 
 
-def test_set_local_roles_differ_roles(context):
+def test_set_local_roles_differ_roles(context, registry):
     from . import set_local_roles
     old_roles = {'principal': set()}
     context.__local_roles__ = old_roles
     new_roles = {'principal': {'new'}}
-    set_local_roles(context, new_roles)
+    set_local_roles(context, new_roles, registry)
     assert context.__local_roles__ is new_roles
 
 
@@ -163,7 +171,7 @@ def test_set_local_roles_notify_modified(context, config):
     old_roles = {'principal': set()}
     context.__local_roles__ = old_roles
     new_roles = {'principal': {'new'}}
-    set_local_roles(context, new_roles, registry=config.registry)
+    set_local_roles(context, new_roles, config.registry)
     event = events[0]
     assert event.object is context
     assert event.new_local_roles == new_roles
@@ -171,35 +179,54 @@ def test_set_local_roles_notify_modified(context, config):
     assert event.registry == config.registry
 
 
-def test_add_local_roles_non_update_roles(context):
+def test_set_local_roles_update_acl(context, registry, set_acl_with_roles):
+    from . import set_local_roles
+    context.__acl__ = [('principal', 'role:admin', 'view')]
+    new_roles = {'principal': {'role:admin'}}
+    set_local_roles(context, new_roles, registry)
+    set_acl_with_roles.assert_called_with(context,
+                                          [('principal', 'role:admin', 'view')],
+                                          registry)
+
+
+def test_set_local_roles_removes_old_role_aces(context, registry,
+                                               set_acl_with_roles):
+    from . import set_local_roles
+    context.__acl__ = [('Allow', 'group:admin', 'view')]
+    new_roles = {}
+    set_local_roles(context, new_roles, registry)
+    set_acl_with_roles.assert_called_with(context, [], registry)
+
+
+def test_add_local_roles_non_update_roles(context, registry):
     from . import add_local_roles
     new_roles = {'principal': []}
     with raises(AssertionError):
-        add_local_roles(context, new_roles)
+        add_local_roles(context, new_roles, registry)
 
 
-def test_add_local_roles_new_roles(context):
+def test_add_local_roles_new_roles(context, registry):
     from . import add_local_roles
     new_roles = {'principal': set()}
-    add_local_roles(context, new_roles)
+    add_local_roles(context, new_roles, registry)
     assert context.__local_roles__ == new_roles
 
 
-def test_add_local_roles_non_differ_roles(context):
+def test_add_local_roles_non_differ_roles(context, registry):
     from . import add_local_roles
     old_roles = {'principal': set()}
     context.__local_roles__ = old_roles
     new_roles = {'principal': set()}
-    add_local_roles(context, new_roles)
+    add_local_roles(context, new_roles, registry)
     assert context.__local_roles__ is old_roles
 
 
-def test_add_local_roles_differ_roles(context):
+def test_add_local_roles_differ_roles(context, registry):
     from . import add_local_roles
     old_roles = {'principal': {'old'}, 'principal2': set()}
     context.__local_roles__ = old_roles
     new_roles = {'principal': {'new'}}
-    add_local_roles(context, new_roles)
+    add_local_roles(context, new_roles, registry)
     assert context.__local_roles__ == {'principal': {'old', 'new'},
                                        'principal2': set()}
 
@@ -273,18 +300,18 @@ class TestSetACMSForAppRoot:
     @fixture
     def root_acl(self, mocker):
         mock = mocker.patch('adhocracy_core.authorization._get_root_base_acl')
-        mock.return_value =[('Allow', 'role:admin', 'view')]
+        mock.return_value = [('Allow', 'role:admin', 'view')]
         return mock
 
     def test_set_god_permissions(self, mocker, root, event, root_acl):
         from adhocracy_core import authorization
         from . import god_all_permission_ace
         mock_commit = mocker.patch('transaction.commit')
-        mocker.spy(authorization, 'set_acl')
+        mocker.spy(authorization, '_set_acl')
         self.call_fut(event)
         assert mock_commit.called
         assert root.__acl__[0] == god_all_permission_ace
-        assert authorization.set_acl.called
+        assert authorization._set_acl.called
 
     def test_set_root_acl_after_god_permission(self, root, event, root_acl):
         self.call_fut(event)
@@ -302,10 +329,10 @@ class TestSetACMSForAppRoot:
 
     def test_ignore_if_acl_not_changed(self, mocker, event, root_acl):
         from adhocracy_core import authorization
-        mocker.spy(authorization, 'set_acl')
+        mocker.spy(authorization, '_set_acl')
         self.call_fut(event)
         self.call_fut(event)
-        assert authorization.set_acl.call_count == 1
+        assert authorization._set_acl.call_count == 1
 
 
 @mark.usefixtures('integration')
@@ -315,56 +342,132 @@ def test_get_root_base_acl():
     assert acl[0] == ('Allow', 'role:admin', 'edit')
 
 
-def test_set_acl_set_resource_dirty():
-    """Regression test."""
-    from persistent.mapping import PersistentMapping
-    from . import set_acl
-    resource = PersistentMapping()
-    resource._p_jar = Mock()  # make _p_changed property work
-    set_acl(resource, [('Deny', 'role:creator', 'edit')])
-    assert resource._p_changed is True
-
-
 def test_create_fake_god_request(registry):
     from . import create_fake_god_request
     req = create_fake_god_request(registry)
     assert req.__cached_principals__ == ['role:god']
 
 
-class TestGetPrincipalsWithLocalRoles:
+class TestSetACLWithLocalRoles:
 
-    def call_fut(self,  *args):
-        from . import get_principals_with_local_roles
-        return get_principals_with_local_roles(*args)
+    @fixture
+    def acl_lineage(self, mocker):
+        return mocker.patch('adhocracy_core.authorization.get_acl_lineage',
+                            magic_spec=True,
+                            return_value=[])
 
-    def test_principals_with_no_local_roles(self, context):
-        principals = ['system.Everyone', 'system.Authenticated']
-        assert set(self.call_fut(context, principals)) == set(principals)
+    @fixture
+    def roles_all(self, mocker):
+        return mocker.patch('adhocracy_core.authorization.get_local_roles_all',
+                            magic_spec=True,
+                            return_value={})
 
-    def test_principals_with_wrong_local_roles(self, context):
-        context.__local_roles__ = {'group:default_group': {'role:participant'}}
-        principals = ['system.Everyone', 'system.Authenticated']
-        assert set(self.call_fut(context, principals)) == set(principals)
+    @fixture
+    def _set_acl(self, mocker):
+        return mocker.patch('adhocracy_core.authorization._set_acl',
+                            magic_spec=True)
 
-    def test_principals_with_local_roles(self, context):
-        context.__local_roles__ = {'group:default_group': {'role:participant'}}
-        principals = ['system.Everyone', 'system.Authenticated',
-                      'group:default_group']
-        principals_with_roles = list(principals)
-        principals_with_roles.append('role:participant')
-        result = self.call_fut(context, principals)
-        assert set(result) == set(principals_with_roles)
+    def call_fut(self, *args):
+        from . import _set_acl_with_local_roles
+        return _set_acl_with_local_roles(*args)
 
-    def test_principals_with_anonymized_creator(self, context, mocker):
-        mocker.patch('adhocracy_core.authorization.get_anonymized_creator',
-                     return_value='userid')
-        context.__local_roles__ = {}
-        principals = ['system.Everyone', 'system.Authenticated',
-                      'userid']
-        principals_with_roles = list(principals)
-        principals_with_roles.append('role:creator')
-        result = self.call_fut(context, principals)
-        assert set(result) == set(principals_with_roles)
+    def test_set_acl(self, context, acl_lineage, roles_all, _set_acl, registry):
+        acl_lineage.return_value = []
+        roles_all.return_value = {}
+        self.call_fut(context, [('Allow', 'role:admin', 'view')], registry)
+        _set_acl.assert_called_with(context,
+                                    [('Allow', 'role:admin', 'view')],
+                                    registry=registry)
+
+    def test_set_empty_acl(self, context, acl_lineage, roles_all, _set_acl,
+                           registry):
+        acl_lineage.return_value = []
+        roles_all.return_value = {}
+        self.call_fut(context, [], registry)
+        _set_acl.assert_called_with(context, [], registry=registry)
+
+    def test_add_role_to_local_acl(self, context, acl_lineage, roles_all,
+                                   _set_acl, registry):
+        acl_lineage.return_value = []
+        roles_all.return_value = {'admin': {'role:admin'}}
+        self.call_fut(context, [('Allow', 'role:admin', 'view')], registry)
+        _set_acl.assert_called_with(context,
+                                    [('Allow', 'admin', 'view'),
+                                     ('Allow', 'role:admin', 'view')],
+                                    registry=registry)
+
+    def test_add_role_to_inherited_acl(self, context, acl_lineage, roles_all,
+                                       _set_acl, registry):
+        acl_lineage.return_value = [('Allow', 'role:admin', 'view')]
+        roles_all.return_value = {'admin': {'role:admin'}}
+        self.call_fut(context, [], registry)
+        _set_acl.assert_called_with(context,
+                                    [('Allow', 'admin', 'view')],
+                                    registry=registry)
+
+    def test_dont_add_role_if_not_matching(self, context, acl_lineage, roles_all,
+                                           _set_acl, registry):
+        acl_lineage.return_value = [('Allow', 'role:admin', 'view')]
+        roles_all.return_value = {'User': {'role:participant'}}
+        self.call_fut(context, [], registry)
+        _set_acl.assert_called_with(context, [], registry=registry)
+
+    def test_dont_add_role_if_creator(self, context, acl_lineage, roles_all,
+                                      _set_acl, registry):
+        from . import CREATOR_ROLEID
+        acl_lineage.return_value = [('Allow', CREATOR_ROLEID, 'view')]
+        roles_all.return_value = {'admin': {CREATOR_ROLEID}}
+        self.call_fut(context, [], registry)
+        _set_acl.assert_called_with(context, [], registry=registry)
+
+    def test_dont_add_role_if_ace_exists(self, context, acl_lineage, roles_all,
+                                          _set_acl, registry):
+        acl_lineage.return_value = [('Allow', 'role:admin', 'view'),
+                                ('Allow', 'admin', 'view')]
+        roles_all.return_value = {'admin': {'role:admin'}}
+        self.call_fut(context, [], registry) == []
+        _set_acl.assert_called_with(context, [], registry=registry)
+
+
+def test_get_acl_return_empty_list_if_no_acl(context):
+    from . import get_acl
+    assert get_acl(context) == []
+
+
+def test_get_acl_return_acl(context):
+    from . import get_acl
+    context.__acl__ = [('Allow', 'Admin', 'view')]
+    assert get_acl(context) == [('Allow', 'Admin', 'view')]
+
+
+def test_get_acl_lineage_return_inherited_acl(context):
+    from . import get_acl_lineage
+    grand_parent = testing.DummyResource(__acl__=[('Allow', 'Admin', 'view')])
+    grand_parent['parent'] = testing.DummyResource()
+    grand_parent['parent']['child'] = context
+    context.__acl__ = [('Deny', 'Admin', 'view')]
+    assert get_acl_lineage(context) == [('Allow', 'Admin', 'view')]
+
+
+class TestSetAcl:
+
+    def call_fut(self, *args):
+        from . import set_acl
+        return set_acl(*args)
+
+    def test_set_acl_with_local_roles(self, context, registry,
+                                      set_acl_with_roles):
+        self.call_fut(context, [('Allow', 'Admin', 'view')], registry)
+        set_acl_with_roles.assert_called_with(context,
+                                              [('Allow', 'Admin', 'view')],
+                                              registry)
+
+    @mark.parametrize('acl', [([('Allow',), 'Admin', 'view'],
+                               ['Allow', ('Admin',), 'view'],
+                               ['Allow', 'Admin', ('view',)])])
+    def test_raise_if_ace_not_lists_of_strings(self, context, registry, acl):
+        with raises(AssertionError):
+            self.call_fut(context, acl, registry)
 
 
 @mark.usefixtures('integration')
@@ -373,3 +476,35 @@ def test_root_acm_extensions_adapter_register(registry, context):
     root_acm_extension = registry.getAdapter(context, IRootACMExtension)
     assert root_acm_extension == {'principals': [],
                                   'permissions': []}
+
+
+class TestIsPasswordRequiredToEdit:
+
+    def call_fut(self, *args):
+        from . import is_password_required_to_edit
+        return is_password_required_to_edit(*args)
+
+    def test_false_if_no_marker_sheet(self, mock_sheet):
+        assert self.call_fut(mock_sheet) is False
+
+    def test_true_if_marker_sheet(self, mock_sheet):
+        from adhocracy_core.interfaces import ISheetRequirePassword
+        mock_sheet.meta = \
+            mock_sheet.meta._replace(isheet=ISheetRequirePassword)
+        assert self.call_fut(mock_sheet) is True
+
+
+class TestIsPasswordRequiredToEditSome:
+
+    def call_fut(self, *args):
+        from . import is_password_required_to_edit_some
+        return is_password_required_to_edit_some(*args)
+
+    def test_false_if_no_marker_sheets(self, mock_sheet):
+        assert self.call_fut([mock_sheet]) is False
+
+    def test_true_if_markers_sheet(self, mock_sheet):
+        from adhocracy_core.interfaces import ISheetRequirePassword
+        mock_sheet.meta = \
+            mock_sheet.meta._replace(isheet=ISheetRequirePassword)
+        assert self.call_fut([mock_sheet]) is True

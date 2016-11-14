@@ -1,0 +1,30 @@
+<div data-ng-switch="transclusionId">
+    <div data-ng-switch-when="menu">
+        <div class="moving-column-tab">
+            <i class="icon-user-unfilled moving-column-icon"></i>
+        </div>
+    </div>
+
+    <adh-recompile-on-change
+        data-ng-switch-when="body"
+        data-value="{{userUrl}}">
+        <adh-user-profile
+            data-modals="modals"
+            data-path="{{userUrl}}">
+
+            <adh-user-activity-overview
+                data-path="{{path}}"
+                data-show-comments="true"
+                data-show-proposals="true"
+                data-show-ratings="true"
+            ></adh-user-activity-overview>
+
+            <section class="s1-user-profile-proposal-list">
+                <adh-s1-proposal-listing
+                    data-creator="{{path}}"
+                    data-counter="false">
+                </adh-s1-proposal-listing>
+            </section>
+        </adh-user-profile>
+    </adh-recompile-on-change>
+</div>

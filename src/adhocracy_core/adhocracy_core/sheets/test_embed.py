@@ -23,7 +23,9 @@ class TestEmbedCodeConfigAdapter:
                           'autoresize': 'false',
                           'locale': 'en',
                           'autourl': 'false',
+                          'initial_url': '',
                           'nocenter': 'true',
+                          'noheader': 'false',
                           'style': 'height: 650px',
                           }
 
@@ -67,6 +69,23 @@ class TestDeferredEmbedCode:
         result = self.call_fut(node, kw)
         assert 'data-path="http:localhost/1"' in result
 
+    def test_remove_noheader_from_embed_code_if_false(
+            self, mock_config_adapter, config, node, kw):
+        config.include('pyramid_mako')
+        mock_config_adapter.return_value = \
+            mock_config_adapter.return_value = {'noheader': 'false'}
+        result = self.call_fut(node, kw)
+        assert 'data-noheader' not in result
+
+
+    def test_remove_nocenter_from_embed_code_if_false(
+        self, mock_config_adapter, config, node, kw):
+        config.include('pyramid_mako')
+        mock_config_adapter.return_value = \
+            mock_config_adapter.return_value = {'nocenter': 'false'}
+        result = self.call_fut(node, kw)
+        assert 'data-nocenter' not in result
+
 
 class TestEmbedSheet:
 
@@ -85,11 +104,12 @@ class TestEmbedSheet:
 
     def test_create(self, meta, context):
         from .embed import deferred_default_embed_code
+        from deform.widget import TextAreaWidget
         inst = meta.sheet_class(meta, context, None)
         assert inst
-        assert inst.schema['embed_code'].readonly
         assert inst.schema['embed_code'].default \
                == deferred_default_embed_code
+        assert isinstance(inst.schema['embed_code'].widget, TextAreaWidget)
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context, None)

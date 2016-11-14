@@ -12,10 +12,12 @@ class TestS1Process:
     def test_meta(self, meta):
         import adhocracy_core.resources
         from adhocracy_s1 import resources
+        assert meta.content_name == 'Agenda-S1-Prozess'
         assert meta.iresource == resources.s1.IProcess
         assert meta.iresource.isOrExtends(
             adhocracy_core.resources.process.IProcess)
-        assert meta.default_workflow== 's1'
+        assert meta.is_implicit_addable == True
+        assert meta.default_workflow == 's1'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

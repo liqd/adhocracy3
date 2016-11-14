@@ -52,7 +52,7 @@ def filter_core_keys(keys):
     return keys
 
 
-if __name__ == '__main__':
+def main():  # noqa
     package_name = sys.argv[1]
     file_prefix = sys.argv[2]
     keys = [l.rstrip() for l in sys.stdin]
@@ -87,3 +87,7 @@ if __name__ == '__main__':
                 sort_keys=True,
                 separators=(',', ': '),
                 ensure_ascii=False)
+
+
+if __name__ == '__main__':
+    main()

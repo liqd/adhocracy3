@@ -2,6 +2,7 @@
 from pyramid.view import view_config
 from adhocracy_core.authentication import validate_user_headers
 from adhocracy_core.authentication import validate_anonymize_header
+from adhocracy_core.authentication import validate_password_header
 from adhocracy_core.caching import set_cache_header
 from adhocracy_core.interfaces import API_ROUTE_NAME
 from adhocracy_core.rest.schemas import validate_request_data
@@ -63,6 +64,7 @@ class api_view(view_config):  # noqa
                     'route_name': API_ROUTE_NAME,
                     'decorator': [validate_user_headers,
                                   validate_anonymize_header,
+                                  validate_password_header,
                                   validate_visibility,
                                   set_cache_header,
                                   ]

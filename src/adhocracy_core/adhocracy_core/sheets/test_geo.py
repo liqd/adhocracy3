@@ -51,6 +51,20 @@ class TestMultiPolygonSchema:
         with raises(Invalid):
             inst.deserialize(cstruct)
 
+    def test_deserialize_line_string_empty(self, inst):
+        cstruct = {'coordinates': [['[]']]}
+        assert inst.deserialize(cstruct) == {'coordinates': [[[]]]}
+
+    def test_deserialize_line_string_valid(self, inst):
+        cstruct = {'coordinates': [['[[1, 1]]']]}
+        assert inst.deserialize(cstruct) == {'coordinates': [[[(1.0, 1.0)]]]}
+
+    def test_deserialize_line_string_invalid(self, inst):
+        from colander import Invalid
+        cstruct = {'coordinates': [['][']]}
+        with raises(Invalid):
+            inst.deserialize((cstruct))
+
     def test_serialize_empty(self, inst, multipolygon_default):
         assert inst.serialize({}) == multipolygon_default
 

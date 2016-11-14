@@ -84,7 +84,7 @@ class LocalRolesSheet(AnnotationRessourceSheet):
         if not roles_list:
             return
         roles = {x['principal']: set(x['roles']) for x in roles_list}
-        set_local_roles(self.context, roles)
+        set_local_roles(self.context, roles, self.registry)
 
 
 local_roles_meta = sheet_meta._replace(

@@ -39,7 +39,7 @@ def test_includeme_add_bplan_private_workflow(registry):
 
 @mark.usefixtures('integration')
 def test_initiate_bplan_private_workflow(registry, context):
-    from substanced.util import get_acl
+    from adhocracy_core.authorization import get_acl
     workflow = registry.content.workflows['bplan_private']
     assert workflow.state_of(context) is None
     workflow.initialize(context)
@@ -181,24 +181,24 @@ class TestBPlanWorkflow:
         resp = app_anonymous.get(path='/bplan/proposal_0000000')
         assert resp.status_code == 403
 
-    def test_participate_initiator_can_view_proposal(self,
-                                                     app_initiator):
+    def test_participate_initiator_cannot_view_proposal(self,
+                                                        app_initiator):
         resp = app_initiator.get(path='/bplan/proposal_0000000')
-        assert resp.status_code == 200
+        assert resp.status_code == 403
 
     def test_change_state_to_frozen(self, app_initiator):
         resp = do_transition_to(app_initiator, '/bplan', 'closed')
         assert resp.status_code == 200
 
     def test_closed_anonymous_cannot_create_proposal(self,
-                                                       app_anonymous):
+                                                     app_anonymous):
         from adhocracy_meinberlin.resources.bplan import IProposal
         assert IProposal not in app_anonymous.get_postable_types('/bplan')
 
-    def test_closed_initiator_can_view_proposal(self,
-                                                  app_initiator):
+    def test_closed_initiator_cannot_view_proposal(self,
+                                                   app_initiator):
         resp = app_initiator.get(path='/bplan/proposal_0000000')
-        assert resp.status_code == 200
+        assert resp.status_code == 403
 
     def test_closed_anonymous_cannot_view_proposal(self,
                                                      app_anonymous):

@@ -1,15 +1,17 @@
 /// <reference path="../../../../../lib2/types/angular.d.ts"/>
 
-import * as AdhConfig from "../../../Config/Config";
-import * as AdhHttp from "../../../Http/Http";
-import * as AdhMetaApi from "../../../MetaApi/MetaApi";
-import * as AdhMovingColumns from "../../../MovingColumns/MovingColumns";
-import * as AdhPermissions from "../../../Permissions/Permissions";
-import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
-import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
-import * as AdhUtil from "../../../Util/Util";
+import * as AdhConfig from "../../../Core/Config/Config";
+import * as AdhHttp from "../../../Core/Http/Http";
+import * as AdhMetaApi from "../../../Core/MetaApi/MetaApi";
+import * as AdhMovingColumns from "../../../Core/MovingColumns/MovingColumns";
+import * as AdhPermissions from "../../../Core/Permissions/Permissions";
+import * as AdhResourceArea from "../../../Core/ResourceArea/ResourceArea";
+import * as AdhTopLevelState from "../../../Core/TopLevelState/TopLevelState";
+import * as AdhUtil from "../../../Core/Util/Util";
 
 import * as AdhMercator2015Workbench from "../../2015/Workbench/Workbench";
+
+import * as ResourcesBase from "../../../../ResourcesBase";
 
 import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 import RIProcess from "../../../../Resources_/adhocracy_mercator/resources/mercator2/IProcess";
@@ -164,7 +166,7 @@ export var proposalListingColumnDirective = (
 
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
-                var currentPhase = resource.data[SIWorkflow.nick].workflow_state;
+                var currentPhase = SIWorkflow.get(resource).workflow_state;
 
                 scope.sort = "item_creation_date";
                 scope.setSort = (sort : string) => {
@@ -253,7 +255,7 @@ export var registerRoutes = (
         .specific(RICommentVersion, "", processType, context, ["adhHttp", "$q", (
             adhHttp : AdhHttp.Service,
             $q : angular.IQService
-        ) => (resource : RICommentVersion) => {
+        ) => (resource : ResourcesBase.IResource) => {
             var specifics = {};
             specifics["commentUrl"] = resource.path;
 
@@ -261,7 +263,7 @@ export var registerRoutes = (
                 if (resource.content_type !== RICommentVersion.content_type) {
                     return $q.when(resource);
                 } else {
-                    var url = resource.data[SIComment.nick].refers_to;
+                    var url = SIComment.get(resource).refers_to;
                     return adhHttp.get(url).then(getCommentableUrl);
                 }
             };
@@ -295,7 +297,7 @@ export var registerRoutes = (
         })
         .specific(RIProcess, "create_proposal", processType, context, ["adhHttp",
             (adhHttp : AdhHttp.Service) => {
-                return (resource : RIProcess) => {
+                return (resource : ResourcesBase.IResource) => {
                     return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                         if (!options.POST) {
                             throw 401;
@@ -310,7 +312,7 @@ export var registerRoutes = (
             space: "content",
             movingColumns: "is-show-show-hide"
         })
-        .specific(RIProposal, "", processType, context, () => (resource : RIProposal) => {
+        .specific(RIProposal, "", processType, context, () => (resource : ResourcesBase.IResource) => {
             return {
                 proposalUrl: resource.path
             };
@@ -319,7 +321,7 @@ export var registerRoutes = (
             space: "content",
             movingColumns: "is-show-show-hide"
         })
-        .specific(RIProposal, "blog", processType, context, () => (resource : RIProposal) => {
+        .specific(RIProposal, "blog", processType, context, () => (resource : ResourcesBase.IResource) => {
             return {
                 proposalUrl: resource.path
             };
@@ -329,7 +331,7 @@ export var registerRoutes = (
             movingColumns: "is-collapse-show-hide"
         })
         .specific(RIProposal, "moderate", processType, context, ["adhHttp", (adhHttp : AdhHttp.Service) => {
-            return (resource : RIProposal) => {
+            return (resource : ResourcesBase.IResource) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.canPut(SIWinnerInfo.nick)) {
                         throw 401;
@@ -346,7 +348,7 @@ export var registerRoutes = (
             movingColumns: "is-collapse-show-hide"
         })
         .specific(RIProposal, "edit", processType, context, ["adhHttp", (adhHttp : AdhHttp.Service) => {
-            return (resource : RIProposal) => {
+            return (resource : ResourcesBase.IResource) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -363,7 +365,7 @@ export var registerRoutes = (
             movingColumns: "is-show-show-hide",
             proposalTab: "blog"
         })
-        .specific(RIProposal, "blog", processType, context, () => (resource : RIProposal) => {
+        .specific(RIProposal, "blog", processType, context, () => (resource : ResourcesBase.IResource) => {
             return {
                 proposalUrl: resource.path
             };
@@ -372,7 +374,7 @@ export var registerRoutes = (
             space: "content",
             movingColumns: "is-collapse-show-show"
         })
-        .specific(RIProposal, "comments", processType, context, () => (resource : RIProposal) => {
+        .specific(RIProposal, "comments", processType, context, () => (resource : ResourcesBase.IResource) => {
             return {
                 proposalUrl: resource.path,
                 commentableUrl: resource.path,
@@ -388,10 +390,10 @@ export var registerRoutes = (
                 movingColumns: "is-collapse-show-show"
             })
             .specific(RIProposal, "comments:" + section, processType, context, () =>
-                (resource : RIProposal) => {
+                (resource : ResourcesBase.IResource) => {
                     return {
                         proposalUrl: resource.path,
-                        commentableUrl: resource.data[SIMercatorSubResources.nick][section],
+                        commentableUrl: SIMercatorSubResources.get(resource)[section],
                         commentCloseUrl: resource.path
                     };
                 }

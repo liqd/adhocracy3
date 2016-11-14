@@ -53,6 +53,8 @@ class TestRoot:
         assert find_catalog(inst, 'adhocracy') is not None
         assert find_service(inst, 'principals', 'users') is not None
         assert find_service(inst, 'locations') is not None
+        assert find_service(inst, 'pages') is not None
+        assert find_service(inst, 'activity_stream') is not None
 
     def test_create_root_with_initial_god_user(self, registry, request_):
         from substanced.interfaces import IUserLocator

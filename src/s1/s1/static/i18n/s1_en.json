@@ -1,15 +1,11 @@
 {
     "TR__ARCHIVE": "Archive",
     "TR__CREATE_PROPOSAL": "Add proposal",
-    "TR__I_UNDERSTAND": "I understand",
-    "TR__LATER": "Later",
+    "TR__DO_YOU_WANT_TO_RENOMINATE": "Do you want to renominate this proposal?",
     "TR__MEETING_A": "Upcoming meeting",
     "TR__MEETING_B": "Following meeting",
-    "TR__MORE": "More",
     "TR__NEW_PROPOSAL": "New proposal",
     "TR__PROPOSAL_EMPTY_TEXT": "There are no proposals for this meeting yet. Be the first to create one!",
-    "TR__S1_ABOUT_HEADER": "About the process",
-    "TR__S1_ABOUT_TEXT": "**How does it work?**\n\nThe Agenda S-1 is a participation tool which makes it easier to identify issues within your staff that otherwise would not have come up. At the same time, Agenda S-1 does not reverse or disrupt the established decision-making process of your organisation.\n\n**Phase 1: Creating Suggestions**\n\nSingle member of your staff and/or a group make a suggestion for an Agenda S-1 item. It is important to encourage an open and discussion-friendly wording. A meaningful heading is a first step to create a viable suggestion. The main body of the suggestion gives the user the opportunity to describe the issue also for people who are less in the know. Ideally, the user also specifies how the topic will be presented at the meeting.  The suggestion phase for the upcoming board meeting ends typically three days before the actual meeting. After this phase, it is no longer possible to make new suggestions for the next meeting but vote on the existing suggestions. However, your staff can work on suggestions for the next but one meeting. This means that suggestions can be created at any phase of the participation process.\n\n**Phase 2: Discussion**\n\nAfter the end of the suggestion phase for the next board meeting, your staff enters the discussion phase. It has the opportunity to elaborate on the suggestions, add solutions and/or more detail. The aim is to strengthen the suggestion, show its relevance with regard to the aims of your organisation and to facilitate a deliberative learning process for both the members of staff and the board.\n\n**Phase 3: Voting**\n\nAny member of staff can cast a vote on any number of suggestion eligible for the next board meeting. It is not mandatory to support only the most important suggestions. Nonetheless, only the suggestion with the most support (according to staff's votes) becomes an item on the agenda for the next board meeting. However, non-wining suggestions may become part of subsequent Agenda S-1 participation processes.  The voting phase ends typically two days before the board meeting so that the board has ample time to prepare the topic for their meeting.",
     "TR__S1_DESCRIPTION_PLACEHOLDER": "Add description here",
     "TR__S1_ERROR_REQUIRED_DESCRIPTION": "Description required",
     "TR__S1_ERROR_REQUIRED_TITLE": "Title required",
@@ -18,14 +14,10 @@
     "TR__S1_FACET_STATE_HEADER": "State",
     "TR__S1_GO_HEADER": "Let's go",
     "TR__S1_GO_TO_PLATFORM": "To the platform",
-    "TR__S1_INTRODUCTION_HEADER": "Welcome to Agenda S-1 – the second but last item on the meeting agenda",
-    "TR__S1_INTRODUCTION_TEXT": "Thanks for using our participation platform Agenda S-1. Our platform offers your staff the opportunity to collaboratively put an additional item on the agenda of the next board meeting. In a first step, your staff has the opportunity to discuss different suggestions. Then in a second phase, your staff identifies the most suitable suggestion for the next board meeting. The winning suggestion becomes automatically the second but last item on the next meeting agenda – the one before any other business.",
     "TR__S1_RENOMINATE_PROPOSAL": "Renominate proposal",
     "TR__S1_TITLE_PLACEHOLDER": "Add title here",
-    "TR__S1_SWITCH_TO": "Switch to",
     "TR__S1_WORKFLOW_PROPOSE": "Create and rate proposals",
-    "TR__S1_WORKFLOW_SELECT": "Rate proposals",
     "TR__S1_WORKFLOW_RESULT": "Show winner",
-    "TR__SELECTED": "Winner",
-    "TR__SUPPORT": "Support"
+    "TR__S1_WORKFLOW_SELECT": "Rate proposals",
+    "TR__SELECTED": "Winner"
 }
