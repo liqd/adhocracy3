@@ -29,7 +29,7 @@ def do_transition_to_voteable(context: IPool, request: Request, **kwargs):
 def do_transition_to_result(context: IPool, request: Request, **kwargs):
     """Do various tasks to complete transition to result state."""
     decision_date = datetime.utcnow().replace(tzinfo=UTC)
-    _store_state_data(context, 'result', request, start_date=decision_date)
+    _store_start_date(context, 'result', request, decision_date)
     _change_children_to_rejected_or_selected(context, request,
                                              start_date=decision_date)
 
@@ -52,20 +52,14 @@ def _change_children_to_rejected_or_selected(context: IPool, request: Request,
                            to_state='rejected', start_date=start_date)
 
 
-def _store_state_data(context: IWorkflowAssignment, state_name: str,
-                      request: Request,
-                      **kwargs):
+def _store_start_date(context: IWorkflowAssignment, state_name: str,
+                      request: Request, start_date: datetime):
     sheet = request.registry.content.get_sheet(context,
                                                IWorkflowAssignment,
                                                request=request)
-    state_data = sheet.get()['state_data']
-    datas = [x for x in state_data if x['name'] == state_name]
-    if datas == []:
-        data = {'name': state_name}
-        state_data.append(data)
-    else:
-        data = datas[0]
-    data.update(**kwargs)
+    # TODO: Do not overwrite other state_date.
+    state_data = [{'name': state_name,
+                  'start_date': start_date}]
     sheet.set({'state_data': state_data})
 
 
@@ -101,8 +95,7 @@ def _do_transition(context, request: Request, from_state: str, to_state: str,
         if current_state == from_state:
             sheet.set({'workflow_state': to_state})
             if start_date is not None:
-                _store_state_data(context, to_state, request,
-                                  start_date=start_date)
+                _store_start_date(context, to_state, request, start_date)
 
 
 def do_transition_to_proposed(context: IProposal,
