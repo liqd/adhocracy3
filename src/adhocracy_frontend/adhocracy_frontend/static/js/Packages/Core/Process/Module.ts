@@ -21,5 +21,5 @@ export var register = (angular) => {
         .directive("adhProcessListItem", ["adhConfig", "adhHttp", "adhNames", Process.listItemDirective])
         .directive("adhProcessListing", ["adhConfig", Process.listingDirective])
         .directive("adhCurrentProcessTitle", ["adhTopLevelState", "adhHttp", Process.currentProcessTitleDirective])
-        .directive("adhIdeaCollectionDetail", ["adhConfig", "adhEmbed", "adhHttp", "adhPermissions", "$q", Process.detailDirective]);
+        .directive("adhProcessDetail", ["adhConfig", "adhEmbed", "adhHttp", "adhPermissions", "$q", Process.detailDirective]);
 };
