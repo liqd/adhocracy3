@@ -24,8 +24,8 @@ import * as moment from "moment";
 import * as webshim from "polyfiller";
 
 import * as AdhCoreModule from "./Packages/Core/Module";
-import * as AdhIdeaCollectionModule from "./Packages/Core/IdeaCollection/Module";
 import * as AdhMeinberlinModule from "./Packages/Meinberlin/Module";
+import * as AdhWorkbenchModule from "./Packages/Core/Workbench/Module";
 
 import * as AdhConfig from "./Packages/Core/Config/Config";
 import * as AdhTopLevelState from "./Packages/Core/TopLevelState/TopLevelState";
@@ -61,8 +61,8 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "ngMessages",
         "flow",
         AdhCoreModule.moduleName,
-        AdhIdeaCollectionModule.moduleName,
-        AdhMeinberlinModule.moduleName
+        AdhMeinberlinModule.moduleName,
+        AdhWorkbenchModule.moduleName
     ];
 
     if (config.cachebust) {

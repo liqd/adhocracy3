@@ -1,7 +1,7 @@
-import * as AdhIdeaCollectionModule from "../../Core/IdeaCollection/Module";
 import * as AdhNamesModule from "../../Core/Names/Module";
 import * as AdhProcessModule from "../../Core/Process/Module";
 import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
+import * as AdhWorkbenchModule from "../../Core/Workbench/Module";
 
 import * as AdhEmbed from "../../Core/Embed/Embed";
 import * as AdhNames from "../../Core/Names/Names";
@@ -22,10 +22,10 @@ export var register = (angular) => {
 
     angular
         .module(moduleName, [
-            AdhIdeaCollectionModule.moduleName,
             AdhNamesModule.moduleName,
             AdhProcessModule.moduleName,
-            AdhResourceAreaModule.moduleName
+            AdhResourceAreaModule.moduleName,
+            AdhWorkbenchModule.moduleName,
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider

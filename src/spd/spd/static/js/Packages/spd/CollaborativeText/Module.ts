@@ -1,6 +1,6 @@
 import * as AdhDocumentModule from "../../Core/Document/Module";
 import * as AdhEmbedModule from "../../Core/Embed/Module";
-import * as AdhIdeaCollectionModule from "../../Core/IdeaCollection/Module";
+import * as AdhWorkbenchModule from "../../Core/Workbench/Module";
 import * as AdhNamesModule from "../../Core/Names/Module";
 import * as AdhProcessModule from "../../Core/Process/Module";
 import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
@@ -25,10 +25,10 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhDocumentModule.moduleName,
             AdhEmbedModule.moduleName,
-            AdhIdeaCollectionModule.moduleName,
             AdhNamesModule.moduleName,
             AdhProcessModule.moduleName,
             AdhResourceAreaModule.moduleName,
+            AdhWorkbenchModule.moduleName,
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider
