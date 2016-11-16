@@ -1,17 +1,17 @@
-import * as AdhAbuseModule from "../../Abuse/Module";
-import * as AdhBadgeModule from "../../Badge/Module";
-import * as AdhCommentModule from "../../Comment/Module";
-import * as AdhHttpModule from "../../Http/Module";
-import * as AdhMovingColumnsModule from "../../MovingColumns/Module";
-import * as AdhPermissionsModule from "../../Permissions/Module";
-import * as AdhProcessModule from "../../Process/Module";
-import * as AdhResourceActionsModule from "../../ResourceActions/Module";
-import * as AdhResourceAreaModule from "../../ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
+import * as AdhAbuseModule from "../Abuse/Module";
+import * as AdhBadgeModule from "../Badge/Module";
+import * as AdhCommentModule from "../Comment/Module";
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhMovingColumnsModule from "../MovingColumns/Module";
+import * as AdhPermissionsModule from "../Permissions/Module";
+import * as AdhProcessModule from "../Process/Module";
+import * as AdhResourceActionsModule from "../ResourceActions/Module";
+import * as AdhResourceAreaModule from "../ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
 import * as Workbench from "./Workbench";
 
-export var moduleName = "adhIdeaCollectionWorkbench";
+export var moduleName = "adhWorkbench";
 
 export var register = (angular) => {
     angular

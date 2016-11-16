@@ -5,11 +5,11 @@ import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
 
 import * as AdhEmbed from "../../Core/Embed/Embed";
 import * as AdhIdeaCollectionProposal from "../../Core/IdeaCollection/Proposal/Proposal";
-import * as AdhIdeaCollectionWorkbench from "../../Core/IdeaCollection/Workbench/Workbench";
 import * as AdhNames from "../../Core/Names/Names";
 import * as AdhPoll from "../../Core/IdeaCollection/Poll/Poll";
 import * as AdhProcess from "../../Core/Process/Process";
 import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
+import * as AdhWorkbench from "../../Core/Workbench/Workbench";
 
 import RIPoll from "../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IPoll";
 import RIProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
@@ -43,14 +43,14 @@ export var register = (angular) => {
             AdhPoll.detailDirective(processType)])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
             var registerRoutes = (context? : string) => (provider) => {
-                AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
+                AdhWorkbench.registerCommonRoutesFactory(
                     RIStadtforumProcess, RIPoll, RIProposalVersion)(context)(provider);
-                AdhIdeaCollectionWorkbench.registerProposalRoutesFactory(
+                AdhWorkbench.registerProposalRoutesFactory(
                     RIStadtforumProcess, RIPoll, RIProposalVersion, false)(context)(provider);
             };
             registerRoutes()(adhResourceAreaProvider);
 
-            var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
+            var processHeaderSlot = adhConfig.pkg_path + AdhWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
         }])
         .config(["adhProcessProvider", "adhConfig", (adhProcessProvider : AdhProcess.Provider, adhConfig) => {

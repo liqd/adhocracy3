@@ -36,6 +36,7 @@ import * as AdhTrackingModule from "./Tracking/Module";
 import * as AdhUserModule from "./User/Module";
 import * as AdhUserViewsModule from "./User/ViewsModule";
 import * as AdhWebSocketModule from "./WebSocket/Module";
+import * as AdhWorkbenchModule from "./Workbench/Module";
 
 export var moduleName = "adhCore";
 
@@ -78,6 +79,7 @@ export var register = (angular, config, metaApi) => {
     AdhUserModule.register(angular);
     AdhUserViewsModule.register(angular);
     AdhWebSocketModule.register(angular);
+    AdhWorkbenchModule.register(angular);
 
     angular
         .module(moduleName, [
@@ -90,6 +92,7 @@ export var register = (angular, config, metaApi) => {
             AdhPageModule.moduleName,
             AdhResourceAreaModule.moduleName,
             AdhTrackingModule.moduleName,
-            AdhUserViewsModule.moduleName
+            AdhUserViewsModule.moduleName,
+            AdhWorkbenchModule.moduleName
         ]);
 };

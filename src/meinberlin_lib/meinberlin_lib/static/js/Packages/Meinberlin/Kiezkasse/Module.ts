@@ -6,10 +6,10 @@ import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
 
 import * as AdhEmbed from "../../Core/Embed/Embed";
 import * as AdhIdeaCollectionProposal from "../../Core/IdeaCollection/Proposal/Proposal";
-import * as AdhIdeaCollectionWorkbench from "../../Core/IdeaCollection/Workbench/Workbench";
 import * as AdhNames from "../../Core/Names/Names";
 import * as AdhProcess from "../../Core/Process/Process";
 import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
+import * as AdhWorkbench from "../../Core/Workbench/Workbench";
 
 import RIKiezkasseProcess from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
 import RIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
@@ -35,15 +35,15 @@ export var register = (angular) => {
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
             var registerRoutes = (context? : string) => (provider) => {
-                AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
+                AdhWorkbench.registerCommonRoutesFactory(
                     RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion)(context)(provider);
-                AdhIdeaCollectionWorkbench.registerProposalRoutesFactory(
+                AdhWorkbench.registerProposalRoutesFactory(
                     RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion, true)(context)(provider);
             };
             registerRoutes()(adhResourceAreaProvider);
             registerRoutes("kiezkasse")(adhResourceAreaProvider);
 
-            var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
+            var processHeaderSlot = adhConfig.pkg_path + AdhWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
         }])
         .config(["adhConfig", "adhProcessProvider", (adhConfig, adhProcessProvider : AdhProcess.Provider) => {

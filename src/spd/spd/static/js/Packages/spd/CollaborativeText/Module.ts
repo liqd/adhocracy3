@@ -7,10 +7,10 @@ import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
 
 import * as AdhDocument from "../../Core/Document/Document";
 import * as AdhEmbed from "../../Core/Embed/Embed";
-import * as AdhIdeaCollectionWorkbench from "../../Core/IdeaCollection/Workbench/Workbench";
 import * as AdhNames from "../../Core/Names/Names";
 import * as AdhProcess from "../../Core/Process/Process";
 import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
+import * as AdhWorkbench from "../../Core/Workbench/Workbench";
 
 import RIDigitalLebenProcess from "../../../Resources_/adhocracy_spd/resources/digital_leben/IProcess";
 import RIDocument from "../../../Resources_/adhocracy_core/resources/document/IDocument";
@@ -35,12 +35,12 @@ export var register = (angular) => {
                 .registerDirective("debate-workbench");
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider: AdhResourceArea.Provider, adhConfig) => {
-            AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
+            AdhWorkbench.registerCommonRoutesFactory(
                 RIDigitalLebenProcess, RIDocument, RIDocumentVersion)()(adhResourceAreaProvider);
-            AdhIdeaCollectionWorkbench.registerDocumentRoutesFactory(
+            AdhWorkbench.registerDocumentRoutesFactory(
                 RIDigitalLebenProcess, RIDocument, RIDocumentVersion)()(adhResourceAreaProvider);
 
-            var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/AddDocumentSlot.html";
+            var processHeaderSlot = adhConfig.pkg_path + AdhWorkbench.pkgLocation + "/AddDocumentSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
         }])
         .config(["adhConfig", "adhProcessProvider", (adhConfig, adhProcessProvider : AdhProcess.Provider) => {

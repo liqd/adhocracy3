@@ -9,7 +9,7 @@ import * as AdhEmbed from "../../Core/Embed/Embed";
 import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
 
 import * as AdhMeinberlinAlexanderplatzWorkbench from "../Alexanderplatz/Workbench/Workbench";
-import * as AdhIdeaCollectionWorkbench from "../../Core/IdeaCollection/Workbench/Workbench";
+import * as AdhWorkbench from "../../Core/Workbench/Workbench";
 
 import RIAlexanderplatzProcess from "../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess";
 import RIBuergerhaushaltProcess from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
@@ -51,16 +51,16 @@ export var register = (angular) => {
                 RIAlexanderplatzProcess.content_type, "mein.berlin.de")(adhResourceAreaProvider);
 
             var registerCommonAndProposalRoutes = (processType, itemType, versionType, hasCommentColumn) => {
-                AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
+                AdhWorkbench.registerCommonRoutesFactory(
                     processType, itemType, versionType)("mein.berlin.de")(adhResourceAreaProvider);
-                AdhIdeaCollectionWorkbench.registerProposalRoutesFactory(
+                AdhWorkbench.registerProposalRoutesFactory(
                     processType, itemType, versionType, hasCommentColumn)("mein.berlin.de")(adhResourceAreaProvider);
             };
 
             var registerCommonAndDocumentRoutes = (processType, itemType, versionType) => {
-                AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
+                AdhWorkbench.registerCommonRoutesFactory(
                     processType, itemType, versionType)("mein.berlin.de")(adhResourceAreaProvider);
-                AdhIdeaCollectionWorkbench.registerDocumentRoutesFactory(
+                AdhWorkbench.registerDocumentRoutesFactory(
                     processType, itemType, versionType)("mein.berlin.de")(adhResourceAreaProvider);
             };
 

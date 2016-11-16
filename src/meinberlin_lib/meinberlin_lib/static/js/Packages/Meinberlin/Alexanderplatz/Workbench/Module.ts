@@ -10,9 +10,9 @@ import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
 import * as AdhTopLevelStateModule from "../../../Core/TopLevelState/Module";
 
 import * as AdhIdeaCollectionProposal from "../../../Core/IdeaCollection/Proposal/Proposal";
-import * as AdhIdeaCollectionWorkbench from "../../../Core/IdeaCollection/Workbench/Workbench";
 import * as AdhNames from "../../../Core/Names/Names";
 import * as AdhProcess from "../../../Core/Process/Process";
+import * as AdhWorkbench from "../../../Core/Workbench/Workbench";
 
 import RIGeoProposal from "../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
 import RIGeoProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
@@ -55,7 +55,7 @@ export var register = (angular) => {
             });
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider, adhConfig) => {
-            var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
+            var processHeaderSlot = adhConfig.pkg_path + AdhWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
             Workbench.registerRoutes(processType)(adhResourceAreaProvider);
         }])
