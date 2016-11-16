@@ -55,8 +55,7 @@ export var register = (angular) => {
         }])
         .config(["adhProcessProvider", "adhConfig", (adhProcessProvider : AdhProcess.Provider, adhConfig) => {
             adhProcessProvider.templates[processType] =
-                "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
-                "</adh-idea-collection-workbench>";
+                "<adh-workbench data-process-properties=\"processProperties\"></adh-workbench>";
             adhProcessProvider.setProperties(processType, {
                 createSlot: adhConfig.pkg_path + AdhProposal.pkgLocation + "/CreateSlot.html",
                 detailSlot: adhConfig.pkg_path + AdhPoll.pkgLocation + "/DetailSlot.html",

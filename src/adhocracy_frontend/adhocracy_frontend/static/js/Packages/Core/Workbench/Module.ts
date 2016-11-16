@@ -33,7 +33,7 @@ export var register = (angular) => {
         // "adhDebateWorkbench" such as not to break currently running embeds.
         .directive("adhDebateWorkbench", [
             "adhTopLevelState", "adhConfig", "adhHttp", Workbench.workbenchDirective])
-        .directive("adhIdeaCollectionWorkbench", [
+        .directive("adhWorkbench", [
             "adhTopLevelState", "adhConfig", "adhHttp", Workbench.workbenchDirective])
         .directive("adhDocumentDetailColumn", [
             "adhConfig", "adhPermissions", "adhTopLevelState", Workbench.documentDetailColumnDirective])
@@ -47,11 +47,11 @@ export var register = (angular) => {
             "adhConfig", "adhTopLevelState", Workbench.proposalCreateColumnDirective])
         .directive("adhProposalEditColumn", [
             "adhConfig", "adhTopLevelState", Workbench.proposalEditColumnDirective])
-        .directive("adhIdeaCollectionImageColumn", [
+        .directive("adhImageColumn", [
             "adhConfig", "adhTopLevelState", "adhResourceUrlFilter", "adhParentPathFilter", Workbench.imageColumnDirective])
         .directive("adhProcessDetailColumn", ["adhConfig", "adhTopLevelState", Workbench.detailColumnDirective])
-        .directive("adhIdeaCollectionAddDocumentButton", [
+        .directive("adhAddDocumentButton", [
             "adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", Workbench.addDocumentButtonDirective])
-        .directive("adhIdeaCollectionAddProposalButton", [
+        .directive("adhAddProposalButton", [
             "adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", Workbench.addProposalButtonDirective]);
 };
