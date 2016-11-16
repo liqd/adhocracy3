@@ -5,7 +5,7 @@ import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
 
 import * as AdhEmbed from "../../Core/Embed/Embed";
 import * as AdhNames from "../../Core/Names/Names";
-import * as AdhPoll from "../../Core/IdeaCollection/Poll/Poll";
+import * as AdhPoll from "../../Core/Poll/Poll";
 import * as AdhProcess from "../../Core/Process/Process";
 import * as AdhProposal from "../../Core/Proposal/Proposal";
 import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";

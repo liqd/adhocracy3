@@ -24,6 +24,7 @@ import * as AdhMovingColumnsModule from "./MovingColumns/Module";
 import * as AdhNamesModule from "./Names/Module";
 import * as AdhPageModule from "./Page/Module";
 import * as AdhPermissionsModule from "./Permissions/Module";
+import * as AdhPollModule from "./Poll/Module";
 import * as AdhPreliminaryNamesModule from "./PreliminaryNames/Module";
 import * as AdhProcessModule from "./Proposal/Module";
 import * as AdhProposalModule from "./Process/Module";
@@ -68,6 +69,7 @@ export var register = (angular, config, metaApi) => {
     AdhNamesModule.register(angular);
     AdhPageModule.register(angular);
     AdhPermissionsModule.register(angular);
+    AdhPollModule.register(angular);
     AdhPreliminaryNamesModule.register(angular);
     AdhProcessModule.register(angular);
     AdhProposalModule.register(angular);
