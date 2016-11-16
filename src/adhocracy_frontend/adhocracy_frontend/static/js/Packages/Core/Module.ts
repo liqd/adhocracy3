@@ -25,7 +25,8 @@ import * as AdhNamesModule from "./Names/Module";
 import * as AdhPageModule from "./Page/Module";
 import * as AdhPermissionsModule from "./Permissions/Module";
 import * as AdhPreliminaryNamesModule from "./PreliminaryNames/Module";
-import * as AdhProcessModule from "./Process/Module";
+import * as AdhProcessModule from "./Proposal/Module";
+import * as AdhProposalModule from "./Process/Module";
 import * as AdhRateModule from "./Rate/Module";
 import * as AdhResourceActionsModule from "./ResourceActions/Module";
 import * as AdhResourceAreaModule from "./ResourceArea/Module";
@@ -69,6 +70,7 @@ export var register = (angular, config, metaApi) => {
     AdhPermissionsModule.register(angular);
     AdhPreliminaryNamesModule.register(angular);
     AdhProcessModule.register(angular);
+    AdhProposalModule.register(angular);
     AdhRateModule.register(angular);
     AdhResourceActionsModule.register(angular);
     AdhResourceAreaModule.register(angular);

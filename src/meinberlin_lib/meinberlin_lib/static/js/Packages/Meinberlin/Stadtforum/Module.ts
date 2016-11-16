@@ -4,10 +4,10 @@ import * as AdhProcessModule from "../../Core/Process/Module";
 import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
 
 import * as AdhEmbed from "../../Core/Embed/Embed";
-import * as AdhIdeaCollectionProposal from "../../Core/IdeaCollection/Proposal/Proposal";
 import * as AdhNames from "../../Core/Names/Names";
 import * as AdhPoll from "../../Core/IdeaCollection/Poll/Poll";
 import * as AdhProcess from "../../Core/Process/Process";
+import * as AdhProposal from "../../Core/Proposal/Proposal";
 import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
 import * as AdhWorkbench from "../../Core/Workbench/Workbench";
 
@@ -58,9 +58,9 @@ export var register = (angular) => {
                 "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
                 "</adh-idea-collection-workbench>";
             adhProcessProvider.setProperties(processType, {
-                createSlot: adhConfig.pkg_path + AdhIdeaCollectionProposal.pkgLocation + "/CreateSlot.html",
+                createSlot: adhConfig.pkg_path + AdhProposal.pkgLocation + "/CreateSlot.html",
                 detailSlot: adhConfig.pkg_path + AdhPoll.pkgLocation + "/DetailSlot.html",
-                editSlot: adhConfig.pkg_path + AdhIdeaCollectionProposal.pkgLocation + "/EditSlot.html",
+                editSlot: adhConfig.pkg_path + AdhProposal.pkgLocation + "/EditSlot.html",
                 itemClass: RIPoll,
                 versionClass: RIProposalVersion
             });

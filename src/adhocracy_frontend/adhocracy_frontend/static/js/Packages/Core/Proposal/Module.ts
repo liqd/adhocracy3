@@ -1,17 +1,17 @@
-import * as AdhAngularHelpersModule from "../../AngularHelpers/Module";
-import * as AdhAnonymizeModule from "../../Anonymize/Module";
-import * as AdhBadgeModule from "../../Badge/Module";
-import * as AdhHttpModule from "../../Http/Module";
-import * as AdhMappingModule from "../../Mapping/Module";
-import * as AdhPermissionsModule from "../../Permissions/Module";
-import * as AdhPreliminaryNamesModule from "../../PreliminaryNames/Module";
-import * as AdhRateModule from "../../Rate/Module";
-import * as AdhResourceAreaModule from "../../ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
+import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
+import * as AdhAnonymizeModule from "../Anonymize/Module";
+import * as AdhBadgeModule from "../Badge/Module";
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhMappingModule from "../Mapping/Module";
+import * as AdhPermissionsModule from "../Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
+import * as AdhRateModule from "../Rate/Module";
+import * as AdhResourceAreaModule from "../ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
 import * as Proposal from "./Proposal";
 
-export var moduleName = "adhIdeaCollectionProposal";
+export var moduleName = "adhProposal";
 
 export var register = (angular) => {
     angular
