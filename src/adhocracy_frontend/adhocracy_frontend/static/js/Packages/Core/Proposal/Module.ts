@@ -27,13 +27,13 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .directive("adhIdeaCollectionProposalDetail", [
+        .directive("adhProposalDetail", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.detailDirective])
-        .directive("adhIdeaCollectionProposalListItem", [
+        .directive("adhProposalListItem", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.listItemDirective])
-        .directive("adhIdeaCollectionProposalMapListItem", [
+        .directive("adhProposalMapListItem", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", Proposal.mapListItemDirective])
-        .directive("adhIdeaCollectionProposalCreate", [
+        .directive("adhProposalCreate", [
             "adhConfig",
             "adhHttp",
             "adhPreliminaryNames",
@@ -44,7 +44,7 @@ export var register = (angular) => {
             "$location",
             Proposal.createDirective
         ])
-        .directive("adhIdeaCollectionProposalEdit", [
+        .directive("adhProposalEdit", [
             "adhConfig",
             "adhHttp",
             "adhPermissions",
