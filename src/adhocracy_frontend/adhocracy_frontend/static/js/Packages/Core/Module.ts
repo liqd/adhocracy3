@@ -12,7 +12,6 @@ import * as AdhEmbedModule from "./Embed/Module";
 import * as AdhEventManagerModule from "./EventManager/Module";
 import * as AdhHomeModule from "./Home/Module";
 import * as AdhHttpModule from "./Http/Module";
-import * as AdhIdeaCollectionModule from "./IdeaCollection/Module";
 import * as AdhImageModule from "./Image/Module";
 import * as AdhInjectModule from "./Inject/Module";
 import * as AdhListingModule from "./Listing/Module";
@@ -57,7 +56,6 @@ export var register = (angular, config, metaApi) => {
     AdhEventManagerModule.register(angular);
     AdhHomeModule.register(angular);
     AdhHttpModule.register(angular, config);
-    AdhIdeaCollectionModule.register(angular);
     AdhImageModule.register(angular);
     AdhInjectModule.register(angular);
     AdhListingModule.register(angular);
