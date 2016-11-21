@@ -76,7 +76,7 @@ export var detailDirective = (
                         scope.contentType = scope.processProperties.versionClass.content_type;
                         var context = adhEmbed.getContext();
                         var notIdeaColl = resource.content_type !== "adhocracy_meinberlin.resources.idea_collection.IProcess";
-                        // show the resource header if there is no embed context and the process type is not idea collection.
+                        // meinberlin idea collection is used with a plain embed, so we assume it is always embedded
                         scope.hasResourceHeader = (context === "" && notIdeaColl);
                     });
                 }
