@@ -1,17 +1,18 @@
-import * as AdhAbuseModule from "../../Abuse/Module";
-import * as AdhBadgeModule from "../../Badge/Module";
-import * as AdhCommentModule from "../../Comment/Module";
-import * as AdhHttpModule from "../../Http/Module";
-import * as AdhMovingColumnsModule from "../../MovingColumns/Module";
-import * as AdhPermissionsModule from "../../Permissions/Module";
-import * as AdhProcessModule from "../../Process/Module";
-import * as AdhResourceActionsModule from "../../ResourceActions/Module";
-import * as AdhResourceAreaModule from "../../ResourceArea/Module";
-import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
+import * as AdhAbuseModule from "../Abuse/Module";
+import * as AdhBadgeModule from "../Badge/Module";
+import * as AdhCommentModule from "../Comment/Module";
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhPollModule from "../Poll/Module";
+import * as AdhMovingColumnsModule from "../MovingColumns/Module";
+import * as AdhPermissionsModule from "../Permissions/Module";
+import * as AdhProcessModule from "../Process/Module";
+import * as AdhResourceActionsModule from "../ResourceActions/Module";
+import * as AdhResourceAreaModule from "../ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
 import * as Workbench from "./Workbench";
 
-export var moduleName = "adhIdeaCollectionWorkbench";
+export var moduleName = "adhWorkbench";
 
 export var register = (angular) => {
     angular
@@ -22,6 +23,7 @@ export var register = (angular) => {
             AdhHttpModule.moduleName,
             AdhMovingColumnsModule.moduleName,
             AdhPermissionsModule.moduleName,
+            AdhPollModule.moduleName,
             AdhProcessModule.moduleName,
             AdhResourceActionsModule.moduleName,
             AdhResourceAreaModule.moduleName,
@@ -31,7 +33,7 @@ export var register = (angular) => {
         // "adhDebateWorkbench" such as not to break currently running embeds.
         .directive("adhDebateWorkbench", [
             "adhTopLevelState", "adhConfig", "adhHttp", Workbench.workbenchDirective])
-        .directive("adhIdeaCollectionWorkbench", [
+        .directive("adhWorkbench", [
             "adhTopLevelState", "adhConfig", "adhHttp", Workbench.workbenchDirective])
         .directive("adhDocumentDetailColumn", [
             "adhConfig", "adhPermissions", "adhTopLevelState", Workbench.documentDetailColumnDirective])
@@ -39,17 +41,17 @@ export var register = (angular) => {
             "adhConfig", "adhTopLevelState", Workbench.documentCreateColumnDirective])
         .directive("adhDocumentEditColumn", [
             "adhConfig", "adhTopLevelState", Workbench.documentEditColumnDirective])
-        .directive("adhIdeaCollectionProposalDetailColumn", [
+        .directive("adhProposalDetailColumn", [
             "adhConfig", "adhTopLevelState", Workbench.proposalDetailColumnDirective])
-        .directive("adhIdeaCollectionProposalCreateColumn", [
+        .directive("adhProposalCreateColumn", [
             "adhConfig", "adhTopLevelState", Workbench.proposalCreateColumnDirective])
-        .directive("adhIdeaCollectionProposalEditColumn", [
+        .directive("adhProposalEditColumn", [
             "adhConfig", "adhTopLevelState", Workbench.proposalEditColumnDirective])
-        .directive("adhIdeaCollectionImageColumn", [
+        .directive("adhImageColumn", [
             "adhConfig", "adhTopLevelState", "adhResourceUrlFilter", "adhParentPathFilter", Workbench.imageColumnDirective])
-        .directive("adhIdeaCollectionDetailColumn", ["adhConfig", "adhTopLevelState", Workbench.detailColumnDirective])
-        .directive("adhIdeaCollectionAddDocumentButton", [
+        .directive("adhProcessDetailColumn", ["adhConfig", "adhTopLevelState", Workbench.detailColumnDirective])
+        .directive("adhAddDocumentButton", [
             "adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", Workbench.addDocumentButtonDirective])
-        .directive("adhIdeaCollectionAddProposalButton", [
+        .directive("adhAddProposalButton", [
             "adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", Workbench.addProposalButtonDirective]);
 };

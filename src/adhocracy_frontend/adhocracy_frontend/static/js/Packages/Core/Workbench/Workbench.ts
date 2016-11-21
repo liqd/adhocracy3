@@ -1,23 +1,23 @@
-/// <reference path="../../../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../../lib2/types/angular.d.ts"/>
 
-import * as AdhConfig from "../../Config/Config";
-import * as AdhHttp from "../../Http/Http";
-import * as AdhPermissions from "../../Permissions/Permissions";
-import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
-import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
-import * as AdhUtil from "../../Util/Util";
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
+import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhResourceArea from "../ResourceArea/ResourceArea";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUtil from "../Util/Util";
 
-import * as ResourcesBase from "../../../ResourcesBase";
+import * as ResourcesBase from "../../ResourcesBase";
 
-import RIComment from "../../../../Resources_/adhocracy_core/resources/comment/IComment";
-import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
-import RIParagraph from "../../../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
-import RIParagraphVersion from "../../../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion";
-import * as SIComment from "../../../../Resources_/adhocracy_core/sheets/comment/IComment";
-import * as SIParagraph from "../../../../Resources_/adhocracy_core/sheets/document/IParagraph";
-import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
+import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
+import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIParagraph from "../../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
+import RIParagraphVersion from "../../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion";
+import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
+import * as SIParagraph from "../../../Resources_/adhocracy_core/sheets/document/IParagraph";
+import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-export var pkgLocation = "/Core/IdeaCollection/Workbench";
+export var pkgLocation = "/Core/Workbench";
 
 
 export var workbenchDirective = (
