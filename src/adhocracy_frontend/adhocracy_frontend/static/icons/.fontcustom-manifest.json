@@ -61,6 +61,10 @@
       "codepoint": 128489,
       "source": "svg/speechbubble.svg"
     },
+    "speechbubble-unfilled": {
+      "codepoint": 128488,
+      "source": "svg/speechbubble-unfilled.svg"
+    },
     "speechbubbles": {
       "codepoint": 128490,
       "source": "svg/speechbubbles.svg"
@@ -84,6 +88,10 @@
     "vote-up": {
       "codepoint": 9651,
       "source": "svg/vote-up.svg"
+    },
+    "voting": {
+      "codepoint": 128499,
+      "source": "svg/voting.svg"
     },
     "x": {
       "codepoint": 10005,
