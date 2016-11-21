@@ -292,6 +292,10 @@ export var detailDirective = (
                         }
 
                         scope.contentType = scope.processProperties.versionClass.content_type;
+                        var context = adhEmbed.getContext();
+                        var notIdeaColl = resource.content_type !== "adhocracy_meinberlin.resources.idea_collection.IProcess";
+                        // meinberlin idea collection is used with a plain embed, so we assume it is always embedded
+                        scope.hasResourceHeader = (context === "" && notIdeaColl);
                     });
                 }
             });
@@ -300,9 +304,6 @@ export var detailDirective = (
             scope.showMap = (isShowMap) => {
                 scope.data.isShowMap = isShowMap;
             };
-
-            var context = adhEmbed.getContext();
-            scope.hasResourceHeader = (context === "");
         }
     };
 };
