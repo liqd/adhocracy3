@@ -255,3 +255,4 @@ def includeme(config):  # pragma: no cover
     config.add_request_method(get_header_password,
                               name='password',
                               reify=True)
+    config.include('.service_konto')
