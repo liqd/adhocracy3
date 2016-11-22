@@ -173,6 +173,7 @@ class TestUser:
              adhocracy_core.sheets.badge.IBadgeable,
              adhocracy_core.sheets.image.IImageReference,
              adhocracy_core.sheets.notification.INotification,
+             adhocracy_core.sheets.principal.IServiceKonto,
             )
         assert meta.element_types == ()
         assert meta.use_autonaming is True

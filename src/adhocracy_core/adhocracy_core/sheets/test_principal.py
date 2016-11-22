@@ -591,3 +591,34 @@ class TestUserEmailNewSheet:
         inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'email': ''}
 
+
+class TestServiceKontoSheet:
+
+    @fixture
+    def meta(self):
+        from .principal import service_konto_meta
+        return service_konto_meta
+
+    def test_create(self, meta, context):
+        from .principal import IServiceKonto
+        from .principal import ServiceKontoSchema
+        from adhocracy_core.sheets import AnnotationRessourceSheet
+        inst = meta.sheet_class(meta, context, None)
+        assert isinstance(inst, AnnotationRessourceSheet)
+        assert inst.meta.isheet == IServiceKonto
+        assert inst.meta.schema_class == ServiceKontoSchema
+        assert meta.readable is False
+        assert meta.editable is False
+        assert meta.creatable is False
+        assert inst.meta.permission_create == 'create_service_konto_user'
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context, None)
+        assert inst.get() == {'userid': 0}
+
+    def test_includeme_set_creatable_if_enabled(self, config, meta):
+        config.registry.settings['adhocracy.service_konto.enabled'] = 'true'
+        config.include('adhocracy_core.content')
+        config.include('adhocracy_core.sheets.principal')
+        meta_included = config.registry.content.sheets_meta[meta.isheet]
+        assert meta_included.creatable
