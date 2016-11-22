@@ -15,7 +15,7 @@ from pyramid.threadlocal import get_current_request
 from pyramid.i18n import TranslationStringFactory
 from pyramid.i18n import get_localizer
 
-from adhocracy_core.auditing import generate_activity_description
+from adhocracy_core.activity import generate_activity_description
 from adhocracy_core.interfaces import Activity
 from adhocracy_core.interfaces import ActivityType
 from adhocracy_core.interfaces import IResource

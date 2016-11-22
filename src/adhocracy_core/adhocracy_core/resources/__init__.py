@@ -319,3 +319,4 @@ def includeme(config):
     config.include('.logbook')
     config.include('.relation')
     config.include('.page')
+    config.include('.activity')

@@ -1,0 +1,91 @@
+<div data-ng-if="hasResourceHeader">
+    <div class="resource-navigation">
+        <adh-resource-dropdown
+            data-print="true">
+        </adh-resource-dropdown>
+    </div>
+    <adh-background-image
+        data-no-fallback="true"
+        data-path="{{data.picture}}">
+        <header class="resource-header" data-ng-class="{'m-image': data.picture}">
+
+            <h1 class="resource-header-title">{{ data.title }}</h1>
+
+            <ul class="resource-header-meta">
+                <li data-ng-if="data.participationStartDate && data.participationEndDate">{{ "TR__PARTICIPATION_DATES" | translate:{
+                    startDate: data.participationStartDate,
+                    endDate: data.participationEndDate}
+                }}</li>
+            </ul>
+
+            <ul class="resource-header-description">
+                <li>
+                    {{data.shortDescription}}
+                </li>
+            </ul>
+        </header>
+    </adh-background-image>
+    <div class="action-bar">
+        <adh-map-switch data-ng-if="hasLocation" data-model="data.isShowMap"></adh-map-switch>
+    </div>
+</div>
+<div class="action-bar" data-ng-if="!hasResourceHeader">
+    <adh-print-action data-class="action-bar-item"></adh-print-action>
+    <adh-map-switch data-ng-if="hasLocation" data-model="data.isShowMap"></adh-map-switch>
+</div>
+<div>
+    <div data-ng-switch="currentPhase.name">
+        <div data-ng-switch-when="announce">
+            {{ currentPhase.description }}
+        </div>
+        <div data-ng-switch-default="">
+            <adh-listing
+                data-content-type="{{contentType}}"
+                data-custom="{
+                    processProperties: processProperties
+                }"
+                data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
+                data-facets="facets"
+                data-ng-show="!data.isShowMap"
+                data-no-create-form="true"
+                data-path="{{path}}"
+                data-sort="sort"
+                data-sorts="sorts"
+                data-counter="true">
+                <adh-proposal-list-item
+                    data-path="{{element}}"
+                    data-process-properties="custom.processProperties">
+                </adh-proposal-list-item>
+            </adh-listing>
+
+            <div
+                class="map-info-persistent"
+                data-ng-if="hasLocation && data.isShowMap"
+                data-adh-html-translate="TR__MAP_INCOMPLETE"
+                data-translate-templates="{
+                    link: '&lt;a href=&quot;&quot; data-ng-click=&quot;showMap(false)&quot;&gt;{{ content }}&lt;/a&gt;'
+            }"></div>
+            <adh-wait condition="data.isShowMap">
+                <adh-map-listing
+                    data-ng-if="hasLocation"
+                    data-content-type="{{contentType}}"
+                    data-custom="{
+                        processProperties: processProperties
+                    }"
+                    data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
+                    data-facets="facets"
+                    data-ng-show="data.isShowMap"
+                    data-no-create-form="true"
+                    data-path="{{path}}"
+                    data-polygon="polygon"
+                    data-sort="sort"
+                    data-sorts="sorts">
+                    <adh-proposal-map-list-item
+                        data-path="{{item}}"
+                        data-process-properties="custom.processProperties">
+                    </adh-proposal-map-list-item>
+                </adh-map-listing>
+            </adh-wait>
+        </div>
+    </div>
+</div>

@@ -1,6 +1,7 @@
 """Basic simple type without children and non versionable."""
 from adhocracy_core.interfaces import ISimple
 import adhocracy_core.sheets.name
+import adhocracy_core.sheets.title
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.workflow
 from adhocracy_core.resources import add_resource_type_to_registry
