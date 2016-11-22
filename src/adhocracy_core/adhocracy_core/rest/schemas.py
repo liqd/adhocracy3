@@ -42,6 +42,7 @@ from adhocracy_core.interfaces import Reference as ReferenceTuple
 from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.resources.principal import IPasswordReset
+from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.base import Base
 from adhocracy_core.sheets.metadata import is_older_than
 from adhocracy_core.sheets.principal import IUserBasic
@@ -77,6 +78,7 @@ from adhocracy_core.schema import URL
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.sheets.principal import IUserExtended
+from adhocracy_core.sheets.principal import IServiceKonto
 from adhocracy_core.catalog import ICatalogsService
 from adhocracy_core.catalog.index import ReferenceIndex
 from adhocracy_core.utils import now
@@ -525,9 +527,18 @@ def create_validate_login(context,
             error = Invalid(node)
             error.add(Invalid(node['password'], msg=error_msg_wrong_login))
             raise error
-        else:
-            request.validated['user'] = user
+        is_service_konto_user = _is_service_konto_user(registry, user)
+        if is_service_konto_user:
+            error = Invalid(node)
+            error.add(Invalid(node[child_node_name],
+                              msg='Please use ServiceKonto login'))
+            raise error
+        request.validated['user'] = user
     return validate_login
+
+def _is_service_konto_user(registry: Registry, user: IUser):
+    userid = registry.content.get_sheet_field(user, IServiceKonto, 'userid')
+    return bool(userid)
 
 
 def create_validate_login_password(request: Request,
