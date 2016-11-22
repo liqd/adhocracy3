@@ -88,7 +88,10 @@ class TestSendActivityNotificationEmails:
     def test_send_activity_to_object_followers(self, event, activity,
                                              mock_catalogs, followable,
                                              mock_messenger, search_result):
-        activity = activity._replace(object=followable)
+        from adhocracy_core.sheets.description import IDescription
+        sheet_data = [{IDescription: {}}]
+        activity = activity._replace(object=followable,
+                                     sheet_data=sheet_data)
         event.activities = [activity]
         user = testing.DummyResource()
         mock_catalogs.search.return_value = search_result._replace(
