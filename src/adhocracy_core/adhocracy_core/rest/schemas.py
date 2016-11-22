@@ -44,9 +44,7 @@ from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.resources.base import Base
 from adhocracy_core.sheets.metadata import is_older_than
-from adhocracy_core.sheets.principal import IEmailNew
 from adhocracy_core.sheets.principal import IUserBasic
-from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import SchemaNode
 from adhocracy_core.schema import MappingSchema
@@ -85,6 +83,7 @@ from adhocracy_core.utils import now
 from adhocracy_core.utils import unflatten_multipart_request
 from adhocracy_core.utils import create_schema
 from adhocracy_core.utils import get_reason_if_blocked
+from adhocracy_core.authentication.service_konto import authenticate_user
 
 resolver = DottedNameResolver()
 
@@ -1298,3 +1297,31 @@ class POSTPasswordResetRequestSchema(MappingSchema):
                     validator=validate_password_reset_path,
                     )
     password = Password(missing=required)
+
+class POSTLoginServiceKontoSchema(MappingSchema):
+    """Schema for login requests via service konto token."""
+
+    token = SingleLine(missing=required)
+
+    @deferred
+    def validator(node: SchemaNode, kw: dict) -> All:
+        request = kw['request']
+        context = kw['context']
+        registry = kw['registry']
+        return All(
+            create_validate_service_konto_auth(context, request, registry),
+        )
+
+def create_validate_service_konto_auth(context, request: Request,
+                                       registry: Registry):
+    """Return validator that does the service konto token authentication."""
+    def validate_service_konto_auth(node: SchemaNode, value: dict):
+        token = value['token']
+        try:
+            user = authenticate_user(context, registry, request, token)
+        except ValueError as err:
+            raise Invalid(node,
+                          'An error occurred during ServiceKonto '
+                          'authentication: {}'.format(str(err)))
+        request.validated['user'] = user
+    return validate_service_konto_auth

@@ -1696,4 +1696,47 @@ class TestCreateValidateAccountActive:
                {'child_node': 'User account not yet activated'}
 
 
+class TestCreateValidateServiceKontoAuth:
 
+    @fixture
+    def mock_user(self, mocker):
+        return mocker.Mock()
+
+    @fixture
+    def mock_service_konto(self, mocker, mock_user):
+        return mocker.patch(
+            'adhocracy_core.rest.schemas.authenticate_user',
+            return_value=mock_user)
+
+    def make_one(self, kw):
+        from .schemas import POSTLoginServiceKontoSchema
+        return POSTLoginServiceKontoSchema().bind(**kw)
+
+    def call_fut(self, *args):
+        from adhocracy_core.rest.schemas import \
+            create_validate_service_konto_auth
+        return create_validate_service_konto_auth(*args)
+
+    def test_create(self, mocker, kw):
+        val_service_konto = mocker.patch('adhocracy_core.rest.schemas.'
+                                         'create_validate_service_konto_auth')
+        inst = self.make_one(kw)
+        assert inst['token'].required
+        validators = inst.validator.validators
+        assert validators[0] == val_service_konto.return_value
+        val_service_konto.assert_called_with(kw['context'],
+                                             kw['request'],
+                                             kw['registry'])
+
+    def test_validate_service_konto_auth(self, node, context, request_,
+                registry, mock_service_konto, mock_user):
+        validator = self.call_fut(context, request_, registry)
+        assert validator(node, {'token': '12345'}) is None
+        assert request_.validated['user'] == mock_user
+
+    def test_validate_service_konto_auth_invalid(self, node, context, request_,
+                registry, mock_service_konto, mock_user):
+        mock_service_konto.side_effect = ValueError()
+        validator = self.call_fut(context, request_, registry)
+        with raises(colander.Invalid):
+            validator(node, {'token': '12345'})
