@@ -403,6 +403,11 @@ class UserLocatorAdapter(object):
                                  activation_path)
         return user
 
+    def get_user_by_service_konto_userid(self, userid: str) -> IUser:
+        """Find user per service konto userid or return None."""
+        user = self._search_user('private_service_konto_userid', userid)
+        return user
+
     def _search_user(self, index_name: str, value: str) -> IUser:
         catalogs = find_service(self.context, 'catalogs')
         query = search_query._replace(indexes={index_name: value},
