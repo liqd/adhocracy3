@@ -67,8 +67,10 @@ export class Service {
                     _self.enableToken(token, path);
                     deferred.resolve(true);
                 }, (msg) => {
-                    console.log("Expired or invalid session deleted");
-                    _self.deleteToken();
+                    if (msg.status >= 400) {
+                        console.log("Expired or invalid session deleted");
+                        _self.deleteToken();
+                    }
                     deferred.resolve(false);
                 });
             } catch (e) {
