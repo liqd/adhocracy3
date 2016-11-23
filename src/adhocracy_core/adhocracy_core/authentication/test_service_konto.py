@@ -218,6 +218,7 @@ class TestCreateUser:
             principal.IUserBasic.__identifier__: {'name': 'Foo Bar'},
             principal.IUserExtended.__identifier__: {'email': 'foo@bar.com'},
             principal.IServiceKonto.__identifier__: {'userid': 1},
+            principal.IServiceKontoSettings.__identifier__: {'enabled': True},
 
         }
         registry.content.create.assert_called_with(

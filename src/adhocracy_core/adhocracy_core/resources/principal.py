@@ -195,6 +195,7 @@ user_meta = pool_meta._replace(
                      adhocracy_core.sheets.image.IImageReference,
                      adhocracy_core.sheets.notification.INotification,
                      adhocracy_core.sheets.principal.IServiceKonto,
+                     adhocracy_core.sheets.principal.IServiceKontoSettings,
                      ),
     element_types=(),  # we don't want the frontend to post resources here
     use_autonaming=True,

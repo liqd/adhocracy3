@@ -436,6 +436,26 @@ service_konto_meta = sheet_meta._replace(
 )
 
 
+class IServiceKontoSettings(ISheet):
+    """Marker interface for the ServiceKonto settings sheet."""
+
+
+class ServiceKontoSettingsSchema(MappingSchema):
+    """Data structure for public ServiceKonto user information."""
+
+    enabled = Boolean()
+
+
+service_konto_settings_meta = sheet_meta._replace(
+    isheet=IServiceKontoSettings,
+    schema_class=ServiceKontoSettingsSchema,
+    editable=False,
+    creatable=False,
+    permission_create='create_service_konto_user',
+    permission_view='view_userextended',
+)
+
+
 def includeme(config):
     """Register sheets and activate catalog factory."""
     add_sheet_to_registry(userbasic_meta, config.registry)
@@ -459,5 +479,9 @@ def includeme(config):
     if service_konto_enabled:
         add_sheet_to_registry(service_konto_meta._replace(creatable=True),
                               config.registry)
+        add_sheet_to_registry(
+            service_konto_settings_meta._replace(creatable=True),
+            config.registry)
     else:
         add_sheet_to_registry(service_konto_meta, config.registry)
+        add_sheet_to_registry(service_konto_settings_meta, config.registry)

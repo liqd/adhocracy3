@@ -622,3 +622,36 @@ class TestServiceKontoSheet:
         config.include('adhocracy_core.sheets.principal')
         meta_included = config.registry.content.sheets_meta[meta.isheet]
         assert meta_included.creatable
+
+
+class TestServiceKontoSettingsSheet:
+
+    @fixture
+    def meta(self):
+        from .principal import service_konto_settings_meta
+        return service_konto_settings_meta
+
+    def test_create(self, meta, context):
+        from .principal import IServiceKontoSettings
+        from .principal import ServiceKontoSettingsSchema
+        from adhocracy_core.sheets import AnnotationRessourceSheet
+        inst = meta.sheet_class(meta, context, None)
+        assert isinstance(inst, AnnotationRessourceSheet)
+        assert inst.meta.isheet == IServiceKontoSettings
+        assert inst.meta.schema_class == ServiceKontoSettingsSchema
+        assert meta.readable is True
+        assert meta.editable is False
+        assert meta.creatable is False
+        assert inst.meta.permission_create == 'create_service_konto_user'
+        assert inst.meta.permission_view == 'view_userextended'
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context, None)
+        assert inst.get() == {'enabled': False}
+
+    def test_includeme_set_creatable_if_enabled(self, config, meta):
+        config.registry.settings['adhocracy.service_konto.enabled'] = 'true'
+        config.include('adhocracy_core.content')
+        config.include('adhocracy_core.sheets.principal')
+        meta_included = config.registry.content.sheets_meta[meta.isheet]
+        assert meta_included.creatable

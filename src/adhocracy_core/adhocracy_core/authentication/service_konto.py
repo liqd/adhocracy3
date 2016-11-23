@@ -11,6 +11,7 @@ from adhocracy_core.resources.principal import IUser
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.principal import IServiceKonto
+from adhocracy_core.sheets.principal import IServiceKontoSettings
 
 
 SERVICE_KONTO_GET_USER_DATA_SUCCESS = 1
@@ -98,6 +99,7 @@ def _create_user(context: IResource, registry: Registry, request: Request,
         IUserBasic.__identifier__: {'name': name},
         IUserExtended.__identifier__: {'email': user_data.get('email')},
         IServiceKonto.__identifier__: {'userid': int(user_data.get('userid'))},
+        IServiceKontoSettings.__identifier__: {'enabled': True},
     }
     user = registry.content.create(IUser.__identifier__, users, appstruct,
                                    registry=registry, send_event=False)
