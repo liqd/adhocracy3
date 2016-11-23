@@ -275,6 +275,7 @@ export var detailDirective = (
                     index: "item_creation_date",
                     reverse: true
                 }];
+                scope.sort = "item_creation_date";
             }
 
             scope.$watch("path", (value : string) => {
