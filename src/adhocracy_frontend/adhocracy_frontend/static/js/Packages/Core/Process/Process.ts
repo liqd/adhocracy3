@@ -257,18 +257,26 @@ export var detailDirective = (
 
             scope.data = {};
 
-            scope.sorts = [{
-                key: "rates",
-                name: "TR__RATES",
-                index: "rates",
-                reverse: true
-            }, {
-                key: "item_creation_date",
-                name: "TR__CREATION_DATE",
-                index: "item_creation_date",
-                reverse: true
-            }];
-            scope.sort = "item_creation_date";
+            if (scope.processProperties.itemClass.content_type === "adhocracy_core.resources.document.IDocument") {
+                scope.sorts = [{
+                    key: "item_creation_date",
+                    name: "TR__CREATION_DATE",
+                    index: "item_creation_date",
+                    reverse: false
+                }];
+            } else {
+                scope.sorts = [{
+                    key: "rates",
+                    name: "TR__RATES",
+                    index: "rates",
+                    reverse: true
+                }, {
+                    key: "item_creation_date",
+                    name: "TR__CREATION_DATE",
+                    index: "item_creation_date",
+                    reverse: true
+                }];
+            }
 
             scope.$watch("path", (value : string) => {
                 if (value) {
