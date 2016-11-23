@@ -56,7 +56,6 @@ export var register = (angular) => {
                 hasAuthorInListItem: true,
                 hasCommentColumn: true,
                 hasDescription: true,
-                hasImage: true,
                 hasLocation: true,
                 hasLocationText: true,
                 itemClass: RIBuergerhaushaltProposal,
