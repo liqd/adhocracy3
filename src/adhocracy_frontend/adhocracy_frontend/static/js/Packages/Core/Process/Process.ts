@@ -259,10 +259,8 @@ export var detailDirective = (
 
             if (scope.processProperties.itemClass.content_type === "adhocracy_core.resources.document.IDocument") {
                 scope.sorts = [{
-                    key: "item_creation_date",
-                    name: "TR__CREATION_DATE",
-                    index: "item_creation_date",
-                    reverse: false
+                    key: "title",
+                    index: "title"
                 }];
             } else {
                 scope.sorts = [{
