@@ -16,6 +16,7 @@ import * as SIMultiPolygon from "../../../Resources_/adhocracy_core/sheets/geo/I
 import * as SIName from "../../../Resources_/adhocracy_core/sheets/name/IName";
 import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
+import RIDocument from "../../../Resources_/adhocracy_core/resources/document/IDocument";
 import RIProcess from "../../../Resources_/adhocracy_core/resources/process/IProcess";
 
 var pkgLocation = "/Core/Process";
@@ -257,18 +258,25 @@ export var detailDirective = (
 
             scope.data = {};
 
-            scope.sorts = [{
-                key: "rates",
-                name: "TR__RATES",
-                index: "rates",
-                reverse: true
-            }, {
-                key: "item_creation_date",
-                name: "TR__CREATION_DATE",
-                index: "item_creation_date",
-                reverse: true
-            }];
-            scope.sort = "item_creation_date";
+            if (scope.processProperties.itemClass.content_type === RIDocument.content_type) {
+                scope.sorts = [{
+                    key: "title",
+                    index: "title"
+                }];
+            } else {
+                scope.sorts = [{
+                    key: "rates",
+                    name: "TR__RATES",
+                    index: "rates",
+                    reverse: true
+                }, {
+                    key: "item_creation_date",
+                    name: "TR__CREATION_DATE",
+                    index: "item_creation_date",
+                    reverse: true
+                }];
+                scope.sort = "item_creation_date";
+            }
 
             scope.$watch("path", (value : string) => {
                 if (value) {

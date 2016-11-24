@@ -57,7 +57,6 @@ export var register = (angular) => {
                 hasCommentColumn: true,
                 hasCreatorParticipate: true,
                 hasDescription: true,
-                hasImage: true,
                 hasLocation: true,
                 hasLocationText: true,
                 itemClass: RIKiezkasseProposal,

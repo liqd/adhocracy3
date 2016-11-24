@@ -44,7 +44,6 @@ export var register = (angular) => {
                 detailSlot: adhConfig.pkg_path + AdhDocument.pkgLocation + "/DetailSlot.html",
                 editSlot: adhConfig.pkg_path + AdhDocument.pkgLocation + "/EditSlot.html",
                 hasCommentColumn: true,
-                hasImage: true,
                 itemClass: RIDocument,
                 versionClass: RIDocumentVersion
             });
