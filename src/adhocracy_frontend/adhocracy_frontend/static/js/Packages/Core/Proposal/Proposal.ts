@@ -14,9 +14,11 @@ import * as AdhUtil from "../Util/Util";
 import * as ResourcesBase from "../../ResourcesBase";
 
 import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIDocument from "../../../Resources_/adhocracy_core/resources/document/IDocument";
 import RISystemUser from "../../../Resources_/adhocracy_core/resources/principal/ISystemUser";
 import * as SICommentable from "../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
 import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIDocument from "../../../Resources_/adhocracy_core/sheets/document/IDocument";
 import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SILocationReference from "../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
 import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
@@ -122,6 +124,23 @@ export var bindPath = (
                         commentCount: SICommentable.get(resource).comments_count,
                         assignments: assignments
                     };
+
+                    if (scope.processProperties.itemClass.content_type === RIDocument.content_type) {
+                        var paragraphPaths : string[] = SIDocument.get(resource).elements;
+                        var paragraphPromises = _.map(paragraphPaths, (path) => {
+                            return adhHttp.get(path);
+                        });
+
+                        $q.all(paragraphPromises).then((paragraphVersions : ResourcesBase.IResource[]) => {
+                            var paragraphs = _.map(paragraphVersions, (paragraphVersion) => {
+                                return {
+                                    commentCount: SICommentable.get(paragraphVersion).comments_count
+                                };
+                            });
+
+                            scope.data.commentCount = (<any>_).sumBy(paragraphs, "commentCount");
+                        });
+                    }
 
                     if (scope.processProperties.hasDescription) {
                         var descriptionSheet = SIDescription.get(resource);
