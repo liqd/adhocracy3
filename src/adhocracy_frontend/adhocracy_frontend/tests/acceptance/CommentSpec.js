@@ -55,7 +55,7 @@ describe("comments", function() {
         expect(page.getCommentText(comment)).toEqual("comment 0b1");
     });
 
-    it("can be edited after child edit", function() {
+    xit("can be edited after child edit", function() {
         var page = new EmbeddedCommentsPage("c10").get();
         var parent = page.createComment("comment 1");
         var reply = page.createReply(parent, "comment 1.1");

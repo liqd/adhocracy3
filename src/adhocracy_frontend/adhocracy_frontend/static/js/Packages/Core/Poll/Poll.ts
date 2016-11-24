@@ -1,16 +1,16 @@
-/// <reference path="../../../../../lib2/types/angular.d.ts"/>
+/// <reference path="../../../../lib2/types/angular.d.ts"/>
 
-import * as AdhBadge from "../../Badge/Badge";
-import * as AdhConfig from "../../Config/Config";
-import * as AdhHttp from "../../Http/Http";
-import * as AdhIdeaCollectionProposal from "../Proposal/Proposal";
-import * as AdhPermissions from "../../Permissions/Permissions";
-import * as AdhProcess from "../../Process/Process";
-import * as AdhRate from "../../Rate/Rate";
-import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
+import * as AdhBadge from "../Badge/Badge";
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
+import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhProcess from "../Process/Process";
+import * as AdhProposal from "../Proposal/Proposal";
+import * as AdhRate from "../Rate/Rate";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
 
-export var pkgLocation = "/Core/IdeaCollection/Poll";
+export var pkgLocation = "/Core/Poll";
 
 
 export var pollDetailColumnDirective = (
@@ -56,7 +56,7 @@ export var detailDirective = (
             if (!scope.processProperties && processType) {
                 scope.processProperties = adhProcess.getProperties(processType);
             }
-            AdhIdeaCollectionProposal.bindPath(adhConfig, adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
+            AdhProposal.bindPath(adhConfig, adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(scope);
 
             scope.goToLogin = () => {
                 adhTopLevelState.setCameFromAndGo("/login");

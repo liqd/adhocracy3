@@ -1,10 +1,10 @@
-import * as AdhBadgeModule from "../../Badge/Module";
-import * as AdhHttpModule from "../../Http/Module";
-import * as AdhPermissionsModule from "../../Permissions/Module";
-import * as AdhPreliminaryNamesModule from "../../PreliminaryNames/Module";
-import * as AdhProcessModule from "../../Process/Module";
-import * as AdhRateModule from "../../Rate/Module";
-import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
+import * as AdhBadgeModule from "../Badge/Module";
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhPermissionsModule from "../Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
+import * as AdhProcessModule from "../Process/Module";
+import * as AdhRateModule from "../Rate/Module";
+import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
 import * as Poll from "./Poll";
 

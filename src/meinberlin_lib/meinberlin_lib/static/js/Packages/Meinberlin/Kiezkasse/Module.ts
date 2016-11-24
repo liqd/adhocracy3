@@ -1,15 +1,15 @@
 import * as AdhEmbedModule from "../../Core/Embed/Module";
-import * as AdhIdeaCollectionModule from "../../Core/IdeaCollection/Module";
 import * as AdhNamesModule from "../../Core/Names/Module";
 import * as AdhProcessModule from "../../Core/Process/Module";
 import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
+import * as AdhWorkbenchModule from "../../Core/Workbench/Module";
 
 import * as AdhEmbed from "../../Core/Embed/Embed";
-import * as AdhIdeaCollectionProposal from "../../Core/IdeaCollection/Proposal/Proposal";
-import * as AdhIdeaCollectionWorkbench from "../../Core/IdeaCollection/Workbench/Workbench";
 import * as AdhNames from "../../Core/Names/Names";
 import * as AdhProcess from "../../Core/Process/Process";
+import * as AdhProposal from "../../Core/Proposal/Proposal";
 import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
+import * as AdhWorkbench from "../../Core/Workbench/Workbench";
 
 import RIKiezkasseProcess from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
 import RIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
@@ -25,40 +25,38 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhEmbedModule.moduleName,
-            AdhIdeaCollectionModule.moduleName,
             AdhNamesModule.moduleName,
             AdhProcessModule.moduleName,
-            AdhResourceAreaModule.moduleName
+            AdhResourceAreaModule.moduleName,
+            AdhWorkbenchModule.moduleName,
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerContext("kiezkasse", ["kiezkassen"]);
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
             var registerRoutes = (context? : string) => (provider) => {
-                AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
+                AdhWorkbench.registerCommonRoutesFactory(
                     RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion)(context)(provider);
-                AdhIdeaCollectionWorkbench.registerProposalRoutesFactory(
+                AdhWorkbench.registerProposalRoutesFactory(
                     RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion, true)(context)(provider);
             };
             registerRoutes()(adhResourceAreaProvider);
             registerRoutes("kiezkasse")(adhResourceAreaProvider);
 
-            var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
+            var processHeaderSlot = adhConfig.pkg_path + AdhWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
         }])
         .config(["adhConfig", "adhProcessProvider", (adhConfig, adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[processType] =
-                "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
-                "</adh-idea-collection-workbench>";
+                "<adh-workbench data-process-properties=\"processProperties\"></adh-workbench>";
             adhProcessProvider.setProperties(processType, {
-                createSlot: adhConfig.pkg_path + AdhIdeaCollectionProposal.pkgLocation + "/CreateSlot.html",
-                detailSlot: adhConfig.pkg_path + AdhIdeaCollectionProposal.pkgLocation + "/DetailSlot.html",
-                editSlot: adhConfig.pkg_path + AdhIdeaCollectionProposal.pkgLocation + "/EditSlot.html",
+                createSlot: adhConfig.pkg_path + AdhProposal.pkgLocation + "/CreateSlot.html",
+                detailSlot: adhConfig.pkg_path + AdhProposal.pkgLocation + "/DetailSlot.html",
+                editSlot: adhConfig.pkg_path + AdhProposal.pkgLocation + "/EditSlot.html",
                 hasAuthorInListItem: true,
                 hasCommentColumn: true,
                 hasCreatorParticipate: true,
                 hasDescription: true,
-                hasImage: true,
                 hasLocation: true,
                 hasLocationText: true,
                 itemClass: RIKiezkasseProposal,

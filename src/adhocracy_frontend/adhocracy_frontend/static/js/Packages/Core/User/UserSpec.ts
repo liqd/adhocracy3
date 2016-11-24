@@ -116,7 +116,7 @@ export var register = () => {
                 });
 
                 it("calls 'deleteToken' if the backend does not accept the user-token", (done) => {
-                    httpMock.head.and.returnValue(q.reject());
+                    httpMock.head.and.returnValue(q.reject({status: 400}));
                     var sessionValue = JSON.stringify({
                         "user-path": "huhu",
                         "user-token": "huhu"

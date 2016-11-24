@@ -12,7 +12,6 @@ import * as AdhEmbedModule from "./Embed/Module";
 import * as AdhEventManagerModule from "./EventManager/Module";
 import * as AdhHomeModule from "./Home/Module";
 import * as AdhHttpModule from "./Http/Module";
-import * as AdhIdeaCollectionModule from "./IdeaCollection/Module";
 import * as AdhImageModule from "./Image/Module";
 import * as AdhInjectModule from "./Inject/Module";
 import * as AdhListingModule from "./Listing/Module";
@@ -24,8 +23,10 @@ import * as AdhMovingColumnsModule from "./MovingColumns/Module";
 import * as AdhNamesModule from "./Names/Module";
 import * as AdhPageModule from "./Page/Module";
 import * as AdhPermissionsModule from "./Permissions/Module";
+import * as AdhPollModule from "./Poll/Module";
 import * as AdhPreliminaryNamesModule from "./PreliminaryNames/Module";
-import * as AdhProcessModule from "./Process/Module";
+import * as AdhProcessModule from "./Proposal/Module";
+import * as AdhProposalModule from "./Process/Module";
 import * as AdhRateModule from "./Rate/Module";
 import * as AdhResourceActionsModule from "./ResourceActions/Module";
 import * as AdhResourceAreaModule from "./ResourceArea/Module";
@@ -36,6 +37,7 @@ import * as AdhTrackingModule from "./Tracking/Module";
 import * as AdhUserModule from "./User/Module";
 import * as AdhUserViewsModule from "./User/ViewsModule";
 import * as AdhWebSocketModule from "./WebSocket/Module";
+import * as AdhWorkbenchModule from "./Workbench/Module";
 
 export var moduleName = "adhCore";
 
@@ -54,7 +56,6 @@ export var register = (angular, config, metaApi) => {
     AdhEventManagerModule.register(angular);
     AdhHomeModule.register(angular);
     AdhHttpModule.register(angular, config);
-    AdhIdeaCollectionModule.register(angular);
     AdhImageModule.register(angular);
     AdhInjectModule.register(angular);
     AdhListingModule.register(angular);
@@ -66,8 +67,10 @@ export var register = (angular, config, metaApi) => {
     AdhNamesModule.register(angular);
     AdhPageModule.register(angular);
     AdhPermissionsModule.register(angular);
+    AdhPollModule.register(angular);
     AdhPreliminaryNamesModule.register(angular);
     AdhProcessModule.register(angular);
+    AdhProposalModule.register(angular);
     AdhRateModule.register(angular);
     AdhResourceActionsModule.register(angular);
     AdhResourceAreaModule.register(angular);
@@ -78,6 +81,7 @@ export var register = (angular, config, metaApi) => {
     AdhUserModule.register(angular);
     AdhUserViewsModule.register(angular);
     AdhWebSocketModule.register(angular);
+    AdhWorkbenchModule.register(angular);
 
     angular
         .module(moduleName, [
@@ -90,6 +94,7 @@ export var register = (angular, config, metaApi) => {
             AdhPageModule.moduleName,
             AdhResourceAreaModule.moduleName,
             AdhTrackingModule.moduleName,
-            AdhUserViewsModule.moduleName
+            AdhUserViewsModule.moduleName,
+            AdhWorkbenchModule.moduleName
         ]);
 };
