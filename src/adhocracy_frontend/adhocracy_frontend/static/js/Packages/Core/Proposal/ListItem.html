@@ -1,10 +1,4 @@
-<a class="list-item {{selectedState}}" data-ng-class="{ 'm-contains-image': processProperties.hasImage }" href="{{path | adhParentPath | adhResourceUrl }}">
-    <adh-show-image
-        data-css-class="list-item-image"
-        data-ng-if="processProperties.hasImage"
-        data-path="{{data.picture}}"
-        data-format="thumbnail"
-    ></adh-show-image>
+<a class="list-item {{selectedState}}" href="{{path | adhParentPath | adhResourceUrl }}">
     <div class="list-item-body">
         <div class="list-item-author" data-ng-if="processProperties.hasAuthorInListItem">
             {{ "TR__BY" | translate }}
