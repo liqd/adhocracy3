@@ -43,8 +43,8 @@ Following
 On default you don`t follow any resource:
 
     >>> resp = app_participant.get(participant_path).json
-    >>> resp['data'][INotification.__identifier__]
-    {'follow_resources': []}
+    >>> resp['data'][INotification.__identifier__].get('follow_resources')
+    []
 
 Lets follow a process::
 
