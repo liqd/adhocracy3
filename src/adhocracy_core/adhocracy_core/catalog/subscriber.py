@@ -20,6 +20,7 @@ from adhocracy_core.sheets.comment import IComment
 from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.badge import IBadgeable
+from adhocracy_core.sheets.principal import IEmailNew
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
@@ -167,6 +168,9 @@ def includeme(config):
     config.add_subscriber(reindex_user_activation_path,
                           IResourceSheetModified,
                           event_isheet=IUserBasic)
+    config.add_subscriber(reindex_user_activation_path,
+                          IResourceSheetModified,
+                          event_isheet=IEmailNew)
     config.add_subscriber(reindex_comments,
                           ISheetBackReferenceModified,
                           event_isheet=ICommentable)

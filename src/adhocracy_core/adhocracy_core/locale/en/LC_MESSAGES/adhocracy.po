@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-09-27 18:28+0200\n"
+"POT-Creation-Date: 2016-11-08 17:07+0100\n"
 "PO-Revision-Date: 2015-05-26 21:25+0200\n"
 "Last-Translator: Joscha <joka@jokasis.de>\n"
 "Language-Team: English\n"
@@ -130,17 +130,17 @@ msgstr ""
 "Dein \"${site_name}\"-Team"
 
 #. Default: ${site_name}: ${activity_name}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:294
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:295
 msgid "mail_send_activity_subject"
 msgstr "mail_send_activity_subject"
 
 #. Default: ${site_name}: Password changed / Passwort wurde geändert
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:327
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:328
 msgid "mail_password_change_subject"
 msgstr ""
 
 #. Default: Your password has been changed.
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:331
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:332
 msgid "mail_password_change_body_txt"
 msgstr ""
 "Automatically generated Email. / Automatisch generierte E-Mail.\n"
@@ -165,6 +165,44 @@ msgstr ""
 "Falls du das Passwort nicht geändert hast, setze es mit folgendem Link neu.\n"
 "\n"
 "${create_reset_url}\n"
+"\n"
+"Dein \"${site_name}\"-Team"
+
+#. Default: ${site_name}: Email Verification / Email Aktivierung
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:350
+msgid "mail_new_email_verification_subject"
+msgstr "mail_new_email_verification_subject"
+
+#. Default: ${frontend_url}${activation_path}
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:354
+msgid "mail_new_email_verification_body_txt"
+msgstr ""
+"Automatically generated Email. / Automatisch generierte E-Mail.\n"
+"\n"
+"Für die deutsche Version, siehe unten.\n"
+"\n"
+"\n"
+"Dear ${user_name},\n"
+"\n"
+"This email has the purpose to validate your new email address.\n"
+"Please use the link below to activate it.\n"
+"\n"
+"${frontend_url}${activation_path}\n"
+"\n"
+"Have fun and be inspired!\n"
+"\n"
+"Your \"${site_name}\" Team\n"
+"\n"
+"----------------------------------------------------------\n"
+"\n"
+"Hallo ${user_name},\n"
+"\n"
+"Diese E-Mail dient der Validierung Deiner neuen Email-Adresse. Bitte\n"
+"nutze den folgenden Link um sie zu aktivieren.\n"
+"\n"
+"${frontend_url}${activation_path}\n"
+"\n"
+"Wir wünschen Dir viel Spaß und Inspiration!\n"
 "\n"
 "Dein \"${site_name}\"-Team"
 
@@ -214,7 +252,7 @@ msgstr ""
 "Dein \"${site_name}\"-Team"
 
 #. Default: ${activity_description} Visit ${target_type_name}: ${target_url} .
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:298
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:299
 #, fuzzy
 msgid "mail_send_activity_remove_body_txt"
 msgstr ""
@@ -227,7 +265,7 @@ msgstr ""
 "\n"
 
 #. Default: ${activity_description} Visit ${object_type_name}: ${object_url} .
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:304
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:305
 #, fuzzy
 msgid "mail_send_activity_add_update_body_txt"
 msgstr ""
@@ -243,15 +281,15 @@ msgstr ""
 msgid "Catalogs"
 msgstr ""
 
-#: src/adhocracy_core/adhocracy_core/sdi/views/sheets.py:39
+#: src/adhocracy_core/adhocracy_core/sdi/views/sheets.py:38
 msgid "save"
 msgstr ""
 
-#: src/adhocracy_core/adhocracy_core/sdi/views/sheets.py:31
+#: src/adhocracy_core/adhocracy_core/sdi/views/sheets.py:30
 msgid "Sheets"
 msgstr ""
 
-#: src/adhocracy_core/adhocracy_core/sdi/views/sheets.py:84
+#: src/adhocracy_core/adhocracy_core/sdi/views/sheets.py:83
 msgid "add"
 msgstr ""
 
@@ -279,7 +317,7 @@ msgstr ""
 msgid "Proposal"
 msgstr ""
 
-#: src/adhocracy_core/adhocracy_core/resources/process.py:23
+#: src/adhocracy_core/adhocracy_core/resources/process.py:29
 msgid "Process"
 msgstr ""
 

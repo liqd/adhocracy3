@@ -44,7 +44,9 @@ from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.resources.base import Base
 from adhocracy_core.sheets.metadata import is_older_than
+from adhocracy_core.sheets.principal import IEmailNew
 from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import SchemaNode
 from adhocracy_core.schema import MappingSchema
@@ -452,8 +454,8 @@ def create_validate_activation_path(context,
     `request.validated`.
     """
     def validate_activation_path(node, value):
-        locator = request.registry.getMultiAdapter((context, request),
-                                                   IUserLocator)
+        registry = request.registry
+        locator = registry.getMultiAdapter((context, request), IUserLocator)
         user = locator.get_user_by_activation_path(value)
         error_msg = 'Unknown or expired activation path'
         if user is None:
@@ -463,11 +465,15 @@ def create_validate_activation_path(context,
             raise Invalid(node, error_msg)
         else:
             request.validated['user'] = user
-            # TODO we should use a sheet to activate the user.
-            user.activate()
+            if not user.active:
+                user.activate()
+            elif user.has_new_email_pending:
+                user.activate_new_email()
+            else:
+                raise Invalid(node, 'No new email waiting for activation.')
             user.activation_path = None
             autoupdated = False
-            event = ResourceSheetModified(user, IUserBasic, request.registry, {},
+            event = ResourceSheetModified(user, IUserBasic, registry, {},
                                           {}, request, autoupdated)
             registry.notify(event)  # trigger reindex activation_path index
     return validate_activation_path

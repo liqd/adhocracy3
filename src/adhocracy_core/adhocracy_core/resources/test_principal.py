@@ -162,6 +162,7 @@ class TestUser:
                                      adhocracy_core.sheets.principal.IPermissions,
                                      adhocracy_core.sheets.metadata.IMetadata,
                                      adhocracy_core.sheets.pool.IPool,
+                                     adhocracy_core.sheets.principal.IEmailNew,
                                      )
         assert meta.extended_sheets == \
             (adhocracy_core.sheets.principal.IPasswordAuthentication,
@@ -202,6 +203,31 @@ class TestUser:
         assert user.timezone == timezone(user.tzname)
         assert user.is_password_valid(registry, '123456') == False
         assert user.is_password_valid(registry, 'fodThyd2') == True
+        assert user.has_new_email_pending() == False
+
+    @mark.usefixtures('integration')
+    def test_user_with_new_email(self, meta, registry, principals):
+        from pytz import timezone
+        from zope.interface.verify import verifyObject
+        from adhocracy_core import sheets
+        appstructs = {
+            sheets.principal.IUserBasic.__identifier__ : {
+                'name': 'Anna Müller',
+            },
+            sheets.principal.IUserExtended.__identifier__ : {
+                'email': 'old@foo.bar',
+            },
+            sheets.principal.IEmailNew.__identifier__ : {
+                'email': 'new@foo.bar',
+            },
+        }
+        user = registry.content.create(meta.iresource.__identifier__,
+                                       parent=principals['users'],
+                                       appstructs=appstructs)
+        assert user.has_new_email_pending() == True
+        user.activate_new_email()
+        assert user.has_new_email_pending() == False
+        user.email == 'new@foo.bar'
 
 
 class TestSystemUser:

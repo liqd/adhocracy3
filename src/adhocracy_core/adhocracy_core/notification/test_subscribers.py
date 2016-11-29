@@ -30,10 +30,10 @@ class TestSendActivityNotificationEmails:
 
     @fixture
     def event(self, request_, registry, context):
-        from adhocracy_core.events import ActivitiesAddedToAuditLog
+        from adhocracy_core.events import ActivitiesGenerated
         request_.registry = registry
         registry.root = context
-        return ActivitiesAddedToAuditLog(None, [], request_)
+        return ActivitiesGenerated([], request_)
 
     @fixture
     def mock_catalogs(self, mock_catalogs, mocker):
@@ -88,7 +88,10 @@ class TestSendActivityNotificationEmails:
     def test_send_activity_to_object_followers(self, event, activity,
                                              mock_catalogs, followable,
                                              mock_messenger, search_result):
-        activity = activity._replace(object=followable)
+        from adhocracy_core.sheets.description import IDescription
+        sheet_data = [{IDescription: {}}]
+        activity = activity._replace(object=followable,
+                                     sheet_data=sheet_data)
         event.activities = [activity]
         user = testing.DummyResource()
         mock_catalogs.search.return_value = search_result._replace(
@@ -122,6 +125,34 @@ class TestSendActivityNotificationEmails:
         comment = testing.DummyResource(__provides__=IComment)
 
         activity = activity._replace(object=comment)
+        event.activities = [activity]
+        user = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
+        self.call_fut(event)
+        assert not mock_messenger.send_activity_mail.called
+
+    def test_ignore_if_transition(self, event, activity, mock_catalogs,
+                                  mock_messenger, search_result, followable):
+        from adhocracy_core.interfaces import ActivityType
+        activity = activity._replace(object=followable,
+                                     type=ActivityType.transition)
+        event.activities = [activity]
+        user = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
+        self.call_fut(event)
+        assert not mock_messenger.send_activity_mail.called
+
+    def test_ignore_if_workflow_assignment_update(
+            self, event, activity, mock_catalogs, mock_messenger,
+            search_result, followable):
+        from adhocracy_core.interfaces import ActivityType
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        sheet_data = [{IWorkflowAssignment: {}}]
+        activity = activity._replace(object=followable,
+                                     type=ActivityType.update,
+                                     sheet_data=sheet_data)
         event.activities = [activity]
         user = testing.DummyResource()
         mock_catalogs.search.return_value = search_result._replace(

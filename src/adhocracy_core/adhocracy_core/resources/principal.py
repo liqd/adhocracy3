@@ -36,6 +36,7 @@ from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.resources.asset import add_assets_service
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.metadata import is_older_than
+from adhocracy_core.sheets.principal import IEmailNew
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.principal import IPasswordAuthentication
@@ -148,6 +149,24 @@ class User(Pool):
         statsd_incr('users.activated', 1)
         sheet.set(appstruct)
 
+    def has_new_email_pending(self):
+        registry = get_current_registry(self)
+        email_new = registry.content.get_sheet_field(self, IEmailNew, 'email')
+        return bool(email_new)
+
+    def activate_new_email(self):
+        """Activate email stored in the IEmailNew sheet."""
+        registry = get_current_registry(self)
+        email_new_sheet = registry.content.get_sheet(self, IEmailNew)
+        email_new_appstruct = email_new_sheet.get()
+        user_extended_sheet = registry.content.get_sheet(self,
+                                                         IUserExtended)
+        user_extended_appstruct = user_extended_sheet.get()
+        user_extended_appstruct['email'] = email_new_appstruct['email']
+        user_extended_sheet.set(user_extended_appstruct)
+        email_new_appstruct['email'] = ''
+        email_new_sheet.set(email_new_appstruct)
+
     def is_password_valid(self, registry: Registry, password: str):
         """Validate password against the IPasswordAuthentication sheet."""
         sheet = registry.content.get_sheet(self, IPasswordAuthentication)
@@ -165,6 +184,7 @@ user_meta = pool_meta._replace(
                   adhocracy_core.sheets.principal.IPermissions,
                   adhocracy_core.sheets.metadata.IMetadata,
                   adhocracy_core.sheets.pool.IPool,
+                  adhocracy_core.sheets.principal.IEmailNew,
                   ),
     extended_sheets=(adhocracy_core.sheets.principal.IPasswordAuthentication,
                      adhocracy_core.sheets.principal.IActivationConfiguration,
