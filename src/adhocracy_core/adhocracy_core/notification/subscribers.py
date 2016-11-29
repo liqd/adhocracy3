@@ -64,8 +64,14 @@ def _get_follow_subscriptions(streams: [tuple],
 
 def _send_emails(subscriptions: dict, streams: [tuple], request: IRequest):
     messenger = request.registry.messenger
+    registry = request.registry
     for resource, activites in streams:
         for follower in subscriptions[resource]:
+            is_notification_enabled = \
+                registry.content.get_sheet_field(follower, INotification,
+                                                 'email_notification_enabled')
+            if not is_notification_enabled:
+                continue
             for activity in activites:
                 if activity.subject != follower:
                     messenger.send_activity_mail(follower, activity, request)
