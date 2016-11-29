@@ -32,6 +32,7 @@ import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/
 import * as SIPasswordAuthentication from "../../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication";
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIUserBasic from "../../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
+import * as SIUserExtended from "../../../Resources_/adhocracy_core/sheets/principal/IUserExtended";
 
 var pkgLocation = "/Core/User";
 
@@ -737,6 +738,7 @@ var postEdit = (
     data : {
         name : string;
         email? : string;
+        oldEmail? : string;
         password? : string;
         anonymize? : boolean;
         passwordOld? : string;
@@ -752,7 +754,7 @@ var postEdit = (
                 name: data.name,
             });
         }
-        if (data.email) {
+        if (data.email !== data.oldEmail) {
             SIEmailNew.set(patch, {
                 email: data.email,
             });
@@ -798,6 +800,7 @@ export var userEditDirective = (
                         scope.data = {
                             name: SIUserBasic.get(user).name,
                             email: SIUserExtended.get(user).email,
+                            oldEmail: SIUserExtended.get(user).email,
                             password: "",
                             anonymize: SIAnonymizeDefault.get(user).anonymize,
                         };
