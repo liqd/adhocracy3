@@ -2,14 +2,16 @@ import * as AdhEmbedModule from "../../Core/Embed/Module";
 import * as AdhNamesModule from "../../Core/Names/Module";
 import * as AdhProcessModule from "../../Core/Process/Module";
 import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
-import * as AdhWorkbenchModule from "../../Core/Workbench/Module";
+
+import * as AdhIdeaCollectionModule from "../../Core/IdeaCollection/Module";
 
 import * as AdhEmbed from "../../Core/Embed/Embed";
 import * as AdhNames from "../../Core/Names/Names";
 import * as AdhProcess from "../../Core/Process/Process";
-import * as AdhProposal from "../../Core/Proposal/Proposal";
 import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
-import * as AdhWorkbench from "../../Core/Workbench/Workbench";
+
+import * as AdhIdeaCollectionProposal from "../../Core/IdeaCollection/Proposal/Proposal";
+import * as AdhIdeaCollectionWorkbench from "../../Core/IdeaCollection/Workbench/Workbench";
 
 import RIBuergerhaushaltProcess from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
 import RIBuergerhaushaltProposal from "../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal";
@@ -25,43 +27,38 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhEmbedModule.moduleName,
+            AdhIdeaCollectionModule.moduleName,
             AdhNamesModule.moduleName,
             AdhProcessModule.moduleName,
-            AdhResourceAreaModule.moduleName,
-            AdhWorkbenchModule.moduleName,
+            AdhResourceAreaModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerContext("buergerhaushalt", ["burgerhaushalt"]);
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
-            var registerRoutes = (context? : string) => (provider) => {
-                AdhWorkbench.registerCommonRoutesFactory(
-                    RIBuergerhaushaltProcess, RIBuergerhaushaltProposal, RIBuergerhaushaltProposalVersion)(context)(provider);
-                AdhWorkbench.registerProposalRoutesFactory(
-                    RIBuergerhaushaltProcess, RIBuergerhaushaltProposal, RIBuergerhaushaltProposalVersion, true)(context)(provider);
-            };
+            var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
+                RIBuergerhaushaltProcess, RIBuergerhaushaltProposal, RIBuergerhaushaltProposalVersion, true);
             registerRoutes()(adhResourceAreaProvider);
             registerRoutes("buergerhaushalt")(adhResourceAreaProvider);
 
-            var processHeaderSlot = adhConfig.pkg_path + AdhWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
+            var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
         }])
         .config(["adhConfig", "adhProcessProvider", (adhConfig, adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[processType] =
-                "<adh-workbench data-process-properties=\"processProperties\"></adh-workbench>";
+                "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
+                "</adh-idea-collection-workbench>";
             adhProcessProvider.setProperties(processType, {
-                createSlot: adhConfig.pkg_path + AdhProposal.pkgLocation + "/CreateSlot.html",
-                detailSlot: adhConfig.pkg_path + AdhProposal.pkgLocation + "/DetailSlot.html",
-                editSlot: adhConfig.pkg_path + AdhProposal.pkgLocation + "/EditSlot.html",
+                detailSlot: adhConfig.pkg_path + AdhIdeaCollectionProposal.pkgLocation + "/DetailSlot.html",
                 hasAuthorInListItem: true,
                 hasCommentColumn: true,
                 hasDescription: true,
                 hasLocation: true,
                 hasLocationText: true,
-                itemClass: RIBuergerhaushaltProposal,
                 maxBudget: Infinity,
+                proposalClass: RIBuergerhaushaltProposal,
                 proposalSheet: SIBuergerhaushaltProposal,
-                versionClass: RIBuergerhaushaltProposalVersion
+                proposalVersionClass: RIBuergerhaushaltProposalVersion
             });
         }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {

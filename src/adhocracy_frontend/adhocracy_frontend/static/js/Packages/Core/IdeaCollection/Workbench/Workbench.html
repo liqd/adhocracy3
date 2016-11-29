@@ -1,0 +1,14 @@
+<div data-adh-moving-columns="" class="moving-columns">
+    <adh-moving-column>
+        <adh-idea-collection-detail-column></adh-idea-collection-detail-column>
+    </adh-moving-column>
+    <adh-moving-column>
+        <adh-idea-collection-proposal-create-column data-ng-if="view === 'create_proposal'"></adh-idea-collection-proposal-create-column>
+        <adh-idea-collection-proposal-edit-column data-ng-if="view === 'edit'"></adh-idea-collection-proposal-edit-column>
+        <adh-idea-collection-proposal-image-column data-ng-if="processProperties.hasImage && view === 'image'"></adh-idea-collection-proposal-image-column>
+        <ng-include data-ng-if="view !== 'create_proposal' && view !== 'edit' && view !== 'image'" src="processProperties.detailSlot"></ng-include>
+    </adh-moving-column>
+    <adh-moving-column>
+        <adh-comment-column data-ng-if="processProperties.hasCommentColumn"></adh-comment-column>
+    </adh-moving-column>
+</div>

@@ -1,0 +1,28 @@
+<div data-ng-switch="transclusionId">
+    <div data-ng-switch-when="menu">
+        <div class="moving-column-tab">
+            <i class="icon-document moving-column-icon"></i>
+        </div>
+
+        <div class="moving-column-menu-nav">
+            <a class="moving-column-menu-nav-button" data-ng-href="{{ processUrl | adhResourceUrl }}" title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
+        </div>
+    </div>
+
+    <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ proposalUrl | adhParentPath | adhResourceUrl }}">
+        <div class="moving-column-tab">
+            <i class="icon-document moving-column-icon"></i>
+        </div>
+    </a>
+
+    <div data-ng-switch-when="body">
+        <adh-recompile-on-change
+            data-value="{{proposalUrl}}">
+            <adh-idea-collection-proposal-detail
+                data-ng-if="proposalUrl"
+                data-process-properties="processProperties"
+                data-path="{{proposalUrl}}">
+            </adh-idea-collection-proposal-detail>
+        </adh-recompile-on-change>
+    </div>
+</div>

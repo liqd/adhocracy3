@@ -3,9 +3,8 @@
         <div class="moving-column-tab">
             <i class="icon-document moving-column-icon"></i>
         </div>
-
         <div class="moving-column-menu-nav">
-            <a class="moving-column-menu-nav-button" data-ng-href="{{ processUrl | adhResourceUrl:'proposals' }}" title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
+            <a class="moving-column-menu-nav-button" data-ng-href="{{ processUrl | adhResourceUrl }}" title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
         </div>
     </div>
 
@@ -14,12 +13,12 @@
     </a>
 
     <adh-recompile-on-change
-        data-ng-switch-when="body"
-        data-value="{{proposalUrl}}">
+            data-ng-switch-when="body"
+            data-value="{{proposalUrl}}">
         <adh-idea-collection-proposal-edit
             data-ng-if="proposalUrl"
-            data-path="{{proposalUrl}}"
             data-process-properties="processProperties"
+            data-path="{{proposalUrl}}"
             data-cancel-url="proposalUrl | adhParentPath | adhResourceUrl">
         </adh-idea-collection-proposal-edit>
     </adh-recompile-on-change>
