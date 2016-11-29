@@ -797,7 +797,7 @@ export var userEditDirective = (
                     adhHttp.get(path).then((user) => {
                         scope.data = {
                             name: SIUserBasic.get(user).name,
-                            email: "",
+                            email: SIUserExtended.get(user).email,
                             password: "",
                             anonymize: SIAnonymizeDefault.get(user).anonymize,
                         };
