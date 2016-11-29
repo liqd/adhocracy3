@@ -65,6 +65,12 @@
             {{ "TR__ERROR_REQUIRED_PASSWORD" | translate }}
         </span>
     </label>
+    <label data-ng-if="data.followablesExist">
+        <input
+            type="checkbox"
+            data-ng-model="data.notificationsEnabled" />
+        <span class="label-text">{{ "TR__GET_EMAIL_NOTIFICATIONS" | translate }}</span>
+    </label>
     <label data-ng-if="config.anonymize_enabled">
         <input
             type="checkbox"
