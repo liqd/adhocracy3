@@ -74,6 +74,7 @@ export var detailDirective = (
                         }
 
                         scope.contentType = scope.processProperties.proposalVersionClass.content_type;
+
                         var context = adhEmbed.getContext();
                         var isIdeaColl = resource.content_type === "adhocracy_meinberlin.resources.idea_collection.IProcess";
                         // show the resource header if
