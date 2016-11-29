@@ -29,6 +29,7 @@ import * as SIEmailNew from "../../../Resources_/adhocracy_core/sheets/principal
 import * as SIHasAssetPool from "../../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
 import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SINotification from "../../../Resources_/adhocracy_core/sheets/notification/INotification";
 import * as SIPasswordAuthentication from "../../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication";
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIUserBasic from "../../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
@@ -742,6 +743,7 @@ var postEdit = (
         password? : string;
         anonymize? : boolean;
         passwordOld? : string;
+        notificationsEnabled? : boolean;
     }
 ) => {
     return adhHttp.get(path).then((oldUser) => {
@@ -766,6 +768,10 @@ var postEdit = (
         }
         SIAnonymizeDefault.set(patch, {
             anonymize: data.anonymize,
+        });
+        SINotification.set(patch, {
+            follow_resources: SINotification.get(oldUser).follow_resources,
+            email_notification_enabled: data.notificationsEnabled,
         });
         return adhHttp.put(oldUser.path, patch, {
             password: data.passwordOld
@@ -803,6 +809,8 @@ export var userEditDirective = (
                             oldEmail: SIUserExtended.get(user).email,
                             password: "",
                             anonymize: SIAnonymizeDefault.get(user).anonymize,
+                            followablesExist: !!SINotification.get(user).follow_resources.length,
+                            notificationsEnabled: SINotification.get(user).email_notification_enabled
                         };
                     });
                 }
