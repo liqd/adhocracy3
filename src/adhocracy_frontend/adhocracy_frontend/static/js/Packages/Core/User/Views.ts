@@ -739,10 +739,9 @@ var postEdit = (
     data : {
         name : string;
         email? : string;
-        oldEmail? : string;
         password? : string;
-        anonymize? : boolean;
         passwordOld? : string;
+        anonymize? : boolean;
         notificationsEnabled? : boolean;
     }
 ) => {
@@ -756,7 +755,7 @@ var postEdit = (
                 name: data.name,
             });
         }
-        if (data.email !== data.oldEmail) {
+        if (data.email !== SIUserExtended.get(oldUser).email) {
             SIEmailNew.set(patch, {
                 email: data.email,
             });
@@ -806,7 +805,6 @@ export var userEditDirective = (
                         scope.data = {
                             name: SIUserBasic.get(user).name,
                             email: SIUserExtended.get(user).email,
-                            oldEmail: SIUserExtended.get(user).email,
                             password: "",
                             anonymize: SIAnonymizeDefault.get(user).anonymize,
                             followablesExist: !!SINotification.get(user).follow_resources.length,
