@@ -73,8 +73,8 @@ export var detailDirective = (
                             });
                         }
 
-                        var proposalVersion = scope.processProperties.proposalVersionClass;
-                        scope.contentType = proposalVersion.content_type;
+                        scope.contentType = scope.processProperties.proposalVersionClass.content_type;
+                        var context = adhEmbed.getContext();
                         var isIdeaColl = resource.content_type === "adhocracy_meinberlin.resources.idea_collection.IProcess";
                         // show the resource header if
                         // - the process type is an idea collection and the context is "mein.berlin.de"
