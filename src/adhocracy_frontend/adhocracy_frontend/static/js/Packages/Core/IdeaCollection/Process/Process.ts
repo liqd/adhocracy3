@@ -75,6 +75,11 @@ export var detailDirective = (
 
                         var proposalVersion = scope.processProperties.proposalVersionClass;
                         scope.contentType = proposalVersion.content_type;
+                        var isIdeaColl = resource.content_type === "adhocracy_meinberlin.resources.idea_collection.IProcess";
+                        // show the resource header if
+                        // - the process type is an idea collection and the context is "mein.berlin.de"
+                        // - OR: the process type is somethng else and there is no context.
+                        scope.hasResourceHeader = isIdeaColl ? context === "mein.berlin.de" : context === "";
                     });
                 }
             });
@@ -83,9 +88,6 @@ export var detailDirective = (
             scope.showMap = (isShowMap) => {
                 scope.data.isShowMap = isShowMap;
             };
-
-            var context = adhEmbed.getContext();
-            scope.hasResourceHeader = (context === "");
         }
     };
 };
