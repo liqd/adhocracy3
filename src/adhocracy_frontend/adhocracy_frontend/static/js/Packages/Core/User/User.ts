@@ -100,6 +100,21 @@ export class Service {
             .then(success, AdhHttp.logBackendError);
     }
 
+    public logInWithServiceKonto(token : string) : angular.IPromise<void> {
+        var _self : Service = this;
+
+        var promise = _self.adhHttp.postRaw("/login_service_konto", {
+            token: token
+        });
+
+        var success = (response) => {
+            return _self.adhCredentials.storeAndEnableToken(response.data.user_token, response.data.user_path);
+        };
+
+        return promise
+            .then(success, AdhHttp.logBackendError);
+    }
+
     public logOut() : void {
         // The server does not have a logout yet.
         this.adhCredentials.deleteToken();
