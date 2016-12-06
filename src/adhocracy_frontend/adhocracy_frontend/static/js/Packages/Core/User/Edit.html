@@ -59,11 +59,17 @@
         <input
             type="password"
             name="password_old"
-            data-ng-required="data.password || data.email"
+            data-ng-required="data.password || userEditForm.email.$dirty"
             data-ng-model="data.passwordOld" />
         <span class="input-error" data-ng-show="showError(userEditForm, userEditForm.password_old, 'required')">
             {{ "TR__ERROR_REQUIRED_PASSWORD" | translate }}
         </span>
+    </label>
+    <label data-ng-if="data.followablesExist">
+        <input
+            type="checkbox"
+            data-ng-model="data.notificationsEnabled" />
+        <span class="label-text">{{ "TR__GET_EMAIL_NOTIFICATIONS" | translate }}</span>
     </label>
     <label data-ng-if="config.anonymize_enabled">
         <input

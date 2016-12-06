@@ -29,9 +29,11 @@ import * as SIEmailNew from "../../../Resources_/adhocracy_core/sheets/principal
 import * as SIHasAssetPool from "../../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
 import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SINotification from "../../../Resources_/adhocracy_core/sheets/notification/INotification";
 import * as SIPasswordAuthentication from "../../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication";
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIUserBasic from "../../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
+import * as SIUserExtended from "../../../Resources_/adhocracy_core/sheets/principal/IUserExtended";
 
 var pkgLocation = "/Core/User";
 
@@ -766,8 +768,9 @@ var postEdit = (
         name : string;
         email? : string;
         password? : string;
-        anonymize? : boolean;
         passwordOld? : string;
+        anonymize? : boolean;
+        notificationsEnabled? : boolean;
     }
 ) => {
     return adhHttp.get(path).then((oldUser) => {
@@ -780,7 +783,7 @@ var postEdit = (
                 name: data.name,
             });
         }
-        if (data.email) {
+        if (data.email !== SIUserExtended.get(oldUser).email) {
             SIEmailNew.set(patch, {
                 email: data.email,
             });
@@ -792,6 +795,10 @@ var postEdit = (
         }
         SIAnonymizeDefault.set(patch, {
             anonymize: data.anonymize,
+        });
+        SINotification.set(patch, {
+            follow_resources: SINotification.get(oldUser).follow_resources,
+            email_notification_enabled: data.notificationsEnabled,
         });
         return adhHttp.put(oldUser.path, patch, {
             password: data.passwordOld
@@ -825,9 +832,11 @@ export var userEditDirective = (
                     adhHttp.get(path).then((user) => {
                         scope.data = {
                             name: SIUserBasic.get(user).name,
-                            email: "",
+                            email: SIUserExtended.get(user).email,
                             password: "",
                             anonymize: SIAnonymizeDefault.get(user).anonymize,
+                            followablesExist: !!SINotification.get(user).follow_resources.length,
+                            notificationsEnabled: SINotification.get(user).email_notification_enabled
                         };
                     });
                 }
