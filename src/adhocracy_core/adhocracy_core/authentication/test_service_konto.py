@@ -190,11 +190,18 @@ class TestCreateUser:
 
     @fixture
     def mock_user_service(self, mocker):
-        user_service = mocker.Mock()
-        mocker.patch(
+        return mocker.Mock()
+
+    @fixture
+    def mock_group_service(self, mocker):
+        return mocker.Mock()
+
+    @fixture
+    def mock_service(self, mocker, mock_user_service, mock_group_service):
+        mock_service = mocker.patch(
             'adhocracy_core.authentication.service_konto.find_service',
-            return_value=user_service)
-        return  user_service
+            side_effect=[mock_user_service, mock_group_service])
+        return  mock_service
 
     def call_fut(self, *args):
         from .service_konto import _create_user
@@ -207,7 +214,8 @@ class TestCreateUser:
             self.call_fut(context, registry, request_, mock_user_data)
 
     def test_create_user(self, context, registry, request_, mock_locator,
-                         mock_generate_username, mock_user_service,
+                         mock_generate_username, mock_service,
+                         mock_user_service, mock_group_service,
                          mock_user_data):
         from adhocracy_core.resources.principal import IUser
         from adhocracy_core.sheets import principal
@@ -217,6 +225,8 @@ class TestCreateUser:
         expected_appstruct = {
             principal.IUserBasic.__identifier__: {'name': 'Foo Bar'},
             principal.IUserExtended.__identifier__: {'email': 'foo@bar.com'},
+            principal.IPermissions.__identifier__:
+                {'groups': [mock_group_service.get()]},
             principal.IServiceKonto.__identifier__: {'userid': 1},
             principal.IServiceKontoSettings.__identifier__: {'enabled': True},
 

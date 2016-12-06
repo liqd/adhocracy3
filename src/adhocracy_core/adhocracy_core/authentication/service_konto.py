@@ -4,12 +4,14 @@ from lxml import etree
 from pyramid.registry import Registry
 from pyramid.request import Request
 from pyramid.settings import asbool
+from adhocracy_core.interfaces import DEFAULT_USER_GROUP_NAME
 from substanced.interfaces import IUserLocator
 from substanced.util import find_service
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.principal import IUserExtended
+from adhocracy_core.sheets.principal import IPermissions
 from adhocracy_core.sheets.principal import IServiceKonto
 from adhocracy_core.sheets.principal import IServiceKontoSettings
 
@@ -94,10 +96,13 @@ def _create_user(context: IResource, registry: Registry, request: Request,
     if _is_email_used(context, registry, request, user_data.get('email')):
         raise ValueError('User with ServiceKonto email already exists.')
     users = find_service(context, 'principals', 'users')
+    groups = find_service(context, 'principals', 'groups')
+    default_group = groups.get(DEFAULT_USER_GROUP_NAME, None)
     name = _generate_username(context, registry, request, user_data)
     appstruct = {
         IUserBasic.__identifier__: {'name': name},
         IUserExtended.__identifier__: {'email': user_data.get('email')},
+        IPermissions.__identifier__: {'groups': [default_group]},
         IServiceKonto.__identifier__: {'userid': int(user_data.get('userid'))},
         IServiceKontoSettings.__identifier__: {'enabled': True},
     }
