@@ -173,6 +173,8 @@ class TestUser:
              adhocracy_core.sheets.badge.IBadgeable,
              adhocracy_core.sheets.image.IImageReference,
              adhocracy_core.sheets.notification.INotification,
+             adhocracy_core.sheets.principal.IServiceKonto,
+             adhocracy_core.sheets.principal.IServiceKontoSettings,
             )
         assert meta.element_types == ()
         assert meta.use_autonaming is True
@@ -537,6 +539,22 @@ class TestUserLocatorAdapter:
 
     def test_get_user_by_userid_user_not_exists(self, inst):
         assert inst.get_user_by_userid('/principals/users/User1') is None
+
+    def test_get_user_by_service_konto_userid_user_exists(self, inst,
+            mock_catalogs, search_result, query):
+        user = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
+        assert inst.get_user_by_service_konto_userid('123') is user
+        assert mock_catalogs.search.call_args[0][0] == query._replace(
+            indexes={'private_service_konto_userid': '123'},
+            resolve=True,
+        )
+
+    def test_get_user_by_service_konto_userid_user_not_exists(self, inst,
+                                                              mock_catalogs):
+        assert inst.get_user_by_service_konto_userid('312') is None
+        assert mock_catalogs.search.called
 
     def test_get_groupids_user_exists(self, context, mock_sheet, request_, inst):
         from adhocracy_core.sheets.principal import IPermissions

@@ -1590,12 +1590,20 @@ class TestPostLoginNameRequestSchemma:
 
 class TestCreateValidateLogin:
 
+    @fixture
+    def mock_sheet_fields(self, mocker, registry):
+        mock_sheet_fields =  mocker.Mock(return_value=0)
+        registry.content.get_sheet_field = mock_sheet_fields
+        return mock_sheet_fields
+
+        return mocker.Mock()
+
     def call_fut(self, *args):
         from adhocracy_core.rest.schemas import create_validate_login
         return create_validate_login(*args)
 
     def test_add_user_by_name(self, node, context, request_, registry,
-                               mock_user_locator):
+                               mock_user_locator, mock_sheet_fields):
         user = testing.DummyResource()
         mock_user_locator.get_user_by_login.return_value = user
         validator = self.call_fut(context, request_, registry, 'name')
@@ -1603,7 +1611,7 @@ class TestCreateValidateLogin:
         assert request_.validated['user'] == user
 
     def test_add_user_by_email(self, node, context, request_, registry,
-                      mock_user_locator):
+                      mock_user_locator, mock_sheet_fields):
         user = testing.DummyResource()
         mock_user_locator.get_user_by_email.return_value = user
         validator = self.call_fut(context, request_, registry, 'email')
@@ -1623,7 +1631,7 @@ class TestCreateValidateLogin:
         assert 'user' not in request_.validated
 
     def test_normalise_email(self, node, context, request_, registry,
-                             mock_user_locator):
+                             mock_user_locator, mock_sheet_fields):
         user = testing.DummyResource()
         mock_user_locator.get_user_by_email.return_value = user
         validator = self.call_fut(context, request_, registry, 'email')
@@ -1631,6 +1639,18 @@ class TestCreateValidateLogin:
         mock_user_locator.get_user_by_email\
             .assert_called_with('user@example.org')
 
+    def test_raise_if_service_konto_user(self, node, context, request_,
+                                         registry, mock_user_locator,
+                                         mock_sheet_fields):
+        mock_sheet_fields.return_value = 1
+        user = testing.DummyResource()
+        mock_user_locator.get_user_by_login.return_value = user
+        node['name'] = node.clone()  # used to raise error
+        validator = self.call_fut(context, request_, registry, 'name')
+        with raises(colander.Invalid) as error_info:
+            validator(node, {'name': 'username'})
+        assert error_info.value.asdict() == \
+               {'name': 'Please use ServiceKonto login'}
 
 class TestCreateValidateLoginPassword:
 
@@ -1696,4 +1716,47 @@ class TestCreateValidateAccountActive:
                {'child_node': 'User account not yet activated'}
 
 
+class TestCreateValidateServiceKontoAuth:
 
+    @fixture
+    def mock_user(self, mocker):
+        return mocker.Mock()
+
+    @fixture
+    def mock_service_konto(self, mocker, mock_user):
+        return mocker.patch(
+            'adhocracy_core.rest.schemas.authenticate_user',
+            return_value=mock_user)
+
+    def make_one(self, kw):
+        from .schemas import POSTLoginServiceKontoSchema
+        return POSTLoginServiceKontoSchema().bind(**kw)
+
+    def call_fut(self, *args):
+        from adhocracy_core.rest.schemas import \
+            create_validate_service_konto_auth
+        return create_validate_service_konto_auth(*args)
+
+    def test_create(self, mocker, kw):
+        val_service_konto = mocker.patch('adhocracy_core.rest.schemas.'
+                                         'create_validate_service_konto_auth')
+        inst = self.make_one(kw)
+        assert inst['token'].required
+        validators = inst.validator.validators
+        assert validators[0] == val_service_konto.return_value
+        val_service_konto.assert_called_with(kw['context'],
+                                             kw['request'],
+                                             kw['registry'])
+
+    def test_validate_service_konto_auth(self, node, context, request_,
+                registry, mock_service_konto, mock_user):
+        validator = self.call_fut(context, request_, registry)
+        assert validator(node, {'token': '12345'}) is None
+        assert request_.validated['user'] == mock_user
+
+    def test_validate_service_konto_auth_invalid(self, node, context, request_,
+                registry, mock_service_konto, mock_user):
+        mock_service_konto.side_effect = ValueError()
+        validator = self.call_fut(context, request_, registry)
+        with raises(colander.Invalid):
+            validator(node, {'token': '12345'})

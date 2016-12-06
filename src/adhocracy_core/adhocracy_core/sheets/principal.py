@@ -30,6 +30,7 @@ from adhocracy_core.schema import TimeZoneName
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Roles
 from adhocracy_core.schema import Boolean
+from adhocracy_core.schema import Integer
 
 
 class IUserBasic(ISheet):
@@ -415,6 +416,46 @@ anonymize_default_meta = sheet_meta._replace(
 )
 
 
+class IServiceKonto(ISheet):
+    """Marker interface for the ServiceKonto sheet."""
+
+
+class ServiceKontoSchema(MappingSchema):
+    """Data structure for ServiceKonto user information."""
+
+    userid = Integer()
+
+
+service_konto_meta = sheet_meta._replace(
+    isheet=IServiceKonto,
+    schema_class=ServiceKontoSchema,
+    readable=False,
+    editable=False,
+    creatable=False,
+    permission_create='create_service_konto_user',
+)
+
+
+class IServiceKontoSettings(ISheet):
+    """Marker interface for the ServiceKonto settings sheet."""
+
+
+class ServiceKontoSettingsSchema(MappingSchema):
+    """Data structure for public ServiceKonto user information."""
+
+    enabled = Boolean()
+
+
+service_konto_settings_meta = sheet_meta._replace(
+    isheet=IServiceKontoSettings,
+    schema_class=ServiceKontoSettingsSchema,
+    editable=False,
+    creatable=False,
+    permission_create='create_service_konto_user',
+    permission_view='view_userextended',
+)
+
+
 def includeme(config):
     """Register sheets and activate catalog factory."""
     add_sheet_to_registry(userbasic_meta, config.registry)
@@ -433,3 +474,14 @@ def includeme(config):
     add_sheet_to_registry(activation_configuration_meta, config.registry)
     add_sheet_to_registry(anonymize_default_meta, config.registry)
     add_sheet_to_registry(emailnew_meta, config.registry)
+    service_konto_enabled = asbool(config.registry.settings.get(
+        'adhocracy.service_konto.enabled', False))
+    if service_konto_enabled:
+        add_sheet_to_registry(service_konto_meta._replace(creatable=True),
+                              config.registry)
+        add_sheet_to_registry(
+            service_konto_settings_meta._replace(creatable=True),
+            config.registry)
+    else:
+        add_sheet_to_registry(service_konto_meta, config.registry)
+        add_sheet_to_registry(service_konto_settings_meta, config.registry)

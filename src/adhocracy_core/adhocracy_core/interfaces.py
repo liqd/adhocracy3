@@ -986,6 +986,9 @@ class IRolesUserLocator(IUserLocator):  # pragma: no cover
     def get_user_by_activation_path(activation_path: str) -> IResource:
         """Find user per activation path or return None."""
 
+    def get_user_by_service_konto_userid(userid: str) -> IResource:
+        """Find user per service konto userid or return None."""
+
 
 class IRoleACLAuthorizationPolicy(IAuthorizationPolicy):  # pragma: no cover
     """A :term:`authorization policy` supporting creator term:`local role`."""

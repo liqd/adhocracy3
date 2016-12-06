@@ -194,6 +194,8 @@ user_meta = pool_meta._replace(
                      adhocracy_core.sheets.badge.IBadgeable,
                      adhocracy_core.sheets.image.IImageReference,
                      adhocracy_core.sheets.notification.INotification,
+                     adhocracy_core.sheets.principal.IServiceKonto,
+                     adhocracy_core.sheets.principal.IServiceKontoSettings,
                      ),
     element_types=(),  # we don't want the frontend to post resources here
     use_autonaming=True,
@@ -400,6 +402,11 @@ class UserLocatorAdapter(object):
         """Find user per activation path or return None."""
         user = self._search_user('private_user_activation_path',
                                  activation_path)
+        return user
+
+    def get_user_by_service_konto_userid(self, userid: str) -> IUser:
+        """Find user per service konto userid or return None."""
+        user = self._search_user('private_service_konto_userid', userid)
         return user
 
     def _search_user(self, index_name: str, value: str) -> IUser:

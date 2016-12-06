@@ -210,6 +210,11 @@ def test_reindex_user_text(event, catalog):
     reindex_user_text(event)
     catalog.reindex_index.assert_called_with(event.object, 'text')
 
+def test_reindex_service_konto_userid(event, catalog):
+    from .subscriber import reindex_service_konto_userid
+    reindex_service_konto_userid(event)
+    catalog.reindex_index.assert_called_with(event.object, 'private_service_konto_userid')
+
 @mark.usefixtures('integration')
 def test_register_subscriber(registry):
     from adhocracy_core.catalog import subscriber
