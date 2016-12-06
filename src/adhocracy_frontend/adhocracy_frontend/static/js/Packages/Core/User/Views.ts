@@ -270,7 +270,7 @@ export var loginDirective = (
                 };
 
                 $window.addEventListener("message", handler);
-                popup = $window.open(adhConfig.service_konto_login_url, "_blank", "width=460,height=225");
+                popup = $window.open(adhConfig.service_konto_login_url, "_blank", "width=1000,height=750");
             };
 
             scope.logIn = () => {
