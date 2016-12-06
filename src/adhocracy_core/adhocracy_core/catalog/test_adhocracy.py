@@ -585,3 +585,25 @@ class TestIndexUserActivationPath:
         from substanced.interfaces import IIndexView
         assert registry.adapters.lookup((IUserBasic,), IIndexView,
                                         name='adhocracy|private_user_activation_path')
+
+class TestIndexServiceKontoUserid:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    def call_fut(self, *args):
+        from .adhocracy import index_service_konto_userid
+        return index_service_konto_userid(*args)
+
+    def test_return_userid(self, registry, context, mock_sheet):
+        registry.content.get_sheet.return_value = mock_sheet
+        mock_sheet.get.return_value = {'userid': '123'}
+        assert self.call_fut(context, 'default') == '123'
+
+    @mark.usefixtures('integration')
+    def test_register(self, registry):
+        from adhocracy_core.sheets.principal import IServiceKonto
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IServiceKonto,), IIndexView,
+                                        name='adhocracy|private_service_konto_userid')

@@ -1313,6 +1313,36 @@ class TestPasswordResetView:
         assert inst.options() == {'POST': {}}
 
 
+class TestLoginServiceKonto:
+
+    @fixture
+    def request(self, request_):
+        request_.validated['user'] = testing.DummyResource()
+        request_.validated['password'] = 'lalala'
+        return request_
+
+    def make_one(self, request, context):
+        from adhocracy_core.rest.views import LoginServiceKontoView
+        return LoginServiceKontoView(request, context)
+
+    def test_create(self, context, request):
+        inst = self.make_one(context, request)
+        assert inst.context is context
+        assert inst.request is request
+
+    def test_post(self, context, request, mock_authpolicy):
+        mock_authpolicy.remember.return_value = [('X-User-Token', 'token')]
+        inst = self.make_one(context, request)
+        result = inst.post()
+        assert result == {'status': 'success',
+                          'user_path': 'http://example.com/',
+                          'user_token': 'token'}
+
+    def test_options(self, request, context):
+        inst = self.make_one(context, request)
+        assert inst.options() == {}
+
+
 @fixture
 def integration(config):
     config.include('adhocracy_core.rest.views')
@@ -1325,4 +1355,3 @@ class TestIntegrationIncludeme:
     def test_includeme(self):
         """Check that includeme runs without errors."""
         assert True
-

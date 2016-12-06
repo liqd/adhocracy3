@@ -103,7 +103,10 @@ export interface IScopeLogin extends angular.IScope {
     enableCancel : boolean;
     cancel : () => void;
     logIn : () => angular.IPromise<void>;
+    logInWithServiceKonto : () => void;
     showError;
+    serviceKontoEnabled : boolean;
+    serviceKontoHelpUrl : string;
 }
 
 
@@ -214,7 +217,8 @@ export var loginDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhEmbed : AdhEmbed.Service,
     adhPermissions : AdhPermissions.Service,
-    adhShowError
+    adhShowError,
+    $window : angular.IWindowService
 ) => {
     return {
         restrict: "E",
@@ -223,6 +227,8 @@ export var loginDirective = (
         link: (scope : IScopeLogin) => {
             scope.errors = [];
             scope.supportEmail = adhConfig.support_email;
+            scope.serviceKontoEnabled = !!adhConfig.service_konto_login_url;
+            scope.serviceKontoHelpUrl = adhConfig.service_konto_help_url;
             scope.showError = adhShowError;
 
             adhPermissions.bindScope(scope, "/principals/users");
@@ -243,17 +249,39 @@ export var loginDirective = (
                  adhTopLevelState.goToCameFrom("/");
             };
 
+            var handleErrors = (errors) => {
+                bindServerErrors(scope, errors);
+                scope.credentials.password = "";
+                scope.loginForm.$setPristine();
+            };
+
+            scope.logInWithServiceKonto = () => {
+                var popup;
+
+                var handler = (event) => {
+                    var message = JSON.parse(event.data);
+
+                    if (message.name === "serviceKontoToken" && event.origin === $window.location.origin) {
+                        adhUser.logInWithServiceKonto(message.data.token).then(() => {
+                            adhTopLevelState.goToCameFrom("/", true);
+                        }, handleErrors);
+
+                        popup.close();
+                        $window.removeEventListener("message", handler);
+                    }
+                };
+
+                $window.addEventListener("message", handler);
+                popup = $window.open(adhConfig.service_konto_login_url, "_blank", "width=1000,height=750");
+            };
+
             scope.logIn = () => {
                 return adhUser.logIn(
                     scope.credentials.nameOrEmail,
                     scope.credentials.password
                 ).then(() => {
                     adhTopLevelState.goToCameFrom("/", true);
-                }, (errors) => {
-                    bindServerErrors(scope, errors);
-                    scope.credentials.password = "";
-                    scope.loginForm.$setPristine();
-                });
+                }, handleErrors);
             };
         }
     };

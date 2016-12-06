@@ -50,6 +50,7 @@ from adhocracy_core.rest.schemas import GETPoolRequestSchema
 from adhocracy_core.rest.schemas import GETItemResponseSchema
 from adhocracy_core.rest.schemas import GETResourceResponseSchema
 from adhocracy_core.rest.schemas import DELETEResourceResponseSchema
+from adhocracy_core.rest.schemas import POSTLoginServiceKontoSchema
 from adhocracy_core.rest.schemas import options_resource_response_data_dict
 from adhocracy_core.schema import SchemaNode
 from adhocracy_core.schema import AbsolutePath
@@ -1008,6 +1009,32 @@ class PasswordResetView:
         reset = self.request.validated['path']
         password = self.request.validated['password']
         reset.reset_password(password)
+        return _login_user(self.request)
+
+
+@view_defaults(
+    context=IRootPool,
+    name='login_service_konto',
+)
+class LoginServiceKontoView:
+    """Log in a user via service konto token."""
+
+    def __init__(self, context: IRootPool, request: IRequest):
+        self.context = context
+        self.request = request
+
+    @api_view(request_method='OPTIONS')
+    def options(self) -> dict:
+        """Return options for view."""
+        return {}
+
+    @api_view(
+        request_method='POST',
+        schema=POSTLoginServiceKontoSchema,
+        accept='application/json',
+    )
+    def post(self) -> dict:
+        """Login user."""
         return _login_user(self.request)
 
 

@@ -24,7 +24,7 @@ import * as SIPoint from "../../../Resources_/adhocracy_core/sheets/geo/IPoint";
 import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
-export var pkgLocation = "/Core/Document";
+var pkgLocation = "/Core/Document";
 
 
 export interface IParagraph {

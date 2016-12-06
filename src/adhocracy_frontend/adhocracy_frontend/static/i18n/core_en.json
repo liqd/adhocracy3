@@ -109,6 +109,7 @@
     "TR__LIST": "list",
     "TR__LOAD_MORE": "load more",
     "TR__LOGIN": "login",
+    "TR__LOGIN_SERVICE_KONTO": "Login via Service-Konto Berlin",
     "TR__LOGIN_SUPPORT": "Having trouble with login?",
     "TR__LOGOUT": "logout",
     "TR__MANAGE_BADGE_ASSIGNMENTS": "badges",

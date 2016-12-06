@@ -16,11 +16,11 @@
     <adh-recompile-on-change
         data-ng-switch-when="body"
         data-value="{{proposalUrl}}">
-        <adh-proposal-edit
+        <adh-idea-collection-proposal-edit
             data-ng-if="proposalUrl"
             data-path="{{proposalUrl}}"
             data-process-properties="processProperties"
             data-cancel-url="proposalUrl | adhParentPath | adhResourceUrl">
-        </adh-proposal-edit>
+        </adh-idea-collection-proposal-edit>
     </adh-recompile-on-change>
 </div>

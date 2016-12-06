@@ -35,13 +35,13 @@ export var register = () => {
                     postMessageMock, locationMock, windowMock, rootScopeMock, ["http://trusted.lan"], adhCredentialsMock, adhUserMock);
             });
 
-            describe("registerMessageHandler", () => {
+            describe("on", () => {
                 var callbackMock;
                 var args;
 
                 beforeEach(() => {
                     callbackMock = jasmine.createSpy("callbackMock");
-                    service.registerMessageHandler("test", callbackMock);
+                    service.on("test", callbackMock);
 
                     args = windowMock.addEventListener.calls.mostRecent().args;
                 });
@@ -151,9 +151,9 @@ export var register = () => {
                 expect(dummy.dummy).toBeDefined();
             });
 
-            describe("registerMessageHandler", () => {
+            describe("on", () => {
                 it("can be called", () => {
-                    expect(() => dummy.registerMessageHandler()).not.toThrow();
+                    expect(() => dummy.on()).not.toThrow();
                 });
             });
             describe("postResize", () => {
@@ -202,7 +202,7 @@ export var register = () => {
             it("allows to register message handlers in configuration phase", () => {
 
                 var callbackMock = jasmine.createSpy("callbackMock");
-                provider.registerMessageHandler("test", callbackMock);
+                provider.on("test", callbackMock);
 
                 var data = {x: "y"};
                 var message = {

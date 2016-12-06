@@ -1,8 +1,6 @@
 /// <reference path="../../../../lib2/types/angular.d.ts"/>
 
-import * as AdhBadge from "../Badge/Badge";
 import * as AdhConfig from "../Config/Config";
-import * as AdhEmbed from "../Embed/Embed";
 import * as AdhHttp from "../Http/Http";
 import * as AdhNames from "../Names/Names";
 import * as AdhPermissions from "../Permissions/Permissions";
@@ -12,11 +10,9 @@ import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
 import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SILocationReference from "../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
-import * as SIMultiPolygon from "../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
 import * as SIName from "../../../Resources_/adhocracy_core/sheets/name/IName";
 import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
-import RIDocument from "../../../Resources_/adhocracy_core/resources/document/IDocument";
 import RIProcess from "../../../Resources_/adhocracy_core/resources/process/IProcess";
 
 var pkgLocation = "/Core/Process";
@@ -30,23 +26,21 @@ export interface IStateData {
 }
 
 export interface IProcessProperties {
-    createSlot : string;
     detailSlot : string;
-    editSlot : string;
-    hasAuthorInListItem? : boolean;
     hasCommentColumn? : boolean;
     hasCreatorParticipate? : boolean;
     hasDescription? : boolean;
     hasImage? : boolean;
     hasLocation? : boolean;
     hasLocationText? : boolean;
-    itemClass;
+    hasAuthorInListItem? : boolean;
     // if a process has a proposal budget, but no max budget, then set maxBudget = Infinity.
     maxBudget? : number;
+    proposalClass;
     // WARNING: proposalSheet is not a regular feature of adhocracy,
     // but a hack of Buergerhaushalt and Kiezkasse.
     proposalSheet?;
-    versionClass;
+    proposalVersionClass;
 }
 
 export var getStateData = (sheet : SIWorkflow.ISheet, name : string) : IStateData => {
@@ -237,81 +231,3 @@ export var currentProcessTitleDirective = (
     };
 };
 
-export var detailDirective = (
-    adhConfig : AdhConfig.IService,
-    adhEmbed: AdhEmbed.Service,
-    adhHttp : AdhHttp.Service,
-    adhPermissions : AdhPermissions.Service,
-    $q : angular.IQService
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
-        scope: {
-            path: "@",
-            processProperties: "="
-        },
-        link: (scope) => {
-            AdhBadge.getBadgeFacets(adhHttp, $q)(scope.path).then((facets) => {
-                scope.facets = facets;
-            });
-
-            scope.data = {};
-
-            if (scope.processProperties.itemClass.content_type === RIDocument.content_type) {
-                scope.sorts = [{
-                    key: "title",
-                    index: "title"
-                }];
-            } else {
-                scope.sorts = [{
-                    key: "rates",
-                    name: "TR__RATES",
-                    index: "rates",
-                    reverse: true
-                }, {
-                    key: "item_creation_date",
-                    name: "TR__CREATION_DATE",
-                    index: "item_creation_date",
-                    reverse: true
-                }];
-                scope.sort = "item_creation_date";
-            }
-
-            scope.$watch("path", (value : string) => {
-                if (value) {
-                    adhHttp.get(value).then((resource) => {
-                        var workflow = SIWorkflow.get(resource);
-                        var stateName = workflow.workflow_state;
-                        scope.currentPhase = getStateData(workflow, stateName);
-                        scope.data.picture = (SIImageReference.get(resource) || {}).picture;
-                        scope.data.title = SITitle.get(resource).title;
-                        scope.data.participationStartDate = getStateData(workflow, "participate").start_date;
-                        scope.data.participationEndDate = getStateData(workflow, "evaluate").start_date;
-                        scope.data.shortDescription = SIDescription.get(resource).short_description;
-
-                        scope.hasLocation = scope.processProperties.hasLocation && SILocationReference.get(resource).location;
-                        if (scope.hasLocation) {
-                            var locationUrl = SILocationReference.get(resource).location;
-                            adhHttp.get(locationUrl).then((location) => {
-                                var polygon = SIMultiPolygon.get(location).coordinates[0][0];
-                                scope.polygon =  polygon;
-                            });
-                        }
-
-                        scope.contentType = scope.processProperties.versionClass.content_type;
-                        var context = adhEmbed.getContext();
-                        var notIdeaColl = resource.content_type !== "adhocracy_meinberlin.resources.idea_collection.IProcess";
-                        // meinberlin idea collection is used with a plain embed, so we assume it is always embedded
-                        scope.hasResourceHeader = (context === "" && notIdeaColl);
-                    });
-                }
-            });
-            adhPermissions.bindScope(scope, () => scope.path);
-
-            scope.showMap = (isShowMap) => {
-                scope.data.isShowMap = isShowMap;
-            };
-        }
-    };
-};

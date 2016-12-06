@@ -1,15 +1,15 @@
+import * as AdhIdeaCollectionModule from "../../Core/IdeaCollection/Module";
 import * as AdhNamesModule from "../../Core/Names/Module";
 import * as AdhProcessModule from "../../Core/Process/Module";
 import * as AdhResourceAreaModule from "../../Core/ResourceArea/Module";
-import * as AdhWorkbenchModule from "../../Core/Workbench/Module";
 
 import * as AdhEmbed from "../../Core/Embed/Embed";
+import * as AdhIdeaCollectionPoll from "../../Core/IdeaCollection/Poll/Poll";
+import * as AdhIdeaCollectionWorkbench from "../../Core/IdeaCollection/Workbench/Workbench";
 import * as AdhNames from "../../Core/Names/Names";
-import * as AdhPoll from "../../Core/Poll/Poll";
+import * as AdhPoll from "../../Core/IdeaCollection/Poll/Poll";
 import * as AdhProcess from "../../Core/Process/Process";
-import * as AdhProposal from "../../Core/Proposal/Proposal";
 import * as AdhResourceArea from "../../Core/ResourceArea/ResourceArea";
-import * as AdhWorkbench from "../../Core/Workbench/Workbench";
 
 import RIPoll from "../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IPoll";
 import RIProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
@@ -22,10 +22,10 @@ export var register = (angular) => {
 
     angular
         .module(moduleName, [
+            AdhIdeaCollectionModule.moduleName,
             AdhNamesModule.moduleName,
             AdhProcessModule.moduleName,
-            AdhResourceAreaModule.moduleName,
-            AdhWorkbenchModule.moduleName,
+            AdhResourceAreaModule.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider
@@ -40,28 +40,23 @@ export var register = (angular) => {
             "adhTopLevelState",
             "adhGetBadges",
             "$q",
-            AdhPoll.detailDirective(processType)])
+            AdhIdeaCollectionPoll.detailDirective(processType)])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider : AdhResourceArea.Provider, adhConfig) => {
-            var registerRoutes = (context? : string) => (provider) => {
-                AdhWorkbench.registerCommonRoutesFactory(
-                    RIStadtforumProcess, RIPoll, RIProposalVersion)(context)(provider);
-                AdhWorkbench.registerProposalRoutesFactory(
-                    RIStadtforumProcess, RIPoll, RIProposalVersion, false)(context)(provider);
-            };
+            var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
+                RIStadtforumProcess, RIPoll, RIProposalVersion, false);
             registerRoutes()(adhResourceAreaProvider);
 
-            var processHeaderSlot = adhConfig.pkg_path + AdhWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
+            var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
         }])
         .config(["adhProcessProvider", "adhConfig", (adhProcessProvider : AdhProcess.Provider, adhConfig) => {
             adhProcessProvider.templates[processType] =
-                "<adh-workbench data-process-properties=\"processProperties\"></adh-workbench>";
+                "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
+                "</adh-idea-collection-workbench>";
             adhProcessProvider.setProperties(processType, {
-                createSlot: adhConfig.pkg_path + AdhProposal.pkgLocation + "/CreateSlot.html",
                 detailSlot: adhConfig.pkg_path + AdhPoll.pkgLocation + "/DetailSlot.html",
-                editSlot: adhConfig.pkg_path + AdhProposal.pkgLocation + "/EditSlot.html",
-                itemClass: RIPoll,
-                versionClass: RIProposalVersion
+                proposalClass: RIPoll,
+                proposalVersionClass: RIProposalVersion
             });
         }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {

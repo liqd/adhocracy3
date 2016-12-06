@@ -1,6 +1,7 @@
 import * as AdhDocumentModule from "../../../Core/Document/Module";
 import * as AdhHttpModule from "../../../Core/Http/Module";
 import * as AdhMappingModule from "../../../Core/Mapping/Module";
+import * as AdhIdeaCollectionModule from "../../../Core/IdeaCollection/Module";
 import * as AdhMovingColumnsModule from "../../../Core/MovingColumns/Module";
 import * as AdhNamesModule from "../../../Core/Names/Module";
 import * as AdhPermissionsModule from "../../../Core/Permissions/Module";
@@ -8,10 +9,10 @@ import * as AdhProcessModule from "../../../Core/Process/Module";
 import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
 import * as AdhTopLevelStateModule from "../../../Core/TopLevelState/Module";
 
+import * as AdhIdeaCollectionProposal from "../../../Core/IdeaCollection/Proposal/Proposal";
+import * as AdhIdeaCollectionWorkbench from "../../../Core/IdeaCollection/Workbench/Workbench";
 import * as AdhNames from "../../../Core/Names/Names";
 import * as AdhProcess from "../../../Core/Process/Process";
-import * as AdhProposal from "../../../Core/Proposal/Proposal";
-import * as AdhWorkbench from "../../../Core/Workbench/Workbench";
 
 import RIGeoProposal from "../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
 import RIGeoProposalVersion from "../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
@@ -29,6 +30,7 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhDocumentModule.moduleName,
             AdhHttpModule.moduleName,
+            AdhIdeaCollectionModule.moduleName,
             AdhMappingModule.moduleName,
             AdhMovingColumnsModule.moduleName,
             AdhNamesModule.moduleName,
@@ -41,19 +43,17 @@ export var register = (angular) => {
             adhProcessProvider.templates[processType] = "<adh-meinberlin-alexanderplatz-workbench " +
                 "data-process-properties=\"processProperties\"></adh-meinberlin-alexanderplatz-workbench>";
             adhProcessProvider.setProperties(processType, {
-                createSlot: adhConfig.pkg_path + AdhProposal.pkgLocation + "/CreateSlot.html",
-                detailSlot: adhConfig.pkg_path + AdhProposal.pkgLocation + "/DetailSlot.html",
-                editSlot: adhConfig.pkg_path + AdhProposal.pkgLocation + "/EditSlot.html",
+                detailSlot: adhConfig.pkg_path + AdhIdeaCollectionProposal.pkgLocation + "/DetailSlot.html",
                 hasAuthorInListItem: true,
                 hasCommentColumn: true,
                 hasDescription: true,
                 hasLocation: true,
-                itemClass: RIGeoProposal,
-                versionClass: RIGeoProposalVersion
+                proposalClass: RIGeoProposal,
+                proposalVersionClass: RIGeoProposalVersion
             });
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider, adhConfig) => {
-            var processHeaderSlot = adhConfig.pkg_path + AdhWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
+            var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
             Workbench.registerRoutes(processType)(adhResourceAreaProvider);
         }])

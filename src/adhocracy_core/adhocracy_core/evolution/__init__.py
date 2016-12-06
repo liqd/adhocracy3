@@ -974,6 +974,23 @@ def add_activity_service_to_root(root, registry):  # pragma: no cover
         add_activiy_service(root, registry, {})
 
 
+@log_migration
+def add_service_konto_sheet_to_user(root, registry):  # pragma: no cover
+    """Add ServiceKonto sheet to user."""
+    from adhocracy_core.resources.principal import IUser
+    from adhocracy_core.sheets.principal import IServiceKonto
+    migrate_new_sheet(root, IUser, IServiceKonto)
+
+
+@log_migration
+def add_service_konto_settings_sheet_to_user(root,
+                                             registry):  # pragma: no cover
+    """Add ServiceKonto settings sheet to user."""
+    from adhocracy_core.resources.principal import IUser
+    from adhocracy_core.sheets.principal import IServiceKontoSettings
+    migrate_new_sheet(root, IUser, IServiceKontoSettings)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -1039,3 +1056,5 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(reindex_users_text)
     config.add_evolution_step(add_email_new_sheet_to_user)
     config.add_evolution_step(add_activity_service_to_root)
+    config.add_evolution_step(add_service_konto_sheet_to_user)
+    config.add_evolution_step(add_service_konto_settings_sheet_to_user)
