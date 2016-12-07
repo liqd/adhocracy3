@@ -46,7 +46,9 @@ class ConfigViewTest(unittest.TestCase):
                  'attribution': '© <a href="https://www.openstreetmap.org/' +
                                 'copyright">OpenStreetMap</a>',
                  'maxZoom': 18},
-             'map_tile_url': 'http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+             'map_tile_url': 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+             'service_konto_help_url': None,
+             'service_konto_login_url': None,
              }
 
     def test_ws_url_without_ws_url_settings_scheme_https(self):
