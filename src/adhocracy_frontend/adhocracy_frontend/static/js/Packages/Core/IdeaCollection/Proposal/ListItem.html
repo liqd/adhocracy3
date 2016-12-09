@@ -1,4 +1,3 @@
-<!-- FIXME: may contain links in adh-user-meta -->
 <a class="list-item {{selectedState}}" data-ng-class="{ 'm-contains-image': processProperties.hasImage }" href="{{path | adhParentPath | adhResourceUrl }}">
     <adh-show-image
         data-css-class="list-item-image"
@@ -7,9 +6,9 @@
         data-format="thumbnail"
     ></adh-show-image>
     <div class="list-item-body">
-        <div class="list-item-author">
+        <div class="list-item-author" data-ng-if="processProperties.hasAuthorInListItem">
             {{ "TR__BY" | translate }}
-            <adh-user-meta data-path="{{data.creator}}" data-ng-if="data.creator"></adh-user-meta>
+            <adh-user-meta data-ng-if="data.creator" data-path="{{data.creator}}" data-no-link="true"></adh-user-meta>
             {{ "TR__ON" | translate }}
             <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
         </div>

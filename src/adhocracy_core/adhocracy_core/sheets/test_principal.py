@@ -268,7 +268,7 @@ class TestUserExtendedSheet:
         assert inst.meta.schema_class == UserExtendedSchema
         assert inst.meta.permission_create == 'create_user'
         assert inst.meta.permission_view == 'view_userextended'
-        assert inst.meta.permission_edit == 'edit_userextended'
+        assert inst.meta.permission_edit == 'activate_user'
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context, None)
@@ -567,3 +567,91 @@ class TestAnonymizeDefaultSheet:
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context, None)
         assert inst.get() == {'anonymize': False}
+
+class TestUserEmailNewSheet:
+
+    @fixture
+    def meta(self):
+        from adhocracy_core.sheets.principal import emailnew_meta
+        return emailnew_meta
+
+    def test_create(self, meta, context):
+        from adhocracy_core.sheets.principal import IEmailNew
+        from adhocracy_core.sheets.principal import EmailNewSchema
+        from adhocracy_core.sheets import AnnotationRessourceSheet
+        inst = meta.sheet_class(meta, context, None)
+        assert isinstance(inst, AnnotationRessourceSheet)
+        assert inst.meta.isheet == IEmailNew
+        assert inst.meta.schema_class == EmailNewSchema
+        assert inst.meta.permission_create == 'create_user'
+        assert inst.meta.permission_view == 'view_userextended'
+        assert inst.meta.permission_edit == 'edit_userextended'
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context, None)
+        assert inst.get() == {'email': ''}
+
+
+class TestServiceKontoSheet:
+
+    @fixture
+    def meta(self):
+        from .principal import service_konto_meta
+        return service_konto_meta
+
+    def test_create(self, meta, context):
+        from .principal import IServiceKonto
+        from .principal import ServiceKontoSchema
+        from adhocracy_core.sheets import AnnotationRessourceSheet
+        inst = meta.sheet_class(meta, context, None)
+        assert isinstance(inst, AnnotationRessourceSheet)
+        assert inst.meta.isheet == IServiceKonto
+        assert inst.meta.schema_class == ServiceKontoSchema
+        assert meta.readable is False
+        assert meta.editable is False
+        assert meta.creatable is False
+        assert inst.meta.permission_create == 'create_service_konto_user'
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context, None)
+        assert inst.get() == {'userid': 0}
+
+    def test_includeme_set_creatable_if_enabled(self, config, meta):
+        config.registry['config'].adhocracy.service_konto.enabled = True
+        config.include('adhocracy_core.content')
+        config.include('adhocracy_core.sheets.principal')
+        meta_included = config.registry.content.sheets_meta[meta.isheet]
+        assert meta_included.creatable
+
+
+class TestServiceKontoSettingsSheet:
+
+    @fixture
+    def meta(self):
+        from .principal import service_konto_settings_meta
+        return service_konto_settings_meta
+
+    def test_create(self, meta, context):
+        from .principal import IServiceKontoSettings
+        from .principal import ServiceKontoSettingsSchema
+        from adhocracy_core.sheets import AnnotationRessourceSheet
+        inst = meta.sheet_class(meta, context, None)
+        assert isinstance(inst, AnnotationRessourceSheet)
+        assert inst.meta.isheet == IServiceKontoSettings
+        assert inst.meta.schema_class == ServiceKontoSettingsSchema
+        assert meta.readable is True
+        assert meta.editable is False
+        assert meta.creatable is False
+        assert inst.meta.permission_create == 'create_service_konto_user'
+        assert inst.meta.permission_view == 'view_userextended'
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context, None)
+        assert inst.get() == {'enabled': False}
+
+    def test_includeme_set_creatable_if_enabled(self, config, meta):
+        config.registry['config'].adhocracy.service_konto.enabled = True
+        config.include('adhocracy_core.content')
+        config.include('adhocracy_core.sheets.principal')
+        meta_included = config.registry.content.sheets_meta[meta.isheet]
+        assert meta_included.creatable

@@ -12,6 +12,7 @@ from deform.widget import SelectWidget
 import requests
 
 from adhocracy_core.interfaces import ISheet
+from adhocracy_core.interfaces import ISheetRequirePassword
 from substanced.interfaces import IUserLocator
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import BaseResourceSheet
@@ -28,26 +29,132 @@ from adhocracy_core.schema import TimeZoneName
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Roles
 from adhocracy_core.schema import Boolean
-
-
-class IGroup(ISheet):
-    """Marker interface for the group sheet."""
+from adhocracy_core.schema import Integer
 
 
 class IUserBasic(ISheet):
     """Marker interface for the basic user sheet."""
 
 
+@deferred
+def deferred_validate_user_name(node: SchemaNode, kw: dict)\
+        -> callable:
+    """Return validator to check that the user login `name` is unique or None.
+
+    :param kw: dictionary with 'request' key and
+               :class:`pyramid.request.Request` object.
+               If this is not available the validator is None.
+    :raise: Invalid: if name is not unique.
+    """
+    request = kw['request']
+    registry = kw['registry']
+    context = kw['context']
+    locator = registry.getMultiAdapter((context, request), IUserLocator)
+
+    def validate_user_name_is_unique(node, value):
+        if locator.get_user_by_login(value):
+            raise Invalid(node, 'The user login name is not unique',
+                          value=value)
+    return validate_user_name_is_unique
+
+
+class UserBasicSchema(MappingSchema):
+    """Basic user sheet data structure.
+
+    This sheet must only store public information, as everyone can see it.
+
+    `name`: visible name
+    """
+
+    name = SingleLine(missing=required,
+                      validator=deferred_validate_user_name)
+
+
+userbasic_meta = sheet_meta._replace(
+    isheet=IUserBasic,
+    schema_class=UserBasicSchema,
+    sheet_class=AttributeResourceSheet,
+    permission_create='create_user',
+)
+
+
 class IUserExtended(ISheet):
     """Marker interface for the extended user sheet."""
 
 
-class ICaptcha(ISheet):
-    """Marker interface for user-submitted captcha data."""
+@deferred
+def deferred_validate_user_email(node: SchemaNode, kw: dict) -> callable:
+    """Return validator to check that the `email` is unique and valid or None.
+
+    :param kw: dictionary with 'request' key and
+               :class:`pyramid.request.Request` object
+               If this is not available the validator is None.
+    :raise: Invalid: if name is not unique or not an email address.
+    """
+    request = kw['request']
+    registry = kw['registry']
+    context = kw['context']
+    locator = registry.getMultiAdapter((context, request), IUserLocator)
+
+    def validate_user_email_is_unique(node, value):
+        if locator.get_user_by_email(value):
+            raise Invalid(node, 'The user login email is not unique',
+                          value=value)
+    validate_email = Email.validator
+    return All(validate_email, validate_user_email_is_unique)
+
+
+class UserExtendedSchema(MappingSchema):
+    """Extended user sheet data structure.
+
+    Sensitive information (not for everyone's eyes) should be stored here.
+
+    `email`: email address
+    `tzname`: time zone
+    """
+
+    email = Email(validator=deferred_validate_user_email,)
+    tzname = TimeZoneName()
+
+
+userextended_meta = sheet_meta._replace(
+    isheet=IUserExtended,
+    schema_class=UserExtendedSchema,
+    sheet_class=AttributeResourceSheet,
+    permission_create='create_user',
+    permission_view='view_userextended',
+    permission_edit='activate_user',
+)
+
+
+class IEmailNew(ISheet, ISheetRequirePassword):
+    """Marker interface for not yet activate new user email."""
+
+
+class EmailNewSchema(MappingSchema):
+    """New user mail sheet data structure.
+
+    `email`: email address
+    """
+
+    email = Email(validator=deferred_validate_user_email,)
+
+
+emailnew_meta = sheet_meta._replace(
+    isheet=IEmailNew,
+    schema_class=EmailNewSchema,
+    permission_create='create_user',
+    permission_view='view_userextended',
+    permission_edit='edit_userextended',
+)
 
 
 class IPermissions(ISheet):
     """Marker interface for the permissions sheet."""
+
+
+class IGroup(ISheet):
+    """Marker interface for the group sheet."""
 
 
 class PermissionsGroupsReference(SheetToSheet):
@@ -74,91 +181,8 @@ group_meta = sheet_meta._replace(
 )
 
 
-@deferred
-def deferred_validate_user_name(node: SchemaNode, kw: dict)\
-        -> callable:
-    """Return validator to check that the user login `name` is unique or None.
-
-    :param kw: dictionary with 'request' key and
-               :class:`pyramid.request.Request` object.
-               If this is not available the validator is None.
-    :raise: Invalid: if name is not unique.
-    """
-    request = kw['request']
-    registry = kw['registry']
-    context = kw['context']
-    locator = registry.getMultiAdapter((context, request), IUserLocator)
-
-    def validate_user_name_is_unique(node, value):
-        if locator.get_user_by_login(value):
-            raise Invalid(node, 'The user login name is not unique',
-                          value=value)
-    return validate_user_name_is_unique
-
-
-@deferred
-def deferred_validate_user_email(node: SchemaNode, kw: dict) -> callable:
-    """Return validator to check that the `email` is unique and valid or None.
-
-    :param kw: dictionary with 'request' key and
-               :class:`pyramid.request.Request` object
-               If this is not available the validator is None.
-    :raise: Invalid: if name is not unique or not an email address.
-    """
-    request = kw['request']
-    registry = kw['registry']
-    context = kw['context']
-    locator = registry.getMultiAdapter((context, request), IUserLocator)
-
-    def validate_user_email_is_unique(node, value):
-        if locator.get_user_by_email(value):
-            raise Invalid(node, 'The user login email is not unique',
-                          value=value)
-    validate_email = Email.validator
-    return All(validate_email, validate_user_email_is_unique)
-
-
-class UserBasicSchema(MappingSchema):
-    """Basic user sheet data structure.
-
-    This sheet must only store public information, as everyone can see it.
-
-    `name`: visible name
-    """
-
-    name = SingleLine(missing=required,
-                      validator=deferred_validate_user_name)
-
-
-userbasic_meta = sheet_meta._replace(
-    isheet=IUserBasic,
-    schema_class=UserBasicSchema,
-    sheet_class=AttributeResourceSheet,
-    permission_create='create_user',
-)
-
-
-class UserExtendedSchema(MappingSchema):
-    """Extended user sheet data structure.
-
-    Sensitive information (not for everyone's eyes) should be stored here.
-
-    `email`: email address
-    `tzname`: time zone
-    """
-
-    email = Email(validator=deferred_validate_user_email,)
-    tzname = TimeZoneName()
-
-
-userextended_meta = sheet_meta._replace(
-    isheet=IUserExtended,
-    schema_class=UserExtendedSchema,
-    sheet_class=AttributeResourceSheet,
-    permission_create='create_user',
-    permission_view='view_userextended',
-    permission_edit='edit_userextended',
-)
+class ICaptcha(ISheet):
+    """Marker interface for user-submitted captcha data."""
 
 
 class CaptchaSchema(MappingSchema):
@@ -264,7 +288,7 @@ permissions_meta = sheet_meta._replace(
 )
 
 
-class IPasswordAuthentication(ISheet):
+class IPasswordAuthentication(ISheet, ISheetRequirePassword):
     """Marker interface for the password sheet."""
 
 
@@ -390,6 +414,46 @@ anonymize_default_meta = sheet_meta._replace(
 )
 
 
+class IServiceKonto(ISheet):
+    """Marker interface for the ServiceKonto sheet."""
+
+
+class ServiceKontoSchema(MappingSchema):
+    """Data structure for ServiceKonto user information."""
+
+    userid = Integer()
+
+
+service_konto_meta = sheet_meta._replace(
+    isheet=IServiceKonto,
+    schema_class=ServiceKontoSchema,
+    readable=False,
+    editable=False,
+    creatable=False,
+    permission_create='create_service_konto_user',
+)
+
+
+class IServiceKontoSettings(ISheet):
+    """Marker interface for the ServiceKonto settings sheet."""
+
+
+class ServiceKontoSettingsSchema(MappingSchema):
+    """Data structure for public ServiceKonto user information."""
+
+    enabled = Boolean()
+
+
+service_konto_settings_meta = sheet_meta._replace(
+    isheet=IServiceKontoSettings,
+    schema_class=ServiceKontoSettingsSchema,
+    editable=False,
+    creatable=False,
+    permission_create='create_service_konto_user',
+    permission_view='view_userextended',
+)
+
+
 def includeme(config):
     """Register sheets and activate catalog factory."""
     add_sheet_to_registry(userbasic_meta, config.registry)
@@ -407,3 +471,15 @@ def includeme(config):
     add_sheet_to_registry(permissions_meta, config.registry)
     add_sheet_to_registry(activation_configuration_meta, config.registry)
     add_sheet_to_registry(anonymize_default_meta, config.registry)
+    add_sheet_to_registry(emailnew_meta, config.registry)
+    settings = config.registry['config']
+    service_konto_enabled = settings.adhocracy.service_konto.enabled
+    if service_konto_enabled:
+        add_sheet_to_registry(service_konto_meta._replace(creatable=True),
+                              config.registry)
+        add_sheet_to_registry(
+            service_konto_settings_meta._replace(creatable=True),
+            config.registry)
+    else:
+        add_sheet_to_registry(service_konto_meta, config.registry)
+        add_sheet_to_registry(service_konto_settings_meta, config.registry)

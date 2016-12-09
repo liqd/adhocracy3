@@ -9,6 +9,7 @@ import * as AdhProcessModule from "../../../Core/Process/Module";
 import * as AdhResourceAreaModule from "../../../Core/ResourceArea/Module";
 import * as AdhTopLevelStateModule from "../../../Core/TopLevelState/Module";
 
+import * as AdhIdeaCollectionProposal from "../../../Core/IdeaCollection/Proposal/Proposal";
 import * as AdhIdeaCollectionWorkbench from "../../../Core/IdeaCollection/Workbench/Workbench";
 import * as AdhNames from "../../../Core/Names/Names";
 import * as AdhProcess from "../../../Core/Process/Process";
@@ -38,17 +39,20 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName,
             AdhTopLevelStateModule.moduleName
         ])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
+        .config(["adhConfig", "adhProcessProvider", (adhConfig, adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templates[processType] = "<adh-meinberlin-alexanderplatz-workbench " +
                 "data-process-properties=\"processProperties\"></adh-meinberlin-alexanderplatz-workbench>";
-            adhProcessProvider.processProperties[processType] = {
+            adhProcessProvider.setProperties(processType, {
+                detailSlot: adhConfig.pkg_path + AdhIdeaCollectionProposal.pkgLocation + "/DetailSlot.html",
+                hasAuthorInListItem: true,
+                hasCommentColumn: true,
+                hasDescription: true,
                 hasLocation: true,
                 proposalClass: RIGeoProposal,
                 proposalVersionClass: RIGeoProposalVersion
-            };
+            });
         }])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider, adhConfig) => {
-            var processType = RIAlexanderplatzProcess.content_type;
             var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
             Workbench.registerRoutes(processType)(adhResourceAreaProvider);

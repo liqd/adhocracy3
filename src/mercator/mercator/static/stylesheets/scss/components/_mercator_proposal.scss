@@ -14,12 +14,8 @@ selected. If no proposal is selected, no state is applied.
         border: 0;
     }
 
-    .annotated-section {
-        width: 157.5%;
-
-        .annotated-section-annotation {
-            background-color: $color-background-base-introvert;
-        }
+    .annotated-section-annotation {
+        background-color: $color-background-base-introvert;
     }
 
     .button-cta-secondary {

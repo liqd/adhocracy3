@@ -20,8 +20,10 @@ from adhocracy_core.sheets.comment import IComment
 from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.badge import IBadgeable
+from adhocracy_core.sheets.principal import IEmailNew
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.principal import IUserExtended
+from adhocracy_core.sheets.principal import IServiceKonto
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import list_resource_with_descendants
 
@@ -122,6 +124,18 @@ def _get_affected_commentables(commentable):
     return commentables
 
 
+def reindex_user_text(event):
+    """Reindex indexes `text`."""
+    catalogs = find_service(event.object, 'catalogs')
+    catalogs.reindex_index(event.object, 'text')
+
+
+def reindex_service_konto_userid(event):
+    """Reindex indexes `private_service_konto_userid`."""
+    catalogs = find_service(event.object, 'catalogs')
+    catalogs.reindex_index(event.object, 'private_service_konto_userid')
+
+
 def includeme(config):
     """Register index subscribers."""
     config.add_subscriber(reindex_tag,
@@ -161,8 +175,20 @@ def includeme(config):
     config.add_subscriber(reindex_user_activation_path,
                           IResourceSheetModified,
                           event_isheet=IUserBasic)
+    config.add_subscriber(reindex_user_activation_path,
+                          IResourceSheetModified,
+                          event_isheet=IEmailNew)
     config.add_subscriber(reindex_comments,
                           ISheetBackReferenceModified,
                           event_isheet=ICommentable)
+    config.add_subscriber(reindex_user_text,
+                          IResourceSheetModified,
+                          event_isheet=IUserBasic)
+    config.add_subscriber(reindex_user_text,
+                          IResourceSheetModified,
+                          event_isheet=IUserExtended)
+    config.add_subscriber(reindex_service_konto_userid,
+                          IResourceSheetModified,
+                          event_isheet=IServiceKonto)
     # add subscriber to updated allowed index
     config.scan('substanced.objectmap.subscribers')

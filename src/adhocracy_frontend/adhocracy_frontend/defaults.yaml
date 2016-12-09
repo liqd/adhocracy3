@@ -96,3 +96,7 @@ adhocracy:
   # is the same as captcha backend; if nginx is dispatching inbound
   # requests, this is just the frontend url)
   captcha_frontend_url: 'http://localhost:6542/'
+  # Use Berlin service konto for authentication
+  service_konto:
+    enabled: False
+    api_url: ''

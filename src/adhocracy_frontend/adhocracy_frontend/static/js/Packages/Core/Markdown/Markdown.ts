@@ -19,6 +19,10 @@ export var parseMarkdown = (adhConfig : AdhConfig.IService, markdownit) => {
             scope.$watch("parsetext", (newValue : string) => {
                 if (newValue) {
                     wrapper.html(md.render(newValue));
+                    wrapper.find("[href]").attr({
+                        rel: "external",
+                        target: "_blank",
+                    });
                 } else {
                     wrapper.html("");
                 }

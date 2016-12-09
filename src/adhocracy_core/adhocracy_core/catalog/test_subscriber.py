@@ -205,6 +205,15 @@ class TestReindexComments:
         catalog.reindex_index.assert_any_call(event.object, 'comments')
         catalog.reindex_index.assert_any_call(reference, 'comments')
 
+def test_reindex_user_text(event, catalog):
+    from .subscriber import reindex_user_text
+    reindex_user_text(event)
+    catalog.reindex_index.assert_called_with(event.object, 'text')
+
+def test_reindex_service_konto_userid(event, catalog):
+    from .subscriber import reindex_service_konto_userid
+    reindex_service_konto_userid(event)
+    catalog.reindex_index.assert_called_with(event.object, 'private_service_konto_userid')
 
 @mark.usefixtures('integration')
 def test_register_subscriber(registry):
@@ -213,10 +222,11 @@ def test_register_subscriber(registry):
     assert subscriber.reindex_tag.__name__ in handlers
     assert subscriber.reindex_visibility.__name__ in handlers
     assert subscriber.reindex_rates.__name__ in handlers
+    assert subscriber.reindex_controversiality.__name__ in handlers
     assert subscriber.reindex_badge.__name__ in handlers
     assert subscriber.reindex_item_badge.__name__ in handlers
     assert subscriber.reindex_workflow_state.__name__ in handlers
     assert subscriber.reindex_user_name.__name__ in handlers
     assert subscriber.reindex_user_email.__name__ in handlers
-    assert subscriber.reindex_controversiality.__name__ in handlers
+    assert subscriber.reindex_comments.__name__ in handlers
 

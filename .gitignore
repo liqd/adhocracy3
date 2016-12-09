@@ -55,7 +55,6 @@ etc/tslint.json
 lib64/
 src/rubygemsrecipe/
 src/substanced/
-*.fontcustom-manifest.json
 src/pyramid_cachebust/
 /package.json
 /node_modules
@@ -63,18 +62,16 @@ src/pyramid_cachebust/
 src/adhocracy_frontend/adhocracy_frontend/build/
 src/mercator/mercator/build/
 src/meinberlin/meinberlin/build/
-src/pcompass/pcompass/build/
 src/s1/s1/build/
 src/spd/spd/build/
-src/euth/euth/build/
 src/demo/demo/build/
 /tmp
 /wheelhouse
 /share
-.fontcustom-manifest.json
 RELEASE-VERSION
 *-requirements.txt
 /src/Mako/
 /styleguides
 src/deform
 src/deform_markdown
+adhocracy3-icons-preview.html

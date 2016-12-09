@@ -43,8 +43,8 @@ Following
 On default you don`t follow any resource:
 
     >>> resp = app_participant.get(participant_path).json
-    >>> resp['data'][INotification.__identifier__]
-    {'follow_resources': []}
+    >>> resp['data'][INotification.__identifier__].get('follow_resources')
+    []
 
 Lets follow a process::
 
@@ -82,9 +82,9 @@ Added content:
     >>> document_path_last_version = resp.json['responses'][1]['body']['path']
 
     >>> send_mails[-1].subject
-    'Adhocracy: Participant2 added a Document to Process Title.'
+    'Adhocracy: participant2 added a Document to Process Title.'
     >>> send_mails[-1].body
-    'Participant2 added the Document "Document Title" to Process "Process Title". Visit Document: http:.../r/process/document_0000000/ .'
+    'participant2 added the Document "Document Title" to Process "Process Title". Visit Document: http:.../r/process/document_0000000/ .'
 
 Added comment:
 
@@ -109,9 +109,9 @@ Added comment:
     >>> comment_path_last_version = resp.json['responses'][1]['body']['path']
 
    >>> send_mails[-1].subject
-   'Adhocracy: Participant2 added a Comment to Document Title.'
+   'Adhocracy: participant2 added a Comment to Document Title.'
    >>> send_mails[-1].body
-   'Participant2 added the Comment "comment text" to Document "Document Title". Visit Comment: http:.../r/process/document_0000000/comments/comment_0000000/ .'
+   'participant2 added the Comment "comment text" to Document "Document Title". Visit Comment: http:.../r/process/document_0000000/comments/comment_0000000/ .'
 
 
 Updated comment:
@@ -128,9 +128,9 @@ Updated comment:
     >>> comment_path_last_version = resp.json['path']
 
     >>> send_mails[-1].subject
-    'Adhocracy: Participant2 updated Comment'
+    'Adhocracy: participant2 updated Comment'
     >>> send_mails[-1].body
-    'Participant2 updated Comment "updated comment text". Visit Comment: http:.../r/process/document_0000000/comments/comment_0000000/ .'
+    'participant2 updated Comment "updated comment text". Visit Comment: http:.../r/process/document_0000000/comments/comment_0000000/ .'
 
 Updated content:
 
@@ -145,7 +145,7 @@ Updated content:
     >>> resp = app_participant2.post(document_path, data)
 
     >>> send_mails[-1].subject
-    'Adhocracy: Participant2 updated Document'
+    'Adhocracy: participant2 updated Document'
     >>> send_mails[-1].body
-    'Participant2 updated Document "updated document title". Visit Document: http:.../r/process/document_0000000/ .'
+    'participant2 updated Document "updated document title". Visit Document: http:.../r/process/document_0000000/ .'
 

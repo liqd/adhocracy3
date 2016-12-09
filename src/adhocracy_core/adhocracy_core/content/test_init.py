@@ -429,6 +429,17 @@ class TestResourceContentRegistry:
         mock_created_anonymized.return_value = True
         assert inst.can_delete_anonymized(context, request_) is True
 
+    def test_password_required_false(self, config, inst, context, request_,
+                                     mock_sheet):
+        assert inst.is_password_required(context, request_) is False
+
+    def test_password_required_true(self, config, inst, context, request_,
+                                     mock_sheet):
+        from adhocracy_core.interfaces import ISheetRequirePassword
+        mock_sheet.meta = \
+            mock_sheet.meta._replace(isheet=ISheetRequirePassword)
+        assert inst.is_password_required(context, request_) is True
+
 
 @fixture
 def integration(config):

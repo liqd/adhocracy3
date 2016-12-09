@@ -43,7 +43,6 @@ export var register = (angular) => {
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider
-                .registerDirective("comment-listing")
                 .registerDirective("create-or-show-comment-listing");
         }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {

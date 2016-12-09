@@ -18,7 +18,6 @@ import * as AdhCredentialsModule from "./CredentialsModule";
 import * as AdhUserModule from "./Module";
 import * as AdhImageModule from "../Image/Module";
 
-import * as AdhEmbed from "../Embed/Embed";
 import * as AdhHttp from "../Http/Http";
 import * as AdhNames from "../Names/Names";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
@@ -94,12 +93,6 @@ export var register = (angular) => {
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
             adhNamesProvider.names[RIUser.content_type] = "TR__RESOURCE_USER";
         }])
-        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider
-                .registerDirective("login")
-                .registerDirective("register")
-                .registerDirective("user-indicator");
-        }])
         .filter("adhTranslateUsername", ["translateFilter", AdhUserViews.translateUsernameFilter])
         .directive("adhListUsers", ["adhCredentials", "adhConfig", AdhUserViews.userListDirective])
         .directive("adhUserListItem", ["adhConfig", AdhUserViews.userListItemDirective])
@@ -129,6 +122,7 @@ export var register = (angular) => {
             "adhEmbed",
             "adhPermissions",
             "adhShowError",
+            "$window",
             AdhUserViews.loginDirective])
         .directive("adhPasswordReset", [
             "adhConfig", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", AdhUserViews.passwordResetDirective])

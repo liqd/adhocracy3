@@ -35,6 +35,7 @@ def test_set_response_header_set_cors_header_if_api_request(request_,
 
 def test_add_cors_headers(request_):
     from adhocracy_core.authentication import AnonymizeHeader
+    from adhocracy_core.authentication import UserPasswordHeader
     from .subscriber import add_cors_headers
     response = testing.DummyResource(headers={})
     event = testing.DummyResource(response=response,
@@ -44,7 +45,8 @@ def test_add_cors_headers(request_):
         {'Access-Control-Allow-Origin': '*',
          'Access-Control-Allow-Headers': 'Origin, Content-Type, Accept,'
                                          ' X-User-Path, X-User-Token, '
-                                         + AnonymizeHeader ,
+                                         + AnonymizeHeader + ', '
+                                         + UserPasswordHeader,
          'Access-Control-Allow-Credentials': 'true',
          'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS'}
 

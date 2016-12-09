@@ -198,6 +198,30 @@ def update_workflow_state_acl_for_all_resources(root,
     update_workflow_state_acls(root, registry)
 
 
+@log_migration
+def add_embed_sheet_to_stadtforum_polls(root, registry):
+    """Add embed sheet to stadtforum polls."""
+    from adhocracy_core.sheets.embed import IEmbed
+    from adhocracy_meinberlin.resources.stadtforum import IPoll
+    migrate_new_sheet(root, IPoll, IEmbed)
+
+
+@log_migration
+def add_image_reference_to_stadtforum(root, registry):
+    """Add image reference sheet to stadtforum process."""
+    from adhocracy_meinberlin.resources.stadtforum import IProcess
+    from adhocracy_core.sheets.image import IImageReference
+    migrate_new_sheet(root, IProcess, IImageReference)
+
+
+@log_migration
+def add_image_reference_to_collaborative_text(root, registry):
+    """Add image reference sheet to collaborative_text process."""
+    from adhocracy_meinberlin.resources.collaborative_text import IProcess
+    from adhocracy_core.sheets.image import IImageReference
+    migrate_new_sheet(root, IProcess, IImageReference)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(use_adhocracy_core_title_sheet)
@@ -210,3 +234,6 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_image_reference_to_blplan)
     config.add_evolution_step(remove_workflow_state_data_end_date)
     config.add_evolution_step(update_workflow_state_acl_for_all_resources)
+    config.add_evolution_step(add_embed_sheet_to_stadtforum_polls)
+    config.add_evolution_step(add_image_reference_to_stadtforum)
+    config.add_evolution_step(add_image_reference_to_collaborative_text)

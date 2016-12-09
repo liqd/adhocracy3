@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ -z ${1+x} ]; then
-    projects="adhocracy_frontend mercator meinberlin spd pcompass s1"
+    projects="adhocracy_frontend mercator meinberlin spd s1"
 else
     projects=$1;
 fi

@@ -1,10 +1,12 @@
 """Notification Sheet."""
+from colander import drop
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.schema import MappingSchema
 from adhocracy_core.schema import UniqueReferences
+from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import get_choices_by_interface
 
 
@@ -37,6 +39,7 @@ class NotificationSchema(MappingSchema):
 
     follow_resources = UniqueReferences(reftype=NotificationFollowReference,
                                         choices_getter=get_follow_choices)
+    email_notification_enabled = Boolean(default=True, missing=drop)
 
 
 notification_meta = sheet_meta._replace(isheet=INotification,

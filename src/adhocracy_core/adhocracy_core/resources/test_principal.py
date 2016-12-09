@@ -86,6 +86,7 @@ class TestUsers:
         assert meta.iresource is principal.IUsersService
         assert meta.permission_create == 'create_service'
         assert meta.content_name == 'users'
+        assert meta.sdi_column_mapper == principal.sdi_user_columns
         assert sheets.asset.IHasAssetPool in meta.extended_sheets
         assert badge.add_badge_assignments_service in meta.after_creation
         assert asset.add_assets_service in meta.after_creation
@@ -105,6 +106,39 @@ def test_create_asset_permission(context, registry, mocker):
     set_acl.assert_called_with(context,
                                [('Allow', 'system.Authenticated', 'create_asset')],
                                registry=registry)
+
+
+class TestSdiUserColums:
+
+    @fixture
+    def request_(self, context, registry_with_content):
+        request = testing.DummyRequest(context=context)
+        request.registry = registry_with_content
+        return request
+
+    def call_fut(self, *args, **kwargs):
+        from .principal import sdi_user_columns
+        return sdi_user_columns(*args, **kwargs)
+
+    def test_sdi_user_columns_none_user(self, request_):
+        context = testing.DummyResource()
+        result = self.call_fut(None, context, request_, [])
+        assert result == [
+            {'name': 'User','value': ''},
+            {'name': 'Email','value': ''},
+        ]
+
+    def test_sdi_user_columns_user(self, request_):
+        from .principal import IUser
+        context = testing.DummyResource(__provides__=IUser)
+        mock_get_sheet_field = Mock()
+        mock_get_sheet_field.side_effect = ['Admin', 'admin@example.com']
+        request_.registry.content.get_sheet_field = mock_get_sheet_field
+        result = self.call_fut(None, context, request_, [])
+        assert result == [
+            {'name': 'User','value': 'Admin'},
+            {'name': 'Email','value': 'admin@example.com'},
+        ]
 
 
 class TestUser:
@@ -128,6 +162,7 @@ class TestUser:
                                      adhocracy_core.sheets.principal.IPermissions,
                                      adhocracy_core.sheets.metadata.IMetadata,
                                      adhocracy_core.sheets.pool.IPool,
+                                     adhocracy_core.sheets.principal.IEmailNew,
                                      )
         assert meta.extended_sheets == \
             (adhocracy_core.sheets.principal.IPasswordAuthentication,
@@ -138,6 +173,8 @@ class TestUser:
              adhocracy_core.sheets.badge.IBadgeable,
              adhocracy_core.sheets.image.IImageReference,
              adhocracy_core.sheets.notification.INotification,
+             adhocracy_core.sheets.principal.IServiceKonto,
+             adhocracy_core.sheets.principal.IServiceKontoSettings,
             )
         assert meta.element_types == ()
         assert meta.use_autonaming is True
@@ -166,6 +203,33 @@ class TestUser:
         assert user.tzname == 'UTC'
         assert user.roles == []
         assert user.timezone == timezone(user.tzname)
+        assert user.is_password_valid(registry, '123456') == False
+        assert user.is_password_valid(registry, 'fodThyd2') == True
+        assert user.has_new_email_pending() == False
+
+    @mark.usefixtures('integration')
+    def test_user_with_new_email(self, meta, registry, principals):
+        from pytz import timezone
+        from zope.interface.verify import verifyObject
+        from adhocracy_core import sheets
+        appstructs = {
+            sheets.principal.IUserBasic.__identifier__ : {
+                'name': 'Anna Müller',
+            },
+            sheets.principal.IUserExtended.__identifier__ : {
+                'email': 'old@foo.bar',
+            },
+            sheets.principal.IEmailNew.__identifier__ : {
+                'email': 'new@foo.bar',
+            },
+        }
+        user = registry.content.create(meta.iresource.__identifier__,
+                                       parent=principals['users'],
+                                       appstructs=appstructs)
+        assert user.has_new_email_pending() == True
+        user.activate_new_email()
+        assert user.has_new_email_pending() == False
+        user.email == 'new@foo.bar'
 
 
 class TestSystemUser:
@@ -475,6 +539,22 @@ class TestUserLocatorAdapter:
 
     def test_get_user_by_userid_user_not_exists(self, inst):
         assert inst.get_user_by_userid('/principals/users/User1') is None
+
+    def test_get_user_by_service_konto_userid_user_exists(self, inst,
+            mock_catalogs, search_result, query):
+        user = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
+        assert inst.get_user_by_service_konto_userid('123') is user
+        assert mock_catalogs.search.call_args[0][0] == query._replace(
+            indexes={'private_service_konto_userid': '123'},
+            resolve=True,
+        )
+
+    def test_get_user_by_service_konto_userid_user_not_exists(self, inst,
+                                                              mock_catalogs):
+        assert inst.get_user_by_service_konto_userid('312') is None
+        assert mock_catalogs.search.called
 
     def test_get_groupids_user_exists(self, context, mock_sheet, request_, inst):
         from adhocracy_core.sheets.principal import IPermissions

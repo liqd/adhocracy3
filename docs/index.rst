@@ -53,6 +53,7 @@ Contents
    projects/index
    attic/index
    CHANGES
+   roadmap
    glossary
 
 

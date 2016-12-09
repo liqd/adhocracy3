@@ -1,4 +1,3 @@
-import * as AdhEmbedModule from "../Core/Embed/Module";
 import * as AdhHttpModule from "../Core/Http/Module";
 import * as AdhImageModule from "../Core/Image/Module";
 import * as AdhListingModule from "../Core/Listing/Module";
@@ -7,9 +6,7 @@ import * as AdhNamesModule from "../Core/Names/Module";
 import * as AdhPermissionsModule from "../Core/Permissions/Module";
 import * as AdhPreliminaryNamesModule from "../Core/PreliminaryNames/Module";
 
-import * as AdhEmbed from "../Core/Embed/Embed";
 import * as AdhNames from "../Core/Names/Names";
-import * as AdhResourceArea from "../Core/ResourceArea/ResourceArea";
 
 import * as Blog from "./Blog";
 
@@ -21,20 +18,14 @@ export var moduleName = "adhBlog";
 export var register = (angular) => {
     angular
         .module(moduleName, [
-            AdhEmbedModule.moduleName,
             AdhHttpModule.moduleName,
             AdhImageModule.moduleName,
             AdhListingModule.moduleName,
             AdhMarkdownModule.moduleName,
+            AdhNamesModule.moduleName,
             AdhPermissionsModule.moduleName,
             AdhPreliminaryNamesModule.moduleName
         ])
-        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider
-                .registerDirective("blog-post")
-                .registerDirective("blog-post-create")
-                .registerDirective("blog");
-        }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
             adhNamesProvider.names[RIDocumentVersion.content_type] = "TR__RESOURCE_DOCUMENT";
         }])

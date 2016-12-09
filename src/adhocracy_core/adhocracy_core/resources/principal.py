@@ -36,6 +36,10 @@ from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.resources.asset import add_assets_service
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.metadata import is_older_than
+from adhocracy_core.sheets.principal import IEmailNew
+from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.sheets.principal import IUserExtended
+from adhocracy_core.sheets.principal import IPasswordAuthentication
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.pool
@@ -145,6 +149,30 @@ class User(Pool):
         statsd_incr('users.activated', 1)
         sheet.set(appstruct)
 
+    def has_new_email_pending(self):
+        registry = get_current_registry(self)
+        email_new = registry.content.get_sheet_field(self, IEmailNew, 'email')
+        return bool(email_new)
+
+    def activate_new_email(self):
+        """Activate email stored in the IEmailNew sheet."""
+        registry = get_current_registry(self)
+        email_new_sheet = registry.content.get_sheet(self, IEmailNew)
+        email_new_appstruct = email_new_sheet.get()
+        user_extended_sheet = registry.content.get_sheet(self,
+                                                         IUserExtended)
+        user_extended_appstruct = user_extended_sheet.get()
+        user_extended_appstruct['email'] = email_new_appstruct['email']
+        user_extended_sheet.set(user_extended_appstruct)
+        email_new_appstruct['email'] = ''
+        email_new_sheet.set(email_new_appstruct)
+
+    def is_password_valid(self, registry: Registry, password: str):
+        """Validate password against the IPasswordAuthentication sheet."""
+        sheet = registry.content.get_sheet(self, IPasswordAuthentication)
+        valid = sheet.check_plaintext_password(password)
+        return valid
+
 
 user_meta = pool_meta._replace(
     iresource=IUser,
@@ -156,6 +184,7 @@ user_meta = pool_meta._replace(
                   adhocracy_core.sheets.principal.IPermissions,
                   adhocracy_core.sheets.metadata.IMetadata,
                   adhocracy_core.sheets.pool.IPool,
+                  adhocracy_core.sheets.principal.IEmailNew,
                   ),
     extended_sheets=(adhocracy_core.sheets.principal.IPasswordAuthentication,
                      adhocracy_core.sheets.principal.IActivationConfiguration,
@@ -165,11 +194,13 @@ user_meta = pool_meta._replace(
                      adhocracy_core.sheets.badge.IBadgeable,
                      adhocracy_core.sheets.image.IImageReference,
                      adhocracy_core.sheets.notification.INotification,
+                     adhocracy_core.sheets.principal.IServiceKonto,
+                     adhocracy_core.sheets.principal.IServiceKontoSettings,
                      ),
     element_types=(),  # we don't want the frontend to post resources here
     use_autonaming=True,
     permission_create='create_user',
-    is_sdi_addable=True
+    is_sdi_addable=True,
 )
 
 
@@ -202,6 +233,21 @@ def allow_create_asset_authenticated(context: IPool,
     set_acl(context, acl, registry)
 
 
+def sdi_user_columns(folder, subobject, request, default_columnspec):
+    """Mapping function to add info columns to the sdi user listing."""
+    content = request.registry.content
+    user_name = ''
+    mail = ''
+    if IUser.providedBy(subobject):
+        user_name = content.get_sheet_field(subobject, IUserBasic, 'name')
+        mail = content.get_sheet_field(subobject, IUserExtended, 'email')
+    additional_columns = [
+        {'name': 'User', 'value': user_name},
+        {'name': 'Email', 'value': mail},
+    ]
+    return default_columnspec + additional_columns
+
+
 class IUsersService(IServicePool):
     """Service Pool for Users."""
 
@@ -216,6 +262,7 @@ users_meta = service_meta._replace(
                     add_assets_service,
                     allow_create_asset_authenticated,
                     ),
+    sdi_column_mapper=sdi_user_columns,
 )
 
 
@@ -355,6 +402,11 @@ class UserLocatorAdapter(object):
         """Find user per activation path or return None."""
         user = self._search_user('private_user_activation_path',
                                  activation_path)
+        return user
+
+    def get_user_by_service_konto_userid(self, userid: str) -> IUser:
+        """Find user per service konto userid or return None."""
+        user = self._search_user('private_service_konto_userid', userid)
         return user
 
     def _search_user(self, index_name: str, value: str) -> IUser:

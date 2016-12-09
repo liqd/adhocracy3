@@ -122,8 +122,8 @@ class TestBaseResourceSheet:
         assert inst.get() == {'count': 0}
 
     def test_get_with_deferred_default(self, inst):
-        """A dictionary with 'registry', 'context', 'creating is passed
-        to deferred default functions.
+        """A dictionary with 'registry', 'context', 'creating' and 'request' is
+        passed to deferred default functions.
         """
         schema = inst.schema.bind()
         @colander.deferred
@@ -131,7 +131,7 @@ class TestBaseResourceSheet:
             return len(kw)
         schema['count'].default = default
         inst.schema = schema
-        assert inst.get() == {'count': 3}
+        assert inst.get() == {'count': 4}
 
     def test_get_with_omit_defaults(self, inst):
         assert inst.get(omit_defaults=True) == {}

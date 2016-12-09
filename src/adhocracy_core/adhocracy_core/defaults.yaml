@@ -92,4 +92,13 @@ adhocracy:
   # URL of the caching reverse proxy to send PURGE request to
   caching_proxy: ''
 
+  # Create activity stream for users
+  activity_stream:
+    enabled: True
+  # Use Berlin service konto for authentication
+  service_konto:
+    enabled: False
+    api_url: ''
+
+
 

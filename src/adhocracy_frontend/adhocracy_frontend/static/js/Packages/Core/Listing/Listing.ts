@@ -241,10 +241,10 @@ export class Listing<Container extends ResourcesBase.IResource> {
                     return getElements($scope.currentLimit).then((container) => {
                         $scope.container = container;
                         $scope.poolPath = $scope.container.path;
-                        $scope.totalCount = $scope.container.data[SIPool.nick].count;
+                        $scope.totalCount = parseInt((<any>SIPool.get($scope.container)).count, 10);
 
                         // avoid modifying the cached result
-                        $scope.elements = _.clone($scope.container.data[SIPool.nick].elements);
+                        $scope.elements = _.clone(SIPool.get($scope.container).elements);
 
                         if (!$scope.sorts || $scope.sorts.length === 0) {
                             // If no backend based sorting is used, we
@@ -258,7 +258,7 @@ export class Listing<Container extends ResourcesBase.IResource> {
                 $scope.loadMore = () : void => {
                     if ($scope.currentLimit < $scope.totalCount) {
                         getElements($scope.initialLimit, $scope.currentLimit).then((container) => {
-                            var elements = _.clone(container.data[SIPool.nick].elements);
+                            var elements = _.clone(SIPool.get(container).elements);
                             $scope.elements = $scope.elements.concat(elements);
                             $scope.currentLimit += $scope.initialLimit;
                         });

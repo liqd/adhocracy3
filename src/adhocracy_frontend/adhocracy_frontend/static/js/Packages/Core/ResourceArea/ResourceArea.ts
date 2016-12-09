@@ -270,20 +270,17 @@ export class Service implements AdhTopLevelState.IAreaInput {
     private conditionallyRedirectVersionToLast(resourceUrl : string, view? : string) : angular.IPromise<boolean> {
         var self : Service = this;
 
-        return self.$q.all([
-            self.adhHttp.get(resourceUrl),
-            self.adhHttp.get(AdhUtil.parentPath(resourceUrl))
-        ]).then((args : ResourcesBase.IResource[]) => {
-            var version = args[0];
-            var item = args[1];
-            if (version.data.hasOwnProperty(SIVersionable.nick) && item.data.hasOwnProperty(SITags.nick)) {
-                var lastUrl = item.data[SITags.nick].LAST;
-                if (lastUrl === resourceUrl) {
-                    return false;
-                } else {
-                    self.$location.path(self.adhResourceUrlFilter(lastUrl, view));
-                    return true;
-                }
+        return self.adhHttp.get(resourceUrl).then((version) => {
+            if (version.data.hasOwnProperty(SIVersionable.nick)) {
+                return self.adhHttp.get(AdhUtil.parentPath(resourceUrl)).then((item) => {
+                    var lastUrl = SITags.get(item).LAST;
+                    if (lastUrl === resourceUrl) {
+                        return false;
+                    } else {
+                        self.$location.path(self.adhResourceUrlFilter(lastUrl, view));
+                        return true;
+                    }
+                });
             } else {
                 return false;
             }
@@ -334,7 +331,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
             var processType = process ? process.content_type : "";
             var processUrl = process ? process.path : "/";
-            var processState = process ? process.data[SIWorkflowAssignment.nick].workflow_state : "";
+            var processState = process ? SIWorkflowAssignment.get(process).workflow_state : "";
 
             if (hasRedirected) {
                 return;

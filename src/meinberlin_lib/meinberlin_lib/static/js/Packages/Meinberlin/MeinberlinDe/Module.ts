@@ -24,6 +24,9 @@ import RIIdeaCollectionProcess from "../../../Resources_/adhocracy_meinberlin/re
 import RIKiezkasseProcess from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
 import RIKiezkasseProposal from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
 import RIKiezkasseProposalVersion from "../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
+import RIPoll from "../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IPoll";
+import RIProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
+import RIStadtforumProcess from "../../../Resources_/adhocracy_meinberlin/resources/stadtforum/IProcess";
 
 import * as AdhMeinberlinDe from "./MeinberlinDe";
 
@@ -51,14 +54,17 @@ export var register = (angular) => {
                 RIAlexanderplatzProcess.content_type, "mein.berlin.de")(adhResourceAreaProvider);
 
             var registerRoutes1 = AdhIdeaCollectionWorkbench.registerRoutesFactory(
-                RIBuergerhaushaltProcess, RIBuergerhaushaltProposal, RIBuergerhaushaltProposalVersion);
+                RIBuergerhaushaltProcess, RIBuergerhaushaltProposal, RIBuergerhaushaltProposalVersion, true);
             registerRoutes1("mein.berlin.de")(adhResourceAreaProvider);
             var registerRoutes2 = AdhIdeaCollectionWorkbench.registerRoutesFactory(
-                RIIdeaCollectionProcess, RIGeoProposal, RIGeoProposalVersion);
+                RIIdeaCollectionProcess, RIGeoProposal, RIGeoProposalVersion, true);
             registerRoutes2("mein.berlin.de")(adhResourceAreaProvider);
             var registerRoutes3 = AdhIdeaCollectionWorkbench.registerRoutesFactory(
-                RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion);
+                RIKiezkasseProcess, RIKiezkasseProposal, RIKiezkasseProposalVersion, true);
             registerRoutes3("mein.berlin.de")(adhResourceAreaProvider);
+            var registerRoutes4 = AdhIdeaCollectionWorkbench.registerRoutesFactory(
+                RIStadtforumProcess, RIPoll, RIProposalVersion, false);
+            registerRoutes4("mein.berlin.de")(adhResourceAreaProvider);
         }])
         .directive("adhMeinberlinDeHeader", ["adhConfig", "adhTopLevelState", AdhMeinberlinDe.headerDirective]);
 };

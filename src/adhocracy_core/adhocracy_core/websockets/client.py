@@ -130,7 +130,9 @@ class Client:
                            ' try again later')
 
     def _send_messages(self, changelog_metadata: list):
-        self.changelog_metadata_messages_to_send.update(changelog_metadata)
+        metadata = [x._replace(modified_appstructs=None)  # remove non hashable
+                    for x in changelog_metadata]
+        self.changelog_metadata_messages_to_send.update(metadata)
         while self.changelog_metadata_messages_to_send:
             meta = self.changelog_metadata_messages_to_send.pop()
             events = extract_events_from_changelog_metadata(meta)

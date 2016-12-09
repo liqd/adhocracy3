@@ -207,6 +207,20 @@ class TestResourceRESTView:
         assert response['PUT']['request_headers'] == {'X-Anonymize': []}
         assert response['DELETE']['request_headers'] == {'X-Anonymize': []}
 
+    def test_options_with_allow_x_user_password_header(
+            self, request_, context, resource_meta, mock_sheet):
+        from adhocracy_core.interfaces import ISheetRequirePassword
+        content = request_.registry.content
+        mock_sheet.meta = \
+            mock_sheet.meta._replace(isheet=ISheetRequirePassword)
+        content.get_sheets_edit.return_value = [mock_sheet]
+        content.get_resources_meta_addable.return_value = [resource_meta]
+        inst = self.make_one(context, request_)
+        response = inst.options()
+        assert response['POST']['request_headers'] == {}
+        assert response['PUT']['request_headers'] == {'X-User-Password': []}
+        assert response['DELETE']['request_headers'] == {}
+
     def test_add_workflow_permissions_info(
             self, request_, registry, context, mock_sheet, mock_workflow):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
@@ -287,6 +301,35 @@ class TestSimpleRESTView:
         request_.registry.content.get_sheets_edit.return_value = [mock_sheet]
         data = {'content_type': 'X',
                 'data': {ISheet.__identifier__: {'x': 'y'}}}
+        request_.validated = data
+        inst = self.make_one(context, request_)
+
+        response = inst.put()
+        assert mock_sheet.set.call_args[0][0] == {'x': 'y'}
+
+    def test_put_with_sheets_require_password_no_password(
+            self, request_, context, mock_sheet):
+        from adhocracy_core.interfaces import ISheetRequirePassword
+        mock_sheet.meta = \
+            mock_sheet.meta._replace(isheet=ISheetRequirePassword)
+        request_.registry.content.get_sheets_edit.return_value = [mock_sheet]
+        data = {'content_type': 'X',
+                'data': {ISheet.__identifier__: {'x': 'y'}}}
+        request_.validated = data
+
+        inst = self.make_one(context, request_)
+        response = inst.put()
+        assert not mock_sheet.set.called
+
+    def test_put_with_sheets_require_password(
+            self, request_, context, mock_sheet):
+        from adhocracy_core.interfaces import ISheetRequirePassword
+        mock_sheet.meta = \
+            mock_sheet.meta._replace(isheet=ISheetRequirePassword)
+        request_.registry.content.get_sheets_edit.return_value = [mock_sheet]
+        request_.password = '123456'
+        data = {'content_type': 'X',
+                'data': {ISheetRequirePassword.__identifier__: {'x': 'y'}}}
         request_.validated = data
 
         inst = self.make_one(context, request_)
@@ -1270,6 +1313,36 @@ class TestPasswordResetView:
         assert inst.options() == {'POST': {}}
 
 
+class TestLoginServiceKonto:
+
+    @fixture
+    def request(self, request_):
+        request_.validated['user'] = testing.DummyResource()
+        request_.validated['password'] = 'lalala'
+        return request_
+
+    def make_one(self, request, context):
+        from adhocracy_core.rest.views import LoginServiceKontoView
+        return LoginServiceKontoView(request, context)
+
+    def test_create(self, context, request):
+        inst = self.make_one(context, request)
+        assert inst.context is context
+        assert inst.request is request
+
+    def test_post(self, context, request, mock_authpolicy):
+        mock_authpolicy.remember.return_value = [('X-User-Token', 'token')]
+        inst = self.make_one(context, request)
+        result = inst.post()
+        assert result == {'status': 'success',
+                          'user_path': 'http://example.com/',
+                          'user_token': 'token'}
+
+    def test_options(self, request, context):
+        inst = self.make_one(context, request)
+        assert inst.options() == {}
+
+
 @fixture
 def integration(config):
     config.include('adhocracy_core.rest.views')
@@ -1282,4 +1355,3 @@ class TestIntegrationIncludeme:
     def test_includeme(self):
         """Check that includeme runs without errors."""
         assert True
-

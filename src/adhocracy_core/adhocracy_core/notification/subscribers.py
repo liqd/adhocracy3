@@ -5,16 +5,18 @@ from pyramid.traversal import find_interface
 from substanced.util import find_service
 
 from adhocracy_core.interfaces import Activity
+from adhocracy_core.interfaces import ActivityType
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.interfaces import Reference
-from adhocracy_core.interfaces import IActivitiesAddedToAuditLog
+from adhocracy_core.interfaces import IActivitiesGenerated
 from adhocracy_core.sheets.notification import INotification
 from adhocracy_core.sheets.notification import IFollowable
+from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.resources.comment import IComment
 from adhocracy_core.resources.process import IProcess
 
 
-def send_activity_notification_emails(event: IActivitiesAddedToAuditLog):
+def send_activity_notification_emails(event: IActivitiesGenerated):
     """Notify users about activities regarding resources they follow."""
     streams = _create_resource_streams(event.activities)
     subscriptions = _get_follow_subscriptions(streams, event.request)
@@ -24,6 +26,10 @@ def send_activity_notification_emails(event: IActivitiesAddedToAuditLog):
 def _create_resource_streams(activities: [Activity]) -> [tuple]:
     streams = defaultdict(list)
     for activity in activities:
+        if activity.type == ActivityType.transition:
+            continue
+        if _is_workflow_assignment_update(activity):
+            continue
         if IFollowable.providedBy(activity.object):
             streams[activity.object].append(activity)
         if IFollowable.providedBy(activity.target):
@@ -33,6 +39,13 @@ def _create_resource_streams(activities: [Activity]) -> [tuple]:
             if process and IFollowable.providedBy(process):
                 streams[process].append(activity)
     return sorted(streams.items(), key=lambda x: x[1][0].published)
+
+
+def _is_workflow_assignment_update(activity: Activity) -> bool:
+    for x in activity.sheet_data:
+        if IWorkflowAssignment in x:
+            return True
+    return False
 
 
 def _get_follow_subscriptions(streams: [tuple],
@@ -51,8 +64,14 @@ def _get_follow_subscriptions(streams: [tuple],
 
 def _send_emails(subscriptions: dict, streams: [tuple], request: IRequest):
     messenger = request.registry.messenger
+    registry = request.registry
     for resource, activites in streams:
         for follower in subscriptions[resource]:
+            is_notification_enabled = \
+                registry.content.get_sheet_field(follower, INotification,
+                                                 'email_notification_enabled')
+            if not is_notification_enabled:
+                continue
             for activity in activites:
                 if activity.subject != follower:
                     messenger.send_activity_mail(follower, activity, request)
@@ -61,4 +80,4 @@ def _send_emails(subscriptions: dict, streams: [tuple], request: IRequest):
 def includeme(config):
     """Register subscribers."""
     config.add_subscriber(send_activity_notification_emails,
-                          IActivitiesAddedToAuditLog)
+                          IActivitiesGenerated)

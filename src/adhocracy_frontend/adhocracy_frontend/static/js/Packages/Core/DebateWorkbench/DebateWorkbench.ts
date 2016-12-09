@@ -25,7 +25,7 @@ import * as SIParagraph from "../../../Resources_/adhocracy_core/sheets/document
 import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
 import * as SIWorkflow from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
-var pkgLocation = "/Core/DebateWorkbench";
+export var pkgLocation = "/Core/DebateWorkbench";
 
 
 export var debateWorkbenchDirective = (
@@ -101,18 +101,38 @@ export var processDetailColumnDirective = (
             scope.$watch("processUrl", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
-                        var workflow = resource.data[SIWorkflow.nick];
-                        scope.data.picture = (resource.data[SIImageReference.nick] || {}).picture;
-                        scope.data.title = resource.data[SITitle.nick].title;
+                        var workflow = SIWorkflow.get(resource);
+                        scope.data.picture = (SIImageReference.get(resource) || {}).picture;
+                        scope.data.title = SITitle.get(resource).title;
                         scope.data.participationStartDate = AdhProcess.getStateData(workflow, "participate").start_date;
                         scope.data.participationEndDate = AdhProcess.getStateData(workflow, "evaluate").start_date;
-                        scope.data.shortDescription = resource.data[SIDescription.nick].short_description;
+                        scope.data.shortDescription = SIDescription.get(resource).short_description;
                     });
                 }
             });
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
             var context = adhEmbed.getContext();
             scope.hasResourceHeader = (context === "");
+        }
+    };
+};
+
+export var addDocumentButtonDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service,
+    adhPermissions : AdhPermissions.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/AddDocumentButton.html",
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
+
+            scope.setCameFrom = () => {
+                adhTopLevelState.setCameFrom();
+            };
         }
     };
 };
@@ -158,7 +178,7 @@ export var registerRoutes = (
             movingColumns: "is-show-show-hide"
         })
         .specificVersionable(RIDocument, RIDocumentVersion, "", processType.content_type, context, [
-            () => (item : RIDocument, version : RIDocumentVersion) => {
+            () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return {
                     documentUrl: version.path
                 };
@@ -168,7 +188,7 @@ export var registerRoutes = (
             movingColumns: "is-show-show-hide"
         })
         .specificVersionable(RIDocument, RIDocumentVersion, "edit", processType.content_type, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service) => (item : RIDocument, version : RIDocumentVersion) => {
+            "adhHttp", (adhHttp : AdhHttp.Service) => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;
@@ -184,8 +204,8 @@ export var registerRoutes = (
             movingColumns: "is-collapse-show-show"
         })
         .specificVersionable(RIParagraph, RIParagraphVersion, "comments", processType.content_type, context, [
-            () => (item : RIParagraph, version : RIParagraphVersion) => {
-                var documentUrl = _.last(_.sortBy(version.data[SIParagraph.nick].documents));
+            () => (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
+                var documentUrl = _.last(_.sortBy(SIParagraph.get(version).documents));
                 return {
                     commentableUrl: version.path,
                     commentCloseUrl: documentUrl,
@@ -204,14 +224,14 @@ export var registerRoutes = (
                 if (resource.content_type !== RICommentVersion.content_type) {
                     return $q.when(resource);
                 } else {
-                    var url = resource.data[SIComment.nick].refers_to;
+                    var url = SIComment.get(resource).refers_to;
                     return adhHttp.get(url).then(getCommentableUrl);
                 }
             };
 
-            return (item : RIComment, version : RICommentVersion) => {
+            return (item : ResourcesBase.IResource, version : ResourcesBase.IResource) => {
                 return getCommentableUrl(version).then((commentable) => {
-                    var documentUrl = _.last(_.sortBy(commentable.data[SIParagraph.nick].documents));
+                    var documentUrl = _.last(_.sortBy(SIParagraph.get(commentable).documents));
                     return {
                         commentableUrl: commentable.path,
                         commentCloseUrl: documentUrl,

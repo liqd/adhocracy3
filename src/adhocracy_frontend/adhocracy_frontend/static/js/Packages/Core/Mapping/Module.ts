@@ -1,13 +1,10 @@
 import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
-import * as AdhEmbedModule from "../Embed/Module";
 import * as AdhHttpModule from "../Http/Module";
 import * as AdhInjectModule from "../Inject/Module";
 import * as AdhListingModule from "../Listing/Module";
 import * as AdhPermissionsModule from "../Permissions/Module";
 import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
 import * as AdhWebSocketModule from "../WebSocket/Module";
-
-import * as AdhEmbed from "../Embed/Embed";
 
 import * as AdhMapping from "./Mapping";
 
@@ -18,7 +15,6 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhAngularHelpersModule.moduleName,
-            AdhEmbedModule.moduleName,
             AdhHttpModule.moduleName,
             AdhInjectModule.moduleName,
             AdhListingModule.moduleName,
@@ -28,12 +24,6 @@ export var register = (angular) => {
             "duScroll"
         ])
         .provider("adhMapData", AdhMapping.MapDataProvider)
-        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider
-                .registerDirective("map-input")
-                .registerDirective("map-detail")
-                .registerDirective("map-listing-internal");
-        }])
         .config(["adhMapDataProvider", (adhMapDataProvider : AdhMapping.MapDataProvider) => {
             adhMapDataProvider.style = {
                 fillColor: "#000",

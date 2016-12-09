@@ -14,8 +14,11 @@ from zope.interface.interfaces import IInterface
 from zope.interface import Interface
 import colander
 
+from adhocracy_core.authentication import UserPasswordHeader
 from adhocracy_core.authentication import UserTokenHeader
 from adhocracy_core.authentication import AnonymizeHeader
+from adhocracy_core.authorization import is_password_required_to_edit_some
+from adhocracy_core.authorization import is_password_required_to_edit
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -47,6 +50,7 @@ from adhocracy_core.rest.schemas import GETPoolRequestSchema
 from adhocracy_core.rest.schemas import GETItemResponseSchema
 from adhocracy_core.rest.schemas import GETResourceResponseSchema
 from adhocracy_core.rest.schemas import DELETEResourceResponseSchema
+from adhocracy_core.rest.schemas import POSTLoginServiceKontoSchema
 from adhocracy_core.rest.schemas import options_resource_response_data_dict
 from adhocracy_core.schema import SchemaNode
 from adhocracy_core.schema import AbsolutePath
@@ -101,11 +105,16 @@ class ResourceRESTView:
             edits = self.content.get_sheets_edit(context, request)
             put_sheets = [(s.meta.isheet.__identifier__, empty) for s in edits]
             can_anonymize = self.content.can_edit_anonymized(context, request)
+            allow_password = is_password_required_to_edit_some(edits)
+            headers_dict = {}
             if put_sheets:
                 put_sheets_dict = dict(put_sheets)
                 self._add_workflow_edit_permission_info(put_sheets_dict, edits)
                 cstruct['PUT']['request_body']['data'] = put_sheets_dict
-                headers_dict = can_anonymize and {AnonymizeHeader: []} or {}
+                if can_anonymize:
+                    headers_dict[AnonymizeHeader] = []
+                if allow_password:
+                    headers_dict[UserPasswordHeader] = []
                 cstruct['PUT']['request_headers'] = headers_dict
             else:
                 del cstruct['PUT']
@@ -233,6 +242,7 @@ class SimpleRESTView(ResourceRESTView):
         """Edit resource and get response data."""
         with statsd_timer('process.put', rate=.1, registry=self.registry):
             sheets = self.content.get_sheets_edit(self.context, self.request)
+            sheets = self._filter_require_password_header(sheets)
             appstructs = self.request.validated.get('data', {})
             for sheet in sheets:
                 name = sheet.meta.isheet.__identifier__
@@ -247,6 +257,13 @@ class SimpleRESTView(ResourceRESTView):
                                    self.request)
             cstruct = schema.serialize(appstruct)
         return cstruct
+
+    def _filter_require_password_header(self, sheets):
+        if hasattr(self.request, 'password') and self.request.password:
+            return sheets
+        sheets_without_password = [sheet for sheet in sheets
+                                   if not is_password_required_to_edit(sheet)]
+        return sheets_without_password
 
     @api_view(
         request_method='DELETE',
@@ -992,6 +1009,32 @@ class PasswordResetView:
         reset = self.request.validated['path']
         password = self.request.validated['password']
         reset.reset_password(password)
+        return _login_user(self.request)
+
+
+@view_defaults(
+    context=IRootPool,
+    name='login_service_konto',
+)
+class LoginServiceKontoView:
+    """Log in a user via service konto token."""
+
+    def __init__(self, context: IRootPool, request: IRequest):
+        self.context = context
+        self.request = request
+
+    @api_view(request_method='OPTIONS')
+    def options(self) -> dict:
+        """Return options for view."""
+        return {}
+
+    @api_view(
+        request_method='POST',
+        schema=POSTLoginServiceKontoSchema,
+        accept='application/json',
+    )
+    def post(self) -> dict:
+        """Login user."""
         return _login_user(self.request)
 
 

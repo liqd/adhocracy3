@@ -16,6 +16,8 @@ import * as AdhUtil from "../Util/Util";
 import * as AdhCredentials from "./Credentials";
 import * as AdhUser from "./User";
 
+import * as ResourcesBase from "../../ResourcesBase";
+
 import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RIProposal from "../../../Resources_/adhocracy_core/resources/proposal/IProposal";
 import RIRate from "../../../Resources_/adhocracy_core/resources/rate/IRate";
@@ -23,12 +25,15 @@ import RIUser from "../../../Resources_/adhocracy_core/resources/principal/IUser
 import RISystemUser from "../../../Resources_/adhocracy_core/resources/principal/ISystemUser";
 import * as SIAnonymizeDefault from "../../../Resources_/adhocracy_core/sheets/principal/IAnonymizeDefault";
 import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIEmailNew from "../../../Resources_/adhocracy_core/sheets/principal/IEmailNew";
 import * as SIHasAssetPool from "../../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
 import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SINotification from "../../../Resources_/adhocracy_core/sheets/notification/INotification";
 import * as SIPasswordAuthentication from "../../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication";
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIUserBasic from "../../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
+import * as SIUserExtended from "../../../Resources_/adhocracy_core/sheets/principal/IUserExtended";
 
 var pkgLocation = "/Core/User";
 
@@ -98,7 +103,10 @@ export interface IScopeLogin extends angular.IScope {
     enableCancel : boolean;
     cancel : () => void;
     logIn : () => angular.IPromise<void>;
+    logInWithServiceKonto : () => void;
     showError;
+    serviceKontoEnabled : boolean;
+    serviceKontoHelpUrl : string;
 }
 
 
@@ -209,7 +217,8 @@ export var loginDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhEmbed : AdhEmbed.Service,
     adhPermissions : AdhPermissions.Service,
-    adhShowError
+    adhShowError,
+    $window : angular.IWindowService
 ) => {
     return {
         restrict: "E",
@@ -218,6 +227,8 @@ export var loginDirective = (
         link: (scope : IScopeLogin) => {
             scope.errors = [];
             scope.supportEmail = adhConfig.support_email;
+            scope.serviceKontoEnabled = !!adhConfig.service_konto_login_url;
+            scope.serviceKontoHelpUrl = adhConfig.service_konto_help_url;
             scope.showError = adhShowError;
 
             adhPermissions.bindScope(scope, "/principals/users");
@@ -238,17 +249,39 @@ export var loginDirective = (
                  adhTopLevelState.goToCameFrom("/");
             };
 
+            var handleErrors = (errors) => {
+                bindServerErrors(scope, errors);
+                scope.credentials.password = "";
+                scope.loginForm.$setPristine();
+            };
+
+            scope.logInWithServiceKonto = () => {
+                var popup;
+
+                var handler = (event) => {
+                    var message = JSON.parse(event.data);
+
+                    if (message.name === "serviceKontoToken" && event.origin === $window.location.origin) {
+                        adhUser.logInWithServiceKonto(message.data.token).then(() => {
+                            adhTopLevelState.goToCameFrom("/", true);
+                        }, handleErrors);
+
+                        popup.close();
+                        $window.removeEventListener("message", handler);
+                    }
+                };
+
+                $window.addEventListener("message", handler);
+                popup = $window.open(adhConfig.service_konto_login_url, "_blank", "width=1000,height=750");
+            };
+
             scope.logIn = () => {
                 return adhUser.logIn(
                     scope.credentials.nameOrEmail,
                     scope.credentials.password
                 ).then(() => {
                     adhTopLevelState.goToCameFrom("/", true);
-                }, (errors) => {
-                    bindServerErrors(scope, errors);
-                    scope.credentials.password = "";
-                    scope.loginForm.$setPristine();
-                });
+                }, handleErrors);
             };
         }
     };
@@ -595,15 +628,18 @@ export var metaDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Meta.html",
         scope: {
             path: "@",
-            name: "@?"
+            name: "@?",
+            noLink: "@?"
         },
         controller: ["adhHttp", "$translate", "$scope", (adhHttp : AdhHttp.Service, $translate, $scope) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
-                        $scope.userBasic = res.data[SIUserBasic.nick];
-                        // provide no link if either there are no user profiles enabled or user is anonymous
-                        $scope.noLink = !adhResourceArea.has(RIUser.content_type) || (res.content_type === RISystemUser.content_type);
+                        $scope.userBasic = SIUserBasic.get(res);
+                        // provide no link if either noLink is true or there are no user profiles enabled or user is anonymous
+                        var usersEnabled = adhResourceArea.has(RIUser.content_type);
+                        var userIsAnonymous = res.content_type === RISystemUser.content_type;
+                        $scope.noLink = !!$scope.noLink || !usersEnabled || userIsAnonymous;
                         adhGetBadges(res).then((assignments) => {
                             $scope.assignments = assignments;
                         });
@@ -650,7 +686,7 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
-                        $scope.userBasic = res.data[SIUserBasic.nick];
+                        $scope.userBasic = SIUserBasic.get(res);
                         adhGetBadges(res).then((assignments) => {
                             $scope.assignments = assignments;
                         });
@@ -694,10 +730,10 @@ export var userProfileDirective = (
             scope.$watch("path", (path) => {
                 if (path) {
                     adhHttp.get(path).then((user) => {
-                        scope.userBasic = user.data[SIUserBasic.nick];
+                        scope.userBasic = SIUserBasic.get(user);
                         scope.data = {
-                            description: user.data[SIDescription.nick].description,
-                            shortDescription: user.data[SIDescription.nick].short_description,
+                            description: SIDescription.get(user).description,
+                            shortDescription: SIDescription.get(user).short_description,
                         };
                         adhGetBadges(user).then((assignments) => {
                             scope.assignments = assignments;
@@ -712,7 +748,7 @@ export var userProfileDirective = (
                         content_type: oldUser.content_type,
                         data: {}
                     };
-                    patch.data[SIDescription.nick] = new SIDescription.Sheet({
+                    SIDescription.set(patch, {
                         description: scope.data.description,
                         short_description: scope.data.shortDescription,
                     });
@@ -730,8 +766,11 @@ var postEdit = (
     path : string,
     data : {
         name : string;
+        email? : string;
         password? : string;
+        passwordOld? : string;
         anonymize? : boolean;
+        notificationsEnabled? : boolean;
     }
 ) => {
     return adhHttp.get(path).then((oldUser) => {
@@ -739,20 +778,31 @@ var postEdit = (
             content_type: oldUser.content_type,
             data: {}
         };
-        if (oldUser.data[SIUserBasic.nick].name !== data.name) {
-            patch.data[SIUserBasic.nick] = new SIUserBasic.Sheet({
+        if (SIUserBasic.get(oldUser).name !== data.name) {
+            SIUserBasic.set(patch, {
                 name: data.name,
             });
         }
+        if (data.email !== SIUserExtended.get(oldUser).email) {
+            SIEmailNew.set(patch, {
+                email: data.email,
+            });
+        }
         if (data.password) {
-            patch.data[SIPasswordAuthentication.nick] = new SIPasswordAuthentication.Sheet({
+            SIPasswordAuthentication.set(patch, {
                 password: data.password,
             });
         }
-        patch.data[SIAnonymizeDefault.nick] = new SIAnonymizeDefault.Sheet({
+        SIAnonymizeDefault.set(patch, {
             anonymize: data.anonymize,
         });
-        return adhHttp.put(oldUser.path, patch);
+        SINotification.set(patch, {
+            follow_resources: SINotification.get(oldUser).follow_resources,
+            email_notification_enabled: data.notificationsEnabled,
+        });
+        return adhHttp.put(oldUser.path, patch, {
+            password: data.passwordOld
+        });
     });
 };
 
@@ -781,9 +831,12 @@ export var userEditDirective = (
                 if (path) {
                     adhHttp.get(path).then((user) => {
                         scope.data = {
-                            name: user.data[SIUserBasic.nick].name,
+                            name: SIUserBasic.get(user).name,
+                            email: SIUserExtended.get(user).email,
                             password: "",
-                            anonymize: user.data[SIAnonymizeDefault.nick].anonymize,
+                            anonymize: SIAnonymizeDefault.get(user).anonymize,
+                            followablesExist: !!SINotification.get(user).follow_resources.length,
+                            notificationsEnabled: SINotification.get(user).email_notification_enabled
                         };
                     });
                 }
@@ -820,8 +873,8 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
             modals: "="
         },
         link: (scope)  => {
-            adhHttp.get(scope.recipientUrl).then((recipient : RIUser) => {
-                scope.recipientName = recipient.data[SIUserBasic.nick].name;
+            adhHttp.get(scope.recipientUrl).then((recipient : ResourcesBase.IResource) => {
+                scope.recipientName = SIUserBasic.get(recipient).name;
             });
 
             scope.messageSend = () => {
@@ -910,7 +963,7 @@ export var adhUserActivityOverviewDirective = (
                 params[SIMetadata.nick + ":creator"] = scope.path;
 
                 adhHttp.get(adhConfig.rest_url, params)
-                    .then((pool) => { scope[scopeTarget] = pool.data[SIPool.nick].count; });
+                    .then((pool) => { scope[scopeTarget] = parseInt((<any>SIPool.get(pool)).count, 10); });
             };
 
             requestCountInto(RIComment, "commentCount", attrs.showComments);
@@ -944,8 +997,8 @@ export var adhUserProfileImageDirective = (
                 if ( ! path) { return; }
 
                 adhHttp.get(scope.path).then((user) => {
-                    scope.assetPath = user.data[SIImageReference.nick].picture;
-                    scope.userName = user.data[SIUserBasic.nick].name;
+                    scope.assetPath = SIImageReference.get(user).picture;
+                    scope.userName = SIUserBasic.get(user).name;
                     if ( ! scope.assetPath) {
                         scope.didFailToLoadImage();
                     }
@@ -969,7 +1022,7 @@ export var adhUserProfileImageEditDirective = (
         link: (scope) => {
             scope.config = adhConfig;
             adhHttp.get(AdhUtil.parentPath(scope.path)).then((userPool) => {
-                scope.assetPool = userPool.data[SIHasAssetPool.nick].asset_pool;
+                scope.assetPool = SIHasAssetPool.get(userPool).asset_pool;
             });
             scope.triggerUpload = () => {
                 scope.isUploading = true;
@@ -1025,7 +1078,7 @@ export var registerRoutes = (
             space: "user",
             movingColumns: "is-show-hide-hide"
         })
-        .specific(RIUser, "", "", context, () => (resource : RIUser) => {
+        .specific(RIUser, "", "", context, () => (resource : ResourcesBase.IResource) => {
             return {
                 userUrl: resource.path
             };
@@ -1034,7 +1087,7 @@ export var registerRoutes = (
             space: "user",
             movingColumns: "is-show-hide-hide"
         })
-        .specific(RIUser, "edit", "", context, ["adhHttp", (adhHttp : AdhHttp.Service) => (resource : RIUser) => {
+        .specific(RIUser, "edit", "", context, ["adhHttp", (adhHttp : AdhHttp.Service) => (resource : ResourcesBase.IResource) => {
             return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                 if (!options.PUT) {
                     throw 401;

@@ -21,6 +21,7 @@ import * as moment from "moment";
 import * as webshim from "polyfiller";
 
 import * as AdhBlogModule from "./Packages/Blog/Module";
+import * as AdhResourceWidgetsModule from "./Packages/ResourceWidgets/Module";
 import * as AdhCoreModule from "./Packages/Core/Module";
 import * as AdhMercatorModule from "./Packages/Mercator/Module";
 
@@ -84,12 +85,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
                 return {
                     skip: true
                 };
-            }])
-            .otherwise(() : AdhTopLevelState.IAreaInput => {
-                return {
-                    template: "<adh-header></adh-header><div class=\"l-content\"><h1>404 - Not Found</h1></div>"
-                };
-            });
+            }]);
     }]);
     app.config(["$compileProvider", ($compileProvider) => {
         $compileProvider.debugInfoEnabled(config.debug);
@@ -131,6 +127,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
 
     // register our modules
     AdhBlogModule.register(angular);
+    AdhResourceWidgetsModule.register(angular);
     AdhCoreModule.register(angular, config, metaApi);
     AdhMercatorModule.register(angular);
 

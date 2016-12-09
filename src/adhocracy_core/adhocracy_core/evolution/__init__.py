@@ -931,6 +931,66 @@ def add_local_roles_to_acl(root, registry):  # pragma: no cover
         _set_acl_with_local_roles(resource, acl, registry)
 
 
+@log_migration
+def add_pages_service_to_root(root, registry):  # pragma: no cover
+    """Add pages service to root."""
+    from adhocracy_core.resources.page import add_page_service
+    pages = find_service(root, 'pages')
+    if pages is None:
+        logger.info('Add pages service to {0}'.format(root))
+        add_page_service(root, registry, {})
+
+
+@log_migration
+def add_embed_sheet_to_processes(root, registry):  # pragma: no cover
+    """Add embed to processes."""
+    from adhocracy_core.sheets.embed import IEmbed
+    migrate_new_sheet(root, IProcess, IEmbed)
+
+
+@log_migration
+def reindex_users_text(root, registry):  # pragma: no cover
+    """Reindex user system text index."""
+    catalogs = find_service(root, 'catalogs')
+    users = find_service(root, 'principals', 'users')
+    for user in users.values():
+        catalogs.reindex_index(user, 'text')
+
+
+@log_migration
+def add_email_new_sheet_to_user(root, registry):  # pragma: no cover
+    """Add email new sheet to user."""
+    from adhocracy_core.sheets.principal import IEmailNew
+    migrate_new_sheet(root, IUser, IEmailNew)
+
+
+@log_migration
+def add_activity_service_to_root(root, registry):  # pragma: no cover
+    """Add activity service to root."""
+    from adhocracy_core.resources.activity import add_activiy_service
+    activity_stream = find_service(root, 'activity_stream')
+    if activity_stream is None:
+        logger.info('Add activity service to {0}'.format(root))
+        add_activiy_service(root, registry, {})
+
+
+@log_migration
+def add_service_konto_sheet_to_user(root, registry):  # pragma: no cover
+    """Add ServiceKonto sheet to user."""
+    from adhocracy_core.resources.principal import IUser
+    from adhocracy_core.sheets.principal import IServiceKonto
+    migrate_new_sheet(root, IUser, IServiceKonto)
+
+
+@log_migration
+def add_service_konto_settings_sheet_to_user(root,
+                                             registry):  # pragma: no cover
+    """Add ServiceKonto settings sheet to user."""
+    from adhocracy_core.resources.principal import IUser
+    from adhocracy_core.sheets.principal import IServiceKontoSettings
+    migrate_new_sheet(root, IUser, IServiceKontoSettings)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -991,3 +1051,10 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_anonymize_default_sheet_to_user)
     config.add_evolution_step(add_allow_add_anonymized_sheet_to_rates)
     config.add_evolution_step(add_local_roles_to_acl)
+    config.add_evolution_step(add_pages_service_to_root)
+    config.add_evolution_step(add_embed_sheet_to_processes)
+    config.add_evolution_step(reindex_users_text)
+    config.add_evolution_step(add_email_new_sheet_to_user)
+    config.add_evolution_step(add_activity_service_to_root)
+    config.add_evolution_step(add_service_konto_sheet_to_user)
+    config.add_evolution_step(add_service_konto_settings_sheet_to_user)

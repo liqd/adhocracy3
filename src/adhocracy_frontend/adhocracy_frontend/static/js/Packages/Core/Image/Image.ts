@@ -5,6 +5,7 @@ import * as AdhHttp from "../Http/Http";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
 import RIImage from "../../../Resources_/adhocracy_core/resources/image/IImage";
+import * as SIAssetData from "../../../Resources_/adhocracy_core/sheets/asset/IAssetData";
 import * as SIHasAssetPool from "../../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
 import * as SIImageMetadata from "../../../Resources_/adhocracy_core/sheets/image/IImageMetadata";
 import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
@@ -55,11 +56,11 @@ export var uploadImageFactory = (
 
     var formData = new FormData();
     formData.append("content_type", contentType);
-    formData.append("data:adhocracy_core.sheets.asset.IAssetData:data", bytes());
+    formData.append("data:" + SIAssetData.nick + ":data", bytes());
 
     return adhHttp.get(poolPath)
         .then((pool) => {
-            var postPath : string = pool.data[SIHasAssetPool.nick].asset_pool;
+            var postPath : string = SIHasAssetPool.get(pool).asset_pool;
             return adhHttp.postRaw(postPath, formData)
                 .then((rsp) => rsp.data.path)
                 .catch(<any>AdhHttp.logBackendError);
@@ -78,10 +79,10 @@ export var addImage = (
             data: {},
             content_type: resource.content_type
         };
-        patch.data[SIImageReference.nick] = new SIImageReference.Sheet({ picture: imagePath });
+        SIImageReference.set(patch, { picture: imagePath });
 
         // Versioned resources are on the way out, so they get the special treatment
-        if (resource.data[SIVersionable.nick]) {
+        if (SIVersionable.get(resource)) {
             var newVersion = _.clone(resource);
             _.merge(newVersion.data, patch.data);
             return adhHttp.postNewVersionNoFork(resourcePath, newVersion);

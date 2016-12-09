@@ -28,6 +28,7 @@ import * as AdhDebateWorkbenchModule from "./Packages/Core/DebateWorkbench/Modul
 
 import * as AdhConfig from "./Packages/Core/Config/Config";
 import * as AdhDebateWorkbench from "./Packages/Core/DebateWorkbench/DebateWorkbench";
+import * as AdhNames from "./Packages/Core/Names/Names";
 import * as AdhProcess from "./Packages/Core/Process/Process";
 import * as AdhTopLevelState from "./Packages/Core/TopLevelState/TopLevelState";
 
@@ -90,12 +91,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
                 return {
                     skip: true
                 };
-            }])
-            .otherwise(() : AdhTopLevelState.IAreaInput => {
-                return {
-                    template: "<adh-header></adh-header><div class=\"l-content\"><h1>404 - Not Found</h1></div>"
-                };
-            });
+            }]);
     }]);
     app.config(["$compileProvider", ($compileProvider) => {
         $compileProvider.debugInfoEnabled(config.debug);
@@ -132,7 +128,14 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         adhProcessProvider.templates[RIDigitalLebenProcess.content_type] =
             "<adh-debate-workbench></adh-debate-workbench>";
     }]);
-    app.config(["adhResourceAreaProvider", AdhDebateWorkbench.registerRoutes(RIDigitalLebenProcess)]);
+    app.config(["adhConfig", "adhResourceAreaProvider", (adhConfig, adhResourceAreaProvider) => {
+        var processHeaderSlot = adhConfig.pkg_path + AdhDebateWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
+        adhResourceAreaProvider.processHeaderSlots[RIDigitalLebenProcess.content_type] = processHeaderSlot;
+        AdhDebateWorkbench.registerRoutes(RIDigitalLebenProcess)(adhResourceAreaProvider);
+    }]);
+    app.config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
+        adhNamesProvider.names[RIDigitalLebenProcess.content_type] = "TR__RESOURCE_COLLABORATIVE_TEXT_EDITING";
+    }]);
 
     app.value("angular", angular);
     app.value("leaflet", leaflet);

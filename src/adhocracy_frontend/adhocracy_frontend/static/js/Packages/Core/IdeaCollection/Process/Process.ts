@@ -55,26 +55,32 @@ export var detailDirective = (
             scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
-                        var workflow = resource.data[SIWorkflow.nick];
+                        var workflow = SIWorkflow.get(resource);
                         var stateName = workflow.workflow_state;
                         scope.currentPhase = AdhProcess.getStateData(workflow, stateName);
-                        scope.data.picture = (resource.data[SIImageReference.nick] || {}).picture;
-                        scope.data.title = resource.data[SITitle.nick].title;
+                        scope.data.picture = (SIImageReference.get(resource) || {}).picture;
+                        scope.data.title = SITitle.get(resource).title;
                         scope.data.participationStartDate = AdhProcess.getStateData(workflow, "participate").start_date;
                         scope.data.participationEndDate = AdhProcess.getStateData(workflow, "evaluate").start_date;
-                        scope.data.shortDescription = resource.data[SIDescription.nick].short_description;
+                        scope.data.shortDescription = SIDescription.get(resource).short_description;
 
-                        scope.hasLocation = scope.processProperties.hasLocation && resource.data[SILocationReference.nick].location;
+                        scope.hasLocation = scope.processProperties.hasLocation && SILocationReference.get(resource).location;
                         if (scope.hasLocation) {
-                            var locationUrl = resource.data[SILocationReference.nick].location;
+                            var locationUrl = SILocationReference.get(resource).location;
                             adhHttp.get(locationUrl).then((location) => {
-                                var polygon = location.data[SIMultiPolygon.nick].coordinates[0][0];
+                                var polygon = SIMultiPolygon.get(location).coordinates[0][0];
                                 scope.polygon =  polygon;
                             });
                         }
 
-                        var proposalVersion = scope.processProperties.proposalVersionClass;
-                        scope.contentType = proposalVersion.content_type;
+                        scope.contentType = scope.processProperties.proposalVersionClass.content_type;
+
+                        var context = adhEmbed.getContext();
+                        var isIdeaColl = resource.content_type === "adhocracy_meinberlin.resources.idea_collection.IProcess";
+                        // show the resource header if
+                        // - the process type is an idea collection and the context is "mein.berlin.de"
+                        // - OR: the process type is somethng else and there is no context.
+                        scope.hasResourceHeader = isIdeaColl ? context === "mein.berlin.de" : context === "";
                     });
                 }
             });
@@ -83,9 +89,6 @@ export var detailDirective = (
             scope.showMap = (isShowMap) => {
                 scope.data.isShowMap = isShowMap;
             };
-
-            var context = adhEmbed.getContext();
-            scope.hasResourceHeader = (context === "");
         }
     };
 };

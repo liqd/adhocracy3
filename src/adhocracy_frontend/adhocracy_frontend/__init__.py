@@ -23,6 +23,8 @@ def config_view(request):
     config['captcha_url'] = settings.adhocracy.captcha_frontend_url
     config['custom'] = settings.adhocracy.custom
     config['site_name'] = settings.adhocracy.site_name
+    config['service_konto.enabled'] = settings.adhocracy.service_konto.enabled
+    config['service_konto.api_url'] = settings.adhocracy.service_konto.api_url
     use_cachbust = settings.configurator.cachebust.enabled
     if not use_cachbust:  # ease testing
         return config
@@ -98,6 +100,13 @@ def adhocracy_sdk_view(request):
     return FileResponse(path, request=request)
 
 
+def service_konto_finish_view(request):
+    """View that passes a service konto token back to adhocracy."""
+    path = pkg_resources.resource_filename('adhocracy_frontend',
+                                           'build/ServiceKontoFinish.html')
+    return FileResponse(path, request=request)
+
+
 def includeme(config):
     """Add routing and static view to deliver the frontend application."""
     config_files = config.registry.settings.get('yaml.location', '')
@@ -129,6 +138,9 @@ def includeme(config):
     # AdhocracySDK shall not be cached the way other static files are cached
     config.add_route('adhocracy_sdk', 'AdhocracySDK.js')
     config.add_view(adhocracy_sdk_view, route_name='adhocracy_sdk')
+    config.add_route('service_konto_finish', 'service_konto_finish')
+    config.add_view(service_konto_finish_view,
+                    route_name='service_konto_finish')
     config.add_static_view('static', 'adhocracy_frontend:build/',
                            cache_max_age=cache_max_age)
     config.add_subscriber(add_cors_headers, NewResponse)

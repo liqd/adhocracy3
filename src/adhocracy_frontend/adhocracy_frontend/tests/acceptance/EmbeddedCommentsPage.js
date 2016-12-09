@@ -27,6 +27,7 @@ var EmbeddedCommentsPage = function(referer) {
     };
 
     this.fillComment = function(content) {
+        browser.wait(this.listingCreateForm.isDisplayed());
         browser.wait(this.commentInput.isDisplayed());
         this.commentInput.sendKeys(content);
     };

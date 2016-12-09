@@ -2,6 +2,7 @@
 import os.path
 
 from colander import deferred
+from deform.widget import TextAreaWidget
 from pyramid.interfaces import IRequest
 from pyramid.renderers import render
 from zope.interface import Interface
@@ -39,7 +40,9 @@ def embed_code_config_adapter(context: IResource,
             'autoresize': 'false',
             'locale': locale,
             'autourl': 'false',
+            'initial_url': '',
             'nocenter': 'true',
+            'noheader': 'false',
             'style': 'height: 650px',
             }
 
@@ -64,8 +67,8 @@ class EmbedSchema(MappingSchema):
     `external_url`: canonical URL that embeds the `context` resource.
     """
 
-    embed_code = Text(readonly=True,
-                      default=deferred_default_embed_code,
+    embed_code = Text(default=deferred_default_embed_code,
+                      widget=TextAreaWidget(rows=10),
                       )
     external_url = URL()
 

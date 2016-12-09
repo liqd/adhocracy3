@@ -1,1 +1,0 @@
-adhocracy_pcompass README

@@ -28,6 +28,7 @@ badge_meta = simple_meta._replace(
         adhocracy_core.sheets.badge.IBadge,
     ),
     permission_create='create_badge',
+    is_sdi_addable=True,
 )._add(
     extended_sheets=(adhocracy_core.sheets.name.IName,)
 )
@@ -46,6 +47,7 @@ badge_group_meta = pool_meta._replace(
     element_types=(IBadge,
                    IBadgeGroup,
                    ),
+    is_sdi_addable=True,
 )
 
 
@@ -58,7 +60,9 @@ participants_assignable_badge_group_meta = badge_group_meta._replace(
     default_workflow='badge_assignment',
     element_types=(IBadge,
                    IBadgeGroup,
-                   IParticipantsAssignableBadgeGroup,),
+                   IParticipantsAssignableBadgeGroup,
+                   ),
+    is_implicit_addable=True,
 )
 
 
@@ -118,7 +122,10 @@ def add_badge_assignments_service(context: IPool, registry: Registry,
     """Add `badge_assignments` service to context."""
     creator = options.get('creator')
     registry.content.create(IBadgeAssignmentsService.__identifier__,
-                            parent=context, registry=registry, creator=creator)
+                            parent=context,
+                            registry=registry,
+                            creator=creator,
+                            autoupdated=True)
 
 
 def includeme(config):

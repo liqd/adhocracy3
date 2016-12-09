@@ -45,4 +45,6 @@ export interface IService {
     piwik_track_user_id : boolean;
     map_tile_url : string;
     map_tile_options : L.TileLayerOptions;
+    service_konto_login_url? : string;
+    service_konto_help_url? : string;
 }

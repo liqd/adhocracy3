@@ -26,6 +26,7 @@ from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.principal import IUserExtended
+from adhocracy_core.sheets.principal import IServiceKonto
 
 
 class Reference(IndexFactory):
@@ -57,6 +58,7 @@ class AdhocracyCatalogIndexes:
     user_name = catalog.Field()
     private_user_email = catalog.Field()
     private_user_activation_path = catalog.Field()
+    private_service_konto_userid = catalog.Field()
 
 
 def index_creator(resource, default) -> str:
@@ -257,6 +259,15 @@ def index_user_activation_path(resource, default) -> str:
     return path
 
 
+def index_service_konto_userid(resource, default) -> str:
+    """Return value for the service konto index."""
+    registry = get_current_registry(resource)
+    userid = registry.content.get_sheet_field(resource,
+                                              IServiceKonto,
+                                              'userid')
+    return userid
+
+
 def includeme(config):
     """Register adhocracy catalog factory."""
     config.add_catalog_factory('adhocracy', AdhocracyCatalogIndexes)
@@ -335,4 +346,9 @@ def includeme(config):
                          catalog_name='adhocracy',
                          index_name='private_user_activation_path',
                          context=IUserBasic,
+                         )
+    config.add_indexview(index_service_konto_userid,
+                         catalog_name='adhocracy',
+                         index_name='private_service_konto_userid',
+                         context=IServiceKonto,
                          )

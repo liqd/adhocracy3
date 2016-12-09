@@ -35,7 +35,8 @@ class TestNotificationSheet:
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context, None)
-        assert inst.get() == {'follow_resources': []}
+        assert inst.get() == {'follow_resources': [],
+                              'email_notification_enabled': True}
 
     @mark.usefixtures('integration')
     def test_includeme_register_sheet(self, meta, config):

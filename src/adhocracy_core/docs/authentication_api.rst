@@ -366,3 +366,82 @@ Other users, even if logged in, cannot::
     False
     >>> 'adhocracy_core.sheets.principal.IPermissions' in resp['data']
     False
+
+
+Editing Users
+-------------
+
+User can edit their own data::
+
+    >>> headers = {'X-User-Token': user_token_via_username}
+    >>> user = copy(anonymous)
+    >>> user.header = headers
+    >>> data = {'data': {'adhocracy_core.sheets.principal.IUserBasic': {'name': 'edited_name'}}}
+    >>> resp = user.put(user_path, data).json
+    >>> len(resp['updated_resources']['modified'])
+    1
+
+If they want to edit security-related information they need to pass
+their passwords in a custom header::
+
+    >>> headers = {'X-User-Token': user_token_via_username,
+    ...            'X-User-Password': 'EckVocUbs3'}
+    >>> user = copy(anonymous)
+    >>> user.header = headers
+    >>> data = {'data': {'adhocracy_core.sheets.principal.IPasswordAuthentication': {'password': 'edited_password'}}}
+    >>> resp = user.put(user_path, data).json
+    >>> len(resp['updated_resources']['modified'])
+    1
+
+If the header is missing the change is silently dropped::
+
+    >>> headers = {'X-User-Token': user_token_via_username}
+    >>> user = copy(anonymous)
+    >>> user.header = headers
+    >>> data = {'data': {'adhocracy_core.sheets.principal.IPasswordAuthentication': {'password': 'edited_password'}}}
+    >>> resp = user.put(user_path, data).json
+    >>> len(resp['updated_resources']['modified'])
+    0
+
+
+Password Reset
+--------------
+
+If users forget their passwords, they can request a reset email::
+
+    >>> data = {'email': 'anna@example.org'}
+    >>> resp = anonymous.post('http://localhost/create_password_reset', data).json
+    >>> resp['status']
+    'success'
+
+The email contains a link that will allow them to enter a new password.
+Password reset also returns the credentials so that a user can login
+directly::
+
+    >>> newest_reset_path = getfixture('newest_reset_path')
+    >>> data = {'path': newest_reset_path(),
+    ...         'password': 'new_password'}
+    >>> resp = anonymous.post("http://localhost/password_reset", data).json
+    >>> pprint(resp)
+    {'status': 'success',
+     'user_path': '.../principals/users/...',
+     'user_token': '...'}
+
+
+Security Considerations
+-----------------------
+
+-   The password-reset mechanism allows attackers that have access to a
+    user's email address to take over an account.
+
+-   The password-edit mechanism allows attackers that have access to a
+    user's session and password to change the password. However, the
+    user receives an email informing them about the change and about
+    ways to recover their password (i.e. password-reset).
+
+-   In the future we may want to allow users to change their email
+    address. In this case attackers with access to a user's session and
+    password would be able to take over an account.
+
+-   Once an account has been compromised it is not possible to recover.
+    Legitimate users have no way to prove their legitimacy.

@@ -102,6 +102,7 @@ class TestBatchView:
             self, context, request_, mock_invoke_subrequest):
         from pyramid.traversal import resource_path
         from adhocracy_core.authentication import AnonymizeHeader
+        from adhocracy_core.authentication import UserPasswordHeader
         from adhocracy_core.utils import is_batchmode
         request_.validated = [self._make_subrequest_cstruct(
             path='http://a.org/virtual/adhocracy/blah')]
@@ -111,6 +112,7 @@ class TestBatchView:
         request_.headers['X-User-Path'] = 2
         request_.headers['X-User-Token'] = 3
         request_.headers[AnonymizeHeader] = ''
+        request_.headers[UserPasswordHeader] = 'pwd'
         # Needed to stop the validator from complaining if these headers are
         # present
         request_.authenticated_userid = resource_path(context)
@@ -129,6 +131,7 @@ class TestBatchView:
         assert subrequest.headers.get('X-User-Path') == 2
         assert subrequest.headers.get('X-User-Token') == 3
         assert subrequest.headers.get(AnonymizeHeader) == ''
+        assert subrequest.headers.get(UserPasswordHeader) == 'pwd'
         assert subrequest.script_name == '/virtual'
         assert subrequest.path_info == '/adhocracy/blah'
 

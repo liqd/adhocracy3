@@ -17,7 +17,11 @@ import * as Error from "./Error";
 var mkHttpMock = (adhPreliminaryNames : AdhPreliminaryNames.Service) => {
     var mock = jasmine.createSpy("$httpMock");
 
-    var response = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
+    var response : ResourcesBase.IResource = {
+        path: adhPreliminaryNames.nextPreliminary(),
+        content_type: RIParagraph.content_type,
+        data: {},
+    };
 
     (<any>mock).get = jasmine.createSpy("$httpMock.get").and.returnValue(q.when({ data: response }));
     (<any>mock).post = jasmine.createSpy("$httpMock.post").and.returnValue(q.when({ data: response }));
@@ -54,6 +58,7 @@ var mkAdhMetaApiMock = () => {
             }
         },
 
+        resourceExists: () => true,
         sheetExists: () => true,
         fieldExists: () => true,
 
@@ -210,8 +215,12 @@ export var register = () => {
                     var path = "path/";
                     var returnPath1 = "path1/";
 
-                    var dag = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
-                    dag.data["adhocracy_core.sheets.tags.ITags"] = new SITags.Sheet({ LAST: returnPath1 });
+                    var dag : ResourcesBase.IResource = {
+                        path: adhPreliminaryNames.nextPreliminary(),
+                        content_type: RIParagraph.content_type,
+                        data: {},
+                    };
+                    SITags.set(dag, { LAST: returnPath1 });
                     $httpMock.get.and.returnValue(q.when({ data: dag }));
 
                     adhHttp.getNewestVersionPathNoFork(path).then(
@@ -331,10 +340,15 @@ export var register = () => {
                     };
 
                     var newHead = "new_head";
-                    var dag = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
-                    dag.data["adhocracy_core.sheets.tags.ITags"] = new SITags.Sheet({ FIRST: undefined,
-                                                                                      LAST: newHead
-                                                                                    });
+                    var dag : ResourcesBase.IResource = {
+                        path: adhPreliminaryNames.nextPreliminary(),
+                        content_type: RIParagraph.content_type,
+                        data: {},
+                    };
+                    SITags.set(dag, {
+                        FIRST: undefined,
+                        LAST: newHead,
+                    });
 
 
                     var postResponses = [q.reject({ data: error }), q.when({ data: dag })].reverse();

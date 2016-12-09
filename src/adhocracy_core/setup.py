@@ -30,6 +30,8 @@ requires = [
     'pyrsistent',
     'multipledispatch',
     'PyYAML',
+    'lxml',
+    'osa',
 ]
 
 if sys.version_info < (3, 4):
