@@ -23,7 +23,7 @@ exports.config = {
     },
     onPrepare: function() {
         var getMailQueuePath = function() {
-            var testConf = process.cwd() + "/var/mail";
+            return process.cwd() + "/var/mail";
         };
 
         browser.params.mail = {
