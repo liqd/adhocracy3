@@ -55,6 +55,9 @@ adhocracy.thentos_captcha.frontend_url = http://localhost:6542/
 #adhocracy.varnish_url = http://127.0.0.1:8088
 # Enable activity stream generation
 adhocracy.activity_stream.enabled = true
+# Allow login with a service konto account
+adhocracy.service_konto.enabled = false
+adhocracy.service_konto.api_url = https://skbref.verwalt-berlin.de/HHGWUserData/HHGWUserData.asmx?wsdl
 
 # Name of the entire site. Used in account registration information etc.
 adhocracy.site_name = Adhocracy Test Site

@@ -64,6 +64,7 @@ def main():
         ('Du diese E-Mail nicht erhältst',
             'Sie diese E-Mail nicht erhalten'),
         ('Du kannst', 'Sie können'),
+        ('Du Dich beteiligen willst', 'Sie sich beteiligen wollen'),
         ('Du Dich', 'Sie sich'),
         ('Dir', 'Ihnen'),
         ('Dein', 'Ihr'),

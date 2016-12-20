@@ -66,11 +66,12 @@ export class Service {
                 // The user resource that was returned by the server could not be accessed.
                 // This may happen e.g. with a network disconnect
 
-                // FIXME: The request might fail because the window is
+                // The request might fail because the window is
                 // closed. In that case there is no reason to delete
-                // the token. We need to be able to discern the two
-                // cases.
-                _self.adhCredentials.deleteToken();
+                // the token.
+                if (reason[0].code >= 400) {
+                    _self.adhCredentials.deleteToken();
+                }
                 throw "failed to fetch user resource";
             });
     }
@@ -90,6 +91,21 @@ export class Service {
                 password: password
             });
         }
+
+        var success = (response) => {
+            return _self.adhCredentials.storeAndEnableToken(response.data.user_token, response.data.user_path);
+        };
+
+        return promise
+            .then(success, AdhHttp.logBackendError);
+    }
+
+    public logInWithServiceKonto(token : string) : angular.IPromise<void> {
+        var _self : Service = this;
+
+        var promise = _self.adhHttp.postRaw("/login_service_konto", {
+            token: token
+        });
 
         var success = (response) => {
             return _self.adhCredentials.storeAndEnableToken(response.data.user_token, response.data.user_path);

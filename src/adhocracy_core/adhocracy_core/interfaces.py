@@ -617,6 +617,7 @@ class VisibilityChange(Enum):
 
 class ChangelogMetadata(namedtuple('ChangelogMetadata',
                                    ['modified',
+                                    'modified_appstructs',
                                     'created',
                                     'autoupdated',
                                     'followed_by',
@@ -627,6 +628,7 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
                                     'visibility'])):
     def __new__(cls,
                 modified: bool=False,
+                modified_appstructs: list=None,
                 created: bool=False,
                 autoupdated: bool=False,
                 followed_by: IResource=None,
@@ -636,7 +638,8 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
                 changed_backrefs: bool=False,
                 visibility: str=VisibilityChange.visible,
                 ):
-        return super().__new__(cls, modified, created, autoupdated,
+        return super().__new__(cls, modified, modified_appstructs,
+                               created, autoupdated,
                                followed_by, resource, last_version,
                                changed_descendants, changed_backrefs,
                                visibility)
@@ -648,6 +651,7 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
     modified (bool):
         Resource sheets (:class:`adhocracy_core.interfaces.IResourceSheet`) are
         modified.
+    modified_appstructs {Interface: dict} or None: new sheet appstructs
     created (bool):
         This resource is created and added to a pool.
     autoupdated (bool):
@@ -740,7 +744,7 @@ class Activity(namedtuple('Activity', ['subject',
         simple, humane readable description of the activity.
     sheet_data (list):
         List of sheet appstruct data when changing or deleting resources,
-        not part of the actvity stream ontology
+        not part of the activity stream ontology
     published (datetime.DateTime):
         the date/time the activity was published, required
     """
@@ -776,6 +780,8 @@ class ActivityType(Enum):
     add = 'Add'
     update = 'Update'
     remove = 'Remove'
+    transition = 'Transition'
+    """Transition to new workflow state."""
 
 
 class SerializedActivity(namedtuple('SerializedActivity', ['subject_path',
@@ -980,6 +986,9 @@ class IRolesUserLocator(IUserLocator):  # pragma: no cover
 
     def get_user_by_activation_path(activation_path: str) -> IResource:
         """Find user per activation path or return None."""
+
+    def get_user_by_service_konto_userid(userid: str) -> IResource:
+        """Find user per service konto userid or return None."""
 
 
 class IRoleACLAuthorizationPolicy(IAuthorizationPolicy):  # pragma: no cover

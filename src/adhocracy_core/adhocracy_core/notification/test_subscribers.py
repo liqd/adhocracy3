@@ -24,9 +24,10 @@ class TestSendActivityNotificationEmails:
         return testing.DummyResource(__provides__=IFollowable)
 
     @fixture
-    def registry(self, registry, mock_messenger):
-        registry.messenger = mock_messenger
-        return registry
+    def registry(self, registry_with_content, mock_messenger, mocker):
+        registry_with_content.messenger = mock_messenger
+        registry_with_content.content.get_sheet_field = mocker.Mock(return_value=True)
+        return registry_with_content
 
     @fixture
     def event(self, request_, registry, context):
@@ -73,6 +74,20 @@ class TestSendActivityNotificationEmails:
         self.call_fut(event)
         assert not mock_messenger.send_activity_mail.called
 
+    def test_ignore_if_disabled_for_follower(self, event, activity,
+                                             mock_catalogs, followable,
+                                             mock_messenger, search_result,
+                                             mocker):
+        activity = activity._replace(target=followable)
+        event.activities = [activity]
+        user = testing.DummyResource()
+        event.request.registry.content.get_sheet_field = \
+            mocker.Mock(return_value=False)
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
+        self.call_fut(event)
+        assert not mock_messenger.send_activity_mail.called
+
     def test_send_activity_to_target_followers(self, event, activity,
                                                mock_catalogs, followable,
                                                mock_messenger, search_result):
@@ -88,7 +103,10 @@ class TestSendActivityNotificationEmails:
     def test_send_activity_to_object_followers(self, event, activity,
                                              mock_catalogs, followable,
                                              mock_messenger, search_result):
-        activity = activity._replace(object=followable)
+        from adhocracy_core.sheets.description import IDescription
+        sheet_data = [{IDescription: {}}]
+        activity = activity._replace(object=followable,
+                                     sheet_data=sheet_data)
         event.activities = [activity]
         user = testing.DummyResource()
         mock_catalogs.search.return_value = search_result._replace(
@@ -122,6 +140,34 @@ class TestSendActivityNotificationEmails:
         comment = testing.DummyResource(__provides__=IComment)
 
         activity = activity._replace(object=comment)
+        event.activities = [activity]
+        user = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
+        self.call_fut(event)
+        assert not mock_messenger.send_activity_mail.called
+
+    def test_ignore_if_transition(self, event, activity, mock_catalogs,
+                                  mock_messenger, search_result, followable):
+        from adhocracy_core.interfaces import ActivityType
+        activity = activity._replace(object=followable,
+                                     type=ActivityType.transition)
+        event.activities = [activity]
+        user = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
+        self.call_fut(event)
+        assert not mock_messenger.send_activity_mail.called
+
+    def test_ignore_if_workflow_assignment_update(
+            self, event, activity, mock_catalogs, mock_messenger,
+            search_result, followable):
+        from adhocracy_core.interfaces import ActivityType
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        sheet_data = [{IWorkflowAssignment: {}}]
+        activity = activity._replace(object=followable,
+                                     type=ActivityType.update,
+                                     sheet_data=sheet_data)
         event.activities = [activity]
         user = testing.DummyResource()
         mock_catalogs.search.return_value = search_result._replace(

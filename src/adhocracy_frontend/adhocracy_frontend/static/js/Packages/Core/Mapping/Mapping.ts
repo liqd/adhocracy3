@@ -372,6 +372,7 @@ export class MapListingController {
 
         var map = this.leaflet.map(mapElement[0]);
         this.leaflet.tileLayer(this.adhConfig.map_tile_url, this.adhConfig.map_tile_options).addTo(map);
+        map.attributionControl.setPrefix("<a target=\"_blank\" href=\"http://www.leafletjs.com\">Leaflet</a>");
 
         this.$scope.polygon = this.leaflet.polygon(this.leaflet.GeoJSON.coordsToLatLngs(this.$scope.rawPolygon), this.adhMapData.style);
         this.$scope.polygon.addTo(map);

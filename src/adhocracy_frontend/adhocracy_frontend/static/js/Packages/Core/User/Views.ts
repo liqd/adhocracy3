@@ -29,9 +29,11 @@ import * as SIEmailNew from "../../../Resources_/adhocracy_core/sheets/principal
 import * as SIHasAssetPool from "../../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
 import * as SIImageReference from "../../../Resources_/adhocracy_core/sheets/image/IImageReference";
 import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SINotification from "../../../Resources_/adhocracy_core/sheets/notification/INotification";
 import * as SIPasswordAuthentication from "../../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication";
 import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SIUserBasic from "../../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
+import * as SIUserExtended from "../../../Resources_/adhocracy_core/sheets/principal/IUserExtended";
 
 var pkgLocation = "/Core/User";
 
@@ -101,7 +103,10 @@ export interface IScopeLogin extends angular.IScope {
     enableCancel : boolean;
     cancel : () => void;
     logIn : () => angular.IPromise<void>;
+    logInWithServiceKonto : () => void;
     showError;
+    serviceKontoEnabled : boolean;
+    serviceKontoHelpUrl : string;
 }
 
 
@@ -212,7 +217,8 @@ export var loginDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhEmbed : AdhEmbed.Service,
     adhPermissions : AdhPermissions.Service,
-    adhShowError
+    adhShowError,
+    $window : angular.IWindowService
 ) => {
     return {
         restrict: "E",
@@ -221,6 +227,8 @@ export var loginDirective = (
         link: (scope : IScopeLogin) => {
             scope.errors = [];
             scope.supportEmail = adhConfig.support_email;
+            scope.serviceKontoEnabled = !!adhConfig.service_konto_login_url;
+            scope.serviceKontoHelpUrl = adhConfig.service_konto_help_url;
             scope.showError = adhShowError;
 
             adhPermissions.bindScope(scope, "/principals/users");
@@ -241,17 +249,39 @@ export var loginDirective = (
                  adhTopLevelState.goToCameFrom("/");
             };
 
+            var handleErrors = (errors) => {
+                bindServerErrors(scope, errors);
+                scope.credentials.password = "";
+                scope.loginForm.$setPristine();
+            };
+
+            scope.logInWithServiceKonto = () => {
+                var popup;
+
+                var handler = (event) => {
+                    var message = JSON.parse(event.data);
+
+                    if (message.name === "serviceKontoToken" && event.origin === $window.location.origin) {
+                        adhUser.logInWithServiceKonto(message.data.token).then(() => {
+                            adhTopLevelState.goToCameFrom("/", true);
+                        }, handleErrors);
+
+                        popup.close();
+                        $window.removeEventListener("message", handler);
+                    }
+                };
+
+                $window.addEventListener("message", handler);
+                popup = $window.open(adhConfig.service_konto_login_url, "_blank", "width=1000,height=750");
+            };
+
             scope.logIn = () => {
                 return adhUser.logIn(
                     scope.credentials.nameOrEmail,
                     scope.credentials.password
                 ).then(() => {
                     adhTopLevelState.goToCameFrom("/", true);
-                }, (errors) => {
-                    bindServerErrors(scope, errors);
-                    scope.credentials.password = "";
-                    scope.loginForm.$setPristine();
-                });
+                }, handleErrors);
             };
         }
     };
@@ -738,8 +768,9 @@ var postEdit = (
         name : string;
         email? : string;
         password? : string;
-        anonymize? : boolean;
         passwordOld? : string;
+        anonymize? : boolean;
+        notificationsEnabled? : boolean;
     }
 ) => {
     return adhHttp.get(path).then((oldUser) => {
@@ -752,7 +783,7 @@ var postEdit = (
                 name: data.name,
             });
         }
-        if (data.email) {
+        if (data.email !== SIUserExtended.get(oldUser).email) {
             SIEmailNew.set(patch, {
                 email: data.email,
             });
@@ -764,6 +795,10 @@ var postEdit = (
         }
         SIAnonymizeDefault.set(patch, {
             anonymize: data.anonymize,
+        });
+        SINotification.set(patch, {
+            follow_resources: SINotification.get(oldUser).follow_resources,
+            email_notification_enabled: data.notificationsEnabled,
         });
         return adhHttp.put(oldUser.path, patch, {
             password: data.passwordOld
@@ -797,9 +832,11 @@ export var userEditDirective = (
                     adhHttp.get(path).then((user) => {
                         scope.data = {
                             name: SIUserBasic.get(user).name,
-                            email: "",
+                            email: SIUserExtended.get(user).email,
                             password: "",
                             anonymize: SIAnonymizeDefault.get(user).anonymize,
+                            followablesExist: !!SINotification.get(user).follow_resources.length,
+                            notificationsEnabled: SINotification.get(user).email_notification_enabled
                         };
                     });
                 }

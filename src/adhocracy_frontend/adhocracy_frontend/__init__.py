@@ -64,6 +64,10 @@ def config_view(request):
         'adhocracy.frontend.piwik_track_user_id', 'false'))
     config['profile_images_enabled'] = asbool(settings.get(
         'adhocracy.frontend.profile_images_enabled', 'true'))
+    config['service_konto_login_url'] = settings.get(
+        'adhocracy.frontend.service_konto_login_url')
+    config['service_konto_help_url'] = settings.get(
+        'adhocracy.frontend.service_konto_help_url')
     config['map_tile_url'] = settings.get(
         'adhocracy.frontend.map_tile_url',
         'http://{s}.tile.osm.org/{z}/{x}/{y}.png')
@@ -158,6 +162,13 @@ def adhocracy_sdk_view(request):
     return FileResponse(path, request=request)
 
 
+def service_konto_finish_view(request):
+    """View that passes a service konto token back to adhocracy."""
+    path = pkg_resources.resource_filename('adhocracy_frontend',
+                                           'build/ServiceKontoFinish.html')
+    return FileResponse(path, request=request)
+
+
 def includeme(config):
     """Add routing and static view to deliver the frontend application."""
     config.include('pyramid_cachebust')
@@ -187,6 +198,9 @@ def includeme(config):
     # AdhocracySDK shall not be cached the way other static files are cached
     config.add_route('adhocracy_sdk', 'AdhocracySDK.js')
     config.add_view(adhocracy_sdk_view, route_name='adhocracy_sdk')
+    config.add_route('service_konto_finish', 'service_konto_finish')
+    config.add_view(service_konto_finish_view,
+                    route_name='service_konto_finish')
     config.add_static_view('static', 'adhocracy_frontend:build/',
                            cache_max_age=cache_max_age)
     config.add_subscriber(add_cors_headers, NewResponse)

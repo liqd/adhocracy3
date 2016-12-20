@@ -6,6 +6,7 @@ import * as AdhCommentModule from "./Comment/Module";
 import * as AdhConfigModule from "./Config/Module";
 import * as AdhCrossWindowMessagingModule from "./CrossWindowMessaging/Module";
 import * as AdhDateTimeModule from "./DateTime/Module";
+import * as AdhDebateWorkbenchModule from "./DebateWorkbench/Module";
 import * as AdhDocumentModule from "./Document/Module";
 import * as AdhDoneModule from "./Done/Module";
 import * as AdhEmbedModule from "./Embed/Module";
@@ -48,6 +49,7 @@ export var register = (angular, config, metaApi) => {
     AdhConfigModule.register(angular, config);
     AdhCrossWindowMessagingModule.register(angular);
     AdhDateTimeModule.register(angular);
+    AdhDebateWorkbenchModule.register(angular);
     AdhDocumentModule.register(angular);
     AdhDoneModule.register(angular);
     AdhEmbedModule.register(angular);

@@ -51,7 +51,7 @@ describe("ratings", function() {
         expect(rate.element(by.css(".rate-contra")).getText()).toEqual("1");
     });
 
-    it("is not affected by the edition of the comment", function() {
+    xit("is not affected by the edition of the comment", function() {
         var page = new EmbeddedCommentsPage("c2").get();
         var comment = page.createComment("c4");
         var rate = page.getRateWidget(comment);

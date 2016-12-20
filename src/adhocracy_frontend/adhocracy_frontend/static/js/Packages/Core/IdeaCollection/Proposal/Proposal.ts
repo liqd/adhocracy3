@@ -203,8 +203,8 @@ var postCreate = (
     scope : IScope,
     poolPath : string
 ) => {
-    var proposalClass = scope.processProperties.itemClass;
-    var proposalVersionClass = scope.processProperties.versionClass;
+    var proposalClass = scope.processProperties.proposalClass;
+    var proposalVersionClass = scope.processProperties.proposalVersionClass;
 
     var proposal : ResourcesBase.IResource = {
         path: adhPreliminaryNames.nextPreliminary(),
@@ -237,7 +237,7 @@ var postEdit = (
     scope : IScope,
     oldVersion
 ) => {
-    var proposalVersionClass = scope.processProperties.versionClass;
+    var proposalVersionClass = scope.processProperties.proposalVersionClass;
 
     var proposalVersion : ResourcesBase.IResource = {
         path: adhPreliminaryNames.nextPreliminary(),

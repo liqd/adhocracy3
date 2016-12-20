@@ -27,10 +27,9 @@ export var register = (angular) => {
             AdhResourceAreaModule.moduleName,
         ])
         .config(["adhResourceAreaProvider", "adhConfig", (adhResourceAreaProvider: AdhResourceArea.Provider, adhConfig) => {
-            AdhIdeaCollectionWorkbench.registerCommonRoutesFactory(
-                RIIdeaCollectionProcess, RIGeoProposal, RIGeoProposalVersion)()(adhResourceAreaProvider);
-            AdhIdeaCollectionWorkbench.registerProposalRoutesFactory(
-                RIIdeaCollectionProcess, RIGeoProposal, RIGeoProposalVersion, true)()(adhResourceAreaProvider);
+            var registerRoutes = AdhIdeaCollectionWorkbench.registerRoutesFactory(
+                RIIdeaCollectionProcess, RIGeoProposal, RIGeoProposalVersion, true);
+            registerRoutes()(adhResourceAreaProvider);
 
             var processHeaderSlot = adhConfig.pkg_path + AdhIdeaCollectionWorkbench.pkgLocation + "/ProcessHeaderSlot.html";
             adhResourceAreaProvider.processHeaderSlots[processType] = processHeaderSlot;
@@ -40,16 +39,13 @@ export var register = (angular) => {
                 "<adh-idea-collection-workbench data-process-properties=\"processProperties\">" +
                 "</adh-idea-collection-workbench>";
             adhProcessProvider.setProperties(processType, {
-                createSlot: adhConfig.pkg_path + AdhIdeaCollectionProposal.pkgLocation + "/CreateSlot.html",
                 detailSlot: adhConfig.pkg_path + AdhIdeaCollectionProposal.pkgLocation + "/DetailSlot.html",
-                editSlot: adhConfig.pkg_path + AdhIdeaCollectionProposal.pkgLocation + "/EditSlot.html",
                 hasAuthorInListItem: true,
                 hasCommentColumn: true,
                 hasDescription: true,
-                hasImage: true,
                 hasLocation: true,
-                itemClass: RIGeoProposal,
-                versionClass: RIGeoProposalVersion
+                proposalClass: RIGeoProposal,
+                proposalVersionClass: RIGeoProposalVersion
             });
         }])
         .config(["adhNamesProvider", (adhNamesProvider : AdhNames.Provider) => {
