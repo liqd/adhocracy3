@@ -4,6 +4,8 @@ from logging.config import fileConfig
 from os import path
 from signal import signal
 from signal import SIGTERM
+import pkg_resources
+import yaml
 import logging
 import os
 import sys
@@ -130,7 +132,12 @@ def _read_config(config_file: str) -> ConfigParser:
 
 
 def _get_zodb_database(config: ConfigParser) -> dict:
-    zodb_uri = config['app:main']['zodbconn.uri']
+    yaml_config_package_file = config['app:main']['yaml.location']
+    package, filename = yaml_config_package_file.split(':')
+    yaml_config_file = pkg_resources.resource_filename(package, filename)
+    with open(yaml_config_file, 'r') as stream:
+        yaml_config = yaml.load(stream)
+        zodb_uri = yaml_config['configurator']['zodbconn']['uri']
     logger.info('Getting ZEO database on {}'.format(zodb_uri))
     storage_factory, dbkw = resolve_uri(zodb_uri)
     storage = storage_factory()
