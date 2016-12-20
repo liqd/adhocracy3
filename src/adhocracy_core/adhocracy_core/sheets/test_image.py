@@ -91,14 +91,13 @@ class TestGetAssetChoices:
         assert self.call_fut(pool, None) == []
 
     def test_get_asset_choices_from_assets_service(self, pool, request_,
-                                                   service):
+                                                   service, rest_url):
         from .image import IImageMetadata
         service['image'] = testing.DummyResource(__provides__=IImageMetadata)
         service['no_image'] = testing.DummyResource()
         pool['assets'] = service
         choices = self.call_fut(pool, request_)
-        assert choices == [('http://example.com/assets/image/',
-                            '/assets/image')]
+        assert choices == [(rest_url + '/assets/image/', '/assets/image')]
 
 
 class TestPictureUrlValidator:

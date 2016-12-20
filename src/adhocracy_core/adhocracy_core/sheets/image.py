@@ -8,6 +8,7 @@ from substanced.util import find_service
 import requests
 
 from adhocracy_core.interfaces import Dimensions
+from adhocracy_core.interfaces import API_ROUTE_NAME
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.sheets.asset import AssetMetadataSchema
@@ -91,7 +92,9 @@ def get_asset_choices(context, request) -> []:
     if assets is None:
         return []
     target_isheet = ImageReference.getTaggedValue('target_isheet')
-    choices = [(request.resource_url(asset), resource_path(asset))
+    choices = [(request.resource_url(asset,
+                                     route_name=API_ROUTE_NAME),
+                resource_path(asset))
                for asset in assets.values()
                if target_isheet.providedBy(asset)]
     return choices

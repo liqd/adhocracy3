@@ -281,23 +281,23 @@ class TestResourceResponseSchema:
         from adhocracy_core.rest.schemas import ResourceResponseSchema
         return ResourceResponseSchema()
 
-    def test_serialize_no_appstruct(self, kw, request_):
+    def test_serialize_no_appstruct(self, kw, rest_url):
         inst = self.make_one().bind(**kw)
         wanted = {'content_type': IResource.__identifier__,
-                  'path': request_.application_url + '/',
+                  'path': rest_url,
                   'updated_resources': {'changed_descendants': [],
                           'created': [],
                           'modified': [],
                           'removed': []}}
         assert inst.serialize() == wanted
 
-    def test_serialize_with_appstruct(self, kw, context, request_):
+    def test_serialize_with_appstruct(self, kw, context, rest_url):
         inst = self.make_one().bind(**kw)
         context['child'] = testing.DummyResource()
         wanted = {'content_type': ISheet.__identifier__,
-                  'path': request_.application_url + '/child/',
+                  'path': rest_url + '/child/',
                   'updated_resources': {'changed_descendants': [],
-                          'created': [request_.application_url + '/child/'],
+                          'created': [rest_url + '/child/'],
                           'modified': [],
                           'removed': []}}
         assert inst.serialize({'content_type': ISheet,
@@ -323,13 +323,13 @@ class TestItemResponseSchema:
                                     creating=None)
         assert inst.serialize()['first_version_path'] == None
 
-    def test_serialize_with_appstruct(self, request_, context):
+    def test_serialize_with_appstruct(self, request_, context, rest_url):
         inst = self.make_one().bind(request=request_,
                                     context=context,
                                     creating=None)
         context['child'] = testing.DummyResource()
         result = inst.serialize({'first_version_path': context['child']})
-        assert result['first_version_path'] == request_.application_url + '/child/'
+        assert result['first_version_path'] == rest_url + '/child/'
 
 
 class TestPOSTResourceRequestSchema:
@@ -475,7 +475,8 @@ class TestPOSTItemRequestSchema:
                           'root_versions': []}
 
     def test_deserialize_with_root_versions(self, inst, request_, version):
-        root_version_path = request_.resource_url(version)
+        from adhocracy_core.interfaces import API_ROUTE_NAME
+        root_version_path = request_.resource_url(version, route_name=API_ROUTE_NAME)
         result = inst.deserialize({'content_type': IResource.__identifier__,
                                    'data': {},
                                    'root_versions': [root_version_path]})

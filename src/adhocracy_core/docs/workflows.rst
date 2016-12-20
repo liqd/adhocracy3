@@ -33,7 +33,7 @@ State transitions can have a callable to execute arbitrary tasks.
 
 The MetaAPI gives us the states and transitions metadata for each workflow::
 
-    >>> resp = app_god.get('http://localhost/meta_api').json
+    >>> resp = app_god.get('/meta_api').json
     >>> workflow = resp['workflows']['sample']
 
 State metadata contains a human readable title::
@@ -151,5 +151,5 @@ Filtering Pools allow to search for resource with specific workflow state:
 
     >>> resp_data = app_god.get('/', {'workflow_state': 'frozen'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/process/']
+    ['.../process/']
 

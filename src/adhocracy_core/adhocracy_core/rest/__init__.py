@@ -4,6 +4,7 @@ from adhocracy_core.authentication import validate_user_headers
 from adhocracy_core.authentication import validate_anonymize_header
 from adhocracy_core.authentication import validate_password_header
 from adhocracy_core.caching import set_cache_header
+from adhocracy_core.interfaces import API_ROUTE_NAME
 from adhocracy_core.rest.schemas import validate_request_data
 from adhocracy_core.rest.schemas import validate_visibility
 
@@ -15,6 +16,7 @@ class api_view(view_config):  # noqa
     the following defaults are set::
 
         renderer='json'
+        route_name=API_ROUTE_NAME,
         decorator = [validate_user_headers,
                      validate_anonymize_header,
                      validate_visibility,
@@ -59,6 +61,7 @@ class api_view(view_config):  # noqa
 
     def _create_view_settings(self, wrapped, info) -> dict:
         settings = {'renderer': 'json',
+                    'route_name': API_ROUTE_NAME,
                     'decorator': [validate_user_headers,
                                   validate_anonymize_header,
                                   validate_password_header,
@@ -78,6 +81,10 @@ class api_view(view_config):  # noqa
 
 def includeme(config):  # pragma: no cover
     """Include all rest views configuration."""
+    settings = config.registry.settings
+    api_prefix = settings.get('adhocracy.api_prefix', '/api')
+    api_pattern = api_prefix + '*traverse'
+    config.add_route(API_ROUTE_NAME, api_pattern)
     config.include('.views')
     config.include('.batchview')
     config.add_request_method(lambda x: [], name='errors', reify=True)

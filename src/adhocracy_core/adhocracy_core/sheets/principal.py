@@ -13,6 +13,7 @@ from deform.widget import SelectWidget
 import requests
 
 from adhocracy_core.interfaces import ISheet
+from adhocracy_core.interfaces import API_ROUTE_NAME
 from adhocracy_core.interfaces import ISheetRequirePassword
 from substanced.interfaces import IUserLocator
 from adhocracy_core.interfaces import SheetToSheet
@@ -252,7 +253,7 @@ def get_group_choices(context, request) -> []:
     if groups is None:
         return []
     target_isheet = PermissionsGroupsReference.getTaggedValue('target_isheet')
-    choices = [(request.resource_url(group), name)
+    choices = [(request.resource_url(group, route_name=API_ROUTE_NAME), name)
                for name, group in groups.items()
                if target_isheet.providedBy(group)]
     return choices

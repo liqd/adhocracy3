@@ -37,7 +37,7 @@ workers = 2
 [websockets]
 port = 8081
 pid_file = var/WS_TEST_SERVER.pid
-rest_url = http://localhost:9080
+rest_url = http://localhost:9080/api
 
 # Begin logging configuration
 

@@ -4,6 +4,7 @@ from logging import getLogger
 from pyramid.httpexceptions import HTTPException
 from pyramid.httpexceptions import HTTPClientError
 
+from adhocracy_core.interfaces import API_ROUTE_NAME
 from adhocracy_core.rest.exceptions import handle_error_x0x_exception
 from adhocracy_core.rest.exceptions import handle_error_40x_exception
 from adhocracy_core.rest.exceptions import handle_error_500_exception
@@ -232,7 +233,8 @@ class BatchView:
         instrospector = self.request.registry.introspector
         for view in instrospector.get_category('views'):
             context = view['introspectable']['context']
-            if context == error.__class__:
+            route_name = view['introspectable']['route_name']
+            if context == error.__class__ and route_name == API_ROUTE_NAME:
                 error_view = view['introspectable']['callable']
                 break
         return error_view

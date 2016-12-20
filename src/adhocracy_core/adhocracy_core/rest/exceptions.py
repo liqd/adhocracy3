@@ -14,6 +14,7 @@ from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
 
+from adhocracy_core.interfaces import API_ROUTE_NAME
 from adhocracy_core.authentication import UserTokenHeader
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
 from adhocracy_core.interfaces import error_entry
@@ -68,6 +69,7 @@ class JSONHTTPClientError(HTTPClientError):
 @view_config(
     context=Exception,
     permission=NO_PERMISSION_REQUIRED,
+    route_name=API_ROUTE_NAME,
 )
 def handle_error_500_exception(error, request):
     """Return 500 JSON error."""
@@ -84,6 +86,7 @@ def handle_error_500_exception(error, request):
 @view_config(
     context=HTTPException,
     permission=NO_PERMISSION_REQUIRED,
+    route_name=API_ROUTE_NAME,
 )
 def handle_error_x0x_exception(error, request):
     """Return HTTPError."""
@@ -93,6 +96,7 @@ def handle_error_x0x_exception(error, request):
 @view_config(
     context=HTTPClientError,
     permission=NO_PERMISSION_REQUIRED,
+    route_name=API_ROUTE_NAME,
 )
 def handle_error_40x_exception(error, request):
     """Return JSON error for generic HTTPClientErrors.
@@ -115,6 +119,7 @@ def handle_error_40x_exception(error, request):
 @view_config(
     context=Invalid,
     permission=NO_PERMISSION_REQUIRED,
+    route_name=API_ROUTE_NAME,
 )
 def handle_error_400_colander_invalid(invalid, request):
     """Return JSON error for colander.Invalid errors."""
@@ -125,6 +130,7 @@ def handle_error_400_colander_invalid(invalid, request):
 @view_config(
     context=HTTPBadRequest,
     permission=NO_PERMISSION_REQUIRED,
+    route_name=API_ROUTE_NAME,
 )
 def handle_error_400_bad_request(error, request):
     """Return 400 JSON error with filtered error messages."""
@@ -190,6 +196,7 @@ def _get_filtered_request_headers(request) -> []:
 @view_config(
     context=AutoUpdateNoForkAllowedError,
     permission=NO_PERMISSION_REQUIRED,
+    route_name=API_ROUTE_NAME,
 )
 def handle_error_400_auto_update_no_fork_allowed(error, request):
     """Return 400 JSON error for the internal "No Fork allowed" error.
@@ -213,6 +220,7 @@ def handle_error_400_auto_update_no_fork_allowed(error, request):
 @view_config(
     context=URLDecodeError,
     permission=NO_PERMISSION_REQUIRED,
+    route_name=API_ROUTE_NAME,
 )
 def handle_error_400_url_decode_error(error, request):
     """
@@ -228,6 +236,7 @@ def handle_error_400_url_decode_error(error, request):
 
 @view_config(context=HTTPGone,
              permission=NO_PERMISSION_REQUIRED,
+             route_name=API_ROUTE_NAME,
              )
 def handle_error_410_exception(error, request):
     """Add json body with explanation to 410 errors."""

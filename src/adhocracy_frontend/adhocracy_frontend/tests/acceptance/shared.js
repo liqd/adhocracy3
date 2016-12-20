@@ -5,7 +5,7 @@ var MailParser = require("mailparser").MailParser;
 var fs = require("fs");
 var EC = protractor.ExpectedConditions;
 
-var restUrl = "http://localhost:9080/";
+var restUrl = "http://localhost:9080/api/";
 
 
 var hasClass = function (element, cls) {

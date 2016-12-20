@@ -42,7 +42,7 @@ class TestEmbedCodeConfigAdapter:
 
     @mark.usefixtures('integration')
     def test_get_config_for_process(self, request_, registry,
-                                    mocker):
+                                    mocker, rest_url):
         from .process import IProcess
         from adhocracy_core.sheets.embed import IEmbedCodeConfig
         context = testing.DummyResource(__provides__=IProcess)
@@ -52,7 +52,7 @@ class TestEmbedCodeConfigAdapter:
                                           IEmbedCodeConfig)
         assert result == {'sdk_url': 'http://localhost:6551/AdhocracySDK.js',
                           'frontend_url': 'http://localhost:6551',
-                          'path': 'http://example.com/',
+                          'path': rest_url,
                           'widget': 'plain',
                           'autoresize': 'false',
                           'locale': 'en',

@@ -13,11 +13,12 @@ Some imports to work with rest api calls::
 
 Start Adhocracy testapp ::
 
+    >>> log = getfixture('log')
     >>> anonymous = getfixture('app_anonymous')
     >>> participant = getfixture('app_participant')
     >>> moderator = getfixture('app_moderator')
     >>> admin = getfixture('app_admin')
-    >>> log = getfixture('log')
+    >>> rest_url = getfixture('rest_url')
 
 Message to a User
 -----------------
@@ -25,11 +26,11 @@ Message to a User
 The end point '/message_user' can be used to send messages from a user to
 another user or a group of users::
 
-    >>> data = {'recipient': 'http://localhost/principals/users/0000000',
+    >>> data = {'recipient': rest_url + '/principals/users/0000000',
     ...         'title': 'Important notice regarding your Adhocracy account',
     ...         'text': '''Everything is fine.
     ... Thank you for your attention and have a nice day.'''}
-    >>> resp = participant.post('http://localhost/message_user', data)
+    >>> resp = participant.post('/message_user', data)
     >>> resp.status_code
     200
     >>> resp.text
@@ -56,11 +57,11 @@ message is sent back.
 If a user doesn't have the necessary permissions (e.g. because they are not
 logged in), the backend responds with 403 Forbidden::
 
-    >>> data= {'recipient': 'http://localhost/principals/users/0000000',
+    >>> data= {'recipient': rest_url + '/principals/users/0000000',
     ...        'title': 'Important notice regarding your Adhocracy account',
     ...        'text': '''Everything is fine.
     ... Thanks you for your attention and have a nice day.'''}
-    >>> resp = anonymous.post('http://localhost/message_user', data)
+    >>> resp = anonymous.post('/message_user', data)
     >>> resp.status_code
     403
 
@@ -89,7 +90,7 @@ The end point '/message_all' can be used to send messages from a user to
 
     >> data = {'title': 'Call for participation',
     ...        'text': 'With great power comes great responsibility!'}
-    >> resp = moderator.post('http://localhost/message_all', data)
+    >> resp = moderator.post('/message_all', data)
     >> resp.status_code
     200
     >> resp.text
@@ -107,6 +108,6 @@ The backend responds with an empty string or an error message, as above.
 
     ...>>> data = {'title': 'Call for participation',
     ......        'text': 'With great power comes great responsibility!'}
-    ...>>> resp = moderator.post("./../message_all", data)
+    ...>>> resp = moderator.post('./../message_all', data)
     ...>>> resp.text
     ...403

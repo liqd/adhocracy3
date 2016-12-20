@@ -99,7 +99,7 @@ port = 6541
 port = 6561
 pid_file = var/WS_SERVER.pid
 # The URL prefix to let the websocket server create/resolve resource urls
-rest_url = http://localhost:6541
+rest_url = http://localhost:6541/api
 
 # Begin logging configuration
 

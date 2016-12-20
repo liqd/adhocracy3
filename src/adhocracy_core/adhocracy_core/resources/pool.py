@@ -103,7 +103,7 @@ class Pool(Base, Folder):
         """
         subresource = self[name]
         registry = registry or get_current_registry(self)
-        if send_events:
+        if send_events:  # pragma: no branch
             event = ResourceWillBeDeleted(object=subresource,
                                           parent=self,
                                           registry=registry)

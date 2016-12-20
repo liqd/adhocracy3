@@ -17,6 +17,7 @@ import colander
 from adhocracy_core.authentication import UserPasswordHeader
 from adhocracy_core.authentication import UserTokenHeader
 from adhocracy_core.authentication import AnonymizeHeader
+from adhocracy_core.interfaces import API_ROUTE_NAME
 from adhocracy_core.authorization import is_password_required_to_edit_some
 from adhocracy_core.authorization import is_password_required_to_edit
 from adhocracy_core.interfaces import IResource
@@ -506,7 +507,9 @@ class BadgeAssignmentsRESTView(PoolRESTView):
             if IBadgeAssignment.__identifier__ not in info['data']:
                 continue
             assignables = get_assignable_badges(self.context, self.request)
-            urls = [self.request.resource_url(x) for x in assignables]
+            urls = [self.request.resource_url(x, route_name=API_ROUTE_NAME)
+                    for x in assignables]
+            # TODO: use colander schema to create cstruct
             info['data'][IBadgeAssignment.__identifier__] =\
                 {'badge': urls}
         return cstruct
@@ -815,7 +818,7 @@ def _get_api_auth_data(headers: [tuple], request: IRequest, user: IResource)\
         -> dict:
     token_headers = dict([(x, y) for x, y in headers if x == UserTokenHeader])
     token = token_headers[UserTokenHeader]
-    user_url = request.resource_url(user)
+    user_url = request.resource_url(user, route_name=API_ROUTE_NAME)
     # TODO: use colander schema to create cstruct
     return {'status': 'success',
             'user_path': user_url,
