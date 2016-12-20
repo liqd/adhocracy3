@@ -14,6 +14,7 @@ def test_set_response_header_set_x_frame_options_if_no_api_request(request_,
     from .subscriber import set_response_headers
     mock_route.name = 'route_name'
     request_.matched_route = mock_route
+    request_.path = '/manage'
     response = testing.DummyResource(headers={})
     event = testing.DummyResource(response=response,
                                   request=request_)
@@ -23,8 +24,22 @@ def test_set_response_header_set_x_frame_options_if_no_api_request(request_,
 
 def test_set_response_header_set_cors_header_if_api_request(request_,
                                                              mocker):
+    from adhocracy_core.interfaces import API_ROUTE_NAME
     from .subscriber import set_response_headers
-    request_.matched_route = None
+    request_.matched_route = API_ROUTE_NAME
+    mock = mocker.patch('adhocracy_core.rest.subscriber.add_cors_headers')
+    response = testing.DummyResource(headers={})
+    event = testing.DummyResource(response=response,
+                                  request=request_)
+    set_response_headers(event)
+    mock.assert_called_with(event)
+
+
+def test_set_response_header_set_cors_header_if_root_request(request_,
+                                                              mocker):
+    """Needed to make CORS Preflight requests work."""
+    from .subscriber import set_response_headers
+    request_.path = '/'
     mock = mocker.patch('adhocracy_core.rest.subscriber.add_cors_headers')
     response = testing.DummyResource(headers={})
     event = testing.DummyResource(response=response,

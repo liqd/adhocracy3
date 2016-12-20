@@ -70,12 +70,12 @@ The organization for the B-Plan needs to exist beforehand in the a3
 platform.
 
     >>> from webtest import TestApp
+    >>> rest_url = 'http://localhost/api'
     >>> app_router = getfixture('app_router')
     >>> testapp = TestApp(app_router)
-    >>> resp = testapp.post_json('/login_username',
+    >>> resp = testapp.post_json(rest_url + '/login_username',
     ...                          {'name': 'admin', 'password': 'password'})
     >>> admin_header = {'X-User-Token': resp.json['user_token']}
-    >>> rest_url = 'http://localhost'
 
     >>> data = {'content_type':
     ...                'adhocracy_core.resources.organisation.IOrganisation',
@@ -101,7 +101,7 @@ A working image url is needed to test referencing external images.
 
     >>> data = {'name': 'god',
     ...         'password': 'password'}
-    >>> resp = testapp.post_json('/login_username', data)
+    >>> resp = testapp.post_json(rest_url + '/login_username', data)
     >>> resp.status_code
     200
     >>> user_token = resp.json['user_token']
@@ -141,7 +141,7 @@ The username here is just an example, please use your credentials.
     ...             'adhocracy_core.sheets.embed.IEmbed':
     ...                 {'external_url': 'http://embedding-url.com'}
     ...             }}
-    >>> resp = testapp.post_json('/orga/', data, headers=auth_header)
+    >>> resp = testapp.post_json(rest_url + '/orga/', data, headers=auth_header)
     >>> resp.status_code
     200
 
@@ -150,7 +150,7 @@ required fields.
 
 **Get the workflow state**::
 
-    >>> resp = testapp.get('/orga/1-23/', headers=auth_header)
+    >>> resp = testapp.get(rest_url + '/orga/1-23/', headers=auth_header)
     >>> resp.status_code
     200
     >>> resp.json['data'] \
@@ -165,10 +165,10 @@ required fields.
     ...             'adhocracy_core.sheets.workflow.IWorkflowAssignment':
     ...                 {'workflow_state': 'announce'}
     ...             }}
-    >>> resp = testapp.put_json('/orga/1-23/', data, headers=auth_header)
+    >>> resp = testapp.put_json(rest_url + '/orga/1-23/', data, headers=auth_header)
     >>> resp.status_code
     200
-    >>> resp = testapp.get('/orga/1-23/', headers=auth_header)
+    >>> resp = testapp.get(rest_url + '/orga/1-23/', headers=auth_header)
     >>> resp.status_code
     200
     >>> resp.json['data'] \
@@ -179,7 +179,7 @@ required fields.
 
 **Get the HTML code snipped to embed the bplan and its external URL**::
 
-    >>> resp = testapp.get('/orga/1-23/', headers=auth_header)
+    >>> resp = testapp.get(rest_url + '/orga/1-23/', headers=auth_header)
     >>> resp.status_code
     200
     >>> embed_code = (resp.json['data'] \
@@ -193,7 +193,7 @@ required fields.
                             });
     </script>
     <div class="adhocracy_marker"
-         data-path="http://localhost/orga/1-23/"
+         data-path="http://localhost/api/orga/1-23/"
          data-widget="mein-berlin-bplaene-proposal-embed"
          data-autoresize="false"
          data-locale="en"
@@ -217,7 +217,7 @@ E.g. Changing the description::
     ...             'adhocracy_core.sheets.description.IDescription':
     ...                 {'description': 'Updated description'}
     ...             }}
-    >>> resp = testapp.put_json('/orga/1-23', data, headers=auth_header)
+    >>> resp = testapp.put_json(rest_url + '/orga/1-23', data, headers=auth_header)
     >>> resp.status_code
     200
 
@@ -231,6 +231,6 @@ E.g. Changing the participation dates::
     ...                    'start_date': '2016-03-03T12:00:09'},
     ...                   {'name': 'closed', 'description': 'test',
     ...                    'start_date': '2016-05-01T12:00:09'}]}}}
-    >>> resp = testapp.put_json('/orga/1-23', data, headers=auth_header)
+    >>> resp = testapp.put_json(rest_url + '/orga/1-23', data, headers=auth_header)
     >>> resp.status_code
     200

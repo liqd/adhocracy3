@@ -304,7 +304,6 @@ class TestHTTPCacheStrategyStrongAdapter:
 
 @fixture
 def integration(config):
-    config.include('adhocracy_core.rest.exceptions')
     config.include('adhocracy_core.caching')
 
 
@@ -366,7 +365,10 @@ class TestIntegrationCaching:
         assert resp.headers['X-Caching-Mode'] == 'no_cache'
 
     def test_strategy_and_error_is_raised_no_header_is_modified(self, app_user):
-        resp = app_user.get('/?error=True', status=400)
+        from adhocracy_core.rest.exceptions import JSONHTTPClientError
+        with raises(JSONHTTPClientError) as error:
+            app_user.get('/?error=True')
+        resp = error.value
         assert 'X-Caching-Strategy' not in resp.headers
 
     def test_strategy_not_registered_no_header_is_modified(self, app_user):
@@ -402,11 +404,13 @@ class TestIntegrationCaching:
     def test_strategy_not_modified_if_modified_since_request(self, app_user,
                                                              context):
         from datetime import datetime
+        from pyramid.httpexceptions import HTTPNotModified
         from . import HTTPCacheStrategyWeakAdapter
         HTTPCacheStrategyWeakAdapter.last_modified = True
         context.modification_date = datetime(2000, 1, 23)
-        resp = app_user.get('/', status=304, headers={'If-Modified-Since':
-                                                      'Fri, 23 Jan 2000 00:00:00 GMT'})
+        with raises(HTTPNotModified) as error:
+            app_user.get('/', headers={'If-Modified-Since': 'Fri, 23 Jan 2000 00:00:00 GMT'})
+        resp = error.value
         assert resp.status == '304 Not Modified'
 
     def test_strategy_ok_if_modified_since_request_without_modification_date(
@@ -415,8 +419,11 @@ class TestIntegrationCaching:
         assert resp.status == '200 OK'
 
     def test_strategy_not_modified_if_none_match_request(self, app_user):
-        resp = app_user.get('/', status=304, headers={'If-None-Match':
+        from pyramid.httpexceptions import  HTTPNotModified
+        with raises(HTTPNotModified) as error:
+            app_user.get('/', status=304, headers={'If-None-Match':
                                                       'None|None|None|None|None'})
+        resp = error.value
         assert resp.status == '304 Not Modified'
 
     def test_strategy_ok_if_none_match_request_without_etag(self, app_user):

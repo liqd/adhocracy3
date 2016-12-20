@@ -287,12 +287,12 @@ class TestS1Workflow:
         next_states = get_next_states(app_participant, '/s1/proposal_0000001')
         assert next_states == []
 
-    def test_select_everybody_can_list_voteable_proposals(self, app_participant):
+    def test_select_everybody_can_list_voteable_proposals(self, app_participant, rest_url):
         from adhocracy_core.sheets.pool import IPool
         resp = app_participant.get('/s1', {'workflow_state': 'voteable'})
         assert resp.json['data'][IPool.__identifier__]['elements'] == \
-             ['http://localhost/s1/proposal_0000000/',
-              'http://localhost/s1/proposal_0000001/']
+             [rest_url + '/s1/proposal_0000000/',
+              rest_url + '/s1/proposal_0000001/']
 
     def test_change_state_to_result(self, app_initiator):
         resp = do_transition_to(app_initiator, '/s1', 'result')
@@ -346,7 +346,7 @@ class TestS1Workflow:
             '/s1/proposal_0000002/rates')
 
     def test_result_everybody_can_list_proposals_used_for_this_meeting(
-            self, app_participant):
+            self, app_participant, rest_url):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
         from adhocracy_core.sheets.pool import IPool
         resp = app_participant.get('/s1')
@@ -355,8 +355,8 @@ class TestS1Workflow:
         decision_date = datas[0]['start_date']
         resp = app_participant.get('/s1', {'decision_date': decision_date})
         assert resp.json['data'][IPool.__identifier__]['elements'] == \
-             ['http://localhost/s1/proposal_0000000/',
-              'http://localhost/s1/proposal_0000001/']
+             [rest_url + '/s1/proposal_0000000/',
+              rest_url + '/s1/proposal_0000001/']
 
     def test_change_state_to_propose_again(self, app_initiator):
         resp = do_transition_to(app_initiator, '/s1', 'propose')
@@ -383,17 +383,18 @@ class TestS1Workflow:
         assert resp.status_code == 200
 
     def test_result_everybody_can_list_proposals_used_for_this_meeting_again(
-            self, app_participant):
+            self, app_participant, rest_url):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
         from adhocracy_core.sheets.pool import IPool
+
         resp = app_participant.get('/s1')
         state_data = resp.json['data'][IWorkflowAssignment.__identifier__]['state_data']
         datas = [x for x in state_data if x['name'] == 'result']
         decision_date = datas[0]['start_date']
         resp = app_participant.get('/s1', {'decision_date': decision_date})
         assert resp.json['data'][IPool.__identifier__]['elements'] == \
-             ['http://localhost/s1/proposal_0000002/',
-              'http://localhost/s1/proposal_0000003/']
+             [rest_url + '/s1/proposal_0000002/',
+              rest_url + '/s1/proposal_0000003/']
 
 
 @mark.usefixtures('integration')

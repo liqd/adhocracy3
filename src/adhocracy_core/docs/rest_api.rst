@@ -16,21 +16,13 @@ Some imports to work with rest api calls::
     >>> import requests
     >>> from pprint import pprint
 
-Start Adhocracy testapp::
+Start Adhocracy testapp and login admin::
 
-    >>> from webtest import TestApp
     >>> log = getfixture('log')
-    >>> app_router = getfixture('app_router')
-    >>> testapp = TestApp(app_router)
-    >>> rest_url = 'http://localhost'
-
-Login::
-
-   >>> data = {'name': 'admin',
-   ...         'password': 'password'}
-   >>> resp = testapp.post_json(rest_url + '/login_username', data).json
-   >>> admin_header = {'X-User-Token': resp['user_token']}
-   >>> admin_path = resp['user_path']
+    >>> app_admin = getfixture('app_admin')
+    >>> rest_url = getfixture('rest_url')
+    >>> rest_url
+    'http://localhost/api'
 
 .. _api-resource-structure:
 
@@ -108,7 +100,7 @@ Global Info
 The dedicated prefix defaults to "/meta_api/", but can be customized. The
 result is a JSON object with two main keys, "resources" and "sheets"::
 
-    >>> resp_data = testapp.get("/meta_api/").json
+    >>> resp_data = app_admin.get('/meta_api/').json
     >>> sorted(resp_data.keys())
     ['resources', 'sheets', 'workflows']
 
@@ -258,7 +250,7 @@ Returns possible methods for this resource, example request/response data
 structures and available interfaces with resource data. The result is a
 JSON object that has the allowed request methods as keys::
 
-    >>> resp_data = testapp.options(rest_url + "/", headers=admin_header).json
+    >>> resp_data = app_admin.options('/').json
     >>> sorted(resp_data.keys())
     ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
 
@@ -283,7 +275,7 @@ the actual response body that will be returned::
 GET request. "data" points to an object whose keys are the property sheets
 that are part of the returned resource. The corresponding values will be
 filled during actual GET requests; the stub contains just empty objects
-("{}") instead.
+('{}') instead.
 
 If the current user has the right to post new versions of the resource or
 add new details to it, the "request_body" sub-key returned for POST points
@@ -296,7 +288,7 @@ to a array of stub views of allowed requests::
     ...                            'adhocracy_core.sheets.description.IDescription': {},
     ...                            'adhocracy_core.sheets.image.IImageReference': {},
     ...                            'adhocracy_core.sheets.workflow.IWorkflowAssignment': {}}}
-    >>> data_post_pool in resp_data["POST"]["request_body"]
+    >>> data_post_pool in resp_data['POST']['request_body']
     True
 
 The "response_body" sub-key again gives a stub view of the response
@@ -333,7 +325,7 @@ HEAD
 
 Returns only http headers::
 
-    >>> resp = testapp.head(rest_url + "/adhocracy")
+    >>> resp = app_admin.head('/adhocracy')
     >>> resp.headerlist
     [...('Content-Type', 'application/json; charset=UTF-8'), ...
     >>> resp.text
@@ -349,8 +341,8 @@ GET
 
 Returns resource and child elements meta data and all sheet with data::
 
-    >>> resp_data = testapp.get(rest_url + "/").json
-    >>> pprint(resp_data["data"])
+    >>> resp_data = app_admin.get('/').json
+    >>> pprint(resp_data['data'])
     {...'adhocracy_core.sheets.metadata.IMetadata': ...
 
 POST
@@ -360,8 +352,8 @@ Create a new resource ::
 
     >>> prop = {'content_type': 'adhocracy_core.resources.process.IProcess',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'Documents'}}}
-    >>> resp_data = testapp.post_json(rest_url + "/", prop, headers=admin_header).json
-    >>> resp_data["content_type"]
+    >>> resp_data = app_admin.post('/', prop).json
+    >>> resp_data['content_type']
     'adhocracy_core.resources.process.IProcess'
 
 The response object has 3 top-level entries:
@@ -382,12 +374,12 @@ The response object has 3 top-level entries:
   transaction::
 
       >>> sorted(resp_data['updated_resources']['created'])
-      ['http://localhost/Documents/', 'http://localhost/Documents/assets/', 'http://localhost/Documents/badges/']
+      ['.../', '.../Documents/assets/', '.../Documents/badges/']
 
   The subkey 'modified' lists any resources that have been modified::
 
       >>> sorted(resp_data['updated_resources']['modified'])
-      ['http://localhost/', 'http://localhost/principals/users/...']
+      ['...', '.../principals/users/00...']
 
   Modifications also include that case that a reference from another
   resource has been added or removed, since references are often exposed in
@@ -410,7 +402,7 @@ The response object has 3 top-level entries:
   transaction (see "Filtering Pools" document below)::
 
       >>> sorted(resp_data['updated_resources']['changed_descendants'])
-      ['http://localhost/', 'http://localhost/principals/', 'http://localhost/principals/users/']
+      ['...', '.../principals/', '.../principals/users/']
 
 
 PUT
@@ -423,15 +415,15 @@ Modify data of an existing resource ::
 
 ...    >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
 ...    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'youdidntexpectthis'}}}
-...    >>> resp_data = testapp.put_json(rest_url + "/Documents", data, headers=admin_header).json
+...    >>> resp_data = app_admin.put_json('/Documents', data).json
 ...    >>> pprint(resp_data)
 ...    {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
-...     'path': rest_url + '/Documents'}
+...     'path': '/Documents'}
 
 Check the changed resource ::
 
-...   >>> resp_data = testapp.get(rest_url + "/Documents").json
-...   >>> resp_data["data"]["adhocracy_core.sheets.name.IName"]["name"]
+...   >>> resp_data = app_admin.get('/Documents').json
+...   >>> resp_data['data']['adhocracy_core.sheets.name.IName']['name']
 ...   'youdidntexpectthis'
 
 FIXME: write test cases for attributes with "create_mandatory",
@@ -458,7 +450,7 @@ The normal return code is 200 ::
     >>> data = {'content_type': 'adhocracy_core.resources.process.IProcess',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'Documents'}}}
 
-.. >>> testapp.put_json(rest_url + "/Documents", data, headers=admin_header)
+.. >>> app_admin.put_json('/Documents', data)
 .. 200 OK application/json ...
 
 If you submit invalid data the return error code is 400 ::
@@ -466,7 +458,7 @@ If you submit invalid data the return error code is 400 ::
     >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
     ...         'data': {'adhocracy_core.sheets.example.WRONGINTERFACE': {'name': 'Documents'}}}
 
-.. >>> testapp.put_json(rest_url + "/Documents", data, headers=admin_header)
+.. >>> app_admin.put_json('/Documents', data)
 .. Traceback (most recent call last):
 .. ...
 .. {"errors": [{"description": ...
@@ -558,8 +550,8 @@ Create a Document (a subclass of Item which pools DocumentVersions) ::
     >>> pdag = {'content_type': 'adhocracy_core.resources.document.IDocument',
     ...         'data': {},
     ...         }
-    >>> resp = testapp.post_json(rest_url + "/Documents", pdag, headers=admin_header)
-    >>> pdag_path = resp.json["path"]
+    >>> resp = app_admin.post('/Documents', pdag)
+    >>> pdag_path = resp.json['path']
     >>> pdag_path
     '.../Documents/document_0000000/'
 
@@ -578,7 +570,7 @@ sheet ITags.
 
 The Document has the IVersions and ITags interfaces to work with Versions::
 
-    >>> resp = testapp.get(pdag_path)
+    >>> resp = app_admin.get(pdag_path)
     >>> resp.json['data']['adhocracy_core.sheets.versions.IVersions']['elements']
     ['.../Documents/document_0000000/VERSION_0000000/']
 
@@ -594,7 +586,7 @@ Update
 
 Fetch the first Document version, it is empty ::
 
-    >>> resp = testapp.get(pvrs0_path)
+    >>> resp = app_admin.get(pvrs0_path)
     >>> pprint(resp.json['data']['adhocracy_core.sheets.document.IDocument'])
     {'elements': []}
 
@@ -612,8 +604,8 @@ Create a new version of the proposal that follows the first version ::
     ...                  'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [pvrs0_path]}},
     ...          'root_versions': [pvrs0_path]}
-    >>> resp = testapp.post_json(pdag_path, pvrs, headers=admin_header)
-    >>> pvrs1_path = resp.json["path"]
+    >>> resp = app_admin.post(pdag_path, pvrs)
+    >>> pvrs1_path = resp.json['path']
     >>> pvrs1_path != pvrs0_path
     True
 
@@ -623,7 +615,7 @@ Add and update child resource
 We expect certain Versionable fields for the rest of this test suite
 to work ::
 
-    >>> resp = testapp.get('/meta_api')
+    >>> resp = app_admin.get('/meta_api')
     >>> vers_fields = resp.json['sheets']['adhocracy_core.sheets.versions.IVersionable']['fields']
     >>> pprint(sorted(vers_fields, key=itemgetter('name')))
     [{'containertype': 'list',
@@ -643,18 +635,18 @@ Create a Section item inside the Document item ::
     >>> sdag = {'content_type': 'adhocracy_core.resources.paragraph.IParagraph',
     ...         'data': {}
     ...         }
-    >>> resp = testapp.post_json(pdag_path, sdag, headers=admin_header)
-    >>> sdag_path = resp.json["path"]
-    >>> svrs0_path = resp.json["first_version_path"]
+    >>> resp = app_admin.post(pdag_path, sdag)
+    >>> sdag_path = resp.json['path']
+    >>> svrs0_path = resp.json['first_version_path']
 
 and a second Section ::
 
     >>> sdag = {'content_type': 'adhocracy_core.resources.paragraph.IParagraph',
     ...         'data': {}
     ...         }
-    >>> resp = testapp.post_json(pdag_path, sdag, headers=admin_header)
-    >>> s2dag_path = resp.json["path"]
-    >>> s2vrs0_path = resp.json["first_version_path"]
+    >>> resp = app_admin.post(pdag_path, sdag)
+    >>> s2dag_path = resp.json['path']
+    >>> s2vrs0_path = resp.json['first_version_path']
 
 Create a third Document version and add the two Sections in their
 initial versions ::
@@ -666,8 +658,8 @@ initial versions ::
     ...                     'follows': [pvrs1_path],}
     ...                 },
     ...          'root_versions': [pvrs1_path]}
-    >>> resp = testapp.post_json(pdag_path, pvrs, headers=admin_header)
-    >>> pvrs2_path = resp.json["path"]
+    >>> resp = app_admin.post(pdag_path, pvrs)
+    >>> pvrs2_path = resp.json['path']
 
 If we create a second version of kapitel1 ::
 
@@ -682,7 +674,7 @@ If we create a second version of kapitel1 ::
     ...          },
     ...          'root_versions': [pvrs2_path]
     ...         }
-    >>> resp = testapp.post_json(sdag_path, svrs, headers=admin_header)
+    >>> resp = app_admin.post(sdag_path, svrs)
     >>> svrs1_path = resp.json['path']
     >>> svrs1_path != svrs0_path
     True
@@ -697,7 +689,7 @@ The 'root_versions' set allows automatical updates of items that embedding
 or otherwise linking to the updated item. In this case, a fourth Document
 version is automatically created along with the updated Section version::
 
-    >>> resp = testapp.get(pdag_path)
+    >>> resp = app_admin.get(pdag_path)
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersions'])
     {'count': '4',
      'elements': ['.../Documents/document_0000000/VERSION_0000000/',
@@ -705,7 +697,7 @@ version is automatically created along with the updated Section version::
                   '.../Documents/document_0000000/VERSION_0000002/',
                   '.../Documents/document_0000000/VERSION_0000003/']}
 
-    >>> resp = testapp.get(rest_url + '/Documents/document_0000000/VERSION_0000003')
+    >>> resp = app_admin.get('/Documents/document_0000000/VERSION_0000003')
     >>> pvrs3_path = resp.json['path']
 
     >>> s2vrs1_path = resp.json['path']
@@ -727,7 +719,7 @@ and pvrs2 (both contain s2vrs0_path)::
     ...          },
     ...          'root_versions': []
     ...         }
-    >>> resp = testapp.post_json(s2dag_path, svrs, headers=admin_header, status=400)
+    >>> resp = app_admin.post(s2dag_path, svrs)
     >>> pprint(resp.json['errors'][0])
     {'description': 'No fork allowed - The auto update ...
 
@@ -743,11 +735,11 @@ But if we set the `root_version` to the last  Document version (pvrs3)::
     ...          },
     ...          'root_versions': [pvrs3_path]
     ...         }
-    >>> resp = testapp.post_json(s2dag_path, svrs, headers=admin_header)
+    >>> resp = app_admin.post(s2dag_path, svrs)
 
 a new version pvrs4 is automatically created following only pvrs3, not pvrs2::
 
-    >>> resp = testapp.get(pdag_path)
+    >>> resp = app_admin.get(pdag_path)
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersions'])
     {'count': '5',
      'elements': ['.../Documents/document_0000000/VERSION_0000000/',
@@ -756,12 +748,12 @@ a new version pvrs4 is automatically created following only pvrs3, not pvrs2::
                   '.../Documents/document_0000000/VERSION_0000003/',
                   '.../Documents/document_0000000/VERSION_0000004/']}
 
-    >>> resp = testapp.get(rest_url + '/Documents/document_0000000/VERSION_0000004')
+    >>> resp = app_admin.get('/Documents/document_0000000/VERSION_0000004')
     >>> pvrs4_path = resp.json['path']
     >>> resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['follows']
     [.../Documents/document_0000000/VERSION_0000003/']
 
-    >>> resp = testapp.get(rest_url + '/Documents/document_0000000/VERSION_0000003')
+    >>> resp = app_admin.get('/Documents/document_0000000/VERSION_0000003')
     >>> resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['follows']
     [.../Documents/document_0000000/VERSION_0000002/']
 
@@ -778,7 +770,7 @@ Tags
 
 Each Versionable has a FIRST tag that points to the initial version::
 
-    >>> resp = testapp.get(rest_url + '/Documents/document_0000000')
+    >>> resp = app_admin.get('/Documents/document_0000000')
     >>> pprint(resp.json['data']['adhocracy_core.sheets.tags.ITags']['FIRST'])
     '.../Documents/document_0000000/VERSION_0000000/'
 
@@ -858,13 +850,13 @@ To give an example, *Comments* only allow a linear version history (just a
 single heads). Lets create a comment with an initial version (see below
 for more on comments and *post pools*)::
 
-    >>> resp = testapp.get('/Documents/document_0000000/VERSION_0000004')
+    >>> resp = app_admin.get('/Documents/document_0000000/VERSION_0000004')
     >>> commentable = resp.json['data']['adhocracy_core.sheets.comment.ICommentable']
     >>> post_pool_path = commentable['post_pool']
     >>> comment = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...            'data': {}}
-    >>> resp = testapp.post_json(post_pool_path, comment, headers=admin_header)
-    >>> comment_path = resp.json["path"]
+    >>> resp = app_admin.post(post_pool_path, comment)
+    >>> comment_path = resp.json['path']
     >>> first_commvers_path = resp.json['first_version_path']
     >>> first_commvers_path
     '.../Documents/document_0000000/comments/comment_000.../VERSION_0000000/'
@@ -880,7 +872,7 @@ version as predecessor::
     ...                 'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [first_commvers_path]}},
     ...             'root_versions': [first_commvers_path]}
-    >>> resp = testapp.post_json(comment_path, commvers, headers=admin_header)
+    >>> resp = app_admin.post(comment_path, commvers)
     >>> snd_commvers_path = resp.json['path']
     >>> snd_commvers_path
     '.../Documents/document_0000000/comments/comment_000.../VERSION_0000001/'
@@ -888,7 +880,7 @@ version as predecessor::
 However, if we try to add another version that *also* gives the first
 version (no longer head) as predecessor, we get an error::
 
-    >>> resp_data = testapp.post_json(comment_path, commvers, status=400, headers=admin_header).json
+    >>> resp_data = app_admin.post(comment_path, commvers).json
     >>> pprint(resp_data)
     {'errors': [{'description': 'No fork allowed ...
                  'location': 'body',
@@ -911,7 +903,7 @@ To give another example of a versionable content type, we can write comments
 about proposals.
 The proposal has a commentable sheet::
 
-    >>> resp = testapp.get(pvrs4_path)
+    >>> resp = app_admin.get(pvrs4_path)
     >>> commentable = resp.json['data']['adhocracy_core.sheets.comment.ICommentable']
 
 This sheet has a special field :term:`post_pool` referencing a pool::
@@ -922,8 +914,8 @@ We can post comments to this pool only::
 
     >>> comment = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...            'data': {}}
-    >>> resp = testapp.post_json(post_pool_path, comment, headers=admin_header)
-    >>> comment_path = resp.json["path"]
+    >>> resp = app_admin.post(post_pool_path, comment)
+    >>> comment_path = resp.json['path']
     >>> comment_path
     '.../Documents/document_0000000/comments/comment_000...'
     >>> first_commvers_path = resp.json['first_version_path']
@@ -942,7 +934,7 @@ another version to say something meaningful. A comment contains *content*
     ...                 'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [first_commvers_path]}},
     ...             'root_versions': [first_commvers_path]}
-    >>> resp = testapp.post_json(comment_path, commvers, headers=admin_header)
+    >>> resp = app_admin.post(comment_path, commvers)
     >>> snd_commvers_path = resp.json['path']
     >>> snd_commvers_path
     '.../Documents/document_0000000/comments/comment_000.../VERSION_0000001/'
@@ -952,8 +944,8 @@ it's also possible to write a comment about another comment::
 
     >>> metacomment = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...                 'data': {}}
-    >>> resp = testapp.post_json(post_pool_path, metacomment, headers=admin_header)
-    >>> metacomment_path = resp.json["path"]
+    >>> resp = app_admin.post(post_pool_path, metacomment)
+    >>> metacomment_path = resp.json['path']
     >>> metacomment_path
     '.../Documents/document_0000000/comments/comment_000...'
     >>> comment_path != metacomment_path
@@ -972,7 +964,7 @@ As usual, we have to add another version to actually say something::
     ...                     'adhocracy_core.sheets.versions.IVersionable': {
     ...                         'follows': [first_metacommvers_path]}},
     ...                 'root_versions': [first_metacommvers_path]}
-    >>> resp = testapp.post_json(metacomment_path, metacommvers, headers=admin_header)
+    >>> resp = app_admin.post(metacomment_path, metacommvers)
     >>> snd_metacommvers_path = resp.json['path']
     >>> snd_metacommvers_path
     '.../Documents/document_0000000/comments/comment_000.../VERSION_0000001/'
@@ -981,7 +973,7 @@ As usual, we have to add another version to actually say something::
 Let view all the comments referring to the proposal with a query on
 the comments pool::
 
-    >>> resp_data = testapp.get(post_pool_path,
+    >>> resp_data = app_admin.get(post_pool_path,
     ...     params={'content_type': 'adhocracy_core.resources.comment.ICommentVersion',
     ...             'depth': 2}).json
     >>> commvers = resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
@@ -991,7 +983,7 @@ the comments pool::
 Since comments can refer to other comments, we can also find out which
 other comments refer to this comment version::
 
-    >>> resp_data = testapp.get(post_pool_path,
+    >>> resp_data = app_admin.get(post_pool_path,
     ...     params={'content_type': 'adhocracy_core.resources.comment.ICommentVersion',
     ...             'adhocracy_core.sheets.comment.IComment:refers_to': snd_commvers_path,
     ...             'depth': 2}).json
@@ -1007,7 +999,7 @@ We can rate objects that provide the `adhocracy_core.sheets.rate.IRateable`
 sheet (or a subclass of it), e.g. comment versions. Rateables have their own
 post pool, so we ask the comment where to send rates about it::
 
-    >>> resp = testapp.get(snd_commvers_path)
+    >>> resp = app_admin.get(snd_commvers_path)
     >>> rateable_post_pool = resp.json['data']['adhocracy_core.sheets.rate.IRateable']['post_pool']
 
 `IRate` objects are versionable too, so we first have to create a `IRate`
@@ -1015,19 +1007,19 @@ resource and then post a `IRateVersion` resource below it::
 
     >>> rate = {'content_type': 'adhocracy_core.resources.rate.IRate',
     ...         'data': {}}
-    >>> resp = testapp.post_json(rateable_post_pool, rate, headers=admin_header)
-    >>> rate_path = resp.json["path"]
+    >>> resp = app_admin.post(rateable_post_pool, rate)
+    >>> rate_path = resp.json['path']
     >>> first_ratevers_path = resp.json['first_version_path']
     >>> ratevers = {'content_type': 'adhocracy_core.resources.rate.IRateVersion',
     ...             'data': {
     ...                 'adhocracy_core.sheets.rate.IRate': {
-    ...                     'subject': admin_path,
+    ...                     'subject': app_admin.user_path,
     ...                     'object': snd_commvers_path,
     ...                     'rate': '1'},
     ...                 'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [first_ratevers_path]}},
     ...             'root_versions': [first_ratevers_path]}
-    >>> resp = testapp.post_json(rate_path, ratevers, headers=admin_header)
+    >>> resp = app_admin.post(rate_path, ratevers)
     >>> snd_ratevers_path = resp.json['path']
     >>> snd_ratevers_path
     '...Documents/document_0000000/rates/rate_0000000/VERSION_0000001/'
@@ -1037,7 +1029,7 @@ If we want to change our rate, we can post a new version::
     >>> ratevers['data']['adhocracy_core.sheets.rate.IRate']['rate'] = '0'
     >>> ratevers['data']['adhocracy_core.sheets.versions.IVersionable']['follows'] = [snd_ratevers_path]
     >>> ratevers['root_versions'] = [snd_ratevers_path]
-    >>> resp = testapp.post_json(rate_path, ratevers, headers=admin_header)
+    >>> resp = app_admin.post(rate_path, ratevers)
     >>> third_ratevers_path = resp.json['path']
     >>> third_ratevers_path != snd_ratevers_path
     True
@@ -1045,13 +1037,12 @@ If we want to change our rate, we can post a new version::
 But creating a second rate is not allowed to prevent people from voting
 multiple times::
 
-    >>> resp = testapp.post_json(rateable_post_pool, rate, headers=admin_header)
-    >>> rate2_path = resp.json["path"]
+    >>> resp = app_admin.post(rateable_post_pool, rate)
+    >>> rate2_path = resp.json['path']
     >>> first_rate2vers_path = resp.json['first_version_path']
     >>> ratevers['data']['adhocracy_core.sheets.versions.IVersionable']['follows'] = [first_rate2vers_path]
     >>> ratevers['root_versions'] = [first_rate2vers_path]
-    >>> resp_data = testapp.post_json(rate2_path, ratevers, headers=admin_header,
-    ...                               status=400).json
+    >>> resp_data = app_admin.post(rate2_path, ratevers).json
     >>> resp_data['errors'][0]['name']
     'data.adhocracy_core.sheets.rate.IRate.object'
     >>> resp_data['errors'][0]['description']
@@ -1062,11 +1053,10 @@ multiple times::
 The *subject* of a rate must always be the user that is currently logged in --
 it's not possible to vote for other users::
 
-    >>> ratevers['data']['adhocracy_core.sheets.rate.IRate']['subject'] = 'http://localhost/principals/users/0000005/'
+    >>> ratevers['data']['adhocracy_core.sheets.rate.IRate']['subject'] = '/principals/users/0000005/'
     >>> ratevers['data']['adhocracy_core.sheets.versions.IVersionable']['follows'] = [third_ratevers_path]
     >>> ratevers['root_versions'] = [third_ratevers_path]
-    >>> resp_data = testapp.post_json(rate_path, ratevers, headers=admin_header,
-    ...                               status=400).json
+    >>> resp_data = app_admin.post(rate_path, ratevers).json
     >>> resp_data['errors'][0]['name']
     'data.adhocracy_core.sheets.rate.IRate.subject'
     >>> resp_data['errors'][0]['description']
@@ -1130,7 +1120,7 @@ omitted or left empty. ::
 
     >>> encoded_request_with_name = {
     ...     'method': 'POST',
-    ...     'path': rest_url + '/Proposal/document_0000000',
+    ...     'path': '/Proposal/document_0000000',
     ...     'body': { 'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraph' },
     ...     'result_path': '@par1_item',
     ...     'result_first_version_path': '@par1_item/v1'
@@ -1195,7 +1185,7 @@ Let's add some more paragraphs to the second document above ::
 
 The batch response is a dictionary with two fields::
 
-    >>> batch_resp = testapp.post_json(batch_url, batch, headers=admin_header).json
+    >>> batch_resp = app_admin.post(batch_url, batch).json
     >>> sorted(batch_resp)
     ['responses', 'updated_resources']
 
@@ -1206,9 +1196,9 @@ requests in the batch request. If the batch requests doesn't contain any such
 requests (only GET etc.), all of its sub-entries will be empty. ::
 
     >>> updated_resources = batch_resp['updated_resources']
-    >>> 'http://localhost/Documents/' in updated_resources['changed_descendants']
+    >>> rest_url + '/Documents/' in updated_resources['changed_descendants']
     True
-    >>> 'http://localhost/Documents/document_0000000/PARAGRAPH_0000002/' in updated_resources['created']
+    >>> rest_url + '/Documents/document_0000000/PARAGRAPH_0000002/' in updated_resources['created']
     True
 
 Lets inspect some of the responses. The 'code' field contains the HTTP status
@@ -1251,17 +1241,17 @@ The follow reference points to None:
 
 The LAST tag should point to the last version we created within the batch request::
 
-    >>> resp_data = testapp.get(rest_url + "/Documents/document_0000000/PARAGRAPH_0000002").json
+    >>> resp_data = app_admin.get('/Documents/document_0000000/PARAGRAPH_0000002').json
     >>> resp_data['data']['adhocracy_core.sheets.tags.ITags']['LAST']
     '.../Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/'
 
 All creation and modification dates are equal for one batch request:
 
-    >>> pdag_metadata = testapp.get(pdag_path).json['data']['adhocracy_core.sheets.metadata.IMetadata']
+    >>> pdag_metadata = app_admin.get(pdag_path).json['data']['adhocracy_core.sheets.metadata.IMetadata']
     >>> pv0_path =  batch_resp['responses'][0]['body']['first_version_path']
-    >>> pv0_metadata = testapp.get(pv0_path).json['data']['adhocracy_core.sheets.metadata.IMetadata']
+    >>> pv0_metadata = app_admin.get(pv0_path).json['data']['adhocracy_core.sheets.metadata.IMetadata']
     >>> pv1_path =  batch_resp['responses'][0]['body']['path']
-    >>> pv1_metadata = testapp.get(pv1_path).json['data']['adhocracy_core.sheets.metadata.IMetadata']
+    >>> pv1_metadata = app_admin.get(pv1_path).json['data']['adhocracy_core.sheets.metadata.IMetadata']
     >>> pv0_metadata['creation_date'] \
     ... == pv0_metadata['modification_date']\
     ... == pv1_metadata['creation_date']\
@@ -1297,8 +1287,7 @@ the paragraph will not be present in the database ::
     ...             'result_path': '@par2_item/v2'
     ...           }
     ...         ]
-    >>> invalid_batch_resp = testapp.post_json(batch_url, invalid_batch,
-    ...                                        status=400, headers=admin_header).json
+    >>> invalid_batch_resp = app_admin.post(batch_url, invalid_batch).json
     >>> pprint(sorted(invalid_batch_resp['updated_resources']))
     ['changed_descendants', 'created', 'modified', 'removed']
     >>> pprint(invalid_batch_resp['responses'])
@@ -1309,7 +1298,7 @@ the paragraph will not be present in the database ::
      {'body': {'errors': [...],
                'status': 'error'},
       'code': 400}]
-    >>> get_nonexistent_obj = testapp.get(invalid_batch_resp['responses'][0]['body']['path'], status=404)
+    >>> get_nonexistent_obj = app_admin.get(invalid_batch_resp['responses'][0]['body']['path'])
     >>> get_nonexistent_obj.status
     '404 Not Found'
 
@@ -1328,7 +1317,7 @@ Filtering Pools / Search
 By default resources with IPool sheets do not list the child elements but
 only the `count`:
 
-    >>> resp_data = testapp.get('/Documents/document_0000000/comments/').json
+    >>> resp_data = app_admin.get('/Documents/document_0000000/comments/').json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
     {'count': '3', 'elements': []}
 
@@ -1338,22 +1327,22 @@ only the `count`:
 To list child elements you have to do a search query with `elements=paths`
  (see below for more detailed examples):
 
-    >>> resp_data = testapp.get('/Documents/document_0000000/comments',
+    >>> resp_data = app_admin.get( '/Documents/document_0000000/comments',
     ...     params={'elements': 'paths'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
     {'count': '3',
-     'elements': ['http://localhost...]}
+     'elements': ['http://...]}
 
 It is possible to filter and aggregate the elements listed in the IPool sheet
 by additional GET parameters. For example, we can only retrieve children
 that have specific resource type (`content_type`):
 
-    >>> resp_data = testapp.get('/Documents/document_0000000',
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
     ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraph'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/PARAGRAPH_0000000/',
-     'http://localhost/Documents/document_0000000/PARAGRAPH_0000001/',
-     'http://localhost/Documents/document_0000000/PARAGRAPH_0000002/']
+    ['.../Documents/document_0000000/PARAGRAPH_0000000/',
+     '.../Documents/document_0000000/PARAGRAPH_0000001/',
+     '.../Documents/document_0000000/PARAGRAPH_0000002/']
 
 Note that multiple filters are combined by AND. If we specify a content_type
 filter and a sheet filter, only the elements matched by *both* filters will be
@@ -1364,62 +1353,62 @@ parameter value. The available comparators depend on the choosedn filter.
 
 *eq* 'equal to' is the default comparator we already used implicit::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000',
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
     ...     params={'content_type': '["eq", "adhocracy_core.resources.paragraph.IParagraph"]'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/PARAGRAPH_0000000/'...
+    ['.../Documents/document_0000000/PARAGRAPH_0000000/'...
 
 *noteq* not equal to::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000',
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
     ...     params={'content_type': '["noteq", "adhocracy_core.resources.paragraph.IParagraph"]'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/VERSION_0000000/',...
+    ['.../Documents/document_0000000/VERSION_0000000/',...
 
 *gt* greater then::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000/rates/',
+    >>> resp_data = app_admin.get('/Documents/document_0000000/rates/',
     ...     params={'name': '["gt", "rate_0000000"]'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/rates/rate_0000001/']
+    ['.../Documents/document_0000000/rates/rate_0000001/']
 
 *ge* greater or equal to::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000/rates/',
+    >>> resp_data = app_admin.get('/Documents/document_0000000/rates/',
     ...     params={'name': '["ge", "rate_0000000"]'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/rates/rate_0000000/',
-     'http://localhost/Documents/document_0000000/rates/rate_0000001/']
+    ['.../Documents/document_0000000/rates/rate_0000000/',
+     '.../Documents/document_0000000/rates/rate_0000001/']
 
 
 *lt* lower then::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000/rates/',
+    >>> resp_data = app_admin.get('/Documents/document_0000000/rates/',
     ...     params={'name': '["lt", "rate_0000001"]'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/rates/rate_0000000/']
+    ['.../Documents/document_0000000/rates/rate_0000000/']
 
 *le* lower or equal to::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000/rates/',
+    >>> resp_data = app_admin.get('/Documents/document_0000000/rates/',
     ...     params={'name': '["le", "rate_0000001"]'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/rates/rate_0000000/',
-     'http://localhost/Documents/document_0000000/rates/rate_0000001/']
+    ['.../Documents/document_0000000/rates/rate_0000000/',
+     '.../Documents/document_0000000/rates/rate_0000001/']
 
 Some comparators can handle a list of query values.
 
 *any*::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000/rates/',
+    >>> resp_data = app_admin.get('/Documents/document_0000000/rates/',
     ...     params={'name': '["any", ["rate_0000000", "rate_0000001"]]'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/rates/rate_0000000/',
-     'http://localhost/Documents/document_0000000/rates/rate_0000001/']
+    ['.../Documents/document_0000000/rates/rate_0000000/',
+     '.../Documents/document_0000000/rates/rate_0000001/']
 
 *notany*::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000/rates/',
+    >>> resp_data = app_admin.get('/Documents/document_0000000/rates/',
     ...     params={'name': '["notany", ["rate_0000000", "rate_0000001"]]'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     []
@@ -1430,22 +1419,22 @@ value allows also including grandchildren (depth=2) or even great-grandchildren
 (depth=3) etc. Allowed values are arbitrary positive numbers and *all*.
 *all* can be used to get nested elements of arbitrary nesting depth::
 
-    >>> resp_data = testapp.get('/Documents',
+    >>> resp_data = app_admin.get('/Documents',
     ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
     ...             'depth': 'all'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    [...'http://localhost/Documents/document_0000000/VERSION_0000001/'...]
+    [...'.../Documents/document_0000000/VERSION_0000001/'...]
 
-    >>> resp_data = testapp.get('/Documents',
+    >>> resp_data = app_admin.get('/Documents',
     ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
     ...             'depth': '2'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    [...'http://localhost/Documents/document_0000000/VERSION_0000001/'...]
+    [...'.../Documents/document_0000000/VERSION_0000001/'...]
 
 Without specifying a deeper depth, the above query for IDocumentVersions
 wouldn't have found anything, since they are children of children of the pool::
 
-    >>> resp_data = testapp.get('/Documents',
+    >>> resp_data = app_admin.get('/Documents',
     ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion'
     ...             }).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
@@ -1454,10 +1443,10 @@ wouldn't have found anything, since they are children of children of the pool::
 If you specify *sort* you can set a *<custom>* filter (see below) that supports
 sorting to sort the result::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000',
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
     ...     params={'sort': 'name'}).json
     >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
-    ['http://localhost/Documents/document_0000000/PARAGRAPH_0000000/',...
+    ['.../Documents/document_0000000/PARAGRAPH_0000000/',...
 
 *Note* All resource in the result set must have a value in the chosen sort
 filter. For example if you use *rates* you have to limit the result to resources
@@ -1465,29 +1454,28 @@ with :class:`adhocracy_core.sheets.rate.IRateable` sheet.
 
 Not supported filters cannot be used for sorting::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000',
-    ...                         params={'sort': 'path'},
-    ...                         status=400).json
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
+    ...                         params={'sort': 'path'}).json
     >>> resp_data['errors'][0]['description']
     '"path" is not one of content_type, name, text,...
 
 If *reverse* is set to ``True`` the sorting will be reversed::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000',
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
     ...     params={'sort': 'name', 'reverse': True}).json
     >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
-    ['http://localhost/Documents/document_0000000/rates/',...
+    ['.../Documents/document_0000000/rates/',...
 
 You can also specifiy a *limit* and an *offset* for pagination::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000',
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
     ...     params={'sort': 'name', 'limit': 1, 'offset': 0}).json
     >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
-    ['http://localhost/Documents/document_0000000/PARAGRAPH_0000000/']
+    ['.../Documents/document_0000000/PARAGRAPH_0000000/']
 
 The *count* is not affected by *limit*::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000',
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
     ...     params={'count': 'true', 'limit': 1}).json
     >>> child_count = resp_data['data']['adhocracy_core.sheets.pool.IPool']['count']
     >>> assert int(child_count) >= 10
@@ -1496,7 +1484,7 @@ The *elements* parameter allows controlling how matching element are
 returned. By default, 'elements' in the IPool sheet contains nothing.
 This corresponds to setting *elements=omit*
 
-    >>> resp_data = testapp.get('/Documents/document_0000000',
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
     ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
     ...             'elements': 'omit'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
@@ -1504,17 +1492,17 @@ This corresponds to setting *elements=omit*
 
 Setting *elements=paths* will yield a response with a listing of resource paths.
 
-    >>> resp_data = testapp.get('/Documents/document_0000000',
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
     ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
     ...             'elements': 'paths'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/VERSION_0000000/',...
+    ['.../Documents/document_0000000/VERSION_0000000/',...
 
 Setting *elements=content* will instead return the complete contents of all
 matching elements -- what you would get by making a GET request on each of
 their paths::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000',
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
     ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
     ...             'elements': 'content'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
@@ -1524,10 +1512,10 @@ their paths::
 
 *sheet* filter resources with a specific sheet type::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000',
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
     ...     params={'content_type': 'adhocracy_core.sheets.document.IDocument'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/VERSION_0000000/',...
+    ['.../Documents/document_0000000/VERSION_0000000/',...
 
 Valid query comparables: 'eq', 'noteq', 'lt', 'le', 'gt', 'ge', 'any', 'notany'
 
@@ -1536,13 +1524,13 @@ specific tag. Often we are only interested in the newest versions of
 Versionables. We can get them by setting *tag=LAST*. Let's find the latest
 versions of all documents::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000',
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
     ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
     ...             'depth': 'all', 'tag': 'LAST'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/PARAGRAPH_0000000/VERSION_0000001/',
-     'http://localhost/Documents/document_0000000/PARAGRAPH_0000001/VERSION_0000001/',
-     'http://localhost/Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/']
+    ['.../Documents/document_0000000/PARAGRAPH_0000000/VERSION_0000001/',
+     '.../Documents/document_0000000/PARAGRAPH_0000001/VERSION_0000001/',
+     '.../Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/']
 
 Valid query comparables: 'eq', 'noteq', 'any', 'notany'
 
@@ -1573,10 +1561,10 @@ custom filters:
   user resource url.
   Valid query comparable: 'eq'
   Supports sorting.
-    >>> resp_data = testapp.get('/Documents', params={'creator': '/principals/users/0000003'}).json
+    >>> resp_data = app_admin.get('/Documents', params={'creator': '/principals/users/0000003'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/badges/',
-     'http://localhost/Documents/document_0000000/']
+    ['.../Documents/badges/',
+     '.../Documents/document_0000000/']
 
 * *item_creation_date* the the item_creation_date value of resources with :class:`adhocracy_core.sheets.metadata.IMetadata`.
   Valid query comparable: 'eq', 'noteq', 'lt', 'le', 'gt', 'ge', 'any', 'notany'
@@ -1602,43 +1590,50 @@ reference target.
 
 First we create more paragraphs versions::
 
-    >>> pvrs0_path = 'http://localhost/Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/'
+    >>> pvrs0_path = '/Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/'
     >>> pvrs = {'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
     ...         'data': {'adhocracy_core.sheets.versions.IVersionable': {
     ...                  'follows': [pvrs0_path]}},
     ...          'root_versions': [pvrs0_path]}
-    >>> resp = testapp.post_json('http://localhost/Documents/document_0000000/PARAGRAPH_0000002',
-    ...                           pvrs, headers=admin_header)
-    >>> pvrs1_path = resp.json["path"]
+    >>> resp = app_admin.post('/Documents/document_0000000/PARAGRAPH_0000002',
+    ...                        pvrs)
+    >>> pvrs1_path = resp.json['path']
 
 Now we can search references::
-
-    >>> resp_data = testapp.get('/Documents/document_0000000',
+def get(self, path: str, params={}, extra_headers={}) -> TestResponse:
+        """Send get request to the backend rest server."""
+        url = self._build_url(path)
+        headers = copy(self.header)
+        headers.update(extra_headers)
+        resp = self.app.get(url,
+                            headers=headers,
+                            params=params,
+                            expect_errors=True)
+        return resp
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
     ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
     ...             'adhocracy_core.sheets.versions.IVersionable:follows':
-    ...             'http://localhost/Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/',
+    ...             '/Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/',
     ...             'depth': 'all', 'tag': 'LAST'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000001/']
+    ['.../Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000001/']
 
 Valid query comparable: 'eq'
 
 If the specified sheet or field doesn't exist or if the field exists but is
 not a reference field, the backend responds with an error::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000',
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
     ...     params={'adhocracy_core.sheets.NoSuchSheet:nowhere':
-    ...             'http://localhost/Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/'},
-    ...     status=400).json
+    ...             '.../Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/'}).json
     >>> resp_data['errors'][0]['description']
     'No such sheet or field'
     >>> resp_data['errors'][0]['location']
     'querystring'
 
-    >>> resp_data = testapp.get('/Documents/document_0000000',
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
     ...     params={'adhocracy_core.sheets.name.IName:name':
-    ...             'http://localhost/Documents/document_0000000/kapitel2/VERSION_0000000/'},
-    ...     status=400).json
+    ...             '.../Documents/document_0000000/kapitel2/VERSION_0000000/'}).json
     >>> resp_data['errors'][0]['description']
     'Not a reference node'
     >>> resp_data['errors'][0]['name']
@@ -1646,10 +1641,9 @@ not a reference field, the backend responds with an error::
 
 You'll also get an error if you try to filter by a catalog that doesn't exist::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000',
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
     ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
-    ...             'foocat': 'whatever'},
-    ...     status=400).json
+    ...             'foocat': 'whatever'}).json
     >>> resp_data['errors'][0]['description']
     'Unrecognized keys in mapping: "{\'foocat\': \'whatever\'}"'
 
@@ -1659,7 +1653,7 @@ to an existing filter like *aggregateby=tag*. Only index values that exist in
 the query result will be reported, i.e. the count reported for each value
 will be 1 or higher. ::
 
-    >>> resp_data = testapp.get('/Documents/document_0000000',
+    >>> resp_data = app_admin.get('/Documents/document_0000000',
     ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
     ...             'depth': 'all', 'aggregateby': 'tag'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['aggregateby'])

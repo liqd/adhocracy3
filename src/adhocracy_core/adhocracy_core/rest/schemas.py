@@ -383,7 +383,7 @@ class AbsolutePaths(SequenceSchema):
     path = AbsolutePath()
 
 
-def validate_root_versions(node: SchemaNode,  value: list):
+def validate_root_versions(node: SchemaNode,  value: list):  # pragma: no cover
     """Validate root versions."""
     for root_version in value:
         if not IItemVersion.providedBy(root_version):

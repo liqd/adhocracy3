@@ -75,6 +75,7 @@ def _post_proposal_itemversion(app_user, path='') -> TestResponse:
 
 
 @mark.functional
+@mark.usefixtures('log')
 class TestBPlanWorkflow:
 
     @fixture(scope='class')

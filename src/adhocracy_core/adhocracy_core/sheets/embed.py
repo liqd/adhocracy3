@@ -7,6 +7,7 @@ from pyramid.interfaces import IRequest
 from pyramid.renderers import render
 from zope.interface import Interface
 
+from adhocracy_core.interfaces import API_ROUTE_NAME
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.sheets import add_sheet_to_registry
@@ -30,7 +31,7 @@ def embed_code_config_adapter(context: IResource,
     settings = request.registry['config']
     frontend_url = settings.adhocracy.frontend_url
     sdk_url = os.path.join(frontend_url, 'AdhocracySDK.js')
-    path = request.resource_url(context)
+    path = request.resource_url(context, route_name=API_ROUTE_NAME)
     # TODO use frontend.locale instead
     locale = settings.configurator.pyramid.default_locale_name
     return {'sdk_url': sdk_url,

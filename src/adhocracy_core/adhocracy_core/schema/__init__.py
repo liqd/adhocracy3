@@ -51,6 +51,7 @@ from zope.interface.interfaces import IInterface
 import colander
 import pytz
 
+from adhocracy_core.interfaces import API_ROUTE_NAME
 from adhocracy_core.utils import normalize_to_tuple
 from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.utils import get_iresource
@@ -515,7 +516,8 @@ class ResourceObjectType(SchemaType):
             cstruct['data'] = sheet_cstructs
             return cstruct
         else:
-            return bindings['request'].resource_url(value)
+            return bindings['request'].resource_url(value,
+                                                    route_name=API_ROUTE_NAME)
 
     def deserialize(self, node, value):
         """Deserialize url or path to object.
@@ -543,11 +545,12 @@ class ResourceObjectType(SchemaType):
         else:
             context = node.bindings['context']
             request = node.bindings['request']
-            application_url_len = len(request.application_url)
-            if application_url_len > len(str(value)):
+            root_url = request.resource_url(request.root,
+                                            route_name=API_ROUTE_NAME)
+            root_url_len = len(root_url)
+            if root_url_len > len(str(value)):
                 raise KeyError
-            # Fixme: This does not work with :term:`virtual hosting`
-            path = value[application_url_len:]
+            path = value[root_url_len:]
             return find_resource(context, path)
 
 
@@ -1127,5 +1130,7 @@ def get_choices_by_interface(interface: IInterface,
     catalogs = find_service(context, 'catalogs')
     query = search_query._replace(interfaces=interface)
     resources = catalogs.search(query).elements
-    choices = [(request.resource_url(r), resource_path(r)) for r in resources]
+    choices = [(request.resource_url(r,
+                                     route_name=API_ROUTE_NAME),
+                resource_path(r)) for r in resources]
     return choices

@@ -232,8 +232,11 @@ def _get_root_extension_acl(context: IResource, registry: Registry) -> []:
 
 def create_fake_god_request(registry):
     """Create a fake request issued by god."""
+    from adhocracy_core.interfaces import API_ROUTE_NAME
+    from collections import namedtuple
     request = Request.blank('/dummy')
     request.registry = registry
+    request.matched_route = namedtuple('dummy', 'name')(name=API_ROUTE_NAME)
     request.__cached_principals__ = ['role:god']
     return request
 

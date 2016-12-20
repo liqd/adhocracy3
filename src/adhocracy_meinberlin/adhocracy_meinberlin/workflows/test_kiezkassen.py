@@ -73,6 +73,7 @@ def _post_proposal_item(app_user, path='') -> TestResponse:
 
 
 @mark.functional
+@mark.usefixtures('log')
 class TestKiezkassenWorkflow:
 
     def test_create_resources(self,

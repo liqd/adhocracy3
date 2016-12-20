@@ -33,6 +33,7 @@ class TestAPIView:
 
     def test_call_defaults(self, venusian):
         from pyramid.tests.test_view import call_venusian
+        from adhocracy_core.interfaces import API_ROUTE_NAME
         from adhocracy_core import authentication
         from adhocracy_core import caching
         from . import schemas
@@ -48,6 +49,7 @@ class TestAPIView:
                                schemas.validate_visibility,
                                caching.set_cache_header,
                                ],
+                'route_name': API_ROUTE_NAME,
                 'renderer': 'json',
                 'view': None,  # comes from call_venusian
                 'venusian': venusian}]

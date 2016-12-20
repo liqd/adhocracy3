@@ -393,12 +393,12 @@ class TestResourceObjectUnitTests:
         result = inst.serialize(None, colander.null)
         assert result == ''
 
-    def test_serialize_value_url_location_aware(self, context, request_, node):
+    def test_serialize_value_url_location_aware(self, context, request_, node, rest_url):
         inst = self.make_one()
         context['child'] = testing.DummyResource()
         node = node.bind(request=request_)
         result = inst.serialize(node, context['child'])
-        assert result == request_.application_url + '/child/'
+        assert result == rest_url + '/child/'
 
     def test_serialize_value_url_not_location_aware(self, request_, node):
         inst = self.make_one()
@@ -409,15 +409,19 @@ class TestResourceObjectUnitTests:
             inst.serialize(node, child)
 
     def test_serialize_value_url_location_aware_without_parent_and_name(
-            self, request_, node):
+            self, request_, node, mocker, rest_url):
+        from adhocracy_core.interfaces import API_ROUTE_NAME
         inst = self.make_one()
         child = testing.DummyResource()
         node = node.bind(request=request_)
+        mocker.spy(request_, 'resource_url')
         result = inst.serialize(node, child)
-        assert result == request_.application_url + '/'
+        request_.resource_url.assert_called_with(child,
+                                                 route_name=API_ROUTE_NAME)
+        assert result == rest_url
 
     def test_serialize_value_url_location_aware_with_serialize_to_content(
-            self, context, request_, registry, node):
+            self, context, request_, registry, node, rest_url):
         from adhocracy_core.interfaces import IResource
         inst = self.make_one(serialization_form='content')
         context['child'] = testing.DummyResource(__provides__=IResource)
@@ -428,7 +432,7 @@ class TestResourceObjectUnitTests:
         result = inst.serialize(node, context['child'])
         assert result == {'content_type': 'adhocracy_core.interfaces.IResource',
                           'data': {},
-                          'path': request_.application_url + '/child/'}
+                          'path': rest_url + '/child/'}
 
     def test_serialize_value_url_location_aware_with_serialize_to_path(
             self, context, node):
@@ -443,12 +447,12 @@ class TestResourceObjectUnitTests:
         result = inst.deserialize(node, colander.null)
         assert result == colander.null
 
-    def test_deserialize_value_url_valid_path(self, context, request_, node):
+    def test_deserialize_value_url_valid_path(self, context, request_, node, rest_url):
         inst = self.make_one()
         context['child'] = testing.DummyResource()
         node = node.bind(request=request_,
                          context=context)
-        result = inst.deserialize(node, request_.application_url + '/child')
+        result = inst.deserialize(node, rest_url + '/child')
         assert result == context['child']
 
     def test_deserialize_value_url_invalid_path_wrong_child_name(
@@ -577,18 +581,18 @@ class TestResources:
         inst = self.make_one(default=[1])
         assert inst.default == [1]
 
-    def test_serialize(self, request_, context):
+    def test_serialize(self, request_, context, rest_url):
         inst = self.make_one().bind(context=context, request=request_)
         child = testing.DummyResource()
         context['child'] = child
-        child_url = request_.resource_url(child)
+        child_url = rest_url + '/child/'
         assert inst.serialize([child]) == [child_url]
 
-    def test_deserialize(self, request_, context):
+    def test_deserialize(self, request_, context, rest_url):
         inst = self.make_one().bind(context=context, request=request_)
         child = testing.DummyResource()
         context['child'] = child
-        child_url = request_.resource_url(child)
+        child_url = rest_url + 'child'
         assert inst.deserialize([child_url]) == [child]
 
 
@@ -658,17 +662,19 @@ class TestUniqueReferences:
         assert inst.deserialize(colander.null) == []
 
     def test_valid_deserialize_with_duplication(self, request_, context):
+        from adhocracy_core.interfaces import API_ROUTE_NAME
         inst = self.make_one().bind(request=request_, context=context)
         target = context['target']
-        target_url = request_.resource_url(target)
+        target_url = request_.resource_url(target, route_name=API_ROUTE_NAME)
         assert inst.deserialize([target_url, target_url]) == [target]
 
     def test_valid_deserialize_without_duplication(self, request_, context):
+        from adhocracy_core.interfaces import API_ROUTE_NAME
         inst = self.make_one().bind(request=request_, context=context)
         target = context['target']
         target1 = context['target1']
-        target_url = request_.resource_url(target)
-        target1_url = request_.resource_url(target1)
+        target_url = request_.resource_url(target, route_name=API_ROUTE_NAME)
+        target1_url = request_.resource_url(target1, route_name=API_ROUTE_NAME)
         assert inst.deserialize([target_url, target1_url]) == [target, target1]
 
 
@@ -1452,7 +1458,7 @@ class TestChoicesByInterface:
         return get_choices_by_interface(*args)
 
     def test_create_choices(self, request_, mocker, mock_catalogs,
-                            search_result):
+                            search_result, rest_url):
         from zope.interface.interfaces import IInterface
         context = testing.DummyResource(__name__='resource')
         mocker.patch('adhocracy_core.schema.find_service',
@@ -1461,4 +1467,4 @@ class TestChoicesByInterface:
                                                                    [context])
         result = self.call_fut(IInterface, context, request_)
         assert mock_catalogs.search.call_args[0][0].interfaces == IInterface
-        assert result == [('http://example.comresource/', 'resource')]
+        assert result == [(rest_url + 'resource/', 'resource')]

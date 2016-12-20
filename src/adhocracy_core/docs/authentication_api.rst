@@ -19,11 +19,10 @@ Start adhocracy app and log in some users::
     >>> participant = getfixture('app_participant')
     >>> moderator = getfixture('app_moderator')
     >>> admin = getfixture('app_admin')
-    >>> log = getfixture('log')
 
 Test that the relevant resources and sheets exist:
 
-    >>> resp = anonymous.get("http://localhost/meta_api/").json
+    >>> resp = anonymous.get('/meta_api').json
     >>> 'adhocracy_core.sheets.versions.IVersions' in resp['sheets']
     True
     >>> 'adhocracy_core.sheets.principal.IUserBasic' in resp['sheets']
@@ -48,10 +47,10 @@ path of the new user::
     ...                  'email': 'anna@example.org'},
     ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
     ...                  'password': 'EckVocUbs3'}}}
-    >>> resp = anonymous.post("http://localhost/principals/users", data).json
-    >>> resp["content_type"]
+    >>> resp = anonymous.post('/principals/users', data).json
+    >>> resp['content_type']
     'adhocracy_core.resources.principal.IUser'
-    >>> user_path = resp["path"]
+    >>> user_path = resp['path']
     >>> user_path
     '.../principals/users/00...
 
@@ -80,7 +79,7 @@ E.g. when we try to register a user with an empty password::
     ...                  'email': 'annina@example.org'},
     ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
     ...                  'password': ''}}}
-    >>> resp = anonymous.post('http://localhost/principals/users', data)
+    >>> resp = anonymous.post('/principals/users', data)
     >>> resp.status_code
     400
     >>> pprint(resp.json)
@@ -113,7 +112,7 @@ registered::
     ...                  'email': 'anna@example.org'},
     ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
     ...                  'password': 'EckVocUbs3'}}}
-    >>> resp = anonymous.post('http://localhost/principals/users', data)
+    >>> resp = anonymous.post('/principals/users', data)
     >>> resp.status_code
     400
     >>> pprint(resp.json)
@@ -169,7 +168,7 @@ must post a JSON request containing the path to the
 
     >>> newest_activation_path = getfixture('newest_activation_path')
     >>> data = {'path': newest_activation_path}
-    >>> resp = anonymous.post('http://localhost/activate_account', data).json
+    >>> resp = anonymous.post('/activate_account', data).json
     >>> pprint(resp)
     {'status': 'success',
      'user_path': '.../principals/users/...',
@@ -181,7 +180,7 @@ successful login request (see next section).  This means that the user
 account has been activated and the user is now logged in. ::
 
     >>> data = {'path': '/activate/blahblah'}
-    >>> resp = anonymous.post('http://localhost/activate_account', data)
+    >>> resp = anonymous.post('/activate_account', data)
     >>> resp.status_code
     400
     >>> pprint(resp.json)
@@ -234,7 +233,7 @@ JSON request to the URL ``login_username`` with a user name and password::
 
     >>> data = {'name': 'Anna Müller',
     ...         'password': 'EckVocUbs3'}
-    >>> resp = anonymous.post('http://localhost/login_username', data).json
+    >>> resp = anonymous.post('/login_username', data).json
     >>> pprint(resp)
     {'status': 'success',
      'user_path': '.../principals/users/...',
@@ -249,7 +248,7 @@ Or to ``login_email``, specifying the user's email address instead of name::
 
     >>> data = {'email': 'anna@example.org',
     ...        'password': 'EckVocUbs3'}
-    >>> resp = anonymous.post('http://localhost/login_email', data).json
+    >>> resp = anonymous.post('/login_email', data).json
     >>> pprint(resp)
     {'status': 'success',
      'user_path': '.../principals/users/...',
@@ -266,7 +265,7 @@ the wrong password is specified. For security reasons, the same error message
 
     >>> data = {'name': 'No such user',
     ...         'password': 'EckVocUbs3'}
-    >>> resp = anonymous.post('http://localhost/login_username', data)
+    >>> resp = anonymous.post('/login_username', data)
     >>> resp.status_code
     400
     >>> pprint(resp.json)
@@ -278,9 +277,9 @@ the wrong password is specified. For security reasons, the same error message
 A different error message is given if username and password are valid but
 the user account hasn't been activated yet::
 
-    {"description": "User account not yet activated",
-     "location": "body",
-     "name": "name"}
+    {'description': 'User account not yet activated',
+     'location': 'body',
+     'name': 'name'}
 
 
 User Authentication
@@ -295,13 +294,12 @@ of the logged-in user.
 
 Without authentication we may not post anything::
 
-    >>> resp = anonymous.options("/").json
+    >>> resp = anonymous.options('/').json
     >>> 'POST' not in resp
     True
 
 With authentication instead we may::
-
-    >>> resp = admin.options("/").json
+    >>> resp = admin.options('/').json
     >>> pprint(resp['POST']['request_body'])
     [...'adhocracy_core.resources.organisation.IOrganisation',...]
 
@@ -310,7 +308,7 @@ that identifies the "X-User-Token" header as source of the problem::
 
     >>> broken = copy(anonymous)
     >>> broken.header = broken_header
-    >>> resp = broken.get('http://localhost/meta_api/')
+    >>> resp = broken.get('/meta_api')
     >>> resp.status_code
     400
     >>> sorted(resp.json.keys())
@@ -410,7 +408,7 @@ Password Reset
 If users forget their passwords, they can request a reset email::
 
     >>> data = {'email': 'anna@example.org'}
-    >>> resp = anonymous.post('http://localhost/create_password_reset', data).json
+    >>> resp = anonymous.post('/create_password_reset', data).json
     >>> resp['status']
     'success'
 
@@ -421,7 +419,7 @@ directly::
     >>> newest_reset_path = getfixture('newest_reset_path')
     >>> data = {'path': newest_reset_path(),
     ...         'password': 'new_password'}
-    >>> resp = anonymous.post("http://localhost/password_reset", data).json
+    >>> resp = anonymous.post('/password_reset', data).json
     >>> pprint(resp)
     {'status': 'success',
      'user_path': '.../principals/users/...',

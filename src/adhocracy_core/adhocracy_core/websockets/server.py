@@ -119,10 +119,13 @@ class DummyRequest:
         self.root = root
         """The root resource to resolve resource paths"""
 
-    def resource_url(self, resource):
+    def resource_url(self, resource, **kwargs):
         """Return the pyramid resource url."""
         path = resource_path(resource)
-        return self.application_url + path + '/'
+        url = self.application_url + path
+        if not url.endswith('/'):
+            url += '/'
+        return url
 
 
 class ClientCommunicator(WebSocketServerProtocol):

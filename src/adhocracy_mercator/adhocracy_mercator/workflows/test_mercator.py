@@ -84,29 +84,25 @@ def _batch_post_full_sample_proposal(app_user) -> TestResponse:
 
 
 @mark.functional
+@mark.usefixtures('log')
 class TestMercatorWorkflow:
 
-    @mark.xfail(reason='state is currently set to participate when creating the mercator process')
     def test_draft_participant_cannot_create_proposal(self, app_participant):
         from adhocracy_mercator.resources.mercator import IMercatorProposal
         assert IMercatorProposal not in app_participant.get_postable_types('/')
 
-    @mark.xfail(reason='state is currently set to participate when creating the mercator process')
     def test_draft_participant_cannot_create_proposal_per_batch(self, app_anonymous):
         resp = _batch_post_full_sample_proposal(app_anonymous)
         assert resp.status_code == 403
 
-    @mark.xfail(reason='state is currently set to participate when creating the mercator process')
     def test_change_state_to_announce(self, app_initiator):
         resp = do_transition_to(app_initiator, '/', 'announce')
         assert resp.status_code == 200
 
-    @mark.xfail(reason='state is currently set to participate when creating the mercator process')
     def test_announce_participant_cannot_create_proposal(self, app_participant):
         from adhocracy_mercator.resources.mercator import IMercatorProposal
         assert IMercatorProposal not in app_participant.get_postable_types('/')
 
-    @mark.xfail(reason='state is currently set to participate when creating the mercator process')
     def test_change_state_to_participate(self, app_initiator):
         resp = do_transition_to(app_initiator, '/', 'participate')
         assert resp.status_code == 200
@@ -182,7 +178,7 @@ class TestMercatorWorkflow:
         postable_types = app_participant.get_postable_types( proposal + 'logbook')
         assert postable_types == []
 
-    def test_result_participant_can_search_proposals(self, app_participant):
+    def test_result_participant_can_search_proposals(self, app_participant, rest_url):
         from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
         from adhocracy_core.sheets.pool import IPool
         params = dict(content_type=IMercatorProposalVersion.__identifier__,
@@ -196,7 +192,7 @@ class TestMercatorWorkflow:
                       )
         resp = app_participant.get('/', params=params).json
         assert resp['data'][IPool.__identifier__]['elements'] == \
-            ['http://localhost/mercator/proposal_0000001/VERSION_0000001/']
+            [rest_url + '/mercator/proposal_0000001/VERSION_0000001/']
 
 
 

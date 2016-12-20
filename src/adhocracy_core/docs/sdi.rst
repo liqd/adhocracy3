@@ -11,22 +11,22 @@ First you have to start adhocracy
     >>> from webtest import TestApp
     >>> app_router = getfixture('app_router')
     >>> testapp = TestApp(app_router)
-    >>> rest_url = 'http://localhost'
+    >>> manage_url = 'http://localhost/manage'
 
 You have to login first::
 
-    >>> resp = testapp.get(rest_url + '/manage/')
+    >>> resp = testapp.get(manage_url)
     >>> csrf = resp.html.input['value']
     >>> data = {'login': 'god',
     ...         'password': 'password',
     ...         'csrf_token': csrf,
     ...         'form.submitted': 'Log In'}
-    >>> resp = testapp.post('/manage/@@login', data)
+    >>> resp = testapp.post(manage_url + '/@@login', data)
 
 then you are redirected to the sdi contents listing::
 
     >>> resp.location
-    '.../manage/'
+    '.../manage'
     >>> resp = testapp.get(resp.location)
     >>> resp.location
     '.../manage/@@contents'

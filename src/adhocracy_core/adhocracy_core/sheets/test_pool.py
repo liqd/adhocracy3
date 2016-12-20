@@ -94,12 +94,12 @@ class TestFilteringPoolSheet:
         assert cstruct == {'elements': [],
                            'count': '1'}
 
-    def test_serialize_with_params(self, inst_mock):
+    def test_serialize_with_params(self, inst_mock, rest_url):
         child = testing.DummyResource()
         inst_mock.get.return_value = {'elements': [child],
                                       'count': 1}
         cstruct = inst_mock.serialize(params={'name': 'child'})
-        assert cstruct == {'elements': ['http://example.com/'],
+        assert cstruct == {'elements': [rest_url],
                            'count': '1'}
 
     def test_serialize_filter_by_view_permission(self, inst_mock):
@@ -127,14 +127,14 @@ class TestFilteringPoolSheet:
         cstruct = inst_mock.serialize()
         assert 'only_visible' not in inst_mock.get.call_args[1]['params']
 
-    def test_serialize_with_serialization_content(self, inst_mock):
+    def test_serialize_with_serialization_content(self, inst_mock, rest_url):
         child = testing.DummyResource()
         inst_mock.get.return_value = {'elements': [child]}
         cstruct = inst_mock.serialize(params={'serialization_form': 'content'})
         assert cstruct['elements'] == \
             [{'content_type': 'adhocracy_core.interfaces.IResource',
               'data': {},
-              'path': 'http://example.com/'}]
+              'path': rest_url}]
 
     def test_serialize_with_serialization_omit(self, inst_mock):
         child = testing.DummyResource()
