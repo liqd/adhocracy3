@@ -10,7 +10,7 @@ class TestEmbedCodeConfigAdapter:
         from .embed import embed_code_config_adapter
         return embed_code_config_adapter(*args)
 
-    def test_default_mapping_based_on_frontend_url(self, context, request_, rest_url):
+    def test_default_mapping_based_on_frontend_url(self, context, request_, rest_url, mocker):
         from adhocracy_core.interfaces import API_ROUTE_NAME
         mocker.spy(request_, 'resource_url')
         request_.registry['config'].adhocracy.frontend_url = 'http://x.de'

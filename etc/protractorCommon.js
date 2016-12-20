@@ -23,9 +23,7 @@ exports.config = {
     },
     onPrepare: function() {
         var getMailQueuePath = function() {
-            var testConf = ini.parse(fs.readFileSync("etc/test.ini", "utf-8"));
-            return testConf["app:main"]["mail.queue_path"]
-                   .replace("%(here)s", process.cwd() + "/etc");
+            var testConf = process.cwd() + "/var/mail";
         };
 
         browser.params.mail = {
