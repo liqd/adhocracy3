@@ -50,7 +50,7 @@ adhocracy:
     # The URL path to find the frontend templates
     template_path: '/static/templates'
     # The url to find the backend rest service
-    rest_url: 'http://localhost:6541'
+    rest_url: 'http://localhost:6541/api'
     # backend behind varnish (default port)
     #rest_url: 'http://localhost:8088'
     # The email address shown to users seeking support
@@ -62,8 +62,9 @@ adhocracy:
     # Enable debugging mode
     debug:  True
     # URL to terms and services
-    terms_url.en: 'https://advocate-europe.eu/en/terms-of-use'
-    terms_url.de: 'https://advocate-europe.eu/de/terms-of-use'
+    terms_url:
+        en: 'https://advocate-europe.eu/en/terms-of-use'
+        de: 'https://advocate-europe.eu/de/terms-of-use'
     # Netiquitte URL - currently only used in mercator
     netiquette_url:  https://advocate-europe.eu/de/netiquette
     # Piwik tracking configuration
