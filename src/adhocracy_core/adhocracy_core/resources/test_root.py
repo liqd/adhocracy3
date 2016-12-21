@@ -70,9 +70,10 @@ class TestRoot:
             self,  registry, request_):
         from substanced.interfaces import IUserLocator
         from adhocracy_core.resources.root import IRootPool
-        registry.settings['adhocracy.initial_login'] = 'custom'
-        registry.settings['adhocracy.initial_password'] = 'password'
-        registry.settings['adhocracy.initial_email'] = 'c@test.de'
+        settings = registry['config']
+        settings.adhocracy.initial_login = 'custom'
+        settings.adhocracy.initial_password = 'password'
+        settings.adhocracy.initial_email = 'c@test.de'
         inst = registry.content.create(IRootPool.__identifier__)
         locator = registry.getMultiAdapter((inst, request_), IUserLocator)
         user_god = locator.get_user_by_login('custom')
@@ -107,13 +108,13 @@ class TestRoot:
             self, registry, request_):
         from substanced.interfaces import IUserLocator
         from adhocracy_core.resources.root import IRootPool
-        registry.settings['adhocracy.anonymous_user'] = 'custom_anonymous'
-        registry.settings['adhocracy.anonymous_user_email'] = 'custom@test.de'
+        settings = registry['config']
+        settings.adhocracy.anonymous_user = 'custom_anonymous'
+        settings.adhocracy.anonymous_user_email = 'custom@test.de'
         inst = registry.content.create(IRootPool.__identifier__)
         locator = registry.getMultiAdapter((inst, request_), IUserLocator)
         anonymous_user = locator.get_user_by_login('custom_anonymous')
         assert anonymous_user.email == 'custom@test.de'
-
 
     def test_create_root_with_example_process(self, registry):
         from adhocracy_core.resources.process import IProcess

@@ -2,7 +2,6 @@
 from copy import deepcopy
 
 from colander import drop
-from pyramid.settings import asbool
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
@@ -98,13 +97,10 @@ class PoolSheet(AnnotationRessourceSheet):
         """
         params = params or {}
         has_custom_filters = params != {}
-        filter_view_permission = asbool(self.registry.settings.get(
-            'adhocracy.filter_by_view_permission', True))
-        if filter_view_permission:
+        settings = self.registry['config']
+        if settings.adhocracy.filter_by_view_permission:
             params['allows'] = (self.request.effective_principals, 'view')
-        filter_visible = asbool(self.registry.settings.get(
-            'adhocracy.filter_by_visible', True))
-        if filter_visible:
+        if settings.adhocracy.filter_by_visible:
             params['only_visible'] = True
         params_query = remove_keys_from_dict(params, self._additional_params)
         appstruct = self.get(params=params_query, omit_readonly=True)

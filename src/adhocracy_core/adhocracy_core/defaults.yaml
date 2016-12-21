@@ -1,0 +1,104 @@
+# default configuration
+
+# include 3rd party pyramid packages
+
+include:
+  # force logging all exceptions
+  pyramid_exclog: True
+  # send mails
+  pyramid_mailer: True
+
+# configure 3rd party packages
+
+configurator:
+  pyramid:
+    default_locale_name: 'en'
+  tm:
+    attempts: 5
+  zodbconn:
+    # Example database connection:
+    # uri: 'zeo://localhost:9963?cache_size=200MB&connection_cache_size=250000&storage=main'
+    # uri.audit: 'zeo://localhost:9964?cache_size=10MB&connection_cache_size=50000&storage=main&blob_dir=var/blobs&shared_blob_dir=True'
+  substanced:
+    secret: ''
+    manage_prefix: '/manage'
+    uploads_tempdir: '%(here)s/../../../var/uploads_tmp'
+    autosync_catalogs: True
+    autoevolve: False
+    # send runtime statistics to statsd
+    statsd:
+      enabled: False
+      host: 'localhost'
+      port: 8125
+      prefix: 'a3'
+  mail:
+    queue_path: '%(here)s/../../../var/mail'
+    # Configure the following fields for sending mails via SMTP
+    # See github.com/Pylons/pyramid_mailer for details
+    default_sender: support@unconfigured.domain
+    noreply_sender: noreply@unconfigured.domain
+    host: localhost
+    port: 25
+    tls: False
+    ssl: False
+
+# configure adhocracy
+
+adhocracy:
+  # Name of the entire site. Used in account registration information etc.
+  site_name: 'Adhocracy'
+  # Canonical frontend base URL. For example the main webpage embedding the
+  # frontend. If this is set, frontend links will always prefix links with this
+  # URL. If this is an embedding URL, it should end with #!.
+  canonical_url: 'http://localhost:6551/static/embed.html#!'
+  # The base URL of the frontend javascript code and the SDK for embedding.
+  frontend_url: 'http://localhost:6551'
+  # The websocket url to notify about resource modifications
+  ws_url: ''
+  #ws_url: ws://localhost:6561
+  # The login name for the initial user
+  initial_login: god
+  # The password for the initial user
+  initial_password: 'password'
+  # the email for the initial user
+  initial_email: 'sysadmin@test.de'
+  # The initial user group
+  # Members of this group have permission for everything
+  initial_group_name: 'gods'
+  # Set to False to use the SMTP server instead
+  # anonymous system user
+  anonymous_user: 'anonymous'
+  anonymous_user_email: 'sysadmin@test.de'
+  # use file system queue to send mails
+  use_mail_queue: False
+  # Email address receiving abuse complaints
+  abuse_handler_mail: 'abuse_handler@unconfigured.domain'
+  # performance workaround: disable filter references by view permission
+  filter_by_view_permission: True
+  # performance workaround: disable filter references by visible (not hidden)
+  filter_by_visible: True
+
+  # Only accept registration requests with valid captcha solutions
+  captcha_enabled: False
+  # Where the frontend sends captcha traffic
+  captcha_backend_url: 'http://localhost:6542/'
+  # Where the backend sends captcha traffic (in development mode, this
+  # is the same as captcha backend; if nginx is dispatching inbound
+  # requests, this is just the frontend url)
+  captcha_frontend_url: 'http://localhost:6542/'
+
+  # Mode to set http cache headers for resources, valid entries: no_cache, without_proxy_cache, with_proxy_cache
+  caching_mode: 'no_cache'
+  # URL of the caching reverse proxy to send PURGE request to
+  caching_proxy: ''
+
+  # Create activity stream for users
+  activity_stream:
+    enabled: True
+  # Use Berlin service konto for authentication
+  service_konto:
+    enabled: False
+    api_url: ''
+
+
+

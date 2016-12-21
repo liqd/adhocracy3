@@ -211,7 +211,7 @@ def request_(registry):
         `errors`, `validated`
     """
     request = DummyRequest()
-    request.registry.settings = {}
+    request.registry = registry
     request.user = None
     request.anonymized_user = None
     request.scheme = 'http'
@@ -420,6 +420,8 @@ def config(request) -> Configurator:
     """Return dummy testing configuration."""
     from adhocracy_core.interfaces import API_ROUTE_NAME
     config = testing.setUp()
+    config.include('tzf.pyramid_yml')
+    config.config_defaults('adhocracy_core:defaults.yaml')
     request.addfinalizer(testing.tearDown)
     config.add_route(API_ROUTE_NAME, '/api*traverse')
     return config
@@ -501,27 +503,7 @@ def settings(request) -> dict:
 def app_settings(request) -> dict:
     """Return settings to start the test wsgi app."""
     settings = {}
-    # don't look for the websocket server
-    settings['adhocracy.ws_url'] = ''
-    # use in memory database without zeo
-    settings['zodbconn.uri'] = 'memory://'
-    # satisfy substanced
-    settings['substanced.secret'] = 'secret'
-    settings['substanced.uploads_tempdir'] = 'var/tmp'
-    # extra dependenies
-    settings['pyramid.includes'] = [
-        # database connection
-        'pyramid_zodbconn',
-        # commit after request
-        'pyramid_tm',
-        # mock mail server
-        'pyramid_mailer.testing',
-        # force error logging
-        'pyramid_exclog',
-    ]
-    settings['mail.default_sender'] = 'substanced_demo@example.com'
-    settings['adhocracy.abuse_handler_mail'] = \
-        'abuse_handler@unconfigured.domain'
+    settings['yaml.location'] = 'adhocracy_core:test_memory.yaml'
     return settings
 
 
@@ -640,6 +622,7 @@ def make_configurator(app_settings: dict, package) -> Configurator:
 def app_router_filestorage(app_settings_filestorage: dict) -> Router:
     """Return the adhocracy test wsgi application using file storage db."""
     import adhocracy_core
+
     configurator = make_configurator(app_settings_filestorage, adhocracy_core)
     app_router = configurator.make_wsgi_app()
     return app_router
@@ -648,11 +631,10 @@ def app_router_filestorage(app_settings_filestorage: dict) -> Router:
 @fixture(scope='class')
 def app_settings_filestorage(request, app_settings: dict) -> dict:
     """Add zodb connection with filestorage, add finalizer to cleanup files."""
+    app_settings['yaml.location'] = 'adhocracy_core:test_persistent.yaml'
     db_test_dir = 'var/db/test/'
     db_file = db_test_dir + 'Data.fs'
     blobs_dir = db_test_dir + 'blobs'
-    uri = 'file://{}?blobstorage_dir={}'.format(db_file, blobs_dir)
-    app_settings['zodbconn.uri'] = uri
 
     def remove_test_db():
         os.remove(db_file)

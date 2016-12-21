@@ -1,0 +1,12 @@
+# test configuration with persistent database, extending test_memory.yaml
+
+# include 3rd party pyramid packages
+
+include:
+  pyramid_mailer.testing: True
+
+# include 3rd party pyramid packages
+
+configurator:
+  zodbconn:
+    uri: 'file://var/db/test/Data.fs?blobstorage_dir=var/db/test/blobs'

@@ -71,16 +71,16 @@ def _set_auditlog_if_missing(request):
 
 def add_after_commit_hooks(request):
     """Add after commit hooks."""
-    from adhocracy_core.caching import purge_varnish_after_commit_hook
+    from adhocracy_core.caching import purge_caching_proxy_after_commit_hook
     from adhocracy_core.websockets.client import \
         send_messages_after_commit_hook
     current_transaction = transaction.get()
     registry = request.registry
     # Order matters here
-    current_transaction.addAfterCommitHook(purge_varnish_after_commit_hook,
-                                           args=(registry, request))
-    current_transaction.addAfterCommitHook(send_messages_after_commit_hook,
-                                           args=(registry,))
+    current_transaction.addAfterCommitHook(
+        purge_caching_proxy_after_commit_hook, args=(registry, request))
+    current_transaction.addAfterCommitHook(
+        send_messages_after_commit_hook, args=(registry,))
 
 
 def add_request_callbacks(request):
@@ -95,14 +95,18 @@ def add_request_callbacks(request):
 
 def includeme(config):
     """Setup basic adhocracy."""
-    settings = config.registry.settings
-    config.include('deform_markdown')
+    config_files = config.registry.settings.get('yaml.location', '')
+    config.registry.settings['yaml.location'] =\
+        'adhocracy_core:defaults.yaml, ' + config_files
+    config.include('tzf.pyramid_yml')
+    config.include('pyramid_tm')
     config.include('pyramid_zodbconn')
     config.include('pyramid_mako')
     config.include('pyramid_chameleon')
+    config.include('deform_markdown')
     config.include('.authorization')
     config.include('.authentication')
-    authn_policy = _create_authentication_policy(settings, config)
+    authn_policy = _create_authentication_policy(config)
     config.set_authentication_policy(authn_policy)
     config.include('.renderers')
     config.include('.evolution')
@@ -125,9 +129,10 @@ def includeme(config):
                                     name='adhocracy_core:test_users_fixture')
 
 
-def _create_authentication_policy(settings, config: Configurator)\
+def _create_authentication_policy(config: Configurator)\
         -> IAuthenticationPolicy:
-    secret = settings.get('substanced.secret', 'secret')
+    settings = config.registry['config'].configurator
+    secret = settings.substanced.secret
     groupfinder = groups_and_roles_finder
     timeout = 60 * 60 * 24 * 30
     multi_policy = MultiRouteAuthenticationPolicy()

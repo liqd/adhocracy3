@@ -1,0 +1,15 @@
+# configuration for local development
+
+configurator:
+  zodbconn:
+    uri: 'zeo://localhost:9963?cache_size=200MB&connection_cache_size=250000&storage=main'
+    uri.audit: 'zeo://localhost:9964?cache_size=10MB&connection_cache_size=50000&storage=main&blob_dir=var/blobs&shared_blob_dir=True'
+  substanced:
+    secret: 'SUPER_SECRET'
+
+adhocracy:
+  ws_url: ws://localhost:6561
+  canonical_url: 'http://localhost:6551/static/embed.html#!'
+  frontend_url: 'http://localhost:6551'
+  use_mail_queue: True
+

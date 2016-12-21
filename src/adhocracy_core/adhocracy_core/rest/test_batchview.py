@@ -272,31 +272,31 @@ class TestBatchView:
                             '@newpath/v1': '/adhocracy/new_item/v0'}
 
     def test_copy_header_if_exists_not_existing(self, context, request_):
-        from copy import deepcopy
+        from copy import copy
         inst = self.make_one(context, request_)
-        subrequest = deepcopy(request_)
+        subrequest = copy(request_)
         inst.copy_header_if_exists('non_existing', subrequest)
         assert 'non_existing' not in subrequest.headers
 
     def test_copy_header_if_exists_existing(self, context, request_):
-        from copy import deepcopy
+        from copy import copy
         inst = self.make_one(context, request_)
-        subrequest = deepcopy(request_)
+        subrequest = copy(request_)
         request_.headers['existing'] = 'Test'
         inst.copy_header_if_exists('existing', subrequest)
         assert 'existing' in subrequest.headers
 
     def test_copy_attr_if_exists_not_existing(self, context, request_):
-        from copy import deepcopy
+        from copy import copy
         inst = self.make_one(context, request_)
-        subrequest = deepcopy(request_)
+        subrequest = copy(request_)
         inst.copy_attr_if_exists('non_existing', subrequest)
         assert not hasattr(subrequest, 'non_existing')
 
     def test_copy_attr_if_exists_not_exists(self, context, request_):
-        from copy import deepcopy
+        from copy import copy
         inst = self.make_one(context, request_)
-        subrequest = deepcopy(request_)
+        subrequest = copy(request_)
         request_.existing = 'Buh'
         inst.copy_attr_if_exists('existing', subrequest)
         assert hasattr(subrequest, 'existing')

@@ -306,15 +306,15 @@ class TestFunctionalClient:
 
     def test_includeme_without_ws_url_setting(self, config):
         from adhocracy_core.websockets.client import includeme
-        config.registry.settings['adhocracy.ws_url'] = ''
+        config.registry['config'].adhocracy.ws_url = ''
         includeme(config)
         assert not hasattr(config.registry, 'ws_client')
 
     def test_includeme_with_ws_url_setting(self, config):
         from adhocracy_core.websockets.client import includeme
         from adhocracy_core.websockets.client import Client
-        settings = config.registry.settings
-        settings['adhocracy.ws_url'] = 'ws://localhost:6561'
+        settings = config.registry['config']
+        settings.adhocracy.ws_url = 'ws://localhost:6561'
         includeme(config)
         assert isinstance(config.registry.ws_client, Client)
 

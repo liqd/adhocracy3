@@ -73,7 +73,7 @@ describe("user password reset", function() {
 
         var page = new UserPages.ResetPasswordCreatePage().get();
         page.fill(UserPages.participantEmail);
-        expect(element(by.css(".login-success")).getText()).toContain("SPAM");
+        expect(element(by.css(".login-success")).getText()).toContain("Spam");
 
         var flow = browser.controlFlow();
         flow.execute(function() {
@@ -96,32 +96,11 @@ describe("user password reset", function() {
 
         page.fill(UserPages.participantEmail);
 
+        expect(element(by.css(".login-success")).getText()).toContain("Spam");
         var flow = browser.controlFlow();
         flow.execute(function() {
             var mailsAfterMessaging = fs.readdirSync(browser.params.mail.queue_path + "/new");
-            var newMails = _.difference(mailsAfterMessaging, mailsBeforeMessaging);
-            var mailpath = browser.params.mail.queue_path + "/new/" + newMails[0];
-
-            shared.parseEmail(mailpath, function(mail) {
-                expect(mail.subject).toContain("Passwor");
-                expect(mail.to[0].address).toContain("participant");
-                resetUrl = _.find(mail.text.split("\n"), function(line) {return _.startsWith(line, "http");});
-            });
-        });
-
-        browser.driver.wait(function() {
-            return resetUrl != "";
-        }, 1000).then(function() {
-            var resetPage = new UserPages.ResetPasswordPage().get(resetUrl);
-            resetPage.fill('new password');
-
-            // After changing the password the user is logged in
-            //expect(UserPages.isLoggedIn()).toBe(true);
-
-            // and can now login with the new password
-            UserPages.logout();
-            UserPages.login(UserPages.participantEmail, 'new password');
-            expect(UserPages.isLoggedIn()).toBe(true);
+            expect(mailsAfterMessaging.length).toEqual(mailsBeforeMessaging.length + 1);
         });
     });
 });

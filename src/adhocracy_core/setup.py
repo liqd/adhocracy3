@@ -17,6 +17,7 @@ requires = [
     'pyramid_exclog',
     'pyramid_bpython',
     'pyramid_jwt',
+    'tzf.pyramid_yml',
     'gunicorn',
     'substanced',
     'pyramid_tm',

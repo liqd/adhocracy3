@@ -82,7 +82,7 @@ def _export_comments(root: IResource, registry: Registry):
 
 def _get_url(registry: Registry, context: IResource) -> str:
     path = resource_path(context)
-    frontend_url = registry.settings.get('adhocracy.frontend_url')
+    frontend_url = registry.settings.get('adhocracy.canonical_url')
     return frontend_url + '/r' + path
 
 

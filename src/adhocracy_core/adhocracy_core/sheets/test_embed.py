@@ -10,14 +10,15 @@ class TestEmbedCodeConfigAdapter:
         from .embed import embed_code_config_adapter
         return embed_code_config_adapter(*args)
 
-    def test_default_mapping(self, context, request_, mocker, rest_url):
+    def test_default_mapping_based_on_frontend_url(self, context, request_, rest_url, mocker):
         from adhocracy_core.interfaces import API_ROUTE_NAME
         mocker.spy(request_, 'resource_url')
+        request_.registry['config'].adhocracy.frontend_url = 'http://x.de'
         result = self.call_fut(context, request_)
         request_.resource_url.assert_called_with(context,
-                                                route_name=API_ROUTE_NAME)
-        assert result == {'sdk_url': 'http://localhost:6551/AdhocracySDK.js',
-                          'frontend_url': 'http://localhost:6551',
+                                                 route_name=API_ROUTE_NAME)
+        assert result == {'sdk_url': 'http://x.de/AdhocracySDK.js',
+                          'frontend_url': 'http://x.de',
                           'path': rest_url,
                           'widget': '',
                           'autoresize': 'false',
@@ -29,15 +30,8 @@ class TestEmbedCodeConfigAdapter:
                           'style': 'height: 650px',
                           }
 
-    def test_set_sdk_and_frontend_url_based_on_frontend_url(self, context,
-                                                            request_):
-        request_.registry.settings['adhocracy.frontend_url'] = 'http://x.de'
-        result = self.call_fut(context, request_)
-        assert result['sdk_url'] == 'http://x.de/AdhocracySDK.js'
-        assert result['frontend_url'] == 'http://x.de'
-
     def test_set_locale_based_on_default_locale(self, context, request_):
-        request_.registry.settings['pyramid.default_locale_name'] = 'de'
+        request_.registry['config'].configurator.pyramid.default_locale_name = 'de'
         result = self.call_fut(context, request_)
         assert result['locale'] == 'de'
 

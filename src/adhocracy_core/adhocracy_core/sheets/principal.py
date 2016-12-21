@@ -5,7 +5,6 @@ from colander import Invalid
 from colander import All
 from colander import OneOf
 from cryptacular.bcrypt import BCRYPTPasswordManager
-from pyramid.settings import asbool
 from pyramid.traversal import resource_path
 from substanced.util import find_service
 from urllib.parse import urljoin
@@ -204,12 +203,12 @@ class CaptchaSchema(MappingSchema):
         """
         Validate the captcha.
 
-        If 'adhocracy.thentos_captcha.enabled' is true, we ask the
+        If 'adhocracy.captcha_enabled' is true, we ask the
         thentos-captcha service whether the given solution is correct.
         If captchas are not enabled, this validator will always pass.
         """
         request = node.bindings['request']
-        settings = request.registry.settings
+        settings = request.registry['config']
         if not self._captcha_is_correct(settings, value):
             err = Invalid(node)
             err['solution'] = 'Captcha solution is wrong'
@@ -217,8 +216,7 @@ class CaptchaSchema(MappingSchema):
 
     def _captcha_is_correct(self, settings, value) -> bool:
         """Ask the captcha service whether the captcha was solved correctly."""
-        captcha_service = settings.get('adhocracy.thentos_captcha.backend_url',
-                                       'http://localhost:6542/')
+        captcha_service = settings.adhocracy.captcha_backend_url
         resp = requests.post(urljoin(captcha_service, 'solve_captcha'),
                              json=value)
         return resp.json()['data']
@@ -461,8 +459,8 @@ def includeme(config):
     """Register sheets and activate catalog factory."""
     add_sheet_to_registry(userbasic_meta, config.registry)
     add_sheet_to_registry(userextended_meta, config.registry)
-    captcha_enabled = asbool(config.registry.settings.get(
-        'adhocracy.thentos_captcha.enabled', False))
+    settings = config.registry['config']
+    captcha_enabled = settings.adhocracy.captcha_enabled
     if captcha_enabled:
         add_sheet_to_registry(captcha_meta._replace(creatable=True,
                                                     create_mandatory=True),
@@ -475,8 +473,8 @@ def includeme(config):
     add_sheet_to_registry(activation_configuration_meta, config.registry)
     add_sheet_to_registry(anonymize_default_meta, config.registry)
     add_sheet_to_registry(emailnew_meta, config.registry)
-    service_konto_enabled = asbool(config.registry.settings.get(
-        'adhocracy.service_konto.enabled', False))
+    settings = config.registry['config']
+    service_konto_enabled = settings.adhocracy.service_konto.enabled
     if service_konto_enabled:
         add_sheet_to_registry(service_konto_meta._replace(creatable=True),
                               config.registry)

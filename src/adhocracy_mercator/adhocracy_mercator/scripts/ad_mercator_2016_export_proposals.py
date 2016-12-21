@@ -271,7 +271,7 @@ def _get_creation_date(proposal):
 def _get_proposal_url(registry: Registry,
                       proposal: IMercatorProposal) -> str:
     path = resource_path(proposal)
-    frontend_url = registry.settings.get('adhocracy.frontend_url')
+    frontend_url = registry.settings.get('adhocracy.canonical_url')
     return frontend_url + '/r' + path
 
 

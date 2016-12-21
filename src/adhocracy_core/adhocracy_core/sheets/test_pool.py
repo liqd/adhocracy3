@@ -110,7 +110,7 @@ class TestFilteringPoolSheet:
             (inst_mock.request.effective_principals, 'view')
 
     def test_serialize_filter_by_view_permission_disabled(self, inst_mock):
-        inst_mock.registry.settings['adhocracy.filter_by_view_permission'] = 'False'
+        inst_mock.registry['config'].adhocracy.filter_by_view_permission = False
         inst_mock.get = Mock()
         inst_mock.get.return_value = {}
         cstruct = inst_mock.serialize()
@@ -123,7 +123,7 @@ class TestFilteringPoolSheet:
 
     def test_serialize_filter_by_only_visible_disabled(self, inst_mock):
         inst_mock.get.return_value = {}
-        inst_mock.registry.settings['adhocracy.filter_by_visible'] = 'False'
+        inst_mock.registry['config'].adhocracy.filter_by_visible = False
         cstruct = inst_mock.serialize()
         assert 'only_visible' not in inst_mock.get.call_args[1]['params']
 

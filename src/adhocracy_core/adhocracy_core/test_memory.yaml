@@ -1,0 +1,12 @@
+# test configuration with in memory database
+
+# include 3rd party pyramid packages
+
+include:
+  pyramid_mailer.testing: True
+
+# configure 3rd party pyramid packages
+
+configurator:
+  zodbconn:
+    uri: 'memory://'

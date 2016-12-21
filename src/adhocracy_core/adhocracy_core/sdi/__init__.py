@@ -1,6 +1,7 @@
 """Admin interface based on substanced (sdi), url prefix is '/manage'."""
 from pkg_resources import resource_filename
 from pyramid.config import Configurator
+from tzf.pyramid_yml import ConfigManager
 from substanced.form import get_deform_renderer
 from substanced.content import _ContentTypePredicate
 from substanced.sdi import MANAGE_ROUTE_NAME
@@ -49,7 +50,7 @@ def add_sdi_add_view_directive(config: Configurator,
 
 def includeme(config):
     """Register sdi admin interface."""
-    settings = config.registry.settings
+    settings = config.registry['config'].configurator
     config.add_directive('add_mgmt_view', add_mgmt_view,
                          action_wrap=False)
     config.add_directive('add_sdi_add_view', add_sdi_add_view_directive,
@@ -84,8 +85,8 @@ def _add_sdi_assets(config: Configurator):
     deform.Form.set_default_renderer(deform_renderer)
 
 
-def _add_manage_route(settings: dict, config: Configurator):
-    manage_prefix = settings.get('substanced.manage_prefix', '/manage')
+def _add_manage_route(settings: ConfigManager, config: Configurator):
+    manage_prefix = settings.substanced.manage_prefix
     manage_pattern = manage_prefix + '*traverse'
     config.add_route(MANAGE_ROUTE_NAME, manage_pattern)
 

@@ -43,8 +43,7 @@ def _set_cache_header(context: IResource, request: IRequest):
 
 
 def _get_cache_mode(registry) -> HTTPCacheMode:
-    mode_name = registry.settings.get('adhocracy_core.caching.http.mode',
-                                      HTTPCacheMode.no_cache.name)
+    mode_name = registry['config'].adhocracy.caching_mode
     mode = HTTPCacheMode[mode_name]
     return mode
 
@@ -270,11 +269,12 @@ class HTTPCacheStrategyStrongAdapter(HTTPCacheStrategyBaseAdapter):
     etags = (etag_modified, etag_userid, etag_blocked)
 
 
-def purge_varnish_after_commit_hook(success: bool, registry: Registry,
-                                    request: IRequest):
+def purge_caching_proxy_after_commit_hook(success: bool, registry: Registry,
+                                          request: IRequest):
     """Send PURGE requests for all changed resources to Varnish."""
-    varnish_url = registry.settings.get('adhocracy.varnish_url')
-    if not (success and varnish_url):
+    settings = registry['config']
+    proxy_url = settings.adhocracy.caching_proxy
+    if not (success and proxy_url):
         return
     changelog_metadata = registry.changelog.values()
     errcount = 0
@@ -283,7 +283,7 @@ def purge_varnish_after_commit_hook(success: bool, registry: Registry,
         if events == []:
             continue
         path = resource_path(meta.resource)
-        url = varnish_url + request.script_name + path
+        url = proxy_url + request.script_name + path
         for event in events:
             headers = {'X-Purge-Host': request.host}
             headers['X-Purge-Regex'] = '/?\??[^/]*'

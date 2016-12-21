@@ -10,7 +10,6 @@ from colander import required
 from persistent.mapping import PersistentMapping
 from pyramid.decorator import reify
 from pyramid.registry import Registry
-from pyramid.settings import asbool
 from pyramid.interfaces import IRequest
 from substanced.util import find_service
 from zope.interface import implementer
@@ -254,13 +253,10 @@ class BaseResourceSheet:
         Read :func:`adhocracy_core.interfaces.IResourceSheet.serialize`
         """
         params = params or {}
-        filter_view_permission = asbool(self.registry.settings.get(
-            'adhocracy.filter_by_view_permission', True))
-        if filter_view_permission:
+        settings = self.registry['config']
+        if settings.adhocracy.filter_by_view_permission:
             params['allows'] = (self.request.effective_principals, 'view')
-        filter_visible = asbool(self.registry.settings.get(
-            'adhocracy.filter_by_visible', True))
-        if filter_visible:
+        if settings.adhocracy.filter_by_visible:
             params['only_visible'] = True
         appstruct = self.get(params=params,
                              add_back_references=add_back_references,

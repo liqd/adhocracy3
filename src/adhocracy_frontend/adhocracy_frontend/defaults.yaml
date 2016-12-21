@@ -1,0 +1,103 @@
+# default configuration
+
+# 3rd party pyramid packages
+
+include:
+    pyramid_cachebust: True
+    pyramid_mako: True
+
+# 3rd party settings
+
+configurator:
+  # pyramid_cachebust
+  cachebust:
+    enabled: False
+    method: 'init'
+
+# adhocracy default settings
+
+adhocracy:
+
+  # The path to the root level adhocracy resource
+  rest_platform_path: '/adhocracy'
+  # Name of the entire site. Used in account registration information etc.
+  site_name: 'Adhocracy Test Site'
+  # Canonical frontend base URL. If this is set, frontend links will always
+  # prefix links with this URL. If this is an embedding URL, it should end with
+  # #!.
+  canonical_url: 'http://localhost:6551/static/embed.html#!'
+  # Redirect URL - This is the path you get redirected to when visiting /.
+  # This is especially relevant for cases in which cameFrom is not set,
+  # e.g. account activation.
+  redirect_url: '/r/organisation/advocate-europe2/'
+  # If the Adhocracy frontend is embedded in a website from a trusted domain,
+  # Adhocracy may pass user authentication token to the embedding website.
+  trusted_domains: []
+  # - http://localhost:9000
+  # - http://localhost:9001
+
+  frontend:
+    # Whether to allow users to post resources anonymously
+    anonymize_enabled: False
+    # package path
+    pkg_path: '/static/js/Packages'
+    # Wether to display profile images in the frontend (disabling can improve performance for large installations)
+    profile_images_enabled:  False
+    # The url to find the backend websocket service
+    # If you don't set this, the url is build based on the domain of the current
+    # Request.
+    ws_url: 'ws://localhost:6561'
+    # The URL path to find the frontend templates
+    template_path: '/static/templates'
+    # The url to find the backend rest service
+    rest_url: 'http://localhost:6541/api'
+    # backend behind varnish (default port)
+    #rest_url: 'http://localhost:8088'
+    # The email address shown to users seeking support
+    support_email: 'support@unconfigured.domain'
+    # The link shown to users seeking support
+    support_url: ''
+    # Default frontend locale
+    locale: 'de'
+    # Enable debugging mode
+    debug:  True
+    # URL to terms and services
+    terms_url:
+        en: 'https://advocate-europe.eu/en/terms-of-use'
+        de: 'https://advocate-europe.eu/de/terms-of-use'
+    # Netiquitte URL - currently only used in mercator
+    netiquette_url:  https://advocate-europe.eu/de/netiquette
+    # Piwik tracking configuration
+    piwik_enabled: False
+    piwik_host: ''
+    piwik_site_id: ''
+    # Tracking also works without cookie
+    piwik_use_cookies: False
+    # User id tracking (not recommended; should be used with care cause privacy)
+    piwik_track_user_id: False
+    # osm settings
+    map_tile_url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+    map_tile_options:
+      maxZoom: 18
+      attribution': '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  # TODO: merge custom to frontend
+  custom:
+    show_add_button: True
+    allow_rate: True
+    embed_only: False
+    # if set to True the hader is not shown
+    hide_header: False
+
+  # Only accept registration requests with valid captcha solutions
+  # enable captcha support
+  captcha_enabled: False
+  # Where the frontend sends captcha traffic
+  captcha_backend_url: 'http://localhost:6542/'
+  # Where the backend sends captcha traffic (in development mode, this
+  # is the same as captcha backend; if nginx is dispatching inbound
+  # requests, this is just the frontend url)
+  captcha_frontend_url: 'http://localhost:6542/'
+  # Use Berlin service konto for authentication
+  service_konto:
+    enabled: False
+    api_url: ''

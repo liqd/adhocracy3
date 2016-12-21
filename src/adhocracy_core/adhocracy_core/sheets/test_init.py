@@ -381,7 +381,7 @@ class TestBaseResourceSheet:
     def test_serialize_filter_by_view_permission_disabled(self, inst,
                                                             request_):
         inst.request = request_
-        inst.registry.settings['adhocracy.filter_by_view_permission'] = "False"
+        inst.registry['config'].adhocracy.filter_by_view_permission = False
         inst.get = Mock()
         inst.get.return_value = {}
         cstruct = inst.serialize()
@@ -396,7 +396,7 @@ class TestBaseResourceSheet:
 
     def test_serialize_filter_by_only_visible_disabled(self, inst, request_):
         inst.request = request_
-        inst.registry.settings['adhocracy.filter_by_visible'] = "False"
+        inst.registry['config'].adhocracy.filter_by_visible = False
         inst.get = Mock()
         inst.get.return_value = {}
         cstruct = inst.serialize()

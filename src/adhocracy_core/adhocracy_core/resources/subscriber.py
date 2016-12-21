@@ -9,7 +9,6 @@ import requests
 from pyramid.interfaces import IApplicationCreated
 from pyramid.registry import Registry
 from pyramid.request import Request
-from pyramid.settings import asbool
 from pyramid.traversal import find_interface
 from pyramid.i18n import get_localizer
 from pyramid.i18n import TranslationStringFactory
@@ -404,9 +403,8 @@ def _create_image(context: IResource,
 def add_activities_to_activity_stream(event: IActivitiesGenerated):
     """Add activity resources to activity_stream."""
     request = event.request
-    registry = request.registry
-    activity_stream_enabled = asbool(registry.settings.get(
-        'adhocracy.activity_stream.enabled', False))
+    settings = request.registry['config']
+    activity_stream_enabled = settings.adhocracy.activity_stream.enabled
     if not activity_stream_enabled:
         return
     activities = event.activities
@@ -425,10 +423,10 @@ def add_activities_to_activity_stream(event: IActivitiesGenerated):
                 'published': activity.published,
             }
         }
-        registry.content.create(IActivity.__identifier__,
-                                appstructs=appstructs,
-                                parent=service,
-                                registry=registry)
+        request.registry.content.create(IActivity.__identifier__,
+                                        appstructs=appstructs,
+                                        parent=service,
+                                        registry=request.registry)
 
 
 def includeme(config):
