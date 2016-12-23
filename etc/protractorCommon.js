@@ -14,7 +14,7 @@ exports.config = {
     beforeLaunch: function() {
         exec("bin/supervisord");
         exec("bin/supervisorctl restart  adhocracy_test:");
-        exec("bin/ad_fixtures -a etc/test.ini ");
+        exec("bin/ad_fixtures -a etc/acceptance.ini ");
         exec("src/current/current/tests/acceptance/setup_tests.sh");
     },
     afterLaunch: function() {

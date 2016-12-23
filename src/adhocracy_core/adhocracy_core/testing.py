@@ -480,7 +480,7 @@ def mock_messenger():
 def _get_settings(request, part):
     """Return settings of a config part."""
     config_parser = ConfigParser()
-    config_file = 'etc/test.ini'
+    config_file = 'etc/acceptance.ini'
     config_parser.read(config_file)
     settings = {}
     for option, value in config_parser.items(part):
@@ -532,13 +532,13 @@ def supervisor(request) -> str:
 def zeo(request, supervisor) -> str:
     """Start zeo server with supervisor."""
     output = subprocess.check_output(
-        'bin/supervisorctl restart adhocracy_test:test_zeo',
+        'bin/supervisorctl restart adhocracy_test:acceptance_zeo',
         shell=True,
         stderr=subprocess.STDOUT)
 
     def fin():
         subprocess.check_output(
-            'bin/supervisorctl stop adhocracy_test:test_zeo',
+            'bin/supervisorctl stop adhocracy_test:acceptance_zeo',
             shell=True,
             stderr=subprocess.STDOUT)
         subprocess.check_output('rm -rf var/db/test/Data.fs*',
@@ -552,13 +552,13 @@ def zeo(request, supervisor) -> str:
 def websocket(request, zeo) -> bool:
     """Start websocket server with supervisor."""
     output = subprocess.check_output(
-        'bin/supervisorctl restart adhocracy_test:test_autobahn',
+        'bin/supervisorctl restart adhocracy_test:acceptance_autobahn',
         shell=True,
         stderr=subprocess.STDOUT)
 
     def fin():
         subprocess.check_output(
-            'bin/supervisorctl stop adhocracy_test:test_autobahn',
+            'bin/supervisorctl stop adhocracy_test:acceptance_autobahn',
             shell=True,
             stderr=subprocess.STDOUT)
     request.addfinalizer(fin)
