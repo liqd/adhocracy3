@@ -7,30 +7,35 @@ from pytest import raises
 
 
 @fixture
-def config(request):
-    config = testing.setUp()
-    request.addfinalizer(testing.tearDown)
-    return config
-
-
-@fixture
 def integration(config):
+    config.include('tzf.pyramid_yml')
+    config.config_defaults('adhocracy_frontend:defaults.yaml')
     config.include('adhocracy_frontend')
     return config
 
 
 class TestConfigView:
 
+    @fixture
+    def config(self, request):
+        """Return dummy testing configuration."""
+        config = testing.setUp()
+        config.include('tzf.pyramid_yml')
+        config.config_defaults('adhocracy_frontend:defaults.yaml')
+        request.addfinalizer(testing.tearDown)
+        return config
+
     def call_fut(self, request):
         from adhocracy_frontend import config_view
         return config_view(request)
 
     def test_raise_if_no_config(self, request_):
+        del request_.registry['config']
         with raises(KeyError):
             self.call_fut(request_)
 
     @mark.usefixtures('integration')
-    def test_add_frontend_settings(self, config, request_):
+    def test_add_frontend_settings(self, request_):
         settings = request_.registry['config']
         config_json = self.call_fut(request_)
         assert settings.adhocracy.frontend.ws_url == config_json['ws_url']
@@ -89,9 +94,8 @@ class TestConfig:
 
     @fixture
     def config(self, config):
-        config.registry.settings['yaml.location'] =\
-            'adhocracy_frontend:test_config.yaml, '
         config.include('tzf.pyramid_yml')
+        config.config_defaults('adhocracy_frontend:test_config.yaml')
         return config
 
     def test_config_file_set_default_values(self, config):
@@ -99,7 +103,7 @@ class TestConfig:
         assert settings.setting == 'test'
 
     def test_additional_config_files_extend_defaul_values(self, config):
-        config.config_defaults(
+        config.config_defaults('adhocracy_frontend:test_config.yaml, '
             'adhocracy_frontend:test_config_extended.yaml')
         settings = config.registry['config']
         assert settings.setting == 'test'

@@ -503,7 +503,8 @@ def settings(request) -> dict:
 def app_settings(request) -> dict:
     """Return settings to start the test wsgi app."""
     settings = {}
-    settings['yaml.location'] = 'adhocracy_core:test_memory.yaml'
+    settings['yaml.location'] = 'adhocracy_core:defaults.yaml'
+    settings['env'] = 'test'
     return settings
 
 
@@ -631,7 +632,7 @@ def app_router_filestorage(app_settings_filestorage: dict) -> Router:
 @fixture(scope='class')
 def app_settings_filestorage(request, app_settings: dict) -> dict:
     """Add zodb connection with filestorage, add finalizer to cleanup files."""
-    app_settings['yaml.location'] = 'adhocracy_core:test_persistent.yaml'
+    app_settings['env'] = 'test_persistent'
     db_test_dir = 'var/db/test/'
     db_file = db_test_dir + 'Data.fs'
     blobs_dir = db_test_dir + 'blobs'

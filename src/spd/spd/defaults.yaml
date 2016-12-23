@@ -1,0 +1,4 @@
+adhocracy:
+    frontend:
+        profile_images_enabled: False
+        redirect_url: /r/digital_leben/

@@ -95,9 +95,6 @@ def add_request_callbacks(request):
 
 def includeme(config):
     """Setup basic adhocracy."""
-    config_files = config.registry.settings.get('yaml.location', '')
-    config.registry.settings['yaml.location'] =\
-        'adhocracy_core:defaults.yaml, ' + config_files
     config.include('tzf.pyramid_yml')
     config.include('pyramid_tm')
     config.include('pyramid_zodbconn')

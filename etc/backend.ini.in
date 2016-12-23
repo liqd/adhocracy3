@@ -4,17 +4,20 @@
 #
 
 [app:main]
-use = egg:${adhocracy:backend_package_name}
+use = egg:${adhocracy:package_name}
 
 pyramid.reload_templates = true
 pyramid.debug_templates = true
 pyramid.debug_authorization = false
 
-# adhocracy application config
-# To override default config ('adhocracy_core:config.yaml' add the
-# absolute or package path of your custom yaml files
-# yaml.location = /my/absolute/path, my_package:config.yaml, my_package:configdir
+# application config (yaml files):
+# You can add custom config files by adding a absolute or python package path.
+# yaml.location = /my/absolute/path, my_package:config.yaml
 yaml.location = ${:yaml_config}
+# config environment:
+# yaml files with this subtext are added to the yaml.location paths.
+# defaults to 'dev'
+env = ${:yaml_env}
 
 [server:main]
 use = egg:gunicorn#main
