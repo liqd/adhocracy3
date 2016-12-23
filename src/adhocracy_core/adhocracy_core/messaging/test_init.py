@@ -7,16 +7,17 @@ from pyramid import testing
 
 
 @fixture
-def integration(config):
+def config(config):
     config.include('pyramid_mailer.testing')
     config.include('pyramid_mako')
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.principal')
     config.include('adhocracy_core.sheets.metadata')
     config.include('adhocracy_core.messaging')
+    config.registry['config'].adhocracy.use_mail_queue = False
+    return config
 
 
-@mark.usefixtures('integration')
 class TestSendMail:
 
     def test_send_mail_with_body_and_html(self, registry, request_):
@@ -61,11 +62,8 @@ class TestSendMail:
 
 class TestSendMailToQueue:
 
-    def test_send_mail_to_queue(self, config, registry, request_):
-        config.include('pyramid_mailer.testing')
-        config.include('adhocracy_core.content')
+    def test_send_mail_to_queue(self, registry, request_):
         registry['config'].adhocracy.use_mail_queue = True
-        config.include('adhocracy_core.messaging')
         mailer = registry.messenger.mailer
         registry.messenger.send_mail(subject='Test mail',
                                      recipients=['user@example.org'],
@@ -88,7 +86,6 @@ def _msg_to_str(msg):
     return msgtext.replace('=20', ' ')
 
 
-@mark.usefixtures('integration')
 class TestSendAbuseComplaint:
 
     def test_send_abuse_complaint_with_user(self, request_, registry):
@@ -120,7 +117,6 @@ class TestSendAbuseComplaint:
         assert 'sent by an anonymous user' in msgtext
 
 
-@mark.usefixtures('integration')
 class TestSendMessageToUser:
 
     def test_send_message_to_user(self, request_, registry):
@@ -151,16 +147,10 @@ class TestSendMessageToUser:
 class TestSendRegistrationMail:
 
     @fixture
-    def registry(self, config):
-        config.include('pyramid_mailer.testing')
-        settings = config.registry['config']
-        settings.adhocracy.use_mail_queue = False
-        return config.registry
-
-    @fixture
     def inst(self, registry):
         from . import Messenger
-        return Messenger(registry)
+        messenger = Messenger(registry)
+        return messenger
 
     @fixture
     def user(self):
@@ -182,11 +172,10 @@ class TestSendRegistrationMail:
 class TestSendPasswordResetMail:
 
     @fixture
-    def registry(self, config):
-        config.include('pyramid_mailer.testing')
-        config.registry['config'].adhocracy.site_name = 'sitename'
-        config.registry['config'].adhocracy.canonical_url = 'http://front.end'
-        return config.registry
+    def registry(self, registry):
+        registry['config'].adhocracy.site_name = 'sitename'
+        registry['config'].adhocracy.canonical_url = 'http://front.end'
+        return registry
 
     @fixture
     def inst(self, registry):
@@ -213,12 +202,10 @@ class TestSendPasswordResetMail:
 class TestSendInvitationMail:
 
     @fixture
-    def registry(self, config):
-        config.include('pyramid_mako')
-        config.include('pyramid_mailer.testing')
-        config.registry['config'].adhocracy.site_name = 'sitename'
-        config.registry['config'].adhocracy.canonical_url = 'http://front.end'
-        return config.registry
+    def registry(self, registry):
+        registry['config'].adhocracy.site_name = 'sitename'
+        registry['config'].adhocracy.canonical_url = 'http://front.end'
+        return registry
 
     @fixture
     def inst(self, registry):
@@ -264,11 +251,10 @@ class TestSendInvitationMail:
 class TestActivityEmail:
 
     @fixture
-    def registry(self, config):
-        config.include('pyramid_mailer.testing')
-        config.registry['config'].adhocracy.site_name = 'sitename'
-        config.registry['config'].adhocracy.canonical_url = 'http://front.end'
-        return config.registry
+    def registry(self, registry):
+        registry['config'].adhocracy.site_name = 'sitename'
+        registry['config'].adhocracy.canonical_url = 'http://front.end'
+        return registry
 
     @fixture
     def inst(self, registry):
@@ -329,11 +315,10 @@ class TestActivityEmail:
 class TestSendPasswordChangeMail:
 
     @fixture
-    def registry(self, config):
-        config.include('pyramid_mailer.testing')
-        config.registry['config'].adhocracy.site_name = 'sitename'
-        config.registry['config'].adhocracy.canonical_url = 'http://front.end'
-        return config.registry
+    def registry(self, registry):
+        registry['config'].adhocracy.site_name = 'sitename'
+        registry['config'].adhocracy.canonical_url = 'http://front.end'
+        return registry
 
     @fixture
     def inst(self, registry):
@@ -359,12 +344,11 @@ class TestSendPasswordChangeMail:
 class TestSendNewEmailActivationMail:
 
     @fixture
-    def registry(self, config, registry_with_content):
-        config.include('pyramid_mailer.testing')
-        config.registry = registry_with_content
-        config.registry['config'].adhocracy.site_name = 'sitename'
-        config.registry['config'].adhocracy.canonical_url = 'http://front.end'
-        return config.registry
+    def registry(self, registry_with_content):
+        registry = registry_with_content
+        registry['config'].adhocracy.site_name = 'sitename'
+        registry['config'].adhocracy.canonical_url = 'http://front.end'
+        return registry
 
     @fixture
     def inst(self, registry):

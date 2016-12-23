@@ -11,6 +11,7 @@ def integration(integration):
     integration.include('pyramid_mailer.testing')
     integration.include('pyramid_mako')
     integration.include('adhocracy_core.messaging')
+    integration.registry['config'].adhocracy.use_mail_queue = False
     return integration
 
 
