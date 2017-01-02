@@ -13,7 +13,6 @@ CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 requires = [
     'pyramid_chameleon',
     'pyramid',
-    'pyramid_debugtoolbar',
     'pyramid_exclog',
     'pyramid_bpython',
     'pyramid_jwt',
@@ -42,6 +41,7 @@ test_requires = [
     'pytest',
     'polytester',
     'selenium',
+    'pyramid_debugtoolbar',
     'webtest',
     'pytest-timeout',
     'pytest-mock',
