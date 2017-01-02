@@ -32,7 +32,7 @@ class TestGetUsers:
         mock_locator = Mock()
         registry.getMultiAdapter = mock_locator
         users = self.call_fut(context, registry)
-        mock_locator.get_users.assert_called_once()
+        assert mock_locator.return_value.get_users.called
 
 class TestWriteUsersToCSV:
 
