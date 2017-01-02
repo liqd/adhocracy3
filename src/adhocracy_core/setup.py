@@ -13,7 +13,6 @@ CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 requires = [
     'pyramid_chameleon',
     'pyramid',
-    'pyramid_debugtoolbar',
     'pyramid_exclog',
     'pyramid_bpython',
     'pyramid_jwt',
@@ -42,6 +41,7 @@ test_requires = [
     'pytest',
     'polytester',
     'selenium',
+    'pyramid_debugtoolbar',
     'webtest',
     'pytest-timeout',
     'pytest-mock',
@@ -52,11 +52,11 @@ test_requires = [
     'lingua',
     'testfixtures',
     'Sphinx',
+    'sphinxcontrib_programoutput',
     'repoze.sphinx.autointerface',
     'sphinx-autodoc-annotation',
     'sphinxcontrib-blockdiag',
     'sphinxcontrib-actdiag',
-    'sphinxcontrib-programoutput',
     'sphinx-rtd-theme',
     'requires.io',
 ]
