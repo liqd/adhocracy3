@@ -37,8 +37,7 @@ class Messenger:
         """
         self.registry = registry
         settings = registry['config']
-        self.use_mail_queue = settings.adhocracy.use_mail_queue
-        logger.debug('Messenger will use mail queue: %s', self.use_mail_queue)
+        self.settings = settings
         self.abuse_handler_mail = settings.adhocracy.abuse_handler_mail
         self.site_name = settings.adhocracy.site_name
         self.frontend_url = settings.adhocracy.canonical_url
@@ -89,7 +88,7 @@ class Messenger:
                           )
         debug_msg = 'Sending message "{0}" from {1} to {2} with body:\n{3}'
         logger.debug(debug_msg.format(subject, sender, recipients, body))
-        if self.use_mail_queue:
+        if self.settings.adhocracy.use_mail_queue:
             self.mailer.send_to_queue(message)
         else:
             self.mailer.send_immediately(message)

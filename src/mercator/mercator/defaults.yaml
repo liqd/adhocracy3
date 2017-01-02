@@ -1,5 +1,10 @@
 
 adhocracy:
+  netiquette_url: https://advocate-europe.eu/de/netiquette
+  redirect_url: /r/organisation/advocate-europe2/
+  terms_url:
+      en: 'https://advocate-europe.eu/en/terms-of-use'
+      de: 'https://advocate-europe.eu/de/terms-of-use'
   custom:
     mercator_platform_path: '/mercator/'
     financial_plan_url_de: ''

@@ -11,11 +11,11 @@
 
 <blobstorage main>
   <filestorage>
-    path $INSTANCE/var/db/${adhocracy:backend_package_name}/Data.fs
+    path $INSTANCE/var/db/${adhocracy:package_name}/Data.fs
     # keep old objects when running bin/zeopack
     pack-keep-old false
     # do garbage collection when running bin/zeopack (slow)
     pack-gc true
   </filestorage>
-  blob-dir $INSTANCE/var/db/${adhocracy:backend_package_name}/blobs
+  blob-dir $INSTANCE/var/db/${adhocracy:package_name}/blobs
 </blobstorage>

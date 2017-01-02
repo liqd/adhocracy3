@@ -4,7 +4,6 @@ from logging.config import fileConfig
 from os import path
 from signal import signal
 from signal import SIGTERM
-import pkg_resources
 import yaml
 import logging
 import os
@@ -12,6 +11,8 @@ import sys
 import errno
 
 from autobahn.asyncio.websocket import WebSocketServerFactory
+from tzf.pyramid_yml import _translate_config_path
+from tzf.pyramid_yml import _env_filenames
 from ZODB import DB
 from adhocracy_core.websockets.server import ClientCommunicator
 from zodburi import resolve_uri
@@ -131,13 +132,33 @@ def _read_config(config_file: str) -> ConfigParser:
     return config
 
 
-def _get_zodb_database(config: ConfigParser) -> dict:
-    yaml_config_package_file = config['app:main']['yaml.location']
-    package, filename = yaml_config_package_file.split(':')
-    yaml_config_file = pkg_resources.resource_filename(package, filename)
-    with open(yaml_config_file, 'r') as stream:
-        yaml_config = yaml.load(stream)
-        zodb_uri = yaml_config['configurator']['zodbconn']['uri']
+def _get_zodb_database(config: ConfigParser) -> dict:  # pragma: no cover
+    config_locations = config['app:main']['yaml.location']
+    if not isinstance(config_locations, (list, tuple)):
+        config_locations = config_locations.split(',')
+    env = config['app:main'].get('env', 'dev')
+    file_paths = []
+    files = ['config.yaml', 'config.yml']
+    for location in config_locations:
+        path = _translate_config_path(location)
+        current_files = files
+        if os.path.isfile(path):
+            path, current_files = os.path.split(path)
+            current_files = [current_files]
+        for config_path in [
+            os.path.join(path, f) for f in _env_filenames(current_files, env)
+        ]:
+            if os.path.isfile(config_path):
+                file_paths.append(config_path)
+    zodb_uri = ''
+    for config_file in file_paths:
+        with open(config_file, 'r') as stream:
+            yaml_config = yaml.load(stream)
+            configurator = yaml_config.get('configurator') or {}
+            zodbconn = configurator.get('zodbconn') or {}
+            new_zodb_uri = zodbconn.get('uri')
+            if new_zodb_uri:
+                zodb_uri = new_zodb_uri
     logger.info('Getting ZEO database on {}'.format(zodb_uri))
     storage_factory, dbkw = resolve_uri(zodb_uri)
     storage = storage_factory()

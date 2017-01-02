@@ -109,10 +109,6 @@ def service_konto_finish_view(request):
 
 def includeme(config):
     """Add routing and static view to deliver the frontend application."""
-    config_files = config.registry.settings.get('yaml.location', '')
-    config.registry.settings['yaml.location'] = \
-        'adhocracy_frontend:defaults.yaml, ' + config_files
-    config.include('tzf.pyramid_yml')
     settings = config.registry['config']
     cachebust_enabled = settings.configurator.cachebust.enabled
     if cachebust_enabled:
@@ -155,5 +151,6 @@ def add_frontend_route(config, name, pattern):
 def main(global_config, **settings):
     """Return a Pyramid WSGI application to serve the frontend application."""
     config = Configurator(settings=settings)
+    config.include('tzf.pyramid_yml')
     includeme(config)
     return config.make_wsgi_app()

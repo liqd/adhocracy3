@@ -10,11 +10,11 @@ exports.config = {
         //current: "../src/current/current/tests/acceptance/*Spec.js",
         core: "../src/adhocracy_frontend/adhocracy_frontend/tests/acceptance/*Spec.js"
     },
-    baseUrl: "http://localhost:9090",
+    baseUrl: "http://localhost:9080",
     beforeLaunch: function() {
         exec("bin/supervisord");
         exec("bin/supervisorctl restart  adhocracy_test:");
-        exec("bin/ad_fixtures -a etc/test.ini ");
+        exec("bin/ad_fixtures -a etc/acceptance.ini ");
         exec("src/current/current/tests/acceptance/setup_tests.sh");
     },
     afterLaunch: function() {

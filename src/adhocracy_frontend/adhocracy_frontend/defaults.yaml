@@ -17,25 +17,23 @@ configurator:
 # adhocracy default settings
 
 adhocracy:
-
+  # Name of the entire site. Used in account registration information etc.
+  site_name: 'Adhocracy'
+  # Canonical frontend base URL. For example the main webpage embedding the
+  # frontend. If this is set, frontend links will always prefix links with this
+  # URL. If this is an embedding URL, it should end with #!.
+  canonical_url: 'http://localhost:6551/static/embed.html#!'
   # The path to the root level adhocracy resource
   rest_platform_path: '/adhocracy'
-  # Name of the entire site. Used in account registration information etc.
-  site_name: 'Adhocracy Test Site'
-  # Canonical frontend base URL. If this is set, frontend links will always
-  # prefix links with this URL. If this is an embedding URL, it should end with
-  # #!.
-  canonical_url: 'http://localhost:6551/static/embed.html#!'
   # Redirect URL - This is the path you get redirected to when visiting /.
   # This is especially relevant for cases in which cameFrom is not set,
   # e.g. account activation.
-  redirect_url: '/r/organisation/advocate-europe2/'
+  redirect_url: '/r/adhocracy'
   # If the Adhocracy frontend is embedded in a website from a trusted domain,
   # Adhocracy may pass user authentication token to the embedding website.
   trusted_domains: []
   # - http://localhost:9000
   # - http://localhost:9001
-
   frontend:
     # Whether to allow users to post resources anonymously
     anonymize_enabled: False
@@ -65,8 +63,6 @@ adhocracy:
     terms_url:
         en: 'https://advocate-europe.eu/en/terms-of-use'
         de: 'https://advocate-europe.eu/de/terms-of-use'
-    # Netiquitte URL - currently only used in mercator
-    netiquette_url:  https://advocate-europe.eu/de/netiquette
     # Piwik tracking configuration
     piwik_enabled: False
     piwik_host: ''
@@ -80,13 +76,13 @@ adhocracy:
     map_tile_options:
       maxZoom: 18
       attribution': '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-  # TODO: merge custom to frontend
   custom:
     show_add_button: True
     allow_rate: True
     embed_only: False
     # if set to True the hader is not shown
     hide_header: False
+    # TODO remove custom
 
   # Only accept registration requests with valid captcha solutions
   # enable captcha support
