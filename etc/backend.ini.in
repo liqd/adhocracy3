@@ -23,6 +23,7 @@ env = ${:yaml_env}
 use = egg:gunicorn#main
 host = 0.0.0.0
 port = ${:backend_port}
+workers = 4
 
 [websockets]
 port = ${:ws_port}
