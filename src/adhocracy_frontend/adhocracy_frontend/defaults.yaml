@@ -76,14 +76,9 @@ adhocracy:
     map_tile_options:
       maxZoom: 18
       attribution': '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-  custom:
-    show_add_button: True
-    allow_rate: True
-    embed_only: False
-    # if set to True the hader is not shown
-    hide_header: False
-    # TODO remove custom
-
+  embed_only: False
+  # if set to True the header is not shown
+  hide_header: False
   # Only accept registration requests with valid captcha solutions
   # enable captcha support
   captcha_enabled: False

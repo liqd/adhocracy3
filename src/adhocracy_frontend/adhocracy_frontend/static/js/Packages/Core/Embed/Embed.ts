@@ -127,7 +127,7 @@ export class Service {
         var directiveName = this.provider.normalizeDirective(widget);
         var contextName = this.provider.normalizeContext(widget);
 
-        this.adhConfig.custom["hide_header"] = this.adhConfig.custom["hide_header"] || search.hasOwnProperty("noheader");
+        this.adhConfig.hide_header = this.adhConfig.hide_header || search.hasOwnProperty("noheader");
 
         if (this.provider.hasDirective(directiveName)) {
             this.widget = directiveName;
