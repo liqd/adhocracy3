@@ -34,7 +34,5 @@ addons:
 env:
   matrix:
     - BUILDOUT_TARGET=meinberlin
-    - BUILDOUT_TARGET=mercator
-    - BUILDOUT_TARGET=spd
 after_success:
   - ./bin/coveralls
