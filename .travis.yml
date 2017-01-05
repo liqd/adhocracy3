@@ -21,8 +21,13 @@ notifications:
   email: false
 cache:
   directories:
-    - eggs
-    - node_modules
+  - eggs
+  - node_modules
+  - .cache/pip
+  - .cache/bower
+  - .buildout
+  - parts/wheels
+  - parts/rubygems
 addons:
   firefox: latest-esr
 env:
