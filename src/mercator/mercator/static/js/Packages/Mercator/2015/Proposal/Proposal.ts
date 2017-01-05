@@ -240,9 +240,9 @@ export class Widget<R extends ResourcesBase.IResource> extends AdhResourceWidget
             var financialPlanUrl : string;
 
             if (locale === "de") {
-                financialPlanUrl = this.adhConfig.custom["financial_plan_url_de"];
+                financialPlanUrl = this.adhConfig.financial_plan_url_de;
             } else {
-                financialPlanUrl = this.adhConfig.custom["financial_plan_url_en"];
+                financialPlanUrl = this.adhConfig.financial_plan_url_en;
             }
             scope.financialPlanTemplate = "<a href=\"" + financialPlanUrl + "\" target=\"_blank\">{{content}}</a>";
         });
@@ -860,7 +860,7 @@ export var userListing = (adhConfig : AdhConfig.IService) => {
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserListing.html",
         link: (scope) => {
-            scope.poolUrl = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
+            scope.poolUrl = adhConfig.rest_url + adhConfig.mercator_platform_path;
             scope.contentType = RIMercatorProposalVersion.content_type;
             scope.params = {
                 creator: scope.path.replace(adhConfig.rest_url, "").replace(/\/+$/, "")

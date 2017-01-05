@@ -5,6 +5,5 @@ adhocracy:
   terms_url:
       en: 'https://advocate-europe.eu/en/terms-of-use'
       de: 'https://advocate-europe.eu/de/terms-of-use'
-  custom:
-    mercator_platform_path: '/mercator/'
-    financial_plan_url_de: ''
+  mercator_platform_path: '/mercator/'
+  financial_plan_url_de: ''

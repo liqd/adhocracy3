@@ -26,9 +26,10 @@ export interface IService {
     captcha_enabled : boolean;
     captcha_url : string;
     anonymize_enabled : boolean;
-    // the place for instance specific customizations
-    // remember to parse (e.g. booleans) where they are used
-    custom : {[key : string]: string};
+    embed_only : boolean;
+    hide_header : boolean;
+    mercator_platform_path: string;
+    financial_plan_url_de: string;
     site_name : string;
     netiquette_url : string;
     cachebust : boolean;

@@ -85,7 +85,7 @@ var pkgLocation = "/Core/User";
  *
  * Currently, both options are implemented. The first version is avoided because
  * of the risk of dead ends.  However, if there is no central platform
- * (`custom.embed_only` config) the first version is used.
+ * (`embed_only` config) the first version is used.
  */
 
 
@@ -186,7 +186,7 @@ export var activateArea = (
     $scope.success = false;
     $scope.ready = false;
     $scope.siteName = adhConfig.site_name;
-    $scope.embedOnly = adhConfig.custom["embed_only"] && adhConfig.custom["embed_only"].toLowerCase() === "true";
+    $scope.embedOnly = adhConfig.embed_only;
     $scope.user = adhUser;
 
     $scope.goBack = () => {
@@ -508,7 +508,7 @@ export var passwordResetDirective = (
             scope.showError = adhShowError;
             scope.success = false;
             scope.siteName = adhConfig.site_name;
-            scope.embedOnly = adhConfig.custom["embed_only"] && adhConfig.custom["embed_only"].toLowerCase() === "true";
+            scope.embedOnly = adhConfig.embed_only;
 
             scope.input = {
                 password: "",

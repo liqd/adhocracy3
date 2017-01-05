@@ -21,7 +21,6 @@ def config_view(request):
     config['trusted_domains'] = settings.adhocracy.trusted_domains
     config['captcha_enabled'] = settings.adhocracy.captcha_enabled
     config['captcha_url'] = settings.adhocracy.captcha_frontend_url
-    config['custom'] = settings.adhocracy.custom
     config['site_name'] = settings.adhocracy.site_name
     config['service_konto.enabled'] = settings.adhocracy.service_konto.enabled
     config['service_konto.api_url'] = settings.adhocracy.service_konto.api_url
