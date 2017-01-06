@@ -31,8 +31,6 @@ adhocracy:
   redirect_url: '/r/adhocracy'
   # The url to find the backend rest service  # TODO this is already given by the pyamid request and the "api" route 
   rest_url: 'http://localhost:6541/api'
-  # The url to find the backend websocket service
-  ws_url: 'ws://localhost:6561'
   # If the Adhocracy frontend is embedded in a website from a trusted domain,
   # Adhocracy may pass user authentication token to the embedding website.
   trusted_domains: []
@@ -52,6 +50,8 @@ adhocracy:
     enabled: False
     api_url: ''
   frontend:
+    # The url to find the backend websocket service
+    ws_url: 'ws://localhost:6561'
     # Whether to allow users to post resources anonymously
     anonymize_enabled: False
     # package path

@@ -18,7 +18,6 @@ def config_view(request):
     config['canonical_url'] = settings.adhocracy.canonical_url
     config['redirect_url'] = settings.adhocracy.redirect_url
     config['rest_platform_path'] = settings.adhocracy.rest_platform_path
-    config['ws_url'] = settings.adhocracy.ws_url
     config['rest_url'] = settings.adhocracy.rest_url
     config['trusted_domains'] = settings.adhocracy.trusted_domains
     config['captcha_enabled'] = settings.adhocracy.captcha_enabled
