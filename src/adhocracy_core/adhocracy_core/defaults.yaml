@@ -77,7 +77,6 @@ adhocracy:
   filter_by_view_permission: True
   # performance workaround: disable filter references by visible (not hidden)
   filter_by_visible: True
-
   # Only accept registration requests with valid captcha solutions
   captcha_enabled: False
   # Where the frontend sends captcha traffic

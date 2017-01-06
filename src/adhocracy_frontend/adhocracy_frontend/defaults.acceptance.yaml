@@ -1,7 +1,7 @@
 adhocracy:
   site_name: 'Adhocracy Test Site'
   canonical_url: 'http://localhost:9080/static/embed.html#!'
+  rest_url: 'http://localhost:9080/api'
+  ws_url: 'ws://localhost:8081'
   frontend:
-    ws_url: 'ws://localhost:8081'
-    rest_url: 'http://localhost:9080/api'
     debug:  True

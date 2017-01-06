@@ -38,7 +38,7 @@ class TestConfigView:
     def test_add_frontend_settings(self, request_):
         settings = request_.registry['config']
         config_json = self.call_fut(request_)
-        assert settings.adhocracy.frontend.ws_url == config_json['ws_url']
+        assert settings.adhocracy.ws_url == config_json['ws_url']
 
 
 class RootViewTest(unittest.TestCase):
