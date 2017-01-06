@@ -1,0 +1,3 @@
+include RELEASE-VERSION version.py
+global-exclude *Spec.js
+recursive-include adhocracy_frontend *.json *.ico *.png *.css *.gif *.jpg *.pt *.txt *.mak *.mako *.js *.html *.xml *.mo *.po *.yaml

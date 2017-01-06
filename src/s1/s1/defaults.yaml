@@ -1,4 +1,4 @@
 adhocracy:
-    frontend:
-        profile_images_enabled: True
-        redirect_url: /r/s1/
+  frontend:
+    profile_images_enabled: True
+    redirect_url: /r/s1/
