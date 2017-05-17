@@ -1,4 +1,4 @@
-from mock import MagicMock
+from unittest.mock import MagicMock
 from pyramid import testing
 from pytest import raises
 from pytest import fixture

@@ -1,4 +1,4 @@
-from mock import Mock
+from unittest.mock import Mock
 from pyramid import testing
 from pytest import fixture
 from pytest import raises
