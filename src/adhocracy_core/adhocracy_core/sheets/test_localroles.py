@@ -2,7 +2,7 @@ from pyramid import testing
 from pytest import fixture
 from pytest import mark
 from pytest import raises
-from mock import Mock
+from unittest.mock import Mock
 
 
 

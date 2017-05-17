@@ -430,7 +430,7 @@ def test_get_title_return_title(registry):
 
 
 def test_get_title_return_title_of_last_version_if_item(registry, item):
-    from mock import call
+    from unittest.mock import call
     from adhocracy_core.sheets.title import ITitle
     from adhocracy_core.sheets.tags import ITags
     from . import _get_title
@@ -443,7 +443,7 @@ def test_get_title_return_title_of_last_version_if_item(registry, item):
 
 
 def test_get_title_return_content_of_last_version_if_comment(registry, item):
-    from mock import call
+    from unittest.mock import call
     from adhocracy_core.sheets.comment import IComment
     from adhocracy_core.sheets.tags import ITags
     from . import _get_title

@@ -13,7 +13,7 @@ class TestImportFixtures:
 
     def test_list_registered_fixtures(self, mocker, context, registry, capfd,
                                       log):
-        from mock import call
+        from unittest.mock import call
         from adhocracy_core.interfaces import IFixtureAsset
         mock = mocker.patch('adhocracy_core.scripts.ad_fixtures.import_fixture')
         registry.registerUtility('', IFixtureAsset, name='adhocracy_core:fixt')
@@ -24,7 +24,7 @@ class TestImportFixtures:
                in mock.call_args_list
 
     def test_import_registered_fixtures(self, mocker, context, registry, log):
-        from mock import call
+        from unittest.mock import call
         from adhocracy_core.interfaces import IFixtureAsset
         mock = mocker.patch('adhocracy_core.scripts.ad_fixtures.import_fixture')
         registry.registerUtility('', IFixtureAsset, name='adhocracy_core:fixt')
@@ -36,7 +36,7 @@ class TestImportFixtures:
                in mock.call_args_list
 
     def test_import_custom_fixture(self, mocker, context, registry, log):
-        from mock import call
+        from unittest.mock import call
         from adhocracy_core.interfaces import IFixtureAsset
         mock = mocker.patch('adhocracy_core.scripts.ad_fixtures.import_fixture')
         registry.registerUtility('', IFixtureAsset, name='adhocracy_core:fixt')
