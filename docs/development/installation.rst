@@ -45,7 +45,7 @@ Pillow instead of creating a virtualenv ::
 
 Install adhocracy ::
 
-    ./bin/python ./bootstrap.py --buildout-version 2.5.3 --setuptools-version=32.3.0
+    ./bin/python ./bootstrap.py --buildout-version 2.9.3 --setuptools-version=32.0.0
     ./bin/buildout
 
 Update your shell environment::
