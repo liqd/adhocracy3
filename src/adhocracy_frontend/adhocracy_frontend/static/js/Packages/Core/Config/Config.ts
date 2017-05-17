@@ -29,7 +29,8 @@ export interface IService {
     embed_only : boolean;
     hide_header : boolean;
     mercator_platform_path: string;
-    financial_plan_url_de: string;
+    financial_plan_url_de?: string;
+    financial_plan_url_en?: string;
     site_name : string;
     netiquette_url : string;
     cachebust : boolean;
