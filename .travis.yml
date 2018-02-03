@@ -32,6 +32,8 @@ cache:
   - .buildout
   - parts/wheels
   - parts/rubygems
+  - .gem
+  - .npm
 addons:
   firefox: latest-esr
   ssh_known_hosts: russell.partou.org
