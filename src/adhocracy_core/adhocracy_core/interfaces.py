@@ -44,7 +44,7 @@ def namedtuple(typename, field_names, verbose=False, rename=False):
             last_modified = last_modified._replace(**{key: new_value})
         return last_modified
 
-    inst = collections.namedtuple(typename, field_names, verbose, rename)
+    inst = collections.namedtuple(typename, field_names, verbose=verbose, rename=rename)
     setattr(inst, '_add', add)
     return inst
 
