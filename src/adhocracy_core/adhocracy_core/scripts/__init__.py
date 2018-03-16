@@ -81,7 +81,7 @@ def _create_resource(resource_info: PMap,
 
 
 def _load_info(filename: str) -> [dict]:
-    with open(filename, 'r') as f:
+    with open(filename, 'r', encoding='utf8') as f:
         return json.load(f)
 
 
