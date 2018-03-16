@@ -102,7 +102,7 @@ def import_users(context: IResource, registry: Registry, filename: str):
 
 
 def _load_users_info(filename: str) -> [dict]:
-    with open(filename, 'r') as f:
+    with open(filename, 'r', encoding='utf8') as f:
         return json.load(f)
 
 
