@@ -11,7 +11,7 @@ install:
 - pip install -r requirements.txt
 # - python bootstrap.py
 - PATH=${TRAVIS_BUILD_DIR}/bin:${PATH} buildout -N -c buildout-${BUILDOUT_TARGET}.cfg buildout:pip_exec=pip
-  #2>/dev/null
+  2>/dev/null
 # - PATH=${TRAVIS_BUILD_DIR}/bin:${PATH} ./bin/buildout -N -c buildout-${BUILDOUT_TARGET}.cfg buildout:pip_exec=pip
   # 2>/dev/null
 - bin/ad_make_wheels
