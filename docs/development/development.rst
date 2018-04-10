@@ -123,12 +123,7 @@ Update packages
 python
 ``````
 
-Check whether new Python versions exist::
-
-    bin/requires.io update-site -t a54831113b039e9edbb2d26c2d2f9a9c99887437 -r adhocracy3
-    xdg-open https://requires.io/github/liqd/adhocracy3/requirements/?branch=master
-
-You may then update the pinned Python versions in `versions.cfg` if
+Update the pinned Python versions in `versions.cfg` if
 appropriate.
 
 ruby

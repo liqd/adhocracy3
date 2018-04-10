@@ -58,7 +58,6 @@ test_requires = [
     'sphinxcontrib-blockdiag',
     'sphinxcontrib-actdiag',
     'sphinx-rtd-theme',
-    'requires.io',
 ]
 
 debug_requires = [
