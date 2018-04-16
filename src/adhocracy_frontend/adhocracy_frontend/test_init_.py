@@ -1,32 +1,41 @@
-import unittest
-
 from pyramid import testing
+from pyramid.config import Configurator
+from pytest import raises
 from pytest import fixture
 from pytest import mark
-from pytest import raises
 
 
 @fixture
 def integration(config):
-    config.include('tzf.pyramid_yml')
-    config.config_defaults('adhocracy_frontend:defaults.yaml')
     config.include('adhocracy_frontend')
     return config
 
 
+@fixture
+def config(request):
+    """Return dummy testing configuration."""
+    config = testing.setUp()
+    config.include('tzf.pyramid_yml')
+    config.config_defaults('adhocracy_frontend:defaults.yaml')
+    request.addfinalizer(testing.tearDown)
+    return config
+
+
+@fixture(scope='class')
+def functional():
+    from webtest import TestApp
+    config = Configurator(settings={})
+    config.include('tzf.pyramid_yml')
+    config.config_defaults('adhocracy_frontend:defaults.yaml')
+    config.include('adhocracy_frontend')
+    app = config.make_wsgi_app()
+    return TestApp(app)
+
+
 class TestConfigView:
 
-    @fixture
-    def config(self, request):
-        """Return dummy testing configuration."""
-        config = testing.setUp()
-        config.include('tzf.pyramid_yml')
-        config.config_defaults('adhocracy_frontend:defaults.yaml')
-        request.addfinalizer(testing.tearDown)
-        return config
-
     def call_fut(self, request):
-        from adhocracy_frontend import config_view
+        from . import config_view
         return config_view(request)
 
     def test_raise_if_no_config(self, request_):
@@ -41,21 +50,18 @@ class TestConfigView:
         assert settings.adhocracy.frontend.ws_url == config_json['ws_url']
 
 
-class RootViewTest(unittest.TestCase):
+class TestRootView:
 
     def call_fut(self, request):
-        from adhocracy_frontend import root_view
+        from . import root_view
         return root_view(request)
 
-    def test_call_and_root_html_exists(self):
-        request = testing.DummyRequest(scheme='https')
-        resp = self.call_fut(request)
+    def test_call_and_root_html_exists(self, request_):
+        resp = self.call_fut(request_)
         assert resp.status_code == 200
         assert resp.body_file
 
 
-@mark.usefixtures('functional')
-class ViewsFunctionalTest:
 
     @mark.xfail(reason='asset build:/stylesheets/a3.css must exists')
     def test_static_view(self):
@@ -94,7 +100,6 @@ class TestConfig:
 
     @fixture
     def config(self, config):
-        config.include('tzf.pyramid_yml')
         config.config_defaults('adhocracy_frontend:test_config.yaml')
         return config
 
