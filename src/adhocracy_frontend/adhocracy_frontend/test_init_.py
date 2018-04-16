@@ -62,24 +62,25 @@ class TestRootView:
         assert resp.body_file
 
 
+class TestViewsFunctional:
 
     @mark.xfail(reason='asset build:/stylesheets/a3.css must exists')
-    def test_static_view(self):
-        resp = self.testapp.get('/static/root.html', status=200)
+    def test_static_view(self, functional ):
+        resp = functional.get('/static/root.html', status=200)
         assert '200' in resp.status
 
-    def test_config_json_view(self):
-        resp = self.testapp.get('/config.json', status=200)
-        assert '200' in resp.status
-
-    @mark.xfail(reason='asset build:/stylesheets/a3.css must exists')
-    def test_embed_view(self):
-        resp = self.testapp.get('/embed/XX', status=200)
+    def test_config_json_view(self, functional):
+        resp = functional.get('/config.json', status=200)
         assert '200' in resp.status
 
     @mark.xfail(reason='asset build:/stylesheets/a3.css must exists')
-    def test_register_view(self):
-        resp = self.testapp.get('/register', status=200)
+    def test_embed_view(self, functional):
+        resp = functional.get('/embed/XX', status=200)
+        assert '200' in resp.status
+
+    @mark.xfail(reason='asset build:/stylesheets/a3.css must exists')
+    def test_register_view(self, functional):
+        resp = functional.get('/register', status=200)
         assert '200' in resp.status
 
 
