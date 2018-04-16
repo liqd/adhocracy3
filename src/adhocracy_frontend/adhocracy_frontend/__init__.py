@@ -77,6 +77,7 @@ def root_view(request):
                                          'lib/leaflet/dist/leaflet.css'),
                  request.cachebusted_url('adhocracy_frontend:build/'
                                          + css_path),
+                 '/static/custom.css',
                  ],
          'js': [request.cachebusted_url('adhocracy_frontend:build/'
                                         'lib/requirejs/require.js'),
@@ -107,10 +108,19 @@ def service_konto_finish_view(request):
     return FileResponse(path, request=request)
 
 
+def custom_css_view(request):
+    """Return custom CSS styles."""
+    settings = request.registry['config']
+    css = settings.adhocracy.frontend.custom_css
+    request.response.content_type = 'text/css'
+    return css
+
+
 def includeme(config):
     """Add routing and static view to deliver the frontend application."""
     settings = config.registry['config']
-    cachebust_enabled = settings.configurator.cachebust.enabled
+    cachebust_enabled = settings.get('configurator', False)\
+        and settings.configurator.cachebust.enabled
     if cachebust_enabled:
         cache_max_age = 30 * 24 * 60 * 60  # 30 days
     else:
@@ -118,6 +128,12 @@ def includeme(config):
     config.add_route('config_json', 'config.json')
     config.add_view(config_view, route_name='config_json', renderer='json',
                     http_cache=(cache_max_age, {'public': True}))
+    config.add_route('custom_css', 'static/custom.css')
+    config.add_view(custom_css_view, route_name='custom_css', renderer='string',
+                    http_cache=(60 * 60 * 24, {'public': True}))
+    custom_static = settings.adhocracy.frontend.custom_static_folder
+    if custom_static:
+        config.add_static_view('static/custom', custom_static)
     add_frontend_route(config, 'embed', 'embed/{directive}')
     add_frontend_route(config, 'register', 'register')
     add_frontend_route(config, 'login', 'login')

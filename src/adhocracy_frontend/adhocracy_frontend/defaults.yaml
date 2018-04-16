@@ -29,7 +29,7 @@ adhocracy:
   # This is especially relevant for cases in which cameFrom is not set,
   # e.g. account activation.
   redirect_url: '/r/adhocracy'
-  # The url to find the backend rest service  # TODO this is already given by the pyamid request and the "api" route 
+  # The url to find the backend rest service  # TODO this is already given by the pyamid request and the "api" route
   rest_url: 'http://localhost:6541/api'
   # If the Adhocracy frontend is embedded in a website from a trusted domain,
   # Adhocracy may pass user authentication token to the embedding website.
@@ -88,3 +88,10 @@ adhocracy:
     embed_only: False
     # if set to True the header is not shown
     hide_header: False
+    # Optional custom CSS to modify a3.css: /static/custom.css
+    custom_css: |
+      /* Custom a3 CSS */
+    # Absolute file system path to optional static files folder
+    # (like images for custom css): /static/custom/..
+    custom_static_folder: ''
+

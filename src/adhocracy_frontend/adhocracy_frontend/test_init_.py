@@ -62,6 +62,56 @@ class TestRootView:
         assert resp.body_file
 
 
+class TestCustomCSSView:
+
+
+    def call_fut(self, request):
+        from . import custom_css_view
+        return custom_css_view(request)
+
+    def test_return_content_type_css(self, request_):
+        resp = self.call_fut(request_)
+        assert request_.response.content_type == 'text/css'
+
+    def test_return_custom_css_from_config(self, config, request_):
+        settings = request_.registry['config']
+        settings.adhocracy.frontend.custom_css = '/*CSS*/'
+        resp = self.call_fut(request_)
+        assert resp == "/*CSS*/"
+
+    def test_add_custom_css_view(self, functional):
+        resp = functional.get('/static/custom.css', status=200)
+        assert '200' in resp.status
+
+
+class TestCustomStaticFolderView:
+
+    @fixture
+    def testfile(self, tmpdir):
+        testfile = tmpdir.join("test.css")
+        testfile.write('content')
+        return testfile
+
+    @fixture
+    def functional_with_custom_static(self, testfile):
+        from webtest import TestApp
+        config = Configurator(settings={})
+        config.include('tzf.pyramid_yml')
+        config.config_defaults('adhocracy_frontend:defaults.yaml')
+        settings = config.registry['config']
+        settings.adhocracy.frontend.custom_static_folder = testfile.dirname
+        config.include('adhocracy_frontend')
+        app = config.make_wsgi_app()
+        return TestApp(app)
+
+    def test_add_static_view_if_custom_static(
+            self, functional_with_custom_static, testfile):
+        filename = testfile.basename
+        resp = functional_with_custom_static.get('/static/custom/' + filename,
+                                                 status=200)
+        assert '200' in resp.status
+
+
 class TestViewsFunctional:
 
     @mark.xfail(reason='asset build:/stylesheets/a3.css must exists')
