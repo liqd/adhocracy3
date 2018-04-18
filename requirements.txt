@@ -1,3 +1,4 @@
 # initial requirements to run buildout
 setuptools == 38.6.0
-zc.buildout == 2.11.1
+zc.buildout == 2.11.3
+pip == 9.0.1
