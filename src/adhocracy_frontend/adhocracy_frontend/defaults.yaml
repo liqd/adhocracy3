@@ -88,10 +88,9 @@ adhocracy:
     embed_only: False
     # if set to True the header is not shown
     hide_header: False
-    # Optional custom CSS to modify a3.css: /static/custom.css
-    custom_css: |
-      /* Custom a3 CSS */
-    # Absolute file system path to optional static files folder
-    # (like images for custom css): /static/custom/..
+    # Absolute file system path to optional folder with custom css files.
+    # All files are published under the url path `/static/custom/`
+    # In this directory a file named `main.css` is expected. It is imported
+    # after a3.css to allow overriding default css.
     custom_static_folder: ''
 

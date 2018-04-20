@@ -1,4 +1,5 @@
 """Frontend view and simple pyramid app configurations."""
+import os
 import pkg_resources
 
 from pyramid.renderers import render
@@ -67,17 +68,13 @@ def require_config_view(request):
 
 def root_view(request):
     """Return the embeddee HTML."""
-    if not hasattr(request, 'cachebusted_url'):  # ease testing
-        return Response()
     css_path = 'stylesheets/a3.css'
     query_params = cachebust_query_params(request)
-    result = render(
-        'adhocracy_frontend:build/root.html.mako',
+    result = \
         {'css': [request.cachebusted_url('adhocracy_frontend:build/'
                                          'lib/leaflet/dist/leaflet.css'),
                  request.cachebusted_url('adhocracy_frontend:build/'
                                          + css_path),
-                 '/static/custom.css',
                  ],
          'js': [request.cachebusted_url('adhocracy_frontend:build/'
                                         'lib/requirejs/require.js'),
@@ -88,10 +85,12 @@ def root_view(request):
                 ],
          'meta_api': '/static/meta_api.json',
          'config': '/config.json',
-         },
-        request=request)
-    response = Response(result)
-    return response
+         }
+    custom_css_folder = _get_custom_css_folder(request.registry)
+    if custom_css_folder:
+        main_css = os.path.join(custom_css_folder, 'main.css')
+        result['css'].append(request.cachebusted_url(main_css))
+    return result
 
 
 def adhocracy_sdk_view(request):
@@ -108,12 +107,11 @@ def service_konto_finish_view(request):
     return FileResponse(path, request=request)
 
 
-def custom_css_view(request):
-    """Return custom CSS styles."""
-    settings = request.registry['config']
-    css = settings.adhocracy.frontend.custom_css
-    request.response.content_type = 'text/css'
-    return css
+def _get_custom_css_folder(registry) -> str:
+    """Get path to custom css folder from config."""
+    settings = registry['config']
+    custom_static = settings.adhocracy.frontend.custom_static_folder
+    return custom_static
 
 
 def includeme(config):
@@ -128,12 +126,9 @@ def includeme(config):
     config.add_route('config_json', 'config.json')
     config.add_view(config_view, route_name='config_json', renderer='json',
                     http_cache=(cache_max_age, {'public': True}))
-    config.add_route('custom_css', 'static/custom.css')
-    config.add_view(custom_css_view, route_name='custom_css', renderer='string',
-                    http_cache=(60 * 60 * 24, {'public': True}))
-    custom_static = settings.adhocracy.frontend.custom_static_folder
-    if custom_static:
-        config.add_static_view('static/custom', custom_static)
+    custom_css_folder = _get_custom_css_folder(config.registry)
+    if custom_css_folder:
+        config.add_static_view('static/custom', custom_css_folder)
     add_frontend_route(config, 'embed', 'embed/{directive}')
     add_frontend_route(config, 'register', 'register')
     add_frontend_route(config, 'login', 'login')
@@ -161,7 +156,9 @@ def includeme(config):
 def add_frontend_route(config, name, pattern):
     """Add view and route to adhocracy frontend."""
     config.add_route(name, pattern)
-    config.add_view(root_view, route_name=name, renderer='html')
+    config.add_view(root_view,
+                    route_name=name,
+                    renderer='adhocracy_frontend:build/root.html.mako')
 
 
 def main(global_config, **settings):

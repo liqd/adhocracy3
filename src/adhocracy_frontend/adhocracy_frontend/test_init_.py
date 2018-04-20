@@ -56,57 +56,55 @@ class TestRootView:
         from . import root_view
         return root_view(request)
 
-    def test_call_and_root_html_exists(self, request_):
+    def test_add_css(self, request_):
+        request_.cachebusted_url = lambda x: 'cb:' + x
         resp = self.call_fut(request_)
-        assert resp.status_code == 200
-        assert resp.body_file
+        assert 'cb:adhocracy_frontend:build/stylesheets/a3.css' in resp['css']
 
-
-class TestCustomCSSView:
-
-
-    def call_fut(self, request):
-        from . import custom_css_view
-        return custom_css_view(request)
-
-    def test_return_content_type_css(self, request_):
+    def test_ignore_custom_css_if_disabled(self, mocker, request_):
+        request_.cachebusted_url = lambda x: 'cb:' + x
+        mocker.patch('adhocracy_frontend._get_custom_css_folder',
+                     autospec=True, return_value='')
         resp = self.call_fut(request_)
-        assert request_.response.content_type == 'text/css'
+        assert 'cb:static/custom/main.css' not in resp['css']
 
-    def test_return_custom_css_from_config(self, config, request_):
-        settings = request_.registry['config']
-        settings.adhocracy.frontend.custom_css = '/*CSS*/'
+    def test_add_custom_css_if_enabled(self, mocker, request_):
+        request_.cachebusted_url = lambda x: 'cb:' + x
+        mocker.patch('adhocracy_frontend._get_custom_css_folder',
+                     autospec=True, return_value='/static/custom')
         resp = self.call_fut(request_)
-        assert resp == "/*CSS*/"
-
-    def test_add_custom_css_view(self, functional):
-        resp = functional.get('/static/custom.css', status=200)
-        assert '200' in resp.status
+        assert 'cb:/static/custom/main.css' in resp['css']
 
 
 class TestCustomStaticFolderView:
 
     @fixture
-    def testfile(self, tmpdir):
-        testfile = tmpdir.join("test.css")
+    def maincss(self, tmpdir):
+        testfile = tmpdir.join("main.css")
         testfile.write('content')
         return testfile
 
     @fixture
-    def functional_with_custom_static(self, testfile):
+    def functional_with_custom_static(self, maincss):
         from webtest import TestApp
         config = Configurator(settings={})
         config.include('tzf.pyramid_yml')
         config.config_defaults('adhocracy_frontend:defaults.yaml')
         settings = config.registry['config']
-        settings.adhocracy.frontend.custom_static_folder = testfile.dirname
+        settings.adhocracy.frontend.custom_static_folder = maincss.dirname
         config.include('adhocracy_frontend')
         app = config.make_wsgi_app()
         return TestApp(app)
 
-    def test_add_static_view_if_custom_static(
-            self, functional_with_custom_static, testfile):
-        filename = testfile.basename
+    def test_ignoreadd_static_view_if_custom_main_css(
+            self, functional, maincss):
+        filename = maincss.basename
+        resp = functional.get('/static/custom/' + filename, status=404)
+        assert '404' in resp.status
+
+    def test_add_static_view_if_custom_main_css(
+            self, functional_with_custom_static, maincss):
+        filename = maincss.basename
         resp = functional_with_custom_static.get('/static/custom/' + filename,
                                                  status=200)
         assert '200' in resp.status
