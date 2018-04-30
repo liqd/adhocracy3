@@ -50,4 +50,4 @@ before_deploy:
 deploy:
   provider: script
   skip_cleanup: true
-  script: rsync -v -e "ssh -p 2212 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" -r  parts/wheels/* build@russell.partou.org:/var/www/wheels.partou.org/ && rsync -v -e "ssh -p 2212 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" -r parts/wheels/requirements build@russell.partou.org:/var/www/wheels.partou.org/
+  script: rsync -v --chmod=o+r -e "ssh -p 2212 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" -r  parts/wheels/* build@russell.partou.org:/var/www/wheels.partou.org/ && rsync -v -e "ssh -p 2212 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" -r parts/wheels/requirements build@russell.partou.org:/var/www/wheels.partou.org/
