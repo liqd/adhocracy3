@@ -20,7 +20,7 @@ def root_acm_extension_adapter(root: IResource) -> dict:
                          ['activate_user',                 None,        None,            None,          None,         None,      Allow,       None],
                          ['sdi.view',                      None,        None,            None,          None,         None,      Allow,       None],
                          ['sdi.view-contents',             None,        None,            None,          None,         None,      Allow,       None],
-                         ['sdi.add-content',               None,        None,            None,          None,         None,      Allow,       None],
+                         ['sdi.add-content',               None,        None,            None,          None,         None,      Allow,       None]
                          ]}
     return acm
 
