@@ -14,6 +14,13 @@ def root_acm_extension_adapter(root: IResource) -> dict:
          'permissions': [['create_user',                   Deny,        None,            None,          None,         None,      None,        Allow],
                          ['view',                          Deny,        Allow,           Allow,         Allow,        Allow,     Allow,       Allow],
                          ['message_to_user',               None,        Deny,            None,          None,         None,      None,        None],
+                         ['message_to_user',               None,        Deny,            None,          None,         None,      None,        None],
+                         ['create_user',                   None,        None,            None,          None,         None,      Allow,       None],
+                         ['create_group',                  None,        None,            None,          None,         None,      Allow,       None],
+                         ['activate_user',                 None,        None,            None,          None,         None,      Allow,       None],
+                         ['sdi.view',                      None,        None,            None,          None,         None,      Allow,       None],
+                         ['sdi.view-contents',             None,        None,            None,          None,         None,      Allow,       None],
+                         ['sdi.add-content',               None,        None,            None,          None,         None,      Allow,       None],
                          ]}
     return acm
 
