@@ -1,0 +1,7 @@
+# configuration for local development
+configurator:
+  zodbconn:
+    uri: 'zeo://localhost:9963?cache_size=10MB&connection_cache_size=50000&storage=main&blob_dir=var/db/s1/blobs&shared_blob_dir=True'
+    uri.audit: 'zeo://localhost:9964?cache_size=10MB&connection_cache_size=50000&storage=main&blob_dir=var/db/s1/blobs&shared_blob_dir=True'
+  substanced:
+    secret: 'SUPER_SECRET'
